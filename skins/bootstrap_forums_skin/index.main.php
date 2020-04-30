@@ -391,76 +391,80 @@ if( $disp == 'front' )
 }
 ?>
 
-<footer class="row">
+<footer class="container-fluid">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12">
+	<div class="row">
+   
+		<div class="col-md-12">
+
+				<?php
+				// Display container and contents:
+				widget_container( 'footer', array(
+						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
+					) );
+				?>
+
+			<p class="center">
+				<?php
+					// Display footer text (text can be edited in Blog Settings):
+					$Blog->footer_text( array(
+							'before' => '',
+							'after'  => ' &bull; ',
+						) );
+
+				// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+				?>
+
+				<?php
+					// Display a link to contact the owner of this blog (if owner accepts messages):
+					$Blog->contact_link( array(
+							'before' => '',
+							'after'  => ' &bull; ',
+							'text'   => T_('Contact'),
+							'title'  => T_('Send a message to the owner of this blog...'),
+						) );
+					// Display a link to help page:
+					$Blog->help_link( array(
+							'before'      => ' ',
+							'after'       => ' ',
+							'text'        => T_('Help'),
+						) );
+				?>
+
+				<?php
+					// Display additional credits:
+					// If you can add your own credits without removing the defaults, you'll be very cool :))
+					// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+					credits( array(
+							'list_start'  => '&bull;',
+							'list_end'    => ' ',
+							'separator'   => '&bull;',
+							'item_start'  => ' ',
+							'item_end'    => ' ',
+						) );
+				?>
+			</p>
 
 			<?php
-			// Display container and contents:
-			widget_container( 'footer', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
-					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
-					'container_end'   => '</div>',
-					'block_start'     => '<div class="evo_widget $wi_class$">',
-					'block_end'       => '</div>',
-				) );
-			?>
-
-		<p class="center">
-			<?php
-				// Display footer text (text can be edited in Blog Settings):
-				$Blog->footer_text( array(
-						'before' => '',
-						'after'  => ' &bull; ',
-					) );
-
-			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
-			?>
-
-			<?php
-				// Display a link to contact the owner of this blog (if owner accepts messages):
-				$Blog->contact_link( array(
-						'before' => '',
-						'after'  => ' &bull; ',
-						'text'   => T_('Contact'),
-						'title'  => T_('Send a message to the owner of this blog...'),
-					) );
-				// Display a link to help page:
-				$Blog->help_link( array(
-						'before'      => ' ',
-						'after'       => ' ',
-						'text'        => T_('Help'),
+				// Please help us promote b2evolution and leave this logo on your blog:
+				powered_by( array(
+						'block_start' => '<div class="powered_by">',
+						'block_end'   => '</div>',
+						// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+						'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+						'img_width'   => 120,
+						'img_height'  => 32,
 					) );
 			?>
-
-			<?php
-				// Display additional credits:
-				// If you can add your own credits without removing the defaults, you'll be very cool :))
-				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-				credits( array(
-						'list_start'  => '&bull;',
-						'list_end'    => ' ',
-						'separator'   => '&bull;',
-						'item_start'  => ' ',
-						'item_end'    => ' ',
-					) );
-			?>
-		</p>
-
-		<?php
-			// Please help us promote b2evolution and leave this logo on your blog:
-			powered_by( array(
-					'block_start' => '<div class="powered_by">',
-					'block_end'   => '</div>',
-					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-					'img_width'   => 120,
-					'img_height'  => 32,
-				) );
-		?>
-	</div><!-- .col -->
+		</div><!-- .col -->
+		
+	</div>
 
 </footer><!-- .row -->
 
