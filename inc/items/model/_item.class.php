@@ -824,7 +824,7 @@ class Item extends ItemLight
 		}
 
 		// Single/page view:
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
+		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
 		    ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
 		{	// If user has a permission to edit advanced properties of items:
 			if( $this->get( 'status' ) == 'redirected' )
@@ -955,7 +955,7 @@ class Item extends ItemLight
 		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 		}
@@ -980,7 +980,7 @@ class Item extends ItemLight
 			}
 
 			// Goal ID:
-			if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+			if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 			{	// If user has a permission to edit advanced properties of items:
 				$goal_ID = param( 'goal_ID', 'integer', NULL );
 				if( $goal_ID !== NULL )
@@ -1079,7 +1079,7 @@ class Item extends ItemLight
 		}
 
 		// EXPIRY DELAY:
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$expiry_delay = param_duration( 'expiry_delay' );
 			if( empty( $expiry_delay ) )
