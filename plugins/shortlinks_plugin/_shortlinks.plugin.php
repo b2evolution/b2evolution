@@ -798,26 +798,38 @@ class shortlinks_plugin extends Plugin
 		// Initialize Javascript to build shortlinks modal window;
 		$this->init_js_lang_vars();
 
-		$shortlinks_toolbar_config = array(
+		$js_config = array(
+				'js_prefix'            => $params['js_prefix'],
+				'plugin_code'          => $this->code,
+
 				'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
 				'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
 				'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
 				'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
-				'plugin_code'          => $this->code,
+				'toolbar_title'        => T_('Short Links:'),
+
 				'button_title'         => T_('Link to a Post'),
 				'button_value'         => T_('Link to a Post'),
 				'button_class'         => $this->get_template( 'toolbar_button_class' ),
 			);
 
-		expose_var_to_js( 'evo_init_shortlinks_toolbar_config', json_encode( $shortlinks_toolbar_config ) );
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_shortlinks_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'shortlinks_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_shortlinks_toolbar_config' );
+		}
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-
-		expose_var_to_js( 'toolbar_'.$params['js_prefix'], array(
-				'title' => T_('Short Links:'),
-				'prefix' => $params['js_prefix'] ),
-			'evo_init_shortlinks_toolbar' );
 
 		return true;
 	}

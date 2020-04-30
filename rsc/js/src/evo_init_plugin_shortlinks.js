@@ -12,31 +12,34 @@
  */
 jQuery( document ).ready( function()
 {
-	if( typeof( evo_init_shortlinks_toolbar_config ) == 'undefined' )
-	{	// Don't execute code below because no config var is found:
-		return;
-	}
-
-	var config = evo_init_shortlinks_toolbar_config;
-	
-	window.shortlinks_toolbar = function shortlinks_toolbar( title, prefix )
+	window.evo_init_shortlinks_toolbar = function( config )
 		{
-			var r = config['toolbar_title_before'] + title + config['toolbar_title_after']
-					+ config['toolbar_group_before']
-					+ '<input type="button" title="' + config['button_title'] + '"'
-					+ ' class="' + config['button_class'] + '"'
-					+ ' data-func="shortlinks_load_window|' + prefix + '" value="' + config['button_value'] + '" />'
-					+ config['toolbar_group_after'];
+			window.shortlinks_toolbar = function shortlinks_toolbar( title )
+				{
+					console.log( config );
+					var r = config.toolbar_title_before + title + config.toolbar_title_after
+							+ config.toolbar_group_before
+							+ '<input type="button" title="' + config.button_title + '"'
+							+ ' class="' + config.button_class + '"'
+							+ ' data-func="shortlinks_load_window|' + config.js_prefix + '" value="' + config.button_value + '" />'
+							+ config.toolbar_group_after;
 
-				jQuery( '.' + prefix + config['plugin_code'] + '_toolbar' ).html( r );
+						jQuery( '.' + config.js_prefix + config.plugin_code + '_toolbar' ).html( r );
+				};
+			
+			window.shortlinks_toolbar( config.toolbar_title );
 		};
 
-	if( typeof( evo_init_shortlinks_toolbar ) != 'undefined' )
-	{	// Init individual shortlinks toolbar:
-		var toolbars = Object.values( evo_init_shortlinks_toolbar );
-		for( var i = 0; i < toolbars.length; i++ )
+	if( typeof( evo_init_shortlinks_toolbar_config ) != 'undefined' )
+	{
+		// Initialize each Shortlinks toolbar instance:
+		var evo_temp_config = Object.values( evo_init_shortlinks_toolbar_config );
+		for( var i = 0; i < evo_temp_config.length; i++ )
 		{
-			window.shortlinks_toolbar( toolbars[i]['title'], toolbars[i]['prefix'] );
+			( function() {
+				window.evo_init_shortlinks_toolbar( evo_temp_config[i] );
+			} )();
 		}
+		delete evo_temp_config;
 	}
 } );
