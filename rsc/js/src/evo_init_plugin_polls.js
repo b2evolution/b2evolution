@@ -12,121 +12,124 @@
  */
 jQuery( document ).ready( function()
 {
-	if( typeof( evo_init_polls_toolbar_config ) == 'undefined' )
-	{	// Don't execute code below because no config var is found:
-		return;
-	}
-
-	var config = evo_init_polls_toolbar_config;
-	
-	window.polls_toolbar = function polls_toolbar( title, prefix )
+	window.evo_init_polls_toolbar = function( config )
 		{
-			var r = config['toolbar_title_before'] + title + config['toolbar_title_after']
-					+ config['toolbar_group_before']
-					+ '<input type="button" title="' + config['button_title'] + '"'
-					+ ' class="' + config['button_class'] + '"'
-					+ ' data-func="polls_load_window|' + prefix + '" value="' + config['button_value'] + '" />'
-					+ config['toolbar_group_after'];
-
-				jQuery( '.' + prefix + config['plugin_code'] + '_toolbar' ).html( r );
-		}
-
-	window.polls_load_window = function polls_load_window( prefix )
-		{
-			openModalWindow( '<div id="poll_wrapper"></div>', 'auto', '', true,
-					config['modal_window_title'],
-					[ 'Insert Poll' ],
-					true );
-
-			// Load available polls
-			polls_load_polls( prefix );
-
-			// To prevent link default event
-			return false;
-		}
-
-	window.polls_api_request = function polls_api_request( api_path, obj_selector, func )
-		{
-			jQuery.ajax( {
-					url: restapi_url + api_path
-				} )
-				.then( func, function( jqXHR )
+			window.polls_toolbar = function polls_toolbar( title, prefix )
 				{
-					polls_api_print_error( obj_selector, jqXHR );
-				} );
-		}
+					var r = config['toolbar_title_before'] + title + config['toolbar_title_after']
+							+ config['toolbar_group_before']
+							+ '<input type="button" title="' + config['button_title'] + '"'
+							+ ' class="' + config['button_class'] + '"'
+							+ ' data-func="polls_load_window|' + prefix + '" value="' + config['button_value'] + '" />'
+							+ config['toolbar_group_after'];
 
-	window.polls_api_print_error = function polls_api_print_error( obj_selector, error )
-		{
-			if( typeof( error ) != 'string' && typeof( error.code ) == 'undefined' )
-			{
-				error = typeof( error.responseJSON ) == 'undefined' ? error.statusText : error.responseJSON;
-			}
+						jQuery( '.' + prefix + config['plugin_code'] + '_toolbar' ).html( r );
+				};
 
-			if( typeof( error.code ) == 'undefined' )
-			{	// Unknown non-JSON response
-				var error_text = '<h4 class="text-danger">Unknown error: ' + error + '</h4>';
-			}
-			else
-			{
-				var error_text = '<h4 class="text-danger">' + error.message + '</h4>';
-				if( config['debug'] )
+			window.polls_load_window = function polls_load_window( prefix )
 				{
-				
-					error_text += '<div><b>Code:</b> '	+ error.code + '</div>' + '<div><b>Status:</b> ' + error.data.status + '</div>';
-				}
-			}
+					openModalWindow( '<div id="poll_wrapper"></div>', 'auto', '', true,
+							config['modal_window_title'],
+							[ 'Insert Poll' ],
+							true );
 
-			jQuery( obj_selector ).html( error_text );
-		}
+					// Load available polls
+					polls_load_polls( prefix );
 
-	window.polls_load_polls = function polls_load_polls( prefix )
-		{
-			prefix = ( prefix ? prefix : '' );
+					// To prevent link default event
+					return false;
+				};
 
-			polls_api_request( 'polls', '#poll_wrapper', function( data )
-			{
-				var r = '<div id="' + prefix + 'polls_list">';
-
-				r += '<ul>';
-				for( var p in data.polls )
+			window.polls_api_request = function polls_api_request( api_path, obj_selector, func )
 				{
-					var poll = data.polls[p];
-					r += '<li><a href="#" data-poll-id="' + poll.pqst_ID + '" data-prefix="' + prefix + '">' + poll.pqst_question_text + '</a></li>';
-				}
-				r += '</ul>';
-				r += '</div>';
-
-				jQuery( '#poll_wrapper' ).html( r );
-
-				// Insert a poll short tag to textarea
-				jQuery( document ).on( 'click', '#' + prefix + 'polls_list a[data-poll-id]', function()
-					{
-						if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+					jQuery.ajax( {
+							url: restapi_url + api_path
+						} )
+						.then( func, function( jqXHR )
 						{
-							tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+							polls_api_print_error( obj_selector, jqXHR );
+						} );
+				};
+
+			window.polls_api_print_error = function polls_api_print_error( obj_selector, error )
+				{
+					if( typeof( error ) != 'string' && typeof( error.code ) == 'undefined' )
+					{
+						error = typeof( error.responseJSON ) == 'undefined' ? error.statusText : error.responseJSON;
+					}
+
+					if( typeof( error.code ) == 'undefined' )
+					{	// Unknown non-JSON response
+						var error_text = '<h4 class="text-danger">Unknown error: ' + error + '</h4>';
+					}
+					else
+					{
+						var error_text = '<h4 class="text-danger">' + error.message + '</h4>';
+						if( config['debug'] )
+						{
+						
+							error_text += '<div><b>Code:</b> '	+ error.code + '</div>' + '<div><b>Status:</b> ' + error.data.status + '</div>';
 						}
+					}
 
-						var prefix = jQuery( this ).data( 'prefix' ) ? jQuery( this ).data( 'prefix' ) : '';
+					jQuery( obj_selector ).html( error_text );
+				};
 
-						// Insert tag text in area
-						textarea_wrap_selection( window[ prefix + 'b2evoCanvas' ], '[poll:' + jQuery( this ).data( 'pollId' ) + ']', '', 0 );
-						// Close main modal window
-						closeModalWindow();
+			window.polls_load_polls = function polls_load_polls( prefix )
+				{
+					prefix = ( prefix ? prefix : '' );
 
-						// To prevent link default event
-						return false;
+					polls_api_request( 'polls', '#poll_wrapper', function( data )
+					{
+						var r = '<div id="' + prefix + 'polls_list">';
+
+						r += '<ul>';
+						for( var p in data.polls )
+						{
+							var poll = data.polls[p];
+							r += '<li><a href="#" data-poll-id="' + poll.pqst_ID + '" data-prefix="' + prefix + '">' + poll.pqst_question_text + '</a></li>';
+						}
+						r += '</ul>';
+						r += '</div>';
+
+						jQuery( '#poll_wrapper' ).html( r );
+
+						// Insert a poll short tag to textarea
+						jQuery( document ).on( 'click', '#' + prefix + 'polls_list a[data-poll-id]', function()
+							{
+								if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
+								{
+									tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
+								}
+
+								var prefix = jQuery( this ).data( 'prefix' ) ? jQuery( this ).data( 'prefix' ) : '';
+
+								// Insert tag text in area
+								textarea_wrap_selection( window[ prefix + 'b2evoCanvas' ], '[poll:' + jQuery( this ).data( 'pollId' ) + ']', '', 0 );
+								// Close main modal window
+								closeModalWindow();
+
+								// To prevent link default event
+								return false;
+							} );
+
 					} );
+				};
 
-			} );
-		}
+			window.polls_toolbar( config.toolbar_title, config.prefix );
+		};
 
-	if( typeof( evo_init_polls_toolbar ) != 'undefined' )
-	{	// Init individual polls toolbar:
-		var toolbars = Object.values( evo_init_polls_toolbar );
-		for( var i = 0; i < toolbars.length; i++ )
+	if( typeof( evo_init_polls_toolbar_config ) != 'undefined' )
+	{
+		// Initialize each Polls Toolbar instance:
+		var evo_temp_config = Object.values( evo_init_polls_toolbar_config );
+		for( var i = 0; i < evo_temp_config.length; i++ )
 		{
-			window.polls_toolbar( toolbars[i]['title'], toolbars[i]['prefix'] );
+			( function() {
+				window.evo_init_polls_toolbar( evo_temp_config[i] );
+			} )();
 		}
+		delete evo_temp_config;
 	}
+
 } );

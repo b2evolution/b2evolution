@@ -363,30 +363,40 @@ class polls_plugin extends Plugin
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
 
-		$polls_toolbar_config = array(
+		$js_config = array(
+				'prefix'               => $params['js_prefix'],
+				'plugin_code'          => $this->code,
+				'debug'                => $debug,
+
 				'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
 				'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
 				'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
 				'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
-				'plugin_code'          => $this->code,
+				'toolbar_title'        => T_('Polls').':',
+				
 				'button_title'         => T_('Insert a Poll'),
 				'button_value'         => T_('Insert a Poll'),
 				'button_class'         => $this->get_template( 'toolbar_button_class' ),
-
 				'modal_window_title'   => T_('Insert a Poll'),
-
-				'debug'                => $debug,
 			);
 
-		expose_var_to_js( 'evo_init_polls_toolbar_config', json_encode( $polls_toolbar_config ) );
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_polls_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'polls_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_polls_toolbar_config' );
+		}
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-
-		expose_var_to_js( 'toolbar_'.$params['js_prefix'], array(
-				'title' => T_('Polls').':',
-				'prefix' => $params['js_prefix'] ),
-			'evo_init_polls_toolbar' );
 
 		return true;
 	}
