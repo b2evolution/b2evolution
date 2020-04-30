@@ -1051,9 +1051,11 @@ class Item extends ItemLight
 			$renderers = $this->get_renderers();
 		}
 
-		// Short title:
-		$post_short_title = param( 'post_short_title', 'htmlspecialchars', NULL );
-		$this->set_from_Request( 'short_title', 'post_short_title', true );
+		if( $this->get_type_setting( 'use_short_title' ) == 'optional' )
+		{	// Short title:
+			$post_short_title = param( 'post_short_title', 'htmlspecialchars', NULL );
+			$this->set_from_Request( 'short_title', 'post_short_title', true );
+		}
 
 		// CONTENT + TITLE:
 		if( $this->get_type_setting( 'allow_html' ) )
@@ -7791,8 +7793,10 @@ class Item extends ItemLight
 		}
 		else
 		{ // Update was successful
-			if( $db_changed )
-			{	// There were some db modification
+			if( $db_changed && ! empty( $dbchanges ) )
+			{	// There were some db modification for item's content and related settings
+				// (Don't clear prerendered cache and comments when for example only extra cats or tags were updated (see $this->dbchanges_flags) )
+
 				// Delete prerendered content:
 				$this->delete_prerendered_content();
 
