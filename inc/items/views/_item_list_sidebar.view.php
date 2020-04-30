@@ -161,7 +161,7 @@ if( $Blog->get_setting( 'use_workflow' ) )
 			{
 				echo '<li><input type="radio" name="'.$pp.'assgn" value="'.$loop_User->ID.'" class="radio"';
 				if( $loop_User->ID == $assgn ) echo ' checked="checked"';
-				echo ' /> <a href="'.regenerate_url( $pp.'assgn', $pp.'assgn='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">';
+				echo ' /> <a href="'.regenerate_url( $pp.'assgn', $pp.'assgn='.$loop_User->ID ).'">';
 				echo $loop_User->get_colored_login( array( 'login_text' => 'name' ) );
 				echo '</a></li>';
 			}
@@ -303,7 +303,7 @@ if( $user_count )
 		{
 			echo '<li>'
 				.'<input type="radio" name="'.$pp.'author" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $author ? ' checked="checked"' : '' ).' /> '
-				.'<a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">'
+				.'<a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'">'
 					.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
 				.'</a>'
 			.'</li>';

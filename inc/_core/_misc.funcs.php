@@ -1115,7 +1115,7 @@ function replace_content_outcode_shorttags( $search, $replace, $content, $replac
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
 				.'<pre[^>]*>.*?</pre>|'
-				.'\[[a-z]+:[^\]`]+\])~is',
+				.'[^\[]\[[a-z]+:[^\]`]+\])~is',
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else

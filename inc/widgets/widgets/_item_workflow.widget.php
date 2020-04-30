@@ -197,7 +197,7 @@ class item_workflow_Widget extends ComponentWidget
 			{	// Display assigned user:
 				$UserCache = & get_UserCache();
 				$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-				$this->display_workflow_property( T_('Assigned to'), ( $assigned_User ? $assigned_User->get_identity_link() : T_('No user') ) );
+				$this->display_workflow_property( T_('Assigned to'), ( $assigned_User ? $assigned_User->get_identity_link( array( 'display_bubbletip' => false ) ) : T_('No user') ) );
 			}
 
 			if( ! empty( $this->disp_params['show_properties']['priority'] ) )
