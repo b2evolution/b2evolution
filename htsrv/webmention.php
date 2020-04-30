@@ -69,7 +69,7 @@ if( ! $target_Item->can_receive_webmentions() )
 	webmention_response( 400, 'Webmentions are disabled' );
 }
 
-if( is_same_url( $source, $target_Item->get_permanent_url() ) )
+if( is_same_url( $source, $target_Item->get_permanent_url( '', '', '&' ) ) )
 {	// If the posted URL is a permanent URL of the target Item:
 	webmention_response( 400, 'Permanent URL of this Item' );
 }
