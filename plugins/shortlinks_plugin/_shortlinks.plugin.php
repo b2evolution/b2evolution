@@ -398,7 +398,7 @@ class shortlinks_plugin extends Plugin
 					$this->current_wiki_word = $wiki_word;
 
 					// Fix for regexp:
-					$WikiWord = str_replace( '#', '\#', preg_quote( $WikiWord ) );
+					$WikiWord = preg_quote( $WikiWord, '#' );
 
 					// [[WikiWord]]
 					// [[WikiWord text]]
