@@ -104,10 +104,20 @@ switch( $action )
 	case 'force_download':
 		// Check for STEP 2: DOWNLOAD.
 		if( ! $auto_upgrade_from_any_url )
-		{	// Don't allow upgrade from URL:
-			$Messages->add( /*Don't translate because it must not happens on normal back-office UI*/'Auto upgrade is not allowed from URL!', 'error' );
-			header_redirect( $admin_url.'?ctrl=upgrade' );
-			// EXIT here!
+		{	// Don't allow upgrade from any URL:
+			global $global_Cache;
+			// Extract array of info about available update:
+			$updates = $global_Cache->getx( 'updates' );
+			if( empty( $updates[0]['url'] ) )
+			{	// No new available version on the upgrade server:
+				$Messages->add( /*Don't translate because it must not happens on normal back-office UI*/'Auto upgrade is not allowed from URL!'
+						// Display additional messages from upgrade server:
+						.( empty( $updates[0]['name'] ) ? '' : '<br>'.$updates[0]['name'] )
+						.( empty( $updates[0]['description'] ) ? '' : '<br>'.$updates[0]['description'] ),
+					'error' );
+				header_redirect( $admin_url.'?ctrl=upgrade' );
+				// EXIT here!
+			}
 		}
 		break;
 }
@@ -272,9 +282,24 @@ switch( $action )
 		$block_item_Widget->title = T_('Downloading package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
-		$download_url = param( 'upd_url', 'string', '', true );
 		$Messages->clear(); // Clear the messages to avoid a double displaying here
-		param_check_not_empty( 'upd_url', T_('Please enter the URL to download ZIP archive') );
+
+		if( $auto_upgrade_from_any_url )
+		{	// Allow to upgrade from any URL:
+			$download_url = param( 'upd_url', 'string', '', true );
+			param_check_not_empty( 'upd_url', T_('Please enter the URL to download ZIP archive') );
+		}
+		elseif( ! empty( $updates[0]['url'] ) )
+		{	// New available version on the upgrade server:
+			$download_url = $updates[0]['url'];
+			// Set global param for additional check server URL by same as for any not trust URL:
+			set_param( 'upd_url', $download_url );
+		}
+		else
+		{	// This must not happens because of redirect on checking above:
+			debug_die( 'Auto upgrade is not allowed!' );
+		}
+
 		// Check the download url for correct http, https, ftp URI
 		$success = param_check_url( 'upd_url', 'download_src', NULL );
 		if( $success && ! preg_match( '#\.zip$#i', $download_url ) )
