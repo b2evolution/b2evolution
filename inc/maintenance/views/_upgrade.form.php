@@ -53,7 +53,6 @@ else
 	}
 	elseif( ! empty( $update['url'] ) )
 	{	// Allow to upgrade only from URL provided by server:
-		$Form->info( T_('URL'), $update['url'] );
 		$upgrade_is_allowed = true;
 	}
 
