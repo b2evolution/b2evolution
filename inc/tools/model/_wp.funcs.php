@@ -947,7 +947,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							{	// If file has been linked to the post
 								echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 								// Replace this img tag from content with b2evolution format:
-								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name, '#' ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
 								$file_is_linked = true;
 								$link_order++;
 							}

@@ -1382,7 +1382,7 @@ class Blog extends DataObject
 				{	// Update custom cookie domain:
 					$cookie_domain_custom = param( 'cookie_domain_custom', 'string', NULL );
 					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
-					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
+					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ), '#' ).'$#i', $coll_host[1] ) )
 					{	// Wrong cookie domain:
 						param_error( 'cookie_domain_custom', T_('The custom cookie domain must be a parent of the collection domain.') );
 					}
@@ -1397,7 +1397,7 @@ class Blog extends DataObject
 				if( get_param( 'cookie_path_type' ) == 'custom' )
 				{	// Update custom cookie path:
 					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
-					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
+					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ), '#' ).'(/|$)#i', $this->get_basepath() ) )
 					{	// Wrong cookie path:
 						param_error( 'cookie_path_custom', T_('The custom cookie path must be a parent of the collection path.') );
 					}

@@ -397,7 +397,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		$initial_referer_formatted = format_to_output( $initial_referer );
 		if( $Domain && $perm_stat_edit )
 		{
-			$initial_referer_formatted = preg_replace( '#^(.+)('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')(/(.+)?|$)#i',
+			$initial_referer_formatted = preg_replace( '#^(.+)('.preg_quote( trim( $Domain->get( 'name' ), '.' ), '#' ).')(/(.+)?|$)#i',
 				'$1<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
 					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">$2</a>$3',
 				$initial_referer_formatted );

@@ -630,7 +630,7 @@ function init_requested_blog( $use_blog_param_first = true )
 	$BlogCache = & get_BlogCache();
 
 	$re = "/^https?(.*)/i";
-	$str = preg_quote( $baseurl );
+	$str = preg_quote( $baseurl, '#' );
 	$subst = "https?$1";
 
 	$baseurl_regex = preg_replace($re, $subst, $str);
