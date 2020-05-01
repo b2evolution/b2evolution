@@ -41,15 +41,27 @@ else
 
 	$Form->info( TB_('Update'), $update['name'] );
 	$Form->info( TB_('Description'), $update['description'] );
-	$Form->info( TB_('Version'), $update['version'] );
+	if( $update['version'] !== '' )
+	{	// Display version only when newer is allowed by the upgrade server:
+		$Form->info( TB_('Version'), $update['version'] );
+	}
 
-	$buttons = array();
+	$upgrade_is_allowed = false;
 	if( $auto_upgrade_from_any_url )
-	{	// Only when upgrade is allowed from URL:
+	{	// Allow to upgrade from any URL:
 		$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
 			TB_('URL'), '<br/><span class="note">'.TB_('You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.').'</span>',
 			array( 'maxlength' => 300, 'required' => true, 'class' => 'large' ) );
+		$upgrade_is_allowed = true;
+	}
+	elseif( ! empty( $update['url'] ) )
+	{	// Allow to upgrade only from URL provided by server:
+		$upgrade_is_allowed = true;
+	}
 
+	$buttons = array();
+	if( $upgrade_is_allowed )
+	{	// Display button to upgrade only when it is allowed:
 		$Form->add_crumb( 'upgrade_started' );
 		$Form->hiddens_by_key( get_memorized( 'action' ) );
 

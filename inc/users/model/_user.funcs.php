@@ -8569,7 +8569,7 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, & $Fo
 		$DomainCache = & get_DomainCache();
 		if( $Domain = & get_Domain_by_subdomain( $domain_name ) && $perm_stat_edit )
 		{	// Set a link to edit a top existing domain:
-			$domain_name_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')$#i',
+			$domain_name_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ), '#' ).')$#i',
 				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">$1</a>',
 				$domain_name_formatted );
 		}
