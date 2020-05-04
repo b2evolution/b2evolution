@@ -1612,6 +1612,13 @@ class ComponentWidget extends DataObject
 	 */
 	function display_error_message( $message = NULL )
 	{
+		global $current_User, $Blog;
+
+		if( isset( $this->BlockCache ) )
+		{	// Do NOT cache because this widget has an error which is dispalyed only for collection admin:
+			$this->BlockCache->abort_collect();
+		}
+
 		if( $message === NULL )
 		{
 			$message = 'Unable to display widget '.$this->get_name();
@@ -1620,7 +1627,10 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-		echo '<span class="evo_param_error">'.$message.'</span>';
+		if( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		{	// Display error only for collection admin:
+			echo '<span class="evo_param_error">'.$message.'</span>';
+		}
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 	}
