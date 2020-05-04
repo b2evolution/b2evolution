@@ -11027,7 +11027,7 @@ class Item extends ItemLight
 	/**
 	 * Get all slugs of this Item, except of tiny slug
 	 *
-	 * @param string Separator
+	 * @param string|NULL Separator, NULL - to return array
 	 * @return string Slugs list
 	 */
 	function get_slugs( $separator = ', ' )
@@ -11055,7 +11055,7 @@ class Item extends ItemLight
 			}
 		}
 
-		return implode( $separator, $this->slugs );
+		return $separator === NULL ? $this->slugs : implode( $separator, $this->slugs );
 	}
 
 
