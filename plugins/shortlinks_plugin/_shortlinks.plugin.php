@@ -1053,8 +1053,14 @@ class shortlinks_plugin extends Plugin
 			return $m[0];
 		}
 
+		$slug = $m[5];
+		$anchor_position = strpos( $slug, '#' );
+		if( $anchor_position !== false )
+		{	// Remove anchor from slug:
+			$slug = substr( $slug, 0, $anchor_position );
+		}
 		$SlugCache = & get_SlugCache();
-		if( ! $SlugCache->get_by_name( $m[5], false, false ) )
+		if( ! $SlugCache->get_by_name( $slug, false, false ) )
 		{	// The Slug is not found in system, Keep it as is without optimization:
 			return $m[0];
 		}
