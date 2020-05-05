@@ -489,7 +489,12 @@ function wpxml_parser( $file )
 			$post['attachment_url'] = (string) $wp->attachment_url;
 		}
 
-		foreach ( $item->category as $c )
+		if( isset( $evo->post_extra_urltitle ) )
+		{	// Extra slugs:
+			$post['extra_slugs'] = (array)$evo->post_extra_urltitle;
+		}
+
+		foreach( $item->category as $c )
 		{
 			$att = $c->attributes();
 			if( isset( $att['nicename'] ) )
