@@ -1416,8 +1416,12 @@ function db_delta_table_engines( $tables, $silent )
  */
 function install_make_db_schema_current( $display = true )
 {
-	global $schema_queries, $DB, $debug;
+	global $schema_queries, $DB, $debug, $db_config;
 
+	// Changing default charset of DB if its not utf8_general_ci:
+	echo get_install_format_text_and_log( T_('Changing default charset of DB...').'<br />'."\n" );
+	$DB->query( 'ALTER DATABASE `'.$db_config['name'].'` CHARACTER SET utf8 COLLATE utf8_general_ci' );
+	
 	// Go through all tables:
 	foreach( $schema_queries as $table => $query_info )
 	{

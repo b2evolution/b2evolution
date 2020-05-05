@@ -330,18 +330,32 @@ function install_newdb()
 	// Display installation data and instructions
 	$install_result_title = T_('Installation successful!');
 	echo get_install_format_text_and_log( '<h2>'.$install_result_title.'</h2>', 'h2' );
+	
+	global $avoid_log_file;
+	
 	$install_result_body = get_install_format_text_and_log(
 		'<p><strong>'
 			.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
 		.'</strong></p>', 'p' )
 		.get_install_format_text_and_log(
 		'<table>'
-			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>', 'br' )
-		.get_install_format_text_and_log(
+			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>', 'br' );
+	
+	// Log password( not readable ) without printing in browser:
+	get_install_format_text_and_log(
+			'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.'**Not saved to the log file**'.'</evo:password></strong></td></tr>'
+		.'</table>', 'br' );
+	
+	// Print password without log:
+	$avoid_log_file = true;
+	$install_result_body .= get_install_format_text_and_log(
 			'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
-		.'</table>', 'br' )
-		.get_install_format_text_and_log(
+		.'</table>', 'br' );
+	$avoid_log_file = false;
+	
+	$install_result_body .= get_install_format_text_and_log(
 		'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>', 'p' );
+
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions

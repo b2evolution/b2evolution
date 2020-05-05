@@ -8549,11 +8549,14 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
  */
 function get_install_format_text_and_log( $text, $format = 'string' )
 {
-	global $display, $logs_path, $log_file_handle;
+	global $display, $logs_path, $log_file_handle, $avoid_log_file;
 
 	if( empty( $display ) || $display != 'cli' )
 	{	// Don't touch text for non CLI modes:
-		prepare_install_log_message( $text );
+		if( ! $avoid_log_file )
+		{	// Include in log file:
+			prepare_install_log_message( $text );
+		}
 		return $text;
 	}
 
@@ -8615,7 +8618,10 @@ function get_install_format_text_and_log( $text, $format = 'string' )
 	// Replace all html entities like "&nbsp;", "&raquo;", "&laquo;" to readable chars:
 	$text = html_entity_decode( $text );
 	
-	prepare_install_log_message( $text );
+	if( ! $avoid_log_file )
+	{	// Include in log file:
+		prepare_install_log_message( $text );
+	}
 	
 	return $text;
 }
