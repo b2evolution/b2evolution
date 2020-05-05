@@ -40,7 +40,7 @@ load_class( 'collections/model/_section.class.php', 'Section' );
  */
 function task_begin( $title )
 {
-	echo get_install_format_text( $title."\n" );
+	echo get_install_format_text_and_log( $title."\n" );
 	evo_flush();
 }
 
@@ -51,7 +51,7 @@ function task_begin( $title )
  */
 function task_end( $message = 'OK.' )
 {
-	echo get_install_format_text( $message."<br />\n", 'br' );
+	echo get_install_format_text_and_log( $message."<br />\n", 'br' );
 }
 
 
@@ -65,10 +65,10 @@ function task_errors( $errors = array(), $type = 'danger' )
 		return;
 	}
 
-	echo get_install_format_text( '<br />', 'br' );
+	echo get_install_format_text_and_log( '<br />', 'br' );
 	foreach( $errors as $error )
 	{
-		echo get_install_format_text( '<span class="text-'.$type.'">'.$error.'</span><br />', 'br' );
+		echo get_install_format_text_and_log( '<span class="text-'.$type.'">'.$error.'</span><br />', 'br' );
 	}
 }
 
@@ -1269,7 +1269,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	{	// handle only E_USER_NOTICE
 		if( $errno == E_USER_NOTICE )
 		{
-			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
 		}
 	}
 
@@ -4174,7 +4174,7 @@ function install_demo_content()
 	$DB->begin();
 	if( $create_demo_organization )
 	{
-		echo get_install_format_text( '<h2>'.TB_('Creating demo organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.TB_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $create_demo_organization )
@@ -4219,7 +4219,7 @@ function install_demo_content()
 	$emails_data_installed = 0;
 	if( $create_sample_contents || $create_demo_email_lists )
 	{
-		echo get_install_format_text( '<h2>'.TB_('Creating demo website...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.TB_('Creating demo website...').'</h2>', 'h2' );
 	}
 
 	if( $create_sample_contents )
@@ -4237,7 +4237,7 @@ function install_demo_content()
 	{
 		evo_flush();
 		echo '<br/>';
-		echo get_install_format_text( '<span class="text-success">'.TB_('Demo elements successfully created.').'</span>' );
+		echo get_install_format_text_and_log( '<span class="text-success">'.TB_('Demo elements successfully created.').'</span>' );
 
 		if( $collections_installed )
 		{	// Display button to view website if at least one collection was created:

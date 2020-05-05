@@ -47,7 +47,7 @@ class AbstractImport
 	 * Start to log into file on disk
 	 */
 	function start_log()
-	{
+	{	// TODO: Factorize with start_install_log():
 		global $baseurl, $media_path, $rsc_url, $app_version_long;
 
 		// Get file path for log:
@@ -112,7 +112,7 @@ class AbstractImport
 	 * End of log into file on disk
 	 */
 	function end_log()
-	{
+	{	// TODO: Factorize with end_install_log():
 		// Display finish time:
 		$this->log( 'Import finished at: '.date( 'Y-m-d H:i:s' ) );
 
@@ -137,7 +137,7 @@ class AbstractImport
 	 * @return string|FALSE Formatted log message, FALSE - when message should not be displayed
 	 */
 	function get_log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
-	{
+	{	// TODO: Factorize with get_install_log():
 		if( $message === '' )
 		{	// Don't log empty strings:
 			return false;
@@ -184,7 +184,7 @@ class AbstractImport
 	 * @param boolean TRUE to display label
 	 */
 	function log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
-	{
+	{	// TODO: Factorize with prepare_install_log_message():
 		$message = $this->get_log( $message, $type, $type_html_tag, $display_label );
 
 		if( $message === false )
@@ -263,7 +263,7 @@ class AbstractImport
 	 * @param string Message
 	 */
 	function log_to_file( $message )
-	{
+	{	// TODO: Factorize with install_log_to_file():
 		if( ! $this->log_file )
 		{	// Don't log into file:
 			return;

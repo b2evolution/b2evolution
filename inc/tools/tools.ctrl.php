@@ -30,7 +30,7 @@ if( $current_User->check_perm( 'options', 'edit' ) &&
     ( $action != 'utf8check' && $action != 'utf8upgrade' ) &&
     system_check_charset_update() )
 { // DB charset is required to update
-	$Messages->add( sprintf( TB_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
+	$Messages->add( sprintf( TB_('WARNING: Your database and/or some of your tables have a different charset/collation than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
 }
 
 param( 'tab', 'string', '', true );

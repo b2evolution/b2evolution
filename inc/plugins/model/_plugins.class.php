@@ -334,7 +334,7 @@ class Plugins
 		if( ! empty( $this->log_register ) )
 		{	// Display additional log on upgrade page when we reload all plugins:
 			global $plugins_path;
-			echo '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />';
+			echo get_install_format_text_and_log( '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />' );
 			evo_flush();
 		}
 
