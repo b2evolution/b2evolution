@@ -1163,6 +1163,23 @@ class WordpressImport extends AbstractImport
 					$post_urltitle = $post_link_match[1];
 				}
 
+				if( ! empty( $post['extra_slugs'] ) )
+				{	// Extra slugs:
+					foreach( $post['extra_slugs'] as $extra_slug )
+					{
+						if( ( $checke_extra_slug = $this->check_slug( $extra_slug ) ) !== false )
+						{	// Import only not duplicated extra slug:
+							$post_urltitle .= ','.$checke_extra_slug;
+							// Store new slug in cache:
+							$this->cache_slugs[] = $checke_extra_slug;
+						}
+						else
+						{	// Display warning for duplicated slug:
+							$this->log_warning( sprintf( 'Extra slug %s could not be imported because it is already used.', '<code>'.$extra_slug.'</code>' ) );
+						}
+					}
+				}
+
 				$Item->set( 'main_cat_ID', $post_main_cat_ID );
 				$Item->set( 'creator_user_ID', $author_ID );
 				$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
@@ -1930,6 +1947,36 @@ class WordpressImport extends AbstractImport
 		$login = $this->fix_author_login( $login );
 
 		return ( isset( $this->users[ $login ] ) ? $this->users[ $login ] : $default_user_ID );
+	}
+
+
+	/**
+	 * Check if current slug can be used for new Item
+	 *
+	 * @param string Slug
+	 * @return string|boolean Cleaned slug or FALSE if the checked slug is already used
+	 */
+	function check_slug( $slug )
+	{
+		if( ! isset( $this->cache_slugs ) )
+		{	// Load slugs from DB once:
+			global $DB;
+			$slugs_SQL = new SQL( 'Load all slugs before wordpress import to avoid duplicated slugs' );
+			$slugs_SQL->SELECT( 'slug_title' );
+			$slugs_SQL->FROM( 'T_slug' );
+			$this->cache_slugs = $DB->get_col( $slugs_SQL );
+		}
+
+		// Clean up slug:
+		$slug = get_urltitle( $slug );
+
+		if( in_array( $slug, $this->cache_slugs ) )
+		{	// The slug is already used:
+			return false;
+		}
+
+		// Return cleaned slug:
+		return $slug;
 	}
 }
 ?>
