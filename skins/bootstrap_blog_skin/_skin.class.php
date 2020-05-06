@@ -120,6 +120,45 @@ class bootstrap_blog_Skin extends Skin
 
 
 	/**
+	 * Get the declarations of the widgets that the skin wants to use.
+	 *
+	 * @param string Collection type: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param string Skin type: 'normal' - Standard, 'mobile' - Phone, 'tablet' - Tablet
+	 * @param array Additional params. Example value 'init_as_blog_b' => true
+	 * @return array Array of default widgets:
+	 *          - Key - Container code,
+	 *          - Value - array of widget arrays OR SPECIAL VALUES:
+	 *             - 'coll_type': Include this container only for collection kinds separated by comma, first char "-" means to exclude,
+	 *             - 'type': Container type, empty - main container, other values: 'sub', 'page', 'shared', 'shared-sub',
+	 *             - 'name': Container name,
+	 *             - 'order': Container order,
+	 *             - widget data array():
+	 *                - 0: Widget order (*mandatory field*),
+	 *                - 1: Widget code (*mandatory field*),
+	 *                - 'params' - Widget params(array or serialized string),
+	 *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
+	 *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
+	 *                - 'coll_type': Include this widget only for collection types separated by comma, first char "-" means to exclude,
+	 *                - 'skin_type': Include this widget only for skin types separated by comma, first char "-" means to exclude,
+	 *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
+	 */
+	function get_default_widgets( $coll_type = '', $skin_type = 'normal', $context = array() )
+	{
+		$default_widgets = array();
+
+		/* Sidebar 2 */
+		$default_widgets['sidebar_2'] = array(
+			array( 30, 15000, 'free_html', 'params' => array(
+					'title'   => 'Bootstrap Blog Skin Sidebar 2',
+					'content' => 'This widget was added by the Bootstrap Blog Skin.',
+				) ),
+		);
+
+		return $default_widgets;
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()

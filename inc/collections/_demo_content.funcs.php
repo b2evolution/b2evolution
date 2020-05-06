@@ -1491,12 +1491,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'main' );
+				$Blog->setup_default_widgets();
 			}
 
 			$collection_created++;
@@ -1530,12 +1527,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'std' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1568,12 +1562,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'std' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1606,12 +1597,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'photo' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1644,12 +1632,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'forum' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1682,12 +1667,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'manual' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1720,12 +1702,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'group' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1757,13 +1736,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
-			{
-				// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'minisite' );
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{	// Insert basic widgets:
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1784,7 +1759,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	// Install default shared widgets:
 	global $installed_default_shared_widgets;
 	task_begin( TB_('Installing default shared widgets...') );
-	insert_shared_widgets( 'normal', true );
+	insert_shared_widgets( 'normal' );
 	task_end();
 	$installed_default_shared_widgets = true;
 
@@ -3707,12 +3682,14 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$edited_Blog->dbupdate();
 		}
 
-		// Exclude demo items which must not be installed:
-		foreach( $exclude_demo_items as $exclude_demo_item_key )
-		{
-			if( isset( $demo_items[ $exclude_demo_item_key ] ) )
+		if( ! empty( $exclude_demo_items ) )
+		{	// Exclude demo items which must not be installed:
+			foreach( $exclude_demo_items as $exclude_demo_item_key )
 			{
-				unset( $demo_items[ $exclude_demo_item_key ] );
+				if( isset( $demo_items[ $exclude_demo_item_key ] ) )
+				{
+					unset( $demo_items[ $exclude_demo_item_key ] );
+				}
 			}
 		}
 

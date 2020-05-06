@@ -3831,8 +3831,7 @@ class Blog extends DataObject
 		$Messages->add_to_group( T_('A default category has been created for this collection.'), 'success', T_('New collection created:') );
 
 		// ADD DEFAULT WIDGETS:
-		load_funcs( 'widgets/_widgets.funcs.php' );
-		insert_basic_widgets( $this->ID, 'normal', false, $kind );
+		$this->setup_default_widgets();
 
 		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
@@ -6838,6 +6837,222 @@ class Blog extends DataObject
 
 
 	/**
+	 * Setup default widgets for this collection
+	 *
+	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
+	 * @param array Context
+	 */
+	function setup_default_widgets( $skin_type = 'all', $context = array() )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// This function should be called only for created collection:
+			return;
+		}
+
+		if( $skin_type == 'all' )
+		{	// Setaup default widgets for skins of all types:
+			$this->setup_default_widgets( 'normal', $context );
+			$this->setup_default_widgets( 'mobile', $context );
+			$this->setup_default_widgets( 'tablet', $context );
+			$this->setup_default_widgets( 'alt', $context );
+			return;
+		}
+
+		$coll_skin_ID = $this->get_skin_ID( $skin_type );
+		$SkinCache = & get_SkinCache();
+		if( ! ( $coll_Skin = & $SkinCache->get_by_ID( $coll_skin_ID, false, false ) ) )
+		{	// This collection must has a correct skin:
+			return;
+		}
+
+		// Get the declarations of the widgets that the skin wants to use:
+		$context['current_coll_ID'] = $this->ID;
+		$skin_widgets = $coll_Skin->get_default_widgets( $this->get( 'type' ), $skin_type, $context );
+
+		// Check if the skin wants to use all b2evolution default widgets:
+		if( isset( $skin_widgets['*'] ) )
+		{	// Depending on how the skin want to use this:
+			$use_all_b2evo_default_widgets = $skin_widgets['*'];
+			unset( $skin_widgets['*'] );
+		}
+		else
+		{	// Use all default widgets if the skin does NOT say about this:
+			$use_all_b2evo_default_widgets = true;
+		}
+
+		load_funcs( 'widgets/_widgets.funcs.php' );
+
+		// Get the declarations of the widgets that b2evolution recommends by default:
+		$b2evo_default_widgets = get_default_widgets( $this->get( 'type' ), $context );
+
+		// Merge the skin widget declarations with b2evolution default widgets:
+		foreach( $b2evo_default_widgets as $container_code => $widgets )
+		{
+			if( // The skin has no widget declarations for this container and it allows to use b2evolution default widgets:
+			    ( ! isset( $skin_widgets[ $container_code ] ) &&
+			      $use_all_b2evo_default_widgets )
+			    ||
+			    // The skin wants to use default widget declarations for this container:
+			    ( isset( $skin_widgets[ $container_code ] ) &&
+			      $skin_widgets[ $container_code ] === true ) )
+			{	// Merge widgets from b2evolution default declarations to the skin:
+				$skin_widgets[ $container_code ] = $widgets;
+			}
+			elseif( isset( $skin_widgets[ $container_code ] ) &&
+			        is_array( $skin_widgets[ $container_code ] ) )
+			{	// Append custom skin widgets to default widgets:
+				$skin_widgets[ $container_code ] = array_merge( $widgets, $skin_widgets[ $container_code ] );
+			}
+		}
+
+		// Check all skin widget containers to be sure they all are proper arrays and not other values like true, false and etc.:
+		foreach( $skin_widgets as $container_code => $container_widgets )
+		{
+			if( ! empty( $container_widgets['type'] ) &&
+			    ! in_array( $container_widgets['type'], array( 'main', 'sub', 'page' ) ) )
+			{	// Skip not collection container:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+			if( isset( $container_widgets['coll_type'] ) &&
+			    ! is_allowed_option( $this->get( 'type' ), $container_widgets['coll_type'] ) )
+			{	// Skip container because it should not be installed for the given collection kind:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+
+			if( isset( $container_widgets['skin_type'] ) &&
+			    ! is_allowed_option( $skin_type, $container_widgets['skin_type'] ) )
+			{	// Skip container because it should not be installed for the given skin type:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+
+			if( $container_widgets === true )
+			{	// Set empty container if it has not been detected in b2evolution default widget declarations above:
+				$skin_widgets[ $container_code ] = array();
+			}
+			elseif( ! is_array( $container_widgets ) )
+			{	// Ignore all other not array, probably it is a boolean false or some other string value which should be ignored indeed:
+				unset( $skin_widgets[ $container_code ] );
+			}
+		}
+
+		if( empty( $skin_widgets ) )
+		{	// No skin default widgets:
+			return;
+		}
+
+		// Get all containers declared in this collection skin type:
+		$blog_containers = $this->get_skin_containers( $skin_type );
+
+		// Install additional sub-containers and page containers from default config,
+		// which are not declared as main containers but should be installed too:
+		foreach( $skin_widgets as $container_code => $container_widgets )
+		{
+			if( isset( $container_widgets['type'] ) &&
+			    ( $container_widgets['type'] == 'sub' || $container_widgets['type'] == 'page' ) )
+			{	// If it is a sub-container or page container:
+				$blog_containers[ $container_code ] = array(
+						isset( $container_widgets['name'] ) ? $container_widgets['name'] : $container_code,
+						isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
+						( $container_widgets['type'] == 'sub' ? 0 : 1 ), // Main or Sub-container
+						isset( $container_widgets['item_ID'] ) ? $container_widgets['item_ID'] : NULL,
+					);
+			}
+		}
+
+		// Create rows to insert for all collection containers:
+		$widget_containers_sql_rows = array();
+		foreach( $blog_containers as $container_code => $wico_data )
+		{
+			$widget_containers_sql_rows[] = '( '.$DB->quote( $container_code ).', '
+				.$DB->quote( $skin_type ).', '
+				.$DB->quote( $wico_data[0] ).', '
+				.$this->ID.', '
+				.$DB->quote( $wico_data[1] ).', '
+				.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).', '
+				.( isset( $wico_data[3] ) ? intval( $wico_data[3] ) : 'NULL' ).' )';
+		}
+
+		if( empty( $widget_containers_sql_rows ) )
+		{	// No collection containers to install:
+			return;
+		}
+
+		// Insert widget containers records by one SQL query:
+		$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main, wico_item_ID  ) VALUES'
+			.implode( ', ', $widget_containers_sql_rows ) );
+
+		$insert_id = $DB->insert_id;
+		foreach( $blog_containers as $container_code => $wico_data )
+		{
+			$blog_containers[ $container_code ]['wico_ID'] = $insert_id;
+			$insert_id++;
+		}
+
+		$basic_widgets_insert_sql_rows = array();
+		foreach( $skin_widgets as $container_code => $container_widgets )
+		{
+			if( ! isset( $blog_containers[ $container_code ] ) )
+			{	// Skip container which is not supported by current collection's skin:
+				continue;
+			}
+
+			$wico_id = $blog_containers[ $container_code ]['wico_ID'];
+
+			foreach( $container_widgets as $key => $widget )
+			{
+				if( ! is_number( $key ) )
+				{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+					continue;
+				}
+
+				if( isset( $widget['install'] ) && ! $widget['install'] )
+				{	// Skip widget because it should not be installed by condition from config:
+					continue;
+				}
+
+				if( isset( $widget['coll_type'] ) && ! is_allowed_option( $this->get( 'type' ), $widget['coll_type'] ) )
+				{	// Skip widget because it should not be installed for the given collection kind:
+					continue;
+				}
+
+				if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
+				{	// Skip widget because it should not be installed for the current version:
+					continue;
+				}
+
+				if( isset( $widget['coll_ID'] ) && ! is_allowed_option( $this->ID, $widget['coll_ID'] ) )
+				{	// Skip widget because it should not be installed for the given collection ID:
+					continue;
+				}
+
+				if( isset( $widget['skin_type'] ) && ! is_allowed_option( $skin_type, $widget['skin_type'] ) )
+				{	// Skip widget because it should not be installed for the given skin type:
+					continue;
+				}
+
+				// Initialize a widget row to insert into DB below by single query:
+				$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+				$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+				$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+				$basic_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[2] ).', '.$DB->quote( $widget_params ).' )';
+			}
+		}
+
+		// Check if there are widgets to create:
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+	}
+
+
+	/**
 	 * Get name of default item type
 	 *
 	 * @return string Name of default ItemType object
@@ -7217,6 +7432,50 @@ class Blog extends DataObject
 		$r .= '</select>';
 
 		return $r;
+	}
+
+
+	/**
+	 * Reset widgets for this collection
+	 *
+	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
+	 */
+	function reset_widgets( $skin_type = 'all' )
+	{
+		if( empty( $this->ID ) )
+		{	// This function should be called only for created collection:
+			return;
+		}
+
+		global $DB;
+
+		$all_skin_types = array( 'normal', 'mobile', 'tablet', 'alt' );
+
+		if( $skin_type == 'all' )
+		{	// Reset widgets for all skin types:
+			$skin_types = $all_skin_types;
+		}
+		elseif( in_array( $skin_type, $all_skin_types ) )
+		{	// Reset widgets only for requested skin type:
+			$skin_types = array( $skin_type );
+		}
+		else
+		{	// No correct skin type is requested:
+			return;
+		}
+
+		foreach( $skin_types as $skin_type )
+		{	// Remove previous widgets:
+			$DB->query( 'DELETE T_widget__container, T_widget__widget
+				 FROM T_widget__container
+				 LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID
+				WHERE wico_coll_ID = '.$DB->quote( $this->ID )
+					.( empty( $skin_type ) ? '' :
+				' AND wico_skin_type = '.$DB->quote( $skin_type ) ) );
+
+			// Add default widgets:
+			$this->setup_default_widgets( $skin_type );
+		}
 	}
 }
 
