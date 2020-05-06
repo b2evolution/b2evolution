@@ -4985,6 +4985,9 @@ function render_custom_field( $value, $params = array() )
 	$evo_render_custom_field_note_template = $params['field_value_note'];
 	$value = preg_replace_callback( '/\{([^}]+)\}(\[\.([a-z0-9\-_\.]+)\])?/i', 'render_custom_field_note_callback', $value );
 
+	// Render styled text:
+	$value = preg_replace_callback( '/(.+?)(\[\.([a-z0-9\-_\.]+)\])/i', 'render_custom_field_style_callback', $value );
+
 	// Render stars:
 	if( preg_match_all( '/(#stars(:\d+.?\d+?)?(\/\d+)?)#/', $value, $star_matches ) )
 	{	// If at least one star template is found:
@@ -5023,8 +5026,22 @@ function render_custom_field_note_callback( $m )
 	$note_class = ( isset( $m[3] ) ? ' '.str_replace( '.', ' ', $m[3] ) : '' );
 
 	return str_replace( array( '$note_class$', '$note_text$' ),
-		array( $note_class, $m[1] ),
+		array( format_to_output( $note_class, 'htmlattr' ), $m[1] ),
 		$evo_render_custom_field_note_template );
+}
+
+
+/**
+* Callback function to render "value text[.class1.class2.classX]" in custom field value
+ *
+ * @param array Matches
+ * @return string
+ */
+function render_custom_field_style_callback( $m )
+{
+	$text_class = str_replace( '.', ' ', $m[3] );
+
+	return '<span class="'.format_to_output( $text_class, 'htmlattr' ).'">'.$m[1].'</span>';
 }
 
 

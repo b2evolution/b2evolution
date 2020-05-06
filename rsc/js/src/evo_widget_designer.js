@@ -90,7 +90,13 @@ function evo_widget_initialize_designer_block( widget )
 	jQuery( 'body' ).append( designer_block_start + '<div><div class="evo_designer__title">' + widget.data( 'type' ) + '</div></div>' + designer_block_end );
 	if( widget.data( 'can-edit' ) == '1' )
 	{	// Display a panel with actions if current user has a permission to edit widget:
+		var additional_widget_icons = '';
+		if( widget.hasClass( 'widget_core_subcontainer' ) )
+		{	// Icons to add and list widgets in sub-container:
+			additional_widget_icons += b2evo_widget_icon_add + b2evo_widget_icon_list;
+		}
 		jQuery( '>div', designer_block_selector ).append( '<div class="evo_designer__actions">' +
+				additional_widget_icons +
 				b2evo_widget_icon_top +
 				b2evo_widget_icon_up +
 				b2evo_widget_icon_down +
@@ -146,15 +152,39 @@ jQuery( document ).on( 'mouseover', '.evo_designer__widget', function()
 jQuery( document ).on( 'click', '.evo_designer__action_add, .evo_designer__action_list', function( e )
 {	// Link to add widget or to manage widgets of the container:
 	if( typeof( b2evo_widget_add_url ) != 'undefined' )
-	{	// If global widget add form url is defined:
+	{	// If global widget add/list form url is defined:
 		var container_block = jQuery( this ).closest( '.evo_designer__container' );
-		var container = jQuery( evo_widget_container_selector( container_block ) );
-		if( container.length && container.data( 'can-edit' ) == '1' )
-		{	// Load widget adding list only if it is allowed for current user:
+		if( container_block.length )
+		{	// This is a container:
+			var container = jQuery( evo_widget_container_selector( container_block ) );
+			if( container.length && container.data( 'can-edit' ) == '1' )
+			{
+				var container_name = container.data( 'name' );
+				var container_code = container.data( 'code' );
+			}
+		}
+		else
+		{	// This may be a widget "Sub-Container":
+			var widget_block = jQuery( this ).closest( '.evo_designer__widget' );
+			if( widget_block.length )
+			{
+				var widget = jQuery( evo_widget_selector( widget_block ) );
+				if( widget.length &&
+				    widget.hasClass( 'widget_core_subcontainer' ) &&
+				    widget.data( 'can-edit' ) == '1' )
+				{	// This is a widget "Sub-Container":
+					var container_name = widget.data( 'subcontainer-name' );
+					var container_code = widget.data( 'subcontainer-code' );
+				}
+			}
+		}
+
+		if( typeof( container_name ) != 'undefined' )
+		{	// Load widget add form or widgets list only if it is allowed for current user:
 			var widget_action_url = jQuery( this ).hasClass( 'evo_designer__action_add' ) ? b2evo_widget_add_url : b2evo_widget_list_url;
 			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
-				.href = widget_action_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) );
+				.href = widget_action_url.replace( '$container$', container_name ).replace( '$container_code$', container_code );
 		}
 	}
 } );

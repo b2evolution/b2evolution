@@ -242,7 +242,7 @@ switch( $action )
 		}
 		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers( $skin_type ) ) ) )
 		{ // The container is not part of the current skin
-			$Messages->add( TB_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
+			$Messages->add( TB_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'warning' );
 		}
 
 		switch( $type )
@@ -953,9 +953,19 @@ switch( $action )
 		switch( $mode )
 		{
 			case 'customizer':
+				if( preg_match( '#^(coll|shared):(.+)$#', $container_code, $container_match ) )
+				{	// Sub-container may be from Collection and may be Shared:
+					$container_coll_ID = $container_match[1] == 'coll' ? $blog : NULL;
+					$container_code = $container_match[2];
+				}
+				else
+				{	// Normal container:
+					$container_coll_ID = $blog;
+				}
+
 				// Try to get widget container by collection ID, container code and requested skin type:
 				$WidgetContainerCache = & get_WidgetContainerCache();
-				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $container_coll_ID, $skin_type, $container_code );
 
 				// Change this param to proper work of func get_WidgetContainer_by_coll_skintype_fieldset():
 				set_param( 'container', 'wico_ID_'.$WidgetContainer->ID );
@@ -966,10 +976,20 @@ switch( $action )
 		break;
 
 	case 'customize':
+		if( preg_match( '#^(coll|shared):(.+)$#', $container_code, $container_match ) )
+		{	// Sub-container may be from Collection and may be Shared:
+			$container_coll_ID = $container_match[1] == 'coll' ? $blog : NULL;
+			$container_code = $container_match[2];
+		}
+		else
+		{	// Normal container:
+			$container_coll_ID = $blog;
+		}
+
 		if( ! empty( $container_code ) )
 		{	// Try to get widget container by collection ID, container code and requested skin type:
 			$WidgetContainerCache = & get_WidgetContainerCache();
-			$selected_WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $blog, $skin_type, $container_code );
+			$selected_WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $container_coll_ID, $skin_type, $container_code );
 		}
 		$AdminUI->disp_view( 'widgets/views/_widget_customize.form.php' );
 		break;
