@@ -97,13 +97,27 @@ class item_attachments_Widget extends ComponentWidget
 					'label' => T_( 'Title' ),
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
-					'defaultvalue' => '',
+					'defaultvalue' => T_('Attachments').':',
+				),
+			'display_mode' => array(
+					'type' => 'select',
+					'label' => T_('Display as'),
+					'options' => array(
+							'list'    => T_('List'),
+							'buttons' => T_('Buttons'),
+						),
+					'defaultvalue' => 'list',
 				),
 			'disp_download_icon' => array(
 					'type' => 'checkbox',
 					'label' => T_('Display download icon'),
 					'defaultvalue' => 1,
 					'note' => '',
+				),
+			'link_btn_text' => array(
+					'label' => T_('Link text'),
+					'size' => 40,
+					'defaultvalue' => '',
 				),
 			'link_text' => array(
 					'label' => T_('Link'),
@@ -114,6 +128,11 @@ class item_attachments_Widget extends ComponentWidget
 							array( 'filename', T_('Always display Filename') ),
 							array( 'title', T_('Display Title if available') ) ),
 					'defaultvalue' => 'title',
+				),
+			'link_class' => array(
+					'label' => T_('Link class'),
+					'size' => 40,
+					'defaultvalue' => '',
 				),
 			'disp_file_size' => array(
 					'type' => 'checkbox',
@@ -154,13 +173,36 @@ class item_attachments_Widget extends ComponentWidget
 				'widget_item_attachments_params' => array(),
 			), $this->disp_params );
 
-		// Get attachments/files that are linked to the current item:
-		$item_files = $Item->get_files( array_merge( $this->disp_params['widget_item_attachments_params'], array(
+		$style_params = array(
 				'display_download_icon' => $this->disp_params['disp_download_icon'],
 				'file_link_text'        => $this->disp_params['link_text'],
+				'file_link_class'       => $this->disp_params['link_class'],
 				'display_file_size'     => $this->disp_params['disp_file_size'],
 				'display_file_desc'     => $this->disp_params['disp_file_desc'],
-			) ) );
+			);
+
+		if( $this->disp_params['display_mode'] == 'list' )
+		{	// List style:
+			$style_params = array_merge( $style_params, array(
+					'before'           => '<div class="item_attachments"><ul class="bFiles">',
+					'after'            => '</ul></div>',
+					'file_link_format' => ( empty( $this->disp_params['link_btn_text'] ) ? '' : '<b>'.$this->disp_params['link_btn_text'].'</b> ' ).'$file_name$'
+				) );
+		}
+		else
+		{	// Button style:
+			$style_params = array_merge( $style_params, array(
+					'before'           => '',
+					'before_attach'    => '',
+					'after_attach'     => '',
+					'after'            => '',
+					'attach_format'    => '$file_link$',
+					'file_link_format' => '$icon$ '.( empty( $this->disp_params['link_btn_text'] ) ? '' : '<b>'.$this->disp_params['link_btn_text'].'</b><br />' ).'$file_name$ $file_size$ $file_desc$',
+				) );
+		}
+
+		// Get attachments/files that are linked to the current item:
+		$item_files = $Item->get_files( array_merge( $this->disp_params['widget_item_attachments_params'], $style_params ) );
 
 		if( empty( $item_files ) )
 		{	// Don't display this widget when Item has no attachments:
