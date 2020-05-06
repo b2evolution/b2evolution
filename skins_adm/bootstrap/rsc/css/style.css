@@ -1860,6 +1860,13 @@ div.query-builder .rule-container .rule-value-container {
 #customizer_wrapper .controls .help-inline {
   display: inline-block;
 }
+#customizer_wrapper .form-group.checkbox-group .controls {
+  display: inline-block;
+  vertical-align: middle;
+}
+#customizer_wrapper .form-group.checkbox-group .controls .checkbox {
+  padding-top: 2px;
+}
 #customizer_wrapper .file_select_item {
   margin: 0;
 }

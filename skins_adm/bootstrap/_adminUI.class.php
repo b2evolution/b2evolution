@@ -582,6 +582,8 @@ class AdminUI extends AdminUI_general
 					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
+					'fieldstart_checkbox'    => '<div class="form-group checkbox-group" $ID$>'."\n",
+					'fieldend_checkbox'      => "</div>\n\n",
 					'inputclass_checkbox'    => '',
 					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
 					'inputend_checkbox'      => "</label></div></div>\n",
