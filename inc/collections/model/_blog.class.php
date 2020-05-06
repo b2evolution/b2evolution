@@ -6349,6 +6349,11 @@ class Blog extends DataObject
 			{	// Merge widgets from b2evolution default declarations to the skin:
 				$skin_widgets[ $container_code ] = $widgets;
 			}
+			elseif( isset( $skin_widgets[ $container_code ] ) &&
+			        is_array( $skin_widgets[ $container_code ] ) )
+			{	// Append custom skin widgets to default widgets:
+				$skin_widgets[ $container_code ] = array_merge( $widgets, $skin_widgets[ $container_code ] );
+			}
 		}
 
 		// Check all skin widget containers to be sure they all are proper arrays and not other values like true, false and etc.:
