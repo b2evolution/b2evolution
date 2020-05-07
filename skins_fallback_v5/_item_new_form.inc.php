@@ -108,10 +108,6 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 		) );
 	echo '</div>';
 
-	// set b2evoCanvas for plugins
-	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
-
-
 	// =================================== INSTRUCTION ====================================
 	if( $new_Item->get_type_setting( 'front_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
 	{
