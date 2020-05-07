@@ -732,6 +732,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			break;
 
+		case 'item_selector':
+			$Form->item_selector( $input_name, $set_value, $set_label, $parmeta );
+			break;
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );

@@ -644,29 +644,11 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 	{	// Display parent ID:
-		$parent_info = '<span id="parent_item_info">';
-		if( $parent_Item = & $edited_Item->get_parent_Item() )
-		{	// Get parent item info if it is defined:
-			$status_icons = get_visibility_statuses( 'icons' );
-			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
-			{	// Status colored icon:
-				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
-			}
-			// Title with link to permament url:
-			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
-			// Icon to edit:
-			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
-		}
-		$parent_info .= '</span>';
-
-		// Icon to select parent:
-		$parent_info .= action_icon( TB_('Select parent'), 'magnifier', '#', NULL, NULL, NULL, array(
-				'onclick' => 'return evo_select_parent_load_window( '.$edited_Item->ID.', \''.$edited_Item->get_blog()->get( 'urlname' ).'\' )' ) );
-
 		echo '<tr><td><strong>'.TB_('Parent ID').':</strong></td><td>';
-		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info, array(
-				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
-				'style'    => 'width:115px',
+		$Form->item_selector( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), '', array(
+				'window_title_page1' => NT_('Select the parent'),
+				'window_title_page2' => NT_('Select this Post as parent:'),
+				'required'           => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
 			) );
 		echo '</td></tr>';
 	}
@@ -1157,11 +1139,6 @@ echo_item_merge_js();
 echo_item_add_version_js();
 // JS code for link to link new version:
 echo_item_link_version_js();
-// JS code for selecting parent item:
-if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
-{
-	echo_item_select_parent_js();
-}
 
 // JS to post excerpt mode switching:
 ?>

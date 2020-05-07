@@ -5163,6 +5163,174 @@ class Form extends Widget
 
 		return $this->display_or_return( $r );
 	}
+
+
+	/**
+	 * Builds Item selector field
+	 *
+	 * @param string Name/ID of the input field
+	 * @param string Initial value
+	 * @param string Field label
+	 * @param array Extended attributes/parameters
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function item_selector( $field_name, $selected_item_ID, $field_label, $field_params = array() )
+	{
+		global $thumbnail_sizes, $file_select_js_initialized;
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$field_params = array_merge( array(
+				'btn_select_title'   => NT_('Select'),
+				'btn_selected_title' => NT_('Select another'),
+				'btn_select_icon'    => 'magnifier',
+				'btn_select_class'   => 'btn btn-sm btn-info',
+				'btn_deselect_title' => NT_('Deselect Item'),
+				'btn_deselect_icon'  => 'remove',
+				'window_title_page1' => NT_('Select the Item'),
+				'window_title_page2' => NT_('Select the Item').':',
+			), $field_params );
+
+			$r = $this->begin_field();
+
+			// Hidden field for a selected Item ID:
+			$r .= '<input'.get_field_attribs_as_string( array(
+					'type'  => 'hidden',
+					'id'    => $field_name,
+					'name'  => $field_name,
+					'value' => $selected_item_ID,
+				) ).' />';
+
+			// Try to get Item by initial ID:
+			$ItemCache = & get_ItemCache();
+			$selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false );
+
+			// Display info of the selected Item:
+			$r .= '<span id="'.format_to_output( 'evo_item_selector_info_'.$field_name, 'htmlattr' ).'">';
+			if( $selected_Item )
+			{
+				$r .= $selected_Item->get_form_selector_info();
+			}
+			$r .= '</span>';
+
+			// Button to select Item:
+			$btn_select_title = ( empty( $field_params['btn_select_icon'] ) ? '' : get_icon( $field_params['btn_select_icon'] ).' ' )
+				.'<span class="evo_item_selector_btn_title">'.( $selected_Item ? T_( $field_params['btn_selected_title'] ) : T_( $field_params['btn_select_title'] ) ).'</span>';
+			$r .= '<button type="button"'
+				.'id="evo_item_selector_form_btn_'.$field_name.'" '
+				.'class="'.$field_params['btn_select_class'].' evo_item_selector_form_btn" '
+				.'onclick="return evo_form_item_selector_load_window( \''.$field_name.'\' )" >'
+					.format_to_output( trim( $btn_select_title ), 'htmlbody' )
+				.'</button>';
+
+			// Icon to deselect the Item:
+			$deselector_params = array(
+					'id'      => 'evo_item_deselector_btn_'.$field_name,
+					'title'   => T_( $field_params['btn_deselect_title'] ),
+					'class'   => 'evo_item_deselector_btn pointer',
+				);
+			if( ! $selected_Item )
+			{	// Hide the deselector icon if no selected Item yet:
+				$deselector_params['style'] = 'display:none';
+			}
+			$r .= ' '.get_icon( $field_params['btn_deselect_icon'], 'imgtag', $deselector_params );
+
+			// Initialize different config per each field:
+			$r .= '<script>
+			if( typeof( evo_form_item_selector ) == "undefined" )
+			{
+				var evo_form_item_selector = {};
+			}
+			evo_form_item_selector.'.$field_name.' = {
+				window_title_page1: "'.TS_( $field_params['window_title_page1'] ).'",
+				window_title_page2: "'.TS_( $field_params['window_title_page2'] ).'",
+				btn_select_title:   "'.TS_( $field_params['btn_select_title'] ).'",
+				btn_selected_title: "'.TS_( $field_params['btn_selected_title'] ).'",
+			};
+			</script>';
+
+			if( empty( $this->item_selector_js_initialized ) )
+			{	// Initialize JS code for Item selector once:
+				global $UserSettings, $b2evo_icons_type;
+
+				// Initialize JavaScript to build and open window:
+				echo_modalwindow_js();
+
+				// Initialize JavaScript for item selector window:
+				echo_item_selector_js();
+
+				// Get last selected collection:
+				if( ! ( $last_selected_item_coll_ID = $UserSettings->get( 'last_selected_item_coll_ID' ) ) )
+				{
+					global $Blog;
+					$last_selected_item_coll_ID = empty( $Blog ) ? 0 : $Blog->ID;
+				}
+
+				$r .= '<script>
+				var evo_last_selected_item_coll_ID = '.$last_selected_item_coll_ID.';
+
+				function evo_form_item_selector_load_window( field_name )
+				{
+					return evo_item_selector_load_window( null,
+						[ evo_form_item_selector[ field_name ].window_title_page1, evo_form_item_selector[ field_name ].window_title_page2 ],
+						false,
+						[ { "text": evo_form_item_selector[ field_name ].btn_select_title, "id": "evo_item_selector_window_btn_" + field_name, "class": "btn btn-primary evo_item_selector_window_btn" } ],
+						evo_last_selected_item_coll_ID,
+						"collections"
+					);
+				}
+
+				// Submit form to use the selected Item for the form field:
+				jQuery( document ).on( "click", ".evo_item_selector_window_btn", function()
+				{
+					var field_name = jQuery( this ).attr( "id" ).replace( /^evo_item_selector_window_btn_/, "" );
+					jQuery.ajax(
+					{
+						type: "POST",
+						url: htsrv_url + "anon_async.php",
+						data: {
+							"action": "get_item_selector_info",
+							"item_ID": jQuery( "#evo_item_selector_dest_post_ID" ).val(),
+							"b2evo_icons_type": "'.( isset( $b2evo_icons_type ) ? $b2evo_icons_type : '' ).'",
+							"crumb_item_selector": "'.get_crumb( 'item_selector' ).'"
+						},
+						success: function( data )
+						{
+							data = JSON.parse( ajax_debug_clear( data ) );
+							if( typeof( data.item_ID ) == "undefined" )
+							{	// Unexpected error, do NOT translate!
+								alert( "Wrong Item, try again." );
+							}
+							else
+							{	// Update Item data in the form:
+								jQuery( "#" + field_name ).val( data.item_ID );
+								jQuery( "#evo_item_selector_info_" + field_name ).html( data.item_info );
+								jQuery( "#evo_item_selector_form_btn_" + field_name ).find( ".evo_item_selector_btn_title" ).html( evo_form_item_selector[ field_name ].btn_selected_title );
+								jQuery( "#evo_item_deselector_btn_" + field_name ).show();
+								evo_last_selected_item_coll_ID = data.coll_ID;
+							}
+							closeModalWindow();
+						}
+					} );
+				} );
+
+				// Deselect the Item:
+				jQuery( document ).on( "click", ".evo_item_deselector_btn", function()
+				{
+					var field_name = jQuery( this ).attr( "id" ).replace( /^evo_item_deselector_btn_/, "" );
+					jQuery( "#" + field_name ).val( "" );
+					jQuery( "#evo_item_selector_info_" + field_name ).html( "" );
+					jQuery( "#evo_item_selector_form_btn_" + field_name ).find( ".evo_item_selector_btn_title" ).html( evo_form_item_selector[ field_name ].btn_select_title );
+					jQuery( this ).hide();
+				} );
+				</script>';
+				$this->item_selector_js_initialized = true;
+			}
+
+			$r .= $this->end_field();
+
+			return $this->display_or_return( $r );
+	}
 }
 
 ?>

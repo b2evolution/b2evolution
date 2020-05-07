@@ -1992,46 +1992,35 @@ switch( $action )
 		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
 		break;
 
-	case 'get_item_parent_info':
+	case 'get_item_selector_info':
+		// Get Item's info after selector from Modal/AJAX window by $Form->item_selector():
+
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'item' );
+		$Session->assert_received_crumb( 'item_selector' );
 
 		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
-		param( 'parent_ID', 'integer', true );
+		param( 'item_ID', 'integer', true );
 
 		$ItemCache = & get_ItemCache();
-		$parent_Item = & $ItemCache->get_by_ID( $parent_ID, false, false );
 
-		$r = array();
-		if( $parent_Item )
+		$item_selector_info = array();
+		if( $selected_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
 		{
 			if( is_logged_in() )
 			{	// Remember what last collection was used for linking in order to display it by default on next linking:
 				global $UserSettings;
-
-				$UserSettings->set( 'last_select_parent_coll_ID', $parent_Item->get_blog_ID() );
+				$UserSettings->set( 'last_selected_item_coll_ID', $selected_Item->get_blog_ID() );
 				$UserSettings->dbupdate();
 			}
 
-			$parent_info = '';
-			$status_icons = get_visibility_statuses( 'icons' );
-			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
-			{	// Status colored icon:
-				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
-			}
-			// Title with link to permament url:
-			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
-			// Icon to edit:
-			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
-
-			$r['parent_ID'] = $parent_Item->ID;
-			$r['parent_info'] = $parent_info;
-			$r['parent_coll_ID'] = $parent_Item->get_blog_ID();
+			$item_selector_info['item_ID'] = $selected_Item->ID;
+			$item_selector_info['item_info'] = $selected_Item->get_form_selector_info();
+			$item_selector_info['coll_ID'] = $selected_Item->get_blog_ID();
 		}
 
-		echo json_encode( $r );
+		echo json_encode( $item_selector_info );
 		break;
 
 	case 'get_user_default_filters_form':

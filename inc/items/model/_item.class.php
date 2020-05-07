@@ -14677,5 +14677,28 @@ class Item extends ItemLight
 
 		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect
 	}
+
+
+	/**
+	 * Get info for form field selector
+	 *
+	 * @return string
+	 */
+	function get_form_selector_info()
+	{
+		$r = '';
+
+		$status_icons = get_visibility_statuses( 'icons' );
+		if( isset( $status_icons[ $this->get( 'status' ) ] ) )
+		{	// Status colored icon:
+			$r .= $status_icons[ $this->get( 'status' ) ];
+		}
+		// Title with link to permament url:
+		$r .= ' '.$this->get_title( array( 'link_type' => 'permalink' ) );
+		// Icon to edit if current User has a permission:
+		$r .= ' '.$this->get_edit_link( array( 'text' => '#icon#' ) );
+
+		return $r;
+	}
 }
 ?>
