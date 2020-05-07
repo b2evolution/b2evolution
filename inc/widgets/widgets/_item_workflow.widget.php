@@ -268,15 +268,7 @@ class item_workflow_Widget extends ComponentWidget
 			echo '</div>';
 			$Form->end_form();
 
-			?>
-			<script>
-			jQuery( '#evo_widget_item_workflow_properties_<?php echo $this->ID;?> a' ).click( function() {
-					jQuery( '#evo_widget_item_workflow_form_<?php echo $this->ID;?>' ).show();
-					jQuery( '#evo_widget_item_workflow_properties_<?php echo $this->ID;?>' ).hide();
-					return false;
-				} );
-			</script>
-			<?php
+			expose_var_to_js( 'evo_workflow_properties_widget_config', $this->ID );
 		}
 
 		echo $this->disp_params['block_body_end'];

@@ -439,6 +439,20 @@ jQuery( document ).ready( function()
 		delete evo_temp_configs;
 	}
 
+	// Workflow Properties widget
+	if( typeof( evo_workflow_properties_widget_config ) != 'undefined' )
+	{
+		jQuery( '[id^=evo_widget_item_workflow_properties_] a' ).click( function() {
+				var workflow_properties = jQuery( this ).closest( '[id^=evo_widget_item_workflow_properties_]' ),
+					workflow_form = workflow_properties.next( '[id^=evo_widget_item_workflow_form_]' );
+
+				workflow_form.show();
+				workflow_properties.hide();
+
+				return false;
+			} );
+	}
+
 	// Display attachments fieldset
 	if( typeof( evo_display_attachments_fieldset_config ) != 'undefined' )
 	{
