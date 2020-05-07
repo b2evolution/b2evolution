@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -229,6 +229,7 @@ class ItemList2 extends ItemListLight
 		// fp> That can dramatically fatten the returned data. You must handle this in the postgres class (check that order fields are in select)
 		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
 									.$select_temp_order
+									.$this->ItemQuery->get_orderby_select()
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_orderby_from( ' ' )
 									.$this->ItemQuery->get_where()
@@ -643,6 +644,8 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
 		$next_Query->where_flagged( $this->filters['flagged'] );
+		$next_Query->where_locale_visibility();
+		$next_Query->where_mustread( $this->filters['mustread'] );
 
 		/*
 		 * ORDER BY stuff:

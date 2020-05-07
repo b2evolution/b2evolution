@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -55,7 +55,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -99,6 +99,31 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined (which will be the case for older v6- skins)
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_main_area'       => NULL,
+				'front_page_secondary_area'  => NULL,
+				'forum_front_secondary_area' => array( NT_('Forum Front Secondary Area'), 47 ),
+				'item_list'                  => NULL,
+				'item_in_list'               => NULL,
+				'sidebar_single'             => array( NT_('Sidebar Single'), 95 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -106,6 +131,9 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -133,6 +161,13 @@ class bootstrap_forums_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'sidebar_single_affix' => array(
 						'label' => T_('Sidebar Single'),
 						'note'  => T_('Use affix to keep visible when scrolling down.'),
@@ -141,7 +176,8 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -168,17 +204,26 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				   'workflow_display_mode' => array(
-					  'label'    => T_('Workflow column'),
-					  'note'     => '',
-					  'type'     => 'radio',
-					  'field_lines' => true,
-					  'options'  => array(
-						 array( 'status_and_author', T_('Display Status & Item Author') ),
-						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
-					  ),
-					  'defaultvalue' => 'status_and_author',
-				   ),
+					'workflow_display_mode' => array(
+						'label' => T_('Workflow column'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options'  => array(
+							array( 'status_and_author', T_('Display Status & Item Author') ),
+							array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+						),
+						'defaultvalue' => 'status_and_author',
+					),
+					'voting_place' => array(
+						'label' => T_('Voting'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options' => array(
+							array( 'under_content', T_('Under posts/comments') ),
+							array( 'left_score', T_('Show score on the left of each post/comment') ),
+						),
+						'defaultvalue' => 'under_content',
+					),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -197,25 +242,21 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 						'transparency' => true,
@@ -329,6 +370,29 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Set a skin specific param value for current Blog or Site
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 */
+	function set_setting( $parname, $parvalue )
+	{
+		global $Collection, $Blog;
+
+		// Set skin setting
+		parent::set_setting( $parname, $parvalue );
+
+		if( isset( $Blog ) &&
+		    $parname == 'voting_place' && 
+		    $parvalue == 'left_score' )
+		{	// Turn on positive and negative voting for collection when score voting mode is enabled for this Skin:
+			$Blog->set_setting( 'voting_positive', 1 );
+			$Blog->set_setting( 'voting_negative', 1 );
+		}
+	}
+
+
+	/**
 	 * Get current skin post navigation setting. Always use this navigation setting where this skin is applied.
 	 */
 	function get_post_navigation()
@@ -361,12 +425,15 @@ class bootstrap_forums_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Layout Settings / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
@@ -379,6 +446,18 @@ class bootstrap_forums_Skin extends Skin
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
+		}
+
+		if( $this->get_setting( 'voting_place' ) == 'left_score' )
+		{	// Initialize JS for voting for score mode on the left of each post/comment:
+			if( in_array( $disp, array( 'posts', 'flagged' ) ) )
+			{	// Used to vote on an item:
+				init_voting_item_js( 'blog' );
+			}
+			if( $disp == 'comments' )
+			{	// Used to vote on the comments:
+				init_voting_comment_js( 'blog' );
+			}
 		}
 
 		// Do not affix sidebar for screen width below and lesser:
@@ -504,11 +583,11 @@ class bootstrap_forums_Skin extends Skin
 	/**
 	 * Check if we can display a sidebar for the current layout
 	 *
-	 * @param string Layout: 'general' or 'single'
 	 * @param boolean TRUE to check if at least one sidebar container is visible
+	 * @param string Layout: 'general' or 'single'
 	 * @return boolean TRUE to display a sidebar
 	 */
-	function is_visible_sidebar( $layout = 'general', $check_containers = false )
+	function is_visible_sidebar( $check_containers = false, $layout = 'general' )
 	{
 		$layout = $this->get_setting_layout( $layout );
 
@@ -632,19 +711,57 @@ class bootstrap_forums_Skin extends Skin
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Item
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_item_voting_panel( $Item, $params = array() )
+	function display_item_voting_panel( $Item, $place, $params = array() )
 	{
-		skin_widget( array_merge( array(
-				// CODE for the widget:
-				'widget'      => 'item_vote',
-				// Optional display params
-				'Item'        => $Item,
-				'block_start' => '',
-				'block_end'   => '',
-				'skin_ID'     => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'      => 'item_vote',
+						// Optional display params
+						'Item'        => $Item,
+						'block_start' => '',
+						'block_end'   => '',
+						'skin_ID'     => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				global $disp;
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'                 => 'item_vote',
+						// Optional display params
+						'Item'                   => $Item,
+						'block_start'            => '',
+						'block_end'              => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'title_text'             => '',
+						'title_empty'            => '',
+						'display_summary'        => 'no',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'display_noactive'       => true,
+						'score_class'            => ( in_array( $disp, array( 'posts', 'flagged' ) ) ? 'vote_score__status_'.$Item->get_read_status() : '' ),
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+			}
 	}
 
 
@@ -652,16 +769,47 @@ class bootstrap_forums_Skin extends Skin
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Comment
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_comment_voting_panel( $Comment, $params = array() )
+	function display_comment_voting_panel( $Comment, $place, $params = array() )
 	{
-		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
-				'before_title'          => '',
-				'helpful_text'          => T_('Is this reply helpful?'),
-				'class'                 => 'vote_helpful',
-				'skin_ID'               => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title' => '',
+						'helpful_text' => T_('Is this reply helpful?'),
+						'skin_ID'      => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title'           => '',
+						'helpful_text'           => T_('Is this reply helpful?'),
+						'class'                  => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'display_noactive'       => true,
+						'title_text'             => '',
+						'title_empty'            => '',
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+		}
 	}
 
 

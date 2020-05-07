@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -104,8 +104,14 @@ function & get_LinkOwner( $link_type, $object_ID )
 						break;
 
 					case 'comment':
+					case 'metacomment':
 						load_class( 'comments/model/_comment.class.php', 'Comment' );
-						$LinkOwner = new LinkComment( new Comment(), $object_ID );
+						$Comment = new Comment();
+						if( $TemporaryID->get( 'type' ) == 'metacomment' )
+						{	// Set comment type to meta to ensure correct permissions:
+							$Comment->type = 'meta';
+						}
+						$LinkOwner = new LinkComment( $Comment, $object_ID );
 						break;
 				}
 				$LinkOwner->tmp_ID = $object_ID;
@@ -127,7 +133,7 @@ function & get_LinkOwner( $link_type, $object_ID )
 function get_link_owner_type( $link_ID )
 {
 	$LinkCache = & get_LinkCache();
-	if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && 
+	if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) &&
 	    ( $LinkOwner = & $Link->get_LinkOwner() ) )
 	{
 		return $LinkOwner->type;
@@ -143,7 +149,7 @@ function get_link_owner_type( $link_ID )
  * @param object Form
  * @param object LinkOwner object
  * @param boolean true to allow folding for this fieldset, false otherwise
- * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
  */
 function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fieldset_prefix = '' )
 {
@@ -235,12 +241,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	$fieldset_title .= '<span class="floatright panel_heading_action_icons">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
-				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'refresh\', \''.$fieldset_prefix.'\' )' ) )
 
 			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
-				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
+				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\', \''.$fieldset_prefix.'\' )' ) )
 
 		.'</span>';
 
@@ -306,6 +312,8 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 }
 </script>
 <?php
+// Print JS function to allow edit file properties on modal window
+echo_file_properties();
 	}
 }
 
@@ -515,12 +523,26 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 		// A link to open file manager in modal window:
 		$r .= ' <a href="'.$url.'" onclick="return window.parent.link_attachment_window( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.rawurlencode( $current_File->get_name() ).'\' )"'
-					.' target="_parent" title="'.$title.'">'
+					.' target="_parent" title="'.format_to_output( $title, 'htmlattr' ).'">'
 					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
+	}
 
-		// A link to open file manager in new window:
-		$r .= '<a href="'.$url.'" target="_blank" title="'.$title.'">'
-					.get_icon( 'permalink', 'imgtag', array( 'title' => $title ) ).'</a> ';
+	if( $current_File && is_logged_in() &&
+	    $current_User->check_perm( 'admin', 'restricted' ) &&
+	    $current_User->check_perm( 'files', 'edit_allowed', false, $current_File->get_FileRoot() ) )
+	{	// Edit file:
+		$title = T_('Edit properties...');
+		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
+		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
+
+		// A link to open file manager in modal window:
+		$r .= ' <a href="'.$admin_url.'?ctrl=files&amp;root='.$current_File->get_FileRoot()->ID
+					.'&amp;path='.rawurlencode( $current_File->get_dir_rel_path() )
+					.'&amp;fm_selected[]='.rawurlencode( $current_File->get_rdfp_rel_path() )
+					.'&amp;action=edit_properties&amp;'.url_crumb( 'file' ).'"'
+				.' onclick="return window.parent.file_properties( \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.$current_File->get_rdfp_rel_path().'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.( is_admin_page() ? 'backoffice' : 'frontoffice' ).'\' )"'
+				.' target="_parent" title="'.format_to_output( $title, 'htmlattr' ).'">'
+			.get_icon( 'edit', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
 	// Unlink/Delete icons:
@@ -674,7 +696,7 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 /**
  * Print out JavaScript to make the links table sortable
  *
- * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
  */
 function echo_link_sortable_js( $fieldset_prefix = '' )
 {
@@ -833,11 +855,11 @@ function get_file_links( $file_ID, $params = array() )
 				{
 					if( $current_User->ID != $User->ID && !$current_User->check_perm( 'users', 'view' ) )
 					{ // No permission to view other users in admin form
-						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->login.'</a>';
+						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->get_username().'</a>';
 					}
 					else
 					{ // Build a link to display a user in admin form
-						$r .= $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$User->login.'</a>';
+						$r .= $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$User->get_username().'</a>';
 					}
 					$link_object_ID = $link->link_usr_ID;
 				}

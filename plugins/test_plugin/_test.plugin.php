@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -311,6 +311,37 @@ class test_plugin extends Plugin
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'stealth' ) );
+
+		$r = array_merge( parent::get_shared_setting_definitions( $default_params ),
+				array(
+					'custom_shared' => array(
+							'label' => 'Shared setting',
+							'note' => 'Custom plugin setting ONLY for shared container widgets.',
+							'defaultvalue' => 'Shared value',
+						),
+					'shared_color' => array(
+							'label' => 'Shared color',
+							'type' => 'color',
+							'note' => 'Click on the field to display a color selector.',
+							'defaultvalue' => '#DDF',
+						),
+				)
+			);
+
+		return $r;
+	}
+
+
+	/**
 	 * Get definitions for widget specific editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -461,12 +492,14 @@ class test_plugin extends Plugin
 	 */
 	function GetDbLayout()
 	{
+		global $DB;
+
 		return array(
 				'CREATE TABLE '.$this->get_sql_table( 'test_table_name' ).' (
 					test_ID   INT UNSIGNED NOT NULL AUTO_INCREMENT,
-					test_name VARCHAR( 255 ) NOT NULL,
+					test_name VARCHAR( 255 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 					PRIMARY KEY( test_ID )
-				) ENGINE = innodb DEFAULT CHARSET = utf8'
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset
 			);
 	}
 
@@ -2108,12 +2141,11 @@ class test_plugin extends Plugin
 	}
 
 	/**
-	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
+	 * Event handler: called to filter the comment's anonymous author name
 	 *
 	 * @see Plugin::FilterCommentAuthor()
 	 * @param array Associative array of parameters
 	 *   - 'data': the name of the author/blog (by reference)
-	 *   - 'makelink': true, if the "data" contains a link
 	 *   - 'Comment': the {@link Comment} object
 	 */
 	function FilterCommentAuthor( & $params )

@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog;
+global $Collection, $Blog, $admin_url;
 
 // Create query
 $SQL = new SQL();
@@ -37,20 +37,28 @@ $default_ids = ItemType::get_default_ids();
  */
 function get_actions_for_itemtype( $id )
 {
-	global $default_ids;
-	$action = action_icon( T_('Duplicate this Item Type...'), 'copy',
-										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
+	global $default_ids, $admin_url, $current_User;
 
-	// Edit all item types except of not reserved item type
+	// Exit Item Type:
 	$action = action_icon( T_('Edit this Item Type...'), 'edit',
-									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
-						.$action;
+		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit' ) );
+
+	// Copy Item Type:
+	$action .= action_icon( T_('Duplicate this Item Type...'), 'copy',
+		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new' ) );
+
+	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	{	// Export Item Type only for PRO version:
+		$action .= action_icon( T_('Export this Item Type...'), 'download',
+			$admin_url.'?ctrl=exportxml&amp;action=export_itemtype&amp;ityp_ID='.$id.'&amp;'.url_crumb( 'itemtype' ) );
+	}
 
 	if( ! in_array( $id, $default_ids ) )
 	{	// Delete only the not default item types:
 		$action .= action_icon( T_('Delete this Item Type!'), 'delete',
-									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
+			regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb( 'itemtype' ) ) );
 	}
+
 	return $action;
 }
 
@@ -171,7 +179,9 @@ function ityp_row_usage( $item_type_usage )
 		case 'post':
 			return /* TRANS: noun */ T_('Post');
 		case 'page':
-			return T_('Page');
+			return T_('Content Page');
+		case 'widget-page':
+			return T_('Widget Page');
 		case 'intro-front':
 			return T_('Intro-Front');
 		case 'intro-main':
@@ -240,6 +250,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => '%get_actions_for_itemtype( #ityp_ID# )%',
 						);
+
+	$Results->global_icon( T_('Import Item Type'), 'import',
+		$admin_url.'?ctrl=itimport&amp;it_blog_IDs[]='.$Blog->ID, T_('Import Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
 				regenerate_url( 'action', 'action=new' ), T_('New Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );

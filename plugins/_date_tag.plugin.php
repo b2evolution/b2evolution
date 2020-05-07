@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +21,7 @@ class date_tag_plugin extends Plugin
 	var $code = 'evo_datetag';
 	var $name = 'Date tag';
 	var $priority = 57;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -34,8 +34,8 @@ class date_tag_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = sprintf( T_('Date formatting e-g %s'), '<code>[date:server:F d, Y H\:i\:s:-03.30.badge]</code>' );
-		$this->long_desc = sprintf( T_('This plugin allows to render date inside collection posts and comments by using the syntax %s for example'), '<code>[date:server:F d, Y H\:i\:s:-03.30.badge]</code>' );
+		$this->short_desc = sprintf( T_('Date formatting e-g %s'), '<code>[date:server:F d, Y H\:i\:s:-03.30:.badge]</code>' );
+		$this->long_desc = sprintf( T_('This plugin allows to render date inside collection posts and comments by using the syntax %s for example'), '<code>[date:server:F d, Y H\:i\:s:-03.30:.badge]</code>' );
 	}
 
 

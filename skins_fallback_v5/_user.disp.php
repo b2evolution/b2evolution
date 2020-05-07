@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -267,10 +267,10 @@ echo '<div class="profile_column_left">';
 		if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
 		{ // - Delete in back-office:
 			$buttons['del'] = array();
-			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID ).'" class="btn btn-danger">'
 					.'<button type="button">'.T_('Delete').'</button>'
 				.'</a>';
-			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID ).'" class="btn btn-danger">'
 					.'<button type="button">'.T_('Delete Spammer').'</button>'
 				.'</a>';
 		}
@@ -338,7 +338,7 @@ echo '<div class="profile_column_right">';
 					'after_image_legend'  => NULL,
 					'image_size'          => 'crop-top-80x80',
 					'image_link_to'       => 'original',
-					'image_link_title'    => $User->login,
+					'image_link_title'    => $User->get_username(),
 					'image_link_rel'      => 'lightbox[user]'
 				) );
 			}
@@ -364,13 +364,7 @@ echo '<div class="profile_column_right">';
 			$profileForm->begin_fieldset( $userfield->ufgp_name, array( 'id' => 'fieldset_user_fields' ) );
 		}
 
-		$userfield_icon = '';
-		if( ! empty( $userfield->ufdf_icon_name ) )
-		{ // Icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
-		}
-
-		$profileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
+		$profileForm->info( get_userfield_icon( $userfield->ufdf_icon_name, $userfield->ufdf_code ).' '.$userfield->ufdf_name, $userfield->uf_varchar );
 
 		$group_ID = $userfield->ufgp_ID;
 	}

@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -366,6 +366,10 @@ $emailskins_styles = array(
 ',
 '.squared' => '
 	border-radius: 0;
+',
+'.imgerror' => '
+	border: 1px solid red;
+	box-shadow: 0 0 10px red;
 ',
 );
 ?>

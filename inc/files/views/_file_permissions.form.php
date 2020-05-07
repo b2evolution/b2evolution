@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -25,9 +25,9 @@ global $more_than_one_selected_file, $perms_read_readonly, $field_options_read_r
 
 $Form = new Form( NULL, 'fm_perms_checkchanges' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url() );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url() );
 
-$Form->begin_form( 'fform', T_('Change permissions') );
+$Form->begin_form( 'fform', TB_('Change permissions') );
 
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
@@ -36,18 +36,18 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 
 	if( $more_than_one_selected_file )
 	{ // more than one file, provide default
-		$Form->begin_fieldset( T_('Default') );
+		$Form->begin_fieldset( TB_('Default') );
 
 		if( $perms_read_readonly )
 		{
-			$Form->radio_input( 'edit_perms_default', $edit_perms_default, $field_options_read_readonly, T_('Default permissions') );
+			$Form->radio_input( 'edit_perms_default', $edit_perms_default, $field_options_read_readonly, TB_('Default permissions') );
 		}
 		else
 		{
-			$Form->text_input( 'edit_perms_default', $edit_perms_default, 3, T_('Default permissions') );
+			$Form->text_input( 'edit_perms_default', $edit_perms_default, 3, TB_('Default permissions') );
 		}
 
-		$Form->info_field( '', '<a id="checkallspan_edit_perms_set" href="#" onclick="toggleCheckboxes(\'fm_perms_checkchanges\', \'use_default_perms[]\', \'edit_perms_set\'); return false;">'.T_('check all').'</a>' );
+		$Form->info_field( '', '<a id="checkallspan_edit_perms_set" href="#" onclick="toggleCheckboxes(\'fm_perms_checkchanges\', \'use_default_perms[]\', \'edit_perms_set\'); return false;">'.TB_('check all').'</a>' );
 
 		$Form->end_fieldset();
 	}
@@ -57,7 +57,7 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 		$Form->output = false;
 		$Form->switch_layout('none');
 		$use_default_perms_checkbox = $Form->checkbox_input(
-			'use_default_perms[]', $checked = 0, T_('Use default value'),
+			'use_default_perms[]', $checked = 0, TB_('Use default value'),
 			array( 'value' => '%file_ID%', 'id' => 'use_default_perms_%file_ID%' ) );
 		$Form->switch_layout(NULL);
 		$Form->output = true;
@@ -101,6 +101,6 @@ $Form->begin_form( 'fform', T_('Change permissions') );
 	}
 	$Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Set new permissions'), 'ActionButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', TB_('Set new permissions'), 'ActionButton' ) ) );
 
 ?>

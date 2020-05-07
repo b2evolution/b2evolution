@@ -16,7 +16,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://daniel.hahler.de}.
  *
@@ -497,6 +497,9 @@ class DB
 
 		// Force MySQL strict mode
 		$this->query( 'SET sql_mode = "TRADITIONAL"', 'Force MySQL "strict" mode (and make sure server is not configured with a weird incompatible mode)' );
+
+		// Support 4-byte chars:
+		$this->query( 'SET NAMES utf8mb4' );
 
 		if( $this->debug_profile_queries )
 		{
@@ -1818,7 +1821,7 @@ class DB
 			$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
 			$this->rollback_nested_transaction = false;
 		}
-		elseif( $this->transaction_nesting_level > 1 )
+		else
 		{ // Remember we'll have to roll back at the end!
 			$this->rollback_nested_transaction = true;
 		}

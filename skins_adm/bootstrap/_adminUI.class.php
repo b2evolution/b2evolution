@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url;
+		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url, $rsc_url;
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -89,7 +89,7 @@ class AdminUI extends AdminUI_general
 			) );
 
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-		init_fontawesome_icons( 'fontawesome-glyphicons' );
+		init_fontawesome_icons( 'fontawesome-glyphicons', 'rsc_uri' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:
@@ -99,6 +99,30 @@ class AdminUI extends AdminUI_general
 				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
 			}
 		}
+
+		// evo helpdesk widget:
+		//require_css( $rsc_url.'css/evo_helpdesk_widget.min.css' );
+		//require_js( $rsc_url.'js/evo_helpdesk_widget.min.js' );
+	}
+
+
+	/**
+	 * Get the end of the HTML <body>. Close open divs, etc...
+	 *
+	 * This is not called if {@link $mode} is set.
+	 *
+	 * @return string
+	 */
+	function get_body_bottom()
+	{
+		/*return '<script>
+			// Initialize the b2evolution helpdesk widget:
+			evo_helpdesk_widget.init( {
+				site_url: "https://b2evolution.net/",
+				collection: "man",
+				'.( empty( $this->page_manual_slug ) ? '' : 'default_slug: "'.$this->page_manual_slug.'",' ).'
+			} );
+			</script>';*/
 	}
 
 
@@ -307,8 +331,8 @@ class AdminUI extends AdminUI_general
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
-						'after' => '</div>$button_add_blog$</nav></div>',
+						'before' => '<div class="container-fluid coll-selector"><nav>$button_list_all$<div class="btn-group">',
+						'after' => '</div>$button_add_blog$$collection_groups$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
 						'buttons_start' => '',
@@ -326,17 +350,17 @@ class AdminUI extends AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '<div class="evo_panel">',
-						'header_text' => '<div class="center"><ul class="pagination">'
+					'header_start' => '<div class="results_header clearfix">',
+						'header_text' => '<div class="evo_pager"><div class="results_summary">$nb_results$ Results $reset_filters_button$</div><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
-						'header_text_single' => '',
+						'header_text_single' => '<div class="results_summary">$nb_results$ Results $reset_filters_button$</div>',
 					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'filters_start'        => '<div class="filters panel-body">',
 					'filters_end'          => '</div>',
-					'filter_button_class'  => 'btn-sm btn-info',
+					'filter_button_class'  => 'evo_btn_apply_filters btn-sm btn-info',
 					'filter_button_before' => '<div class="form-group pull-right">',
 					'filter_button_after'  => '</div>',
 					'messages_start' => '<div class="messages form-inline">',
@@ -387,7 +411,7 @@ class AdminUI extends AdminUI_general
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table></div>\n\n",
-					'footer_start' => '<div class="evo_panel evo_panel__footer">',
+					'footer_start' => '<div class="results_footer">',
 					'footer_text' => '<div class="center"><ul class="pagination">'
 							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 						.'</ul></div><div class="center page_size_selector">$page_size$</div>'
@@ -411,7 +435,7 @@ class AdminUI extends AdminUI_general
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
 					'no_results_start' => '<div class="panel-footer">'."\n",
-					'no_results_end'   => '$no_results$</div>'."\n\n",
+					'no_results_end'   => '$no_results$ $reset_filters_button$</div>'."\n\n",
 				'content_end' => '</div>',
 				'after' => '</div>',
 				'sort_type' => 'basic'
@@ -521,9 +545,9 @@ class AdminUI extends AdminUI_general
 					'fieldend_radio'         => "</div>\n\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -536,6 +560,7 @@ class AdminUI extends AdminUI_general
 					'formend'        => '',
 					'title_fmt'      => '<span class="global_icons">$global_icons$</span><h2 class="page-title">$title$</h2>'."\n",
 					'no_title_fmt'   => '<span class="global_icons no_title">$global_icons$</span><div class="clear"></div>'."\n",
+					'fieldset_title' => '',
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
@@ -569,9 +594,9 @@ class AdminUI extends AdminUI_general
 					'fieldend_radio'         => "</div>\n\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -592,7 +617,11 @@ class AdminUI extends AdminUI_general
 									 '</div>' // End of <div class="panel-body...>
 								.'</div>' // End of <div id="$group_item_id$...>
 							.'</div>'."\n", // End of <div class="panel panel-default...>
+					) );
 
+			case 'accordion_table':
+				return array_merge( $this->get_template( 'Results' ), array(
+						'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title"><a class="accordion-toggler collapsed" data-toggle="collapse" data-parent="#$group_id$" href="#$group_item_id$" aria-expanded="false" aria-controls="$group_item_id$">$title$</a></h3></div>'."\n",
 					) );
 
 			case 'linespan_form':
@@ -639,9 +668,9 @@ class AdminUI extends AdminUI_general
 					'inputend_radio'         => "</div>\n",
 					'inputclass_radio'       => '',
 					'radio_label_format'     => '$radio_option_label$',
-					'radio_newline_start'    => '<div class="radio"><label>',
+					'radio_newline_start'    => '<div class="radio $radio_option_class$"><label>',
 					'radio_newline_end'      => "</label></div>\n",
-					'radio_oneline_start'    => '<label class="radio-inline">',
+					'radio_oneline_start'    => '<label class="radio-inline $radio_option_class$">',
 					'radio_oneline_end'      => "</label>\n",
 				);
 
@@ -827,7 +856,6 @@ class AdminUI extends AdminUI_general
 		$buttons = '';
 		$select_options = '';
 		$not_favorite_blogs = false;
-
 		foreach( $blog_array as $l_blog_ID )
 		{ // Loop through all blogs that match the requested permission:
 
@@ -874,13 +902,29 @@ class AdminUI extends AdminUI_general
 
 		$r .= $title;
 
+		if( $this->coll_list_disp_sections )
+		{	// Check if filter by section is used currently:
+			$sec_ID = param( 'sec_ID', 'integer', 0 );
+			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
+			{
+				$sec_ID = 0;
+				set_param( 'sec_ID', 0 );
+			}
+		}
+
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
-			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
 			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
-						.'" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'
+						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
-			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			// Don't display default button if custom is defined:
+			$button_list_all = '';
+		}
+		else
+		{	// Default button to list all collections:
+			$button_list_all = '<a href="'.$admin_url.'?ctrl=collections" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'.T_('List').'</a> ';
 		}
 
 		$r .= $template['buttons_start'];
@@ -899,22 +943,167 @@ class AdminUI extends AdminUI_general
 				.$template['select_end'];
 		}
 
-		// Button to add new collection
-		if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
-		{ // Display a button to add new collection if current user has a permission
-			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
+		// Button to add new collection:
+		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		{	// Display a button to add new collection if it is requested and current user has a permission
+			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.format_to_output( T_('New Collection'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 		}
 		else
-		{ // No permission to add new collection
+		{	// No request or permission to add new collection:
 			$button_add_blog = '';
 		}
 
-		$r .= str_replace( '$button_add_blog$', $button_add_blog, $template['after'] );
+		// Sections:
+		if( $this->coll_list_disp_sections )
+		{
+			$collection_groups = '';
 
-		return $r;
+			$SectionCache = & get_SectionCache();
+			$SectionCache->load_available();
+
+			foreach( $SectionCache->cache as $Section )
+			{	// Loop through all sections that match the requested permission:
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['beforeEachSel'] : $template['beforeEach'];
+
+				$collection_groups .= '<a href="'.format_to_output( $url_params.'blog=0&amp;sec_ID='.$Section->ID, 'htmlattr' )
+					.'" class="btn btn-default'.( $Section->ID == $sec_ID ? ' active' : '' ).'">'
+						.$Section->dget( 'name', 'htmlbody' )
+					.'</a> ';
+
+				$collection_groups .= ( $Section->ID == $sec_ID ) ? $template['afterEachSel'] : $template['afterEach'];
+			}
+
+			$collection_groups = empty( $collection_groups ) ? '' : '<div class="btn-group">'.$collection_groups.'</div>';
+		}
+		else
+		{
+			$collection_groups = '';
+		}
+
+		$r .= $template['after'];
+
+		return str_replace( array( '$button_list_all$', '$button_add_blog$', '$collection_groups$' ),
+			array( $button_list_all, $button_add_blog, $collection_groups ), $r );
 	}
 
 
+	/**
+	 * Display tabs for customizer mode in left iframe
+	 *
+	 * @param array Params
+	 */
+	function display_customizer_tabs( $params = array() )
+	{
+		global $Blog, $Settings, $current_User, $admin_url;
+
+		$params = array_merge( array(
+				'action_links'   => '',
+				'active_submenu' => '',
+				'path'           => NULL, // can be string like 'site', or array like array( 'coll', 'widgets' )
+			), $params );
+
+		if( empty( $Blog ) )
+		{	// Get last working collection:
+			$BlogCache = & get_BlogCache();
+			$tab_Blog = & $BlogCache->get_by_ID( get_working_blog(), false, false );
+		}
+		else
+		{	// Use current collection:
+			$tab_Blog = $Blog;
+			set_working_blog( $tab_Blog->ID );
+		}
+
+		$tabs = array();
+
+		// Site:
+		if( $Settings->get( 'site_skins_enabled' ) &&
+				$current_User->check_perm( 'options', 'edit' ) )
+		{	// If current User can edit site skin settings:
+			$tabs['site'] = array(
+				'text' => T_('Site'),
+				'href' => $admin_url.'?ctrl=customize&amp;view=site_skin',
+			);
+		}
+		// Collection:
+		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+		{	// If current User can edit current collection settings:
+			$tabs['coll'] = array(
+				'text' => $tab_Blog->get( 'shortname' ),
+				'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+				'entries' => array(
+					'skin' => array(
+						'text' => T_('Skin'),
+						'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+					),
+					'widgets' => array(
+						'text' => T_('Widgets'),
+						'href' => $admin_url.'?ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID,
+					),
+				)
+			);
+		}
+		// Other:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_user_blogs( 'blog_properties', 'edit' );
+		if( count( $BlogCache->cache ) > 1 )
+		{	// If current User can edit settings of at least two collections:
+			$tabs['other'] = array(
+				'text' => T_('Other'),
+				'href' => $admin_url.'?ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID,
+			);
+		}
+
+		// Display tabs and menu entries:
+		echo '<div class="evo_customizer__tabs">';
+
+		if( count( $tabs ) )
+		{	// Display tabs if they are allowed for current user by permissions:
+			$path = ( empty( $params['path'] ) || is_string( $params['path'] ) ) ? array( $params['path'] ) : $params['path'];
+
+			$active_tab_entries = NULL;
+			echo '<ul class="nav nav-tabs">';
+			foreach( $tabs as $tab_key => $tab )
+			{
+				$is_active_tab = ( isset( $path[0] ) && $tab_key == $path[0] );
+				if( $is_active_tab && ! empty( $tab['entries'] ) )
+				{	// Store entries of active tab to print out it below:
+					$active_tab_entries = $tab['entries'];
+				}
+				echo '<li'.( $is_active_tab ? ' class="active"' : '' ).'>'
+						.'<a href="'.$tab['href'].'">'.$tab['text'].'</a>'
+					.'</li>';
+			}
+			echo '</ul>';
+
+			if( $active_tab_entries !== NULL )
+			{	// Display sub menu entries for currently active tab:
+				echo '<div class="evo_customizer__menus">';
+				echo '<nav><ul class="nav nav-pills">';
+				foreach( $active_tab_entries as $entry_key => $entry )
+				{
+					echo '<li'.( ( isset( $path[1] ) && $entry_key == $path[1] ) ? ' class="active"' : '' ).'>'
+							.'<a href="'.$entry['href'].'">'.$entry['text'].'</a>'
+						.'</li>';
+				}
+				echo '</ul></nav>';
+				echo '</div>';
+			}
+		}
+
+		if( ! empty( $params['action_links'] ) )
+		{	// Display additional action links:
+			echo '<div class="evo_customizer__actions">'.$params['action_links'].'</div>';
+		}
+
+		// Buttons to collapse and hide left customizer panel:
+		echo '<div class="evo_customizer__tab_buttons btn-group">'
+				.'<button id="evo_customizer__collapser" class="btn btn-sm btn-default"><span class="fa fa-backward"></span></button>'
+				.'<button id="evo_customizer__closer" class="btn btn-sm btn-default"><span class="fa fa-close"></span></a>'
+			.'</div>';
+
+		echo '</div>';
+	}
 }
 
 ?>

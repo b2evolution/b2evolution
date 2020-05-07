@@ -193,10 +193,8 @@ function filter_messages( & $Form )
 $Results->filter_area = array(
 		'submit_title' => T_('Filter messages'),
 		'callback' => 'filter_messages',
-		'presets' => array(
-			'all' => array( T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) ),
-			)
 	);
+$Results->register_filter_preset( 'all', T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) );
 
 /**
  * Author:

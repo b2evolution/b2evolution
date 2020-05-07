@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -192,10 +192,8 @@ function polls_results_block( $params = array() )
 		$polls_Results->filter_area = array(
 			'callback' => 'poll_filters_callback',
 			'url_ignore' => 'owner,results_poll_page',
-			'presets' => array(
-				'all' => array( T_('All'), $admin_url.'?ctrl=polls' ),
-				)
 			);
+		$polls_Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=polls' );
 	}
 
 	$polls_Results->cols[] = array(

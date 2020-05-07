@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -93,7 +93,7 @@ class PageCache
 
 			if( ! $Blog->get_setting('cache_enabled') )
 			{	// We do NOT want caching for this collection
-				$Debuglog->add( 'Cache not enabled for this blog.', 'pagecache' );
+				$Debuglog->add( 'Cache not enabled for this collection.', 'pagecache' );
 			}
 			else
 			{
@@ -643,7 +643,7 @@ class PageCache
 		{ // skip CVS folders - This could be more specific
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
-				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because of reserved name.', 'warning' );
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because of reserved name.' );
 			}
 			return false;
 		}
@@ -655,7 +655,7 @@ class PageCache
 		{ // this file is index.html or sample.htaccess or it is hidden, should not delete it.
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
-				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because of reserved name.', 'warning' );
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because of reserved name.' );
 			}
 			return false;
 		}
@@ -731,7 +731,7 @@ class PageCache
 		{	// No permission to open the cache folder:
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
-				cron_log_action_end( 'Can not access directory: <code>'.$path.'</code>', 'error' );
+				cron_log_action_end( 'Cannot access directory: <code>'.$path.'</code>', 'error' );
 			}
 			$result = false;
 		}

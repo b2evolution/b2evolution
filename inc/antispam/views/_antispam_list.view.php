@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -102,11 +102,9 @@ function filter_antispam( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_antispam',
 	'url_ignore' => 'results_antispam_page,keywords',
-	'presets' => array(
-		'all' => array( T_('All keywords'), '?ctrl=antispam' ),
-		)
 	);
 
+$Results->register_filter_preset( 'all', T_('All keywords'), $admin_url.'?ctrl=antispam' );
 
 
 /*

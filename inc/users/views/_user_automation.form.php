@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -62,7 +62,7 @@ if( $display_mode != 'js' )
 		echo_user_actions( $Form, $edited_User, $action );
 	}
 
-	$form_text_title = T_( 'Add user to an automation...' ); // used for js confirmation message on leave the changed form
+	$form_text_title = TB_( 'Add user to an automation...' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
@@ -76,9 +76,9 @@ $Form->hidden( 'user_ID', $edited_User->ID );
 $close_icon = '';
 if( $display_mode == 'js' )
 { // Display a close link for popup window
-	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+	$close_icon = action_icon( TB_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
-$Form->begin_fieldset( T_('Add user to an automation...').get_manual_link( 'add-user-to-automation' ).$close_icon, array( 'style' => 'width:420px' ) );
+$Form->begin_fieldset( TB_('Add user to an automation...').get_manual_link( 'add-user-to-automation' ).$close_icon, array( 'style' => 'width:420px' ) );
 
 	// Get automations where user is NOT added yet:
 	$AutomationCache = & get_AutomationCache();
@@ -88,15 +88,15 @@ $Form->begin_fieldset( T_('Add user to an automation...').get_manual_link( 'add-
 	$AutomationCache->load_by_sql( $automation_cache_SQL );
 	if( count( $AutomationCache->cache ) > 0 )
 	{	// Allow to select automation if at least one is avaialble:
-		$Form->select_input_object( 'autm_ID', '', $AutomationCache, T_('Automation'), array( 'required' => true ) );
+		$Form->select_input_object( 'autm_ID', '', $AutomationCache, TB_('Automation'), array( 'required' => true ) );
 
 		echo '<p class="center">';
-		$Form->button( array( '', 'actionArray[add_automation]', T_('Add'), 'SaveButton' ) );
+		$Form->button( array( '', 'actionArray[add_automation]', TB_('Add'), 'SaveButton' ) );
 		echo '</p>';
 	}
 	else
 	{	// Otherwise display a message:
-		$Form->custom_content( '<p class="alert alert-info"><strong>'.T_( 'This user was already added to all available automations.' ).'</strong></p>' );
+		$Form->custom_content( '<p class="alert alert-info"><strong>'.TB_( 'This user was already added to all available automations.' ).'</strong></p>' );
 	}
 
 $Form->end_fieldset();

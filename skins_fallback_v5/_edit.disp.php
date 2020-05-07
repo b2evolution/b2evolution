@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -110,6 +110,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+		$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 		$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
@@ -118,21 +119,37 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-		{	// We want to use workflow properties for this blog:
-			$Form->hidden( 'item_priority', $edited_Item->priority );
-			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		if( $edited_Item->can_edit_workflow( 'status' ) )
+		{	// Allow workflow status if current user can edit this property:
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			if( $Blog->get_setting( 'use_deadline' ) )
-			{	// If deadline is enabled for collection:
-				$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
-			}
+		}
+		if( $edited_Item->can_edit_workflow( 'status' ) )
+		{	// Allow workflow user if current user can edit this property:
+			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		}
+		if( $edited_Item->can_edit_workflow( 'priority' ) )
+		{	// Allow workflow priority if current user can edit this property:
+			$Form->hidden( 'item_priority', $edited_Item->priority );
+		}
+		if( $edited_Item->can_edit_workflow( 'deadline' ) )
+		{	// Allow workflow deadline if current user can edit this property:
+			$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
+			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
-		$Form->hidden( 'item_featured', $edited_Item->featured );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$Form->hidden( 'item_featured', $edited_Item->featured );
+			$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
+			$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
+		}
+		if( is_pro() && $Blog->get_setting( 'track_unread_content' ) )
+		{	// Update setting to mark Item as "must read" only for PRO version and when tracking of unread content is enabled for collection:
+			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
+		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
-		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
-		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
+		$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
+		$Form->hidden( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -152,10 +169,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
 			$Form->hidden( 'item_issue_time', substr( $edited_Item->get( 'issue_date' ), 11 ) );
 		}
-		// Tags
-		$Form->hidden( 'item_tags', $item_tags );
-		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 	}
+	// Tags
+	$Form->hidden( 'item_tags', $item_tags );
+	$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 
 	if( $Blog->get_setting( 'in_skin_editing_category' ) )
 	{	// If categories are allowed to update from front-office:
@@ -239,7 +256,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->textarea_input( 'content', $item_content, 16, NULL, array(
 				'cols' => 50 ,
 				'id' => 'itemform_post_content',
-				'class' => 'autocomplete_usernames'
+				'class' => 'autocomplete_usernames link_attachment_dropzone'
 			) );
 		$Form->switch_layout( NULL );
 		?>
@@ -272,7 +289,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// =================================== INSTRUCTION ====================================
-	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	if( $edited_Item->get_type_setting( 'front_order_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
 	{
 		echo '<div class="action_messages evo_instruction"><div class="log_note">'.$edited_Item->get_type_setting( 'instruction' ).'</div></div>';
 	}
@@ -308,8 +325,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ################### TEXT RENDERERS ###################
-	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
-	{	// If text renderers are allowed to update from front-office:
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) && $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// If text renderers are allowed to update from front-office and text content is allowed for the item type:
 		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
 	}
 	else
@@ -403,6 +420,4 @@ echo_autocomplete_tags();
 echo_fieldset_folding_js();
 
 $edited_Item->load_Blog();
-// Location
-echo_regional_js( 'item', $edited_Item->region_visible() );
 ?>

@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Origin:
@@ -33,7 +33,7 @@ function hits_results_block( $params = array() )
 		return;
 	}
 
-	global $blog, $current_User;
+	global $blog, $sec_ID, $current_User;
 
 	if( $blog == 0 )
 	{
@@ -211,8 +211,16 @@ function hits_results_block( $params = array() )
 	}
 
 
+	if( ! empty( $sec_ID ) )
+	{	// Filter by selected section:
+		$filter = 'blog_sec_ID = '.$DB->escape( $sec_ID );
+		$SQL->WHERE_and( $filter );
+		$count_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+		$count_SQL->WHERE_and( $filter );
+	}
+
 	if( ! empty( $blog ) )
-	{
+	{	// Filter by selected collection:
 		$filter = 'hit_coll_ID = '.$DB->escape( $blog );
 		$SQL->WHERE_and( $filter );
 		$count_SQL->WHERE_and( $filter );
@@ -739,6 +747,14 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 
+		if( isset( $Test_hit ) && ! empty( $Test_hit->ID ) && rand( 0, 2 ) == 2 )
+		{	// Insert sample goal hits per random new Hit:
+			$DB->query( 'INSERT INTO T_track__goalhit ( ghit_goal_ID, ghit_hit_ID )
+				SELECT goal_ID, '.$Test_hit->ID.' FROM T_track__goal
+				 ORDER BY RAND()
+				 LIMIT 1' );
+		}
+
 		$sessions[$rand_i] = $cur_session;
 
 		if( $display_process )
@@ -961,12 +977,13 @@ function get_hit_agent_name_by_ID( $agent_ID )
 /**
  * Extract keyphrases from the hitlog
  *
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @return integer Number of new inserted key phrases,
  *         string Error message if the process is already running and not allowed to run
  */
-function extract_keyphrase_from_hitlogs()
+function extract_keyphrase_from_hitlogs( $display_messages = true )
 {
-	global $DB, $Messages;
+	global $DB, $Messages, $Timer;
 
 	// Set lock name based on the database name, table name and process name
 	$lock_name = $DB->dbname.'.T_track__keyphrase.extract_keyphrase';
@@ -986,14 +1003,35 @@ function extract_keyphrase_from_hitlogs()
 	$DB->get_var( 'SELECT GET_LOCK( '.$DB->quote( $lock_name ).', 20 )' );
 
 	// Look for unextracted keyphrases:
-	$sql = 'SELECT MIN(h.hit_ID) as min, MAX(h.hit_ID) as max
-				FROM T_hitlog as h
-				WHERE h.hit_keyphrase IS NOT NULL
-					AND h.hit_keyphrase_keyp_ID IS NULL';
-	$ids = $DB->get_row( $sql, ARRAY_A, NULL, ' Get max/min hits ids of unextracted keyphrases' );
+	$Timer->start( 'extract_keyphrase_number' );
+	$SQL = new SQL( 'Get number of hitlog records and  min/max of hit IDs that have a keyphrase that was not processed yet' );
+	$SQL->SELECT( 'COUNT( hit_ID ) AS hits_num, COUNT( DISTINCT hit_keyphrase ) AS keyphrases_num, MIN( hit_ID ) as min, MAX( hit_ID ) as max' );
+	$SQL->FROM( 'T_hitlog' );
+	$SQL->WHERE( 'hit_keyphrase IS NOT NULL' );
+	$SQL->WHERE_and( 'hit_keyphrase != ""' );
+	$SQL->WHERE_and( 'hit_keyphrase_keyp_ID IS NULL' );  // Keyphrase that has not been extracted yet!
+	$ids = $DB->get_row( $SQL, ARRAY_A );
+	$Timer->stop( 'extract_keyphrase_number' );
 
-	if( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
+	if( $display_messages )
+	{	// Display info:
+		$log_message = sprintf( TB_('Number of hitlog records that have a keyphrase that was not processed yet: %d'), intval( $ids['hits_num'] ) );
+		$log_message .= ' <span class="note">(keyphrases='.$ids['keyphrases_num'].', min='.$ids['min'].', max='.$ids['max'].')('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_number' ) ).')</span>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message );
+		}
+		else
+		{	// Print out a message:
+			echo '<p>'.$log_message.'</p>';
+			evo_flush();
+		}
+	}
+
+	if( ! empty( $ids['min'] ) && ! empty( $ids['max'] ) )
 	{	// Extract keyphrases if needed:
+
+		$Timer->start( 'extract_keyphrase_insert' );
 
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
 					SELECT h.hit_keyphrase, 1
@@ -1001,11 +1039,12 @@ function extract_keyphrase_from_hitlogs()
 					WHERE
 						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
 						AND h.hit_keyphrase IS NOT NULL
+						AND h.hit_keyphrase != ""
 						AND h.hit_keyphrase_keyp_ID IS NULL
 						AND h.hit_referer_type = "search"
 				ON DUPLICATE KEY UPDATE
 				T_track__keyphrase.keyp_count_refered_searches = T_track__keyphrase.keyp_count_refered_searches + 1';
-		$inserted_keyphrases_num += $DB->query( $sql, ' Insert/Update external keyphrase' );
+		$DB->query( $sql, ' Insert/Update external keyphrase' );
 
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_internal_searches)
 					SELECT h.hit_keyphrase, 1
@@ -1013,25 +1052,76 @@ function extract_keyphrase_from_hitlogs()
 					WHERE
 						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
 						AND h.hit_keyphrase IS NOT NULL
+						AND h.hit_keyphrase != ""
 						AND h.hit_keyphrase_keyp_ID IS NULL
 						AND h.hit_referer_type != "search"
 				ON DUPLICATE KEY UPDATE
 				T_track__keyphrase.keyp_count_internal_searches = T_track__keyphrase.keyp_count_internal_searches + 1';
-		$inserted_keyphrases_num += $DB->query( $sql, 'Insert/Update internal keyphrase' );
+		$DB->query( $sql, 'Insert/Update internal keyphrase' );
 
+		$Timer->stop( 'extract_keyphrase_insert' );
+
+		if( $display_messages )
+		{	// Display info:
+			$log_message = sprintf( TB_('%d key phrases have been inserted or updated.'), intval( $ids['keyphrases_num'] ) );
+			$log_message .= ' <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_insert' ) ).')</span>';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo '<p>'.$log_message.'</p>';
+				evo_flush();
+			}
+		}
+
+		if( $display_messages )
+		{	// Display info:
+			$log_message = TB_('Updating hit logs table...').' ';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message, NULL, '' );
+// TODO: We must FORCE writing the log to the DB here
+			}
+			else
+			{	// Print out a message:
+				echo '<p>'.$log_message;
+				evo_flush();
+			}
+		}
+
+		$Timer->start( 'extract_keyphrase_update' );
+// TODO: this still takes too much time!
 		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
 				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
 				WHERE
 					h.hit_keyphrase = k.keyp_phrase
+					AND h.hit_keyphrase != ""
 					AND ( h.hit_ID >= '.$ids['min'].' )
 					AND ( h.hit_ID <= '.$ids['max'].' )
 					AND ( h.hit_keyphrase_keyp_ID IS NULL )';
-		$DB->query( $sql, 'Update hitlogs keyphrase id' );
+		$updated_keyphrases_num = $DB->query( $sql, 'Update hitlogs keyphrase id' );
+		$Timer->stop( 'extract_keyphrase_update' );
+		if( $display_messages )
+		{	// Display info:
+			$log_message = sprintf( TB_('%d records'), $updated_keyphrases_num );
+			$log_message .= ' <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_update' ) ).')</span>';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo $log_message.'</p>';
+				evo_flush();
+			}
+		}
 	}
 
 	$DB->get_var( 'SELECT RELEASE_LOCK( '.$DB->quote( $lock_name ).' )' );
 
-	return $inserted_keyphrases_num;
+	return intval( $ids['keyphrases_num'] );
 }
 
 
@@ -1153,10 +1243,12 @@ function display_hits_filter_form( $mode, $diagram_columns, $display_filter_peri
 
 	echo '<div class="evo_filter_diagram_hits"'.$block_style.'>';
 	$Form = new Form();
-	$Form->hidden_ctrl();
+	$Form->hidden( 'ctrl', 'stats' );
+	$Form->hidden( 'from_ctrl', get_param( 'ctrl' ) );
 	$Form->hidden( 'tab', get_param( 'tab' ) );
 	$Form->hidden( 'tab3', get_param( 'tab3' ) );
 	$Form->hidden( 'blog', get_param( 'blog' ) );
+	$Form->hidden( 'sec_ID', get_param( 'sec_ID' ) );
 	$Form->hidden( 'action', $action );
 	$Form->add_crumb( 'filterhitsdiagram' );
 

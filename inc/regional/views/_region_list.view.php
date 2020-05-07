@@ -124,10 +124,8 @@ function filter_regions( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_regions',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=regions' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=regions' );
 
 
 if( $current_User->check_perm( 'options', 'edit', false ) )

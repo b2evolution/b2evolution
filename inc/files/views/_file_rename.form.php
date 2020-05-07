@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -28,9 +28,9 @@ if( !empty( $new_names ) )
 
 	$Form = new Form( NULL, 'fm_rename_checkchanges' );
 
-	$Form->global_icon( T_('Cancel rename!'), 'close', regenerate_url() );
+	$Form->global_icon( TB_('Cancel rename!'), 'close', regenerate_url() );
 
-	$Form->begin_form( 'fform', T_('Rename') );
+	$Form->begin_form( 'fform', TB_('Rename') );
 
 		$Form->add_crumb( 'file' );
 		$Form->hidden_ctrl();
@@ -46,15 +46,15 @@ if( !empty( $new_names ) )
 				continue;
 			}
 
-			$Form->begin_fieldset( T_('File').': '.$loop_src_File->dget('name') );
+			$Form->begin_fieldset( TB_('File').': '.$loop_src_File->dget('name') );
 
 			$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
-										T_('New name'), $loop_src_File->dget('title'), 128 );
+										TB_('New name'), $loop_src_File->dget('title'), 128 );
 
 			$Form->end_fieldset();
 		}
 
 
-	$Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', TB_('Rename'), 'SaveButton' ) ) );
 	}
 ?>

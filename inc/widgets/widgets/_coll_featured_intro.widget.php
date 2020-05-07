@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -194,12 +194,12 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
+		global $disp;
 
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item( 'front', $this->disp_params['blog_ID'] ) )
+		if( $Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'], true ) )
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -257,8 +257,13 @@ class coll_featured_intro_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_end'];
 			echo $this->disp_params['block_end'];
 			// ----------------------------END ITEM BLOCK  ----------------------------
+			return true;
 		}
-
+		else
+		{	// No featured Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no featured/intro post to display' );
+			return false;
+		}
 	}
 
 
@@ -269,14 +274,10 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $FeaturedList, $current_User;
+		global $Collection, $Blog, $FeaturedList, $current_User, $disp;
 
 		// Get intro Item which is displayed for this widget:
-		$Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] );
-		if( ! empty( $FeaturedList ) )
-		{	// Restart results of the featured list in order to keep the same Item on display this widget:
-			$FeaturedList->restart();
-		}
+		$Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'], true );
 
 		return array(
 				'wi_ID' => $this->ID, // Have the widget settings changed ?
@@ -285,6 +286,26 @@ class coll_featured_intro_Widget extends ComponentWidget
 				'intro_feat_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the intro/featured post changed ?
 				'item_ID' => empty( $Item ) ? 0 : $Item->ID, // Cache each item separately + Has the Item changed?
 			);
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['featured_intro_before'];
+			echo $message;
+			echo $this->disp_params['featured_intro_after'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 ?>

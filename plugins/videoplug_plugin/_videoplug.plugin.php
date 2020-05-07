@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $number_of_installs = 1;
 
 
@@ -128,7 +128,7 @@ class videoplug_plugin extends Plugin
 		      ( $this->get_coll_setting( 'replace_url_post', $setting_Blog ) && ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
 		  ) )
 		{	// Render full video URLs in post or comment content:
-			$content = replace_content_outcode( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
+			$content = replace_content_outcode_shorttags( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
 				array( $this, 'parse_video_url_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
 

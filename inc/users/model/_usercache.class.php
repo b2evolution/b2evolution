@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -44,7 +44,7 @@ class UserCache extends DataObjectCache
 	function __construct()
 	{
 		parent::__construct( 'User', false, 'T_users', 'user_', 'user_ID', NULL, '',
-			/* TRANS: "None" select option */ NT_('No user') );
+			/* TRANS: "None" select option */ NT_('No user'), 0 );
 	}
 
 

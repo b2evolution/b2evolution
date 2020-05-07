@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -67,6 +67,13 @@ class breadcrumb_path_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget uses the selected items:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
@@ -119,12 +126,21 @@ class breadcrumb_path_Widget extends ComponentWidget
 		global $Collection, $Blog, $cat, $disp, $thumbnail_sizes;
 
 		$params = array_merge( array(
-				'item_mask'        => '<a href="$url$">$title$</a>',
-				'item_active_mask' => '$title$',
-				'suffix_text'      => '', // Used to add custom item at the end of list
+				'item_mask'             => '<a href="$url$">$title$</a>',
+				'item_logo_mask'        => '$logo$ <a href="$url$">$title$</a>',
+				'item_active_mask'      => '$title$',
+				'item_active_logo_mask' => '$logo$ $title$',
+				'suffix_text'           => '', // Used to add custom item at the end of list
 			), $params );
 
+		// Make sure we include the above params:
+		$this->disp_params = NULL;
 		$this->init_display( $params );
+
+		$this->disp_params = array_merge( array(
+			'widget_breadcrumb_path_before'      => '',
+			'widget_breadcrumb_path_after'       => '',
+		), $this->disp_params );
 
 		$breadcrumbs = array();
 
@@ -134,6 +150,9 @@ class breadcrumb_path_Widget extends ComponentWidget
 					'title' => $this->disp_params['suffix_text'],
 				);
 		}
+
+		// Use current category:
+		$chapter_ID = $cat;
 
 		if( ! empty( $disp ) && $disp == 'single' )
 		{ // Include current post
@@ -145,16 +164,18 @@ class breadcrumb_path_Widget extends ComponentWidget
 						// Don't get an item url because we don't use a link for last crumb
 						//'url'   => $Item->get_permanent_url(),
 					);
+				if( empty( $chapter_ID ) )
+				{	// Use main category of the current Item:
+					$chapter_ID = $Item->get( 'main_cat_ID' );
+				}
 			}
 		}
 
-		if( ! empty( $cat ) )
+		if( ! empty( $chapter_ID ) )
 		{ // Include full path of the selected chapter
 			$ChapterCache = & get_ChapterCache();
-
-			$chapter_ID = $cat;
 			do
-			{ // Get all parent chapters
+			{	// Get all parent chapters:
 				if( $Chapter = & $ChapterCache->get_by_ID( $chapter_ID, false ) )
 				{
 					$breadcrumbs[] = array(
@@ -180,40 +201,78 @@ class breadcrumb_path_Widget extends ComponentWidget
 		}
 
 		if( empty( $breadcrumbs ) )
-		{ // Nothing to display
-			return;
+		{	// Nothing to display
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is nothing to display.' );
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];
 
+		$breadcrumb_logo = NULL;
 		if( ! empty( $this->disp_params['coll_logo_size'] ) &&
 		    isset( $thumbnail_sizes[ $this->disp_params['coll_logo_size'] ] ) &&
 		    $coll_logo_File = $Blog->get( 'collection_image' ) )
-		{	// Display collection logo before breadcrumb path:
-			echo $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] ).' ';
+		{	// Display collection logo in the breadcrumb path:
+			$breadcrumb_logo = $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] );
 		}
 
 		// Print out the breadcrumbs
 		$breadcrumbs = array_reverse( $breadcrumbs );
+		echo $this->disp_params['widget_breadcrumb_path_before'];
 		foreach( $breadcrumbs as $b => $breadcrumb )
 		{
 			if( $b == count( $breadcrumbs ) - 1 )
 			{ // Last crumb is active
-				echo str_replace( '$title$', $breadcrumb['title'], $params['item_active_mask'] );
+				if( $b === 0 && isset( $breadcrumb_logo ) )
+				{	// Display logo:
+					$item_mask = $this->disp_params['item_active_logo_mask'];
+				}
+				else
+				{
+					$item_mask = $this->disp_params['item_active_mask'];
+				}
+				echo str_replace( array( '$title$', '$logo$' ),
+						array( $breadcrumb['title'], $breadcrumb_logo ),
+						$item_mask );
 			}
 			else
 			{ // All other crumbs are not active
-				echo str_replace( array( '$url$', '$title$' ),
-						array( $breadcrumb['url'], $breadcrumb['title'] ),
-						$params['item_mask'] );
+				if( $b === 0 && isset( $breadcrumb_logo ) )
+				{	// Display logo:
+					$item_mask = $this->disp_params['item_logo_mask'];
+				}
+				else
+				{
+					$item_mask = $this->disp_params['item_mask'];
+				}
+				echo str_replace( array( '$url$', '$title$', '$logo$' ),
+						array( $breadcrumb['url'], $breadcrumb['title'], $breadcrumb_logo ),
+						$item_mask );
 				// Separator
 				echo $this->disp_params['separator'];
 			}
 		}
+		echo $this->disp_params['widget_breadcrumb_path_after'];
 
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $message;
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 

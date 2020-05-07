@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -69,6 +69,7 @@ class Plugins_admin extends Plugins
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 *  - PluginGroupSettingsValidateSet (Called before setting a plugin's group setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
 	 *  - PluginCollSettingsUpdateAction (Called as action before updating the collection/blog's settings)
 	 *
@@ -137,6 +138,7 @@ class Plugins_admin extends Plugins
 				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database.',
 				'AfterItemUpdate' => 'This gets called after an item has been updated in the database.',
 				'AppendItemPreviewTransact' => 'This gets called when instantiating an item for preview.',
+				'ItemLoadFromRequest' => 'This gets called to load additional Item fields.',
 
 				'FilterItemContents' => 'Filters the content of a post/item right after input.',
 				'UnfilterItemContents' => 'Unfilters the content of a post/item right before editing.',
@@ -229,6 +231,7 @@ class Plugins_admin extends Plugins
 				'Logout' => 'Called when a user logs out.',
 
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
+				'GetAuthLinksForSocialNetworks' => 'Asks the plugin for authorization link to specified social network.',
 
 				// Other Plugins can use this:
 				'RequestCaptcha' => 'Return data to display captcha html code.',
@@ -274,6 +277,12 @@ class Plugins_admin extends Plugins
 				'InitImageInlineTagForm' => 'Called to initialize params for form of additional tab on the modal/popup window "Insert image into content"',
 				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
 				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
+
+				// Importer events:
+				'ImporterConstruct' => 'Called for additional initialization of importer classes.',
+				'ImporterSetItemField' => 'Called to set Item field from Importer class.',
+				'ImporterAfterItemImport' => 'Called for additional updating Item after it was imported.',
+				'ImporterAfterItemsDelete' => 'Called after Items were deleted in Importer class.',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -685,13 +694,17 @@ class Plugins_admin extends Plugins
 
 		$DB->begin();
 
-		// Delete Plugin settings (constraints)
-		$DB->query( "DELETE FROM T_pluginsettings
-		              WHERE pset_plug_ID = $plugin_ID" );
+		// Delete Plugin settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginsettings
+			WHERE pset_plug_ID = '.$plugin_ID );
 
-		// Delete Plugin user settings (constraints)
-		$DB->query( "DELETE FROM T_pluginusersettings
-		              WHERE puset_plug_ID = $plugin_ID" );
+		// Delete Plugin user settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginusersettings
+			WHERE puset_plug_ID = '.$plugin_ID );
+
+		// Delete Plugin group settings (constraints):
+		$DB->query( 'DELETE FROM T_plugingroupsettings
+			WHERE pgset_plug_ID = '.$plugin_ID );
 
 		// Delete Plugin events (constraints)
 		$plugin_events = $DB->get_col( '
@@ -1006,7 +1019,7 @@ class Plugins_admin extends Plugins
 		if( $result )
 		{ // Update references to code:
 			// Widgets
-			$DB->query( 'UPDATE T_widget
+			$DB->query( 'UPDATE T_widget__widget
 				  SET wi_code = '.$DB->quote( $code ).'
 				WHERE wi_code = '.$DB->quote( $old_code ) );
 			// Update the renderer fields in the tables of Items, Comments and Messages:

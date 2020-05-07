@@ -106,10 +106,10 @@ function filter_syslog_list( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_syslog_list',
 	'url_ignore' => 'results_slg_per_page,results_slg_page',
-	'presets' => array(
-		'all' => array( 'All', '?ctrl=syslog' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=syslog' );
+
 
 $Results->cols[] = array(
 		'th' => 'Date Time',

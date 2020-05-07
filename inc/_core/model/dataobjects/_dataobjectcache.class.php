@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -881,6 +881,28 @@ class DataObjectCache
 		return $r;
 	}
 
+
+	/**
+	 * Returns option array for Form->cheklist()
+	 *
+	 * Load the cache if necessary
+	 *
+	 * @param string Field name
+	 * @param array IDs to ignore.
+	 * @return array Options
+	 */
+	function get_checklist_options( $field_name, $ignore_IDs = array() )
+	{
+		$options = array();
+
+		$names = $this->get_option_array( $ignore_IDs );
+		foreach( $names as $ID => $name )
+		{
+			$options[] = array( $field_name.'[]', $ID, $name, 0 );
+		}
+
+		return $options;
+	}
 
 
 	/**

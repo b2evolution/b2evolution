@@ -68,7 +68,6 @@ function textarea_replace_selection( myField, snippet, target_document )
  *
  * Used on FRONT-office (EDITING) and BACK-office in the following files:
  *  - By each plugin that works with textarea content of post or comment, to insert a code inside content by click event of toolbar button
- *  - upload.ctrl.php: ???
  *  - _file_list.inc.php: ???
  *  - src/evo_links.js: to insert inline tag like this [image:123:caption text]
  *
@@ -263,9 +262,10 @@ function textarea_str_replace( myField, search, replace, target_document )
  *  - _uiwidget.class.php
  *
  * @param string html id of the element to toggle
+ * @param string Force toggle action: 'collapse', 'expand'
  * @return false
  */
-function toggle_filter_area( filter_name )
+function toggle_filter_area( filter_name, force_toggle_action )
 {
 	// Find objects to toggle:
 	var clickdiv = jQuery( '#clickdiv_'+filter_name );
@@ -304,15 +304,28 @@ function toggle_filter_area( filter_name )
 		clickimg.css( 'background-position', ( parseInt( xy[0] ) + ( !clickdiv.is( ':hidden' ) ? 16 : - 16 ) ) + 'px ' + parseInt( xy[1] ) + 'px' );
 	}
 
-	if( !clickdiv.is( ':hidden' ) )
+	var toggle_action = typeof( force_toggle_action ) == 'undefined'
+		? ( clickdiv.is( ':hidden' ) ? 'expand' : 'collapse' )
+		: force_toggle_action;
+
+	if( toggle_action == 'collapse' )
 	{	// Hide/collapse filters:
 		clickdiv.slideUp( 500 );
-		jQuery.post( htsrv_url+'anon_async.php?action=collapse_filter&target='+filter_name );
 	}
-	else
+	else if( toggle_action == 'expand' )
 	{	// Show/expand filters
 		clickdiv.slideDown( 500 );
-		jQuery.post( htsrv_url+'anon_async.php?action=expand_filter&target='+filter_name );
+	}
+
+	if( typeof( force_toggle_action ) == 'undefined' && toggle_action == 'expand' )
+	{	// Collapse other opened filter areas on expand current filter area:
+		jQuery( '#clickdiv_'+filter_name ).closest( '.filters' ).find( '[id^=clickdiv_]' ).each( function()
+		{
+			if( jQuery( this ).is( ':visible' ) && jQuery( this ).attr( 'id' ) != 'clickdiv_' + filter_name )
+			{	// Collapse only different opened area:
+				toggle_filter_area( jQuery( this ).attr( 'id' ).substr( 9 ), 'collapse' )
+			}
+		} );
 	}
 
 	return false;
@@ -519,16 +532,16 @@ jQuery( document ).ready( function()
 		if( this_obj.is( ':checked' ) )
 		{ // Enable toolbar:
 			toolbar_obj.removeClass( 'disabled' );
-			toolbar_obj.find( 'input[type=button]' ).removeAttr( 'disabled' );
+			toolbar_obj.find( 'input[type=button]' ).prop( 'disabled', false );
 		}
 		else
 		{ // Disable toolbar:
 			toolbar_obj.addClass( 'disabled' );
-			toolbar_obj.find( 'input[type=button]' ).attr( 'disabled', 'disabled' );
+			toolbar_obj.find( 'input[type=button]' ).prop( 'disabled', true );
 		}
 	}
 	jQuery( 'input[type=checkbox][name="renderers[]"]' ).each( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
-	jQuery( 'input[type=checkbox][name="renderers[]"]' ).click( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
+	jQuery( 'input[type=checkbox][name="renderers[]"]' ).on( 'click', function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
 	jQuery( '.plugin-toolbar' ).on( 'click', function() {
 			var toolbar_obj = jQuery( this );
 			if( toolbar_obj.hasClass( 'disabled' ) )

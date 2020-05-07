@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -49,6 +49,7 @@ class UserSettings extends AbstractSettings
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
 		'fold_itemform_comments' => 1,
+		'fold_itemform_usertags' => 1,
 		'fold_itemform_goals' => 1,
 		'fold_itemform_notifications' => 1,
 		'fold_cmntform_datetime' => 1,
@@ -63,6 +64,7 @@ class UserSettings extends AbstractSettings
 		'show_quick_publish' => 1, // Show the quick "Publish!" button on item form edit screen in back-office
 
 		'fm_imglistpreview' => 1,
+		'fm_getimagesizes' => 1,
 		'fm_showdate'       => 'compact',
 		'fm_allowfiltering' => 'simple',
 
@@ -147,8 +149,8 @@ class UserSettings extends AbstractSettings
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_notify_post_proposed' => 1, // Notify when someone proposed a change on a post and the user has right to moderate that post
 		'notify_post_assignment' => 1, // Notify user when a post is assigned to the user
-		'notify_meta_comment_mentioned' => 1, // Notify user when I have been mentioned on a meta comment
-		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
+		'notify_meta_comment_mentioned' => 1, // Notify user when I have been mentioned on an internal comment
+		'notify_meta_comments' => 1, // Notify user when an INTERNAL comment is published in a post where user can sees internal comments
 
 		'enable_PM' => 1,
 		'enable_email' => 1,

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -50,7 +50,7 @@ switch( $action )
 		}
 		else
 		{	// We could not find the link to edit:
-			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Link') ), 'error' );
+			$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Link') ), 'error' );
 			unset( $edited_Link );
 			unset( $link_ID );
 			if( $mode == 'iframe' )
@@ -79,7 +79,7 @@ if( $action == 'edit_links' || $action == 'sort_links' )
 
 if( empty( $LinkOwner ) )
 { // If LinkOwner object is not set, we can't process any action
-	$Messages->add( T_('Requested link owner object does not exist any longer.'), 'error' );
+	$Messages->add( TB_('Requested link owner object does not exist any longer.'), 'error' );
 	header_redirect( $redirect_to );
 }
 
@@ -181,9 +181,9 @@ switch( $action )
 
 
 			if( $action == 'link_move_up' )
-				$msg = T_('Link has been moved up.');
+				$msg = TB_('Link has been moved up.');
 			else
-				$msg = T_('Link has been moved down.');
+				$msg = TB_('Link has been moved down.');
 
 			$Messages->add( $msg, 'success' );
 
@@ -192,7 +192,7 @@ switch( $action )
 		}
 		else
 		{
-			$Messages->add( T_('Link order has not been changed.'), 'note' );
+			$Messages->add( TB_('Link order has not been changed.'), 'note' );
 		}
 
 		header_redirect( $redirect_to );
@@ -235,7 +235,7 @@ switch( $action )
 			}
 		}
 
-		$Messages->add( T_('The attachments have been sorted by file name.'), 'success' );
+		$Messages->add( TB_('The attachments have been sorted by file name.'), 'success' );
 
 		// Need to specify where to redirect, otherwise referrer will be used:
 		switch( $LinkOwner->type )
@@ -267,14 +267,14 @@ switch( $action )
 
 		if( $edited_Link->set( 'position', $link_position ) && $edited_Link->dbupdate() )
 		{
-			$Messages->add( T_('Link position has been changed.'), 'success' );
+			$Messages->add( TB_('Link position has been changed.'), 'success' );
 
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 		}
 		else
 		{
-			$Messages->add( T_('Link position has not been changed.'), 'note' );
+			$Messages->add( TB_('Link position has not been changed.'), 'note' );
 		}
 
 		$header_redirect( $redirect_to );

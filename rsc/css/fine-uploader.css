@@ -86,7 +86,7 @@
 }
 .qq-drop-processing-spinner {
     display: inline-block;
-    background: url("processing.gif");
+    background: url("../icons/loading.gif");
     width: 24px;
     height: 24px;
     vertical-align: text-bottom;

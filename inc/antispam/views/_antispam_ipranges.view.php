@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -75,11 +75,11 @@ function filter_email_blocked( & $Form )
 	$Form->text_input( 'ip_address', get_param( 'ip_address' ), 40, T_('IP address') );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_email_blocked',
-	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges' ),
-		)
+		'callback' => 'filter_email_blocked',
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges' );
+
 
 $Results->cols[] = array(
 		'th' => T_('ID'),

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -23,9 +23,9 @@ global $selected_Filelist;
 
 $Form = new Form( NULL, 'filesdelete_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel delete!'), 'close', regenerate_url() );
+$Form->global_icon( TB_('Cancel delete!'), 'close', regenerate_url() );
 
-$Form->begin_form( 'fform', T_('Confirm delete'), array( 'formstart_class' => 'panel-danger' ) );
+$Form->begin_form( 'fform', TB_('Confirm delete'), array( 'formstart_class' => 'panel-danger' ) );
 
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
@@ -34,8 +34,8 @@ $Form->begin_form( 'fform', T_('Confirm delete'), array( 'formstart_class' => 'p
 	$Form->hidden( 'confirmed', 1 );
 
 	echo $selected_Filelist->count() > 1
-		? T_('Do you really want to delete the following files?')
-		: T_('Do you really want to delete the following file?');
+		? TB_('Do you really want to delete the following files?')
+		: TB_('Do you really want to delete the following file?');
 
 	$selected_Filelist->restart();
 	echo '<ul>';
@@ -46,9 +46,9 @@ $Form->begin_form( 'fform', T_('Confirm delete'), array( 'formstart_class' => 'p
 	echo '</ul>';
 
 	echo '<div class="checkbox"><label><input type="checkbox" name="delete_nonempty" value="1" /> '
-		.T_('Delete non-empty folders').'</label></div><br>';
+		.TB_('Delete non-empty folders').'</label></div><br>';
 
-	$Form->button_input( array( 'value' => T_('Delete'), 'class' => 'btn-danger' ) );
+	$Form->button_input( array( 'value' => TB_('Delete'), 'class' => 'btn-danger' ) );
 
 $Form->end_form();
 ?>

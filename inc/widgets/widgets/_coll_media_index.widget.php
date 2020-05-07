@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -226,8 +226,9 @@ class coll_media_index_Widget extends ComponentWidget
 
 		$BlogCache = & get_BlogCache();
 		if( ! $BlogCache->get_by_ID( $blog_ID, false, false ) )
-		{ // No blog exists
-			return;
+		{	// No collection exists
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
+			return false;
 		}
 
 		// Display photos:
@@ -256,6 +257,7 @@ class coll_media_index_Widget extends ComponentWidget
 		{ // Get image of all available posts for current user
 			$ItemQuery->where_visibility( NULL );
 		}
+		$ItemQuery->where_locale_visibility();
 		$ItemQuery->WHERE_and( '( file_type = "image" ) OR ( file_type IS NULL )' );
 		$ItemQuery->WHERE_and( 'post_datestart <= \''.remove_seconds( $localtimenow ).'\'' );
 		$ItemQuery->WHERE_and( 'link_position != "cover"' );
@@ -337,8 +339,11 @@ class coll_media_index_Widget extends ComponentWidget
 			$r .= $this->get_layout_item_end( $count );
 		}
 
-		// Exit if no files found
-		if( empty($r) ) return;
+		if( empty( $r ) )
+		{	// Exit if no files found:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no image matching the current filters.' );
+			return false;
+		}
 
 		echo $this->disp_params['block_start'];
 

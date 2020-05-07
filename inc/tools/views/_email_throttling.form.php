@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -39,23 +39,29 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-throttling-settings' ) );
+$Form->begin_fieldset( TB_('Email campaign throttling').get_manual_link( 'email-throttling-settings' ) );
 
 	$Form->radio_input( 'email_campaign_send_mode', $Settings->get( 'email_campaign_send_mode' ),
 		array(
-			array( 'value' => 'immediate', 'label' => T_('Immediate'), 'note' => T_('Press "Next" after each chunk') ),
-			array( 'value' => 'cron', 'label' => T_('Asynchronous'), 'note' => T_('A scheduled job will send chunks') )
+			array( 'value' => 'immediate', 'label' => TB_('Immediate'), 'note' => TB_('Press "Next" after each chunk') ),
+			array( 'value' => 'cron', 'label' => TB_('Asynchronous'), 'note' => TB_('A scheduled job will send chunks') )
 		),
-		T_('Sending'),
+		TB_('Sending'),
 		array( 'lines' => true ) );
 
-	$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
+	$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, TB_('Chunk Size'), TB_('emails at a time'), array( 'maxlength' => 10 ) );
+
+	$Form->text_input( 'email_campaign_max_domain', $Settings->get( 'email_campaign_max_domain' ), 5, TB_('Max emails to same domain'), TB_('In each chunk, avoid sending too many emails to same recipient domain (Useful to avoid balcklisting from gmail.com, hotmail.com, etc.)'), array( 'maxlength' => 10 ) );
+
+	$Form->duration_input( 'email_campaign_cron_repeat', $Settings->get( 'email_campaign_cron_repeat' ), TB_('Delay between chunks'), 'days', 'minutes', array( 'note' => TB_('timing between scheduled job runs') ) );
+
+	$Form->duration_input( 'email_campaign_cron_limited', $Settings->get( 'email_campaign_cron_limited' ), TB_('Delay in case all remaining recipients have reached max # of emails for the current day'), 'days', 'minutes', array( 'note' => TB_('timing between scheduled job runs') ) );
 
 $Form->end_fieldset();
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

@@ -17,13 +17,6 @@
 
 
 /**
- * @internal strings various <img> tags
- * these will be set during Init()
- */
-var edit_icon_tag = ''; // edit icon image tag
-var delete_icon_tag = ''; // delete icon image tag
-
-/**
  * @internal string current_widgets
  * holds the list of current widgets
  */
@@ -48,12 +41,6 @@ var reorder_delay = 200;
  */
 var reorder_delay_remaining = 0;
 
-/**
- * @internal string current_widgets
- * crumb to be added to urls
- */
-var crumb_url = '';
-
 
 /**
  * Init()
@@ -62,29 +49,17 @@ var crumb_url = '';
  */
 jQuery(document).ready( function()
 {
-	if( jQuery( '#current_widgets' ).length == 0 )
-	{	// Initialize widgets list only if we really are there:
+	if( typeof( b2evo_widgets_init ) != 'undefined' && b2evo_widgets_init === false )
+	{	// Don't initialize widgets if it is special forced to stop it:
 		return;
 	}
 
-	// grab some constants -- fp> TODO: this is flawed. Fails when starting with an empty blog having ZERO widgets. Init that in .php
-	edit_icon_tag = jQuery( '.edit_icon_hook' ).find( 'a' ).html();// grab the edit icon
-	delete_icon_tag = jQuery( '.delete_icon_hook' ).find( 'a' ).html();// grab the delete icon
-	//get crumb url from delete url and then add it in toggleWidget
-	crumb_url = jQuery( '.delete_icon_hook' ).find( 'a' ).attr('href');
-	if( typeof( crumb_url ) != 'undefined' )
-	{
-		crumb_url = crumb_url.match(/crumb_.*?$/);
-	}
-	// Modify the current widgets screen
-	// remove the "no widgets yet" placeholder:
-	jQuery( ".new_widget" ).parent().parent().remove();
-	// get rid of the odd/even classes and add our own class:
-	jQuery( ".odd" ).addClass( "widget_row" ).removeClass( ".odd" );
-	jQuery( ".even" ).addClass( "widget_row" ).removeClass( ".even" );
+	// Make widget rows drag and drop:
+	makeDragnDrop( '.draggable_widget' );
 
 	// make container title droppable -- fp> This works but gives no visual feedback. It would actually be cool to drop 'after' the current line in which case dropping on the title would make sense
-	jQuery( '.fieldset_title' ).each( function(){
+	jQuery( '.fieldset_title' ).each( function()
+	{
 		jQuery( this ).droppable(
 		{
 			accept: ".draggable_widget", // classname of objects that can be dropped
@@ -97,7 +72,7 @@ jQuery(document).ready( function()
 				jQuery( ".fade_me" ).removeClass( "fade_me" ); // remove any existing fades
 				jQuery( '.available_widgets' ).removeClass( 'available_widgets_active' ); // close any open windows
 
-				jQuery( ui.draggable ).prependTo( jQuery( '#container_' + jQuery( this ).find( '.container_name' ).data( 'container-name' ).replace( / /g, '_' ).replace( /:/g, '-' ) ) ); // add the dragged widget to this container
+				jQuery( ui.draggable ).prependTo( jQuery( '#container_' + jQuery( this ).find( '.container_name' ).data( 'wico_id' ) ) ); // add the dragged widget to this container
 				jQuery( ui.draggable ).addClass( "fade_me server_update" ); // add fade class
 				jQuery( ui.draggable ).droppable( "enable" );	// enable dropping if disabled
 				doFade( ".fade_me" ); // fade the widget
@@ -106,50 +81,6 @@ jQuery(document).ready( function()
 			}
 		});
 	});
-
-	// grab the widget ID out of the "delete" url and add as ID to parent row:
-	jQuery( '.widget_row td:nth-child(7)' ).each( function()
-	{
-		var widget_id = jQuery( this ).find( 'a' ).attr( "href" );
-		widget_id = widget_id.match(/wi_ID=([0-9]+)/)[1] // extract ID
-		jQuery( this ).parent().attr( "id", "wi_ID_"+widget_id ); // add ID to parent row
-	});
-
-	// Convert the tables:
-	var the_widgets = new Array();
-	jQuery( ".widget_container_list" ).each( function()
-	{ // grab each container
-		var container = jQuery( this ).attr( "id" );
-		the_widgets[ container ] = new Array();
-		jQuery( "#"+container+" .widget_row" ).each( function()
-		{ // grab each widget in container
-			var widget = jQuery( this ).attr( "id" );
-			the_widgets[ container ][ widget ] = new Array();
-			the_widgets[ container ][ widget ]["name"] = jQuery( '#' + widget ).find( '.widget_name' ).parent().html();
-			the_widgets[ container ][ widget ]["class"] = jQuery( this ).attr( "className" );
-			the_widgets[ container ][ widget ]["enabled"] = jQuery( '#' + widget + ' .widget_is_enabled' ).size();
-			the_widgets[ container ][ widget ]["plugin_disabled"] = jQuery( '#' + widget + ' .plugin_is_disabled' ).size();
-			the_widgets[ container ][ widget ]["cache"] = jQuery( '#' + widget + ' .widget_cache_status [rel]' ).attr( 'rel' );
-		} );
-	});
-
-	// create new container for each current container
-	for( container in the_widgets )
-	{	// loop through each container
-		var is_droppable = !jQuery( '#'+container ).hasClass( "no-drop" );
-		newContainer = jQuery( "<ul id=\"container_"+container+"\" class=\"widget_container\"></ul>" );
-		if( !is_droppable )
-		{	// container doesn't exist in skin
-			jQuery( newContainer ).addClass( 'no-drop' );
-		}
-		jQuery( "#"+container ).replaceWith( newContainer );// replace table with new container
-
-		// create widget entry for each widget in each container
-		for( widget in the_widgets[container] )
-		{	// loop through all widgets in this container
-			createWidget( widget, container, 0, the_widgets[container][widget]["name"], the_widgets[container][widget]["class"], the_widgets[container][widget]["enabled"], the_widgets[container][widget]["plugin_disabled"], the_widgets[container][widget]["cache"] );
-		}
-	}
 
 	// disable dropping on empty containers:
 	jQuery( '.no-drop .draggable_widget').droppable( "disable" );
@@ -343,8 +274,13 @@ function bufferedServerCall()
 
 		current_widgets = new_widget_order; // store current order
 		//add crumbs here
-		new_widget_order += '&' + crumb_url;
+		new_widget_order += '&' + widget_crumb_url_param;
 		jQuery( '.pending_update' ).removeClass( 'pending_update' ).addClass( 'server_updating' ); // change class to "updating"
+
+		if( jQuery( 'input[type=hidden][name=wico_ID]' ).length )
+		{	// Send param to re-order only single container:
+			new_widget_order += '&wico_ID=' + jQuery( 'input[type=hidden][name=wico_ID]' ).val();
+		}
 
 		SendAdminRequest( 'widgets', 're-order', new_widget_order, false ); // send current order to server
 	}
@@ -387,7 +323,7 @@ function getWidgetOrder()
 		containers_list += container+',';
 	}
 
-	var r = ( typeof( blog ) != 'undefined' ? 'blog='+blog : '' ) +'&'+query_string+'container_list='+containers_list;
+	var r = ( typeof( blog_id ) != 'undefined' ? 'blog='+blog_id : '' ) +'&'+query_string+'container_list='+containers_list;
 
 	// console.log( r );
 
@@ -425,12 +361,28 @@ function deleteWidget( widget )
 }
 
 /**
+ * Duplicate widget
+ */
+function duplicateWidget( widget, mode )
+{
+	var widget_id = widget.substr( 6, widget.length );
+	var query_string = 'wi_ID=' + widget_id + '&' + widget_crumb_url_param;
+	if( mode == 'customizer' )
+	{
+		query_string += '&mode=customizer';
+	}
+	SendAdminRequest( 'widgets', 'duplicate', query_string, true );
+	return false;
+}
+
+
+/**
  * Request edit screen from server...
  */
 function editWidget( widget )
 {
 	jQuery( '#server_messages' ).html( '' );
-	msg = "wi_ID="+widget.substr( 6, widget.length ) + '&' + crumb_url;
+	msg = "wi_ID="+widget.substr( 6, widget.length ) + '&' + widget_crumb_url_param;
 	SendAdminRequest( "widgets", "edit", msg, true );
 	return false;
 }
@@ -568,7 +520,7 @@ function convertAvailableList()
 		the_link = the_link.substr( the_link.indexOf( '&type' ) + 1, the_link.length );
 
 		// replace href with JS addnewwidget action:
-		jQuery( this ).children( 'a:first' ).attr( 'href', '#' ).bind( 'click', function(){
+		jQuery( this ).children( 'a' ).attr( 'href', '#' ).bind( 'click', function(){
 			addNewWidget( this, the_link );
 			// cancel default href action:
 			return false;
@@ -602,11 +554,10 @@ function addNewWidget( widget_list_item, admin_call )
 	var widget_id = jQuery( widget_list_item ).attr( "id" );
 	jQuery( widget_list_item ).attr( "id", widget_id );
 
-	var widget_name = jQuery( widget_list_item ).html();
 	var destination = jQuery( '.available_widgets' ).attr( 'id' );
-	destination = destination.substr( 18, destination.length ).replace( /_/g, ' ' ).replace( /-/g, ':' );
+	destination = destination.substr( 18, destination.length );
 
-	SendAdminRequest( 'widgets', 'create', admin_call+"&blog="+blog+"&container="+destination, true );
+	SendAdminRequest( 'widgets', 'create', admin_call+"&blog="+blog_id+"&container="+destination, true );
 }
 
 
@@ -617,12 +568,16 @@ function addNewWidget( widget_list_item, admin_call )
  * @param string container Container to add widget to
  * @param intger wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
+ * @param boolean wi_enabled Is the widget enabled?
+ * @param boolean wi_plugin_status
  * @param string wi_cache_status Cache status
+ * @param integer wi_ID Id of widget where new widget will be added next to
+ * @param string mode Mode
  */
-function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_plugin_status, wi_cache_status )
+function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID, mode )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', 1, wi_plugin_status, wi_cache_status );
+	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID, mode );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{ // send outstanding updates
@@ -641,11 +596,16 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_plugin_st
  * @param string container Container to add widget to
  * @param integer wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
+ * @param string wi_class CSS class
  * @param boolean wi_enabled Is the widget enabled?
+ * @param boolean wi_plugin_disabled
+ * @param string wi_cache_status Cache status
+ * @param integer wi_ID Id of widget where new widget will be added next to
+ * @param string mode Mode
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_plugin_disabled, wi_cache_status )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_plugin_disabled, wi_cache_status, next_to_wi_ID, mode )
 {
-	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
+	var newWidget = jQuery( '<li id="'+ wi_ID +'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
 	newWidget.find( 'a.widget_name' ).click( function()
 	{
 		return editWidget( wi_ID );
@@ -658,33 +618,46 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	// Add state indicator:
 	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+
 			( wi_plugin_disabled ? disabled_plugin_tag :
-			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">' +
+			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+ wi_ID +'\' );">' +
 				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 			'</a>' ) +
 		'</span>' ) );
 
-	// Add checkbox:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox' + ( wi_enabled ? ' widget_checkbox_enabled' : '' ) + '">' +
-			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
-		'</span>' ) );
+	if( mode != 'customizer' )
+	{
+		// Add checkbox:
+		jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox' + ( wi_enabled ? ' widget_checkbox_enabled' : '' ) + '">' +
+				'<input type="checkbox" name="widgets[]" value="' + wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
+			'</span>' ) );
 
-	// Add icon to toggle cache status:
-	var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
-	jQuery( newWidget ).append( cacheIcon ); // add widget action icons
+
+		// Add icon to toggle cache status:
+		var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
+		jQuery( newWidget ).append( cacheIcon ); // add widget action icons
+	}
 
 	// Add action icons:
 	// Toggle state
-	var actionIcons = '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+ wi_ID + '\' );"' + ( wi_plugin_disabled ? ' style="visibility: hidden">' : '>' )
-				+ ( wi_enabled ? deactivate_icon_tag : activate_icon_tag ) + '</a>';
+	var actionIcons = '<span class="widget_actions">';
 
-	actionIcons += '<a href="#" onclick="return editWidget( \'' + wi_ID + '\' );">'
-			+ edit_icon_tag + '</a><a href="#" onclick="return deleteWidget( \'' + wi_ID + '\' );">'
-			+ delete_icon_tag + '</a></span>'
+	if( mode != 'customizer' )
+	{
+		actionIcons += '<a href="#" onclick="return editWidget( \'' + wi_ID + '\' );">' + edit_icon_tag + '</a>';
+	}
+	actionIcons += '<a href="#" onclick="return duplicateWidget( \'' + wi_ID + '\', \''  + mode + '\' );">' + duplicate_icon_tag + '</a>'
+			+ '<a href="#" onclick="return deleteWidget( \'' + wi_ID + '\' );">' + delete_icon_tag + '</a></span>'
 
 	actionIcons = jQuery( actionIcons );
 	jQuery( newWidget ).append( actionIcons ); // add widget action icons
 
-	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
+	if( next_to_wi_ID )
+	{
+		jQuery( '#container_' + container + ' li#wi_ID_' + next_to_wi_ID ).after( newWidget ); // add next to specified widget
+	}
+	else
+	{
+		jQuery( '#container_' + container ).append( newWidget );	// add widget to container
+	}
 
 	makeDragnDrop( '#'+wi_ID );
 	colourWidgets();	// recolour the widgets
@@ -697,7 +670,7 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
  */
 function toggleWidget( wi_ID )
 {
-	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
+	SendAdminRequest( 'widgets', 'toggle', 'wi_ID=' + wi_ID.substr( 6 ) + '&' + widget_crumb_url_param, true );
 	return false;
 }
 
@@ -717,7 +690,7 @@ function doToggle( wi_ID, wi_enabled, wi_plugin_disabled )
 	else
 	{
 		jQuery( '#wi_ID_' + wi_ID + ' .toggle_action' ).css( 'visibility', 'visible' );
-		jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( '<a href="#" class="toggle_state" onclick="return toggleWidget( \'wi_ID_'+wi_ID+'\', \''+crumb_url+'\' );">'+
+		jQuery( '#wi_ID_' + wi_ID + ' .widget_state' ).html( '<a href="#" class="toggle_state" onclick="return toggleWidget( \'wi_ID_'+wi_ID+'\', \''+widget_crumb_url_param+'\' );">'+
 					( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 				'</a>' );
 	}
@@ -742,7 +715,7 @@ function doToggle( wi_ID, wi_enabled, wi_plugin_disabled )
  */
 function toggleCacheWidget( wi_ID, action )
 {
-	SendAdminRequest( 'widgets', 'cache_' + action, 'wi_ID=' + wi_ID.substr( 6 ) + '&' + crumb_url, true );
+	SendAdminRequest( 'widgets', 'cache_' + action, 'wi_ID=' + wi_ID.substr( 6 ) + '&' + widget_crumb_url_param, true );
 	return false;
 }
 
@@ -794,6 +767,6 @@ function getWidgetCacheIcon( wi_ID, wi_cache_status )
 			return cache_disallowed_icon_tag;
 
 		case 'denied':
-			return '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
+			return '<a href="?ctrl=coll_settings&amp;tab=advanced&amp;blog=' + blog_id + '#fieldset_wrapper_caching">' + cache_denied_icon_tag + '</a>';
 	}
 }

@@ -1,8 +1,12 @@
 {
   "name": "b2evolution",
-  "version": "6.11.4",
+  "version": "7.1.5-stable",
   "description": "This file is used to define all modules used by grunt. Run 'npm install' or 'npm udapte' to download/update these packages.",
-  "license": "GPL v2",
+  "license": "GPL-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/b2evolution/b2evolution.git"
+  },
   "devDependencies": {
     "grunt": "^1.0.4",
     "grunt-autoprefixer": "^3.0.3",
@@ -16,6 +20,6 @@
     "grunt-sass": "^3.1.0"
   },
   "dependencies": {
-    "npm": "^6.11.1"
+    "npm": "^6.14.2"
   }
 }

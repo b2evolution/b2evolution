@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -26,7 +26,7 @@ function hits_results( & $Results, $params = array() )
 			'default_order' => '--D'
 		), $params );
 
-	global $blog, $Session, $sess_ID;
+	global $blog, $sec_ID, $Session, $sess_ID;
 	global $preset_results_title, $preset_referer_type, $preset_filter_all_url;
 	global $hide_columns, $admin_url;
 
@@ -37,20 +37,19 @@ function hits_results( & $Results, $params = array() )
 	$param_prefix = 'results_'.$Results->param_prefix;
 	$tab = get_param( 'tab' );
 
-	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;'.$param_prefix.'order='.$params['default_order'] );
-	if( !isset( $preset_referer_type ) )
-	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-	}
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
 	$Results->filter_area = array(
 		'callback' => 'filter_hits',
 		'url_ignore' => $param_prefix.'page,exclude,sess_ID,remote_IP',
-		'presets' => $filter_presets
 		);
+
+	$Results->register_filter_preset( 'all', T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$Results->register_filter_preset( 'all_but_curr', T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&ampsess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$Results->register_filter_preset( 'direct_hits', T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$Results->register_filter_preset( 'refered_hits', T_('Referred hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 
 	$Results->cols[] = array(
 			'th' => T_('Session'),
@@ -678,7 +677,7 @@ function hit_method_style( $hit_method )
  */
 function get_hits_results_global( $mode = 'live' )
 {
-	global $DB, $blog;
+	global $DB, $blog, $sec_ID;
 
 	// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 	// Bug report: http://lists.mysql.com/bugs/36
@@ -697,6 +696,11 @@ function get_hits_results_global( $mode = 'live' )
 		{	// Filter by collection:
 			$SQL->WHERE( 'hit_coll_ID = '.$DB->quote( $blog ) );
 		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
 
 		$hits_start_date = NULL;
 		$hits_end_date = date( 'Y-m-d' );
@@ -711,6 +715,11 @@ function get_hits_results_global( $mode = 'live' )
 		if( $blog > 0 )
 		{	// Filter by collection:
 			$SQL->WHERE( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
 		}
 		// Filter by date:
 		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
@@ -737,7 +746,7 @@ function get_hits_results_global( $mode = 'live' )
  */
 function get_hits_results_browser( $mode = 'live' )
 {
-	global $DB, $blog;
+	global $DB, $blog, $sec_ID;
 
 	// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 	// Bug report: http://lists.mysql.com/bugs/36
@@ -771,6 +780,13 @@ function get_hits_results_browser( $mode = 'live' )
 			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 			$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
 
 		$hits_start_date = NULL;
 		$hits_end_date = date( 'Y-m-d' );
@@ -801,6 +817,13 @@ function get_hits_results_browser( $mode = 'live' )
 		{	// Get ALL aggregated sessions:
 			$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
 		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hags_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
 		// Filter by date:
 		$sessions_SQL->WHERE_and( 'hags_date >= '.$DB->quote( $hits_start_date ) );
 		$sessions_SQL->WHERE_and( 'hags_date <= '.$DB->quote( $hits_end_date ) );
@@ -828,7 +851,7 @@ function get_hits_results_browser( $mode = 'live' )
  */
 function get_hits_results_search_referers( $mode = 'live' )
 {
-	global $DB, $blog;
+	global $DB, $blog, $sec_ID;
 
 	// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
 	// Bug report: http://lists.mysql.com/bugs/36
@@ -855,6 +878,11 @@ function get_hits_results_search_referers( $mode = 'live' )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
 
 		$hits_start_date = NULL;
 		$hits_end_date = date( 'Y-m-d' );
@@ -875,6 +903,11 @@ function get_hits_results_search_referers( $mode = 'live' )
 		if( $blog > 0 )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
 		}
 	}
 	$SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
@@ -897,7 +930,7 @@ function get_hits_results_search_referers( $mode = 'live' )
  */
 function get_hits_results_api( $mode = 'live' )
 {
-	global $DB, $blog;
+	global $DB, $blog, $sec_ID;
 
 	$SQL = new SQL( 'Get API hits summary (mode: '.$mode.')' );
 	$sessions_SQL = new SQL( 'Get API sessions summary (mode: '.$mode.')' );
@@ -919,6 +952,13 @@ function get_hits_results_api( $mode = 'live' )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
 			$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
 		}
 
 		$hits_start_date = NULL;
@@ -950,6 +990,13 @@ function get_hits_results_api( $mode = 'live' )
 		{	// Get ALL aggregated sessions:
 			$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
 		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hags_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
 		// Filter by date:
 		$sessions_SQL->WHERE_and( 'hags_date >= '.$DB->quote( $hits_start_date ) );
 		$sessions_SQL->WHERE_and( 'hags_date <= '.$DB->quote( $hits_end_date ) );
@@ -977,7 +1024,7 @@ function get_hits_results_api( $mode = 'live' )
  */
 function get_hits_results_robot( $mode = 'live' )
 {
-	global $DB, $blog;
+	global $DB, $blog, $sec_ID;
 
 	$SQL = new SQL( 'Get robot hits summary (mode: '.$mode.')' );
 	if( $mode == 'live' )
@@ -991,6 +1038,11 @@ function get_hits_results_robot( $mode = 'live' )
 		if( $blog > 0 )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
 		}
 
 		$hits_start_date = NULL;
@@ -1007,6 +1059,11 @@ function get_hits_results_robot( $mode = 'live' )
 		if( $blog > 0 )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
 		}
 		// Filter by date:
 		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
@@ -1033,7 +1090,7 @@ function get_hits_results_robot( $mode = 'live' )
  */
 function get_hits_results_rss( $mode = 'live' )
 {
-	global $DB, $blog;
+	global $DB, $blog, $sec_ID;
 
 	$SQL = new SQL( 'Get RSS/Atom feed readers hits summary (mode: '.$mode.')' );
 	if( $mode == 'live' )
@@ -1047,6 +1104,11 @@ function get_hits_results_rss( $mode = 'live' )
 		if( $blog > 0 )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
 		}
 
 		$hits_start_date = NULL;
@@ -1063,6 +1125,11 @@ function get_hits_results_rss( $mode = 'live' )
 		if( $blog > 0 )
 		{	// Filter by collection:
 			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
 		}
 		// Filter by date:
 		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
@@ -1082,6 +1149,53 @@ function get_hits_results_rss( $mode = 'live' )
 
 
 /**
+ * Get goal hits data for chart and table for Analytics -> Goals -> Stats
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array Hits data
+ */
+function get_hits_results_goal( $mode = 'live' )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get goal hits (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'ghit_goal_ID AS goal_ID, COUNT( ghit_ID ) AS hits,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_track__goalhit' );
+		$SQL->FROM_add( 'INNER JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated/compared data:}
+		$SQL->SELECT( 'ghag_date as day, ghag_goal_ID AS goal_ID, ghag_count AS hits,
+			EXTRACT( YEAR FROM ghag_date ) AS year,
+			EXTRACT( MONTH FROM ghag_date ) AS month,
+			EXTRACT( DAY FROM ghag_date ) AS day' );
+		$SQL->FROM( 'T_track__goalhit_aggregate' );
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'ghag_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'ghag_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day, goal_ID' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, goal_ID' );
+
+	$hits = $DB->get_results( $SQL, ARRAY_A );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$hits = fill_empty_hit_days( $hits, $hits_start_date, $hits_end_date );
+
+	return $hits;
+}
+
+
+/**
  * Display diagram for hits data
  *
  * @param string Diagram type: 'global', 'browser', 'search_referers', 'api', 'robot', 'rss'
@@ -1091,7 +1205,11 @@ function get_hits_results_rss( $mode = 'live' )
  */
 function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 'canvasbarschart' )
 {
-	global $blog, $admin_url;
+	global $blog, $sec_ID, $admin_url;
+
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
 	$last_date = 0;
 
@@ -1100,31 +1218,35 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	switch( $type )
 	{
 		case 'global':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$&agent_type=$param2$';
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$&agent_type=$param2$';
 			break;
 
 		case 'browser':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
 			$sessions = $res_hits[1];
 			$res_hits = $res_hits[0];
 			break;
 
 		case 'search_referers':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=browser&referer_type=$param1$';
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=browser&referer_type=$param1$';
 			break;
 
 		case 'api':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&referer_type=$param1$&hit_type=api';
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&referer_type=$param1$&hit_type=api';
 			$sessions = $res_hits[1];
 			$res_hits = $res_hits[0];
 			break;
 
 		case 'robot':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&agent_type=$param1$';
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=$param1$';
 			break;
 
 		case 'rss':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$';
+			break;
+
+		case 'goal':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits&blog='.$blog.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
 			break;
 	}
 
@@ -1153,6 +1275,7 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	}
 
 	$count = 0;
+	//pre_dump( $res_hits );
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
@@ -1206,6 +1329,10 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 			case 'rss':
 				$hit_key = 'rss';
 				break;
+
+			case 'goal':
+				$hit_key = $row_stats['goal_ID'];
+				break;
 		}
 
 		if( isset( $col_mapping[ $hit_key ] ) )
@@ -1230,6 +1357,7 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	}
 
 	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
+	//pre_dump( $chart );
 
 	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');

@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -36,17 +36,22 @@ $required_mysql_version[ 'collections' ] = '5.1';
  */
 $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_blogs'                    => $tableprefix.'blogs',
+		'T_coll_url_aliases'         => $tableprefix.'coll_url_aliases',
 		'T_categories'               => $tableprefix.'categories',
 		'T_coll_group_perms'         => $tableprefix.'bloggroups',
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
 		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
+		'T_coll_locales'             => $tableprefix.'coll_locales',
+		'T_section'                  => $tableprefix.'section',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
 		'T_comments__prerendering'   => $tableprefix.'comments__prerendering',
 		'T_items__item'              => $tableprefix.'items__item',
 		'T_items__item_settings'     => $tableprefix.'items__item_settings',
+		'T_items__item_custom_field' => $tableprefix.'items__item_custom_field',
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
+		'T_items__itemgroup'         => $tableprefix.'items__itemgroup',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
 		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
@@ -63,10 +68,10 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
-		'T_skins__container'         => $tableprefix.'skins__container',
 		'T_skins__skin'              => $tableprefix.'skins__skin',
 		'T_subscriptions'            => $tableprefix.'subscriptions',
-		'T_widget'                   => $tableprefix.'widget',
+		'T_widget__container'        => $tableprefix.'widget__container',
+		'T_widget__widget'           => $tableprefix.'widget__widget',
 		'T_temporary_ID'             => $tableprefix.'temporary_ID',
 	) );
 
@@ -101,6 +106,8 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'widgets'      => 'widgets/widgets.ctrl.php',
 		'wpimportxml'  => 'tools/wpimportxml.ctrl.php',
 		'phpbbimport'  => 'tools/phpbbimport.ctrl.php',
+		'mdimport'     => 'tools/mdimport.ctrl.php',
+		'itimport'     => 'tools/itimport.ctrl.php',
 	) );
 
 
@@ -121,6 +128,26 @@ function & get_BlogCache( $order_by = 'blog_order' )
 	}
 
 	return $BlogCache;
+}
+
+
+/**
+ * Get the SectionCache
+ *
+ * @return SectionCache
+ */
+function & get_SectionCache()
+{
+	global $SectionCache;
+
+	if( ! isset( $SectionCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'collections/model/_section.class.php', 'Section' );
+		load_class( 'collections/model/_sectioncache.class.php', 'SectionCache' );
+		$SectionCache = new SectionCache(); // COPY (FUNC)
+	}
+
+	return $SectionCache;
 }
 
 
@@ -224,7 +251,7 @@ function & get_ItemStatusCache()
 	if( ! isset( $ItemStatusCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
-		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name', 'pst_name', NT_('No status') );
+		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name', 'pst_name', NT_('No status'), 0 );
 	}
 
 	return $ItemStatusCache;
@@ -379,6 +406,26 @@ function & get_WidgetCache()
 	return $WidgetCache;
 }
 
+
+/**
+ * Get the WidgetContainerCache
+ *
+ * @return WidgetContainerCache
+ */
+function & get_WidgetContainerCache()
+{
+	global $WidgetContainerCache;
+
+	if( ! isset( $WidgetContainerCache ) )
+	{ // Cache doesn't exist yet:
+		load_class( 'widgets/model/_widgetcontainercache.class.php', 'WidgetContainerCache' );
+		$WidgetContainerCache = new WidgetContainerCache();
+	}
+
+	return $WidgetContainerCache;
+}
+
+
 /**
  * Get the EnabledWidgetCache
  *
@@ -442,6 +489,17 @@ class collections_Module extends Module
 	 */
 	function get_default_group_permissions( $grp_ID )
 	{
+		$SectionCache = & get_SectionCache();
+		if( ( $default_Section = & $SectionCache->get_by_ID( 3, false, false ) ) ||
+		    ( $default_Section = & $SectionCache->get_by_name( 'Blogs', false, false ) ) )
+		{	// Use section with #3 or name "Blogs" by default for user groups if it exists in DB:
+			$default_section_ID = $default_Section->ID;
+		}
+		else
+		{	// Use first section by default because it always exists and cannot be deleted from DB:
+			$default_section_ID = 1;
+		}
+
 		switch( $grp_ID )
 		{
 			case 1:		// Administrators (group ID 1) have permission by default:
@@ -477,12 +535,17 @@ class collections_Module extends Module
 
 		// We can return as many default permissions as we want:
 		// e.g. array ( permission_name => permission_value, ... , ... )
-		return $permissions = array(
+		$permissions = array(
 				'perm_api' => $permapi,
 				'perm_createblog' => $permcreateblog,
 				'perm_getblog' => $permgetblog,
-				'perm_max_createblog_num' => $permmaxcreateblognum
+				'perm_default_sec_ID' => $default_section_ID,
+				'perm_allowed_sections' => $default_section_ID,
 				);
+
+		$permissions['perm_max_createblog_num'] = $permmaxcreateblognum;
+
+		return $permissions;
 	}
 
 
@@ -493,6 +556,9 @@ class collections_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
+		$SectionCache = & get_SectionCache();
+		$SectionCache->load_all();
+
 		// 'label' is used in the group form as label for radio buttons group
 		// 'user_func' function used to check user permission. This function should be defined in Module.
 		// 'group_func' function used to check group permission. This function should be defined in Module.
@@ -516,7 +582,7 @@ class collections_Module extends Module
 				'group_func' => 'check_createblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'Users can create new blogs for themselves'),
+				'note' => T_( 'Users can create new collections for themselves (in any Section they own, or at a minimum, in the Section specified below)'),
 				),
 			'perm_getblog' => array(
 				'label' => '',
@@ -524,7 +590,25 @@ class collections_Module extends Module
 				'group_func' => 'check_getblog_group_perm',
 				'perm_block' => 'blogging',
 				'perm_type' => 'checkbox',
-				'note' => T_( 'New users automatically get a new blog'),
+				'note' => T_('New users automatically get a new collection (in the Section specified below)'),
+				),
+			'perm_default_sec_ID' => array(
+				'label' => T_('Default Section for new Collections'),
+				'user_func'  => 'check_default_sec_user_perm',
+				'group_func' => 'check_default_sec_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type' => 'select_object',
+				'object_cache' => $SectionCache,
+				'note' => '',
+				),
+			'perm_allowed_sections' => array(
+				'label'      => T_('Allowed section for new collections'),
+				'user_func'  => 'check_allowed_sections_user_perm',
+				'group_func' => 'check_allowed_sections_group_perm',
+				'perm_block' => 'blogging',
+				'perm_type'  => 'checklist',
+				'options'    => $SectionCache->get_checklist_options( 'edited_grp_perm_allowed_sections' ),
+				'note'       => '',
 				),
 			'perm_max_createblog_num' => array(
 				'label' => T_('Maximum collections'),
@@ -640,6 +724,35 @@ class collections_Module extends Module
 					'text' => T_('Site Settings'),
 					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
 				);
+				if( $Settings->get( 'site_skins_enabled' ) )
+				{	// Display tab of site skin only when it is enabled:
+					$site_menu['entries']['skin'] = array(
+						'text' => T_('Site skin'),
+						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
+						'entries' => array(
+							'skin_normal' => array(
+								'text' => T_('Standard'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin'
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=tablet'
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=alt'
+							),
+							'manage_skins' => array(
+								'text' => T_('Manage skins'),
+								'href' => $admin_url.'?ctrl=skins&amp;tab=site_skin'
+							),
+						),
+					);
+				}
 			}
 			if( $current_User->check_perm( 'slugs', 'view' ) )
 			{ // User has an access to view slugs
@@ -657,40 +770,16 @@ class collections_Module extends Module
 			}
 		}
 
-		$working_blog = get_working_blog();
-		$new_actions = array( 'new', 'new-selskin', 'new-name' );
-		if( $working_blog )
-		{ // User is member of some blog or has at least view perms, so Dashboard and Collections menus should be visible
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'site' => $site_menu,
-					'collections' => array(
-						'text' => T_('Collections'),
-						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
-					)
+		$AdminUI->add_menu_entries(
+			NULL, // root
+			array(
+				'site' => $site_menu,
+				'collections' => array(
+					'text' => T_('Collections'),
+					'href' => $admin_url.'?ctrl=collections',
 				)
-			);
-		}
-		elseif( $perm_admin_normal && param( 'ctrl', 'string' ) == 'collections' && in_array( param( 'action', 'string' ), $new_actions ) )
-		{ // User is not member of any blogs, but has admin normal permission.
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'site' => $site_menu,
-					'collections' => array(
-						'text' => T_('Collections')
-					)
-				)
-			);
-		}
-		elseif( $perm_admin_normal )
-		{ // User is not member of any blogs, but has admin normal permission. Only the dashboard menu ( no Collections ) should be visible.
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array( 'site' => $site_menu )
-			);
-		}
+			)
+		);
 	}
 
 
@@ -737,11 +826,11 @@ class collections_Module extends Module
 		$last_group_menu_entry = 'posts';
 
 		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
-		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
+		{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
 					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
-						// Set url to meta comments page if user has a perm to view only meta comments:
+						// Set url to internal comments page if user has a perm to view only internal comments:
 						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';
@@ -792,6 +881,12 @@ class collections_Module extends Module
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
+							'popup' => array(
+								'text' => T_('Popups'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup&amp;blog='.$blog ),
+							'metadata' => array(
+								'text' => T_('Meta data'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=metadata&amp;blog='.$blog ),
 							'more' => array(
 								'text' => T_('More'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$blog ),
@@ -812,12 +907,34 @@ class collections_Module extends Module
 							'skin_tablet' => array(
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
-							)
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=alt'
+							),
 						),
 					),
 					'widgets' => array(
 						'text' => T_('Widgets'),
 						'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog,
+						'entries' => array(
+							'skin_normal' => array(
+								'text' => T_('Standard'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog
+							),
+							'skin_mobile' => array(
+								'text' => T_('Phone'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=mobile'
+							),
+							'skin_tablet' => array(
+								'text' => T_('Tablet'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=tablet'
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=alt'
+							),
+						),
 						'order' => 'group_last', ),
 					'settings' => array(
 						'text' => T_('Settings'),

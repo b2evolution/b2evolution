@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -85,6 +85,11 @@ if( $plugin_ID )
 	elseif( ! method_exists( $Plugin, 'htsrv_'.$method ) )
 	{
 		bad_request_die( 'htsrv method does not exist!' );
+	}
+
+	if( $Plugin->code == 'evo_sociallogin' && $method == 'request_login_credentials' )
+	{	// Instruct crawlers not to index:
+		header( 'X-Robots-Tag: noindex' );
 	}
 
 	// Call the method:

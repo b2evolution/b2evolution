@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -34,8 +34,9 @@ messages( array(
 
 // ------------------ "Register" CONTAINER EMBEDDED HERE -------------------
 // Display container and contents:
-skin_container( NT_('Register'), array_merge( $params, array(
+widget_container( 'register', array_merge( $params, array(
 		// The following (optional) params will be used as defaults for widgets included in this container:
+		'container_display_if_empty' => false, // If no widget, don't display container at all
 		// This will enclose each widget in a block:
 		'block_start'       => '<div class="panel panel-default skin-form evo_widget $wi_class$">',
 		'block_end'         => '</div><br>',

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -348,13 +348,13 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_email__campaign.*, enlt_ID, enlt_name, IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
+	$SQL->SELECT( 'DISTINCT ecmp_ID, T_email__campaign.*, enlt_ID, enlt_name, IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 	$SQL->WHERE( 1 );
 
 	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
+	$count_SQL->SELECT( 'COUNT( DISTINCT ecmp_ID )' );
 	$count_SQL->FROM( 'T_email__campaign' );
 	$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
@@ -377,12 +377,13 @@ function campaign_results_block( $params = array() )
 		$SQL->WHERE_and( $sql_where );
 		$count_SQL->WHERE_and( $sql_where );
 		// Join additional tables for the user columns:
+		$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
 		$SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
 		$count_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
 		$count_SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
 	}
 
-	$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+	$Results = new Results( $SQL->get(), isset( $params['enlt_ID'] ) ? 'lemcmp_' : 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 	$Results->Cache = & get_EmailCampaignCache();
 	$Results->title = $params['results_title'];
 
@@ -391,7 +392,16 @@ function campaign_results_block( $params = array() )
 		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 
-	$Results->filter_area = array( 'callback' => 'filter_campaign_results_block' );
+	$Results->filter_area = array( 
+			'callback' => 'filter_campaign_results_block' 
+		);
+
+	$Results->register_filter_preset( 'all', T_('All'),
+		isset( $params['enlt_ID'] )
+		// URL to display campaigns of the edited List:
+		? $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$params['enlt_ID']
+		// URL to display all campaigns:
+		: $admin_url.'?ctrl=campaigns' );
 
 	$Results->cols[] = array(
 			'th' => T_('ID'),

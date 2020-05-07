@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -118,6 +118,7 @@ class item_location_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
@@ -126,6 +127,7 @@ class item_location_Widget extends ComponentWidget
 
 		if( empty( $item_location ) )
 		{	// Don't display this widget when Item has no locations:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no locations.' );
 			return false;
 		}
 

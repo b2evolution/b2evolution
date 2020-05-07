@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -55,7 +55,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -99,6 +99,29 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_secondary_area' => NULL,
+				'item_single_header'        => NULL,
+				'chapter_main_area'         => array( NT_('Chapter Main Area'), 46 ),
+				'sidebar_single'            => array( NT_('Sidebar Single'), 95 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -106,26 +129,14 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
-					'max_image_height' => array(
-						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
-						'defaultvalue' => '',
-						'type' => 'integer',
-						'size' => '7',
-						'allow_empty' => true,
-					),
-					'message_affix_offset' => array(
-						'label' => T_('Messages affix offset'),
-						'note' => 'px. ' . T_('Set message top offset value.'),
-						'defaultvalue' => '100',
-						'type' => 'integer',
-						'allow_empty' => true,
-					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
 						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
@@ -239,9 +250,40 @@ class bootstrap_manual_Skin extends Skin
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
 							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
-							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ),
+						) ),
 				'section_access_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_advanced_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced')
+				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+				'section_advanced_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -275,12 +317,15 @@ class bootstrap_manual_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Layout Settings / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		// Initialize a template depending on current page
 		switch( $disp )
@@ -316,7 +361,7 @@ class bootstrap_manual_Skin extends Skin
 
 		if( $this->is_side_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			$this->require_js( 'left_navigation.js' );
+			$this->require_js( 'affix_sidebars.js' );
 		}
 
 		// Init JS to affix Messages:
@@ -420,7 +465,7 @@ class bootstrap_manual_Skin extends Skin
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
 	}
 
 

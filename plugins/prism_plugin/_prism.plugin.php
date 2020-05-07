@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +21,7 @@ class prism_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $number_of_installs = 1;
 
 
@@ -291,6 +291,10 @@ class prism_plugin extends Plugin
 		{	// Add lang attribute only if it is defined:
 			preg_match( '/language-([a-z]+)/', $lang, $lang_match );
 			$lang = empty( $lang_match[1] ) ? '' : trim( $lang_match[1] );
+			if( $lang == 'mermaid' )
+			{	// Don't touch marmaid language because we have a separate special plugin "Mermaid Diagrams" for it:
+				return $block[0];
+			}
 			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'html', 'markup', 'apacheconf' ) ) )
 			{	// Don't allow unknown language:
 				$lang = '';

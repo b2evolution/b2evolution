@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -96,7 +96,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 				if( $row->comment_type != 'meta' )
-				{ // Exclude meta comments from feedbacks
+				{ // Exclude internal comments from feedbacks
 					// Total for status on post:
 					$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
@@ -137,7 +137,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 			$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 			if( $row->comment_type != 'meta' )
-			{ // Exclude meta comments from feedbacks
+			{ // Exclude internal comments from feedbacks
 				// Total for status on post:
 				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
@@ -282,7 +282,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
-	{ // Meta comments don't have a status, Display only one button to update
+	{ // Internal comments don't have a status, Display only one button to update
 		$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 	}
 	else
@@ -293,7 +293,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
 			// Get those statuses which are not allowed for the current User to create comments in this blog
 			if( $edited_Comment->is_meta() )
-			{	// Don't restrict statuses for meta comments:
+			{	// Don't restrict statuses for internal comments:
 				$restricted_statuses = array();
 			}
 			else
@@ -364,7 +364,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowe
 	if( $edited_Comment !== NULL )
 	{	// If the edited comment is defined, e-g on edit form:
 		if( $edited_Comment->is_meta() )
-		{	// Don't suggest to change a status of meta comment:
+		{	// Don't suggest to change a status of internal comment:
 			$Form->submit( array( 'actionArray['.$action.']', T_('Save Changes!'), 'SaveButton', '' ) );
 			return;
 		}
@@ -940,14 +940,14 @@ jQuery( 'a.comment_reply' ).click( function()
 		.html( '<?php echo TS_('Reply to this comment') ?>' );
 
 	// Add data for a current comment
-	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no' ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
+	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
 	var hidden_reply_ID = '<input type="hidden" name="reply_ID" value="' + comment_ID + '" />';
-	jQuery( '#bComment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
+	jQuery( '#evo_comment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
 
 	jQuery( this ).addClass( 'active' )
 		.html( '<?php echo TS_('You are currently replying to this comment') ?>' );
 	// Scroll to the comment form
-	jQuery( window ).scrollTop( jQuery( '#bComment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
+	jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
 
 	return false;
 } );
@@ -1011,6 +1011,35 @@ function check_comment_mass_delete( $CommentList )
 
 	// Form is available to mass delete the comments
 	return true;
+}
+
+
+/**
+ * Check if autocomplete username is enabled
+ * 
+ * @param object Comment object
+ * @return boolean TRUE - if autocomplete username is enabled
+ */
+function check_autocomplete_usernames( $Comment )
+{
+	global $Settings, $Collection, $Blog;
+
+	if( $Comment->is_meta() )
+	{	// Always enable autocomplete username for internal comments
+		return true;
+	}
+	elseif( is_admin_page() && ! empty( $Blog ) )
+	{	// Check setting in the Back office or when Blog is not defined
+		return $Blog->get_setting( 'autocomplete_usernames' );
+	}
+	else
+	{	// Check setting in the Front office for current blog & skin
+		$SkinCache = & get_SkinCache();
+		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
+		return $skin->get_setting( 'autocomplete_usernames' );
+	}
+
+	return false;
 }
 
 

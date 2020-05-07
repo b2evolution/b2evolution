@@ -154,11 +154,13 @@ class item_link_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
-			return;
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
 		}
 
 		if( empty( $Item->url ) )
 		{	// Don't display this widget when Item has no link:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no link.' );
 			return false;
 		}
 

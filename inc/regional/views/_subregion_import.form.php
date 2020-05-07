@@ -19,9 +19,9 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 
 $Form = new Form( NULL, 'subregion_checkchanges' );
 
-$Form->global_icon( T_('Cancel importing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( TB_('Cancel importing!'), 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('Import sub-regions') );
+$Form->begin_form( 'fform', TB_('Import sub-regions') );
 
 	$Form->add_crumb( 'subregion' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
@@ -36,11 +36,11 @@ $Form->begin_form( 'fform', T_('Import sub-regions') );
 	if( ! empty( $import_files ) )
 	{
 		$CountryCache = & get_CountryCache();
-		$Form->select_country( 'ctry_ID', get_param( 'ctry_ID' ), $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => true ) );
+		$Form->select_country( 'ctry_ID', get_param( 'ctry_ID' ), $CountryCache, TB_('Country'), array( 'allow_none' => true, 'required' => true ) );
 
-		$Form->checkbox( 'auto_create_regions', get_param( 'auto_create_regions' ), T_('Auto-create regions'), T_('When an imported sub-region refers to a region code that doesn\'t exist yet, automatically create that new region.') );
+		$Form->checkbox( 'auto_create_regions', get_param( 'auto_create_regions' ), TB_('Auto-create regions'), TB_('When an imported sub-region refers to a region code that doesn\'t exist yet, automatically create that new region.') );
 
-		$Form->buttons( array( array( 'submit', 'actionArray[import]', T_('Import'), 'SaveButton' ) ) );
+		$Form->buttons( array( array( 'submit', 'actionArray[import]', TB_('Import'), 'SaveButton' ) ) );
 	}
 
 $Form->end_form();

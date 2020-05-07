@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class bbcode_plugin extends custom_tags_plugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 50;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -298,7 +298,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				$this->comment_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_comment_replace_list', $item_Blog ) );
 			}
 
-			$content = replace_content_outcode( $this->comment_search_list, $this->comment_replace_list, $content, array( $this, 'parse_bbcode' ) );
+			$content = replace_content_outcode_shorttags( $this->comment_search_list, $this->comment_replace_list, $content, array( $this, 'parse_bbcode' ) );
 		}
 	}
 

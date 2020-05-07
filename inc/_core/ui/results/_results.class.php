@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -19,8 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $GLOBALS['debug_results'] = false;
 
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
-load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * Results class
@@ -987,8 +986,10 @@ class Results extends Table
 			$this->display_filters();
 		}
 
-		// Flush in order to show the filters before slow SQL query will be executed below
-		evo_flush();
+		if( ! isset( $this->params['disable_evo_flush'] ) || ! $this->params['disable_evo_flush'] )
+		{	// Flush in order to show the filters before slow SQL query will be executed below
+			evo_flush();
+		}
 
 		// Initialize the order param
 		$this->init_order_param();
@@ -1005,7 +1006,7 @@ class Results extends Table
 		echo $this->replace_vars( $this->params['content_start'] );
 
 			if( $this->total_pages == 0 )
-			{ // There are no results! Nothing to display!
+			{ // There are NO RESULTS! Nothing to display!
 
 				// START OF LIST/TABLE:
 				$this->display_list_start();
@@ -1126,7 +1127,7 @@ class Results extends Table
 						else debug_die( 'Invalid Results-group_by-type: '.var_export( $type, true ) );
 
 
-						if( $this->current_group_ID[$group_depth] != $value )
+						if( isset( $this->current_group_ID[$group_depth] ) &&  $this->current_group_ID[$group_depth] != $value )
 						{ // Group changed here:
 							$this->current_group_ID[$group_depth] = $value;
 
@@ -1454,12 +1455,14 @@ class Results extends Table
 		}
 		else
 		{ // Several pages
+			// e-g: 'header_text' or 'footer_text'
 			$navigation = $this->replace_vars( $this->params[$template.'_text'] );
 		}
 
 		$navigation_text = trim( strip_tags( $navigation ) );
 		if( ! empty( $navigation_text ) )
 		{ // Display navigation only when it is really filled with some text
+			// e-g: 'header_start' or 'footer_start'
 			echo $this->params[$template.'_start'];
 
 			echo $navigation;
@@ -1495,9 +1498,9 @@ class Results extends Table
 						$r .= '<option value="'.format_to_output( $selector, 'formvalue' ).'">'.$label.'</option>';
 					}
 					$r .= '</select> ';
-					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
 				}
 				else
 				{
@@ -1509,14 +1512,39 @@ class Results extends Table
 					{
 						$selector = $this->checkbox_toggle_selectors;
 					}
-					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+				}
+
+				if( ! empty( $this->list_mass_actions ) )
+				{	// Additional actions:
+					foreach( $this->list_mass_actions as $toggle_action_key => $toggle_action )
+					{
+						$r .= ' ';
+						switch( $toggle_action['type'] )
+						{
+							case 'text':
+								$r .= $toggle_action['text'];
+								break;
+							case 'button':
+							case 'submit':
+								$r .= '<input type="'.$toggle_action['type'].'" name="actionArray['.$toggle_action_key.']" id="'.$toggle_action_key.'"'
+									.' value="'.format_to_output( $toggle_action['text'] ).'"'
+									.' class="btn btn-xs '.( empty( $toggle_action['class'] ) ? 'btn-default' : ''.$toggle_action['class'] ).'" />';
+								break;
+						}
+					}
 				}
 				$r .= '</div>';
 				$r .= $this->params['footer_end'];
 			}
 			echo $this->params['list_end'].$r;
+
+			if( ! empty( $this->list_mass_actions ) && isset( $this->Form ) )
+			{	// Start form for list with mass actions:
+				$this->Form->end_form();
+			}
 		}
 	}
 
@@ -1867,6 +1895,10 @@ class Results extends Table
 		// echo '['.$matches[1].']';
 		switch( $matches[1] )
 		{
+			case 'nb_results':
+			case 'total_rows':
+				return $this->total_rows;
+
 			case 'start' :
 				return ( ($this->page-1)*$this->limit+1 );
 

@@ -20,19 +20,19 @@ if( !empty( $new_names ) )
 {
 	$Form = new Form( NULL, 'fm_movecopy_checkchanges' );
 
-	$Form->global_icon( T_('Cancel move/copy!'), 'close', regenerate_url('fm_selected,action,fm_sources_root') );
+	$Form->global_icon( TB_('Cancel move/copy!'), 'close', regenerate_url('fm_selected,action,fm_sources_root') );
 
 	if( $action == 'file_move' )
 	{
-		$form_title = T_('Move');
+		$form_title = TB_('Move');
 	}
 	elseif( $action == 'file_copy' )
 	{
-		$form_title = T_('Copy');
+		$form_title = TB_('Copy');
 	}
 	else
 	{
-		$form_title = T_('Move').'/'.T_('Copy');
+		$form_title = TB_('Move').'/'.TB_('Copy');
 	}
 	$Form->begin_form( 'fform', $form_title );
 
@@ -49,10 +49,10 @@ if( !empty( $new_names ) )
 				continue;
 			}
 
-			$Form->begin_fieldset( T_('File').': '.$loop_src_File->get_rdfp_rel_path() );
+			$Form->begin_fieldset( TB_('File').': '.$loop_src_File->get_rdfp_rel_path() );
 
 			$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 64,
-										T_('New name'), $loop_src_File->dget('title'), 255 );
+										TB_('New name'), $loop_src_File->dget('title'), 255 );
 
 			$Form->end_fieldset();
 		}
@@ -60,15 +60,15 @@ if( !empty( $new_names ) )
 	$buttons = array();
 	if( $action == 'move_copy' || $action == 'file_move' )
 	{	// Display a button to move files/folders:
-		$buttons[] = array( 'submit', 'actionArray[move]', T_('Move'), 'SaveButton' );
+		$buttons[] = array( 'submit', 'actionArray[move]', TB_('Move'), 'SaveButton' );
 	}
 	if( $action == 'move_copy' || $action == 'file_copy' )
 	{	// Display a button to copy files/folders:
-		$buttons[] = array( 'submit', 'actionArray[copy]', T_('Copy'), 'SaveButton' );
+		$buttons[] = array( 'submit', 'actionArray[copy]', TB_('Copy'), 'SaveButton' );
 	}
 	$Form->end_form( $buttons );
 
-	echo '<p class="notes"><strong>'.T_('You are in copy/move mode.')
-					.'</strong> '.T_('Please navigate to the desired target location.').'</p>';
+	echo '<p class="notes"><strong>'.TB_('You are in copy/move mode.')
+					.'</strong> '.TB_('Please navigate to the desired target location.').'</p>';
 }
 ?>

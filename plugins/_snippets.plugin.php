@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class snippets_plugin extends Plugin
 	var $code = 'snippets';
 	var $name = 'Snippets';
 	var $priority = 60;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 

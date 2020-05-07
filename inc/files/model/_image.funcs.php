@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -352,8 +352,8 @@ function check_thumbnail_sizes( $thumb_type, & $thumb_width, & $thumb_height, $s
 		return true;
 	}
 
-	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
-	{ // If original image sizes are less than thumbnail sizes
+	if( $src_width <= $thumb_width || $src_height <= $thumb_height )
+	{ // If at least one of original image sizes(width or height) is less than thumbnail size
 		if( $thumb_type == 'fit' )
 		{ // There is no need to resample, use original!
 			return true;

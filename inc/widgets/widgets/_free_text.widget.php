@@ -52,7 +52,7 @@ class free_text_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Free Text' );
+		$title = T_('Text');
 		return $title;
 	}
 
@@ -96,7 +96,7 @@ class free_text_Widget extends ComponentWidget
 		// Initialize checkboxes options for text renderers setting:
 		$renderers = $Plugins->get_renderer_options( 'default', array(
 				'Blog'         => $this->get_Blog(),
-				'setting_name' => 'coll_apply_rendering',
+				'setting_name' => 'shared_apply_rendering',
 			) );
 		$renderer_checkbox_options = array();
 		foreach( $renderers as $renderer )

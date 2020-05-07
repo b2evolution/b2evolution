@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -40,27 +40,27 @@ $Form->switch_template_parts(
 $link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default' ); // Avoid misclicks by all means!
 if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
-	$Form->global_icon( T_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
-				T_( 'Post as a quote' ), 4, 3, $link_attribs, 'elevate' );
-	$Form->global_icon( T_( 'Post as original user' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=original&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
-				T_( 'Post as original user' ), 4, 3, $link_attribs, 'elevate' );
+	$Form->global_icon( TB_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
+				TB_( 'Post as a quote' ), 4, 3, $link_attribs, 'elevate' );
+	$Form->global_icon( TB_( 'Post as original user' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=original&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
+				TB_( 'Post as original user' ), 4, 3, $link_attribs, 'elevate' );
 }
 
 $delete_url = '?ctrl=comments&amp;action=delete&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment');
 if( $edited_Comment->status == 'trash' )
 {
-	$delete_title = T_('Delete this comment');
-	$delete_text = T_('delete');
+	$delete_title = TB_('Delete this comment');
+	$delete_text = TB_('delete');
 	$link_attribs['onclick'] = 'return confirm(\''.TS_('You are about to delete this comment!\\nThis cannot be undone!').'\')';
 }
 else
 {
-	$delete_title = T_('Recycle this comment');
-	$delete_text = T_('recycle');
+	$delete_title = TB_('Recycle this comment');
+	$delete_text = TB_('recycle');
 }
 $Form->global_icon( $delete_title, 'recycle', $delete_url, $delete_text, 4, 3, $link_attribs );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', str_replace( '&', '&amp;', $redirect_to), T_('cancel'), 4, 1, $link_attribs );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', str_replace( '&', '&amp;', $redirect_to), TB_('cancel'), 4, 1, $link_attribs );
 
 $Form->begin_form( 'eform' );
 
@@ -77,7 +77,7 @@ $Form->hidden( 'from', 'backoffice' );
 
 
 	<?php
-	$Form->begin_fieldset( sprintf( T_('Comment #%s'), $edited_Comment->ID ).get_manual_link( 'editing-comments' ) );
+	$Form->begin_fieldset( sprintf( TB_('Comment #%s'), $edited_Comment->ID ).get_manual_link( 'editing-comments' ) );
 
 	echo '<div class="row">';
 		echo '<div class="col-sm-12">';
@@ -87,11 +87,11 @@ $Form->hidden( 'from', 'backoffice' );
 		$Form->switch_template_parts( array(
 			'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div>',
 		));
-		$Form->info( T_('In response to'), $comment_Item->get_title( array(
+		$Form->info( TB_('In response to'), $comment_Item->get_title( array(
 				'link_type'  => 'admin_view',
 				'link_class' => 'comment_item_title',
 			) ),
-			'<button type="button" class="btn btn-default btn-sm" data-func="evo_comment_change_item_load_window|'.$comment_Item->ID.'">'.T_('Link to Another Post').'...</button>' );
+			'<button type="button" class="btn btn-default btn-sm" data-func="evo_comment_change_item_load_window|'.$comment_Item->ID.'">'.TB_('Link to Another Post').'...</button>' );
 		echo '</div>';
 		echo '<div class="col-sm-12">';
 
@@ -109,18 +109,18 @@ $Form->hidden( 'from', 'backoffice' );
 
 		if( $Blog->get_setting( 'threaded_comments' ) )
 		{	// Display a reply comment ID only when this feature is enabled in blog settings:
-			$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, T_('In reply to comment ID'), T_('(leave blank for normal comments)') );
+			$Form->text_input( 'in_reply_to_cmt_ID', $edited_Comment->in_reply_to_cmt_ID, 10, TB_('In reply to comment ID'), TB_('(leave blank for normal comments)') );
 		}
 
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
 			if( $current_User->check_perm( 'users', 'edit' ) )
 			{	// Allow to change an author if current user has a permission:
-				$Form->username( 'comment_author_login', $edited_Comment->get_author_User(), T_('Author'), '' );
+				$Form->username( 'comment_author_login', $edited_Comment->get_author_User(), TB_('Author'), '' );
 			}
 			else
 			{	// Current user has no permission to edit a comment author
-				$Form->info( T_('Author'), $edited_Comment->get_author( array(
+				$Form->info( TB_('Author'), $edited_Comment->get_author( array(
 						'before'    => '',
 						'link_to'   => '',
 						'link_text' => 'name',
@@ -129,11 +129,15 @@ $Form->hidden( 'from', 'backoffice' );
 		}
 		else
 		{	// This is not a member comment
-			$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width:100%' ) );
-			$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width:100%' ) );
-			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him an email.') );
-			$Form->checkbox( 'comment_anon_notify', $edited_Comment->anon_notify, T_('Notify me of replies') );
-			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+			$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, TB_('Author'), '', array( 'maxlength' => 100, 'style' => 'width:100%' ) );
+			$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, TB_('Email'), array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, TB_('Allow contact'), TB_('If checked, the comment author can be contacted through a form that will send him an email.') );
+			$Form->checkbox( 'comment_anon_notify', $edited_Comment->anon_notify, TB_('Notify me of replies') );
+			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, TB_('Website URL'),
+				'<label><input type="checkbox" name="comment_author_url_nofollow" value="1"'.( $edited_Comment->author_url_nofollow ? ' checked="checked"' : '' ).' /> Nofollow</label> &nbsp; '.
+				'<label><input type="checkbox" name="comment_author_url_ugc" value="1"'.( $edited_Comment->author_url_ugc ? ' checked="checked"' : '' ).' /> UGC</label> &nbsp; '.
+				'<label><input type="checkbox" name="comment_author_url_sponsored" value="1"'.( $edited_Comment->author_url_sponsored ? ' checked="checked"' : '' ).' /> Sponsored</label>',
+				array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		}
 
 		echo '</div>';
@@ -151,7 +155,12 @@ $Form->hidden( 'from', 'backoffice' );
 	$content = $comment_content;
 	$Form->fieldstart = '<div class="edit_area">';
 	$Form->fieldend = "</div>\n";
-	$Form->textarea_input( 'content', $content, 16, '', array( 'cols' => 40 , 'id' => 'commentform_post_content', 'class' => 'autocomplete_usernames' ) );
+	$Form->textarea_input( 'content', $content, 16, '', array(
+			'cols' => 40 ,
+			'id' => 'commentform_post_content',
+			'class' => ( check_autocomplete_usernames( $edited_Comment ) ? 'autocomplete_usernames ' : '' ).'link_attachment_dropzone',
+			'maxlength' => ( $edited_Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
+		) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
@@ -208,7 +217,7 @@ $Form->hidden( 'from', 'backoffice' );
 	if( ! $edited_Comment->is_meta() &&
 	    ( $comment_Item->can_rate() || !empty( $edited_Comment->rating ) ) )
 	{	// Rating is editable
-		$Form->begin_fieldset( T_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
+		$Form->begin_fieldset( TB_('Rating'), array( 'id' => 'cmntform_rating', 'fold' => true ) );
 
 		echo '<p>';
 		$edited_Comment->rating_input( array( 'reset' => true ) );
@@ -224,13 +233,13 @@ $Form->hidden( 'from', 'backoffice' );
 	// ####################### ADVANCED PROPERTIES #########################
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
-		$Form->begin_fieldset( T_('Date & Time'), array( 'id' => 'cmntform_datetime', 'fold' => true ) );
+		$Form->begin_fieldset( TB_('Date & Time'), array( 'id' => 'cmntform_datetime', 'fold' => true ) );
 
 		$Form->switch_layout( 'fieldset' );
 
 		echo '<div id="commentform_edit_timestamp">';
-		$Form->date_input( 'comment_issue_date', $edited_Comment->date, T_('Date'), array( 'add_date_format_note' => true ) );
-		$Form->time( 'comment_issue_time', $edited_Comment->date, T_('Time') );
+		$Form->date_input( 'comment_issue_date', $edited_Comment->date, TB_('Date'), array( 'add_date_format_note' => true ) );
+		$Form->time( 'comment_issue_time', $edited_Comment->date, TB_('Time') );
 		echo '</div>';
 
 		$Form->switch_layout( NULL );
@@ -238,65 +247,57 @@ $Form->hidden( 'from', 'backoffice' );
 		$Form->end_fieldset();
 	}
 
-	// ####################### LINKS #########################
-	$Form->begin_fieldset( T_('Links'), array( 'id' => 'cmntform_html', 'fold' => true ) );
-		echo '<p>';
-		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
-		// TODO: apply to all links  -- note: see basic antispam plugin that does this for x hours
-		echo '</p>';
-	$Form->end_fieldset();
-
 
 	// ####################### FEEDBACK INFO #########################
-	$Form->begin_fieldset( T_('Feedback info'), array( 'id' => 'cmntform_info', 'fold' => true ) );
+	$Form->begin_fieldset( TB_('Feedback info'), array( 'id' => 'cmntform_info', 'fold' => true ) );
 ?>
 
-	<p><strong><?php echo T_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
-	<p><strong><?php echo T_('IP address') ?>:</strong> <?php
+	<p><strong><?php echo TB_('Type') ?>:</strong> <?php echo $edited_Comment->type; ?></p>
+	<p><strong><?php echo TB_('IP address') ?>:</strong> <?php
 		// Display IP address and allow plugins to filter it, e.g. the DNSBL plugin will add a link to check the IP:
 		echo $Plugins->get_trigger_event( 'FilterIpAddress', array('format'=>'htmlbody', 'data'=>$edited_Comment->author_IP), 'data' ); ?>
 		<?php $edited_Comment->ip_country(); ?>
 	</p>
-	<p><strong><?php echo T_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
+	<p><strong><?php echo TB_('Spam Karma') ?>:</strong> <?php $edited_Comment->spam_karma(); ?></p>
 
 	<?php
 	$Form->end_fieldset();
 
 	// ####################### TEXT RENDERERS #########################
 	global $Plugins;
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
+	$Form->begin_fieldset( TB_('Text Renderers'), array( 'id' => 'cmntform_renderers', 'fold' => true  ) );
 	$edited_Comment->renderer_checkboxes();
 	$Form->end_fieldset();
 
 
 	// ################### NOTIFICATIONS ###################
 
-	$Form->begin_fieldset( T_('Notifications'), array( 'id' => 'cmntform_notifications', 'fold' => true ) );
+	$Form->begin_fieldset( TB_('Notifications'), array( 'id' => 'cmntform_notifications', 'fold' => true ) );
 
-		$Form->info( T_('Moderators'), $edited_Comment->check_notifications_flags( 'moderators_notified' ) ? T_('Notified at least once') : T_('Not notified yet') );
+		$Form->info( TB_('Moderators'), $edited_Comment->check_notifications_flags( 'moderators_notified' ) ? TB_('Notified at least once') : TB_('Not notified yet') );
 
 		$notify_types = array(
-				'members_notified'   => T_('Members'),
-				'community_notified' => T_('Community'),
+				'members_notified'   => TB_('Members'),
+				'community_notified' => TB_('Community'),
 		);
 
 		foreach( $notify_types as $notify_type => $notify_title )
 		{
 			if( $edited_Comment->check_notifications_flags( $notify_type ) )
 			{	// Nofications were sent:
-				$notify_status = T_('Notified');
+				$notify_status = TB_('Notified');
 				$notify_select_options = array(
-						''      => T_('Done'),
-						'force' => T_('Notify again')
+						''      => TB_('Done'),
+						'force' => TB_('Notify again')
 					);
 			}
 			else
 			{	// Nofications are not sent yet:
-				$notify_status = T_('To be notified');
+				$notify_status = TB_('To be notified');
 				$notify_select_options = array(
-						''     => T_('Notify on next save'),
-						'skip' => T_('Skip on next save'),
-						'mark' => T_('Mark as Notified')
+						''     => TB_('Notify on next save'),
+						'skip' => TB_('Skip on next save'),
+						'mark' => TB_('Mark as Notified')
 					);
 			}
 			$Form->select_input_array( 'comment_'.$notify_type, get_param( 'comment_'.$notify_type ), $notify_select_options, $notify_title, NULL, array( 'input_prefix' => $notify_status.' &nbsp; &nbsp; ' ) );

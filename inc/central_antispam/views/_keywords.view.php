@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -82,10 +82,9 @@ function filter_central_antispam( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_central_antispam',
-	'presets' => array(
-		'all' => array( T_('All keywords'), $admin_url.'?ctrl=central_antispam' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=central_antispam' );
 
 $Results->cols[] = array(
 		'th' => T_('ID'),

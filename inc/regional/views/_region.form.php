@@ -26,30 +26,30 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'region_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this region!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('region') ) );
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
+$Form->global_icon( TB_('Delete this region!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('region') ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New region') : T_('Region') ).get_manual_link( 'regions-editing' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New region') : TB_('Region') ).get_manual_link( 'regions-editing' ) );
 
 	$Form->add_crumb( 'region' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',rgn_ID' : '' ) ) ); // (this allows to come back to the right list order & page)
 
 	$CountryCache = & get_CountryCache();
-	$Form->select_country( 'rgn_ctry_ID', $edited_Region->ctry_ID, $CountryCache, T_('Country'), array( 'allow_none' => true, 'required' => true ) );
+	$Form->select_country( 'rgn_ctry_ID', $edited_Region->ctry_ID, $CountryCache, TB_('Country'), array( 'allow_none' => true, 'required' => true ) );
 
-	$Form->text_input( 'rgn_code', $edited_Region->code, 6, T_('Code'), '', array( 'maxlength'=> 6, 'required'=>true ) );
+	$Form->text_input( 'rgn_code', $edited_Region->code, 6, TB_('Code'), '', array( 'maxlength'=> 6, 'required'=>true ) );
 
-	$Form->text_input( 'rgn_name', $edited_Region->name, 40, T_('Name'), '', array( 'maxlength'=> 40, 'required'=>true ) );
+	$Form->text_input( 'rgn_name', $edited_Region->name, 40, TB_('Name'), '', array( 'maxlength'=> 40, 'required'=>true ) );
 
 if( $creating )
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_new]', T_('Record, then Create New'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_copy]', T_('Record, then Create Similar'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[create]', TB_('Record'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_new]', TB_('Record, then Create New'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_copy]', TB_('Record, then Create Similar'), 'SaveButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[update]', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -66,14 +66,19 @@ class LinkOwner
 	 */
 	var $ID_field_name;
 
+	/**
+	 * @var integer Last order
+	 */
+	var $last_order = NULL;
+
 
 	/**
 	 * Abstract methods that needs to be overriden in every subclass
 	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
 	 * function get_positions( $file_ID = NULL ); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
-	 * function get_edit_url(); // get link owner edit url
-	 * function get_view_url(); // get link owner view url
+	 * function get_edit_url( $glue = '&amp;', $url_type = NULL ); // get link owner edit url
+	 * function get_view_url( $glue = '&amp;', $url_type = NULL ); // get link owner view url
 	 * function load_Links(); // load link owner all links
 	 * function add_link( $file_ID, $position, $order, $update_owner = true ); // add a new link to link owner
 	 * function load_Blog(); // set Link Owner Blog
@@ -117,7 +122,15 @@ class LinkOwner
 			else
 			{	// Create new temporary object:
 				$tmp_link_Object = new TemporaryID();
-				$tmp_link_Object->set( 'type', $this->type );
+				if( $this->type == 'comment' && $link_Object->type == 'meta' )
+				{	// Special case for internal (meta) comment so we can determine between internal and regular comments:
+					$tmp_link_Object_type = 'metacomment';
+				}
+				else
+				{
+					$tmp_link_Object_type = $this->type;
+				}
+				$tmp_link_Object->set( 'type', $tmp_link_Object_type );
 				if( ! empty( $this->link_Object->blog_ID ) )
 				{	// Set parent collection ID of Item:
 					$tmp_link_Object->set( 'coll_ID', $this->link_Object->blog_ID );
@@ -573,12 +586,16 @@ class LinkOwner
 			return 0;
 		}
 
-		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
-		$SQL->SELECT( 'MAX( link_order )' );
-		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
+		if( $this->last_order === NULL )
+		{	// Get last order frin DB:
+			$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
+			$SQL->SELECT( 'MAX( link_order )' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
+			$this->last_order = intval( $DB->get_var( $SQL ) );
+		}
 
-		return intval( $DB->get_var( $SQL ) );
+		return $this->last_order;
 	}
 }
 

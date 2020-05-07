@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -66,6 +66,7 @@ if( isset( $use_l10n ) && $use_l10n )
 								'ext_transarray' => NULL,
 								'alt_basedir'    => '',
 								'for_helper'     => false,
+								'add_transarray' => NULL,
 								), $params );
 
 		if( empty( $req_locale ) )
@@ -156,6 +157,82 @@ if( isset( $use_l10n ) && $use_l10n )
 			}
 		}
 
+		if( ! empty( $params['add_transarray'] ) )
+		{
+			switch( $params['add_transarray'] )
+			{
+				case 'backoffice':
+					static $_backoffice_array = array();
+					$add_transarray_var = 'trans_backoffice';
+					${$add_transarray_var} = & $_backoffice_array;
+					$trans_file_name    = '_back-office.php';
+					break;
+
+				case 'demo_contents':
+					static $_demo_contents_array = array();
+					$add_transarray_var    = 'trans_demo_contents';
+					${$add_transarray_var} = & $_demo_contents_array;
+					$trans_file_name       = '_demo-contents.php';
+					break;
+
+				default:
+					debug_die( 'Invalid additional translation array.' );
+			}
+
+			if( ! isset( ${$add_transarray_var}[ $messages ] ) )
+			{ // Additional translations for current locale have not yet been loaded:
+				$Debuglog->add( 'We need to load additional translation file to translate: "'. $string.'"', 'locale' );
+
+				if ( $params['alt_basedir'] != '' )
+				{	// Load the translation file from the alternative base dir:
+					//$Debuglog->add( 'Using alternative basedir ['.$params['alt_basedir'].']', 'locale' );
+					$path = $params['alt_basedir'].'/locales/'.$messages.'/'.$trans_file_name;
+				}
+				else
+				{	// Load our additional translation file.
+					$path = $locales_path.$messages.'/'.$trans_file_name;
+				}
+
+				if( file_exists($path) && is_readable($path) )
+				{
+					$Debuglog->add( 'T_: Loading additional file: '.$path, 'locale' );
+					include_once $path;
+				}
+				else
+				{
+					$Debuglog->add( 'T_: Messages file does not exist or is not readable: '.$path, 'locale' );
+				}
+				if( ! isset( ${$add_transarray_var}[ $messages ] ) )
+				{ // Still not loaded... file doesn't exist, memorize that no translations are available
+					// echo 'file not found!';
+					${$add_transarray_var}[ $messages ] = array();
+				}
+				else
+				{
+					if( ! isset( ${$add_transarray_var}[$messages]['__meta__'] ) )
+					{ // Unknown/old messages format (< version 1):
+						$Debuglog->add( 'Found deprecated messages format (no __meta__ info).', 'locale' );
+						// Translate keys (e.g. 'foo\nbar') to real strings ("foo\nbar")
+						// Doing this here for all strings, is actually faster than doing it on key lookup (like it has been done before always)
+						foreach( ${$add_transarray_var}[$messages] as $k => $v )
+						{
+							if( ($pos = strpos($k, '\\')) === false )
+							{ // fast-path-skip
+								continue;
+							}
+							// Replace string as done in the good old days:
+							$new_k = str_replace( array( '\n', '\r', '\t' ), array( "\n", "\r", "\t" ), $k );
+							if( $new_k != $k )
+							{
+								${$add_transarray_var}[$messages][$new_k] = $v;
+								unset( ${$add_transarray_var}[$messages][$k] );
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// sam2kb> b2evolution creates _global.php files with "\n" line breaks, and we must normalize newlines
 		// in supplied string before trying to translate it. Otherwise strings won't match.
 		// fp> TODO: this is not really satisfying in the long term. We need our own
@@ -164,7 +241,30 @@ if( isset( $use_l10n ) && $use_l10n )
 		// That way translators can concentrate on the most essential stuff first.
 		$search_string = str_replace( array("\r\n", "\r"), "\n", $string );
 
-		if( isset( $trans[ $messages ][ $search_string ] ) )
+		if( ! empty( $params['add_transarray'] ) && isset( ${$add_transarray_var}[ $messages ][ $search_string ] ) )
+		{ // If the string has been translated:
+			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
+			$r = ${$add_transarray_var}[ $messages ][ $search_string ];
+			if( isset( ${$add_transarray_var}[$messages]['__meta__']['charset']) )
+			{ // new format: charset in meta data:
+				$messages_charset = ${$add_transarray_var}[$messages]['__meta__']['charset'];
+			}
+			else
+			{ // old format.. extract charset from content type or fall back to setting from global locale definition:
+				$meta = ${$add_transarray_var}[$messages][''];
+				if( preg_match( '~^Content-Type: text/plain; charset=(.*);?$~m', $meta, $match ) )
+				{
+					$messages_charset = $match[1];
+				}
+				else
+				{
+					$messages_charset = $locales[$req_locale]['charset'];
+				}
+				// Set it accordingly to new format.
+				${$add_transarray_var}[$messages]['__meta__']['charset'] = $messages_charset;
+			}
+		}
+		elseif( isset( $trans[ $messages ][ $search_string ] ) )
 		{ // If the string has been translated:
 			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
 			$r = $trans[ $messages ][ $search_string ];
@@ -216,6 +316,38 @@ if( isset( $use_l10n ) && $use_l10n )
 		return $r;
 	}
 
+	/**
+	 * Translate strings in Back-office UI.
+	 *
+	 * @param string String to translate
+	 * @return string The translated string
+	 */
+	function TB_( $string, $req_locale = '', $params = array() )
+	{
+		$params = array_merge( array(
+				'add_transarray' => 'backoffice',
+			), $params );
+
+		return T_( $string, $req_locale, $params );
+	}
+
+
+	/**
+	 * Translate strings in demo/sample contents.
+	 *
+	 * @param string String to translate
+	 * @return string The translated string
+	 */
+	function TD_( $string, $req_locale = '', $params = array() )
+	{
+		// TODO: Later we will make a specific .POT file containing ONLY demo contents.
+		$params = array_merge( array(
+			'add_transarray' => 'demo_contents',
+		), $params );
+
+		return T_( $string, $req_locale, $params );
+	}
+
 }
 else
 { // We are not localizing at all:
@@ -224,6 +356,24 @@ else
 	 * @ignore
 	 */
 	function T_( $string, $req_locale = '', $params = array() )
+	{
+		return $string;
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	function TB_( $string, $req_locale = '', $params = array() )
+	{
+		return $string;
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	function TD_( $string, $req_locale = '', $params = array() )
 	{
 		return $string;
 	}
@@ -244,19 +394,6 @@ else
 function TS_( $string, $req_locale = '', $params = array() )
 {
 	return str_replace( "'", "\\'", T_( $string, $req_locale, $params ) );
-}
-
-
-/**
- * Translate strings in demo/sample contents.
- *
- * @param string String to translate
- * @return string The translated string
- */
-function TD_( $string )
-{
-	// TODO: Later we will make a specific .POT file containing ONLY demo contents.
-	return $string;
 }
 
 
@@ -392,6 +529,47 @@ function locale_charset( $disp = true )
 		echo $current_charset;
 	else
 		return $current_charset;
+}
+
+
+/**
+ * Resolves a #date_format_code to the correct date or time format
+ *
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_resolve_datetime_fmt( $format, $locale = NULL )
+{
+	// Get datetime format:
+	switch( $format )
+	{
+		case '#short_date':
+		case '':
+			$format = locale_datefmt( $locale );
+			break;
+
+		case '#long_date':
+			$format = locale_longdatefmt( $locale );
+			break;
+
+		case '#extended_date':
+			$format = locale_extdatefmt( $locale );
+			break;
+
+		case '#short_time':
+			$format = locale_shorttimefmt( $locale );
+			break;
+
+		case '#long_time':
+			$format = locale_timefmt( $locale );
+			break;
+
+		case '#short_date_time':
+			$format = locale_datefmt( $locale ).' '.locale_shorttimefmt( $locale );
+			break;
+	}
+
+	return $format;
 }
 
 
@@ -908,7 +1086,7 @@ function locale_overwritefromDB()
  */
 function locale_updateDB()
 {
-	global $locales, $DB, $Settings, $Messages, $action;
+	global $locales, $DB, $Settings, $Messages, $action, $current_User, $admin_url;
 	global $saved_params;
 
 	$templocales = $locales;
@@ -994,46 +1172,95 @@ function locale_updateDB()
 	$disabled_locales = ( count( $disabled_locales ) > 0 ) ? $DB->quote( $disabled_locales ) : false;
 	if( $disabled_locales && ( $action != 'confirm_update' ) )
 	{ // Some locales were disabled, create warning message if required
-		$user_disabled_locales = $DB->get_assoc( '
-			SELECT user_locale, count( user_ID ) as number_of_users
-			FROM T_users
-			WHERE user_locale IN ( '.$disabled_locales.' )
-			GROUP BY user_locale
-			HAVING number_of_users > 0
-			ORDER BY user_locale'
-		);
-		$coll_disabled_locales = $DB->get_assoc( '
-			SELECT blog_locale, count( blog_ID ) as number_of_blogs
-			FROM T_blogs
-			WHERE blog_locale IN ( '.$disabled_locales.' )
-			GROUP BY blog_locale
-			HAVING number_of_blogs > 0
-			ORDER BY blog_locale'
-		);
-
 		global $warning_message;
-		$warning_message = array();
-		$users_message = T_('%d users with invalid locale %s');
-		$colls_message = T_('%d collections with invalid locale %s');
-		foreach( $user_disabled_locales as $disabled_locale => $numbe_of_users )
-		{ // Disabled locale is used by users, add warning
-			$warning_message[] = sprintf( $users_message, $numbe_of_users, $disabled_locale );
-			if( isset( $coll_disabled_locales[$disabled_locale] ) )
-			{ // Disabled locale is used by blogs, add warning
-				$warning_message[] = sprintf( $colls_message, $coll_disabled_locales[$disabled_locale], $disabled_locale );
-				unset( $coll_disabled_locales[$disabled_locale] );
+		$warning_message = '';
+
+		// Display what MAIN collection locales will be disabled:
+		$SQL = new SQL( 'Get collections with disabled main locales' );
+		$SQL->SELECT( 'blog_locale, GROUP_CONCAT( blog_ID SEPARATOR "," ) ' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_locale IN ( '.$disabled_locales.' )' );
+		$SQL->ORDER_BY( 'blog_locale' );
+		$SQL->GROUP_BY( 'blog_locale' );
+		$SQL->HAVING( 'COUNT( blog_ID ) > 0' );
+		$main_locale_colls = $DB->get_assoc( $SQL );
+		if( count( $main_locale_colls ) > 0 )
+		{
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_list( explode( ',', implode( ',', $main_locale_colls ) ) );
+			foreach( $main_locale_colls as $main_locale => $main_locale_coll_IDs )
+			{
+				$warning_message .= sprintf( T_('The locale %s is used as main locale by the following collections:'), '<code>'.$main_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$main_locale_coll_IDs = explode( ',', $main_locale_coll_IDs );
+				foreach( $main_locale_coll_IDs as $main_locale_coll_ID )
+				{
+					$locale_Blog = & $BlogCache->get_by_ID( $main_locale_coll_ID );
+					$coll_url = $current_User->check_perm( 'blog_properties', 'edit', false, $main_locale_coll_ID )
+						? $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$locale_Blog->ID.'#fieldset_wrapper_language'
+						: $locale_Blog->get( 'url' );
+					$warning_message .= '<li><a href="'.$coll_url.'">'.$locale_Blog->get( 'name' ).'</a></li>';
+				}
+				$warning_message .= '</ul>'.sprintf( T_('These will be switched to the default locale %s.'), '<code>'.$main_locale.'</code>' ).'<br><br>';
 			}
 		}
-		foreach( $coll_disabled_locales as $disabled_locale => $numbe_of_colls )
-		{ // Disabled locale is used by blogs, add warning
-			$warning_message[] = sprintf( $colls_message, $numbe_of_colls, $disabled_locale );
+
+		// Display what EXTRA collection locales will be disabled:
+		$SQL = new SQL( 'Get collections with disabled extra locales' );
+		$SQL->SELECT( 'cl_locale, GROUP_CONCAT( cl_coll_ID SEPARATOR "," ) ' );
+		$SQL->FROM( 'T_coll_locales' );
+		$SQL->WHERE( 'cl_locale IN ( '.$disabled_locales.' )' );
+		$SQL->ORDER_BY( 'cl_locale' );
+		$SQL->GROUP_BY( 'cl_locale' );
+		$SQL->HAVING( 'COUNT( cl_coll_ID ) > 0' );
+		$extra_locale_colls = $DB->get_assoc( $SQL );
+		if( count( $extra_locale_colls ) > 0 )
+		{
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_list( explode( ',', implode( ',', $extra_locale_colls ) ) );
+			foreach( $extra_locale_colls as $extra_locale => $extra_locale_coll_IDs )
+			{
+				$warning_message .= sprintf( T_('The locale %s is also used as extra locale by the following collections:'), '<code>'.$extra_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$extra_locale_coll_IDs = explode( ',', $extra_locale_coll_IDs );
+				foreach( $extra_locale_coll_IDs as $extra_locale_coll_ID )
+				{
+					$locale_Blog = & $BlogCache->get_by_ID( $extra_locale_coll_ID );
+					$coll_url = $current_User->check_perm( 'blog_properties', 'edit', false, $extra_locale_coll_ID )
+						? $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$locale_Blog->ID.'#fieldset_wrapper_language'
+						: $locale_Blog->get( 'url' );
+					$warning_message .= '<li><a href="'.$coll_url.'">'.$locale_Blog->get( 'name' ).'</a></li>';
+				}
+				$warning_message .= '</ul>'.sprintf( T_('These collections will no longer use the %s extra locale.'), '<code>'.$extra_locale.'</code>' ).'<br><br>';
+			}
 		}
 
-		if( !empty( $warning_message ) )
-		{ // There are disabled locales which are used, create the final warning message
-			$warning_message = T_('You have disabled some locales. This results in:')."\n"
-				.'<ul><li>'.implode( '</li><li>', $warning_message ).'</li></ul>'
-				.sprintf( T_('These will be assigned the default locale %s'), $current_default_locale );
+		// Display what USER locales will be disabled:
+		$SQL = new SQL( 'Get users with disabled locales' );
+		$SQL->SELECT( 'user_locale, GROUP_CONCAT( user_ID SEPARATOR "," ) ' );
+		$SQL->FROM( 'T_users' );
+		$SQL->WHERE( 'user_locale IN ( '.$disabled_locales.' )' );
+		$SQL->ORDER_BY( 'user_locale' );
+		$SQL->GROUP_BY( 'user_locale' );
+		$SQL->HAVING( 'COUNT( user_ID ) > 0' );
+		$locale_users = $DB->get_assoc( $SQL );
+		if( count( $locale_users ) > 0 )
+		{
+			$UserCache = & get_UserCache();
+			$UserCache->load_list( explode( ',', implode( ',', $locale_users ) ) );
+			foreach( $locale_users as $user_locale => $locale_user_IDs )
+			{
+				$warning_message .= sprintf( T_('The locale %s is also used as preferred locale by the following users:'), '<code>'.$user_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$locale_user_IDs = explode( ',', $locale_user_IDs );
+				foreach( $locale_user_IDs as $locale_user_ID )
+				{
+					$locale_User = & $UserCache->get_by_ID( $locale_user_ID );
+					$warning_message .= '<li>'.$locale_User->get_identity_link( array( 'user_tab' => 'userprefs' ) ).'</li>';
+				}
+				$warning_message .= '</ul>'.sprintf( T_('These users\' preferred locale will fall back to %s.'), '<code>'.$user_locale.'</code>' ).'<br><br>';
+			}
+		}
+
+		if( ! empty( $warning_message ) )
+		{
 			return false;
 		}
 	}
@@ -1086,14 +1313,14 @@ function locale_updateDB()
 	if( $action == 'confirm_update' )
 	{ // Update users and blogs locale to the default if the prevously used locale was disabled
 		$users_update = $DB->query( 'UPDATE T_users
-			SET user_locale = '.$DB->quote( $current_default_locale ).'
-			WHERE  user_locale IN ( '.$disabled_locales.' )'
-		);
-		$blogs_update = $DB->query( 'UPDATE T_blogs
-			SET blog_locale = '.$DB->quote( $current_default_locale ).'
-			WHERE  blog_locale IN ( '.$disabled_locales.' )'
-		);
-		$result = ( $users_update !== false ) && ( $blogs_update !== false );
+			  SET user_locale = '.$DB->quote( $current_default_locale ).'
+			WHERE  user_locale IN ( '.$disabled_locales.' )' );
+		$colls_main_locales_update = $DB->query( 'UPDATE T_blogs
+			  SET blog_locale = '.$DB->quote( $current_default_locale ).'
+			WHERE blog_locale IN ( '.$disabled_locales.' )' );
+		$colls_extra_locales_update = $DB->query( 'DELETE FROM T_coll_locales
+			WHERE cl_locale IN ( '.$disabled_locales.' )' );
+		$result = ( $users_update !== false ) && ( $colls_main_locales_update !== false ) && ( $colls_extra_locales_update !== false );
 	}
 
 	if( $result && ( $DB->query($query) !== false ) )
@@ -1480,7 +1707,9 @@ function locale_file_po_info( $po_file_name, $calc_percent_done = false )
 
 	if( $calc_percent_done )
 	{
-		$info['percent'] = locale_file_po_percent_done( $info );
+		$po_path_info    = pathinfo( $po_file_name );
+		$pot_file_name   = $po_path_info['filename'].'.pot';
+		$info['percent'] = locale_file_po_percent_done( $info, $pot_file_name );
 	}
 
 	return $info;
@@ -1493,17 +1722,17 @@ function locale_file_po_info( $po_file_name, $calc_percent_done = false )
  * @param array File info (see result of the function locale_file_po_info() )
  * @return integer Percent
  */
-function locale_file_po_percent_done( $po_file_info )
+function locale_file_po_percent_done( $po_file_info, $pot_file )
 {
 	global $messages_pot_file_info;
 
-	if( !isset( $messages_pot_file_info ) )
+	if( !isset( $messages_pot_file_info[$pot_file] ) )
 	{	// Initialize a file info for the main language file if it doesn't yet set
 		global $locales_path;
-		$messages_pot_file_info = locale_file_po_info( $locales_path.'messages.pot' );
+		$messages_pot_file_info[$pot_file] = locale_file_po_info( $locales_path.$pot_file );
 	}
 
-	$percent_done = ( $messages_pot_file_info['all'] > 0 ) ? round( ( $po_file_info['translated'] - $po_file_info['fuzzy'] / 2 ) / $messages_pot_file_info['all'] * 100 ) : 0;
+	$percent_done = ( $messages_pot_file_info[$pot_file]['all'] > 0 ) ? round( ( $po_file_info['translated'] - $po_file_info['fuzzy'] / 2 ) / $messages_pot_file_info[$pot_file]['all'] * 100 ) : 0;
 
 	return $percent_done;
 }

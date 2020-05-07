@@ -15,13 +15,20 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.11.6-stable';
+$app_version = '7.1.5-stable';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2020-04-10';
+$app_date = '2020-05-01';
+
+/**
+ * Is this b2evolution PRO?
+ * If the PRO modules are available some UI elements will be set up differently.
+ * @global boolean
+ */
+$app_pro = false;
 
 /**
  * Long version string for checking differences
@@ -36,7 +43,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 13220;
+$new_db_version = 16010;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
@@ -48,12 +55,12 @@ $required_php_version = array( 'application' => '5.6' );
  * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
  * @global array
  */
-$required_mysql_version = array( 'application' => '5.1' );
+$required_mysql_version = array( 'application' => '5.5.3' );
 
 /**
  * Is displayed on the login screen:
  */
-$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version.'</strong></a>
+$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version_long.'</strong></a>
 		&ndash;
 		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
@@ -85,5 +92,7 @@ $modules = array(
 		'messaging',
 		'maintenance',
 		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
+		'menus',
+		'templates',
 	);
 ?>

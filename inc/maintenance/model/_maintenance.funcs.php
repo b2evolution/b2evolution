@@ -98,16 +98,18 @@ function check_version( $new_version_dir )
 	{	// Old version:
 		return array(
 				'error'   => 'old',
-				'message' => T_( 'This is an old version!' ).'<br />'
-					.T_('You should NOT install this older version.')
+				'message' => TB_('This is an old version!').'<br />'
+					.'Current: '.$GLOBALS['app_version'].' '.$GLOBALS['app_date'].'<br />'			
+					.'About to install: '.$app_version.' '.$app_date.'<br />'
+					.TB_('You should NOT install this older version.')
 			);
 	}
 	elseif( $result == 'same' )
 	{	// Same version:
 		return array(
 				'error'   => 'same',
-				'message' => T_( 'This package is already installed!' ).'<br />'
-					.T_( 'No upgrade is needed at this time. You might force a re-install if you want to force a cleanup.' )
+				'message' => TB_('This package is already installed!').'<br />'
+					.TB_('No upgrade is needed at this time. You might force a re-install if you want to force a cleanup.')
 			);
 	}
 }
@@ -116,7 +118,7 @@ function check_version( $new_version_dir )
 /**
  * Enable/disable maintenance mode
  *
- * @param boolean true if maintenance mode need to be enabled
+ * @param boolean Do we want to enable or disable maintenance mode?
  * @param string Mode: 'all', 'install', 'upgrade'
  * @param string maintenance mode message
  * @param boolean TRUE to don't print out a message status
@@ -124,6 +126,7 @@ function check_version( $new_version_dir )
 function switch_maintenance_mode( $enable, $mode = 'all', $msg = '', $silent = false )
 {
 	global $conf_path;
+	static $maintenance_mode = 'unknown';
 
 	switch( $mode )
 	{
@@ -145,7 +148,7 @@ function switch_maintenance_mode( $enable, $mode = 'all', $msg = '', $silent = f
 
 	if( $enable )
 	{	// Create maintenance file
-		echo '<p>'.T_('Switching to maintenance mode...');
+		echo '<p>'.TB_('Switching to maintenance mode...');
 		evo_flush();
 
 		$content = '<html>
@@ -176,7 +179,7 @@ a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 		}
 		else
 		{ // Maintenance file has not been created
-			echo '</p><p style="color:red"><evo:error>'.sprintf( T_( 'Unable to switch to maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</evo:error></p>';
+			echo '</p><p style="color:red"><evo:error>'.sprintf( TB_('Unable to switch to maintenance mode. Maintenance file can\'t be created: &laquo;%s&raquo;'), $maintenance_mode_file ).'</evo:error></p>';
 			evo_flush();
 
 			return false;
@@ -184,26 +187,32 @@ a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 	}
 	else
 	{	// Delete maintenance file
-		if( ! $silent )
-		{
-			echo '<p>'.T_('Switching out of maintenance mode...');
-		}
-		// Delete a maintenance file if it exists and writable:
-		if( is_writable( $conf_path.$maintenance_mode_file ) && @unlink( $conf_path.$maintenance_mode_file ) )
-		{	// Unlink was successful:
-			if( ! $silent )
-			{	// Dispaly OK message:
-				echo ' OK.</p>';
-				evo_flush();
-			}
-		}
-		else
-		{	// Unlink failed:
-			echo '</p><p style="color:red"><evo:error>'.sprintf( T_( 'Unable to delete a maintenance file: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</evo:error></p>';
-			evo_flush();
+	    
+		if( $maintenance_mode == 'unknown' ){
+		    
+		    if( ! $silent )
+		    {
+			    echo '<p>'.TB_('Switching out of maintenance mode...');
+			    $maintenance_mode = 'disable';
+		    }
+		    // Delete a maintenance file if it exists and writable:
+		    if( is_writable( $conf_path.$maintenance_mode_file ) && @unlink( $conf_path.$maintenance_mode_file ) )
+		    {	// Unlink was successful:
+			    if( ! $silent )
+			    {	// Dispaly OK message:
+				    echo ' OK.</p>';
+				    evo_flush();
+			    }
+		    }
+		    else
+		    {	// Unlink failed:
+			    echo '</p><p style="color:red"><evo:error>'.sprintf( TB_('Unable to delete maintenance file: &laquo;%s&raquo;'), $maintenance_mode_file ).'</evo:error></p>';
+			    evo_flush();
 
-			return false;
+			    return false;
+		    }
 		}
+		
 	}
 
 	return true;
@@ -240,12 +249,12 @@ function switch_maintenance_lock( $enable )
 function prepare_maintenance_dir( $dir_name, $deny_access = true )
 {
 
-	// echo '<p>'.T_('Checking destination directory: ').$dir_name.'</p>';
+	// echo '<p>'.TB_('Checking destination directory: ').$dir_name.'</p>';
 	if( !file_exists( $dir_name ) )
 	{	// We can create directory
 		if ( ! mkdir_r( $dir_name ) )
 		{
-			echo '<p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory.' ), $dir_name ).'</p>';
+			echo '<p style="color:red">'.sprintf( TB_('Unable to create &laquo;%s&raquo; directory.'), $dir_name ).'</p>';
 			evo_flush();
 
 			return false;
@@ -254,7 +263,7 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
 
 	if( $deny_access )
 	{	// Create .htaccess file
-		echo '<p>'.T_('Checking .htaccess denial for directory: ').$dir_name;
+		echo '<p>'.TB_('Checking .htaccess denial for directory: ').$dir_name;
 		evo_flush();
 
 		$htaccess_name = $dir_name.'.htaccess';
@@ -263,7 +272,7 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
 		{	// We can create .htaccess file
 			if( ! save_to_file( 'deny from all', $htaccess_name, 'w' ) )
 			{
-				echo '</p><p style="color:red">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; file in directory.' ), $htaccess_name ).'</p>';
+				echo '</p><p style="color:red">'.sprintf( TB_('Unable to create &laquo;%s&raquo; file in directory.'), $htaccess_name ).'</p>';
 				evo_flush();
 
 				return false;
@@ -292,60 +301,308 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
  * @param string destination directory path
  * @param boolean true if create destination directory
  * @param string Zip file name
- * @return boolean results
+ * @param boolean TRUE to print error, FALSE to return error
+ * @return boolean|string TRUE on success, FALSE|string on error
  */
-function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '' )
+function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '', $print_error = true )
 {
-	global $Settings, $current_User;
+	global $Settings, $current_User, $basepath, $upgrade_path;
 
 	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
 	{	// No permission to unzip files:
-		$error = '<span class="text-danger">'.T_('You don\'t have permission to UNZIP files automatically on the server.').'</span>';
+		$error = '<span class="text-danger">'.TB_('You don\'t have permission to UNZIP files automatically on the server.').'</span>';
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{	// Link to edit permissions:
 			global $admin_url;
-			$error .= ' ('.sprintf( T_('You can change this <a %s>here</a>'), 'href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file"' ).')';
+			$error .= ' ('.sprintf( TB_('You can change this <a %s>here</a>'), 'href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file"' ).')';
 		}
-		echo '<p>'.$error.'</p>';
-		evo_flush();
-		return false;
+		$error = '<p>'.$error.'</p>';
+		if( $print_error )
+		{	// Print error:
+			echo $error;
+			evo_flush();
+			return false;
+		}
+		else
+		{	// Return error message:
+			return $error;
+		}
+	}
+
+	if( strpos( $src_file, '://' ) !== false )
+	{	// Deny ZIP file from urls:
+		$invalid_path_error = sprintf( TB_('Path must not contain %s'), '<code>://</code>' );
+	}
+	else
+	{	// Check if ZIP path is inside $basepath or $upgrade_path:
+		$canonical_path = get_canonical_path( $src_file );
+		if( strpos( $canonical_path, $basepath ) !== 0 &&
+		    strpos( $canonical_path, get_canonical_path( $upgrade_path ) ) !== 0 )
+		{	// ZIP file path must be started with $basepath or $upgrade_path:
+			$invalid_path_error = sprintf( TB_('Path is outside %s and outside %s.'), '$basepath=<code>'.$basepath.'</code>', '$upgrade_path=<code>'.$upgrade_path.'</code>' );
+		}
+	}
+	if( isset( $invalid_path_error ) )
+	{	// Don't allow wrong ZIP file path:
+		$error = '<p class="text-danger">'.sprintf( TB_('Invalid ZIP file path %s:'), '<code>'.$src_file.'</code>' ).' '.$invalid_path_error.'</p>';
+		if( $print_error )
+		{	// Print error:
+			echo $error;
+			evo_flush();
+			return false;
+		}
+		else
+		{	// Return error message:
+			return $error;
+		}
 	}
 
 	if( ! file_exists( $dest_dir ) && ! mkdir_r( $dest_dir ) )
 	{	// Destination directory doesn't exist and it couldn't be created:
-		echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
-		evo_flush();
-		return false;
+		$error = '<p class="text-danger">'.sprintf( TB_('Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.'), $dest_dir ).'</p>';
+		if( $print_error )
+		{	// Print error:
+			echo $error;
+			evo_flush();
+			return false;
+		}
+		else
+		{	// Return error message:
+			return $error;
+		}
 	}
 
-	if( function_exists( 'gzopen' ) )
-	{ // Unpack using 'zlib' extension and PclZip wrapper
-
-		// Load PclZip class (PHP4):
-		load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
-
-		$PclZip = new PclZip( $src_file );
-		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir, PCLZIP_OPT_SET_CHMOD, octdec( $Settings->get( 'fm_default_chmod_file' ) ) ) == 0 )
+	if( class_exists( 'ZipArchive' ) )
+	{	// Unpack using 'ZipArchive' extension:
+		$ZipArchive = new ZipArchive();
+		if( $ZipArchive->open( $src_file ) &&
+		    $ZipArchive->extractTo( $dest_dir ) )
+		{	// Change rights for unpacked folders and files after successful unpacking:
+			chmod_r( $dest_dir );
+			$ZipArchive->close();
+		}
+		else
 		{
-			if( empty( $src_file_name ) )
-			{ // Set zip file name
-				$src_file_name = $src_file;
-			}
-			echo '<p class="text-danger">'
-					.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) ).'<br />'
-					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name )
+			$error = '<p class="text-danger">'
+					.sprintf( TB_('Error: %s'), $ZipArchive->getStatusString() ).'<br />'
+					.sprintf( TB_('Unable to decompress &laquo;%s&raquo; ZIP archive.'), ( empty( $src_file_name ) ? $src_file : $src_file_name ) )
 				.'</p>';
-			evo_flush();
-
-			return false;
+			if( $print_error )
+			{	// Print error:
+				echo $error;
+				evo_flush();
+				return false;
+			}
+			else
+			{	// Return error message:
+				return $error;
+			}
 		}
 	}
 	else
 	{
-		debug_die( 'Unable to decompress the file because there is no \'zip\' or \'zlib\' extension installed in your PHP!' );
+		debug_die( 'Unable to decompress the file because there is no \'ZipArchive\' extension installed in your PHP!' );
 	}
 
 	return true;
+}
+
+
+/**
+ * Pack ZIP archive from destination directory/file
+ *
+ * @param string Path of new archive
+ * @param string Directory path where files are located
+ * @param string|array Files which should be added into ZIP archive
+ * @param string|array Sub-directory name where files should added inside ZIP relative, Use empty to add in root of the ZIP archive; May be array: 0 key is for all files/folders, other key - for custom files/folders
+ * @param array|string Exclude folders and files from folders with these names, 'subdirs' - to exclude ALL subfolders
+ * @param string Type of log: 'print', 'msg_error'
+ * @return boolean TRUE on success
+ */
+function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs = '', $exclude_folder_names = array(), $log_type = 'print' )
+{
+	global $Settings, $Messages;
+
+	if( ! class_exists( 'ZipArchive' ) )
+	{	// Stop when no installed extension:
+		debug_die( 'Unable to compress the files because there is no \'ZipArchive\' extension installed in your PHP!' );
+	}
+
+	if( file_exists( $archive_path ) )
+	{	// Don't try to create ZIP if same file already exists:
+		$log_msg = sprintf( TB_('File %s already exists.'), '<code>'.$archive_path.'</code>' );
+		if( $log_type == 'print' )
+		{
+			echo '<p class="text-danger">'.$log_msg.'</p>';
+			evo_flush();
+		}
+		elseif( $log_type == 'msg_error' )
+		{
+			$Messages->add( $log_msg, 'error' );
+		}
+		return false;
+	}
+
+	// Pack using 'ZipArchive' extension:
+	$ZipArchive = new ZipArchive();
+
+	if( $ZipArchive->open( $archive_path, ZipArchive::CREATE ) !== TRUE )
+	{	// Cannot create new ZIP archive:
+		$log_msg = sprintf( TB_('Error: %s'), $ZipArchive->getStatusString() ).'<br />'
+			.sprintf( TB_('Unable to create ZIP archive %s.'), '<code>'.$archive_path.'</code>' );
+		if( $log_type == 'print' )
+		{
+			echo '<p class="text-danger">'.$log_msg.'</p>';
+			evo_flush();
+		}
+		elseif( $log_type == 'msg_error' )
+		{
+			$Messages->add( $log_msg, 'error' );
+		}
+
+		return false;
+	}
+
+	if( ! is_array( $files ) )
+	{	// Make array from single file:
+		$files = array( $files );
+	}
+
+	$source_dir_path_length = strlen( $source_dir_path );
+
+	if( ! is_array( $add_in_subdirs ) )
+	{
+		$add_in_subdirs = array( $add_in_subdirs );
+	}
+	foreach( $add_in_subdirs as $a => $add_in_subdir )
+	{
+		if( ! empty( $add_in_subdir ) )
+		{	// Format sub-directory:
+			$add_in_subdirs[ $a ] = trim( $add_in_subdir, '/' ).'/';
+		}
+	}
+
+	if( is_array( $exclude_folder_names ) )
+	{	// Initialize array to exclude subfolders by name:
+		foreach( $exclude_folder_names as $e => $exclude_folder_name )
+		{
+			$exclude_folder_names[ $e ] = preg_quote( trim( $exclude_folder_name, '/' ) );
+		}
+		$exclude_folder_names_regexp = empty( $exclude_folder_names ) ? false : '#(^|/)'.implode( '|', $exclude_folder_names ).'(/|$)#';
+	}
+	else
+	{
+		$exclude_folder_names_regexp = false;
+	}
+
+	$zip_result = true;
+	foreach( $files as $file )
+	{	// Add files into archive:
+		if( $log_type == 'print' )
+		{
+			echo sprintf( TB_('Adding &laquo;<strong>%s</strong>&raquo; to ZIP file...'), $source_dir_path.$file );
+			evo_flush();
+		}
+		$add_in_subdir = isset( $add_in_subdirs[ $file ] ) ? $add_in_subdirs[ $file ] : $add_in_subdirs[0];
+		if( is_dir( $source_dir_path.$file ) )
+		{	// Add directory:
+			if( $exclude_folder_names_regexp !== false &&
+			    preg_match( $exclude_folder_names_regexp, $file ) )
+			{	// Skip file by excluded folder name:
+				continue;
+			}
+			$file_result = $ZipArchive->addEmptyDir( '/'.$add_in_subdir.trim( $file, '/' ) );
+			if( $file_result && ( $dir_files = get_filenames( $source_dir_path.$file, array( 'inc_evocache' => true, 'recurse' => ( $exclude_folder_names !== 'subdirs' ), ) ) ) )
+			{	// Add files of the directory:
+				foreach( $dir_files as $dir_file )
+				{
+					$rel_dir_file_path = '/'.$add_in_subdir.substr( $dir_file, $source_dir_path_length );
+					if( $exclude_folder_names_regexp !== false &&
+					   preg_match( $exclude_folder_names_regexp, $rel_dir_file_path ) )
+					{	// Skip file by excluded folder name:
+						continue;
+					}
+					if( is_dir( $dir_file ) )
+					{	// Add empty sub-directory:
+						if( $exclude_folder_names !== 'subdirs' )
+						{
+							$file_result = $ZipArchive->addEmptyDir( $rel_dir_file_path ) && $file_result;
+						}
+					}
+					else
+					{	// Add file:
+						$file_result = $ZipArchive->addFile( $dir_file, $rel_dir_file_path ) && $file_result;
+					}
+				}
+			}
+		}
+		else
+		{	// Add file:
+			$file_result = $ZipArchive->addFile( $source_dir_path.$file, '/'.$add_in_subdir.$file );
+		}
+
+		if( $file_result )
+		{	// Display success result:
+			if( $log_type == 'print' )
+			{
+				echo ' OK.<br />';
+				evo_flush();
+			}
+		}
+		else
+		{	// Display error:
+			$log_msg = sprintf( TB_('Error: %s'), $ZipArchive->getStatusString() );
+			if( $log_type == 'print' )
+			{
+				echo ' <span class="text-danger">'.$log_msg.'</span>.<br />';
+				evo_flush();
+			}
+			elseif( $log_type == 'msg_error' )
+			{
+				$Messages->add( $log_msg, 'error' );
+			}
+		}
+
+		$zip_result = $zip_result && $file_result;
+	}
+	
+	echo sprintf( TB_('Compressing &laquo;<strong>%s</strong>&raquo;...'), $archive_path );
+	evo_flush();
+	
+	$ZipArchive->close();
+	
+	echo ' OK.<br />';
+
+	// Set rights for new created ZIP file:
+	@chmod( $archive_path, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
+
+	return $zip_result;
+}
+
+
+/**
+ * Download ZIP archive
+ *
+ * @param string Path of the archive
+ */
+function download_archive( $archive_path )
+{
+	if( ! file_exists( $archive_path ) ||
+	    ! preg_match( '/\.zip$/', $archive_path ) )
+	{	// Don't try to download not existing of not ZIP file:
+		return false;;
+	}
+
+	$archive_content = file_get_contents( $archive_path );
+
+	header( 'Content-Type: application/zip' );
+	header( 'Content-Disposition: attachment; filename="'.basename( $archive_path ).'"' );
+	header( 'Content-Length: '.strlen( $archive_content ) );
+	header( 'Content-Transfer-Encoding: binary' );
+	header( 'Cache-Control: no-cache, must-revalidate, max-age=60' );
+	header( 'Expires: 0' );
+
+	echo $archive_content;
 }
 
 
@@ -422,7 +679,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			{ // Unknown commands
 				foreach( $config_unknown_commands as $config_unknown_command )
 				{
-					echo '<div class="red">'.sprintf( T_('Unknown policy command: %s'), $config_unknown_command ).'</div>';
+					echo '<div class="red">'.sprintf( TB_('Unknown policy command: %s'), $config_unknown_command ).'</div>';
 				}
 				$config_has_errors = true;
 			}
@@ -431,7 +688,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			{ // Incorrect commands
 				foreach( $config_incorrect_commands as $config_incorrect_command )
 				{
-					echo '<div class="red">'.sprintf( T_('Incorrect policy command: %s'), $config_incorrect_command ).'</div>';
+					echo '<div class="red">'.sprintf( TB_('Incorrect policy command: %s'), $config_incorrect_command ).'</div>';
 				}
 				$config_has_errors = true;
 			}
@@ -439,7 +696,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 
 		if( $config_has_errors )
 		{ // The upgrade config file contains the errors, Stop the upgrading process
-			echo '<div class="red">'.sprintf( T_('To continue the upgrade process please fix the issues of the file %s or delete it.'), '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
+			echo '<div class="red">'.sprintf( TB_('To continue the upgrade process please fix the issues of the file %s or delete it.'), '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
 			return false;
 		}
 	}
@@ -455,7 +712,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 		{
 			if( $ignore_dir )
 			{ // Ignore folder
-				echo '<div class="orange">'.sprintf( T_('Ignoring %s because of %s'), '&laquo;<b>'.$dest_dir.'</b>&raquo;', '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
+				echo '<div class="orange">'.sprintf( TB_('Ignoring %s because of %s'), '&laquo;<b>'.$dest_dir.'</b>&raquo;', '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
 			}
 			else
 			{ // progressive display of what backup is doing
@@ -466,7 +723,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 		}
 		elseif( $ignore_dir )
 		{ // This subfolder must be ingored, Display message about this
-			echo '<div class="orange">'.sprintf( T_('Ignoring %s because of %s'), '&laquo;<b>'.$dest_dir_name.'</b>&raquo;', '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
+			echo '<div class="orange">'.sprintf( TB_('Ignoring %s because of %s'), '&laquo;<b>'.$dest_dir_name.'</b>&raquo;', '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
 			$dir_success = false;
 			evo_flush();
 		}
@@ -481,7 +738,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			// Create destination directory
 			if( ! evo_mkdir( $dest_dir ) )
 			{ // No permission to create a folder
-				echo '<div class="red">'.sprintf( T_('Unavailable creating of folder %s, probably no permissions.'), '&laquo;<b>'.$dest_dir_name.'</b>&raquo;' ).'</div>';
+				echo '<div class="red">'.sprintf( TB_('Unavailable creating of folder %s, probably no permissions.'), '&laquo;<b>'.$dest_dir_name.'</b>&raquo;' ).'</div>';
 				$result = false;
 				$dir_success = false;
 				evo_flush();
@@ -503,7 +760,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 		$dest_file_name = str_replace( $basepath, '', $dest_file );
 		if( is_array( $config_ignore_files ) && in_array( $dest_file_name, $config_ignore_files ) )
 		{ // Ignore this file
-			echo '<div class="orange">'.sprintf( T_('Ignoring %s because of %s'), '&laquo;<b>'.$dest_file_name.'</b>&raquo;', '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
+			echo '<div class="orange">'.sprintf( TB_('Ignoring %s because of %s'), '&laquo;<b>'.$dest_file_name.'</b>&raquo;', '<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
 			evo_flush();
 			continue;
 		}
@@ -526,7 +783,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			$copy_file = $basepath.$copy_file_name;
 			if( ! $rewrite_old_file && file_exists( $copy_file ) )
 			{ // Display warning if we cannot rewrite an existing file
-				echo '<div class="orange">'.sprintf( T_('Ignoring softmove of %s because %s is already in place (see %s)'),
+				echo '<div class="orange">'.sprintf( TB_('Ignoring softmove of %s because %s is already in place (see %s)'),
 						'&laquo;<b>'.$dest_file_name.'</b>&raquo;',
 						'&laquo;<b>'.$copy_file_name.'</b>&raquo;',
 						'<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
@@ -536,7 +793,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 			}
 			else
 			{ // We can copy this file to other location
-				echo '<div class="orange">'.sprintf( T_('Moving %s to %s as stated in %s'),
+				echo '<div class="orange">'.sprintf( TB_('Moving %s to %s as stated in %s'),
 						'&laquo;<b>'.$dest_file_name.'</b>&raquo;',
 						'&laquo;<b>'.$copy_file_name.'</b>&raquo;',
 						'<code>'.get_upgrade_config_file_name().'</code>' ).'</div>';
@@ -551,7 +808,7 @@ function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read
 		// Copying
 		if( ! @copy( $src_file, $dest_file ) )
 		{ // Display error if a copy command is unavailable
-			echo '<div class="red">'.sprintf( T_('Unavailable copying to %s, probably no permissions.'), '&laquo;<b>'.$dest_file_name.'</b>&raquo;' ).'</div>';
+			echo '<div class="red">'.sprintf( TB_('Unavailable copying to %s, probably no permissions.'), '&laquo;<b>'.$dest_file_name.'</b>&raquo;' ).'</div>';
 			$result = false;
 			evo_flush();
 		}
@@ -610,7 +867,7 @@ function check_upgrade_config( $display_message = false )
 		if( $display_message )
 		{	// Display error message:
 			global $Messages;
-			$Messages->add( T_('WARNING: <code>upgrade_policy.conf</code> not found. We will use <code>/conf/upgrade_policy_sample.conf</code> by default but it is highly recommended you duplicate this file to <code>upgrade_policy.conf</code> and check its contents to make sure the upgrade policy is appropriate for your particluar site.'), 'warning' );
+			$Messages->add( TB_('WARNING: <code>upgrade_policy.conf</code> not found. We will use <code>/conf/upgrade_policy_sample.conf</code> by default but it is highly recommended you duplicate this file to <code>upgrade_policy.conf</code> and check its contents to make sure the upgrade policy is appropriate for your particluar site.'), 'warning' );
 		}
 		return false;
 	}
@@ -668,7 +925,7 @@ function get_upgrade_config( $action )
 	$config_handle = @fopen( $conf_path.get_upgrade_config_file_name(), 'r' );
 	if( ! $config_handle )
 	{ // No permissions to open file
-		$upgrade_policy_config = sprintf( T_('No permission to open the %s file.'), '<code>'.get_upgrade_config_file_name().'</code>' );
+		$upgrade_policy_config = sprintf( TB_('No permission to open the %s file.'), '<code>'.get_upgrade_config_file_name().'</code>' );
 		return $upgrade_policy_config;
 	}
 
@@ -682,7 +939,7 @@ function get_upgrade_config( $action )
 
 	if( empty( $config_content ) )
 	{ // Config file is empty for required action
-		$upgrade_policy_config = sprintf( T_('The %s file is empty.'), '<code>'.get_upgrade_config_file_name().'</code>' );
+		$upgrade_policy_config = sprintf( TB_('The %s file is empty.'), '<code>'.get_upgrade_config_file_name().'</code>' );
 		return $upgrade_policy_config;
 	}
 
@@ -752,7 +1009,7 @@ function remove_after_upgrade()
 
 	$upgrade_removed_files = get_upgrade_config( 'remove' );
 
-	echo '<h4>'.T_('Cleaning up...').'</h4>';
+	echo '<h4>'.TB_('Cleaning up...').'</h4>';
 	evo_flush();
 
 	if( is_string( $upgrade_removed_files ) )
@@ -761,14 +1018,14 @@ function remove_after_upgrade()
 	}
 	elseif( empty( $upgrade_removed_files ) )
 	{ // No files/folders to remove, Exit here
-		$config_error = sprintf( T_('No "remove" sections have been defined in the file %s.'), '<code>'.get_upgrade_config_file_name().'</code>' );
+		$config_error = sprintf( TB_('No "remove" sections have been defined in the file %s.'), '<code>'.get_upgrade_config_file_name().'</code>' );
 	}
 
 	if( !empty( $config_error ) )
 	{ // Display config error
 		echo '<div class="red">';
 		echo $config_error;
-		echo ' '.T_('No cleanup is being done. You should manually remove the <code>/install</code> folder and check for other unwanted files...');
+		echo ' '.TB_('No cleanup is being done. You should manually remove the <code>/install</code> folder and check for other unwanted files...');
 		echo '</div>';
 		return;
 	}
@@ -776,7 +1033,7 @@ function remove_after_upgrade()
 	foreach( $upgrade_removed_files as $file_path )
 	{
 		$file_path = $basepath.$file_path;
-		$log_message = sprintf( T_('Removing %s as stated in %s...'), '<code>'.$file_path.'</code>', '<code>'.get_upgrade_config_file_name().'</code>' ).' ';
+		$log_message = sprintf( TB_('Removing %s as stated in %s...'), '<code>'.$file_path.'</code>', '<code>'.get_upgrade_config_file_name().'</code>' ).' ';
 		$success = true;
 		if( file_exists( $file_path ) )
 		{ // File exists
@@ -784,11 +1041,11 @@ function remove_after_upgrade()
 			{ // Remove folder recursively
 				if( rmdir_r( $file_path ) )
 				{ // Success
-					$log_message .= T_('OK');
+					$log_message .= TB_('OK');
 				}
 				else
 				{ // Failed
-					$log_message .= T_('Failed').': '.T_('No permissions to delete the folder');
+					$log_message .= TB_('Failed').': '.TB_('No permissions to delete the folder');
 					$success = false;
 				}
 			}
@@ -796,23 +1053,23 @@ function remove_after_upgrade()
 			{ // Remove file
 				if( @unlink( $file_path ) )
 				{ // Success
-					$log_message .= T_('OK');
+					$log_message .= TB_('OK');
 				}
 				else
 				{ // Failed
-					$log_message .= T_('Failed').': '.T_('No permissions to delete the file');
+					$log_message .= TB_('Failed').': '.TB_('No permissions to delete the file');
 					$success = false;
 				}
 			}
 			else
 			{ // File is not writable
-				$log_message .= T_('Failed').': '.T_('No permissions to delete the file');
+				$log_message .= TB_('Failed').': '.TB_('No permissions to delete the file');
 				$success = false;
 			}
 		}
 		else
 		{ // No file/folder
-			$log_message .= T_('Failed').': '.T_('No file found');
+			$log_message .= TB_('Failed').': '.TB_('No file found');
 			$success = false;
 		}
 
@@ -832,7 +1089,7 @@ function get_affected_paths( $path )
 {
 	global $basepath;
 
-	$affected_paths = T_( 'Affected paths:' ).' ';
+	$affected_paths = TB_('Affected paths:').' ';
 	if( is_array( $path ) )
 	{
 		$paths = array();
@@ -868,7 +1125,7 @@ function get_affected_tables( $table )
 {
 	global $DB;
 
-	$affected_tables = T_( 'Affected tables:' ).' ';
+	$affected_tables = TB_('Affected tables:').' ';
 	if( is_array( $table ) )
 	{
 		$affected_tables .= implode( ', ', aliases_to_tables( $table ) );
@@ -946,44 +1203,14 @@ function get_tool_steps( $steps, $current_step )
 function autoupgrade_display_steps( $current_step, $type = '' )
 {
 	$steps = array(
-			1 => $type == 'git' ? T_('Connect to Git') : T_('Check for updates'),
-			2 => T_('Download'),
-			3 => T_('Unzip'),
-			4 => T_('Ready to upgrade'),
-			5 => T_('Backup &amp; Upgrade'),
-			6 => T_('Installer script'),
+			1 => $type == 'git' ? TB_('Connect to Git') : TB_('Check for updates'),
+			2 => TB_('Download'),
+			3 => TB_('Unzip'),
+			4 => TB_('Ready to upgrade'),
+			5 => TB_('Backup &amp; Upgrade'),
+			6 => TB_('Installer script'),
 		);
 
 	echo get_tool_steps( $steps, $current_step );
-}
-
-
-/**
- * Callback function to decide what folders backup on zip
- *
- * @param integer Event number, e.g. PCLZIP_CB_PRE_ADD, see class PclZip
- * @param array Params of current file/folder
- * @return integer 1 - to include, 0 - to exclude
- */
-function callback_backup_files( $p_event, & $p_header )
-{
-	global $backup_current_exclude_folders;
-
-	if( empty( $backup_current_exclude_folders ) )
-	{	// Nothing to exclude:
-		return 1;
-	}
-
-	foreach( $backup_current_exclude_folders as $exclude_folder_name )
-	{
-		if( $p_header['stored_filename'] == $exclude_folder_name ||
-		    strpos( $p_header['stored_filename'].'/', '/'.$exclude_folder_name.'/' ) !== false )
-		{	// Skip this file/folder:
-			return 0;
-		}
-	}
-
-	// Include this file/folder to backup zip archive:
-	return 1;
 }
 ?>

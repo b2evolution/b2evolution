@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -210,6 +210,7 @@ $Form->begin_form();
 		}
 
 		echo '</td>';
+		evo_flush();
 
 
 		/********************  Icon / File type:  *******************/
@@ -238,6 +239,7 @@ $Form->begin_form();
 			}
 		}
 		echo '</td>';
+		evo_flush();
 
 		/*******************  Path (flatmode): ******************/
 
@@ -246,6 +248,7 @@ $Form->begin_form();
 			echo '<td class="filepath">';
 			echo dirname( $lFile->get_rdfs_rel_path() ).'/';
 			echo '</td>';
+			evo_flush();
 		}
 
 		/*******************  File name: ******************/
@@ -348,7 +351,7 @@ $Form->begin_form();
 					$link_action = 'set_field';
 
 					$link_attribs['class'] = 'evo_select_file btn btn-primary btn-xs';
-					$link_attribs['onclick'] = 'return window.parent.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
+					$link_attribs['onclick'] = 'return '.( get_param( 'iframe_name' ) == '' ? 'window.parent' : 'parent.frames[\''.format_to_js( get_param( 'iframe_name' ) ).'\']' ).'.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
 					$link_attribs['type'] = 'button';
 					$link_attribs['title'] = T_('Select file');
 					echo '<button'.get_field_attribs_as_string( $link_attribs, false ).'>'.get_icon( 'link' ).' './* TRANS: verb */ T_('Select').'</button> ';
@@ -359,12 +362,14 @@ $Form->begin_form();
 			echo file_td_name( $lFile );
 
 		echo '</td>';
+		evo_flush();
 
 		/*******************  File type  ******************/
 
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types
 			echo '<td class="type">'.$lFile->get_type().'</td>';
+			evo_flush();
 		}
 
 		/*******************  Added by  *******************/
@@ -379,6 +384,7 @@ $Form->begin_form();
 			{
 				echo '<td class="center">unknown</td>';
 			}
+			evo_flush();
 		}
 
 		/****************  Download Count  ****************/
@@ -387,6 +393,7 @@ $Form->begin_form();
 		{ // Show download count
 			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
+			evo_flush();
 		}
 
 		/*******************  File size  ******************/
@@ -402,6 +409,7 @@ $Form->begin_form();
 			echo '<td class="timestamp" title="'.format_to_output( $lastmod_date.' '.$lastmod_time, 'htmlattr' ).'">';
 			echo file_td_lastmod( $lFile );
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File pemissions  ***************/
@@ -422,6 +430,7 @@ $Form->begin_form();
 				echo $lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' );
 			}
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File owner  ********************/
@@ -431,6 +440,7 @@ $Form->begin_form();
 			echo '<td class="fsowner">';
 			echo $lFile->get_fsowner_name();
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File group *********************/
@@ -440,6 +450,7 @@ $Form->begin_form();
 			echo '<td class="fsgroup">';
 			echo $lFile->get_fsgroup_name();
 			echo '</td>';
+			evo_flush();
 		}
 
 		/*****************  Action icons  ****************/
@@ -447,8 +458,10 @@ $Form->begin_form();
 		echo '<td class="actions lastcol text-nowrap">';
 		echo file_td_actions( $lFile );
 		echo '</td>';
+		evo_flush();
 
 		echo '</tr>';
+		evo_flush();
 
 		$countFiles++;
 	}
@@ -533,8 +546,10 @@ $Form->begin_form();
 			}
 
 			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
-				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-				.'<div>#button_text#</div>'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'	// Main dropzone
+				//The div below is not necessary because were making the main dropzone transparent so
+				// the upload button below will not be covered when the main dropzone is "displayed" on drop ((see qq-hide-dropzone doc)):
+				//.'<div>#button_text#</div>' //
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 				.'<div>#button_text#</div>'
@@ -674,6 +689,7 @@ $Form->begin_form();
 				$field_options['resize'] = T_('Resize images...');
 				$field_options['delete'] = T_('Delete files...');
 				$field_options['create_zip'] = T_('Create ZIP archive').'...';
+				$field_options['unpack_zip'] = T_('Unpack ZIP archives').'...';
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 			}
 

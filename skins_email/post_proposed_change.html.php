@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -37,7 +37,7 @@ echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_('%s proposed a change on the p
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 
 echo get_link_tag( $admin_url.'?ctrl=items&action=history_compare&p='.$Item->ID.'&r1=c&r2=p'.$params['iver_ID'], T_('View all changes'), 'div.buttons a+a.btn-primary' )."\n";
-echo get_link_tag( $admin_url.'?ctrl=items&action=history&p='.$Item->ID, T_('View history'), 'div.buttons a+a.btn-default' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=items&action=history&p='.$Item->ID, T_('View change history'), 'div.buttons a+a.btn-default' )."\n";
 echo get_link_tag( $Item->get_permanent_url( '', '', '&' ), T_('View post'), 'div.buttons a+a.btn-default' )."\n";
 
 echo "</div>\n";

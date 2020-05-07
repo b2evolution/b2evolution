@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -59,13 +59,8 @@ See manual for more.');
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array(
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			);
-
-		if( isset( $params['blog_type'] ) && $params['blog_type'] == 'manual' )
-		{ // Set the default settings depends on blog type
-			$default_params['default_post_rendering'] = 'opt-out';
-		}
 
 		$tmp_params = array_merge( $params, $default_params );
 		return parent::get_coll_setting_definitions( $tmp_params );
@@ -134,7 +129,7 @@ See manual for more.');
 			{ // First check if we are starting a new table
 				$indent_level = strlen( $matches[1] );
 
-				$attributes = Sanitizer::fixTagAttributes( $matches[2], 'table' );
+				$attributes = $this->fix_tag_attributes( $matches[2], 'table' );
 
 				$outLine = str_repeat( '<dl><dd>', $indent_level ) . "<table{$attributes}>";
 				array_push( $td_history, false );
@@ -175,7 +170,7 @@ See manual for more.');
 				$line = preg_replace( '#^\|-+#', '', $line );
 
 				// Whats after the tag is now only attributes
-				$attributes = Sanitizer::fixTagAttributes( $line, 'tr' );
+				$attributes = $this->fix_tag_attributes( $line, 'tr' );
 				array_pop( $tr_attributes );
 				array_push( $tr_attributes, $attributes );
 
@@ -278,7 +273,7 @@ See manual for more.');
 					}
 					else
 					{
-						$attributes = Sanitizer::fixTagAttributes( $cell_data[0], $last_tag );
+						$attributes = $this->fix_tag_attributes( $cell_data[0], $last_tag );
 						$cell = "{$previous}<{$last_tag}{$markdown_attribute}{$attributes}>{$cell_data[1]}";
 					}
 
@@ -353,6 +348,29 @@ See manual for more.');
 	function AdminEndHtmlHead( & $params )
 	{
 		$this->SkinBeginHtmlHead( $params );
+	}
+
+
+	/**
+	 * Fix tag attributes
+	 *
+	 * @param string Attributes, e.g. 'style="color:green;" data-display-condition="cur=eur"'
+	 * @param string Element name, e.g. 'tr', 'td', 'table'
+	 * @return string Fixed attributes
+	 */
+	function fix_tag_attributes( $attributes, $element )
+	{
+		$extended_attributes = '';
+
+		if( $attributes !== '' &&
+		    in_array( $element, array( 'table', 'tr', 'td', 'th' ) ) &&
+		    preg_match_all( '#(^|\s)data-[^\s]+="[^"]*"+#', $attributes, $data_attributes ) )
+		{	// Allow extended attributes for several tags:
+			$extended_attributes = implode( '', $data_attributes[0] );
+		}
+
+		// Fix attributes by Sanitizer and append data-* 
+		return $extended_attributes.Sanitizer::fixTagAttributes( $attributes, $element );
 	}
 }
 

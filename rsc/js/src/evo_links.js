@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -312,10 +312,10 @@ function evo_link_attach( type, object_ID, root, path, prefix )
  *
  * @return object Overlay indicator of ajax loading
  */
-function evo_link_ajax_loading_overlay()
+function evo_link_ajax_loading_overlay( fieldset_prefix )
 {
-	var table = jQuery( '#attachments_fieldset_table' );
-
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var table = jQuery( '#' + prefix + 'attachments_fieldset_table' );
 	var ajax_loading = false;
 
 	if( table.find( '.results_ajax_loading' ).length == 0 )
@@ -340,9 +340,14 @@ function evo_link_ajax_loading_overlay()
  * @param integer ID of Item or Comment
  * @param string Action: 'refresh', 'sort'
  */
-function evo_link_refresh_list( type, object_ID, action )
+function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 {
-	var ajax_loading = evo_link_ajax_loading_overlay();
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var ajax_loading = evo_link_ajax_loading_overlay( prefix );
+	if( typeof( action ) == 'undefined' )
+	{
+		action = 'refresh';
+	}
 
 	if( ajax_loading )
 	{	// If new request is allowed in current time:
@@ -350,20 +355,21 @@ function evo_link_refresh_list( type, object_ID, action )
 		// Call REST API request to attach a file to Item/Comment:
 		evo_rest_api_request( 'links',
 		{
-			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
+			'action':    action,
 			'type':      type.toLowerCase(),
 			'object_ID': object_ID,
+			'prefix':    prefix,
 		},
 		function( data )
 		{
 			// Refresh a content of the links list:
-			jQuery( '#attachments_fieldset_table' ).html( data.html );
+			jQuery( '#' + prefix + 'attachments_fieldset_table' ).html( data.html );
 
 			// Remove temporary content of ajax loading indicator:
 			ajax_loading.remove();
 
 			// Update the attachment block height after refreshing:
-			evo_link_fix_wrapper_height();
+			evo_link_fix_wrapper_height( prefix );
 		} );
 	}
 
@@ -378,7 +384,7 @@ function evo_link_refresh_list( type, object_ID, action )
 function evo_link_sort_list( fieldset_prefix )
 {
 	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
-	var rows = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
+	var rows = jQuery( '#' + prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
 	rows.sort( function( a, b )	{
 		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
 		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
@@ -403,7 +409,7 @@ function evo_link_sort_list( fieldset_prefix )
 	$.each( rows, function( index, row ) {
 		if( index === 0 )
 		{
-			jQuery( row ).prependTo( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
+			jQuery( row ).prependTo( '#' + prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
 			previousRow = row;
 		}
 		else

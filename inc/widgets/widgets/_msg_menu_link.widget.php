@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -233,12 +233,14 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		if( empty( $current_Blog ) )
-		{ // Don't use this widget without current collection:
+		{	// Don't use this widget without current collection:
+			$this->display_debug_message( 'Hidden(No collection)' );
 			return false;
 		}
 
 		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
 		{	// Don't use this widget because current user has no access to the collection:
+			$this->display_debug_message( 'Hidden(No access)' );
 			return false;
 		}
 
@@ -249,12 +251,14 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 			case 'loggedin':
 				if( !is_logged_in() )
 				{
+					$this->display_debug_message( 'Hidden(Not logged in)' );
 					return false;
 				}
 				break;
 			case 'perms':
 				if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply', false ) )
 				{
+					$this->display_debug_message( 'Hidden(No access)' );
 					return false;
 				}
 				break; // display
@@ -306,7 +310,7 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		// Display a layout with menu link:
-		echo $this->get_layout_menu_link( $url, $text.$badge, $highlight_current );
+		echo $this->get_layout_standalone_menu_link( $url, $text.$badge, $highlight_current );
 
 		return true;
 	}

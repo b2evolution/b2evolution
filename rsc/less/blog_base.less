@@ -1,5 +1,5 @@
 /**
- * These are the generic styles that are common to "all" skins.
+ * These are the generic styles that are common to "all" NON-bootstrap skins.
  *
  * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
  *
@@ -23,6 +23,9 @@
 // Organization Members widget:
 @import "_org_members_widget.module.less";
 
+// Item Workflow widget:
+@import "_item_workflow_widget.module.less";
+
 
 // ----- PLUGINS -----
 
@@ -31,6 +34,12 @@
 
 // Styles for jQuery plugin "Autocomplete for Textarea":
 @import "inc/jquery.textcomplete.inc.less";
+
+
+// ----- FORMS -----
+
+// Search form:
+@import "_search_form.module.less";
 
 // -----
 
@@ -327,7 +336,7 @@ textarea.form_textarea_input {
 
 
 // Avatar widget
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
 	margin-top: 1em;
 	margin-bottom: 1em;
 	text-align:center;
@@ -358,19 +367,10 @@ div.container_menu_top input.search_field {
 	}
 }
 
-// Advertisement widget
-div.widget_core_coll_item_list.nobullets ul,
-div.widget_core_coll_item_list.nobullets ul li,
-li.widget_core_coll_item_list.nobullets ul,
-li.widget_core_coll_item_list.nobullets ul li {
-	background: none;
-	margin-left: 0;
-	padding-left: 0;
-	list-style: none;
-}
-div.widget_core_coll_item_list.nobullets ul li:before,
-ul li.widget_core_coll_item_list.nobullets ul li:before {
-	content: none;
+// User Profile Picture widget
+.widget_core_user_profile_pics img {
+	max-width: 100%;
+	height: auto;
 }
 
 // Tabs (Used to switch between user profile pages)
@@ -589,6 +589,7 @@ div.item_location {
 // jQuery Tokeninput plugin
 #ffield_item_tags ul.token-input-list-facebook {
 	width: 100%;
+	max-width: 100%;
 }
 
 // Registration form
@@ -857,7 +858,8 @@ input.btn-lg {
 .main_profile_picture {
 	.border-radius;
 }
-.other_profile_pictures {
+div.other_profile_pictures {
+	text-align: left;
 	margin-bottom: 10px;
 	img {
 		.border-radius;
@@ -1005,5 +1007,28 @@ input.btn-lg {
 .evo_widget_form__nolabels {
 	.label label {
 		display: none;
+	}
+}
+
+// Button to close popup windows:
+.close {
+	float: right;
+	font-size: 21px;
+	font-weight: bold;
+	line-height: 1;
+	color: #000;
+	opacity: .2;
+	&:hover {
+		color: #000;
+		text-decoration: none;
+		cursor: pointer;
+		opacity: .5;
+	}
+	button& {
+		-webkit-appearance: none;
+		padding: 0;
+		cursor: pointer;
+		background: transparent;
+		border: 0;
 	}
 }

@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -331,6 +331,13 @@ class Plugins
 
 		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', classfile_path: ['.$classfile_path.']', 'plugins' );
 
+		if( ! empty( $this->log_register ) )
+		{	// Display additional log on upgrade page when we reload all plugins:
+			global $plugins_path;
+			echo '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />';
+			evo_flush();
+		}
+
 		if( ! is_readable( $classfile_path ) )
 		{ // Plugin file not found!
 			if( $must_exists )
@@ -644,6 +651,7 @@ class Plugins
 		//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
 		unset( $Plugin->Settings );
 		unset( $Plugin->UserSettings );
+		unset( $Plugin->GroupSettings );
 
 		// Nothing to do here, will get called through Plugin::__get() when accessed
 		return;
@@ -661,7 +669,7 @@ class Plugins
 	 *           Defaults would need to be handled by Plugin(User)Settings::get_default() then.
 	 *
 	 * @param Plugin
-	 * @param string settings type: "Settings" or "UserSettings"
+	 * @param string settings type: "Settings", "UserSettings" or "GroupSettings"
 	 * @return boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
@@ -679,7 +687,7 @@ class Plugins
 		$defaults = $Plugin->$method( $params );
 
 		if( $set_type == 'Settings' )
-		{	// If general settings are requested we should also append custom, collection, widgets, messages and emails settings:
+		{	// If general settings are requested we should also append custom, collection, widgets, messages, emails and shared settings:
 			if( ! is_array( $defaults ) )
 			{	// Initialize array for default settings:
 				$defaults = array();
@@ -692,6 +700,7 @@ class Plugins
 			$defaults = array_merge( $defaults, $Plugin->get_custom_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_shared_setting_definitions( $params ) );
 
 			// Check what other settings are defined for the Plugin,
 			// We should not merge them with $defaults because they are stored in different DB table,
@@ -719,6 +728,14 @@ class Plugins
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
 
 			$set_Obj = & $Plugin->UserSettings;
+		}
+		elseif( $set_type == 'GroupSettings' )
+		{	// Group specific settings:
+			load_class( 'plugins/model/_plugingroupsettings.class.php', 'PluginGroupSettings' );
+
+			$Plugin->GroupSettings = new PluginGroupSettings( $Plugin->ID );
+
+			$set_Obj = & $Plugin->GroupSettings;
 		}
 		else
 		{ // Global settings:
@@ -1545,7 +1562,7 @@ class Plugins
 	 *
 	 * @param String setting name ( 'coll_apply_rendering', 'coll_apply_comment_rendering' )
 	 * @param Object the Blog which apply rendering setting should be loaded
-	 * @param string Setting type: 'coll', 'msg', 'email'
+	 * @param string Setting type: 'coll', 'msg', 'email', 'shared'
 	 */
 	function load_index_apply_rendering( $setting_name, & $Blog, $type = 'coll' )
 	{
@@ -1589,6 +1606,11 @@ class Plugins
 				case 'email':
 					// Get plugin email setting value:
 					$rendering_value = $Plugin->get_email_setting( $setting_name );
+					break;
+
+				case 'shared':
+					// Get plugin shared setting value:
+					$rendering_value = 'opt-in';
 					break;
 
 				default:
@@ -2010,14 +2032,26 @@ class Plugins
 			$setting_name = 'email_apply_rendering';
 			$setting_type = 'email';
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // Validate the given rendering option in the give Blog
-			$Collection = $Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Validate the given rendering option:
 			$setting_name = $params['setting_name'];
-			$setting_type = 'coll';
-			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
-			{
-				debug_die( 'Invalid apply rendering param name received!' );
+			if( isset( $params['Blog'] ) )
+			{	// If Collection is given:
+				$Collection = $Blog = & $params['Blog'];
+				$setting_type = 'coll';
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+				if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering', 'shared_apply_rendering' ) ) )
+				{
+					debug_die( 'Invalid apply rendering param name received!' );
+				}
+			}
+			if( $setting_name == 'shared_apply_rendering' )
+			{	// Set shared type instead of collection for this spec setting name:
+				$Collection = $Blog = NULL;
+				$setting_type = 'shared';
 			}
 		}
 		else
@@ -2025,7 +2059,7 @@ class Plugins
 			return array();
 		}
 
-		$blog_ID = !is_null( $Blog ) ? $Blog->ID : 0;
+		$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
 
 		// Make sure the requested apply_rendering settings are loaded
 		$this->load_index_apply_rendering( $setting_name, $Blog, $setting_type );
@@ -2137,6 +2171,10 @@ class Plugins
 		{	// get EmailCampaign apply_rendering setting:
 			$setting_name = $params['setting_name'];
 		}
+		elseif( isset( $params['setting_name'] ) && $params['setting_name'] == 'shared_apply_rendering' )
+		{	// get apply_rendering setting for widget from sharaed container:
+			$setting_name = $params['setting_name'];
+		}
 		elseif( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
 		{ // get Comment apply_rendering setting
 			$Comment = & $params['Comment'];
@@ -2150,10 +2188,17 @@ class Plugins
 			$Item = & $params['Item'];
 			$setting_Blog = & $Item->get_Blog();
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // get given "apply_rendering" collection setting from the given Blog
-			$setting_Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Get given setting:
 			$setting_name = $params['setting_name'];
+			if( ! empty( $params['Blog'] ) )
+			{	// If Collection is given::
+				$setting_Blog = & $params['Blog'];
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+			}
 		}
 		else
 		{ // Invalid params
@@ -2177,6 +2222,7 @@ class Plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
 				break;
 
+			case 'shared_apply_rendering':
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
@@ -2191,7 +2237,7 @@ class Plugins
 			{ // No unique code!
 				continue;
 			}
-			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' )
+			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' && $setting_name != 'shared_apply_rendering' )
 			{ // If $setting_Blog is not set we can't get collection apply_rendering options
 				continue;
 			}
@@ -2204,13 +2250,22 @@ class Plugins
 			{	// get rendering setting from plugin email settings:
 				$apply_rendering = $loop_RendererPlugin->get_email_setting( $setting_name );
 			}
+			elseif( $setting_name == 'shared_apply_rendering' )
+			{	// get rendering setting from plugin shared settings:
+				$apply_rendering = $loop_RendererPlugin->get_shared_setting( $setting_name );
+			}
 			else
 			{ // get rendering setting from plugin coll settings
 				$apply_rendering = $loop_RendererPlugin->get_coll_setting( $setting_name, $setting_Blog );
 			}
 
-			if( $apply_rendering == 'stealth'
-				|| $apply_rendering == 'never'
+			$ignored_apply_rendering = array( 'stealth', 'never' );
+			if( isset( $params['ignored_apply_rendering'] ) )
+			{
+				$ignored_apply_rendering = array_merge( $ignored_apply_rendering, $params['ignored_apply_rendering'] );
+			}
+
+			if( in_array( $apply_rendering, $ignored_apply_rendering )
 				|| empty( $apply_rendering ) )
 			{ // This is not an option.
 				continue;
@@ -2351,8 +2406,15 @@ class Plugins
 
 						case 'email_apply_rendering':
 							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
-							{ // Check if current user can edit the messaging settings
+							{ // Check if current user can edit the email settings
 								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
+							}
+							break;
+
+						case 'shared_apply_rendering':
+							if( $current_User->check_perm( 'options', 'edit' ) )
+							{	// Check if current user can edit the plugin settings for shared container:
+								$settings_url = $admin_url.'?ctrl=plugins&amp;tab=shared';
 							}
 							break;
 

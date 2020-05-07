@@ -30,28 +30,28 @@ $Form->hiddens_by_key( get_memorized( 'action' ) );
 $Form->begin_form( 'fform' );
 
 // Display the form buttons
-$Form->begin_fieldset( T_( 'Actions' ) );
+$Form->begin_fieldset( TB_('Actions') );
 
 $form_buttons = array();
 if( $action_success && $unzip_success )
 { // Init a button to next step
-	$form_buttons[] = array( 'submit', 'actionArray[ready]', T_( 'Continue' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[ready]', TB_('Continue'), 'SaveButton' );
 }
 elseif( $unzip_success )
 { // Init the buttons to select next action
-	$form_buttons[] = array( 'submit', 'actionArray[ready]', T_( 'Skip Unzip' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[ready]', TB_('Skip Unzip'), 'SaveButton' );
 	if( file_exists( $upgrade_file ) && $current_User->check_perm( 'files', 'all' ) )
 	{	// Allow to unzip only if current user has a permission to edit all files:
-		$form_buttons[] = array( 'submit', 'actionArray[force_unzip]', T_( 'Force New Unzip' ), 'SaveButton btn-warning' );
+		$form_buttons[] = array( 'submit', 'actionArray[force_unzip]', TB_('Force New Unzip'), 'SaveButton btn-warning' );
 	}
 }
 else
 { // Init a button to back step
 	if( file_exists( $upgrade_dir ) )
 	{	// If zip file was already unzipped before:
-		$form_buttons[] = array( 'submit', 'actionArray[ready]', T_( 'Skip Unzip' ), 'SaveButton' );
+		$form_buttons[] = array( 'submit', 'actionArray[ready]', TB_('Skip Unzip'), 'SaveButton' );
 	}
-	$form_buttons[] = array( 'submit', 'actionArray['.( get_param( 'tab' ) == 'git' ? 'export_git' : 'download' ).']', T_( 'Back to download package' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray['.( get_param( 'tab' ) == 'git' ? 'export_git' : 'download' ).']', TB_('Back to download package'), 'SaveButton' );
 }
 
 $Form->end_form( $form_buttons );

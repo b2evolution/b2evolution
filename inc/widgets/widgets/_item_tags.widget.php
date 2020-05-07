@@ -64,7 +64,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Tags');
+		return T_('Tags');
 	}
 
 
@@ -162,18 +162,20 @@ class item_tags_Widget extends ComponentWidget
 	{
 		global $Item, $current_User;
 
+		$this->init_display( $params );
+
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
-			return;
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
+			return false;
 		}
 
 		if( ! ( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() ) &&
 		    ! count( $Item->get_tags() ) )
 		{	// Nothing to display because current User cannot edit the Item and the Item has no tags:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no tags and you cannot add new for the Item.' );
+			return false;
 		}
-
-		$this->init_display( $params );
 
 		// We renamed some params; older skin may use the old names; let's convert those params now:
 		$this->convert_legacy_param( 'widget_coll_item_tags_before', 'widget_item_tags_before' );

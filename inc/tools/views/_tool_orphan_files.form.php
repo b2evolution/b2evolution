@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -16,9 +16,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 $Form = new Form( NULL, 'delete_orphan_files', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action,blog' ) );
+$Form->global_icon( TB_('Cancel').'!', 'close', regenerate_url( 'action,blog' ) );
 
-$Form->begin_form( 'fform', T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.') );
+$Form->begin_form( 'fform', TB_('Find and delete all orphan File objects (with no matching file on disk) - DB only.') );
 
 	$Form->add_crumb( 'tools' );
 	$Form->hidden( 'ctrl', 'tools' );
@@ -26,11 +26,11 @@ $Form->begin_form( 'fform', T_('Find and delete all orphan File objects (with no
 	$Form->add_crumb( 'tools' );
 
 	$Form->checklist( array(
-			array( 'delete_files', 1, T_('Delete orphan File objects that have no Links'), 1 ),
-			array( 'delete_linked', 1, T_( 'Also delete orphan File objects that have Links (delete Link objects then delete File objects)' ), 1 ),
-		), 'delete_files', T_('Cleanup') );
+			array( 'delete_files', 1, TB_('Delete orphan File objects that have no Links'), 1 ),
+			array( 'delete_linked', 1, TB_( 'Also delete orphan File objects that have Links (delete Link objects then delete File objects)' ), 1 ),
+		), 'delete_files', TB_('Cleanup') );
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Delete'), 'ResetButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', TB_('Delete'), 'ResetButton' ) ) );
 ?>
 <script>
 jQuery( 'input[name=delete_files]' ).click( function()

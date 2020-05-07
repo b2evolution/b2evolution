@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -126,51 +126,68 @@ function create_default_data()
 					 ( 'Instant Messaging', '2' ),
 					 ( 'Phone', '3' ),
 					 ( 'Web', '4' ),
-					 ( 'Address', '5' )" );
+					 ( 'Address', '5' ),
+					 ( 'Administrative', '6' )" );
 	task_end();
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
-	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
 	$DB->query( "
-		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
-		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
-						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
-						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
-						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
-						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
-						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
-						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
-						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
-						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
-						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
-						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
-						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
-						( 3, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
-						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
-						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
-						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
-						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
-						( 4, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'googleplus',   'fa fa-google-plus fa-x-google-plus--nudge' ),
-						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
-						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
-						( 4, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', 'website',      NULL ),
-						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
-						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
-						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
-						( 4, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
-						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
-						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
-						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
-						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
-						( 4, 'url',    'Yelp',          NULL, 'optional',    'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
-						( 4, 'url',    'PayPal',        NULL, 'optional',    'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
-						( 4, 'url',    '500px',         NULL, 'optional',    'forbidden', '17', '0', '500px',        'fa fa-500px' ),
-						( 4, 'url',    'Amazon',        NULL, 'optional',    'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
-						( 4, 'url',    'Instagram',     NULL, 'optional',    'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
-						( 4, 'url',    'Vimeo',         NULL, 'optional',    'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
-						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
-						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
+		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_visibility, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
+		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'unrestricted', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
+						( 1, 'word',   'I like',        NULL, 'recommended', 'unrestricted', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
+						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'unrestricted', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+						( 1, 'list',   'Industry',      'Energy, Utilities & Resources
+Financial Services
+Health Services
+Hospitality & Tourism
+Industrial Manufacturing
+Pharma & Life Sciences
+Public Sector
+Real Estate
+Retail & Consumer Goods
+Sports Business Advisory
+Technology, Media & Telecom',                     'recommended', 'unrestricted', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
+						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'unrestricted', 'allowed',   '1',  '0', 'msnliveim',    NULL ),
+						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'unrestricted', 'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
+						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'unrestricted', 'allowed',   '3',  '0', 'aolaim',       NULL ),
+						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'unrestricted', 'allowed',   '4',  '0', 'icqid',        NULL ),
+						( 2, 'phone',  'Skype',         NULL, 'optional',    'private',      'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'private',      'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
+						( 3, 'phone',  'Main phone',    NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
+						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'private',      'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
+						( 3, 'phone',  'Office phone',  NULL, 'optional',    'private',      'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
+						( 3, 'phone',  'Home phone',    NULL, 'optional',    'private',      'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
+						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'private',      'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
+						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'private',      'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
+						( 4, 'url',    'Twitter',       NULL, 'recommended', 'unrestricted', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
+						( 4, 'url',    'Facebook',      NULL, 'recommended', 'unrestricted', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
+						( 4, 'url',    'Linkedin',      NULL, 'optional',    'unrestricted', 'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
+						( 4, 'url',    'GitHub',        NULL, 'optional',    'unrestricted', 'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
+						( 4, 'url',    'Website',       NULL, 'optional',    'unrestricted', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Blog',          NULL, 'optional',    'unrestricted', 'allowed',   '7',  '0', 'blog',         NULL ),
+						( 4, 'url',    'Myspace',       NULL, 'optional',    'unrestricted', 'forbidden', '8',  '0', 'myspace',      NULL ),
+						( 4, 'url',    'Flickr',        NULL, 'optional',    'unrestricted', 'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
+						( 4, 'url',    'YouTube',       NULL, 'optional',    'unrestricted', 'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
+						( 4, 'url',    'Digg',          NULL, 'optional',    'unrestricted', 'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
+						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'unrestricted', 'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
+						( 4, 'url',    'Pinterest',     NULL, 'optional',    'unrestricted', 'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'unrestricted', 'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
+						( 4, 'url',    'Yelp',          NULL, 'optional',    'unrestricted', 'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
+						( 4, 'url',    'PayPal',        NULL, 'optional',    'unrestricted', 'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
+						( 4, 'url',    '500px',         NULL, 'optional',    'unrestricted', 'forbidden', '17', '0', '500px',        'fa fa-500px' ),
+						( 4, 'url',    'Amazon',        NULL, 'optional',    'unrestricted', 'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
+						( 4, 'url',    'Instagram',     NULL, 'optional',    'unrestricted', 'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
+						( 4, 'url',    'Vimeo',         NULL, 'optional',    'unrestricted', 'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
+						( 5, 'text',   'Main address',  NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
+						( 5, 'text',   'Home address',  NULL, 'optional',    'private',      'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' ),
+						( 6, 'text',   'Admin notes',   NULL, 'recommended', 'admin',        'forbidden', '1',  '0', 'adminnotes',   'fa fa-edit' )" );
+
+	if( is_pro() )
+	{	// Install default user field definitions for PRO version:
+		load_funcs( '_core/_pro_features.funcs.php' );
+		pro_install_default_user_fields();
+	}
 	task_end();
 
 
@@ -220,13 +237,12 @@ function create_default_data()
 			'org_roles' => array( 'King of Spades' ),
 			'org_priorities' => array( 0 ),
 			'fields'    => array(
-					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-					'Website'     => 'http://b2evolution.net/',
-					'Twitter'     => 'https://twitter.com/b2evolution/',
-					'Facebook'    => 'https://www.facebook.com/b2evolution',
-					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+					'website'  => 'http://b2evolution.net/',
+					'twitter'  => 'https://twitter.com/b2evolution/',
+					'facebook' => 'https://www.facebook.com/b2evolution',
+					'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+					'github'   => 'https://github.com/b2evolution/b2evolution',
 				)
 		) );
 	task_end();
@@ -247,10 +263,11 @@ function create_default_data()
 	$post_types = array();
 	$post_types[] = array(
 			'name'           => 'Post',
+			'schema'         => 'Article',
 		);
 	$post_types[] = array(
 			'name'          => 'Recipe',
-			'template_name' => 'recipe',
+			'template_full' => 'recipe_content_full',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -285,6 +302,20 @@ function create_default_data()
 			'template_name'  => 'page',
 			'perm_level'     => 'restricted',
 			'use_comments'   => 0,
+			'allow_featured' => 0,
+		);
+	$post_types[] = array(
+			'name'           => 'Widget Page',
+			'usage'          => 'widget-page',
+			'template_name'  => 'widget_page',
+			'perm_level'     => 'admin',
+			'use_text'       => 'never',
+			'allow_html'        => 0,
+			'allow_breaks'      => 0,
+			'allow_attachments' => 0,
+			'allow_featured'    => 0,
+			'use_comments'   => 0,
+			'use_coordinates'=> 'optional',
 		);
 	$post_types[] = array(
 			'name'           => 'Intro-Front',
@@ -349,17 +380,27 @@ function create_default_data()
 			'use_comments'   => 0,
 		);
 	$post_types[] = array(
+			'name'           => 'Text Ad',
+			'usage'          => 'content-block',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'use_comments'   => 0,
+		);
+	$post_types[] = array(
 			'name'           => 'Sidebar link',
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
 			'allow_disabling_comments' => 1,
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'                   => 'Terms & Conditions',
@@ -381,16 +422,33 @@ function create_default_data()
 			'allow_closing_comments' => 0,
 			'use_comment_expiration' => 'never',
 		);
+	$post_types[] = array(
+			'name'   => 'Product',
+			'schema' => 'Product',
+		);
+	$post_types[] = array(
+			'name'   => 'Review',
+			'schema' => 'Review',
+		);
+	$post_types[] = array(
+			'name'            => 'Homepage Content Tab',
+			'usage'           => 'post',
+			'use_short_title' => 'optional',
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
 			'description'              => NULL,
 			'usage'                    => 'post',
+			'template_full'            => NULL,
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
 			'use_short_title'          => 'never',
+			'short_title_maxlen'       => 30,
+			'title_maxlen'             => 100,
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
+			'allow_attachments'        => 1,
 			'allow_featured'           => 1,
 			'use_text'                 => 'optional',
 			'use_tags'                 => 'optional',
@@ -405,6 +463,12 @@ function create_default_data()
 			'allow_closing_comments'   => 1,
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
+			'schema'                   => NULL,
+			'use_coordinates'          => 'never',
+			'front_order_title'        => 10,
+			'front_order_attachments'  => 30,
+			'front_order_text'         => 80,
+			'front_order_location'     => 90,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
@@ -423,13 +487,16 @@ function create_default_data()
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
 	$recipe_ityp_ID = 2;
+	$product_ityp_ID = 21;
+	$review_ityp_ID = 22;
+	$forum_topic_ityp_ID = 8;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
 			'label'           => T_('Image 1'),
 			'name'            => 'image_1',
 			'type'            => 'image',
-			'order'           => 1,
+			'order'           => 110,
 			'note'            => T_('Enter a link ID'),
 			'format'          => 'fit-192x192',
 			'link'            => 'linkpermzoom',
@@ -440,7 +507,7 @@ function create_default_data()
 			'label'           => T_('First numeric field'),
 			'name'            => 'first_numeric_field',
 			'type'            => 'double',
-			'order'           => 2,
+			'order'           => 120,
 			'note'            => T_('Enter a number'),
 			'cell_class'      => 'right',
 		),
@@ -448,7 +515,7 @@ function create_default_data()
 			'label'           => T_('Second numeric field'),
 			'name'            => 'second_numeric_field',
 			'type'            => 'double',
-			'order'           => 4,
+			'order'           => 140,
 			'note'            => T_('Enter a number'),
 			'cell_class'      => 'right',
 		),
@@ -456,7 +523,7 @@ function create_default_data()
 			'label'           => T_('USD Price'),
 			'name'            => 'usd_price',
 			'type'            => 'double',
-			'order'           => 8,
+			'order'           => 180,
 			'note'            => T_('Enter a number'),
 			'format'          => '$ 0 0.00',
 			'cell_class'      => 'right',
@@ -466,7 +533,7 @@ function create_default_data()
 			'label'           => T_('EUR Price'),
 			'name'            => 'eur_price',
 			'type'            => 'double',
-			'order'           => 9,
+			'order'           => 190,
 			'note'            => T_('Enter a number'),
 			'format'          => '0 0.00 €',
 			'cell_class'      => 'right',
@@ -476,28 +543,28 @@ function create_default_data()
 			'label'           => T_('First string field'),
 			'name'            => 'first_string_field',
 			'type'            => 'varchar',
-			'order'           => 3,
+			'order'           => 130,
 			'note'            => T_('Enter a string'),
 		),
 		array(
 			'label'           => T_('Multiline plain text field'),
 			'name'            => 'multiline_plain_text_field',
 			'type'            => 'text',
-			'order'           => 6,
+			'order'           => 160,
 			'note'            => T_('Enter multiple lines'),
 		),
 		array(
 			'label'           => T_('Multiline HTML field'),
 			'name'            => 'multiline_html_field',
 			'type'            => 'html',
-			'order'           => 5,
+			'order'           => 150,
 			'note'            => T_('Enter HTML code'),
 		),
 		array(
 			'label'           => T_('URL field'),
 			'name'            => 'url_field',
 			'type'            => 'url',
-			'order'           => 7,
+			'order'           => 170,
 			'note'            => T_('Enter an URL (absolute or relative)'),
 			'link'            => 'fieldurl',
 		),
@@ -505,10 +572,18 @@ function create_default_data()
 			'label'           => T_('Checkmark field'),
 			'name'            => 'checkmark_field',
 			'type'            => 'double',
-			'order'           => 10,
+			'order'           => 200,
 			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
+		),
+		array(
+			'label'           => TD_('Numeric Average'),
+			'name'            => 'numeric_average',
+			'type'            => 'computed',
+			'order'           => 210,
+			'cell_class'      => 'right',
+			'formula'         => '($first_numeric_field$+$second_numeric_field$)/2',
 		),
 		// for Item Type "Child Post":
 		array(
@@ -516,7 +591,7 @@ function create_default_data()
 			'label'           => T_('Image 1'),
 			'name'            => 'image_1',
 			'type'            => 'image',
-			'order'           => 1,
+			'order'           => 110,
 			'note'            => T_('Enter a link ID'),
 			'format'          => 'fit-192x192',
 			'link'            => 'linkpermzoom',
@@ -528,7 +603,7 @@ function create_default_data()
 			'label'           => T_('First numeric field'),
 			'name'            => 'first_numeric_field',
 			'type'            => 'double',
-			'order'           => 2,
+			'order'           => 120,
 			'note'            => T_('Enter a number'),
 			'cell_class'      => 'right',
 		),
@@ -537,7 +612,7 @@ function create_default_data()
 			'label'           => T_('First string field'),
 			'name'            => 'first_string_field',
 			'type'            => 'varchar',
-			'order'           => 3,
+			'order'           => 130,
 			'note'            => T_('Enter a string'),
 		),
 		array(
@@ -545,7 +620,7 @@ function create_default_data()
 			'label'           => T_('Checkmark field'),
 			'name'            => 'checkmark_field',
 			'type'            => 'double',
-			'order'           => 4,
+			'order'           => 140,
 			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
@@ -556,7 +631,7 @@ function create_default_data()
 			'label'           => TD_('Course'),
 			'name'            => 'course',
 			'type'            => 'varchar',
-			'order'           => 1,
+			'order'           => 110,
 			'note'            => T_('E-g: ').'"'.TD_('Dessert').'"',
 			'header_class'    => '',
 			'cell_class'      => '',
@@ -566,7 +641,7 @@ function create_default_data()
 			'label'           => TD_('Cuisine'),
 			'name'            => 'cuisine',
 			'type'            => 'varchar',
-			'order'           => 2,
+			'order'           => 120,
 			'note'            => T_('E-g: ').'"'.TD_('Italian').'"',
 			'header_class'    => '',
 			'cell_class'      => '',
@@ -575,7 +650,7 @@ function create_default_data()
 			'ityp_ID'         => $recipe_ityp_ID,
 			'label'           => TD_('Servings'),
 			'name'            => 'servings',
-			'order'           => 3,
+			'order'           => 130,
 			'note'            => TD_('people'),
 			'format'          => sprintf( TD_('%d people'), 0 ),
 			'header_class'    => '',
@@ -585,7 +660,7 @@ function create_default_data()
 			'ityp_ID'         => $recipe_ityp_ID,
 			'label'           => TD_('Prep Time'),
 			'name'            => 'prep_time',
-			'order'           => 4,
+			'order'           => 140,
 			'note'            => TD_('minutes'),
 			'format'          => sprintf( TD_('%s minutes'), 0 ),
 			'header_class'    => '',
@@ -595,7 +670,7 @@ function create_default_data()
 			'ityp_ID'         => $recipe_ityp_ID,
 			'label'           => TD_('Cook Time'),
 			'name'            => 'cook_time',
-			'order'           => 5,
+			'order'           => 150,
 			'note'            => TD_('minutes'),
 			'format'          => sprintf( TD_('%s minutes'), 0 ),
 			'header_class'    => '',
@@ -605,7 +680,7 @@ function create_default_data()
 			'ityp_ID'         => $recipe_ityp_ID,
 			'label'           => TD_('Passive Time'),
 			'name'            => 'passive_time',
-			'order'           => 6,
+			'order'           => 160,
 			'note'            => TD_('minutes'),
 			'format'          => sprintf( TD_('%s minutes'), 0 ),
 			'header_class'    => '',
@@ -616,7 +691,7 @@ function create_default_data()
 			'label'           => TD_('Total time'),
 			'name'            => 'total_time',
 			'type'            => 'computed',
-			'order'           => 7,
+			'order'           => 170,
 			'format'          => sprintf( TD_('%s minutes'), 0 ),
 			'formula'         => '$prep_time$ + $cook_time$ + $passive_time$',
 			'header_class'    => '',
@@ -627,9 +702,115 @@ function create_default_data()
 			'label'           => TD_('Ingredients'),
 			'name'            => 'ingredients',
 			'type'            => 'text',
-			'order'           => 8,
+			'order'           => 180,
 			'header_class'    => '',
 			'cell_class'      => '',
+		),
+		// for Item Type "Product":
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Brand'),
+			'name'            => 'brand',
+			'schema_prop'     => 'brand',
+			'type'            => 'varchar',
+			'order'           => 110,
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('SKU'),
+			'name'            => 'sku',
+			'schema_prop'     => 'sku',
+			'type'            => 'varchar',
+			'order'           => 120,
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Price'),
+			'name'            => 'price',
+			'schema_prop'     => 'offers.price',
+			'type'            => 'double',
+			'order'           => 130,
+			'format'          => '$ 0 0.00',
+			'cell_class'      => 'right',
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Currency'),
+			'name'            => 'currency',
+			'schema_prop'     => 'offers.priceCurrency',
+			'type'            => 'varchar',
+			'order'           => 140,
+			'note'            => T_('in three-letter ISO 4217 format'),
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Availability'),
+			'name'            => 'availability',
+			'schema_prop'     => 'offers.availability',
+			'type'            => 'varchar',
+			'order'           => 150,
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Color'),
+			'name'            => 'item_color',
+			'schema_prop'     => 'color',
+			'type'            => 'varchar',
+			'order'           => 160,
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Package total weight'),
+			'name'            => 'package_total_weight',
+			'type'            => 'double',
+			'order'           => 170,
+			'note'            => T_('Kg'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Package length'),
+			'name'            => 'package_length',
+			'type'            => 'double',
+			'order'           => 180,
+			'note'            => T_('cm'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Package width'),
+			'name'            => 'package_width',
+			'type'            => 'double',
+			'order'           => 190,
+			'note'            => T_('cm'),
+			'cell_class'      => 'right',
+		),
+		array(
+			'ityp_ID'         => $product_ityp_ID,
+			'label'           => T_('Package height'),
+			'name'            => 'package_height',
+			'type'            => 'double',
+			'order'           => 200,
+			'note'            => T_('cm'),
+			'cell_class'      => 'right',
+		),
+		// for Item Type "Review":
+		array(
+			'ityp_ID'         => $review_ityp_ID,
+			'label'           => T_('Item reviewed'),
+			'name'            => 'item_reviewed_name',
+			'schema_prop'     => 'itemReviewed.name',
+			'type'            => 'varchar',
+			'order'           => 110,
+		),
+		array(
+			'ityp_ID'         => $review_ityp_ID,
+			'label'           => T_('Rating value'),
+			'name'            => 'review_rating_value',
+			'schema_prop'     => 'reviewRating.ratingValue',
+			'type'            => 'double',
+			'order'           => 120,
+			'note'            => T_('Rating must be a value between 1 and 5 with 5 being the highest.'),
 		),
 	);
 	// Default settings for custom fields:
@@ -637,6 +818,7 @@ function create_default_data()
 			'ityp_ID'         => $parent_ityp_ID,
 			'label'           => '',
 			'name'            => '',
+			'schema_prop'     => NULL,
 			'type'            => 'double',
 			'order'           => '',
 			'note'            => NULL,
@@ -647,6 +829,7 @@ function create_default_data()
 			'link'            => 'nolink',
 			'line_highlight'  => 'differences',
 			'green_highlight' => 'never',
+			'red_highlight'   => 'never',
 		);
 	// Insert item type custom fields:
 	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';
@@ -713,7 +896,9 @@ function create_default_data()
 			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),
 			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin'),
 			(25, 'md', 'Markdown text file', 'text/plain', 'file_document', 'text', 'registered'),
-			(26, 'csv', 'CSV file', 'text/plain', 'file_document', 'text', 'registered')
+			(26, 'csv', 'CSV file', 'text/plain', 'file_document', 'text', 'registered'),
+			(27, 'svg', 'SVG file', 'image/svg+xml', 'file_document', 'image', 'admin'),
+			(28, 'ico', 'ICO image', 'image/x-icon', 'file_image', 'image', 'admin')
 		" );
 	task_end();
 
@@ -725,6 +910,9 @@ function create_default_data()
 
 	// Create default scheduled jobs
 	create_default_jobs();
+
+	// Create default templates
+	create_default_templates();
 
 	task_begin( 'Creating default "help" slug... ' );
 	$DB->query( '
@@ -1338,7 +1526,7 @@ function create_default_jobs( $is_upgrade = false )
 			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '05:15:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
-	{ // Check if these jobs already exist, and don't create another
+	{	// Check if these jobs already exist, and don't create another
 		$SQL = new SQL();
 		$SQL->SELECT( 'COUNT( ctsk_ID ) AS job_number, ctsk_key' );
 		$SQL->FROM( 'T_cron__task' );
@@ -1348,14 +1536,14 @@ function create_default_jobs( $is_upgrade = false )
 		$SQL->GROUP_BY( 'ctsk_key' );
 		$result = $DB->get_results( $SQL->get() );
 		foreach( $result as $row )
-		{ // clear existing jobs insert values
+		{	// clear existing jobs insert values
 			unset( $insert_values[ $row->ctsk_key ] );
 		}
 	}
 
 	$values = implode( ', ', $insert_values );
 	if( empty( $values ) )
-	{ // nothing to create
+	{	// nothing to create
 		return;
 	}
 
@@ -1367,39 +1555,33 @@ function create_default_jobs( $is_upgrade = false )
 }
 
 
-function create_sample_organization()
-{
-	global $user_org_IDs, $admin_user;
-
-	task_begin( 'Creating sample organization...' );
-	$user_org_IDs = array( create_demo_organization( 1 )->ID );
-	task_end();
-
-	task_begin( 'Adding admin user to sample organization...' );
-	$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-	task_end();
-}
-
-
+/**
+ * Create demo users
+ *
+ * @param array Array of organization IDs
+ * @return  array Array of demo user objects
+ */
 function create_demo_users()
 {
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group, $blogb_Group;
-	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
-	global $user_org_IDs;
+
+	$demo_Users = array();
 
 	task_begin('Assigning avatar to Admin... ');
 	$UserCache = & get_UserCache();
+	$GroupCache = & get_GroupCache();
+	$normal_Group = & $GroupCache->get_by_name( 'Normal Users' );
 	$User_Admin = & $UserCache->get_by_ID( 1 );
 
 	global $media_path;
 	$src_admin_dir = $media_path.'users/admin';
 	$dest_admin_dir = $media_path.'users/'.$User_Admin->login;
 	if( $User_Admin->login != 'admin' )
-	{ // If admin login is not "admin" we should try to rename folder of the admin avatars
+	{	// If admin login is not "admin" we should try to rename folder of the admin avatars
 		if( ! file_exists( $src_admin_dir ) ||
 		    ! is_dir( $src_admin_dir ) ||
 		    ! @rename( $src_admin_dir, $dest_admin_dir ) )
-		{ // Impossible to rename the admin folder to another name
+		{	// Impossible to rename the admin folder to another name
 
 			// Display the errors:
 			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
@@ -1408,7 +1590,7 @@ function create_demo_users()
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
 			if( $User_Admin->dbupdate() )
-			{ // Change global var of admin login for report:
+			{	// Change global var of admin login for report:
 				global $install_login;
 				$install_login = 'admin';
 			}
@@ -1416,7 +1598,7 @@ function create_demo_users()
 	}
 
 	if( file_exists( $media_path.'users/'.$User_Admin->login ) )
-	{ // Do assign avatars to admin only if it the admin folder exists on the disk
+	{	// Do assign avatars to admin only if it the admin folder exists on the disk
 		assign_profile_picture( $User_Admin, 'admin' );
 
 		// Associate secondary picture:
@@ -1437,439 +1619,9 @@ function create_demo_users()
 	}
 	task_end();
 
-	task_begin('Creating demo user mary... ');
-	$mary_moderator = get_demo_user( 'mary', true, $moderators_Group->ID, $user_org_IDs );
-	if( $mary_moderator )
-	{
-		$mary_moderator_ID = $mary_moderator->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
+	$demo_Users = get_demo_users( true );
 
-
-	task_begin('Creating demo user jay... ');
-	$jay_moderator = get_demo_user( 'jay', true, $moderators_Group->ID, $user_org_IDs );
-	if( $jay_moderator )
-	{
-		$jay_moderator_ID = $jay_moderator->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user dave... ');
-	$dave_blogger = get_demo_user( 'dave', true, $editors_Group->ID, $user_org_IDs );
-	if( $dave_blogger )
-	{
-		$dave_blogger_ID = $dave_blogger->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user paul... ');
-	$paul_blogger = get_demo_user( 'paul', true, $editors_Group->ID, $user_org_IDs );
-	if( $paul_blogger )
-	{
-		$paul_blogger_ID = $paul_blogger->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user larry... ');
-	$larry_user = get_demo_user( 'larry', true, $users_Group->ID, NULL );
-	if( $larry_user )
-	{
-		$larry_user_ID = $larry_user->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-
-	task_begin('Creating demo user kate... ');
-	$kate_user = get_demo_user( 'kate', true, $users_Group->ID, NULL );
-	if( $kate_user )
-	{
-		$kate_user_ID = $kate_user->ID;
-		task_end();
-	}
-	else
-	{
-		task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
-	}
-}
-
-
-/**
- * Creates sample private messages between admin and existing users
- *
- */
-function create_demo_messages()
-{
-	task_begin('Creating sample private messages... ');
-	global $UserSettings, $DB, $now, $localtimenow;
-
-	load_class( 'messaging/model/_thread.class.php', 'Thread' );
-	load_class( 'messaging/model/_message.class.php', 'Message' );
-	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
-	$UserSettings = new UserSettings();
-	$UserCache = & get_UserCache();
-
-	$users_SQL = new SQL();
-	$users_SQL->SELECT( 'user_ID, user_login' );
-	$users_SQL->FROM( 'T_users' );
-	$users_SQL->WHERE( 'NOT user_ID  = 1' );
-	$users_SQL->ORDER_BY( 'user_ID' );
-	$users = $DB->get_results( $users_SQL->get() );
-
-	for( $i = 0; $i < count( $users ); $i++ )
-	{
-		if( $i % 2 == 0 )
-		{
-			$author_ID = 1;
-			$recipient_ID = $users[$i]->user_ID;
-		}
-		else
-		{
-			$author_ID = $users[$i]->user_ID;
-			$recipient_ID = 1;
-		}
-
-		$author_User = & $UserCache->get_by_ID( $author_ID );
-		$recipient_User = & $UserCache->get_by_ID( $recipient_ID );
-
-		$loop_Thread = new Thread();
-		$loop_Message = new Message();
-
-		// Initial message
-		$loop_Message->Thread = $loop_Thread;
-		$loop_Message->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow - 60 ) );
-		$loop_Message->Thread->set( 'title', sprintf( T_('Demo private conversation #%s'), $i + 1 ) );
-		$loop_Message->Thread->recipients_list = array( $recipient_ID );
-		$loop_Message->set( 'author_user_ID', $author_ID );
-		$loop_Message->creator_user_ID = $author_ID;
-		$loop_Message->set( 'text', sprintf( T_('This is a demo private message to %s.'), $recipient_User->login ) );
-
-		$DB->begin();
-		$conversation_saved = false;
-		if( $loop_Message->Thread->dbinsert() )
-		{
-			$loop_Message->set_param( 'thread_ID', 'integer', $loop_Message->Thread->ID );
-			if( $loop_Message->dbinsert() )
-			{
-				if( $loop_Message->dbinsert_threadstatus( $loop_Message->Thread->recipients_list ) )
-				{
-					if( $loop_Message->dbinsert_contacts( $loop_Message->Thread->recipients_list ) )
-					{
-						if( $loop_Message->dbupdate_last_contact_datetime() )
-						{
-							$conversation_saved = true;
-						}
-					}
-				}
-			}
-		}
-
-		if( $conversation_saved )
-		{
-			$conversation_saved = false;
-
-			// Reply message
-			$loop_reply_Message = new Message();
-			$loop_reply_Message->Thread = $loop_Thread;
-			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
-			$loop_reply_Message->creator_user_ID = $author_ID;
-			$loop_reply_Message->set( 'text', sprintf( T_('This is a demo private reply to %s.'), $author_User->login ) );
-			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
-
-			if( $loop_reply_Message->dbinsert() )
-			{
-				// Mark reply message as unread by initiator
-				$sql = 'UPDATE T_messaging__threadstatus
-						SET tsta_first_unread_msg_ID = '.$loop_reply_Message->ID.'
-						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
-							AND tsta_user_ID = '.$author_ID.'
-							AND tsta_first_unread_msg_ID IS NULL';
-				$DB->query( $sql, 'Insert thread statuses' );
-
-				// Mark all messages as read by recipient
-				$sql = 'UPDATE T_messaging__threadstatus
-						SET tsta_first_unread_msg_ID = NULL
-						WHERE tsta_thread_ID = '.$loop_reply_Message->Thread->ID.'
-							AND tsta_user_ID = '.$recipient_ID;
-				$DB->query( $sql, 'Insert thread statuses' );
-
-				// check if contact pairs between sender and recipients exists
-				$recipient_list = $loop_reply_Message->Thread->load_recipients();
-				// remove author user from recipient list
-				$recipient_list = array_diff( $recipient_list, array( $loop_reply_Message->author_user_ID ) );
-				// insert missing contact pairs if required
-				if( $loop_reply_Message->dbinsert_contacts( $recipient_list ) )
-				{
-					if( $loop_reply_Message->dbupdate_last_contact_datetime() )
-					{
-						$DB->commit();
-						$conversation_saved = true;
-					}
-				}
-			}
-		}
-
-		if( ! $conversation_saved )
-		{
-			$DB->rollback();
-		}
-	}
-	task_end();
-}
-
-
-/**
- * This is called only for fresh installs and fills the tables with
- * demo/tutorial things.
- */
-function create_demo_contents()
-{
-	global $baseurl, $admin_url, $new_db_version;
-	global $random_password, $query;
-	global $timestamp, $admin_email;
-	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $blogb_Group;
-	global $DB;
-	global $default_locale, $default_country;
-	global $Plugins;
-	global $install_test_features;
-	global $user_org_IDs;
-	global $mary_moderator_ID, $jay_moderator_ID, $dave_blogger_ID, $paul_blogger_ID, $larry_user_ID, $kate_user_ID;
-	global $admin_user;
-	global $create_demo_users;
-
-	// Global exception handler function
-	function demo_content_error_handler( $errno, $errstr, $errfile, $errline )
-	{ // handle only E_USER_NOTICE
-		if( $errno == E_USER_NOTICE )
-		{
-			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
-		}
-	}
-
-	// Set global exception handler
-	set_error_handler( "demo_content_error_handler" );
-
-	if( ! isset( $mary_moderator_ID ) )
-	{
-		$mary_moderator_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $jay_moderator_ID ) )
-	{
-		$jay_moderator_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $dave_blogger_ID ) )
-	{
-		$dave_blogger_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $paul_blogger_ID ) )
-	{
-		$paul_blogger_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $larry_user_ID ) )
-	{
-		$larry_user_ID = $admin_user->ID;
-	}
-
-	if( ! isset( $kate_user_ID ) )
-	{
-		$kate_user_ID = $admin_user->ID;
-	}
-
-
-	/**
-	 * @var FileRootCache
-	 */
-	global $FileRootCache;
-
-	load_class( 'collections/model/_blog.class.php', 'Blog' );
-	load_class( 'files/model/_file.class.php', 'File' );
-	load_class( 'files/model/_filetype.class.php', 'FileType' );
-	load_class( 'links/model/_link.class.php', 'Link' );
-
-	$create_sample_contents = param( 'create_sample_contents', 'string', '' );
-	if( $create_sample_contents == 'all' )
-	{	// Array contains which collections should be installed
-		$install_collection_home =    1;
-		$install_collection_bloga =   1;
-		$install_collection_blogb =   1;
-		$install_collection_photos =  1;
-		$install_collection_forums =  1;
-		$install_collection_manual =  1;
-		$install_collection_tracker = 1;
-	}
-	else
-	{	// Array contains which collections should be installed
-		$collections = param( 'collections', 'array:string', array() );
-		$install_collection_home = in_array( 'home', $collections );
-		$install_collection_bloga = in_array( 'a', $collections );
-		$install_collection_blogb = in_array( 'b', $collections );
-		$install_collection_photos = in_array( 'photos', $collections );
-		$install_collection_forums = in_array( 'forums', $collections );
-		$install_collection_manual = in_array( 'manual', $collections );
-		$install_collection_tracker = in_array( 'group', $collections );
-	}
-
-	// Store the item IDs in this array in order to create additional comments
-	$additional_comments_item_IDs = array();
-
-	// Use this var to shift the posts of the collections in time below:
-	$timeshift = 0;
-
-	if( $install_collection_home )
-	{ // Install Home blog
-		task_begin( 'Creating Home collection...' );
-		create_demo_collection( 'main', $jay_moderator_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	if( $install_collection_bloga )
-	{ // Install Blog A
-		$timeshift += 86400;
-		task_begin( 'Creating Blog A collection...' );
-		create_demo_collection( 'blog_a', $jay_moderator_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	if( $install_collection_blogb )
-	{ // Install Blog B
-		$timeshift += 86400;
-		task_begin( 'Creating Blog B collection...' );
-		create_demo_collection( 'blog_b', $paul_blogger_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	if( $install_collection_photos )
-	{ // Install Photos blog
-		$timeshift += 86400;
-		task_begin( 'Creating Photos collection...' );
-		create_demo_collection( 'photo', $dave_blogger_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	if( $install_collection_forums )
-	{ // Install Forums blog
-		$timeshift += 86400;
-		task_begin( 'Creating Forums collection...' );
-		create_demo_collection( 'forum', $paul_blogger_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	if( $install_collection_manual )
-	{ // Install Manual blog
-		$timeshift += 86400;
-		task_begin( 'Creating Manual collection...' );
-		create_demo_collection( 'manual', $dave_blogger_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	if( $install_collection_tracker )
-	{ // Install Tracker blog
-		$timeshift += 86400;
-		task_begin( 'Creating Tracker collection...' );
-		create_demo_collection( 'group', $jay_moderator_ID, $create_demo_users, $timeshift );
-		update_install_progress_bar();
-		task_end();
-	}
-
-	task_begin( 'Setting default login and default messaging collection...' );
-	$BlogCache = & get_BlogCache();
-	if( $first_Blog = & $BlogCache->get_by_ID( 1, false, false ) )
-	{ // Set first blog as default login and default messaging collection
-		$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
-			VALUES ( '.$DB->quote( 'login_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' ),
-						 ( '.$DB->quote( 'msg_blog_ID' ).', '.$DB->quote( $first_Blog->ID ).' )' );
-	}
-	update_install_progress_bar();
-	task_end();
-
-	if( $install_test_features )
-	{
-		echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
-		task_begin( 'Creating fake hit statistics... ' );
-		load_funcs('sessions/model/_hitlog.funcs.php');
-		load_funcs('_core/_url.funcs.php');
-		$insert_data_count = generate_hit_stat(10, 0, 5000);
-		echo sprintf( '%d test hits are added.', $insert_data_count );
-		task_end();
-	}
-
-	/*
-	// Note: we don't really need this any longer, but we might use it for a better default setup later...
-	echo 'Creating default user/blog permissions... ';
-	// Admin for blog A:
-	$query = "INSERT INTO T_coll_user_perms( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
-							bloguser_perm_poststatuses, bloguser_perm_delpost, bloguser_perm_comments,
-							bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties,
-							bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change )
-						VALUES
-							( $blog_a_ID, ".$User_Demo->ID.", 1,
-							'published,deprecated,protected,private,draft', 1, 1, 1, 0, 0, 1, 1, 1 )";
-	$DB->query( $query );
-	echo "OK.<br />\n";
-	*/
-
-
-	task_begin( 'Creating default polls... ' );
-	$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
-		VALUES ( 1, "What are your favorite b2evolution features?", 3 )' );
-	$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-		VALUES ( 1, "Multiple blogs",          1 ),
-		       ( 1, "Photo Galleries",         2 ),
-		       ( 1, "Forums",                  3 ),
-		       ( 1, "Online Manuals",          4 ),
-		       ( 1, "Lists / E-mailing", 5 ),
-		       ( 1, "Easy Maintenance",        6 )' );
-	$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-		VALUES ( 1, 5, 1 ), ( 1, 5, 5 ), ( 1, 5, 6 ),
-		       ( 1, 6, 2 ), ( 1, 6, 5 ), ( 1, 6, 1 ),
-		       ( 1, 7, 2 ), ( 1, 7, 5 ), ( 1, 6, 3 ),
-		       ( 1, 2, 2 ), ( 1, 2, 5 ), ( 1, 2, 4 ),
-		       ( 1, 3, 3 ), ( 1, 3, 5 ), ( 1, 3, 1 ),
-		       ( 1, 4, 3 ), ( 1, 4, 6 ), ( 1, 4, 2 ),
-		       ( 1, 1, 6 ), ( 1, 1, 5 ), ( 1, 1, 3 )' );
-	task_end();
-
-
-	// Allow all modules to create their own demo contents:
-	modules_call_method( 'create_demo_contents' );
-
-	// Set default locations for each post in test mode installation
-	create_default_posts_location();
-
-	install_basic_widgets( $new_db_version );
-
-	load_funcs( 'tools/model/_system.funcs.php' );
-	system_init_caches( true, true ); // Outputs messages
-
-	restore_error_handler();
+	return $demo_Users;
 }
 
 
@@ -1893,201 +1645,745 @@ function create_default_posts_location()
 
 
 /**
- * Create default newsletters
+ * Create default templates that don't already exist
+ *
+ * @param boolean TRUE to use this as separate task
  */
-function create_default_newsletters()
+function create_default_templates( $is_task = true )
 {
-	global $DB, $create_sample_contents;
+	global $DB;
 
-	task_begin( 'Creating default lists... ' );
-
-	if( $create_sample_contents )
+	if( $is_task )
 	{
-		// Insert default newsletters:
-		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
-			VALUES ( "News", "Send me news about this site.", 1, 1 ),
-			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2, 1 )' );
-
-		// Insert default subscriptions for each user on first newsletter:
-		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
-			SELECT user_ID, 1 FROM T_users' );
+		task_begin( 'Creating default templates... ' );
 	}
 
-	task_end();
-}
+	$templates = array(
+		// Item Info "info line" replacements:
+		'item_details_infoline_date' => array(
+			'name'     => 'Item Details: Posted on Date at Time',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
+		),
+		'item_details_infoline_standard' => array(
+			'name'     => 'Item Details: Posted by Author on Date at Time in Categories',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time|time_format=#extended_date] in [categories]</span>',
+		),
+		'item_details_infoline_long' => array(
+			'name'     => 'Item Details: Long info line',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] [Item:permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
+		),
+		'item_details_infoline_forums' => array(
+			'name'     => 'Item Details: Thread last updated on Date',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]</span>',
+		),
+
+		// Item info New :
+		'item_details_feedback_link' => array(
+			'name'     => 'Item Details: Comment Link',
+			'context'  => 'item_details',
+			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
+		),
+
+		// Item Info "Small print" replacements:
+		'item_details_smallprint_standard' => array(
+			'name'     => 'Item Details: Small Print: Standard',
+			'context'  => 'item_details',
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
+		),
+		'item_details_smallprint_long' => array(
+			'name'     => 'Item Details: Small Print: Long',
+			'context'  => 'item_details',
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
+		),
+		'item_details_revisions' => array(
+			'name'     => 'Item Details: Small Print: Revisions',
+			'context'  => 'item_details',
+			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
+		),
 
 
-/**
- * Create default email campaigns
- */
-function create_default_email_campaigns()
-{
-	global $DB, $Settings, $create_sample_contents, $baseurl;
+		// Content List widget:
+		'content_list' => array(
+			'name'     => 'Content List',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<ul class="chapters_list posts_list">]
+[set:after_list=</ul>]
+[set:subcat_template=content_list_subcat]
+[set:item_template=content_list_item]',
+		),
+		'content_list_subcat' => array(
+			'name'     => 'Content List: Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<li class="chapter">
+	<h3>[Cat:permalink|text=#expandicon+name|class=link]</h3>
+	<div class="evo_cat__description">[Cat:description]</div>
+</li>',
+		),
+		'content_list_item' => array(
+			'name'     => 'Content List: Item',
+			'context'  => 'content_list_item',
+			'template' => '<li>
+	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
+	[Item:excerpt|
+		before=<div class="evo_post__excerpt_text">|
+		after=</div>|
+		excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+</li>',
+		),
 
-	task_begin( 'Creating default email campaigns... ' );
 
-	if( $create_sample_contents )
+		// Content Tiles style 1 (default):
+		'content_tiles' => array(
+            'name'     => 'Content Tiles Style 1 (Fully clickable)',
+            'context'  => 'content_list_master',
+            'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat|          // Sub-template for displaying categories]
+[set:item_template=content_tiles_item|              // Sub-template for displaying items]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4| // RWD classes for tile containers]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow| // Modifier classes for each tile]
+[set:evo_tile_image__modifiers=|                    // Modifier classes for each tile image]
+[set:evo_tile_image__classes=evo_image_block|       // Modifier classes for each evo_image_block]
+[set:evo_tile_image__size=fit-400x320|              // Image size for old browsers]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]
+',
+		),
+		'content_tiles_contain' => array(
+			'name'     => 'Content Tiles Style 1.1 (Contained images)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat]
+[set:item_template=content_tiles_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
+[set:evo_tile_image__modifiers=]
+[set:evo_tile_image__classes=evo_image_block contain]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]
+',
+		),
+
+		'content_tiles_subcat' => array(
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Cat:image|
+					size=$evo_tile_image__size$|
+					sizes=$evo_tile_image__sizes$|
+					link_to=#category_url|
+					before=<figure class="evo_image_block">|
+					before_classes=$evo_tile_image__classes$|
+					after=</figure>]
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Cat:name]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+			</div>
+		</div>
+		[Cat:permalink|text=]
+	</div>
+</div>',
+		),
+
+		'content_tiles_item' => array(
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Item:images|
+					restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
+					limit=1|	                                      // Max 1 images
+					image_size=$evo_tile_image__size$|                // Size for old browsers
+					image_sizes=$evo_tile_image__sizes$|	          // RWD Sizes for modern browsers
+					image_link_to=|	                                  // Do NOT link to anything
+					placeholder=#file_text_icon|	                  // If no image available, display text file icon
+					before_image_classes=$evo_tile_image__classes$|	  // CSS classes to inject into evo_image_block
+				]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">
+					[Item:excerpt|
+						excerpt_more_text=| // No "more" link
+					]
+				</div>
+			</div>
+		</div>
+		[Item:permalink|text=| // This is a link without text which will cover the whole tile and make the whole tile clickable]
+	</div>
+</div>',
+		),
+
+
+		// Tiles style 2:
+		'content_tiles_btn' => array(
+			'name'     => 'Content Tiles Style 2 (Button)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_btn_subcat]
+[set:item_template=content_tiles_btn_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__shadow]
+[set:evo_tile_image__modifiers=evo_tile_image__margin]
+[set:evo_tile_image__classes=evo_image_block]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]',
+		),
+
+		'content_tiles_btn_subcat' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Cat:image|
+					size=$evo_tile_image__size$|
+					sizes=$evo_tile_image__sizes$|
+					link_to=#category_url|
+					before=<figure class="evo_image_block">|
+					after=</figure>|
+					before_classes=$evo_tile_image__classes$]
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_btn_item' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Item:images|
+					restrict_to_image_position=#cover_and_teaser_all|
+					limit=1|
+					image_size=$evo_tile_image__size$|
+					image_sizes=$evo_tile_image__sizes$|
+					image_link_to=single|
+					placeholder=#file_text_icon|
+					before_image_classes=$evo_tile_image__classes$]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+
+		// Tiles style 3 (BG image:Experimental):
+		'content_tiles_bgimg' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_bgimg_subcat]
+[set:item_template=content_tiles_bgimg_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
+[set:evo_tile_image__modifiers=]
+[set:evo_tile_image__classes=evo_image_block]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]',
+		),
+
+		'content_tiles_bgimg_subcat' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Cat:background_image_css|size=fit-400x320|size_2x=fit-720x500]"></div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_bgimg_item' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Item:background_image_css|size=fit-400x320|size_2x=fit-720x500]">
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+
+		// Content Blocks:
+		'cblock_clearfix' => array(
+			'name'     => 'Include Content Block: with clearfix',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block clearfix [echo:content_block_class]">
+	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
+	<div class="evo_cblock_text">
+		[Item:content_teaser] 
+	</div>
+	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
+</div>',
+		),
+		'cblock_noclearfix' => array(
+			'name'     => 'Include Content Block: without clearfix',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block [echo:content_block_class]">
+	[Item:images|
+		restrict_to_image_position=#teaser_all|
+		before=<div class="evo_cblock_images evo_cblock_teaser">|
+		after=</div>]
+	<div class="evo_cblock_text">
+		[Item:content_teaser] 
+	</div>
+	[Item:images|
+		restrict_to_image_position=aftermore|
+		before=<div class="evo_cblock_images evo_cblock_aftermore">|
+		after=</div>]
+</div>',
+		),
+
+		// Item Contents:
+		'item_content_excerpt' => array(
+			'name' => 'Item Excerpt',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__excerpt">
+[Item:excerpt|
+	before=<div class="evo_post__excerpt_text">|
+	after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+	excerpt_more_text=#more+arrow|
+	excerpt_after_more=</span>]
+</section>',
+		),
+		'item_content_teaser' => array(
+			'name' => 'Item Teaser content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+[Item:images|
+	restrict_to_image_position=#teaser_all|
+	image_size=fit-1280x720|
+	image_class=img-responsive|
+	before=<div class="evo_post_images">|
+	after=</div>|
+	before_image=<figure class="evo_image_block">|
+	after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|link_text=Read more &raquo;]
+</div>
+</section>',
+		),
+		'item_content_full' => array(
+			'name' => 'Item Full content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+[Item:images|
+	restrict_to_image_position=#teaser_all|
+	image_size=fit-1280x720|
+	image_class=img-responsive|
+	before=<div class="evo_post_images">|
+	after=</div>|
+	before_image=<figure class="evo_image_block">|
+	after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|anchor_text=]
+	[Item:images|
+		restrict_to_image_position=aftermore|
+		image_size=fit-1280x720|
+		image_class=img-responsive|
+		before=<div class="evo_post_images">|
+		after=</div>|
+		before_image=<figure class="evo_image_block">|
+		after_image=</figure>]
+	[Item:content_extension]
+	[Item:page_links]
+	[Item:footer]
+</div>
+</section>',
+		),
+		'recipe_content_full' => array(
+			'name' => 'Recipe Full content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+<div class="row">
+	<div class="col-sm-5">
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			image_size=crop-320x320|image_class=img-responsive|
+			before=<div class="evo_post_images">|
+			after=</div>|
+			before_image=<figure class="evo_image_block">|
+			after_image=</figure>]
+	</div>
+	<div class="col-sm-7">
+		[Item:content_teaser]
+		[Item:tags|before=<nav class="small post_tags">|after=</nav>|separator= ]
+		[Item:custom_fields|
+			fields=course,cuisine,servings|
+			custom_fields_table_start=|
+			custom_fields_row_start=<div class="row"$row_attrs$>|
+			custom_fields_row_header_field=<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>|
+			custom_fields_description_icon_class=grey|
+			custom_fields_value_default=<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>|
+			custom_fields_row_end=</div>|
+			custom_fields_table_end=]
+		[Item:custom_fields|
+			fields=prep_time,cook_time,passive_time,total_time|
+			custom_fields_table_start=<br /><div class="row">|
+			custom_fields_row_start=<span$row_attrs$>|
+			custom_fields_row_header_field=<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>|
+			custom_fields_description_icon_class=grey|
+			custom_fields_value_default=<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>|
+			custom_fields_row_end=</span>|
+			custom_fields_table_end=</div>|
+			hide_empty_lines=1]
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-3 col-sm-4">
+		<h4>[Item:custom|field=ingredients|what=label]</h4>
+		<p>[Item:custom|field=ingredients]</p>
+	</div>
+	<div class="col-lg-9 col-sm-8">
+		<h4>Directions</h4>
+		[Item:content_extension]
+		[Item:page_links]
+		[Item:footer]
+		[Item:feedback_link]
+	</div>
+</div>
+</section>',
+		),
+/*
+		'cblock_imgleft_textright' => array(
+			'name'     => 'Include Content Block: Images Left / Text Right',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block [cb_class]">
+	<img src="[teaser_image]" class="floatleft">
+	<div class="evo_content_block_text">
+		[content] 
+	</div>
+</div>',
+		),
+		'cblock_textleft_imgright' => array(
+			'name'     => 'Include Content Block: Text Left / Images Right',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block [cb_class]">
+	<img src="[teaser_image]" class="floatright">
+	<div class="evo_content_block_text">
+		[content] 
+	</div>
+</div>',
+		),
+*/
+
+
+		// Content Tabs:
+		'content_tabs' => array(
+			'name'     => 'Content Tabs',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="row">]
+[set:after_list=</div>]
+[set:item_template=content_tabs_item]
+[set:rwd_header_col=col-sm-5 col-xs-12]
+[set:rwd_text_col=col-sm-5 col-xs-12]
+[set:rwd_image_col=col-sm-7 pull-right-sm col-xs-12]
+[set:evo_tabs_image__size=fit-1920x1080]',
+		),
+
+		'content_tabs_item' => array(
+			'name'     => 'Content Tabs: Item',
+			'context'  => 'content_list_item',
+			'template' => '
+	<div class="[echo:rwd_header_col]">
+		<h1>[Item:title]</h1>
+	</div>
+	<div class="[echo:rwd_image_col]">
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			limit=1|
+			image_size=$evo_tabs_image__size$]
+	</div>
+	<div class="[echo:rwd_text_col]">
+		[Item:content_teaser]
+	</div>
+',
+		),
+
+
+		// Registration Templates:
+		'registration_master_standard' => array(
+			'name'     => 'Registration: Standard',
+			'context'  => 'registration_master',
+			'template' => '
+[set:reg1_template=registration_standard]
+[set:reg1_required=login,password,email]
+',
+		),
+
+		'registration_standard' => array(
+			'name'     => 'Registration: Standard',
+			'context'  => 'registration',
+			'template' => '[Form:login]
+[Form:password]
+[Form:email]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>',
+		),
+
+
+
+		// Registration Templates:
+		'registration_master_ask_name' => array(   
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'registration_master',
+			'template' => '
+[set:reg1_template=registration_ask_name]
+[set:reg1_required=firstname,password,email]
+',
+		),
+
+		'registration_ask_name' => array(
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+[Form:lastname]
+[Form:email]
+[Form:password]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>'
+		),
+
+		// Registration Templates:
+		'registration_master_email_social' => array(   
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'registration_master',
+			'template' => '
+[set:reg1_template=registration_email_social]
+[set:reg1_required=email]
+
+[set:reg2_template=registration_step2]
+[set:reg2_required=firstname]
+',
+		),
+
+		'registration_email_social' => array(
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'registration',
+			'template' => '[Form:email]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>
+[Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
+	before=<div class="evo_social_login_buttons margin-top-md">|
+	after=</div>]
+',
+		),
+
+		'registration_step2' => array(
+			'name'     => 'Registration: Step 2',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+	[Form:lastname]
+	[Form:custom_field|field=industry| // this is an example of a User custom field]
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Continue]
+',
+		),
+
+		'search_form_full' => array(
+			'name'     => 'Search Form: Full',
+			'context'  => 'search_form',
+			'template' => '<div class="row row-gutter-sm">
+	<div class="col-sm-12 margin-top-sm margin-bottom-xs">
+		<div class="input-group">
+			[Form:search_input|class=w-100]
+			<span class="input-group-btn">[Form:submit|value=Search]</span>
+		</div>
+	</div>
+</div>
+<div class="row row-gutter-sm">
+	<div class="col-sm-12 col-md-4 col-lg-5 margin-y-xs">
+		[Form:search_author]
+	</div>
+	<div class="col-sm-12 col-md-4 col-lg-4 margin-y-xs">
+		[Form:search_content_age]
+	</div>
+	<div class="col-sm-12 col-md-4 col-lg-3 margin-y-xs">
+		[Form:search_content_type]
+	</div>
+</div>',
+		),
+
+		'search_form_simple' => array(
+			'name'     => 'Search Form: Simple',
+			'context'  => 'search_form',
+			'template' => '<div class="input-group">
+	[Form:search_input|class=w-100]
+	<span class="input-group-btn">[Form:submit|value=Search]</span>
+</div>',
+		),
+
+		'search_result_item' => array(
+			'name'     => 'Search Result: Item',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Item:permalink] ([Item:type])</div>
+		<div class="result_content">[Item:excerpt|excerpt_more_text=]</div>
+		<div class="search_info dimmed">[Item:categories|before=In ]</div>
+		<div class="search_info dimmed">Published by [Item:author|
+			link_text=avatar_login|
+			thumb_size=crop-top-15x15] on [Item:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_comment' => array(
+			'name'     => 'Search Result: Comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] (Comment)</div>
+		<div class="result_content">[Comment:excerpt]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_file' => array(
+			'name'     => 'Search Result: File',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[File:file_link|link_text=title] (File: [File:file_link|link_text=icon] [File:type])</div>
+		<div class="result_content">
+			[File:url]
+			[File:description|before=<div>|after=</div>]
+		</div>
+		<div class="search_info dimmed">File size: [File:file_size]</div>
+	</div>
+</div>',
+		),
+
+		'search_result_category' => array(
+			'name'     => 'Search Result: Category',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Cat:permalink] (Category)</div>
+		<div class="result_content">[Cat:description]</div>
+	</div>
+</div>',
+		),
+
+		'search_result_tag' => array(
+			'name'     => 'Search Result: Tag',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Tag:permalink] (Tag)</div>
+		<div class="result_content">[echo:tag_post_count] posts are tagged with "[Tag:name]"</div>
+	</div>
+</div>',
+		)
+
+	);
+
+	$templates_sql = array();
+	foreach( $templates as $code => $template )
 	{
-		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
-		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-
-		$email_campaigns = array(
-			array(
-				'name' => T_('Markdown Example'),
-				'text' => T_('Heading
-=======
-
-Sub-heading
------------
-
-### H3 header
-
-#### H4 header ####
-
-> Email-style angle brackets
-> are used for blockquotes.
-
-> > And, they can be nested.
-
-> ##### Headers in blockquotes
->
-> * You can quote a list.
-> * Etc.
-
-[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
-
-Paragraphs are separated by a blank line.
-
-    This is a preformatted
-    code block.
-
-Text attributes *Italic*, **bold**, `monospace`.
-
-Shopping list:
-
-* apples
-* oranges
-* pears
-
-The rain---not the reign---in Spain.').
-"\n".
-T_('Button examples:
-[button]This is a button[/button]
-[like]I like this[/like] [dislike]I don\'t like this[/dislike]
-[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
-[cta:1:link]Call to action 1 link only[/cta]'),
-			),
-			array(
-				'name' => T_('Another example'),
-				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
-			),
-			array(
-				'name'  => T_('Welcome & Activate'),
-				'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
-				'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
-					.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
-					.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
-					.T_('Your login is: $login$')."\r\n\r\n"
-					.T_('Your email is: $email$')."\r\n\r\n"
-					.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
-			),
-		);
-
-		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-		foreach( $email_campaigns as $email_campaign )
-		{
-			$EmailCampaign = new EmailCampaign();
-			$EmailCampaign->set( 'enlt_ID', 1 );
-			$EmailCampaign->set( 'name', $email_campaign['name'] );
-			$EmailCampaign->set( 'email_title', isset( $email_campaign['title'] ) ? $email_campaign['title'] : $email_campaign['name'] );
-			$EmailCampaign->set( 'email_defaultdest', $baseurl );
-			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
-
-			if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
-			{	// Add recipients after successfull email campaign creating,
-				// only if we have found the users in DB:
-				$EmailCampaign->add_recipients( $user_IDs );
-			}
-		}
+		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['context'] ).', '.$DB->quote( $template['template'] ).' )';
 	}
 
-	task_end();
-}
+	// Insert/Update templates:
+	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_context, tpl_template_code )
+		VALUES '.implode( ', ', $templates_sql ).'
+		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_context = VALUES( tpl_context ), tpl_template_code = VALUES( tpl_template_code )',
+		'Creating/Updating default templates' );
 
-
-/**
- * Create default automations
- */
-function create_default_automations()
-{
-	global $DB, $create_sample_contents, $baseurl;
-
-	task_begin( 'Creating default automations... ' );
-
-	if( $create_sample_contents )
+	if( $is_task )
 	{
-		//load_funcs( 'automations/model/_automation.funcs.php' );
-		load_class( 'automations/model/_automation.class.php', 'Automation' );
-		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
-
-		$Automation = new Automation();
-		$Automation->set( 'name', T_('Sample Automation') );
-		$Automation->set( 'owner_user_ID', 1 );
-		$Automation->update_newsletters = true;
-		$Automation->newsletters = array( array(
-				'ID'        => 1,
-				'autostart' => 1,
-				'autoexit'  => 1,
-			) );
-
-		if( $Automation->dbinsert() )
-		{	// Add steps after successfull creating of the automation:
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $Automation->ID );
-			$AutomationStep->set( 'order', 1 );
-			$AutomationStep->set( 'type', 'notify_owner' );
-			$AutomationStep->set( 'info', '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)' );
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
-			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
-			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
-			$AutomationStep->set_label();
-			$AutomationStep->dbinsert();
-
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $Automation->ID );
-			$AutomationStep->set( 'order', 2 );
-			$AutomationStep->set( 'type', 'send_campaign' );
-			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
-			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
-			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
-			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
-			$AutomationStep->set_label();
-			$AutomationStep->dbinsert();
-
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $Automation->ID );
-			$AutomationStep->set( 'order', 3 );
-			$AutomationStep->set( 'type', 'send_campaign' );
-			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
-			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
-			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
-			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
-			$AutomationStep->set_label();
-			$AutomationStep->dbinsert();
-
-			// Add users to this automation:
-			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-			$Automation->add_users( $user_IDs );
-		}
+		task_end();
 	}
-
-	task_end();
 }
 ?>

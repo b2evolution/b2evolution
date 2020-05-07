@@ -151,7 +151,8 @@ function init_voting_bar( voting_layout, action_url, element_id, load_form )
  */
 function votingFadeIn( obj, color )
 {
-	if( color == 'transparent' || color == 'rgba(0, 0, 0, 0)' )
+	var is_transparent = ( color == 'transparent' || color == 'rgba(0, 0, 0, 0)' );
+	if( is_transparent )
 	{	// Animation doesn't work with transparent color, it converts to white color
 		// To fix this get bg color of the parent
 		var obj_parent = obj.parent();
@@ -166,7 +167,13 @@ function votingFadeIn( obj, color )
 			color = color_parent;
 		}
 	}
-	obj.animate( { backgroundColor: color }, 200 );
+	obj.animate( { backgroundColor: color }, 200, function()
+	{
+		if( is_transparent )
+		{	// Set real transparent color because parent may has not transparent color only on mouse over:
+			obj.css( 'background-color', 'transparent' );
+		}
+	} );
 }
 
 

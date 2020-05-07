@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -59,7 +59,7 @@ class item_workflow_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Workflow Properties');
+		return T_('Workflow Properties');
 	}
 
 
@@ -106,6 +106,12 @@ class item_workflow_Widget extends ComponentWidget
 					array( 'deadline', T_('Deadline'), 1 ),
 				),
 			),
+			'allow_edit' => array(
+				'label' => T_( 'Allow editing' ),
+				'type' => 'checkbox',
+				'note' => T_( 'Check to enable editing of workflow properties if current user has permission.' ),
+				'defaultvalue' => 0,
+			),
 		), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -122,7 +128,7 @@ class item_workflow_Widget extends ComponentWidget
 		global $preview;
 
 		$params = array_merge( array(
-				'widget_item_workflow_template' => '<p><b>$title$:</b> <a $value_attrs$>$value$</a></p>',
+				'widget_item_workflow_template' => '<p><b>$title$:</b> $workflow_property_value$</p>',
 			), $params );
 
 		parent::init_display( $params );
@@ -142,21 +148,30 @@ class item_workflow_Widget extends ComponentWidget
 	function display( $params )
 	{
 		global $Item, $current_User;
+		global $ReqURL;
 
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
 		if( ! $Item->get_coll_setting( 'use_workflow' ) )
 		{	// Workflow is disabled for current Collection:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because workflow is disabled for Item\'s Collection.' );
 			return false;
 		}
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() ) )
 		{	// Current User has no permission to be assigned for tasks of the Item's Collection:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you don\'t have a permission to be assigned for tasks of the Item\'s Collection.' );
 			return false;
 		}
+
+		$allow_edit = $this->disp_params['allow_edit'] &&
+				is_logged_in() &&
+				$current_User->check_perm( 'admin', 'restricted' ) &&
+				$current_User->check_perm( 'options', 'edit' );
 
 		$this->init_display( $params );
 
@@ -164,26 +179,104 @@ class item_workflow_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		if( ! empty( $this->disp_params['show_properties']['status'] ) )
-		{	// Display task status:
-			$this->display_workflow_property( T_('Task status'), $Item->get( 't_extra_status' ) );
-		}
+		echo '<div id="evo_widget_item_workflow_properties_'.$this->ID.'">';
+		
+			if( ! empty( $this->disp_params['show_properties']['status'] ) )
+			{	// Display task status:
+				if( $allow_edit )
+				{
+					$this->display_workflow_property( T_('Task status'), '<a href="'.$ReqURL.'">'.$Item->get( 't_extra_status').'</a>' );
+				}
+				else
+				{
+					$this->display_workflow_property( T_('Task status'), $Item->get( 't_extra_status' ) );
+				}
+			}
 
-		if( ! empty( $this->disp_params['show_properties']['user'] ) )
-		{	// Display assigned user:
-			$UserCache = & get_UserCache();
-			$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-			$this->display_workflow_property( T_('Assigned to'), ( $assigned_User ? $assigned_User->get_identity_link() : T_('No user') ) );
-		}
+			if( ! empty( $this->disp_params['show_properties']['user'] ) )
+			{	// Display assigned user:
+				$UserCache = & get_UserCache();
+				$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
+				$this->display_workflow_property( T_('Assigned to'), ( $assigned_User ? $assigned_User->get_identity_link( array( 'display_bubbletip' => false ) ) : T_('No user') ) );
+			}
 
-		if( ! empty( $this->disp_params['show_properties']['priority'] ) )
-		{	// Display priority:
-			$this->display_workflow_property( T_('Priority'), item_priority_title( $Item->get( 'priority' ) ), 'style="color:'.item_priority_color( $Item->get( 'priority' ) ).'"' );
-		}
+			if( ! empty( $this->disp_params['show_properties']['priority'] ) )
+			{	// Display priority:
+				if( $allow_edit )
+				{
+					$this->display_workflow_property( T_('Priority'), '<a href="'.$ReqURL.'" style="color:'.item_priority_color( $Item->get( 'priority' ) ).'">'
+							.item_priority_title( $Item->get( 'priority' ) ).'</a>' );
+				}
+				else
+				{
+					$this->display_workflow_property( T_('Priority'), '<span style="color:'.item_priority_color( $Item->get( 'priority' ) ).'">'
+							.item_priority_title( $Item->get( 'priority' ) ).'</span>' );
+				}
+			}
 
-		if( ! empty( $this->disp_params['show_properties']['deadline'] ) )
-		{	// Display deadline:
-			$this->display_workflow_property( T_('Deadline'), ( $Item->get( 'datedeadline' ) === NULL ? T_('None') : mysql2localedatetime( $Item->get( 'datedeadline' ) ) ) );
+			if( ! empty( $this->disp_params['show_properties']['deadline'] ) )
+			{	// Display deadline:
+				if( $allow_edit )
+				{
+					$this->display_workflow_property( T_('Deadline'), '<a href="'.$ReqURL.'">'.( $Item->get( 'datedeadline' ) === NULL ? T_('None') : mysql2localedatetime( $Item->get( 'datedeadline' ) ) ).'</a>' );
+				}
+				else
+				{
+					$this->display_workflow_property( T_('Deadline'), ( $Item->get( 'datedeadline' ) === NULL ? T_('None') : mysql2localedatetime( $Item->get( 'datedeadline' ) ) ) );
+				}
+			}
+
+		echo '</div>';
+
+		if( $allow_edit )
+		{
+			$Form = new Form( get_htsrv_url().'item_edit.php' );
+			$Form->switch_layout( 'linespan' );
+
+			echo '<div class="evo_widget_item_workflow_form" id="evo_widget_item_workflow_form_'.$this->ID.'" style="display:none;">';
+				
+
+				$Form->begin_form( 'evo_item_workflow_form' );
+
+				$Form->add_crumb( 'item' );
+				$Form->hidden( 'blog', $Item->get_blog_ID() );
+				$Form->hidden( 'post_ID', $Item->ID );
+				$Form->hidden( 'redirect_to', $Item->get_permanent_url() );
+
+				if( ! empty( $this->disp_params['show_properties']['status'] ) )
+				{	// Display task status:
+					$Item->display_workflow_field( 'status', $Form );
+				}
+
+				if( ! empty( $this->disp_params['show_properties']['user'] ) )
+				{	// Display assigned user:
+					$Item->display_workflow_field( 'user', $Form );
+				}
+
+				if( ! empty( $this->disp_params['show_properties']['priority'] ) )
+				{	// Display priority:
+					$Item->display_workflow_field( 'priority', $Form );
+				}
+
+				if( ! empty( $this->disp_params['show_properties']['deadline'] ) )
+				{	// Display deadline:
+					$Item->display_workflow_field( 'deadline', $Form );
+				}
+
+				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
+
+			echo '</div>';
+			$Form->end_form();
+
+			?>
+			<script>
+			jQuery( '#evo_widget_item_workflow_properties_<?php echo $this->ID;?> a' ).click( function() {
+					jQuery( '#evo_widget_item_workflow_form_<?php echo $this->ID;?>' ).show();
+					jQuery( '#evo_widget_item_workflow_properties_<?php echo $this->ID;?>' ).hide();
+					return false;
+				} );
+			</script>
+			<?php
 		}
 
 		echo $this->disp_params['block_body_end'];
@@ -200,15 +293,11 @@ class item_workflow_Widget extends ComponentWidget
 	 * @param string Value
 	 * @param string Additional attributes
 	 */
-	function display_workflow_property( $title, $value, $value_attrs = '' )
+	function display_workflow_property( $title, $value )
 	{
-		global $ReqURL;
-
-		$value_attrs .= ' href="'.$ReqURL.'#meta-comment-form"';
-
-		echo str_replace( array( '$title$', '$value$', '$value_attrs$' ),
-			array( $title, $value, trim( $value_attrs ) ),
-			$this->disp_params['widget_item_workflow_template'] );
+		echo str_replace( array( '$title$', '$workflow_property_value$' ),
+				array( $title, $value ),
+				$this->disp_params['widget_item_workflow_template'] );
 	}
 
 

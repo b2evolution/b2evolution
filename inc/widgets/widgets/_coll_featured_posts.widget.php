@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -67,7 +67,6 @@ class coll_featured_posts_Widget extends coll_item_list_Widget
 		$r['flagged']['no_edit'] = true;
 		$r['featured']['defaultvalue'] = 'featured';
 		$r['follow_mainlist']['no_edit'] = true;
-		$r['blog_ID']['no_edit'] = true;
 		$r['cat_IDs']['no_edit'] = true;
 		$r['item_group_by']['no_edit'] = true;
 		$r['item_title_link_type']['no_edit'] = true;
@@ -121,7 +120,7 @@ class coll_featured_posts_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Featured Posts');
+		return T_('Featured Posts list');
 	}
 
 

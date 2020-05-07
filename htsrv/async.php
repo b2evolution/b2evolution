@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the handler for asynchronous 'AJAX' calls.
+ * This is the handler for asynchronous 'AJAX' calls. This requires access to the back office.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -71,9 +71,9 @@ $debug_jslog = false;
 $allow_evo_stats = false;
 
 // Init AJAX log
-$Ajaxlog = new Log();
+$ajax_Log = new Log();
 
-$Ajaxlog->add( sprintf( T_('action: %s'), $action ), 'note' );
+ajax_log_add( sprintf( T_('action: %s'), $action ), 'note' );
 
 $incorrect_action = false;
 
@@ -127,7 +127,14 @@ switch( $action )
 			case 'Widget':
 				$WidgetCache = & get_WidgetCache();
 				$Widget = & $WidgetCache->get_by_ID( $plugin_ID );
-				$Plugin = & $Widget->get_Plugin();
+				if( ( $Plugin = & $Widget->get_Plugin() ) )
+				{	// Set abstract type for Widget initialized from Plugin:
+					$set_type = 'PluginWidget';
+				}
+				else
+				{	// This is a normal Widget:
+					$Plugin = $Widget;
+				}
 				$plugin_Object = $Widget;
 				break;
 
@@ -173,7 +180,7 @@ switch( $action )
 		break;
 
 	case 'edit_comment':
-		// Used to edit a comment from back-office (Note: Only for meta comments now!)
+		// Used to edit a comment from back-office (Note: Only for internal comments now!)
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
@@ -186,7 +193,7 @@ switch( $action )
 		// Load Item
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 
-		// Check user permission to edit this meta comment
+		// Check user permission to edit this internal comment
 		$current_User->check_perm( 'meta_comment', 'edit', true, $edited_Comment );
 
 		// Load Blog of the Item
@@ -210,7 +217,7 @@ switch( $action )
 				$rows_approx = round( strlen( $comment_content ) / 200 );
 				$rows_number = substr_count( $comment_content, "\n" );
 				$rows_number = ( ( $rows_number > 3 && $rows_number > $rows_approx ) ? $rows_number : $rows_approx ) + 2;
-				echo '<textarea class="form_textarea_input form-control" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
+				echo '<textarea class="form_textarea_input form-control'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : '' ).'" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
 				// Display a button to Save the changes
 				echo '<input type="button" value="'.T_('Save Changes!').'" class="SaveButton btn btn-primary" onclick="edit_comment( \'update\', '.$edited_Comment->ID.' )" /> ';
 				// Display a button to Cancel the changes
@@ -539,7 +546,7 @@ switch( $action )
 		$field = param( 'field', 'string' );
 		if( ! in_array( $field, array( 'priority', 'status', 'assigned' ) ) )
 		{ // Invalid field
-			$Ajaxlog->add( sprintf( 'Invalid field: %s', $field ), 'error' );
+			ajax_log_add( sprintf( 'Invalid field: %s', $field ), 'error' );
 			break;
 		}
 
@@ -627,6 +634,7 @@ switch( $action )
 
 		$item_order = param( 'new_item_order', 'string' );
 		$post_ID = param( 'post_ID', 'integer' );
+		$blog = param( 'blog', 'integer', 0 );
 		$cat_ID = param( 'cat_ID', 'integer', NULL );
 
 		$ItemCache = & get_ItemCache();
@@ -644,7 +652,7 @@ switch( $action )
 			$item_order = floatval( $item_order );
 		}
 
-		$Item->update_order( $item_order, $cat_ID );
+		$Item->update_order( $item_order, $cat_ID, $blog );
 
 		// Return a link to make the cell editable on next time:
 		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
@@ -1011,6 +1019,90 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info.
 
+	case 'get_item_add_version_form':
+		// Form to add version for the Item:
+
+		$item_ID = param( 'item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_add_version.form.php';
+		break;
+
+	case 'get_link_locale_selector':
+		// Get a selector to link a collection with other collectios which have same main or extra locale as requested
+		param( 'coll_ID', 'integer', true );
+		param( 'coll_locale', 'string' );
+		param( 'field_name', 'string' );
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $coll_ID );
+
+		echo $Blog->get_link_locale_selector( $field_name, $coll_locale, false );
+		break;
+
+	case 'get_item_mass_change_cat_form':
+		// Form to mass change category of Items:
+
+		param( 'blog', 'integer', true );
+		param( 'selected_items', 'array:integer' );
+		param( 'cat_type', 'string' );
+		param( 'redirect_to', 'url', true );
+
+		// Initialize objects for proper displaying of categories selector table:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+		$post_extracats = array();
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_mass_change_cat.form.php';
+		break;
+
+	case 'get_item_mass_change_renderer_form':
+		// Form to mass change renderer of Items:
+
+		param( 'blog', 'integer', true );
+		param( 'selected_items', 'array:integer' );
+		param( 'renderer_change_type', 'string' );
+		param( 'redirect_to', 'url', true );
+
+		// Initialize objects for proper displaying of list of renderers:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_mass_change_renderer.form.php';
+		break;
+
+	case 'clear_itemprecache':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tools' );
+
+		load_funcs( 'tools/model/_maintenance.funcs.php' );
+		dbm_delete_itemprecache();
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;
@@ -1020,11 +1112,7 @@ if( !$incorrect_action )
 {
 	if( $current_debug || $current_debug_jslog )
 	{	// debug is ON
-		$Ajaxlog->display( NULL, NULL, true, 'all',
-						array(
-								'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
-								'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
-							), 'ul', 'jslog' );
+		ajax_log_display();
 	}
 
 	if( $add_response_end_comment )

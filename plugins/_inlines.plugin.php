@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class inlines_plugin extends Plugin
 {
 	var $code = 'evo_inlines';
-	var $name = 'Inlines';
+	var $name = 'Inline Short Tags';
 	var $priority = 50;
 	var $version = '6.9.4';
 	var $group = 'editor';

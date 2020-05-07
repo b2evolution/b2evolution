@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -226,7 +226,8 @@ class Link extends DataObject
 				'after_image_legend'  => '</div>',
 				'after_image'         => '</div>',
 				'image_size'          => 'original',
-				'image_link_to'       => 'original',
+				'image_sizes'         => NULL, // simplified sizes= attribute for browser to select correct size from srcset= -- NULL = no srcset
+				'image_link_to'       => 'original',   // can be URL, can be empty
 				'image_link_title'    => '',	// can be text or #title# or #desc#
 				'image_link_rel'      => '',
 				'image_class'         => '',
@@ -239,6 +240,7 @@ class Link extends DataObject
 				'add_loadimg'         => true,
 			), $params );
 
+// TODO: we should replace this with a cleaner File->get_html_image_block()
 		return $File->get_tag( $params['before_image'],
 				$params['before_image_legend'],
 				$params['after_image_legend'],
@@ -255,7 +257,8 @@ class Link extends DataObject
 				$params['image_size_x'],
 				$params['tag_size'],
 				$params['image_style'],
-				$params['add_loadimg'] );
+				$params['add_loadimg'],
+				$params['image_sizes'] );
 	}
 
 
@@ -523,7 +526,7 @@ class Link extends DataObject
 		$DB->begin();
 
 		$LinkOwner = & $this->get_LinkOwner();
-		if( $LinkOwner && $LinkOwner->type == 'item' && isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
+		if( $LinkOwner && ( $LinkOwner->type == 'item' ) && ( isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) ) )
 		{
 			if( ! $LinkOwner->Item->check_proposed_change_restriction( 'error' ) )
 			{	// If the Link's Item cannot be updated because of proposed change:

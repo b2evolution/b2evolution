@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -144,25 +144,25 @@ function JS_showhide_ffield_on_this( $field_id )
 
 $Form = new Form( NULL, 'files_checkchanges' );
 
-$Form->begin_form( 'fform', T_('File manager settings') );
+$Form->begin_form( 'fform', TB_('File manager settings') );
 
 $Form->add_crumb( 'file' );
 $Form->hidden( 'ctrl', 'fileset' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Accessible file roots').get_manual_link('accessible-file-roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
-	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), T_('Enable blog directories'), T_('Check to enable root directories for blogs.' ) );
-	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), T_('Enable user directories'), T_('Check to enable root directories for users.' ) );
-	$Form->checkbox( 'fm_enable_roots_shared', $Settings->get('fm_enable_roots_shared'), T_('Enable shared directory'), T_('Check to enable shared root directory.' ) );
-	$Form->checkbox( 'fm_enable_roots_skins', $Settings->get('fm_enable_roots_skins'), T_('Enable skins directory'), T_('Check to enable root directory for skins.' ) );	// fp> note: meaning may change to 1 dir per (installed) skin
-	$Form->checkbox( 'fm_enable_roots_plugins', $Settings->get('fm_enable_roots_plugins'), T_('Enable plugins directory'), T_('Check to enable root directory for plugins.' ) );
+$Form->begin_fieldset( TB_('Accessible file roots').get_manual_link('accessible-file-roots'), array( 'id' => 'ffset_fileroots', 'class' => 'additional_file_settings' ) );
+	$Form->checkbox( 'fm_enable_roots_blog', $Settings->get('fm_enable_roots_blog'), TB_('Enable blog directories'), TB_('Check to enable root directories for blogs.' ) );
+	$Form->checkbox( 'fm_enable_roots_user', $Settings->get('fm_enable_roots_user'), TB_('Enable user directories'), TB_('Check to enable root directories for users.' ) );
+	$Form->checkbox( 'fm_enable_roots_shared', $Settings->get('fm_enable_roots_shared'), TB_('Enable shared directory'), TB_('Check to enable shared root directory.' ) );
+	$Form->checkbox( 'fm_enable_roots_skins', $Settings->get('fm_enable_roots_skins'), TB_('Enable skins directory'), TB_('Check to enable root directory for skins.' ) );	// fp> note: meaning may change to 1 dir per (installed) skin
+	$Form->checkbox( 'fm_enable_roots_plugins', $Settings->get('fm_enable_roots_plugins'), TB_('Enable plugins directory'), TB_('Check to enable root directory for plugins.' ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('File creation options').get_manual_link('file-creation-options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
-	$Form->checkbox( 'fm_enable_create_dir', $Settings->get('fm_enable_create_dir'), T_('Enable creation of folders'), T_('Check to enable creation of directories.' ) );
-	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), T_('Enable creation of files'), T_('Check to enable creation of files.' ) );
-	$Form->checkbox_input( 'upload_enabled', $Settings->get( 'upload_enabled', true ), T_('Enable upload of files'), array(
-		'note' => T_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
+$Form->begin_fieldset( TB_('File creation options').get_manual_link('file-creation-options'), array( 'id' => 'ffset_filecreate', 'class' => 'additional_file_settings' ) );
+	$Form->checkbox( 'fm_enable_create_dir', $Settings->get('fm_enable_create_dir'), TB_('Enable creation of folders'), TB_('Check to enable creation of directories.' ) );
+	$Form->checkbox( 'fm_enable_create_file', $Settings->get('fm_enable_create_file'), TB_('Enable creation of files'), TB_('Check to enable creation of files.' ) );
+	$Form->checkbox_input( 'upload_enabled', $Settings->get( 'upload_enabled', true ), TB_('Enable upload of files'), array(
+		'note' => TB_('Check to allow uploading files in general.' ), 'onclick' => JS_showhide_ffield_on_this('upload_maxkb') ) );
 
 	load_funcs( 'tools/model/_system.funcs.php' );
 	$upload_max_filesize = get_php_bytes_size( ini_get( 'upload_max_filesize' ) );
@@ -175,18 +175,18 @@ $Form->begin_fieldset( T_('File creation options').get_manual_link('file-creatio
 		$upload_maxkb_before_note = '<span class="red">';
 		$upload_maxkb_after_note = '</span>';
 	}
-	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, T_('Maximum upload filesize'), $upload_maxkb_before_note.sprintf( /* TRANS: first %s is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ T_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s)!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)' ).$upload_maxkb_after_note, array( 'maxlength'=>7, 'required'=>true ) );
+	$Form->text_input( 'upload_maxkb', $Settings->get('upload_maxkb'), 6, TB_('Maximum upload filesize'), $upload_maxkb_before_note.sprintf( /* TRANS: first %s is php.ini limit, second is setting/var name, third is file name, 4th is limit in b2evo conf */ TB_('KB. This cannot be higher than your PHP/Webserver setting (PHP: %s)!'), ini_get('upload_max_filesize').'/'.ini_get('post_max_size').' (upload_max_filesize/post_max_size)' ).$upload_maxkb_after_note, array( 'maxlength'=>7, 'required'=>true ) );
 	// Javascript to init hidden/shown state:
 	echo JS_showhide_ffield_on_checkbox( 'upload_maxkb', 'upload_enabled' );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Advanced options').get_manual_link('advanced-file-options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
+$Form->begin_fieldset( TB_('Advanced options').get_manual_link('advanced-file-options'), array( 'id' => 'ffset_fileadvanced', 'class' => 'additional_file_settings' ) );
 
-	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Permissions for new folders'), T_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
+	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, TB_('Permissions for new folders'), TB_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
 
 	// fp> Does the following also apply to *uploaded* files? (It should)
 	// yb> Yes, I tested on December 8, 2018, ver. 6.10.4-stable, branch "develop".
-	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Permissions for new files'), T_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
+	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, TB_('Permissions for new files'), TB_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
 
 	if( empty( $force_regexp_filename ) || empty( $force_regexp_dirname ) )
 	{ // At least one of these strings can be configured in the UI:
@@ -197,8 +197,8 @@ $Form->begin_fieldset( T_('Advanced options').get_manual_link('advanced-file-opt
 			$Form->text( 'regexp_filename',
 											$Settings->get('regexp_filename'),
 											40,
-											T_('Valid filename'),
-											T_('Regular expression'),
+											TB_('Valid filename'),
+											TB_('Regular expression'),
 											255 );
 		}
 		// Do not display regexp for dirname if the force_regexp_dirname var is set
@@ -207,36 +207,36 @@ $Form->begin_fieldset( T_('Advanced options').get_manual_link('advanced-file-opt
 			$Form->text( 'regexp_dirname',
 											$Settings->get('regexp_dirname'),
 											40,
-											T_('Valid dirname'),
-											T_('Regular expression'),
+											TB_('Valid dirname'),
+											TB_('Regular expression'),
 											255 );
 		}
 	}
 
 	$Form->radio_input( 'evocache_foldername', $Settings->get( 'evocache_foldername' ), array(
-						array( 'value' => '.evocache', 'label' => T_('Use .evocache folders (system hidden folders)') ),
-						array( 'value' => '_evocache', 'label' => T_('Use _evocache folders (compatible with all webservers)') ) ), T_('Cache folder names'), array( 'lines' => 2 ) );
+						array( 'value' => '.evocache', 'label' => TB_('Use .evocache folders (system hidden folders)') ),
+						array( 'value' => '_evocache', 'label' => TB_('Use _evocache folders (compatible with all webservers)') ) ), TB_('Cache folder names'), array( 'lines' => 2 ) );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Image options').get_manual_link( 'image-options' ) );
+$Form->begin_fieldset( TB_('Image options').get_manual_link( 'image-options' ) );
 
-	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), T_('Use EXIF info in photos'), T_('Use orientation tag to automatically rotate thumbnails to upright position.') );
+	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), TB_('Use EXIF info in photos'), TB_('Use orientation tag to automatically rotate thumbnails to upright position.') );
 
-	$Form->begin_line( T_('Resize large images after upload'), 'fm_resize_enable' );
+	$Form->begin_line( TB_('Resize large images after upload'), 'fm_resize_enable' );
 		$Form->checkbox( 'fm_resize_enable', $Settings->get( 'fm_resize_enable' ), '' );
-		$Form->text( 'fm_resize_width', $Settings->get( 'fm_resize_width' ), 4, ' &nbsp; '.T_('Fit to') );
+		$Form->text( 'fm_resize_width', $Settings->get( 'fm_resize_width' ), 4, ' &nbsp; '.TB_('Fit to') );
 		$Form->text( 'fm_resize_height', $Settings->get( 'fm_resize_height' ), 4, ' x ' );
-		$Form->text( 'fm_resize_quality', $Settings->get( 'fm_resize_quality' ), 3, T_('pixels').' &nbsp; ' );
-	$Form->end_line( ' % '.T_('quality') );
+		$Form->text( 'fm_resize_quality', $Settings->get( 'fm_resize_quality' ), 3, TB_('pixels').' &nbsp; ' );
+	$Form->end_line( ' % '.TB_('quality') );
 
 $Form->end_fieldset();
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Form->buttons( array(
-			array( 'submit', 'submit[update]', T_('Save Changes!'), 'SaveButton' ),
-			array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
+			array( 'submit', 'submit[update]', TB_('Save Changes!'), 'SaveButton' ),
+			array( 'submit', 'submit[restore_defaults]', TB_('Restore defaults'), 'ResetButton' ),
 		) );
 }
 
@@ -244,8 +244,8 @@ $Form->end_form();
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {	// TODO: better perm check
-	echo '<p class="note">'.T_('See also:').' ';
-	echo T_('Blog Settings').' &gt; '.T_('Advanced').' &gt; '.T_('Media directory location');
+	echo '<p class="note">'.TB_('See also:').' ';
+	echo TB_('Blog Settings').' &gt; '.TB_('Advanced').' &gt; '.TB_('Media directory location');
 }
 
 ?>

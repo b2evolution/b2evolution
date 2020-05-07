@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -86,6 +86,9 @@ function skin_init( $disp )
 		// Exit here.
 	}
 
+	// Initialize site skin if it is enabled:
+	siteskin_init();
+
 	// This is the main template; it may be used to display very different things.
 	// Do inits depending on current $disp:
 	switch( $disp )
@@ -94,10 +97,12 @@ function skin_init( $disp )
 		case 'posts':
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 		case 'download':
 		case 'feedback-popup':
 		case 'flagged':
+		case 'mustread':
 			// We need to load posts for this display:
 
 			if( $disp == 'flagged' && ! is_logged_in() )
@@ -106,6 +111,30 @@ function skin_init( $disp )
 				$disp = '403';
 				$Messages->add( T_('You must log in before you can see your flagged content.'), 'error' );
 				break;
+			}
+
+			if( $disp == 'mustread' )
+			{	// Check access to "must read" content:
+				if( ! is_logged_in() )
+				{	// Forbid access to "must read" content for not logged in users:
+					header_redirect( get_login_url( 'no access to must read content', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
+					// Exit here.
+				}
+				if( ! is_pro() )
+				{	// Forbid access for not PRO version:
+					global $disp, $disp_detail;
+					$disp = '404';
+					$disp_detail = '404-not-supported';
+					$Messages->add( T_('"Must Read" is supported only on b2evolution PRO.'), 'error' );
+					break;
+				}
+				if( ! $Blog->get_setting( 'track_unread_content' ) )
+				{	// Forbid access to "must read" content if collection doesn't track unread content:
+					global $disp;
+					$disp = '404';
+					$Messages->add( T_('This feature only works when <b>Tracking of unread content</b> is enabled.'), 'error' );
+					break;
+				}
 			}
 
 			if( $disp == 'terms' )
@@ -129,6 +158,8 @@ function skin_init( $disp )
 			{	// If we are currently viewing a single post
 				// We assume the current user will have read the entire post and all its current comments:
 				$single_Item->update_read_timestamps( true, true );
+				// Add tags to the current User from the viewing Item:
+				$single_Item->tag_user();
 				// Restart the items list:
 				$MainList->restart();
 			}
@@ -148,6 +179,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 			if( $disp == 'terms' && ! $Item )
 			{	// Wrong post ID for terms page:
@@ -179,8 +211,15 @@ function skin_init( $disp )
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview &&
+			    is_pro() &&
+			    $Item->get_setting( 'external_canonical_url' ) &&
+			    $Item->get( 'url' ) != '' )
+			{	// Use post link to URL as an External Canonical URL:
+				add_headline( '<link rel="canonical" href="'.format_to_output( $Item->get( 'url' ), 'htmlattr' ).'" />' );
+			}
+			elseif( ! $preview &&
 			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-			      || $Blog->get_setting( 'relcanonical_item_urls' ) 
+			      || $Blog->get_setting( 'relcanonical_item_urls' )
 			      || $Blog->get_setting( 'self_canonical_item_urls' )
 			    ) )
 			{	// We want to redirect to the Item's canonical URL:
@@ -197,11 +236,8 @@ function skin_init( $disp )
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
 					$canonical_url = $main_canonical_url;
 				}
-				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
-				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
-				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
-					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
-				}
+				// Keep ONLY allowed noredir params from current URL in the canonical URL:
+				$canonical_url = url_clear_noredir_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
 						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
@@ -223,10 +259,8 @@ function skin_init( $disp )
 							continue;
 						}
 						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
-						if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
-						{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
-							$cat_canonical_url = url_add_param( $cat_canonical_url, implode( '&', $page_param[1] ), '&' );
-						}
+						// Keep ONLY allowed noredir params from current URL in the category canonical URL:
+						$cat_canonical_url = url_clear_noredir_params( $cat_canonical_url );
 						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{	// We have found the same URL, stop find another and stay on the current page without redirect:
 							break;
@@ -272,11 +306,9 @@ function skin_init( $disp )
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
-					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
-					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
-					    ) )
+					    ! $Item->stay_in_cross_posted_collection( 'auto', $Blog->ID ) ) // If the Item cannot stay in the current Collection
 					{	// REDIRECT TO THE CANONICAL URL:
-						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
+						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].', 'request' );
 						header_redirect( $canonical_url, true );
 						// EXITED.
 					}
@@ -291,8 +323,9 @@ function skin_init( $disp )
 				}
 			}
 
-			if( ! $MainList->result_num_rows )
-			{	// There is nothing to display for this page, don't index it!
+			if( $Blog->get_setting( 'single_noindex' ) || ! $MainList->result_num_rows )
+			{	// We prefer robots not to index these pages,
+				// OR There is nothing to display for this page, don't index it!
 				$robots_index = false;
 			}
 			break;
@@ -469,14 +502,6 @@ function skin_init( $disp )
 							$MainList->nav_target = $cat;
 						}
 
-						if( empty( $Chapter ) )
-						{	// If the requested chapter was not found display 404 page:
-							$Messages->add( T_('The requested chapter was not found') );
-							global $disp;
-							$disp = '404';
-							break;
-						}
-
 						if( has_featured_Item() )
 						{	// If current category has Intro post:
 							$disp_detail .= '-intro';
@@ -485,6 +510,14 @@ function skin_init( $disp )
 						else
 						{	// If current category has no Intro post:
 							$disp_detail .= '-nointro';
+						}
+
+						if( empty( $Chapter ) )
+						{	// If the requested chapter was not found display 404 page:
+							$Messages->add( T_('The requested chapter was not found') );
+							global $disp;
+							$disp = '404';
+							break;
 						}
 					}
 				}
@@ -1197,12 +1230,9 @@ function skin_init( $disp )
 
 				// User is already logged in, redirect to "redirect_to" page
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
-				$redirect_to = param( 'redirect_to', 'url', NULL );
-				if( empty( $redirect_to ) )
-				{ // If empty redirect to referer page
-					$redirect_to = '';
-				}
-				header_redirect( $redirect_to, 302 );
+				$redirect_to = param( 'redirect_to', 'url', '' );
+				$forward_to = param( 'forward_to', 'url', $redirect_to );
+				header_redirect( $forward_to, 302 );
 				// will have exited
 			}
 
@@ -1233,9 +1263,11 @@ function skin_init( $disp )
 			check_https_url( 'login' );
 
 			if( is_logged_in() )
-			{ // If user is logged in the register form should not be displayed. In this case redirect to the blog home page.
+			{	// If user is logged in the register form should not be displayed,
+				// Redirect to the collection home page or to a specified url:
 				$Messages->add( T_( 'You are already logged in' ).'.', 'note' );
-				header_redirect( $Blog->gen_blogurl(), false );
+				$forward_to = param( 'forward_to', 'url', $Blog->gen_blogurl() );
+				header_redirect( $forward_to );
 			}
 
 			if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $Blog ) && $Blog->ID != $login_Blog->ID )
@@ -1352,6 +1384,7 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'social':
 		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
@@ -1461,7 +1494,7 @@ function skin_init( $disp )
 
 		case 'edit':
 		case 'proposechange':
-			global $current_User, $post_ID;
+			global $current_User, $post_ID, $admin_url;
 
 			// Post ID, go from $_GET when we edit a post from Front-office
 			//          or from $_POST when we switch from Back-office
@@ -1500,7 +1533,6 @@ function skin_init( $disp )
 				$error_message = T_('Since this blog has no categories, you cannot post into it.');
 				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 				{ // If current user has a permission to create a category
-					global $admin_url;
 					$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID.'"');
 				}
 				$Messages->add( $error_message, 'error' );
@@ -1745,6 +1777,57 @@ function skin_init( $disp )
 			break;
 	}
 
+	// NOTE: Call the update item read status only after complete initialization of $disp_detail in the code above,
+	//       because the $disp_detail is used to select correct intro Item:
+	if( ( $disp == 'posts' || $disp == 'front' ) &&
+	    ( $featured_intro_Item = & get_featured_Item( $disp, NULL, true ) ) )
+	{	// We assume the current user will have read the entire intro Item and all its current comments:
+		$featured_intro_Item->update_read_timestamps( true, true );
+	}
+
+	// Enable shortcut keys:
+	if( is_logged_in() )
+	{
+		init_hotkeys_js( 'blog' );
+	}
+
+	// Add hreflang tags for Items with several versions:
+	if( $version_Item = & get_current_Item() )
+	{	// If current Item is detected
+		$other_version_items = $version_Item->get_other_version_items();
+		if( ! empty( $other_version_items ) )
+		{	// If at least one other version exists for current Item:
+			// Add also current Item as first:
+			array_unshift( $other_version_items, $version_Item );
+			$other_version_locales = array();
+			$version_lang_keys = array();
+			foreach( $other_version_items as $o => $other_version_Item )
+			{	// Check to exclude what items cannot be displayed for hreflang tag:
+				if( in_array( $other_version_Item->get( 'locale' ), $other_version_locales ) ||
+				    ! $other_version_Item->can_be_displayed() )
+				{	// Don't add hreflang tag with same locale
+					// or if the Item cannot be displayed for current user on front-office
+					unset( $other_version_items[ $o ] );
+				}
+				$other_version_locales[] = $other_version_Item->get( 'locale' );
+				// Count different country locales with same language:
+				$version_lang_key = substr( $other_version_Item->get( 'locale' ), 0, 2 );
+				$version_lang_keys[ $version_lang_key ] = isset( $version_lang_keys[ $version_lang_key ] ) ? true : false;
+			}
+			if( count( $other_version_items ) > 1 )
+			{	// Add hreflang tag only when at least two Items can be displayed:
+				foreach( $other_version_items as $other_version_Item )
+				{
+					$version_lang_key = substr( $other_version_Item->get( 'locale' ), 0, 2 );
+					add_headline( '<link rel="alternate" '
+						// Use only language code like 'en' when it is a single, otherwise use full locale code with country code like 'en-US':
+						.'hreflang="'.format_to_output( ( $version_lang_keys[ $version_lang_key ] ? $other_version_Item->get( 'locale' ) : $version_lang_key ), 'htmlattr' ).'" '
+						.'href="'.format_to_output( $other_version_Item->get_permanent_url( '', '', '&' ), 'htmlattr' ).'">' );
+				}
+			}
+		}
+	}
+
 	if( $Blog->get_setting( 'front_disp' ) == $disp )
 	{	// This is the default/front collection page:
 		$seo_page_type = 'Default page';
@@ -1818,15 +1901,64 @@ function skin_init( $disp )
 	}
 }
 
+
+/**
+ * Get site Skin global object
+ *
+ * @return object Site Skin
+ */
+function & get_site_Skin()
+{
+	global $site_Skin;
+
+	if( ! isset( $site_Skin ) )
+	{	// Initialize site Skin only first time:
+
+		global $Settings;
+		if( ! $Settings->get( 'site_skins_enabled' ) )
+		{	// Site skins are not enabled:
+			$site_Skin = NULL;
+			return $site_Skin;
+		}
+
+		global $Session;
+		if( ! empty( $Session ) )
+		{	// Get site skin Id depending on current session:
+			if( $Session->is_mobile_session() )
+			{	// Mobile session:
+				$skin_ID = $Settings->get( 'mobile_skin_ID' );
+			}
+			elseif( $Session->is_tablet_session() )
+			{	// Tablet session:
+				$skin_ID = $Settings->get( 'tablet_skin_ID' );
+			}
+			elseif( $Session->is_alt_session() )
+			{	// Session for alternative skin:
+				$skin_ID = $Settings->get( 'alt_skin_ID' );
+			}
+		}
+		if( empty( $skin_ID ) )
+		{	// Use normal skin ID by default when mobile, tablet and alt skins are not defined for site:
+			$skin_ID = $Settings->get( 'normal_skin_ID' );
+		}
+
+		// Try to get site Skin from DB by ID:
+		$SkinCache = & get_SkinCache();
+		$site_Skin = $SkinCache->get_by_ID( $skin_ID, false, false );
+	}
+
+	return $site_Skin;
+}
+
+
+/**
+ * Initalize site Skin
+ */
 function siteskin_init()
 {
-	// The following is temporary and should be moved to some SiteSkin class
-	global $Settings;
-
-	if( $Settings->get( 'site_skins_enabled' ) )
-	{ // Site skins are enabled
-		// Include the additional required files
-		siteskin_include( '_skin_init.inc.php' );
+	if( $site_Skin = & get_site_Skin() )
+	{	// Initialize site skin:
+		$site_Skin->siteskin_init();
 	}
 }
 
@@ -1957,6 +2089,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_edit_comment'          => '_edit_comment.disp.php',
 				'disp_feedback-popup'        => '_feedback_popup.disp.php',
 				'disp_flagged'               => '_flagged.disp.php',
+				'disp_mustread'              => '_mustread.disp.php',
 				'disp_front'                 => '_front.disp.php',
 				'disp_help'                  => '_help.disp.php',
 				'disp_login'                 => '_login.disp.php',
@@ -1966,6 +2099,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_module_form'           => '_module_form.disp.php',
 				'disp_msgform'               => '_msgform.disp.php',
 				'disp_page'                  => '_page.disp.php',
+				'disp_widget_page'           => '_widget_page.disp.php',
 				'disp_postidx'               => '_postidx.disp.php',
 				'disp_posts'                 => '_posts.disp.php',
 				'disp_profile'               => '_profile.disp.php',
@@ -1989,6 +2123,11 @@ function skin_include( $template_name, $params = array() )
 				'disp_users'                 => '_users.disp.php',
 				'disp_compare'               => '_compare.disp.php',
 			);
+
+		if( is_pro() )
+		{	// Additional disp handler for PRO version:
+			$disp_handlers['disp_social'] = '_profile.disp.php';
+		}
 
 		// Add plugin disp handlers:
 		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetHandledDispModes' ) )
@@ -2033,7 +2172,8 @@ function skin_include( $template_name, $params = array() )
 			if( ! empty( $item_type_template_name ) )
 			{	// The item type has a specific template for this display:
 				$item_type_template_name = '_'.$item_type_template_name.'.disp.php';
-				if( file_exists( $ads_current_skin_path.$item_type_template_name ) ||
+				if( ( $Skin->get_api_version() == 7 && file_exists( $ads_current_skin_path.$Blog->get( 'type' ).'/'.$item_type_template_name ) ) ||
+						file_exists( $ads_current_skin_path.$item_type_template_name ) ||
 						skin_fallback_path( $item_type_template_name ) )
 				{	// Use template file name of the Item Type only if it exists:
 					$template_name = $item_type_template_name;
@@ -2048,6 +2188,12 @@ function skin_include( $template_name, $params = array() )
 	{ // This disp mode is handled by a plugin:
 		$debug_info = 'Call plugin';
 		$disp_handled = 'plugin';
+	}
+	elseif( $Skin->get_api_version() == 7 && file_exists( $ads_current_skin_path.$Blog->get( 'type' ).'/'.$template_name ) )
+	{ // The skin has a customized handler, use that one instead:
+		$file = $ads_current_skin_path.$Blog->get( 'type' ).'/'.$template_name;
+		$debug_info = '<b>Theme template for collection kind</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'custom';
 	}
 	elseif( file_exists( $ads_current_skin_path.$template_name ) )
 	{ // The skin has a customized handler, use that one instead:
@@ -2137,12 +2283,21 @@ function skin_fallback_path( $template_name, $skin_api_version = NULL )
 	global $Skin, $basepath;
 
 	if( $skin_api_version === NULL && ! empty( $Skin ) )
-	{ // Get API version of the current skin
+	{	// Get API version of the current skin:
 		$skin_api_version = $Skin->get_api_version();
 	}
 
-	if( $skin_api_version == 6 )
-	{ // Check fallback file for v6 API skin
+	if( $skin_api_version == 7 )
+	{	// Check fallback file for v7 API skin:
+		$fallback_path = $basepath.'skins_fallback_v7/'.$template_name;
+		if( file_exists( $fallback_path ) )
+		{
+			return $fallback_path;
+		}
+	}
+
+	if( $skin_api_version >= 6 )
+	{	// Check fallback file for v6 API skin:
 		$fallback_path = $basepath.'skins_fallback_v6/'.$template_name;
 		if( file_exists( $fallback_path ) )
 		{
@@ -2150,7 +2305,7 @@ function skin_fallback_path( $template_name, $skin_api_version = NULL )
 		}
 	}
 
-	// Check fallback file for v5 API skin
+	// Check fallback file for v5 API skin:
 	$fallback_path = $basepath.'skins_fallback_v5/'.$template_name;
 	if( file_exists( $fallback_path ) )
 	{
@@ -2190,14 +2345,13 @@ function skin_template_path( $template_name )
  *
  * @param string Template name
  * @param array Params
- * @param boolean force include even if sitewide header/footer not enabled
  */
-function siteskin_include( $template_name, $params = array(), $force = false )
+function siteskin_include( $template_name, $params = array() )
 {
-	global $Settings, $siteskins_path, $Collection, $Blog;
+	global $Settings, $skins_path, $Collection, $Blog, $baseurl;
 
-	if( !$Settings->get( 'site_skins_enabled' ) && !$force )
-	{ // Site skins are not enabled and we don't want to force either
+	if( ! $Settings->get( 'site_skins_enabled' ) )
+	{	// Site skins are not enabled:
 		return;
 	}
 
@@ -2219,20 +2373,23 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 	$timer_name = 'siteskin_include('.$template_name.')';
 	$Timer->resume( $timer_name );
 
-	if( file_exists( $siteskins_path.'custom/'.$template_name ) )
-	{ // Use the custom template:
-		$file = $siteskins_path.'custom/'.$template_name;
-		$debug_info = '<b>Custom template</b>: '.rel_path_to_base($file);
-		$disp_handled = 'custom';
+	// Get site Skin:
+	$site_Skin = & get_site_Skin();
+
+	if( $site_Skin && file_exists( $site_Skin->get_path().$template_name ) )
+	{	// Use site skin template:
+		$file = $site_Skin->get_path().$template_name;
+		$debug_info = '<b>Site Skin template</b>: '.rel_path_to_base( $file );
+		$disp_handled = 'skin';
 	}
-	elseif( file_exists( $siteskins_path.$template_name ) ) // Try to include standard template only if custom template doesn't exist
-	{ // Use the default/fallback template:
-		$file = $siteskins_path.$template_name;
-		$debug_info = '<b>Fallback to</b>: '.rel_path_to_base($file);
+	elseif( $fallback_template_path = skin_fallback_path( $template_name ) )
+	{	// Use the default/fallback template:
+		$file = $fallback_template_path;
+		$debug_info = '<b>Site Skin Fallback to</b>: '.rel_path_to_base( $file );
 		$disp_handled = 'fallback';
 	}
 	else
-	{
+	{	// Site skin is wrong or the requested template file is not found in current site skin:
 		$disp_handled = false;
 	}
 
@@ -2251,30 +2408,25 @@ function siteskin_include( $template_name, $params = array(), $force = false )
 		$display_includes = false;
 	}
 	if( $display_includes )
-	{ // Wrap the include with a visible div:
+	{	// Wrap the include with a visible div:
 		echo '<div class="dev-blocks dev-blocks--siteinclude">';
 		echo '<div class="dev-blocks-name">siteskin_include( <b>'.$template_name.'</b> ) -> '.$debug_info.'</div>';
 	}
 
 
-	if($disp_handled)
-	{
-		$Debuglog->add('siteskin_include: '.rel_path_to_base($file), 'skins');
+	if( $disp_handled )
+	{	// Include site skin template file:
+		$Debuglog->add('siteskin_include: '.rel_path_to_base( $file ), 'skins');
 		require $file;
 	}
 	else
-	{	// nothing handled the display
-		printf( '<div class="skin_error">Site template [%s] not found.</div>', $template_name );
-		if( !empty($current_User) && $current_User->level == 10 )
-		{
-			printf( '<div class="skin_error">User level 10 help info: [%s]</div>', $siteskins_path.$template_name );
-		}
+	{	// Nothing handled the display:
+		printf( '<div class="skin_error">Site skin template [%s] not found.</div>', $template_name );
 	}
 
 
 	if( $display_includes )
-	{ // End of visible container:
-		// echo get_icon( 'pixel', 'imgtag', array( 'class' => 'clear' ) );
+	{	// End of visible container:
 		echo '</div>';
 	}
 
@@ -2337,7 +2489,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+	elseif( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-topcat-nointro', 'posts-subcat-intro', 'posts-subcat-nointro' ) ) )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
@@ -2407,6 +2559,29 @@ function skin_keywords_tag()
 	if( !empty($r) )
 	{
 		echo '<meta name="keywords" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
+	}
+}
+
+
+/**
+ * Template tag
+ *
+ * Note for future mods: we do NOT want to repeat identical content on multiple pages.
+ */
+function skin_favicon_tag()
+{
+	global $Collection, $Blog;
+
+	if( ! empty( $Blog ) )
+	{
+		if( $favicon_File = $Blog->get( 'collection_favicon') )
+		{
+			if( $favicon_File->exists() && $favicon_File->is_image() )
+			{
+				$favicon_Filetype = $favicon_File->get_Filetype();
+				echo sprintf( '<link rel="icon" type="%s" href="%s">', $favicon_Filetype->mimetype, $favicon_File->get_url() );
+			}
+		}
 	}
 }
 
@@ -2586,6 +2761,148 @@ function skin_twitter_tags()
 
 
 /**
+ * Add structured data markup using JSON-LD format
+ */
+function skin_structured_data()
+{
+	global $Collection, $Blog, $disp, $MainList;
+
+	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_structured_data' ) )
+	{ // Structured data markup is not allowed
+		return;
+	}
+
+	switch( $disp )
+	{
+		case 'single':
+		case 'page':
+			$Item = & $MainList->get_by_idx( 0 );
+			$creative_works_schema = array( 'Article', 'WebPage', 'BlogPosting', 'ImageGallery', 'DiscussionForumPosting', 'TechArticle', 'Review' );
+			$products_schema = array( 'Product' );
+
+			if( $Item && ( $item_schema = $Item->get_type_setting( 'schema' ) ) )
+			{
+				$markup = array(
+					'@context' => 'http://schema.org',
+					'@type' => $item_schema,
+				);
+
+				// Markup for CreativeWork schema:
+				if( in_array( $item_schema, $creative_works_schema ) )
+				{
+					$markup['mainEntityOfPage'] = array(
+							'@type' => 'WebPage',
+							'@id' => $Item->get_permanent_url(),
+						);
+					$markup['headline'] = $Item->title;
+					$markup['datePublished'] = date( 'c', mysql2timestamp( $Item->datestart ) );
+					$markup['dateModified'] = date( 'c', mysql2timestamp( $Item->datemodified ) );
+					$markup['author'] = array(
+							'@type' => 'Person',
+							'name' => $Item->get_creator_User()->get_preferred_name(),
+						);
+					$markup['description'] = $Item->get_excerpt();
+
+					// Get publisher info:
+					$FileCache = & get_FileCache();
+					$publisher_name = $Blog->get_setting( 'publisher_name' );
+					$publisher_logo_file_ID = $Blog->get_setting( 'publisher_logo_file_ID' );
+					$publisher_logo_File = & $FileCache->get_by_ID( $publisher_logo_file_ID, false, false );
+					if( $publisher_logo_File && $publisher_logo_File->is_image() )
+					{
+						$publisher_logo_url = $publisher_logo_File->get_url();
+					}
+					if( empty( $publisher_logo_url ) )
+					{ // No publisher logo found, fallback to collection logo:
+						$collection_logo_file_ID = $Blog->get_setting( 'collection_logo_file_ID' );
+						$collection_logo_File = & $FileCache->get_by_ID( $collection_logo_file_ID, false, false );
+						if( $collection_logo_File && $collection_logo_File->is_image() )
+						{
+							$publisher_logo_url = $collection_logo_File->get_url();
+							$publisher_logo_File = $collection_logo_File;
+						}
+					}
+
+					if( ! empty( $publisher_name ) || ! empty( $publisher_logo_url ) )
+					{ // Add publisher data to markup:
+						$markup['publisher'] = array( '@type' => 'Organization' );
+						if( ! empty( $publisher_name ) )
+						{
+							$markup['publisher']['name'] = $publisher_name;
+						}
+						if( ! empty( $publisher_logo_url ) )
+						{
+							$markup['publisher']['logo'] = array(
+									'@type' => 'ImageObject',
+									'url' => $publisher_logo_url,
+									'height' => $publisher_logo_File->get_image_size( 'height' ).'px',
+									'width' => $publisher_logo_File->get_image_size( 'width' ).'px',
+								);
+						}
+					}
+
+					// Add article image:
+					$article_image_File = get_social_media_image( $Item );
+					if( $article_image_File )
+					{
+						$markup['image'] = $article_image_File->get_url();
+					}
+				}
+
+				// Markup for Product schema:
+				if( in_array( $item_schema, $products_schema ) )
+				{
+					$markup['name'] = $Item->title;
+					$product_image_File = get_social_media_image( $Item );
+					if( $product_image_File )
+					{
+						$markup['image'] = $product_image_File->get_url();
+					}
+
+					// Add product description:
+					$markup['description'] = $Item->get_excerpt();
+				}
+
+				if( $Item->get_type_setting( 'add_aggregate_rating' ) )
+				{ // Add aggregate rating:
+					list( $ratings, $active_ratings ) = $Item->get_ratings();
+					if( $ratings['all_ratings'] > 0 )
+					{
+						$markup['aggregateRating'] = array(
+								'@type' => 'AggregateRating',
+								'ratingValue' => round( $ratings["summary"] / $ratings['all_ratings'], 2 ),
+								'ratingCount' => $ratings['all_ratings'],
+							);
+					}
+				}
+
+				// Add markup from custom fields:
+				$custom_fields = $Item->get_custom_fields_defs();
+				$custom_markup = array();
+				foreach( $custom_fields as $custom_field )
+				{
+					if( ! empty( $custom_field['schema_prop'] ) )
+					{
+						$custom_markup = array_merge_recursive( $custom_markup, convert_path_to_array( $custom_field['schema_prop'], $custom_field['value'] ) );
+					}
+				}
+				$markup = array_merge( $markup, $custom_markup );
+
+				// Output the markup:
+				echo '<!-- Start of Structured Data -->'."\n";
+				echo '<script type="application/ld+json">'."\n";
+				echo json_encode( $markup, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES )."\n";
+				echo '</script>'."\n";
+				echo '<!-- End of Structured Data -->'."\n";
+			}
+			break;
+
+		default:
+			// Do nothing
+	}
+}
+
+/**
  * Sends the desired HTTP response header in case of a "404".
  */
 function skin_404_header()
@@ -2686,18 +3003,207 @@ function skin_widget( $params )
 
 
 /**
+ * Display a widget container
+ *
+ * @param string Container code
+ * @param array Additional params
+ */
+function widget_container( $container_code, $params = array() )
+{
+	global $Blog, $Skin;
+
+	$params = array_merge( array(
+			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+			'container_start' => '<div class="evo_container $wico_class$">',
+			'container_end'   => '</div>',
+			// Restriction for Page Containers:
+			'container_item_ID' => NULL,
+			// Default params for widget blocks:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end'   => '</div>',
+		), $params );
+
+	// Try to find widget container by code for current collection and skin type:
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $Blog->ID, $Blog->get_skin_type(), $container_code );
+
+	if( ! $WidgetContainer )
+	{	// Display error if widget container is not detected in DB by requested code:
+		echo '<div class="text-danger">'
+				.sprintf( T_('Requested widget container %s does not exist for current collection #%d and skin type %s!'),
+					'<code>'.$container_code.'</code>', $Blog->ID, '<code>'.$Blog->get_skin_type().'</code>' )
+			.'</div>';
+		// Exit because we cannot display widgets without container:
+		return;
+	}
+
+	// Pass WidgetContainer object:
+	$params['WidgetContainer'] = $WidgetContainer;
+
+	$Skin->container( $WidgetContainer->get( 'name' ), $params, $container_code );
+}
+
+
+/**
+ * Display all widget containers for the requested Item
+ *
+ * @param integer Item ID
+ * @param array Additional widget container params
+ */
+function widget_page_containers( $item_ID, $params = array() )
+{
+	global $Blog;
+
+	if( empty( $Blog ) )
+	{	// Skip wrong reuqest without current Collection:
+		return;
+	}
+
+	// Try to find widget container by code for current collection and skin type:
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	$widget_containers = $WidgetContainerCache->get_by_coll_skintype( $Blog->ID, $Blog->get_skin_type() );
+
+	if( empty( $widget_containers ) )
+	{	// No widget containers for current Collection and skin type:
+		return;
+	}
+
+	// Set params for widget page containers:
+	$params = array_merge( $params, array(
+			// Signal that we are displaying within an Item:
+			'widget_context' => 'item',
+			// Restrict Page Container with these item ID and item type ID:
+			'container_item_ID' => $item_ID,
+		) );
+
+	foreach( $widget_containers as $WidgetContainer )
+	{
+		if( $WidgetContainer->get_type() == 'page' &&
+		    $WidgetContainer->get( 'item_ID' ) == $item_ID )
+		{	// Display only widget page container for the requested Item:
+			widget_container( $WidgetContainer->get( 'code' ), $params );
+		}
+	}
+}
+
+
+/**
+ * Customize params with widget container properties on designer mode;
+ * Replace variables/masks in params with widget container properties;
+ * possible variables/masks in params:
+ *     - $wico_class$ - Widget container class
+ *
+ * @param array Params with variables/masks
+ * @param string Container code
+ * @param string Container name
+ * @return array Params with replaced values instead of source variables
+ */
+function widget_container_customize_params( $params, $wico_code, $wico_name )
+{
+	global $Collection, $Blog, $Session, $current_User;
+
+	$params = array_merge( array(
+			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
+			'container_start' => '',
+			'container_end'   => '',
+		), $params );
+
+	// Enable the desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode"
+	if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
+	{	// Initialize hidden element with data which are used by JavaScript to build overlay designer mode html elements:
+		if( $wico_code === NULL )
+		{	// Display error if container cannot be detected in DB by name:
+			echo ' <span class="text-danger">'.sprintf( T_('Container "%s" cannot be manipulated because it lacks a code name in the skin template.'), $wico_name ).'</span> ';
+		}
+		elseif( preg_match( '#<[^>]+evo_container[^>]+>#', $params['container_start'], $container_start_wrapper ) )
+		{	// If container start param has a wrapper like '<div class="evo_container">':
+			$designer_mode_data = array(
+					'data-name' => $wico_name,
+					'data-code' => $wico_code,
+				);
+			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			{	// Set data to know current user has a permission to edit this widget:
+				$designer_mode_data['data-can-edit'] = 1;
+			}
+			// Append new data for container wrapper:
+			$attrib_actions = array(
+					'data-name'     => 'replace',
+					'data-code'     => 'replace',
+					'data-can-edit' => 'replace',
+				);
+			$params['container_start'] = str_replace( $container_start_wrapper[0], update_html_tag_attribs( $container_start_wrapper[0], $designer_mode_data, $attrib_actions ), $params['container_start'] );
+		}
+		else
+		{	// If container code is NOT defined or detected by name or container wrapper is not correct:
+			echo ' <span class="text-danger">'.sprintf( T_('Container %s cannot be manipulated because wrapper html tag has no %s.'), '"'.$wico_name.'"(<code>'.$wico_code.'</code>)', '<code>class="evo_container"</code>' ).'</span> ';
+		}
+
+		// Force to display container even if no widget:
+		$params['container_display_if_empty'] = true;
+	}
+
+	// Replace variables/masks in params with widget container properties;
+	// Possible variables/masks in params:
+	//   - $wico_class$ - Widget container class
+	$params = str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $wico_code ), $params );
+
+	return $params;
+}
+
+
+/**
  * Display a container
  *
- * @param string
- * @param array
+ * @deprecated Replaced with function widget_container( $container_code, $params = array() )
+ *
+ * @param string Container name
+ * @param array Additional params
+ * @param string Container code
  */
-function skin_container( $sco_name, $params = array() )
+function skin_container( $sco_name, $params = array(), $container_code = NULL )
 {
 	global $Skin;
 
-	$Skin->container( $sco_name, $params );
+	$Skin->container( $sco_name, $params, $container_code );
 }
 
+
+/**
+ * Get default skin/widget containers
+ * They may be overridden by each Skin class in the function get_declared_containers()
+ *
+ * @return array Array of default containers: Key is widget container code, Value is array( 0 - container name, 1 - container order )
+ */
+function get_skin_default_containers()
+{
+	return array(
+			'page_top'                  => array( NT_('Page Top'), 2 ),
+			'header'                    => array( NT_('Header'), 10 ),
+			'menu'                      => array( NT_('Menu'), 15 ),
+			'front_page_main_area'      => array( NT_('Front Page Main Area'), 40 ),
+			'front_page_secondary_area' => array( NT_('Front Page Secondary Area'), 45 ),
+			'item_list'                 => array( NT_('Item List'), 48 ),
+			'item_in_list'              => array( NT_('Item in List'), 49 ),
+			'item_single_header'        => array( NT_('Item Single Header'), 50 ),
+			'item_single'               => array( NT_('Item Single'), 51 ),
+			'item_page'                 => array( NT_('Item Page'), 55 ),
+			'comment_list'              => array( NT_('Comment List'), 57 ),
+			'comment_area'              => array( NT_('Comment Area'), 60 ),
+			'sidebar'                   => array( NT_('Sidebar'), 80 ),
+			'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
+			'footer'                    => array( NT_('Footer'), 100 ),
+			'user_profile_left'         => array( NT_('User Profile - Left'), 110 ),
+			'user_profile_right'        => array( NT_('User Profile - Right'), 120 ),
+			'404_page'                  => array( NT_('404 Page'), 130 ),
+			'login_required'            => array( NT_('Login Required'), 140 ),
+			'access_denied'             => array( NT_('Access Denied'), 150 ),
+			'help'                      => array( NT_('Help'), 160 ),
+			'register'                  => array( NT_('Register'), 170 ),
+			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
+			'photo_index'               => array( NT_('Photo Index'), 190 ),
+			'search_area'               => array( NT_('Search Area'), 200 ),
+		);
+}
 
 /**
  * Install a skin
@@ -2705,12 +3211,13 @@ function skin_container( $sco_name, $params = array() )
  * @todo do not install if skin doesn't exist. Important for upgrade. Need to NOT fail if ZERO skins installed though :/
  *
  * @param string Skin folder
- * @return Skin
+ * @param boolean TRUE if function should die on error
+ * @return object Skin
  */
-function & skin_install( $skin_folder )
+function & skin_install( $skin_folder, $halt_on_error = false )
 {
 	$SkinCache = & get_SkinCache();
-	$Skin = & $SkinCache->new_obj( NULL, $skin_folder );
+	$Skin = & $SkinCache->new_obj( NULL, $skin_folder, $halt_on_error );
 
 	$Skin->install();
 
@@ -2818,7 +3325,7 @@ function skin_installed( $name )
 
 
 /**
- * Display a blog skin setting fieldset which can be normal, mobile or tablet ( used on _coll_skin_settings.form.php )
+ * Display a blog skin setting fieldset which can be normal, mobile, tablet or alt ( used on _coll_skin_settings.form.php )
  *
  * @param object Form
  * @param integer skin ID
@@ -2826,7 +3333,12 @@ function skin_installed( $name )
  */
 function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 {
-	$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog-skin-settings').' '.$display_params[ 'fieldset_links' ] );
+	global $mode;
+
+	if( $mode != 'customizer' )
+	{	// Except of skin customer mode:
+		$Form->begin_fieldset( $display_params[ 'fieldset_title' ].' '.$display_params[ 'fieldset_links' ] );
+	}
 
 	if( !$skin_ID )
 	{ // The skin ID is empty use the same as normal skin ID
@@ -2837,44 +3349,64 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		$SkinCache = & get_SkinCache();
 		$edited_Skin = $SkinCache->get_by_ID( $skin_ID );
 
-		echo '<div class="skin_settings well">';
-		$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
-		Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
+		if( $mode != 'customizer' )
+		{	// Except of skin customer mode:
+			echo '<div class="skin_settings well">';
+			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
+			Skin::disp_skinshot( $edited_Skin->folder, $edited_Skin->name, $disp_params );
 
-		// Skin name
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin name').':</label>';
-			echo '<span>'.$edited_Skin->name.'</span>';
-		echo '</div>';
+			// Skin name
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin name').':</label>';
+				echo '<span>'.$edited_Skin->name.'</span>';
+			echo '</div>';
 
-		// Skin version
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin version').':</label>';
-			echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
-		echo '</div>';
+			// Skin version
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin version').':</label>';
+				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
+			echo '</div>';
 
-		// Skin type
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Skin type').':</label>';
-			echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
-		echo '</div>';
+			// Site Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
 
-		// Containers
-		if( $skin_containers = $edited_Skin->get_containers() )
-		{
-			$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+			// Collection Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Skin format:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin format').':</label>';
+				echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
+			echo '</div>';
+
+			// Containers
+			if( $skin_containers = $edited_Skin->get_containers() )
+			{
+				$skin_containers_names = array();
+				foreach( $skin_containers as $skin_container_data )
+				{
+					$skin_containers_names[] = $skin_container_data[0];
+				}
+				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers_names ).'</li></ul>';
+			}
+			else
+			{
+				$container_ul = '-';
+			}
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Containers').':</label>';
+				echo '<span>'.$container_ul.'</span>';
+			echo '</div>';
+
+			echo '</div>';
+			echo '<div class="skin_settings_form">';
 		}
-		else
-		{
-			$container_ul = '-';
-		}
-		echo '<div class="skin_setting_row">';
-			echo '<label>'.T_('Containers').':</label>';
-			echo '<span>'.$container_ul.'</span>';
-		echo '</div>';
-
-		echo '</div>';
-		echo '<div class="skin_settings_form">';
 
 		$tmp_params = array( 'for_editing' => true );
 		$skin_params = $edited_Skin->get_param_definitions( $tmp_params );
@@ -2909,18 +3441,34 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 					) );
 			}
 
+			if( $mode == 'customizer' )
+			{
+				$Form->begin_group();
+			}
+
 			// Loop through all widget params:
 			foreach( $skin_params as $l_name => $l_meta )
 			{
 				// Display field:
 				autoform_display_field( $l_name, $l_meta, $Form, 'Skin', $edited_Skin );
 			}
+
+			if( $mode == 'customizer' )
+			{
+				$Form->end_group();
+			}
 		}
 
-		echo '</div>';
+		if( $mode != 'customizer' )
+		{	// Except of skin customer mode:
+			echo '</div>';
+		}
 	}
 
-	$Form->end_fieldset();
+	if( $mode != 'customizer' )
+	{	// Except of skin customer mode:
+		$Form->end_fieldset();
+	}
 }
 
 
@@ -2935,7 +3483,7 @@ function skin_body_attrs( $params = array() )
 			'class' => NULL
 		), $params );
 
-	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User;
+	global $PageCache, $Collection, $Blog, $disp, $disp_detail, $Item, $current_User, $instance_name;
 
 	// WARNING: Caching! We're not supposed to have Session dependent stuff in here. This is for debugging only!
 	global $Session, $debug;
@@ -2965,6 +3513,10 @@ function skin_body_attrs( $params = array() )
 			{ // Tablet device
 				$classes[] = 'tablet_device';
 			}
+			elseif( $Session->is_alt_session() )
+			{	// Session for alternative skin:
+				$classes[] = 'alt_skin';
+			}
 			else
 			{ // Desktop device
 				$classes[] = 'desktop_device';
@@ -2972,6 +3524,9 @@ function skin_body_attrs( $params = array() )
 			$classes[] = 'page_notcached';
 		}
 	}
+
+	// Instance class:
+	$classes[] = 'instance_'.$instance_name;
 
 	// Blog class:
 	$classes[] = 'coll_'.( empty( $Blog ) ? 'none' : $Blog->ID );
@@ -3005,6 +3560,14 @@ function skin_body_attrs( $params = array() )
 		{
 			$classes[] = 'dev_show_containers';
 		}
+		if( $Session->get( 'customizer_mode_'.$Blog->ID ) )
+		{
+			$classes[] = 'dev_customizer_mode';
+		}
+		if( $Session->get( 'designer_mode_'.$Blog->ID ) )
+		{
+			$classes[] = 'dev_designer_mode';
+		}
 	}
 
 	if( ! empty( $classes ) )
@@ -3031,6 +3594,29 @@ function get_skin_version( $skin_ID )
 	}
 
 	return 'unknown';
+}
+
+
+/**
+ * Check compatibility skin with requested type
+ *
+ * @param integer Skin ID
+ * @param string Type: 'site' or 'coll'
+ * @return boolean
+ */
+function skin_check_compatibility( $skin_ID, $type )
+{
+	$SkinCache = & get_SkinCache();
+	$Skin = & $SkinCache->get_by_ID( $skin_ID, false, false );
+
+	if( ! $Skin ||
+	    ( $type == 'coll' && ! $Skin->provides_collection_skin() ) ||
+	    ( $type == 'site' && ! $Skin->provides_site_skin() ) )
+	{	// Skin cannot be used for requested type:
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -3069,7 +3655,8 @@ function get_skin_types()
 		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
 		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
 		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
-		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'alt'     => array( T_('Alt'), T_('Alt skin to display by conditions') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers and for alt skin') ),
 		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
 		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
 	);
@@ -3086,5 +3673,30 @@ function get_skin_type_title( $skin_type )
 {
 	$skin_types = get_skin_types();
 	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
+}
+
+
+/**
+ * Get setting value of the current Skin
+ *
+ * @param string Setting name
+ * @param mixed Fallback value when no current Skin or the requested setting is not defined in the current Skin
+ * @return mixed Setting value
+ */
+function get_skin_setting( $setting_name, $fallback_value = NULL )
+{
+	global $Skin;
+
+	if( isset( $Skin ) && $Skin instanceof Skin )
+	{	// Try to get setting value of the current Skin:
+		$setting_value = $Skin->get_setting( $setting_name );
+	}
+
+	if( ! isset( $setting_value ) )
+	{	// Fallback to default value when no current Skin or settings is not defined:
+		$setting_value = $fallback_value;
+	}
+
+	return $setting_value;
 }
 ?>

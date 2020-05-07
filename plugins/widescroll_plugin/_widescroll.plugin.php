@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 

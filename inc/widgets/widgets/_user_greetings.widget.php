@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -94,50 +94,65 @@ class user_greetings_Widget extends ComponentWidget
 				),
 				// Picture
 				'profile_picture_size' => array(
-					'label' => T_( 'Profile picture'),
+					'label' => T_('Profile picture'),
 					'note' => '',
 					'type' => 'select',
 					'options' => get_available_thumb_sizes( T_('none') ),
 					'defaultvalue' => 'crop-top-32x32',
 				),
 				// Group
+				'group_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('User group'),
+				),
 				'group_show' => array(
-					'label' => T_( 'User group'),
-					'note' => T_( 'Show user group' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
 				'group_text' => array(
-					'size' => 30,
-					'note' => T_( 'Group text to display' ),
+					'label' => T_('Show as:'),
+					'size' => 25,
 					'type' => 'text',
 					'defaultvalue' => T_( 'Your group: $group$' ),
 				),
+				'group_end_line' => array(
+					'type' => 'end_line',
+				),
 				// Level
+				'level_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('User level'),
+				),
 				'level_show' => array(
-					'label' => T_( 'User level'),
-					'note' => T_( 'Show user level' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
 				'level_text' => array(
-					'size' => 30,
-					'note' => T_( 'Level text to display' ),
+					'label' => T_('Show as:'),
+					'size' => 25,
 					'type' => 'text',
 					'defaultvalue' => T_( 'Your level: $level$' ),
 				),
+				'level_end_line' => array(
+					'type' => 'end_line',
+				),
 				// Greeting
+				'greeting_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('Greeting'),
+				),
 				'greeting_show' => array(
-					'label' => T_( 'Greeting'),
-					'note' => T_( 'Show greeting' ),
 					'type' => 'checkbox',
 					'defaultvalue' => 1,
 				),
 				'greeting_text' => array(
-					'size' => 30,
-					'note' => T_( 'Greeting text to display' ),
+					'label' => T_('Show as:'),
+					'size' => 25,
 					'type' => 'text',
 					'defaultvalue' => sprintf( T_( 'Hello %s!' ), '$login$' ),
+				),
+				'greeting_end_line' => array(
+					'type' => 'end_line',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -161,6 +176,7 @@ class user_greetings_Widget extends ComponentWidget
 	{
 		if( ! is_logged_in() )
 		{	// Don't display because user is not logged in yet:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not logged in.' );
 			return false;
 		}
 

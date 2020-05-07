@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -57,11 +57,6 @@ if( isset( $edited_User ) )
 
 <?php
 	$Widget = new Widget( 'file_browser' );
-
-	if( ! $ajax_request && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-	{
-		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload').'...', '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
-	}
 
 	$close_link_params = array();
 	if( $ajax_request )

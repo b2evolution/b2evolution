@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -28,15 +28,15 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'itemstatus_checkchanges', 'post' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New post status') : T_('Post status') ).get_manual_link( 'managing-item-statuses-form' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New post status') : TB_('Post status') ).get_manual_link( 'managing-item-statuses-form' ) );
 
 	$Form->add_crumb( 'itemstatus' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',pst_ID' : '' ) ) );
 
-$Form->begin_fieldset( T_('General') );
-	$Form->text_input( 'pst_name', $edited_ItemStatus->get( 'name' ), 30, T_('Name'), '', array( 'required' => true ) );
+$Form->begin_fieldset( TB_('General') );
+	$Form->text_input( 'pst_name', $edited_ItemStatus->get( 'name' ), 30, TB_('Name'), '', array( 'required' => true ) );
 $Form->end_fieldset();
 
 /**
@@ -53,7 +53,7 @@ function filter_itemtypes_results_block( & $Form )
 
 	$ItemTypeCache = & get_ItemTypeCache();
 	$item_usage_options = array(
-			T_('All') => '',
+			TB_('All') => '',
 		) + $ItemTypeCache->get_usage_option_array();
 
 	$options_str = '';
@@ -71,7 +71,7 @@ function filter_itemtypes_results_block( & $Form )
 		}
 	}
 
-	$Form->select_input_options( 'ityp_usage', $options_str, T_('Usage') );
+	$Form->select_input_options( 'ityp_usage', $options_str, TB_('Usage') );
 	echo '</div>';
 	$Form->switch_layout( NULL );
 }
@@ -94,7 +94,7 @@ if( ! empty( $ityp_usage ) )
 {
 	$ItemTypeCache = & get_ItemTypeCache();
 	$item_usage_options = array(
-			T_('All') => '',
+			TB_('All') => '',
 		) + $ItemTypeCache->get_usage_option_array();
 
 	$options = array();
@@ -134,7 +134,7 @@ if( ! empty( $ityp_usage ) )
 }
 
 $Results = new Results( $SQL->get(), 'ityp_' );
-$Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-types-allowed-per-item-status' );
+$Results->title = TB_('Item Types allowed for this Item Status').get_manual_link( 'item-types-allowed-per-item-status' );
 $Results->Form = $Form;
 
 $Results->filter_area = array(
@@ -143,7 +143,7 @@ $Results->filter_area = array(
 
 
 $Results->cols[] = array(
-		'th' => T_('ID'),
+		'th' => TB_('ID'),
 		'th_class' => 'shrinkwrap',
 		'td' => '$ityp_ID$',
 		'td_class' => 'center'
@@ -166,7 +166,7 @@ function item_status_type_checkbox( $row )
 }
 
 $Results->cols[] = array(
-		'th' => T_('Allowed Item Type'),
+		'th' => TB_('Allowed Item Type'),
 		'th_class' => 'shrinkwrap',
 		'td' => '%item_status_type_checkbox( {row} )%',
 		'td_class' => 'center'
@@ -189,7 +189,7 @@ function get_name_for_itemtype( $id, $name )
 }
 
 $Results->cols[] = array(
-		'th' => T_('Name'),
+		'th' => TB_('Name'),
 		'td' => '%get_name_for_itemtype( #ityp_ID#, #ityp_name# )%'
 	);
 
@@ -213,12 +213,12 @@ $Form->hidden( 'item_type_IDs', implode( ',', $item_type_IDs ) );
 
 if( $creating )
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_new]', T_('Record, then Create New'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_copy]', T_('Record, then Create Similar'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[create]', TB_('Record'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_new]', TB_('Record, then Create New'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_copy]', TB_('Record, then Create Similar'), 'SaveButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[update]', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 ?>

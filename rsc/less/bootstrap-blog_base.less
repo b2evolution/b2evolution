@@ -1,11 +1,10 @@
 /**
- * These are the generic styles that are common to "all" skins.
+ * These are the generic styles that are common to "all" Bootstrap skins.
  *
  * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
  *
  * Override this with style.css in your skin folder.
  */
-
 
 // ----- WIDGETS -----
 
@@ -27,6 +26,9 @@
 // Item Tags widget:
 @import "_item_tags_widget.module.less";
 
+// Item Workflow widget:
+@import "_item_workflow_widget.module.less";
+
 
 // ----- PLUGINS -----
 
@@ -34,12 +36,33 @@
 @import "inc/video-js-overrides.inc.less";
 
 
+// ----- FORMS -----
+
+// Search form:
+@import "_search_form.module.less";
+
+
+// ----- ALL PURPOSE MODULES (can be in templates in multiple widgets) -----
+
+// Tiles style 2
+@import "_evo_tile_2.module.less";
+
 // -----
 
 
 // Rating Summary for all comments of the selected post on disp=single:
 @import "inc/star_rating.inc.less";
 
+// This can be used in sub-containers and multiple column widgets to control display of children widgets:
+div.children-widgets-inline > div.evo_widget {
+	display: inline-block;
+	margin-right: 4px;
+}
+// This can be used in individual widgets to hide border:
+.evo_widget.widget-no-border {
+	border: none;
+	box-shadow: none;
+}
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -280,7 +303,7 @@ textarea.form_textarea_input {
 }
 
 // Avatar widget
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
 	// margin-top: 1em;
 	// margin-bottom: 1em;
 	text-align:center;
@@ -336,19 +359,10 @@ div.extended_search_form {
 	}
 }
 
-// Advertisement widget
-div.widget_core_coll_item_list.nobullets ul,
-div.widget_core_coll_item_list.nobullets ul li,
-li.widget_core_coll_item_list.nobullets ul,
-li.widget_core_coll_item_list.nobullets ul li {
-	background: none;
-	margin-left: 0;
-	padding-left: 0;
-	list-style: none;
-}
-div.widget_core_coll_item_list.nobullets ul li:before,
-ul li.widget_core_coll_item_list.nobullets ul li:before {
-	content: none;
+// User Profile Picture widget
+.widget_core_user_profile_pics img {
+	max-width: 100%;
+	height: auto;
 }
 
 .action_icon {
@@ -558,6 +572,7 @@ div.item_location {
 // jQuery Tokeninput plugin
 #ffield_item_tags ul.token-input-list-facebook {
 	width: 100%;
+	max-width: 100%;
 }
 
 // Not published comments display
@@ -790,15 +805,6 @@ form#comment_edit {
 	max-width: 960px;
 	margin: auto;
 }
-.main_profile_picture {
-	.border-radius;
-}
-.other_profile_pictures {
-	margin-bottom: 10px;
-	img {
-		.border-radius;
-	}
-}
 .profile_column_left {
 	float: left;
 	width: 300px;
@@ -808,19 +814,6 @@ form#comment_edit {
 	margin-left: 320px;
 	#fieldset_user_fields {
 		overflow: hidden;
-	}
-}
-.profile_buttons {
-	.btn, .btn-group {
-		width: 100%;
-	}
-	.btn-group .btn {
-		width: 50%;
-	}
-	a.btn button {
-		background: none;
-		border: none;
-		padding: 0;
 	}
 }
 .profile_column_right legend.panel-heading {
@@ -858,6 +851,63 @@ form#comment_edit {
 @media (max-width: 375px) {
 	.evo_form .control-buttons .submit, .evo_form .control-buttons .preview { // Separates form buttons on low resolution when they are not inline
 		margin-bottom: 4px;
+	}
+}
+// Widgets on profile page (disp=user):
+.widget_core_user_info {
+	&.evo_user_info_name,
+	&.evo_user_info_nickname,
+	&.evo_user_info_login {
+		font-size: 30px;
+		font-weight: 500;
+		line-height: 1.1;
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_name {
+		font-size: 36px;
+	}
+	&.evo_user_info_login {
+		color: #777;
+	}
+	&.evo_user_info_gender,
+	&.evo_user_info_location,
+	&.evo_user_info_orgs {
+		margin-bottom: 10px;
+	}
+	&.evo_user_info_location {
+		white-space: nowrap;
+	}
+}
+.widget_core_user_profile_pics {
+	&.evo_user_profile_pics_main,
+	&.evo_user_profile_pics_other {
+		img {
+			.border-radius;
+		}
+	}
+	&.evo_user_profile_pics_other {
+		text-align: left;
+		margin-bottom: 10px;
+		a {
+			display: inline-block;
+			vertical-align: top;
+			margin: 0 0.5em 0.5em 0;
+		}
+	}
+}
+.widget_core_user_action {
+	margin-bottom: 10px;
+	.btn, &.btn-group {
+		width: 100%;
+	}
+	&.btn-group .btn {
+		width: 50%;
+	}
+	a.btn button {
+		background: none;
+		border: none;
+		padding: 0;
 	}
 }
 
@@ -1076,9 +1126,7 @@ div.item_custom_fields {
 		padding: 0;
 	}
 }
-div.qq-upload-button,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button {
 	border: 2px dashed #fff;
 	background: #5bc0de;
 	.border-radius(9px);
@@ -1086,7 +1134,8 @@ div.qq-upload-drop-area-active {
 div.qq-upload-drop-area {
 	padding: 7px 0;
 	text-align: center;
-	color: #FFF;
+	color: transparent;
+	background: transparent;
 	font-weight: bold;
 	> div > span {
 		font-weight: normal;
@@ -1094,10 +1143,11 @@ div.qq-upload-drop-area {
 		margin-top: 2px;
 	}
 }
-div.qq-upload-button-hover,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button-hover {
 	background: #5cb85c;
+}
+div.qq-upload-button-dragover {
+	background: #efbd5b !important;
 }
 ul.qq-upload-list {
 	margin: 0;

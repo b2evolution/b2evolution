@@ -1,4 +1,4 @@
-/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution, including BACK-OFFICE */
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -278,6 +278,14 @@ th, td, caption {
 	margin-bottom: 0;
 }
 
+// Style to make space between inline buttons:
+.btn-margin-right {
+	margin-right: 5px;
+	.btn-group & {
+		margin-right: 0;
+	}
+}
+
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
 .btn.active[disabled] {
 	opacity: 1;
@@ -335,6 +343,9 @@ a.btn.action_icon {
 		.help-inline {
 			color: #999;
 			font-size: 84%;
+			label {
+				font-weight: normal;
+			}
 		}
 		.form-control {
 			display: inline-block;
@@ -384,12 +395,18 @@ a.btn.action_icon {
 		padding-left: 0;
 	}
 	// Don't use bold for radio/checkbox text
-	label.radio-inline {
+	label.radio-inline, label.radiooption {
 		font-weight: normal;
 	}
 	div.radio, div.checkbox {
 		label {
 			font-weight: normal;
+		}
+	}
+	.checkbox_with_input {
+		input[type=checkbox] {
+			position: relative;
+			margin-right: 5px;
 		}
 	}
 	// Fix for text input elements that go after radio inputs on one line
@@ -400,6 +417,9 @@ a.btn.action_icon {
 	#itemform_custom_fields {
 		.panel-body .form-group:last-child {
 			margin-bottom: 0;
+		}
+		.help-inline label {
+			font-weight: normal;
 		}
 	}
 	// Select category table on edit post form
@@ -436,11 +456,32 @@ a.btn.action_icon {
 			padding-right: 5px;
 		}
 	}
+	// Location:
+	#item_locations {
+		th, td {
+			white-space: nowrap;
+			padding: 2px 0;
+		}
+		label {
+			width: auto;
+			float: right;
+		}
+		select {
+			display: inline-block;
+		}
+	}
 	// Text Renderers block on edit post form
-	#itemform_renderers {
+	#itemform_renderers, #commentform_renderers {
+		.dropdown-menu {
+			padding: 10px 10px 5px 10px;
+		}
+		.popover {
+			max-width: initial;
+		}
 		div[id^="block_renderer_"] {
 			padding-left: 20px;
 			position: relative;
+			white-space: nowrap;
 			input[type=checkbox] {
 				margin: 4px 0 0;
 				position: absolute;
@@ -694,6 +735,21 @@ div.results {
 			border-bottom: none;
 		}
 	}
+
+	.results_header {
+		padding: 5px 10px;
+		background-color: #f9f9f9;
+	}
+	.results_footer {
+		// Pager in footer + select "lines per page"
+		padding: 5px;
+		background-color: #f9f9f9;
+	}
+
+	.pagination {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	}
 	.page_size_selector {
 		margin-bottom: 5px;
 		display: block;
@@ -702,10 +758,7 @@ div.results {
 			width: auto;
 		}
 	}
-	.pagination {
-		margin-top: 5px;
-		margin-bottom: 5px;
-	}
+
 	tr.placeholder {
 		position: relative;
 		&:before {
@@ -744,35 +797,74 @@ div.results {
 		max-width: none;
 	}
 }
-// Filters in results table
+
+// Filters at the top of the Results table:
 div.filters {
-	margin-bottom: 0;
-	background: none;
+	background-color: #f9f9f9;
 	border: none;
-	> div {
-		margin-left: 0;
-	}
-	// Align a filter button to the right
-	button.filter {
-		float: right;
-		padding: 4px 12px;
-	}
-	// Set vertical spaces between the filter inputs
-	.block {
-		display: inline-block;
-		margin: 2px;
-	}
 	&.panel-body {
-		padding: 15px;
+		padding: 6px 10px;
 	}
-	// Fix style for fields with autocomplete usernames:
-	.twitter-typeahead {
-		vertical-align: middle;
-		.tt-dropdown-menu div {
-			margin-left: 0;
+
+	// For the whole filter form:
+	.form-inline{
+		margin: 5px -10px 0;
+		// For each  label:input :
+		.form-group {
+			margin: 5px 10px 2px;
 		}
 	}
+	// Styles for button on the right:
+	.evo_btn_apply_filters {
+		margin: 0;
+	}
+
+	// Advanced filters area:
+	.evo_results_filters__advanced {
+		position: relative;
+		.evo_results_filters__defaults_btn {
+			position: absolute;
+			top: 10px;
+			right: 0;
+		}
+	}
+
+	// Fix style for Username fields with autocomplete:
+	.twitter-typeahead {
+		vertical-align: middle; // otherwise "Username:" label is misaligned
+	}
+
+	// Fix style for Query Builder (e-g Users filtering)
+	.query-builder {
+		margin: -15px 0 -12px -4px; 
+		> .rules-group-container {
+			// First group:
+			border: none;
+			background: transparent;
+		}
+	}
+
+	// In BackOffice > Contents > Posts we display the "cuurrent filters" widget in the form:
+	.filters_item_list_table {
+		margin: 0 8px;
+	}
 }
+
+// Navigation used in normal Results abut also post browsing
+.results_summary {
+	float: left;
+	font-weight: bold;
+	// padding: 6px 0;
+	margin-top: 5px;
+	// margin-top: 10px;
+}
+.evo_pager {
+	text-align: center;
+}
+
+
+
+
 .table_scroll .table {
 	margin-bottom: 0;
 }
@@ -785,7 +877,7 @@ div.messages{
 	max-width: 100%;
 	color: #333;
 	&.right {
-		text-align: left;
+		text-align: left !important;
 		&.popover-userfield {
 			// Shift a popover window to the right on 35px to don't hide a plus icon
 			margin-left: 35px !important;
@@ -828,7 +920,7 @@ a:hover .glyphicon {
 }
 
 // Make a label inline
-#itemform_renderers, table.catselect {
+table.catselect {
 	label {
 		display: inline-block;
 		margin-right: 5px;
@@ -887,30 +979,34 @@ select:focus:invalid:focus {
 
 // Panels
 .panel-heading {
+	padding-top: 0;
+	padding-bottom: 0;
+	line-height: 36px;
+	.panel-title {
+		line-height: 36px;
+	}
 	h4 {
 		margin: 0;
 	}
 	.close {
-		position: relative;
-		top: -4px;
+		float: none;
 	}
 	.btn-group {
 		margin-left: 6px;
 	}
 	.panel_heading_action_icons {
-		margin-top: -6px;
 		.btn {
-			margin: 0 3px 3px 0;
+			margin: 0 3px 2px 0;
 		}
-		.btn:last-child {
-			margin: 0 0 3px 0;
+		.btn:last-child, .btn-group .btn {
+			margin-right: 0;
 		}
 		.btn-group {
 			margin: 0 6px 0 0;
-			.btn {
-				margin: 0 0 3px 0;
-			}
 		}
+	}
+	img.avatar_before_login {
+		vertical-align: middle;
 	}
 }
 legend.panel-heading {
@@ -995,6 +1091,9 @@ legend.panel-heading {
 	.form-control.form_textarea_input {
 		display: block;
 	}
+	.form-control.evo_template_select {
+		width: calc( 100% - 24px );
+	}
 }
 
 // Plugin toolbars
@@ -1033,9 +1132,20 @@ div.edit_toolbars, div.message_toolbars {
 		}
 	}
 }
+
+// Text editor controls
+.text_editor_controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: normal;
+}
+.comment_text_renderers {
+	margin-top: -12px;
+}
+
 // Plugin buttons
 .edit_plugin_actions {
-	padding-top: 7px;
+	margin-top: 4px;
 }
 
 // Badge
@@ -1104,17 +1214,17 @@ div.edit_toolbars, div.message_toolbars {
 	}
 }
 
-// Typeahead plugin
+// Typeahead plugin FOR username autosuggest
 .tt-dropdown-menu {
 	background-color: #FFFFFF;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	.border-radius(8px);
+	border-radius: 3px;
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	padding: 8px 0;
+	padding: 0;
 	.tt-suggestion {
-		font-size: 18px;
-		line-height: 24px;
-		padding: 3px 20px;
+		font-size: 14px;
+		// line-height: px;
+		padding: 4px 10px;
 		&.tt-cursor {
 			background-color: #0097CF;
 			color: #FFFFFF;
@@ -1257,7 +1367,7 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Widgets containers "Sidebar" and "Sidebar 2":
-.evo_container__sidebar, .evo_container__sidebar2 {
+.evo_container__sidebar, .evo_container__sidebar_2 {
 	// .widget_core_menu_link
 	// .widget_core_msg_menu_link
 	// .widget_core_profile_menu_link
@@ -1280,14 +1390,15 @@ div.edit_toolbars, div.message_toolbars {
 .accordion-caret {
 	.accordion-toggler {
 		&:before {
-			padding-right: 3px;
 			font-size: 14px;
 			font-family: FontAwesome;
 		}
 		&:not(.collapsed):before {
+			padding-right: 3px;
 			content: '\f0d7';
 		}
 		&.collapsed:before {
+			padding-right: 6px;
 			content: '\f0da';
 		}
 	}
@@ -1326,6 +1437,7 @@ div.edit_toolbars, div.message_toolbars {
 	}
 }
 
+
 // Widget "Item Workflow Properties":
 .evo_widget.widget_core_item_workflow {
 	.panel-body {
@@ -1334,6 +1446,124 @@ div.edit_toolbars, div.message_toolbars {
 		}
 		p:last-child {
 			margin-bottom: 0;
+		}
+	}
+}
+
+// Fieldset folding:
+div.fieldset_wrapper.folded .panel-body {
+	display: none;
+}
+span[id^=title_folding_] {
+	cursor: default;
+}
+
+// Widget "Language/Locale/Version switch":
+.evo_widget.widget_core_coll_locale_switch {
+	ul {
+		list-style: none;
+	}
+}
+
+// Comment status badge
+.evo_comment_title {
+	position: relative;
+	>.evo_status.pull-right {
+		position: absolute;
+		top: 50%;
+		right: 0;
+		transform: translateY(-50%);
+	}
+}
+.evo_comment_subtitle.pull-right {
+	.evo_status.pull-right {
+		position: relative;
+		float: none !important;
+		display: inline-block;
+		margin-left: 6px;
+	}
+}
+
+// Comment footer
+.evo_content_block {
+	.evo_comment_info {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
+	}
+}
+
+// Align post images left or right automatically inside widget "Content Block":
+@media (min-width: 768px) {
+	.alternate-left-right {
+		> div {
+			.evo_content_block_images {
+				width: 40%;
+			}
+			&:nth-child( even ) {
+				.evo_content_block_images {
+					float: left;
+					margin-right: 1em;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_content_block_images {
+					float: right;
+					margin-left: 1em;
+				}
+			}
+		}
+	}
+}
+@media (min-width: 1785px) {
+	.alternate-left-right {
+		> div {
+			.evo_content_block_images {
+				position: relative;
+				width: 60%;
+			}
+			.evo_content_block_text {
+				position: relative;
+				width: 125%;
+			}
+			&:nth-child( even ) {
+				.evo_content_block_images, .evo_content_block_text {
+					left: -295px;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_content_block_images {
+					left: 295px;
+					margin-left: -285px;
+				}
+			}
+		}
+	}
+}
+
+
+// Comment Workflow
+.comment-workflow-form {
+	display: flex !important;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	.controls {
+		display: flex !important;
+		flex-direction: row;
+		align-items: center;
+		> * {
+			margin-left: 6px;
 		}
 	}
 }

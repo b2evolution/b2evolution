@@ -352,7 +352,7 @@ elseif( $confirmed )
 					break;
 
 				case 'meta_comment':
-					// unsubscribe from meta comment notifications
+					// unsubscribe from internal comment notifications
 					$UserSettings->set( 'notify_meta_comments', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
@@ -364,7 +364,7 @@ elseif( $confirmed )
 					break;
 
 				case 'meta_comment_mentioned':
-					// unsubscribe from new meta comment notifications when user is mentioned:
+					// unsubscribe from new internal comment notifications when user is mentioned:
 					$UserSettings->set( 'notify_meta_comment_mentioned', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
@@ -674,7 +674,7 @@ elseif( $confirmed )
 					break;
 
 				case 'meta_comment':
-					// resubscribe from meta comment notifications
+					// resubscribe from internal comment notifications
 					$UserSettings->set( 'notify_meta_comments', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
@@ -686,7 +686,7 @@ elseif( $confirmed )
 					break;
 
 				case 'meta_comment_mentioned':
-					// resubscribe to new meta comment notifications when user is mentioned:
+					// resubscribe to new internal comment notifications when user is mentioned:
 					$UserSettings->set( 'notify_meta_comment_mentioned', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
@@ -894,8 +894,8 @@ switch( $type )
 		break;
 
 	case 'meta_comment':
-		// unsubscribe from meta comment notifications
-		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
+		// unsubscribe from internal comment notifications
+		$type_str = $notification_prefix.': '.T_('an internal comment is posted.');
 		break;
 
 	case 'comment_mentioned':
@@ -904,8 +904,8 @@ switch( $type )
 		break;
 
 	case 'meta_comment_mentioned':
-		// unsubscribe from new meta comment notifications when user is mentioned:
-		$type_str = $notification_prefix.': '.T_('I have been mentioned on a meta comment.');
+		// unsubscribe from new internal comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on an internal comment.');
 		break;
 
 	case 'post_mentioned':

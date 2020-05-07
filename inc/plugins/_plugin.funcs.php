@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -27,9 +27,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
  * @param Form (by reference)
- * @param string Settings type ('Settings' or 'UserSettings' or 'Widget' or 'Skin')
+ * @param string Settings type ('Settings' or 'UserSettings' or 'GroupSettings' or 'Widget' or 'Skin')
  * @param Plugin|Widget
- * @param mixed Target (User object for 'UserSettings')
+ * @param mixed Target (User object for 'UserSettings', Group object for 'GroupSettings')
  * @param mixed Value to really use (used for recursion into array type settings)
  */
 function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $set_target = NULL, $use_value = NULL )
@@ -143,6 +143,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			case 'begin_fieldset':
 				$fieldset_title = $set_label;
+				if( $Form->layout == 'accordion' && ! empty( $Form->_opentags['fieldset'] ) )
+				{	// Use accordion style only for top level:
+					$Form->switch_layout( 'fieldset' );
+				}
 				$fieldset_params = array();
 				if( isset( $parmeta['fold'] ) && $parmeta['fold'] === true )
 				{	// Enable folding for the fieldset:
@@ -159,6 +163,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 			case 'end_fieldset':
 				$Form->end_fieldset();
+				if( isset( $Form->saved_layouts[0] ) && $Form->saved_layouts[0] == 'accordion' && ! empty( $Form->_opentags['fieldset'] ) )
+				{	// We should switch back to accordion style:
+					$Form->switch_layout( NULL );
+				}
 				break;
 
 			case 'separator':
@@ -187,6 +195,27 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		{
 			$params['note'] .= ' '.$help_icon;
 		}
+	}
+
+	if( isset( $parmeta['input_prefix'] ) )
+	{	// Use prefix before input element if it is defined:
+		$params['input_prefix'] = $parmeta['input_prefix'];
+	}
+
+	if( isset( $parmeta['input_suffix'] ) )
+	{	// Use suffix after input element if it is defined:
+		$params['input_suffix'] = $parmeta['input_suffix'];
+	}
+
+	if( $set_type == 'Skin' &&
+	    in_array( $parmeta['type'], array( 'text', 'integer', 'color', 'select', 'select_object' ) ) )
+	{	// Append action icon to restore setting to default value by JavaScript:
+		$params['input_suffix'] = ( isset( $params['input_suffix'] ) ? $params['input_suffix'] : '' ).
+			' '.get_icon( 'reload', 'imgtag', array(
+				'data-default-value' => $Obj->get_setting_default_value( $parname, $group ),
+				'title' => T_('Restore to default value'),
+				'class' => 'pointer'
+			) );
 	}
 
 	if( isset($use_value) )
@@ -218,6 +247,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
+			case 'PluginWidget':
 				$set_value = $Obj->get_param( $parname, NULL, $group );
 				$error_value = NULL;
 				break;
@@ -234,6 +264,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$error_value = $Obj->PluginUserSettingsValidateSet( $tmp_params );
 				break;
 
+			case 'GroupSettings':
+				// NOTE: this assumes we come here only on recursion or with $use_value set..!
+				$set_value = $Obj->GroupSettings->get( $parname, $set_target->ID );
+				$tmp_params = array(
+					'name'   => $parname,
+					'value'  => & $set_value,
+					'meta'   => $parmeta,
+					'Group'  => $set_target,
+					'action' => 'display' );
+				$error_value = $Obj->PluginGroupSettingsValidateSet( $tmp_params );
+				break;
+
 			case 'Settings':
 				// NOTE: this assumes we come here only on recursion or with $use_value set..!
 				$set_value = $Obj->Settings->get( $parname );
@@ -243,6 +285,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					'meta'   => $parmeta,
 					'action' => 'display' );
 				$error_value = $Obj->PluginSettingsValidateSet( $tmp_params );
+				break;
+
+			case 'SharedSettings':
+				$set_value = $Obj->get_shared_setting( $parname, $group );
+				$error_value = NULL;
 				break;
 
 			default:
@@ -274,6 +321,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{	// Hide this field on the editing form:
 		$original_form_fieldstart = $Form->fieldstart;
 		$Form->fieldstart = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart );
+		if( isset( $Form->fieldstart_checkbox ) )
+		{
+			$original_form_fieldstart_checkbox = $Form->fieldstart_checkbox;
+			$Form->fieldstart_checkbox = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_checkbox );
+		}
 	}
 
 	switch( $parmeta['type'] )
@@ -319,7 +371,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'select':
 			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
+			if( ! empty( $parmeta['multiple'] ) )
+			{	// Set specific size of multiple selector or use automatic size depending on count of options:
+				$params['size'] = ( isset( $parmeta['size'] ) ? $parmeta['size'] : count( $parmeta['options'] ) );
+			}
 			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, isset($parmeta['note']) ? $parmeta['note'] : NULL, $params );
+			break;
+
+		case 'select_object':
+			$Form->select_input_object( $input_name, $set_value, $parmeta['object'], $set_label, $params );
 			break;
 
 		case 'select_blog':
@@ -415,9 +475,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
 						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
 					}
-					// Unique ID of fieldset to store in user  settings or in user per collection settings:
-					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
 				}
+				// Unique ID of fieldset to store in user settings or in user per collection settings:
+				$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
 				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
 
 				if( ! empty($params['note']) )
@@ -681,6 +741,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{	// Revert original field start html code:
 		$Form->fieldstart = $original_form_fieldstart;
 	}
+	if( isset( $original_form_fieldstart_checkbox ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart_checkbox = $original_form_fieldstart_checkbox;
+	}
 
 	if( $outer_most && $has_array_type )
 	{ // Note for Non-Javascript users:
@@ -763,12 +827,20 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 	{
 		case 'Settings':
 		case 'CollSettings':
-		case 'Widget':
+		case 'PluginWidget':
 			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'Widget':
+			$Plugin->set( $set_name, $setting );
 			break;
 
 		case 'UserSettings':
 			$Plugin->UserSettings->set( $set_name, $setting );
+			break;
+
+		case 'GroupSettings':
+			$Plugin->GroupSettings->set( $set_name, $setting );
 			break;
 
 		case 'MsgSettings':
@@ -784,6 +856,11 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 		case 'Skin':
 			$Skin = & $Plugin;
 			$Skin->set_setting( $set_name, $setting );
+			break;
+
+		case 'SharedSettings':
+			$set_name = ( $set_name == 'shared_apply_rendering' ? '' : 'shared_' ).$set_name;
+			$Plugin->Settings->set( $set_name, $setting );
 			break;
 
 		default:
@@ -839,6 +916,11 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 			$defaults = $Plugin->GetDefaultUserSettings( $tmp_params );
 			break;
 
+		case 'GroupSettings':
+			$setting = $Plugin->GroupSettings->get( $set_name );
+			$defaults = $Plugin->GetDefaultGroupSettings( $tmp_params );
+			break;
+
 		case 'CollSettings':
 			$setting = $Plugin->Settings->get( $set_name );
 			$defaults = $Plugin->get_coll_setting_definitions( $tmp_params );
@@ -856,15 +938,26 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 			$defaults = $Plugin->get_email_setting_definitions( $tmp_params );
 			break;
 
-		case 'Widget':
+		case 'PluginWidget':
 			$setting = $Plugin->Settings->get( $set_name );
 			$defaults = $Plugin->get_widget_param_definitions( $tmp_params );
+			break;
+
+		case 'Widget':
+			$setting = $Plugin->get_param( $set_name );
+			$defaults = $Plugin->get_param_definitions( $tmp_params );
 			break;
 
 		case 'Skin':
 			$Skin = & $Plugin;
 			$setting = $Skin->get_setting( $set_name );
 			$defaults = $Skin->get_param_definitions( $tmp_params );
+			break;
+
+		case 'SharedSettings':
+			$param_name = ( $set_name == 'shared_apply_rendering' ? '' : 'shared_' ).$set_name;
+			$setting = $Plugin->Settings->get( $param_name );
+			$defaults = $Plugin->get_shared_setting_definitions( $tmp_params );
 			break;
 
 		default:
@@ -956,8 +1049,8 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
  * @param string Settings path, e.g. 'locales[0]' or 'setting'
  * @param array Meta data for this setting.
  * @param Plugin|Widget
- * @param string Type of Settings (either 'Settings' or 'UserSettings').
- * @param mixed Target (User object for 'UserSettings')
+ * @param string Type of Settings (either 'Settings' or 'UserSettings' or 'GroupSettings').
+ * @param mixed Target (User object for 'UserSettings', Group object for 'GroupSettings')
  * @param mixed NULL to use value from request, OR set value what you want to force
  */
 function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type, $set_target = NULL, $set_value = NULL )
@@ -1122,7 +1215,7 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 				$widget_Blog = & $Obj->get_Blog();
 				$l_value = $Plugins->validate_renderer_list( array_keys( $l_value ), array(
 						'Blog'         => & $widget_Blog,
-						'setting_name' => 'coll_apply_rendering',
+						'setting_name' => 'shared_apply_rendering',
 					) );
 				$l_value = array_fill_keys( $l_value, 1 );
 			}
@@ -1147,12 +1240,32 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 			}
 			break;
 
+		case 'GroupSettings':
+			// Plugin Group settings:
+			$dummy = array(
+				'name'   => $parname,
+				'value'  => & $l_value,
+				'meta'   => $parmeta,
+				'Group'  => $set_target,
+				'action' => 'set' );
+			$error_value = $Obj->PluginGroupSettingsValidateSet( $dummy );
+			// Update the param value, because a plugin might have changed it (through reference):
+			$GLOBALS[ $Obj->get_param_prefix().$parname ] = $l_value;
+
+			if( empty( $error_value ) )
+			{
+				$Obj->GroupSettings->set( $parname, $l_value, $set_target->ID );
+			}
+			break;
+
 		case 'Settings':
 			// Plugin global settings:
 		case 'MsgSettings':
 			// Plugin messages settings:
 		case 'EmailSettings':
 			// Plugin emails settings:
+		case 'SharedSettings':
+			// Plugin shared settings:
 			$dummy = array(
 				'name'   => $parname,
 				'value'  => & $l_value,
@@ -1169,8 +1282,12 @@ function autoform_set_param_from_request( $parname, $parmeta, & $Obj, $set_type,
 					$Obj->Settings->set( 'msg_'.$parname, $l_value );
 				}
 				elseif( $set_type == 'EmailSettings' && $parname != 'email_apply_rendering' )
-				{	// Use prefix 'email_' for all message settings except of "email_apply_rendering":
+				{	// Use prefix 'email_' for all email settings except of "email_apply_rendering":
 					$Obj->Settings->set( 'email_'.$parname, $l_value );
+				}
+				elseif( $set_type == 'SharedSettings' && $parname != 'shared_apply_rendering' )
+				{	// Use prefix 'shared_' for all shared settings except of "shared_apply_rendering":
+					$Obj->Settings->set( 'shared_'.$parname, $l_value );
 				}
 				else
 				{	// Global settings:
@@ -1554,7 +1671,7 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 	global $inc_path, $install_db_deltas, $DB, $Messages;
 
 	// Prepare vars for DB layout changes
-	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
+	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5', 'string' );
 
 	$db_layout = $Plugin->GetDbLayout();
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)

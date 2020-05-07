@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -61,7 +61,7 @@ class poll_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display poll.');
+		return T_('Display a poll.');
 	}
 
 
@@ -114,7 +114,7 @@ class poll_Widget extends ComponentWidget
 
 		if( ! $Poll )
 		{	// We cannot find a poll by the entered ID in widget settings:
-			echo '<p class="evo_param_error">'.sprintf( T_('Poll #%s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ).'</p>';
+			echo '<p class="evo_param_error">'.sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ).'</p>';
 		}
 		else
 		{	// Display a form for voting on poll:

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -29,7 +29,7 @@ locales_load_available_defs();
 
 if( !isset( $locales[$edit_locale] ) )
 {	// Check for correct locale
-	$Messages->add( T_('The locale is incorrect!'), 'error' );
+	$Messages->add( TB_('The locale is incorrect!'), 'error' );
 	header_redirect( '?ctrl=locales&loc_transinfo=1', 303 );
 }
 
@@ -52,7 +52,7 @@ switch( $action )
 
 		if( translation_update_table_po( $edit_locale ) )
 		{
-			$Messages->add( T_('The file .PO was imported into database successfully'), 'success' );
+			$Messages->add( TB_('The file .PO was imported into database successfully'), 'success' );
 		}
 		header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
 		break;
@@ -63,7 +63,7 @@ switch( $action )
 
 		if( translation_generate_po_file( $edit_locale ) )
 		{
-			$Messages->add( T_('The file .PO was generated successfully'), 'success' );
+			$Messages->add( TB_('The file .PO was generated successfully'), 'success' );
 		}
 		header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
 		break;
@@ -102,7 +102,7 @@ switch( $action )
 				  SET itst_standard = '.$DB->quote( $itst_standard ).'
 				WHERE itst_ID = '.$DB->quote( $itst_ID ) );
 
-			$Messages->add( T_('A translated string was updated.'), 'success' );
+			$Messages->add( TB_('A translated string was updated.'), 'success' );
 			header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
 		}
 		else
@@ -113,7 +113,7 @@ switch( $action )
 				( itst_iost_ID, itst_locale, itst_standard, itst_inpofile ) VALUES
 				( '.$iost_ID.', '.$DB->quote( $edit_locale ).', '.$DB->quote( $itst_standard ).', 1 )' );
 
-			$Messages->add( T_('New translated string was added.'), 'success' );
+			$Messages->add( TB_('New translated string was added.'), 'success' );
 			header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
 		}
 		break;
@@ -126,17 +126,17 @@ switch( $action )
 
 		$DB->query( 'DELETE FROM T_i18n_translated_string WHERE itst_ID = '.$DB->quote( $itst_ID ) );
 
-		$Messages->add( T_('A translated string was deleted.'), 'success' );
+		$Messages->add( TB_('A translated string was deleted.'), 'success' );
 		header_redirect( '?ctrl=translation&edit_locale='.$edit_locale, 303 );
 		break;
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Locales'), $admin_url.'?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Translation editor'), $admin_url.'?ctrl=translation&locale='.$locale );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('Regional'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( TB_('Locales'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( TB_('Translation editor'), $admin_url.'?ctrl=translation&locale='.$locale );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

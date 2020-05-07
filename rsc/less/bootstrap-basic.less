@@ -346,6 +346,12 @@ select.field_error,
 textarea.field_error {
 	background:#fbf2ee;
 	border: 1px solid #d99;
+	+ span:before, + div + span:before {
+		content: '\f06a';
+		font: 16px FontAwesome;
+		color: #F00;
+		margin-right: 5px;
+	}
 }
 span.checkbox_error {
 	background: #fbf2ee;
@@ -379,6 +385,22 @@ textarea.form_textarea_input {
 // Space between radio option lable and note text
 label.radiooption {
 	margin-right: 1em;
+	cursor: pointer;
+}
+
+// Support for multiline inline forms
+.filters .form-inline {
+	margin: 0 -10px -5px;
+
+	.filter-inputs {
+		min-height: 40px;
+	}
+	.form-group {
+	 	margin: 5px 10px;
+	}
+	.checkbox {
+		margin-left: 10px;
+	}
 }
 // ---------------- //
 
@@ -640,5 +662,15 @@ div.evo_highlight, li.evo_highlight, tr.evo_highlight td {
 	}
 	to {
 		background-color: transparent;
+	}
+}
+
+// Counter for max and recommended length of input/textarea elements:
+.evo_input_counter {
+	position: absolute;
+	color: #999;
+	font-size: 80%;
+	&.label {
+		color: #FFF;
 	}
 }

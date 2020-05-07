@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -169,17 +169,13 @@ class user_register_quick_Widget extends ComponentWidget
 					'options' => $newsletters_options,
 					'note' => ''
 				),
-				'subscribe_post' => array(
+				'subscribe' => array(
 					'label' => T_('Subscribe to collection'),
-					'note' => T_('check to auto subscribe new user to current collection posts'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-				),
-				'subscribe_comment' => array(
-					'label' => '',
-					'note' => T_('check to auto subscribe new user to current collection comments'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
+					'type' => 'checklist',
+					'options' => array(
+						array( 'post', T_('check to auto subscribe new user to current collection posts'), 1 ),
+						array( 'comment', T_('check to auto subscribe new user to current collection comments'), 1 ),
+					),
 				),
 				'button' => array(
 					'label' => T_('Button title'),
@@ -230,6 +226,7 @@ class user_register_quick_Widget extends ComponentWidget
 
 		if( is_logged_in() )
 		{	// No display when user is already registered
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you are already registered.' );
 			return false;
 		}
 
@@ -271,6 +268,7 @@ class user_register_quick_Widget extends ComponentWidget
 		if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 		{ // Display error message when quick registration is disabled
 			echo '<p class="error">'.T_('Quick registration is currently disabled on this system.').'</p>';
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because quick registration is currently disabled on this system.' );
 			return false;
 		}
 
@@ -333,8 +331,8 @@ class user_register_quick_Widget extends ComponentWidget
 			$Form->hidden( 'ask_lastname', $this->disp_params['ask_lastname'] );
 			$Form->hidden( 'ask_country', $this->disp_params['ask_country'] );
 			$Form->hidden( 'usertags', $this->disp_params['usertags'] );
-			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe_post'] );
-			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe_comment'] );
+			$Form->hidden( 'subscribe_post', $this->disp_params['subscribe']['post'] );
+			$Form->hidden( 'subscribe_comment', $this->disp_params['subscribe']['comment'] );
 
 			$newsletters = array();
 			foreach( $this->disp_params['newsletters'] as $loop_newsletter )

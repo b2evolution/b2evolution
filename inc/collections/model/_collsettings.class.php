@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -56,6 +56,7 @@ class CollectionSettings extends AbstractSettings
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
 		// Single post settings:
+			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
@@ -66,7 +67,15 @@ class CollectionSettings extends AbstractSettings
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
 			'tags_twitter_card' => 1,
+			'tags_structured_data' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+
+		// Tiny URLs settings:
+			'tinyurl_type'   => 'basic',
+			'tinyurl_domain' => '',
+			'tinyurl_tag_source' => 'utm_source',
+			'tinyurl_tag_slug' => 'utm_campaign',
+			'tinyurl_tag_extra_term' => 'utm_keywords',
 
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
@@ -83,6 +92,7 @@ class CollectionSettings extends AbstractSettings
 			'require_anon_name' => 1,
 			'require_anon_email' => 1,
 			'allow_anon_url' => 0,
+			'comment_maxlen' => 20000,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -98,7 +108,7 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
-			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
+			'meta_comments_frontoffice' => 1, // Display internal comments in front-office
 			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:
@@ -145,6 +155,7 @@ class CollectionSettings extends AbstractSettings
 		// Other pages:
 			'feedback-popup_noindex' => '1',			// META NOINDEX on Feedback popups
 			'msgform_noindex' => '1',					// META NOINDEX on Message forms
+			'msgform_nofollowto' => '1',
 			'special_noindex' => '1',					// META NOINDEX on other special pages
 			'404_response' => '404',
 			'help_link' => 'slug',
@@ -186,7 +197,7 @@ class CollectionSettings extends AbstractSettings
 			'use_workflow' => 0,						// Don't use workflow by default
 			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',
-			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
+			'blog_footer_text' => 'This collection &copy;$year$ by $publisher$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
@@ -216,7 +227,7 @@ class CollectionSettings extends AbstractSettings
 			'htsrv_assets_absolute_url' => '', // Absolute URL for setting 'htsrv_assets_url_type' with selected option 'absolute'
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
-			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'select_coll', 'select_user'
 			// Cookie settings:
 			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
 			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
@@ -235,11 +246,14 @@ class CollectionSettings extends AbstractSettings
 
 		// User directory:
 			'userdir_enable' => 1,
-			'userdir_filter_gender' => 1,
-			'userdir_filter_level' => 1,
-			'userdir_filter_org' => 1,
-			'userdir_filter_criteria' => 1,
-			'userdir_filter_lastseen' => 1,
+			'userdir_filter_restrict_to_members' => 1,
+			'userdir_filter_name' => 1,
+			'userdir_filter_email' => 0,
+			'userdir_filter_country' => 1,
+			'userdir_filter_region' => 1,
+			'userdir_filter_subregion' => 1,
+			'userdir_filter_city' => 1,
+			'userdir_filter_age_group' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -293,6 +307,11 @@ class CollectionSettings extends AbstractSettings
 			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
 			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
 			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
+			'search_result_template_item'      => 'search_result_item',
+			'search_result_template_comment'   => 'search_result_comment',
+			'search_result_template_file'      => 'search_result_file',
+			'search_result_template_category'  => 'search_result_category',
+			'search_result_template_tag'       => 'search_result_tag',
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:
@@ -306,6 +325,18 @@ class CollectionSettings extends AbstractSettings
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
+
+		// Popups settings:
+			'marketing_popup_using' => 'never',
+			'marketing_popup_animation' => 'random',
+			'marketing_popup_container_front' => 'marketing_popup',
+			'marketing_popup_container_posts' => 'marketing_popup',
+			'marketing_popup_container_single' => 'marketing_popup',
+			'marketing_popup_container_page' => 'marketing_popup',
+			'marketing_popup_container_catdir' => 'marketing_popup',
+			'marketing_popup_container_other_disps' => 'marketing_popup',
+			'marketing_popup_show_repeat' => 0,
+			'marketing_popup_show_frequency' => 'always',
 		);
 
 	/**
@@ -317,6 +348,7 @@ class CollectionSettings extends AbstractSettings
 	 *  'normal_skin_ID' => NULL,
 	 *  'mobile_skin_ID' => NULL,
 	 *  'tablet_skin_ID' => NULL,
+	 *  'alt_skin_ID' => NULL,
 	 */
 
 

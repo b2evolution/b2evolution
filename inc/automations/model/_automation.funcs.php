@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -24,17 +24,17 @@ function autm_display_breadcrumb()
 
 	echo '<nav aria-label="breadcrumb"><ol class="breadcrumb">';
 	echo '<li class="breadcrumb-item'.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '' : ' active' ).'">'
-			.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '<a href="'.$admin_url.'?ctrl=automations">'.T_('All').'</a>' : T_('All') )
+			.( isset( $edited_Automation ) || isset( $edited_AutomationStep ) ? '<a href="'.$admin_url.'?ctrl=automations">'.TB_('All').'</a>' : TB_('All') )
 		.'</li>';
 	if( isset( $edited_AutomationStep ) )
 	{	// Automation step:
 		$step_Automation = & $edited_AutomationStep->get_Automation();
 		echo '<li class="breadcrumb-item"><a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID.'">'.$step_Automation->dget( 'name' ).'</a></li>';
-		echo '<li class="breadcrumb-item active">'.( $edited_AutomationStep->ID > 0 ? T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) : T_('New step') ).'</li>';
+		echo '<li class="breadcrumb-item active">'.( $edited_AutomationStep->ID > 0 ? TB_('Step').' #'.$edited_AutomationStep->dget( 'order' ) : TB_('New step') ).'</li>';
 	}
 	elseif( isset( $edited_Automation ) )
 	{	// Automation:
-		echo '<li class="breadcrumb-item active">'.( $edited_Automation->ID > 0 ? $edited_Automation->dget( 'name' ) : T_('New automation') ).'</li>';
+		echo '<li class="breadcrumb-item active">'.( $edited_Automation->ID > 0 ? $edited_Automation->dget( 'name' ) : TB_('New automation') ).'</li>';
 	}
 	echo '</ol></nav>';
 }
@@ -48,8 +48,8 @@ function autm_display_breadcrumb()
 function autm_get_status_titles()
 {
 	return array(
-		'paused' => T_('Paused'),
-		'active' => T_('Active'),
+		'paused' => TB_('Paused'),
+		'active' => TB_('Active'),
 	);
 }
 
@@ -89,8 +89,8 @@ function autm_td_tied_lists( $newsletters )
 			{
 				$r .= '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit'
 					.'&amp;enlt_ID='.$newsletter[1].'">'.$newsletter[4].'</a>'
-					.( $newsletter[2] ? ' <span class="label label-success" title="'.format_to_js( T_('auto start on list subscribe') ).'">'./* TRANS: Auto Start automation on list subscribe */T_('AS').'</span>': '' )
-					.( $newsletter[3] ? ' <span class="label label-danger" title="'.format_to_js( T_('auto exit on list unsubscribe') ).'">'./* TRANS: Auto Exit automation on list unsubscribe */T_('AE').'</span>': '' )
+					.( $newsletter[2] ? ' <span class="label label-success" title="'.format_to_js( TB_('auto start on list subscribe') ).'">'./* TRANS: Auto Start automation on list subscribe */TB_('AS').'</span>': '' )
+					.( $newsletter[3] ? ' <span class="label label-danger" title="'.format_to_js( TB_('auto exit on list unsubscribe') ).'">'./* TRANS: Auto Exit automation on list unsubscribe */TB_('AE').'</span>': '' )
 					.', ';
 			}
 		}
@@ -117,7 +117,7 @@ function autm_td_users_step( $step_ID, $step_order, $step_label, $step_type, $st
 {
 	if( $step_ID === NULL )
 	{
-		return T_('Finished');
+		return TB_('Finished');
 	}
 	else
 	{
@@ -152,19 +152,19 @@ function autm_td_users_actions( $autm_ID, $user_ID, $user_login, $step_ID, $step
 	{	// Only for active step(excluding finished step):
 
 		// Change execution time:
-		$r .= action_icon( T_('Change execution time to now'), 'forward', $step_action_url.'reduce_step_delay' );
+		$r .= action_icon( TB_('Change execution time to now'), 'forward', $step_action_url.'reduce_step_delay' );
 
 		// Stop automation :
-		$r .= action_icon( T_('Stop automation for this user'), 'stop_square', $step_action_url.'stop_user' );
+		$r .= action_icon( TB_('Stop automation for this user'), 'stop_square', $step_action_url.'stop_user' );
 	}
 
 	// Remove user from automation:
-	$r .= action_icon( T_('Remove this user from automation'), 'remove', $step_action_url.'remove_user', '', 0, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to remove this user from automation?').'\');' ) );
+	$r .= action_icon( TB_('Remove this user from automation'), 'remove', $step_action_url.'remove_user', '', 0, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to remove this user from automation?').'\');' ) );
 
 	// Requeue:
 	$r .= ' <a href="#" class="btn btn-info btn-xs"'
 		.' onclick="return requeue_automation( '.$autm_ID.', '.( $is_step_edit_form ? $step_ID : '0' ).', '.( $is_step_edit_form ? $step_order : '0' ).', '.$user_ID.', \''.$user_login.'\' )">'
-			.T_('Requeue')
+			.TB_('Requeue')
 		.'</a>';
 
 	return $r;
@@ -204,15 +204,15 @@ function autm_td_status( $autm_ID, $autm_status, $url_params = '' )
 function step_get_type_titles()
 {
 	return array(
-		'if_condition'     => T_('IF Condition'),
-		'send_campaign'    => T_('Send Campaign'),
-		'notify_owner'     => T_('Notify owner'),
-		'add_usertag'      => T_('Add Usertag'),
-		'remove_usertag'   => T_('Remove Usertag'),
-		'subscribe'        => T_('Subscribe User to List'),
-		'unsubscribe'      => T_('Unsubscribe User from List'),
-		'start_automation' => T_('Start new automation'),
-		'user_status'      => T_('Change user account status'),
+		'if_condition'     => TB_('IF Condition'),
+		'send_campaign'    => TB_('Send Campaign'),
+		'notify_owner'     => TB_('Notify owner'),
+		'add_usertag'      => TB_('Add Usertag'),
+		'remove_usertag'   => TB_('Remove Usertag'),
+		'subscribe'        => TB_('Subscribe User to List'),
+		'unsubscribe'      => TB_('Unsubscribe User from List'),
+		'start_automation' => TB_('Start new automation'),
+		'user_status'      => TB_('Change user account status'),
 	);
 }
 
@@ -348,7 +348,7 @@ function step_get_result_labels()
 /**
  * Get result label of automation step by step type and result value
  *
- * NOTE! Return string is not translatable, Use funcs T_(), TS_() and etc. in that place where you use this func.
+ * NOTE! Return string is not translatable, Use funcs TB_(), TS_() and etc. in that place where you use this func.
  *
  * @param string Step type: 'if_condition', 'send_campaign
  * @param string Step result: 'YES', 'NO', 'ERROR'
@@ -379,7 +379,7 @@ function step_td_num_users_queued( $step_ID, $autm_ID, $num_users_queued, $step_
 		$num_users_queued = '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'">'
 				.$num_users_queued
 			.'</a>'
-			.' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$autm_ID.', '.$step_ID.', '.$step_order.' )">'.T_('Requeue').'</a>';
+			.' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$autm_ID.', '.$step_ID.', '.$step_order.' )">'.TB_('Requeue').'</a>';
 	}
 
 	return $num_users_queued;
@@ -468,18 +468,18 @@ function step_td_next_step( $step_ID, $next_step_ID, $next_step_order, $next_ste
 
 	if( empty( $next_step_ID ) )
 	{	// Next ordered step:
-		return '<span class="green">'.T_('Continue').' ('.seconds_to_period( $next_step_delay ).')</span>';
+		return '<span class="green">'.TB_('Continue').' ('.seconds_to_period( $next_step_delay ).')</span>';
 	}
 	elseif( $next_step_ID == '-1' )
 	{	// Stop workflow:
-		return '<span class="red">'.T_('STOP').'</span>';
+		return '<span class="red">'.TB_('STOP').'</span>';
 	}
 	elseif( $next_step_ID == $step_ID )
 	{	// Loop:
-		return '<span class="orange">'.T_('Loop').' ('.seconds_to_period( $next_step_delay ).')</span>';
+		return '<span class="orange">'.TB_('Loop').' ('.seconds_to_period( $next_step_delay ).')</span>';
 	}
 
-	return sprintf( T_('Go to step %d'), intval( $next_step_order ) ).' ('.seconds_to_period( $next_step_delay ).')';
+	return sprintf( TB_('Go to step %d'), intval( $next_step_order ) ).' ('.seconds_to_period( $next_step_delay ).')';
 }
 
 
@@ -503,7 +503,7 @@ function step_td_actions( $step_ID, $is_first_step, $is_last_step )
 	}
 	else
 	{	// Display action icon to move step up:
-		$r .= action_icon( T_('Move up'), 'move_up', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=move_step_up&amp;'.url_crumb( 'automationstep' ) ) );
+		$r .= action_icon( TB_('Move up'), 'move_up', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=move_step_up&amp;'.url_crumb( 'automationstep' ) ) );
 	}
 
 	if( $is_last_step )
@@ -512,14 +512,14 @@ function step_td_actions( $step_ID, $is_first_step, $is_last_step )
 	}
 	else
 	{	// Display action icon to move step down:
-		$r .= action_icon( T_('Move down'), 'move_down', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=move_step_down&amp;'.url_crumb( 'automationstep' ) ) );
+		$r .= action_icon( TB_('Move down'), 'move_down', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=move_step_down&amp;'.url_crumb( 'automationstep' ) ) );
 	}
 
-	$r .= action_icon( T_('Edit this step'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID );
+	$r .= action_icon( TB_('Edit this step'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID );
 
-	$r .= action_icon( T_('Duplicate step right below current one'), 'copy', $admin_url.'?ctrl=automations&amp;action=copy_step&amp;step_ID='.$step_ID );
+	$r .= action_icon( TB_('Duplicate step right below current one'), 'copy', $admin_url.'?ctrl=automations&amp;action=copy_step&amp;step_ID='.$step_ID );
 
-	$r .= action_icon( T_('Delete this step!'), 'delete', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=delete_step&amp;'.url_crumb( 'automationstep' ) ) );
+	$r .= action_icon( TB_('Delete this step!'), 'delete', regenerate_url( 'step_ID,action', 'step_ID='.$step_ID.'&amp;action=delete_step&amp;'.url_crumb( 'automationstep' ) ) );
 
 	return $r;
 }
@@ -539,7 +539,7 @@ function step_td_user_state( $step_ID, $step_label, $step_type, $step_info, $ste
 {
 	if( $step_ID === NULL )
 	{	// If all steps for automation were completed for user:
-		return T_('Finished');
+		return TB_('Finished');
 	}
 
 	return '#'.$step_order.' - '.step_td_label( $step_ID, $step_label, $step_type, $step_info );
@@ -580,7 +580,7 @@ function automation_results_block( $params = array() )
 
 	$params = array_merge( array(
 		'enlt_ID'               => NULL, // Newsletter ID
-		'results_title'         => T_('Automations').get_manual_link( 'automations-list' ),
+		'results_title'         => TB_('Automations').get_manual_link( 'automations-list' ),
 		'results_prefix'        => 'autm_',
 		'display_create_button' => true
 	), $params );
@@ -616,14 +616,14 @@ function automation_results_block( $params = array() )
 
 	if( $params['display_create_button'] && $current_User->check_perm( 'options', 'edit' ) )
 	{	// User must has a permission to add new automation:
-		//$Results->global_icon( T_('New automation'), 'new', regenerate_url( 'action', 'action=new' ), T_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
-		$Results->global_icon( T_('New automation'), 'new', $admin_url.'?ctrl=automations&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		//$Results->global_icon( TB_('New automation'), 'new', regenerate_url( 'action', 'action=new' ), TB_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+		$Results->global_icon( TB_('New automation'), 'new', $admin_url.'?ctrl=automations&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), TB_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
 
 	$Results->title = $params['results_title'];
 
 	$Results->cols[] = array(
-			'th'       => T_('ID'),
+			'th'       => TB_('ID'),
 			'order'    => 'autm_ID',
 			'td'       => '$autm_ID$',
 			'th_class' => 'shrinkwrap',
@@ -631,7 +631,7 @@ function automation_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th'    => T_('Name'),
+			'th'    => TB_('Name'),
 			'order' => 'autm_name',
 			'td'    => ( $current_User->check_perm( 'options', 'edit' )
 				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$"><b>$autm_name$</b></a>'
@@ -639,13 +639,13 @@ function automation_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th'    => T_('Tied to Lists'),
+			'th'    => TB_('Tied to Lists'),
 			'order' => 'newsletters',
 			'td'    => '%autm_td_tied_lists( #newsletters# )%',
 		);
 
 	$Results->cols[] = array(
-			'th'          => T_('Users'),
+			'th'          => TB_('Users'),
 			'order'       => 'autm_users_num',
 			'td'          => '$autm_users_num$',
 			'th_class'    => 'shrinkwrap',
@@ -654,7 +654,7 @@ function automation_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th'       => T_('Status'),
+			'th'       => TB_('Status'),
 			'order'    => 'autm_status',
 			'td'       => '%autm_td_status( #autm_ID#, #autm_status#, "'.$url_params.'" )%',
 			'th_class' => 'shrinkwrap',
@@ -664,9 +664,9 @@ function automation_results_block( $params = array() )
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Display actions column only if current user has a permission to edit options:
 		$Results->cols[] = array(
-				'th'       => T_('Actions'),
-				'td'       => action_icon( T_('Edit this automation'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$' )
-										 .action_icon( T_('Delete this automation!'), 'delete', regenerate_url( 'autm_ID,action', 'autm_ID=$autm_ID$&amp;action=delete&amp;'.url_crumb( 'automation' ) ) ),
+				'th'       => TB_('Actions'),
+				'td'       => action_icon( TB_('Edit this automation'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$' )
+										 .action_icon( TB_('Delete this automation!'), 'delete', regenerate_url( 'autm_ID,action', 'autm_ID=$autm_ID$&amp;action=delete&amp;'.url_crumb( 'automation' ) ) ),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
 			);

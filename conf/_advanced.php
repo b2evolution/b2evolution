@@ -94,40 +94,62 @@ $date_default_timezone = '';
  * @global array
  */
 $thumbnail_sizes = array(
-			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
-			'fit-720x500' => array( 'fit', 720, 500, 90 ),
-			'fit-640x480' => array( 'fit', 640, 480, 90 ),
-			'fit-520x390' => array( 'fit', 520, 390, 90 ),
-			'fit-400x320' => array( 'fit', 400, 320, 85 ),
-			'fit-320x320' => array( 'fit', 320, 320, 85 ),
-			'fit-256x256' => array( 'fit', 256, 256, 85 ),
-			'fit-192x192' => array( 'fit', 192, 192, 85 ),
-			'fit-160x160' => array( 'fit', 160, 160, 80 ),
-			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
-			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
-			'fit-160x120' => array( 'fit', 160, 120, 80 ),
-			'fit-128x128' => array( 'fit', 128, 128, 80 ),
-			'fit-128x16' => array( 'fit', 128, 16, 80 ),
-			'fit-80x80' => array( 'fit', 80, 80, 80 ),
-			'crop-480x320' => array( 'crop', 480, 320, 90 ),
-			'crop-256x256' => array( 'crop', 256, 256, 85 ),
-			'crop-192x192' => array( 'crop', 192, 192, 85 ),
-			'crop-128x128' => array( 'crop', 128, 128, 85 ),
-			'crop-80x80' => array( 'crop', 80, 80, 85 ),
-			'crop-64x64' => array( 'crop', 64, 64, 85 ),
-			'crop-48x48' => array( 'crop', 48, 48, 85 ),
-			'crop-32x32' => array( 'crop', 32, 32, 85 ),
-			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+	// FIT: Typical images that will be shrunk to max width and/or max height but keep original aspect ratio (the ratios below are only for reference)
+		// 16:9 ratio 1.77
+			'fit-2880x1620'			=> array( 'fit', 2880, 1620, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-2560x1440'			=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1920x1080'			=> array( 'fit', 1920, 1080, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1600x900'			=> array( 'fit', 1600, 900, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1280x720'			=> array( 'fit', 1280, 720, 85 ),		// 16:9 ratio 1.77
+			'fit-960x540'			=> array( 'fit', 960, 540, 85 ),			// 16:9 ratio 1.77	EXPERIMENTAL
+			'fit-720x500'			=> array( 'fit', 720, 500, 90 ),			// ratio 1.44
+			'fit-640x480'			=> array( 'fit', 640, 480, 90 ),			// 4:3 ratio 1.33
+			'fit-520x390'			=> array( 'fit', 520, 390, 90 ),			// 4:3 ratio 1.33
+			'fit-400x320'			=> array( 'fit', 400, 320, 85 ),			// 5:4 ratio 1.25
+			'fit-320x320'			=> array( 'fit', 320, 320, 85 ),			// 1:1 square ratio 1
+			'fit-256x256'			=> array( 'fit', 256, 256, 85 ),			// 1:1 square ratio 1
+			'fit-192x192'			=> array( 'fit', 192, 192, 85 ),			// 1:1 square ratio 1
+			'fit-160x160'			=> array( 'fit', 160, 160, 85 ),			// 1:1 square ratio 1
+			'fit-160x120'			=> array( 'fit', 160, 120, 85 ),			// 1:1 square ratio 1
+			'fit-128x128'			=> array( 'fit', 128, 128, 85 ),			// 1:1 square ratio 1
+			'fit-128x16'			=> array( 'fit', 128, 16, 85 ),				// 8:1 square ratio 8
+			'fit-80x80'				=> array( 'fit', 80, 80, 85 ),				// 1:1 square ratio 1
+	// FIT+BLUR: Blurred images (probably no need for Retina support, because the intended effect is to be blurred)
+			'fit-160x160-blur-13'		=> array( 'fit', 160, 160, 80, 13 ),
+			'fit-160x160-blur-18'		=> array( 'fit', 160, 160, 80, 18 ),
+	// CROPPED: Images that will be shrunk AND cropped to completely FILL the request aspect ratio
+		// 3:2 ratio 1.5
+			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
+		// 1:1 square ratio 1
+			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina
+			'crop-320x320'			=> array( 'crop', 320, 320, 85 ),
+			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
+			'crop-192x192'			=> array( 'crop', 192, 192, 85 ),
+			'crop-128x128'			=> array( 'crop', 128, 128, 85 ),
+			'crop-80x80'			=> array( 'crop', 80, 80, 85 ),
+			'crop-64x64'			=> array( 'crop', 64, 64, 85 ),
+			'crop-48x48'			=> array( 'crop', 48, 48, 85 ),
+			'crop-32x32'			=> array( 'crop', 32, 32, 85 ),
+			'crop-15x15'			=> array( 'crop', 15, 15, 85 ),
+	// CROPPED near TOP: Images that will be shrunk with preference towards the top AND cropped to completely FILL the request aspect ratio (typically used for profile pictures)
+			'crop-top-640x640'		=> array( 'crop-top', 640, 640, 85 ),		// EXPERIMENTAL For Retina
+			'crop-top-320x320'		=> array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200'		=> array( 'crop-top', 200, 200, 85 ),
+			'crop-top-160x160'		=> array( 'crop-top', 160, 160, 85 ),
+			'crop-top-80x80'		=> array( 'crop-top', 80, 80, 85 ),
+			'crop-top-64x64'		=> array( 'crop-top', 64, 64, 85 ),
+			'crop-top-48x48'		=> array( 'crop-top', 48, 48, 85 ),
+			'crop-top-32x32'		=> array( 'crop-top', 32, 32, 85 ),
+			'crop-top-15x15'		=> array( 'crop-top', 15, 15, 85 ),
+	// CROPPED near TOP + BLUR  (typically used to obfuscate profile pictures) (probably no need for Retina support, because the intended effect is to be blurred)
 			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
-			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
-			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
-			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
-			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
-			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
-			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),
-			'crop-top-32x32' => array( 'crop-top', 32, 32, 85 ),
-			'crop-top-15x15' => array( 'crop-top', 15, 15, 85 ),
 	);
+
+
+/**
+ * Generate additional attribute "srcset" for images
+ */
+$generate_srcset_sizes = true;
 
 
 /**
@@ -461,7 +483,7 @@ $restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
 $rsc_url = $assets_baseurl.$rsc_subdir;  // You should not need to change this
-$rsc_uri = $basesubpath.$rsc_subdir;
+$rsc_uri = $basesubpath.$rsc_subdir;     // You should not need to change this
 
 /**
  * Location of the skins folder.
@@ -472,20 +494,9 @@ $rsc_uri = $basesubpath.$rsc_subdir;
  * @global string $skins_path
  * @global string $skins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_skins_url()
  */
-$skins_subdir = 'skins/';                // Subdirectory relative to base
-$skins_path = $basepath.$skins_subdir;   // You should not need to change this
-$skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change this
-
-/**
- * Location of the site skins folder.
- *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
- *
- * @global string $siteskins_subdir
- */
-$siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
-$siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
-$siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to change this
+$skins_subdir = 'skins/';                   // Subdirectory relative to base
+$skins_path = $basepath.$skins_subdir;      // You should not need to change this
+$skins_url = $assets_baseurl.$skins_subdir; // You should not need to change this
 
 /**
  * Location of the email skins folder.
@@ -497,6 +508,11 @@ $siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to
 $emailskins_subdir = 'skins_email/';               // Subdirectory relative to base
 $emailskins_path = $basepath.$emailskins_subdir;   // You should not need to change this
 $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need to change this
+
+/**
+ * Location of the customizer mode interface
+ */
+$customizer_relative_url = $basesubpath.'customize.php';
 
 /**
  * Location of the admin interface dispatcher
@@ -606,6 +622,49 @@ $backup_path = $basepath.$backup_subdir; // You should not need to change this
  */
 $upgrade_subdir = '_upgrade/';              // Subdirectory relative to base
 $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change this
+
+
+/**
+ * Change to true if you want to be able to install arbitrary ZIP files on the server.
+ * ATTENTION: this poses a security risk if the admin password is compromised.
+ *
+ * @global boolean $auto_upgrade_from_any_url
+ */
+$auto_upgrade_from_any_url = false;
+
+
+/**
+ * Location of the logs folder.
+ *
+ * Note: This folder does SHOULD NOT be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $upgrade_subdir
+ */
+$logs_subdir = '_logs/';              // Subdirectory relative to base
+$logs_path = $basepath.$logs_subdir;  // You should not need to change this
+
+
+/**
+ * Location of the external library folder.
+ *
+ * Note: This folder does NOT NEED to be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $ext_subdir
+ */
+$ext_subdir = 'ext/';               // Subdirectory relative to base
+$ext_path = $basepath.$ext_subdir;  // You should not need to change this
+
+
+/**
+ * Allow to use scripts from /cli folder
+ *
+ * Note: most scripts are available only in b2evolution PRO
+ *
+ * @global boolean
+ */
+$allow_cli_folder = false;
 
 
 /**
@@ -768,6 +827,16 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
+ * Allow parameters in URL without redirect to Item canonical URL when collection setting "301 redirect to canonical URL when possible" is enabled
+ */
+$noredir_params = array(
+	'page',          // For showing a different page in a multipage post
+	'quote_post',    // For quoting a post in the forums
+	'quote_comment', // For quoting a comment in the forums
+);
+
+
+/**
  * Turn this on to simulate email sends instead of really sending them through SMTP.
  * This is useful if you are debugging a production database on a development machine.
  * It will prevent from sending test notifications to real user accounts.
@@ -833,6 +902,7 @@ $library_cdn_urls = array(
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
 		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
+		//'#clipboardjs#' => array( '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js', '//cdn.rawgit.com/zenorocha/clipboard.js/v2.0.4/dist/clipboard.min.js' ),
 		'#fontawesome#' => array( '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' ),
 	);
 
@@ -844,6 +914,7 @@ $library_cdn_urls = array(
  */
 $library_local_urls = array(
 		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
+		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
 		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
 		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
@@ -876,6 +947,8 @@ $library_local_urls = array(
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
+		'#clipboardjs#' => array( 'clipboardjs/clipboard.min.js' ),
+		'#hotkeys#' => array( 'hotkeys/hotkeys.min.js' ),
 	);
 
 
@@ -908,7 +981,14 @@ $check_browser_version = false;
  * Maximum skin API version which is supported by current version of b2evolution.
  * Skin API version is defined in the method Skin::get_api_version() of each skin.
  */
-$max_skin_api_version = 6;
+$max_skin_api_version = 7;
+
+
+/**
+ * Header "Access-Control-Allow-Origin"
+ * Used to enable using of evo helpdesk widget from other sites
+ */
+$access_control_allow_origin = false; // set to '*' or to specific URL to enable CORS requests
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -23,9 +23,9 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'poll_option_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', url_add_param( regenerate_url( 'action,popt_ID,blog' ), 'action=edit' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', url_add_param( regenerate_url( 'action,popt_ID,blog' ), 'action=edit' ) );
 
-$Form->begin_form( 'fform', sprintf( ( $creating ?  T_('New poll option for question "%s"') : T_('Poll option for question "%s"') ), $edited_Poll->get_name() )
+$Form->begin_form( 'fform', sprintf( ( $creating ?  TB_('New poll option for question "%s"') : TB_('Poll option for question "%s"') ), $edited_Poll->get_name() )
 		.get_manual_link( 'poll-option-form' ) );
 
 	$Form->add_crumb( 'poll' );
@@ -33,9 +33,9 @@ $Form->begin_form( 'fform', sprintf( ( $creating ?  T_('New poll option for ques
 	$Form->hidden( 'pqst_ID', $edited_Poll->ID );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',popt_ID' : '' ) ) );
 
-	$Form->text_input( 'popt_option_text', $edited_PollOption->get( 'option_text' ), 10, T_('Option'), '', array( 'maxlength' => 2000, 'required' => true, 'class' => 'large' ) );
+	$Form->text_input( 'popt_option_text', $edited_PollOption->get( 'option_text' ), 10, TB_('Option'), '', array( 'maxlength' => 2000, 'required' => true, 'class' => 'large' ) );
 
-	$Form->text_input( 'popt_order', $edited_PollOption->get( 'order' ), 10, T_('Order'), '', array( 'required' => ! $creating ) );
+	$Form->text_input( 'popt_order', $edited_PollOption->get( 'order' ), 10, TB_('Order'), '', array( 'required' => ! $creating ) );
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton' ) ) );
 ?>

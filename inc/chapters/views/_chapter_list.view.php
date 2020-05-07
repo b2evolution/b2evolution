@@ -7,12 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 //____________________ Callbacks functions to display categories list _____________________
+
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * @var Blog
@@ -395,7 +397,7 @@ $Form->radio_input( 'category_ordering', $Blog->get_setting('category_ordering')
 					array( 'value'=>'alpha', 'label'=>T_('Alphabetically') ),
 					array( 'value'=>'manual', 'label'=>T_('Manually') ),
 			 ), T_('Sort categories'), array( 'note'=>'('.T_('Note: can be overridden for sub-categories').')' ) );
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) )  );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ) )  );
 
 echo '</div>'; // form wrapper end
 

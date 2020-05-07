@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -113,6 +113,16 @@ class AdminUI_general extends Menu
 	 * @var string
 	 */
 	var $coll_list_onclick = NULL;
+	/**
+	 * Collection List buttons: display a link to add new collection
+	 * @var boolean
+	 */
+	var $coll_list_disp_add = true;
+	/**
+	 * Collection List buttons: display a list of sections
+	 * @var boolean
+	 */
+	var $coll_list_disp_sections = false;
 
 
 	/**
@@ -305,6 +315,7 @@ class AdminUI_general extends Menu
 	 */
 	function set_page_manual_link( $topic )
 	{
+		$this->page_manual_slug = $topic;
 		$this->page_manual_link = get_manual_link( $topic, NULL, T_('Manual page'), 5 );
 	}
 
@@ -659,7 +670,7 @@ class AdminUI_general extends Menu
 		}
 
 		$skin_wrapper_class = 'skin_wrapper';
-		if( is_logged_in() )
+		if( show_toolbar() )
 		{ // user is logged in
 			if( $this->get_show_evobar() )
 			{ // show evobar options is enabled for this admin skin
@@ -717,6 +728,12 @@ class AdminUI_general extends Menu
 	{
 		if( is_ajax_content() )
 		{	// Don't display this content on AJAX request
+			return;
+		}
+
+		global $mode;
+		if( $mode == 'customizer' )
+		{	// Don't display this content on skin customizer mode:
 			return;
 		}
 
@@ -831,9 +848,11 @@ class AdminUI_general extends Menu
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
 	 * @param string onclick attribute format string, with %s for blog number. (NOTE: %s so that we can use this.value when selected through list)
+	 * @param boolean TRUE to display a link to add new collection
+	 * @param boolean TRUE to display a list of sections
 	 */
 	function set_coll_list_params( $permname = 'blog_ismember', $permlevel = 1, $url_params = array(),
-							$all_title = NULL, $all_url = '', $onclick = NULL )
+							$all_title = NULL, $all_url = '', $onclick = NULL, $display_add_link = true, $display_sections = false )
 	{
 		$this->coll_list_all_title = $all_title;
 		$this->coll_list_all_url = $all_url;
@@ -841,6 +860,8 @@ class AdminUI_general extends Menu
 		$this->coll_list_permlevel = $permlevel;
 		$this->coll_list_url_params = $url_params;
 		$this->coll_list_onclick = $onclick;
+		$this->coll_list_disp_add = $display_add_link;
+		$this->coll_list_disp_sections = $display_sections;
 	}
 
 
@@ -1685,6 +1706,16 @@ class AdminUI_general extends Menu
 	function get_show_evobar()
 	{
 		return true;
+	}
+
+
+	/**
+	 * Display tabs for customizer mode in left iframe
+	 *
+	 * @param array Params
+	 */
+	function display_customizer_tabs( $params = array() )
+	{
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @todo dh> Lazily handle properties through getters (and do not detect/do much in the constructor)!
@@ -373,7 +373,7 @@ class Hit
 	{
 		global $Debuglog, $debug;
 		global $self_referer_list, $SpecialList;  // used to detect $referer_type
-		global $skins_path, $siteskins_path;
+		global $skins_path;
 		global $Settings;
 
 		if( $referer !== NULL )
@@ -465,7 +465,8 @@ class Hit
 
 			if( $Settings->get( 'antispam_block_spam_referers' ) )
 			{ // In order to preserve server resources, we're going to stop processing immediatly (no logging)!!
-				require $siteskins_path.'_403_referer_spam.main.php';	// error & exit
+				siteskin_init();
+				siteskin_include( '_403_referer_spam.main.php' ); // error
 				exit( 0 ); // just in case.
 				// THIS IS THE END!!
 			}
@@ -857,8 +858,9 @@ class Hit
 			{
 				$s = $this->test_uri['s'];
 			}
-			else
-			{
+			elseif( isset( $_GET['s'] ) || isset( $_POST['s'] ) )
+			{	// Consider a request as search ONLY if a keyword is passed through GET or POST,
+				// and not in automatic searches like 404 page with search widget:
 				$s = get_param( 's' );
 			}
 			if( isset( $s ) && ! empty( $blog_ID ) )

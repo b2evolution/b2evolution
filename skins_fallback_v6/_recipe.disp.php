@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -41,7 +41,7 @@ $params = array_merge( array(
 		'after_image'              => '</figure>',
 		'after_images'             => '</div>',
 		'image_class'              => 'img-responsive',
-		'image_size'               => 'crop-top-320x320',
+		'image_size'               => 'crop-320x320',
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 		'excerpt_image_class'      => '',
@@ -93,31 +93,35 @@ if( mainlist_get_item() )
 	echo empty( $params['item_style'] ) ? '' : ' style="'.format_to_output( $params['item_style'], 'htmlattr' ).'"' ?>>
 
 	<header>
-		<div class="small text-muted">
 		<?php
-			if( $Item->status != 'published' )
-			{	// Display not public Item's status:
-				$Item->format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
-			}
-
 			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
-			skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			widget_container( 'item_single_header', array(
 				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="evo_widget $wi_class$">',
 				'block_end' => '</div>',
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+
 				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_item_title_display' => false,
+				// Item Previous Next widget
+				'widget_item_next_previous_params' => array(
+					),
+				// Item Visibility Badge widge template
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_params'  => array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					),
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		?>
-		</div>
 	</header>
 	
 	<div class="row">
@@ -198,7 +202,7 @@ if( mainlist_get_item() )
 			$Item->custom_fields( array(
 					'fields'                               => 'course,cuisine,servings',
 					'custom_fields_table_start'            => '',
-					'custom_fields_row_start'              => '<div class="row">',
+					'custom_fields_row_start'              => '<div class="row"$row_attrs$>',
 					'custom_fields_row_header_field'       => '<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>',
 					'custom_fields_description_icon_class' => 'grey',
 					'custom_fields_value_default'          => '<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>',
@@ -210,11 +214,11 @@ if( mainlist_get_item() )
 			$Item->custom_fields( array(
 					'fields'                               => 'prep_time,cook_time,passive_time,total_time',
 					'custom_fields_table_start'            => '<br /><div class="row">',
-					'custom_fields_row_start'              => '',
+					'custom_fields_row_start'              => '<span$row_attrs$>',
 					'custom_fields_row_header_field'       => '<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>',
 					'custom_fields_description_icon_class' => 'grey',
 					'custom_fields_value_default'          => '<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>',
-					'custom_fields_row_end'                => '',
+					'custom_fields_row_end'                => '</span>',
 					'custom_fields_table_end'              => '</div>',
 					'hide_empty_lines'                     => true,
 				) );
@@ -223,27 +227,11 @@ if( mainlist_get_item() )
 	</div>
 
 	<div class="row">
-		<?php
-		// Custom field "Ingredients" (if it exists for current Item):
-		$ingredients = $Item->get_custom_field_formatted( 'ingredients' );
-		if( $ingredients !== false )
-		{	// Display "Ingredients" only if this custom field exists for the current Item:
-		?>
 		<div class="col-lg-3 col-sm-4">
-			<h4><?php echo $Item->get_custom_field_title( 'ingredients' ); ?></h4>
-			<p><?php echo $ingredients; ?></p>
+			<h4><?php $Item->custom( array( 'field' => 'ingredients', 'what' => 'label' )  ); ?></h4>
+			<p><?php $Item->custom( array( 'field' => 'ingredients' ) ); ?></p>
 		</div>
-		<?php
-			$directions_col_size = 'col-lg-9 col-sm-8';
-		}
-		else
-		{	// Use full width if ingredients field is not detected:
-			$directions_col_size = 'col-sm-12';
-		}
-
-		// Directions:
-		?>
-		<div class="<?php echo $directions_col_size; ?>">
+		<div class="col-lg-9 col-sm-8">
 			<h4><?php echo T_('Directions'); ?></h4>
 			<?php
 			// Display the "after more" part of the text: (part after "[teaserbreak]")

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -34,7 +34,7 @@ param( 'comment_type', 'string', 'feedback' );
 param( 'redirect_to', 'url', '' );
 param( 'reply_ID', 'integer', 0 );
 
-// Only logged in users can post the meta comments
+// Only logged in users can post the internal comments
 $comment_type = is_logged_in() ? $comment_type : 'feedback';
 
 $action = param_arrayindex( 'submit_comment_post_'.$comment_item_ID, 'save' );
@@ -68,10 +68,10 @@ if( $Settings->get('system_lock') )
 
 // Check user permissions to post this comment:
 if( $comment_type == 'meta' )
-{ // Meta comment
+{ // Internal comment
 	if( ! $commented_Item->can_meta_comment() )
-	{ // Current user has no permission to post a meta comment
-		$Messages->add( T_('You cannot leave meta comments on this post!'), 'error' );
+	{ // Current user has no permission to post an internal comment
+		$Messages->add( T_('You cannot leave internal comments on this post!'), 'error' );
 		header_redirect(); // Will save $Messages into Session
 	}
 }
@@ -177,9 +177,14 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
 
+// Load workflow properties:
+$load_workflow_result = $commented_Item->load_workflow_from_Request();
+// Load meta custom fields:
+$load_custom_fields_result = ( $comment_type == 'meta' && $commented_Item->load_custom_fields_from_Request( true ) );
+
 $workflow_is_updated = false;
-if( ( $workflow_is_loaded = $commented_Item->load_workflow_from_Request() ) &&
-    $action != 'preview' &&
+if( $action != 'preview' &&
+    ( ! empty( $load_workflow_result ) || ! empty( $load_custom_fields_result ) ) &&
     $commented_Item->dbupdate() )
 {	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
 	$Messages->add( T_('The workflow properties have been updated.'), 'success' );
@@ -317,7 +322,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach( $Comment->temp_link_owner_ID ) && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
+if( $commented_Item->can_attach( $Comment->temp_link_owner_ID, $Comment->type ) && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )
@@ -391,7 +396,7 @@ $Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
 	'is_preview' => ( $action == 'preview' ),
 ) );
 
-if( $workflow_is_loaded )
+if( $load_workflow_result )
 {	// Store changed Item workflow properties in session Comment in order to display them after redirect:
 	$Comment->item_workflow = array(
 		'assigned_user_ID' => $commented_Item->get( 'assigned_user_ID' ),
@@ -399,6 +404,19 @@ if( $workflow_is_loaded )
 		'pst_ID' => $commented_Item->get( 'pst_ID' ),
 		'datedeadline' => $commented_Item->get( 'datedeadline' ),
 	);
+}
+
+if( $load_custom_fields_result )
+{	// Store changed Item custom fields in session Comment in order to display them after redirect:
+	$custom_fields = $commented_Item->get_custom_fields_defs();
+	$Comment->item_custom_fields = array();
+	foreach( $custom_fields as $custom_field )
+	{
+		if( $custom_field['meta'] )
+		{
+			$Comment->item_custom_fields[ $custom_field['name'] ] = $custom_field['value'];
+		}
+	}
 }
 
 // Redirect and:
@@ -606,7 +624,7 @@ if( $Comment->ID )
 			$success_message = T_('Your comment is now visible by the community.');
 			break;
 		case 'protected':
-			$success_message = T_('Your comment is now visible by the blog members.');
+			$success_message = T_('Your comment is now visible by the members of this section (this collection).');
 			break;
 		case 'review':
 			if( is_logged_in() && $current_User->check_perm( 'blog_comment!review', 'create', false, $blog ) )

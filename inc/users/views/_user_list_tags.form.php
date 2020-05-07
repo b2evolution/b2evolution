@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -33,21 +33,21 @@ $Form->add_crumb( 'users' );
 $Form->hidden_ctrl();
 
 // A link to close popup window:
-$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+$close_icon = action_icon( TB_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 
-$Form->begin_fieldset( T_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).$close_icon );
+$Form->begin_fieldset( TB_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).$close_icon );
 
-	$Form->usertag_input( 'add_user_tags', '', 40, T_('Tags to add to each user'), '', array(
+	$Form->usertag_input( 'add_user_tags', '', 40, TB_('Tags to add to each user'), '', array(
 		'style'        => 'width:100%',
 	) );
 
-	$Form->usertag_input( 'remove_user_tags', '', 40, T_('Tags to remove from each user'), '', array(
+	$Form->usertag_input( 'remove_user_tags', '', 40, TB_('Tags to remove from each user'), '', array(
 		'style'        => 'width:100%',
 	) );
 
 $Form->end_fieldset();
 
-$Form->button( array( '', 'actionArray[update_tags]', T_('Make changes now!'), 'SaveButton' ) );
+$Form->button( array( '', 'actionArray[update_tags]', TB_('Make changes now!'), 'SaveButton' ) );
 
 $Form->end_form();
 ?>

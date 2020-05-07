@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +21,7 @@ class table_contents_plugin extends Plugin
 	var $name;
 	var $code = 'b2evoTOC';
 	var $priority = 110;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'rendering';
 	var $subgroup = 'infoitem';
 	var $short_desc;
@@ -193,9 +193,11 @@ class table_contents_plugin extends Plugin
 			$toc .= '<ul class="evo_plugin__table_of_contents">';
 			foreach( $header_matches[3] as $h => $header_text )
 			{
+				$header_text = utf8_strip_tags( $header_text );
+				$header_text = preg_replace( '#\[[a-z]+:[^\]`]+\]#i', '', $header_text );
 				$anchor = trim( $header_matches[2][ $h ], '"\'' );
 				$toc .= '<li style="margin-left:'.( ( $header_matches[1][ $h ] - $min_header_level ) * 10 ).'px">'
-						.'<a href="'.$item_url.'#'.$anchor.'" data-anchor="'.$anchor.'">'.utf8_strip_tags( $header_text ).'</a>'
+						.'<a href="'.$item_url.'#'.$anchor.'" data-anchor="'.$anchor.'">'.$header_text.'</a>'
 					.'</li>';
 			}
 			$toc .= '</ul>';
@@ -270,21 +272,33 @@ class table_contents_plugin extends Plugin
 	{
 		global $Item, $disp;
 
+		$this->init_widget_params( $params, array(
+				'block_start'       => '<div class="evo_widget $wi_class$ panel panel-default">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+				'block_title_end'   => '</h4></div>',
+				'block_body_start'  => '<div class="panel-body">',
+				'block_body_end'    => '</div>',
+			) );
+
 		if( $disp != 'single' && $disp != 'page' )
 		{	// Don't display this widget for not post pages:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because no proper disp.' );
 			return false;
 		}
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because no current Item.' );
 			return false;
 		}
 
 		// Generate table of contents:
-		$toc = $this->genereate_toc( $Item, $Item->get_prerendered_content( 'htmlbody' ) );
+		$toc = $this->genereate_toc( $Item, $Item->get_full_content( 'htmlbody', $params ) );
 
 		if( empty( $toc ) )
 		{	// Don't display widget when current Item has no anchor header tags in content:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because Item has no anchor header tags in content.' );
 			return false;
 		}
 

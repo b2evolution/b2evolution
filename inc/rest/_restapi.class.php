@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package api
  */
@@ -72,8 +72,8 @@ class RestApi
 		$UserCache = & get_UserCache();
 
 		// Note: login and password cannot include ' or " or > or <
-		$entered_login = utf8_strtolower( utf8_strip_tags( remove_magic_quotes( $entered_login ) ) );
-		$entered_password = utf8_strip_tags( remove_magic_quotes( $entered_password ) );
+		$entered_login = utf8_strtolower( utf8_strip_tags( $entered_login ) );
+		$entered_password = utf8_strip_tags( $entered_password );
 
 		if( is_email( $entered_login ) )
 		{	// We have an email address instead of login name
@@ -331,7 +331,7 @@ class RestApi
 		{
 			case 'GET':
 				// List of valid resources
-				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees' );
+				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees', 'linked' );
 				break;
 
 			case 'PUT':
@@ -566,6 +566,41 @@ class RestApi
 					'name'      => $Blog->get( 'name' ),
 					'tagline'   => $Blog->get( 'tagline' ),
 					'desc'      => $Blog->get( 'longdesc' ),
+				), 'array' );
+		}
+	}
+
+
+	/**
+	 * Call collection controller to prepare request for linked collections
+	 */
+	private function controller_coll_linked()
+	{
+		global $Collection, $Blog;
+
+		// Get linked collections:
+		$linked_colls = $Blog->get_locales( 'coll' );
+		// Add current collection on top:
+		array_unshift( $linked_colls, $Blog->ID );
+
+		// Load all collections in cache by single SQL query:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_list( $linked_colls );
+
+		foreach( $linked_colls as $linked_locale => $linked_coll_ID )
+		{	// Add each collection row in the response array:
+			if( ! ( $linked_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false ) ) )
+			{	// Skip wrong linked collection:
+				continue;
+			}
+			$this->add_response( 'colls', array(
+					'id'        => intval( $linked_Blog->ID ),
+					'urlname'   => $linked_Blog->get( 'urlname' ),
+					'kind'      => $linked_Blog->get( 'type' ),
+					'shortname' => $linked_Blog->get( 'shortname' ),
+					'name'      => $linked_Blog->get( 'name' ).' ('.( $linked_locale === 0 ? $linked_Blog->get( 'locale' ) : $linked_locale ).')',
+					'tagline'   => $linked_Blog->get( 'tagline' ),
+					'desc'      => $linked_Blog->get( 'longdesc' ),
 				), 'array' );
 		}
 	}
@@ -1992,8 +2027,10 @@ class RestApi
 		/* Yura: Here I added "COLLATE utf8_general_ci" because:
 		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
 		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 * 
+		 * Erwin: Changed added collation from "utf8_general_ci" to "utf8mb4_general_ci" to match default DB connection collation
 		 */
-		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8mb4_general_ci' );
 		$tags_SQL->ORDER_BY( 'tag_name' );
 		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
@@ -2051,8 +2088,10 @@ class RestApi
 		/* Yura: Here I added "COLLATE utf8_general_ci" because:
 		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
 		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 * 
+		 * Erwin: Changed added collation from "utf8_general_ci" to "utf8mb4_general_ci" to match default DB connection collation
 		 */
-		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8mb4_general_ci' );
 		$tags_SQL->ORDER_BY( 'utag_name' );
 		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
@@ -2500,6 +2539,7 @@ class RestApi
 
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
+		$fieldset_prefix = param( 'prefix', 'string', NULL );
 
 		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
@@ -2543,7 +2583,7 @@ class RestApi
 		}
 
 		// Initialize admin skin:
-		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI, $inc_path;
 		$admin_skin = is_logged_in() ? $UserSettings->get( 'admin_skin', $current_User->ID ) : 'bootstrap';
 		$is_admin_page = true;
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
@@ -2554,7 +2594,8 @@ class RestApi
 
 		// Get the refreshed content:
 		ob_start();
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		// We do not use $AdminUI->disp_view() because we need the $fieldset_prefix above:
+		require $inc_path.'links/views/_link_list.view.php';
 		$refreshed_content = ob_get_clean();
 
 		$this->add_response( 'html', $refreshed_content );

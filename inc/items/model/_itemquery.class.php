@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -46,6 +46,15 @@ class ItemQuery extends SQL
 	var $exact;
 	var $featured;
 	var $flagged;
+	var $mustread;
+
+	/**
+	 * A query SELECT string to add other columns.
+	 * It is set in case of the select queries when we need to order by custom fields.
+	 *
+	 * @var string
+	 */
+	var $orderby_select = '';
 
 	/**
 	 * A query FROM string to join other tables.
@@ -1035,6 +1044,74 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict with locale visibility by current navigation locale
+	 */
+	function where_locale_visibility()
+	{
+		if( is_admin_page() )
+		{	// Don't restrict this in back-office:
+			return;
+		}
+
+		global $DB, $current_locale;
+
+		$this->WHERE_and( 'post_locale_visibility = "always" OR post_locale = '.$DB->quote( $current_locale ) );
+	}
+
+
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE/1/'all' - Restrict to all(Read and Unread) items with "must read" flag,
+	 *                FALSE - Don't restrict/Get all items,
+	 *               'unread' - Items which are not read by current User yet,
+	 *               'read' - Items which are already read by current User.
+	 * 
+	 */
+	function where_mustread( $mustread = false )
+	{
+		global $current_User, $DB;
+
+		$this->mustread = $mustread;
+
+		if( ! $this->mustread )
+		{	// Don't restrict if it is not requested:
+			return;
+		}
+
+		if( $mustread === 'read' )
+		{	// Get Items which are already read by current User:
+			if( is_logged_in() )
+			{	// For logged in user:
+				$this->FROM_add( 'INNER JOIN T_items__user_data AS mustread_status ON mustread_status.itud_item_ID = post_ID AND mustread_status.itud_user_ID = '.$DB->quote( $current_User->ID ) );
+				$this->WHERE_and( 'mustread_status.itud_read_item_ts >= post_contents_last_updated_ts' );
+			}
+			else
+			{	// Decide all Items are not read by not logged in user,
+				// because we store read status only for logged in users:
+				$this->WHERE_and( 'FALSE' );
+				return;
+			}
+		}
+		elseif( $mustread === 'unread' )
+		{	// Get Items which are NOT read by current User yet:
+			if( is_logged_in() )
+			{	// For logged in user:
+				$this->FROM_add( 'LEFT JOIN T_items__user_data AS mustread_status ON mustread_status.itud_item_ID = post_ID AND mustread_status.itud_user_ID = '.$DB->quote( $current_User->ID ) );
+				$this->WHERE_and( 'mustread_status.itud_read_item_ts IS NULL OR mustread_status.itud_read_item_ts < post_contents_last_updated_ts' );
+			}
+			// Decide all Items are not read by not logged in user,
+			// because we store read status only for logged in users:
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__item_settings AS is_mustread ON '.$this->dbIDname.' = is_mustread.iset_item_ID
+			AND is_mustread.iset_name = "mustread"
+			AND is_mustread.iset_value = 1' );
+	}
+
+
+	/**
 	 * Generate order by clause
 	 *
 	 * @param $order_by
@@ -1043,6 +1120,36 @@ class ItemQuery extends SQL
 	function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname )
 	{
 		global $DB;
+
+		if( $order_by == 'mustread' )
+		{	// Special ordering for "must read" items:
+			$order_by = '';
+			$order_dir = '';
+
+			// 1) Order by item read status of current logged in User:
+			//    1 - new pages
+			//    2 - updated pages
+			//    3 - already read pages
+			if( is_logged_in() )
+			{	// If user is logged in:
+				global $current_User;
+				$this->orderby_select .= 'IF( mustread_order.itud_read_item_ts IS NULL, 1, IF( mustread_order.itud_read_item_ts < post_contents_last_updated_ts, 2, 3 ) ) AS post_mustread';
+				$this->orderby_from .= 'LEFT JOIN T_items__user_data AS mustread_order ON post_ID = mustread_order.itud_item_ID AND mustread_order.itud_user_ID = '.$DB->quote( $current_User->ID );
+				$order_by = 'mustread';
+				$order_dir = 'ASC';
+			}
+
+			// 2) Order by contents last updated DESC:
+			$order_by .= ',contents_last_updated_ts';
+			$order_dir .= ',DESC';
+
+			// 3) Default orders of current collection:
+			$order_by .= ','.get_blog_order( $this->Blog, 'field' );
+			$order_dir .= ','.get_blog_order( $this->Blog, 'dir' );
+
+			$order_by = trim( $order_by, ',' );
+			$order_dir = trim( $order_dir, ',' );
+		}
 
 		$order_by = str_replace( ' ', ',', $order_by );
 		$orderby_array = explode( ',', $order_by );
@@ -1065,7 +1172,7 @@ class ItemQuery extends SQL
 		foreach( $custom_sort_fields as $key => $field_name )
 		{
 			$table_alias = $key.'_table';
-			$field_value = $table_alias.'.iset_value';
+			$field_value = $table_alias.'.icfv_value';
 			if( strpos( $key, 'custom_double' ) === 0 )
 			{ // Double values should be compared as numbers and not like strings
 				$field_value .= '+0';
@@ -1077,8 +1184,8 @@ class ItemQuery extends SQL
 					$this->orderby_from .= ' ';
 				}
 				// $nullable_fields[$key] = $field_value;
-				$this->orderby_from .= 'LEFT JOIN T_items__item_settings as '.$table_alias.' ON post_ID = '.$table_alias.'.iset_item_ID AND '
-						.$table_alias.'.iset_name = '.$DB->quote( 'custom:'.$field_name );
+				$this->orderby_from .= 'LEFT JOIN T_items__item_custom_field as '.$table_alias.' ON post_ID = '.$table_alias.'.icfv_item_ID AND '
+						.$table_alias.'.icfv_itcf_name = '.$DB->quote( $field_name );
 				$order_by = str_replace( $key, $field_value, $order_by );
 			}
 			$custom_sort_fields[$key] = $field_value;
@@ -1095,6 +1202,7 @@ class ItemQuery extends SQL
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
 		$available_fields[] = 'matched_tags_num'; // This is a virtual column only for order, real post_matched_tags_num doesn't exist in DB
+		$available_fields[] = 'mustread'; // This is a virtual column only for order, real post_mustread doesn't exist in DB
 
 		if( in_array( 'order', $orderby_array ) )
 		{	// If list is ordered by field 'order':
@@ -1152,6 +1260,18 @@ class ItemQuery extends SQL
 		}
 
 		return $order_clause;
+	}
+
+
+	/**
+	 * Get additional SELECT clause if it is required because of custom order_by fields
+	 *
+	 * @param string Before the SELECT clause
+	 * @return string the SELECT clause to select the custom fields
+	 */
+	function get_orderby_select( $prefix = ', ' )
+	{
+		return empty( $this->orderby_select ) ? '' : $prefix.$this->orderby_select;
 	}
 
 

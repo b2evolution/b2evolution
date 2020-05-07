@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -39,7 +39,7 @@ if( $params['notify_full'] )
 	echo T_('Status').': '.$Item->get( 't_extra_status' )."\n";
 
 	if( $Comment->is_meta() )
-	{	// Meta comment:
+	{	// Internal comment:
 		printf( T_('With the following [%s] Comment'), T_('Meta') );
 	}
 	else

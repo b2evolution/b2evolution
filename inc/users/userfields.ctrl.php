@@ -36,7 +36,7 @@ if( param( 'ufdf_ID', 'integer', '', true) )
 	{	// We could not find the user field to edit:
 		unset( $edited_Userfield );
 		forget_param( 'ufdf_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User field') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('User field') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -88,7 +88,7 @@ switch( $action )
 			$DB->begin();
 
 			$edited_Userfield->dbinsert();
-			$Messages->add( T_('New User field created.'), 'success' );
+			$Messages->add( TB_('New User field created.'), 'success' );
 
 			$DB->commit();
 
@@ -133,7 +133,7 @@ switch( $action )
 			$DB->begin();
 
 			$edited_Userfield->dbupdate();
-			$Messages->add( T_('User field updated.'), 'success' );
+			$Messages->add( TB_('User field updated.'), 'success' );
 
 			$DB->commit();
 
@@ -156,7 +156,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('User field &laquo;%s&raquo; deleted.'), $edited_Userfield->dget('name') );
+			$msg = sprintf( TB_('User field &laquo;%s&raquo; deleted.'), $edited_Userfield->dget('name') );
 			$edited_Userfield->dbdelete();
 			unset( $edited_Userfield );
 			forget_param( 'ufdf_ID' );
@@ -168,7 +168,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Userfield->check_delete( sprintf( T_('Cannot delete user field &laquo;%s&raquo;'), $edited_Userfield->dget('name') ) ) )
+			if( ! $edited_Userfield->check_delete( sprintf( TB_('Cannot delete user field &laquo;%s&raquo;'), $edited_Userfield->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -228,7 +228,7 @@ switch( $action )
 		if( $result !== false )
 		{ // Update was successful
 			$DB->commit();
-			$Messages->add( T_('Order has been changed.'), 'success' );
+			$Messages->add( TB_('Order has been changed.'), 'success' );
 		}
 		else
 		{ // Couldn't update successfully, probably because of concurrent modification
@@ -243,9 +243,9 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('User fields configuration'), '?ctrl=userfields' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('User fields configuration'), '?ctrl=userfields' );
 
 // Set an url for manual page:
 switch( $action )
@@ -290,7 +290,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Userfield->confirm_delete(
-				sprintf( T_('Delete user field &laquo;%s&raquo;?'), $edited_Userfield->dget('name') ),
+				sprintf( TB_('Delete user field &laquo;%s&raquo;?'), $edited_Userfield->dget('name') ),
 				'userfield', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

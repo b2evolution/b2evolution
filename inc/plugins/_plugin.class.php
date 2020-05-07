@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -226,6 +226,21 @@ class Plugin
 	 * @var PluginUserSettings
 	 */
 	var $UserSettings;
+
+
+	/**
+	 * If the plugin provides group settings, this will become the object to access them.
+	 *
+	 * This gets instantianted on Plugin registration for PHP4 and through
+	 * overloading in PHP5+, which means on first access.
+	 *
+	 * NOTE: its methods use {@link $current_User::$grp_ID} by default, but you may call it
+	 *       if there's no {@link $current_User} instantiated (yet).
+	 *
+	 * @see GetDefaultGroupSettings()
+	 * @var PluginGroupSettings
+	 */
+	var $GroupSettings;
 
 
 	/**
@@ -611,6 +626,32 @@ class Plugin
 
 
 	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each group.
+	 *
+	 * You can access them in the plugin through the member object
+	 * {@link $GroupSettings}, e.g.:
+	 * <code>$this->GroupSettings->get( 'my_param' );</code>
+	 *
+	 * This method behaves exactly like {@link Plugin::GetDefaultSettings()},
+	 * except that it defines group specific settings instead of global settings.
+	 *
+	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
+	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
+	 * @todo name tentative get_group_param_definitions()
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$GroupSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
+	{
+		return array();
+	}
+
+
+	/**
 	 * Define here default custom settings that are to be made available
 	 *     in the backoffice for collections, private messages and newsletters.
 	 *
@@ -765,6 +806,44 @@ class Plugin
 					'type' => 'select',
 					'options' => $rendering_options,
 					'defaultvalue' => $default_email_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+	}
+
+
+	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		if( $this->group != 'rendering' )
+		{
+			return $this->get_custom_setting_definitions( $params );
+		}
+
+		$render_note = '';
+		if( empty( $this->code ) )
+		{
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_shared_rendering = ( isset( $params['default_shared_rendering'] ) && in_array( $params['default_shared_rendering'], $rendering_options ) ) ? $params['default_shared_rendering'] : 'never';
+		$r = array(
+			'shared_apply_rendering' => array(
+					'label' => T_('Apply rendering to shared container widgets'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_shared_rendering,
 					'note' => $render_note,
 				),
 			);
@@ -1735,6 +1814,18 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the end of {@link Item::load_from_Request() loading
+	 * item/post fields from request}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function ItemLoadFromRequest( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the "Edit item" form.
 	 *
 	 * @param array Associative array of parameters
@@ -2121,11 +2212,10 @@ class Plugin
 	}
 
 	/**
-	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
+	 * Event handler: called to filter the comment's anonymous author name
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the name of the author/blog (by reference)
-	 *   - 'makelink': true, if the "data" contains a link
 	 *   - 'Comment': the {@link Comment} object
 	 */
 	function FilterCommentAuthor( & $params )
@@ -2703,6 +2793,27 @@ class Plugin
 
 	// }}}
 
+
+	// PluginGroupSettings {{{
+	/**
+	 * Event handler: Called before displaying or setting a plugin's group setting in the backoffice.
+	 *
+	 * @see GetDefaultGroupSettings()
+	 * @param array Associative array of parameters
+	 *   - 'name': name of the setting
+	 *   - 'value': value of the setting (by reference)
+	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultGroupSettings()})
+	 *   - 'Group': the {@link Group} for which the setting is
+	 *   - 'action': 'display' or 'set'
+	 * @return string|NULL Return a string with an error to prevent the setting from being set
+	 *                     and/or a message added to the settings field.
+	 */
+	function PluginGroupSettingsValidateSet( & $params )
+	{
+	}
+
+	// }}}
+
 	// PluginCollSettings {{{
 	/**
 	 * Event handler: Called as action just before updating plugin's collection/blog settings.
@@ -2734,6 +2845,18 @@ class Plugin
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
 	function PluginEmailSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
+	// PluginSharedSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's shared campaign settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginSharedSettingsUpdateAction()
 	{
 	}
 
@@ -3258,6 +3381,22 @@ class Plugin
 	function AfterFileUpload( & $params )
 	{
 		return array(); // Do nothing by default:
+	}
+
+
+	/**
+	 * Event handler: Called to ask the plugin for authorization links to specified social networks providers.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'providers': array of names of social network providers.
+	 *   - 'links': array that will contain the links (by reference)
+	 *   - 'link_params': array of parameters for displaying the link
+	 *
+	 * @return string link to authorization
+	 */
+	function GetAuthLinksForSocialNetworks( & $params )
+	{
+		return false;
 	}
 
 
@@ -3867,13 +4006,33 @@ class Plugin
 
 
 	/**
+	 * Initialize Widget params
+	 *
+	 * @param array Custom params
+	 * @param array Default params
+	 */
+	function init_widget_params( $params, $default_params = array() )
+	{
+		if( ! isset( $this->widget_params ) )
+		{	// Don't initialize params twice:
+			$this->widget_params = array_merge( $default_params, $params );
+		}
+	}
+
+
+	/**
 	 * Get Widget setting
 	 * @param string Name of setting
-	 * @param array Array of params (like widget params)
+	 * @param array Array of params (like widget params), NULL - to use the initialized widget params, @see Plugin::init_widget_params()
 	 * @return mixed|null
 	 */
 	function get_widget_setting( $name = NULL, $params = NULL )
 	{
+		if( $params === NULL && isset( $this->widget_params ) )
+		{	// Use the initialized widget params by default:
+			$params = $this->widget_params;
+		}
+
 		if ( empty( $name ) || ! isset ( $params[$name] ) )
 		{
 			return NULL;
@@ -3881,6 +4040,61 @@ class Plugin
 		else
 		{
 			return $params[$name];
+		}
+	}
+
+
+	/**
+	 * Get widget icon
+	 *
+	 * @return string
+	 */
+	function get_widget_icon()
+	{
+		if( empty( $this->widget_icon ) )
+		{
+			return '';
+		}
+
+		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->widget_icon.'"></span></span>';
+	}
+
+
+	/**
+	 * Display widget debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_widget_debug_message( $message = NULL, $params = array() )
+	{
+		$this->init_widget_params( $params, array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="evo_widget widget $wi_class$">',
+				'block_end'         => "</div>\n",
+				// Title:
+				'block_title_start' => '<h4>',
+				'title'             => '',
+				'block_title_end'   => '</h4>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+				// Widget debug mode: 'normal', 'designer'
+				'debug_mode'        => 'normal',
+			) );
+
+		if( isset( $this->widget_params['debug_mode'] ) && $this->widget_params['debug_mode'] == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->widget_params['block_start'];
+			if( ! empty( $this->widget_params['title'] ) )
+			{	// Display title:
+				echo $this->widget_params['block_title_start'];
+				echo $this->widget_params['title'];
+				echo $this->widget_params['block_title_end'];
+			}
+			echo $this->widget_params['block_body_start'];
+			echo $message;
+			echo $this->widget_params['block_body_end'];
+			echo $this->widget_params['block_end'];
 		}
 	}
 
@@ -3921,6 +4135,18 @@ class Plugin
 				if( isset($this->UserSettings) )
 				{
 					return $this->UserSettings;
+				}
+				break;
+
+			case 'GroupSettings':
+				if( $this->ID < 0 )
+				{
+					debug_die( 'Tried to access "GroupSettings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')' );
+				}
+				$Plugins->instantiate_Settings( $this, 'GroupSettings' );
+				if( isset( $this->GroupSettings ) )
+				{
+					return $this->GroupSettings;
 				}
 				break;
 		}
@@ -4155,6 +4381,36 @@ class Plugin
 		$Blog->delete_setting( $blog_setting_name );
 	}
 
+
+	/**
+	 * Get a specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		$value = $this->Settings->get( $parname );
+
+		if( $value !== NULL )
+		{ // We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->GetDefaultSettings( $tmp_params );
+
+		return $this->get_default_setting( $parname, $params, $group );
+	}
+
 	/**
 	 * Get a message specific param value
 	 *
@@ -4218,6 +4474,73 @@ class Plugin
 		}
 
 		return $this->get_default_setting( $parname, $params, $group );
+	}
+
+	/**
+	 * Get a shared specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_shared_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Use prefix 'shared_' for all message settings except of "shared_apply_rendering":
+		$value = $this->Settings->get( $parname == 'shared_apply_rendering' ? $parname : 'shared_'.$parname );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_shared_setting_definitions( $tmp_params );
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Check if plugin is rendering to widget from shared container
+	 *
+	 * @return boolean
+	 */
+	function is_shared_widget( $params )
+	{
+		if( ! is_array( $params ) || ! isset( $params['Widget'] ) )
+		{	// This is a not request for widget rendering:
+			return false;
+		}
+
+		if( ( $plugin_WidgetContainer = & $params['Widget']->get_WidgetContainer() ) &&
+		    ( $plugin_WidgetContainer->get( 'coll_ID' ) == 0 ) )
+		{	// This is a request to render widget from shared container:
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -4398,6 +4721,97 @@ class Plugin
 	{
 		global $app_version_long;
 		require_js( $this->get_plugin_url().$js_file, 'relative', false, $output, $this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Get value of setting with format "checklist" which values are stored as array
+	 *
+	 * @param string Group name
+	 * @param string Setting name
+	 * @param string Setting type: 'default', 'coll', 'msg', 'email', 'shared'
+	 * @return boolean
+	 */
+	function get_checklist_setting( $group_name, $setting_name, $setting_type = 'default', $object = NULL )
+	{
+		switch( $setting_type )
+		{
+			case 'coll':
+				$group_array = $this->get_coll_setting( $group_name, $object );
+				break;
+
+			case 'msg':
+				$group_array = $this->get_msg_setting( $group_name );
+				break;
+
+			case 'email':
+				$group_array = $this->get_email_setting( $group_name );
+				break;
+
+			case 'shared':
+				$group_array = $this->get_shared_setting( $group_name );
+				break;
+
+			default:
+				$group_array = $this->get_setting( $group_name );
+		}
+
+		return isset( $group_array[ $setting_name ] ) ? $group_array[ $setting_name ] : NULL;
+	}
+
+
+	/**
+	 * Event handler: Called for additional initialization of importer classes
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 */
+	function ImporterConstruct( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called to set Item field from Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'field_type' - Field type, e.g. 'yaml',
+	 *   - 'field_name' - Field name
+	 *   - 'field_data' - Field data
+	 */
+	function ImporterSetItemField( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called for additional updating Item after it was imported
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'data'     - Data of the Item from imported file,
+	 */
+	function ImporterAfterItemImport( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after Items were deleted in Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'             - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer'         - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'deleted_item_IDs' - IDs of deleted Items,
+	 */
+	function ImporterAfterItemsDelete( & $params )
+	{
 	}
 }
 

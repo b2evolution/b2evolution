@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $number_of_installs = 1;
 
 
@@ -79,6 +79,20 @@ class polls_plugin extends Plugin
 		// set params to allow rendering for messages by default
 		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-out' ) );
 		return parent::get_email_setting_definitions( $default_params );
+	}
+
+
+	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'never' ) );
+		return parent::get_shared_setting_definitions( $default_params );
 	}
 
 

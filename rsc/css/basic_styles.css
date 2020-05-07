@@ -57,6 +57,11 @@
   margin-top: 1ex;
   margin-bottom: 1ex;
 }
+ul.list-default {
+  list-style: initial;
+  margin: 0 0 10px 25px;
+  padding: 0;
+}
 a.discreet {
   text-decoration: none;
 }
@@ -139,10 +144,17 @@ img.rounded,
 .evo_image_block.rounded img {
   border-radius: 4px;
 }
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-  border-radius: 50%;
+.evo_image_block.contain img {
+  object-fit: contain !important;
+}
+.evo_image_block.cover img {
+  object-fit: cover !important;
+}
+img.imgerror,
+.image_block.imgerror img,
+.evo_image_block.imgerror img {
+  border: 1px solid red;
+  box-shadow: 0 0 10px red;
 }
 .floatleft {
   float: left;
@@ -177,8 +189,36 @@ img.round,
 .margin2ex {
   margin: 2ex;
 }
+.margin-top-sm {
+  margin-top: 10px;
+}
+.margin-top-md {
+  margin-top: 20px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-bottom-sm {
+  margin-bottom: 10px;
+}
+.margin-bottom-md {
+  margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 .indented {
   padding-left: 3em;
+}
+.pointer {
+  cursor: pointer;
 }
 /* The sprite image file is located: "/rsc/icons/flags_sprite.png"
  * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
@@ -782,6 +822,76 @@ input.loader_img {
 .filter_item div.icon {
   height: 22px;
 }
+.visible-xs,
+.visible-sm,
+.visible-md,
+.visible-lg,
+.visible-xs-inline,
+.visible-xs-inline-block,
+.visible-sm-inline,
+.visible-sm-inline-block,
+.visible-md-inline,
+.visible-md-inline-block,
+.visible-lg-inline,
+.visible-lg-inline-block {
+  display: none !important;
+}
+@media (max-width: 767px) {
+  .visible-xs {
+    display: block !important;
+  }
+  .visible-xs-inline {
+    display: inline !important;
+  }
+  .visible-xs-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-xs {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .visible-sm {
+    display: block !important;
+  }
+  .visible-sm-inline {
+    display: inline !important;
+  }
+  .visible-sm-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .visible-md {
+    display: block !important;
+  }
+  .visible-md-inline {
+    display: inline !important;
+  }
+  .visible-md-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  .visible-lg {
+    display: block !important;
+  }
+  .visible-lg-inline {
+    display: inline !important;
+  }
+  .visible-lg-inline-block {
+    display: inline-block !important;
+  }
+  .hidden-lg {
+    display: none !important;
+  }
+}
 code,
 samp {
   font-family: Menlo, Monaco, "Courier New", Courier, monospace;
@@ -1195,7 +1305,8 @@ div.message_toolbars div.edit_toolbar {
   width: 100%;
   border-bottom: none;
 }
-.widget_core_coll_category_list .evo_cat_meta {
+.widget_core_coll_category_list .evo_cat_meta > label,
+.widget_core_coll_category_list .evo_cat_meta > a {
   font-weight: bold;
 }
 .widget_core_coll_category_list .evo_cat_meta ul {
@@ -1203,4 +1314,19 @@ div.message_toolbars div.edit_toolbar {
 }
 .widget_core_coll_category_list .evo_cat_meta input[disabled="disabled"] {
   visibility: hidden;
+}
+.w-100 {
+  width: 100% !important;
+}
+.w-75 {
+  width: 75% !important;
+}
+.w-50 {
+  width: 50% !important;
+}
+.w-25 {
+  width: 25% !important;
+}
+.w-auto {
+  width: auto !important;
 }

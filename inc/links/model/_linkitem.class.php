@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -33,7 +33,7 @@ class LinkItem extends LinkOwner
 	 */
 	function __construct( $Item, $tmp_ID = NULL )
 	{
-		// call parent contsructor
+		// call parent constructor
 		parent::__construct( $Item, 'item', 'itm_ID', $tmp_ID );
 		$this->Item = & $this->link_Object;
 
@@ -191,7 +191,7 @@ class LinkItem extends LinkOwner
 	 *
 	 * @param integer file ID
 	 * @param integer link position ( 'teaser', 'teaserperm', 'teaserlink', 'aftermore', 'inline', 'fallback' )
-	 * @param int order of the link
+	 * @param integer Order of the link, Use 0 to set autoincremented order
 	 * @param boolean true to update owner last touched timestamp after link was created, false otherwise
 	 * @return integer|boolean Link ID on success, false otherwise
 	 */
@@ -213,6 +213,12 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
+		if( $order > 0 && $order <= $this->get_last_order() )
+		{	// Don't allow order which may be already used:
+			$order = $this->get_last_order() + 1;
+			// Update last order for next adding:
+			$this->last_order = $order;
+		}
 		$edited_Link->set( 'order', $order );
 
 		if( ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) > 90 )
@@ -356,23 +362,26 @@ class LinkItem extends LinkOwner
 		return parent::get( $parname );
 	}
 
+
 	/**
 	 * Get Item edit url
 	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
 	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		if( is_admin_page() )
+		if( $url_type == 'backoffice' || ( $url_type === NULL  && is_admin_page() ) )
 		{	// Back-office:
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'action=new';
 			}
 			else
 			{	// The edited Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=edit&amp;p='.$this->get_ID();
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'action=edit'.$glue.'p='.$this->get_ID();
 			}
 		}
 		else
@@ -380,30 +389,35 @@ class LinkItem extends LinkOwner
 			$item_Blog = & $this->get_Blog();
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
+				return url_add_param( $item_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit', $glue );
 			}
 			else
 			{	// The editing Item:
-				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit&amp;p='.$this->get_ID() );
+				return url_add_param( $item_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit'.$glue.'p='.$this->get_ID(), $glue );
 			}
 		}
 	}
 
+
 	/**
 	 * Get Item view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
-		if( is_admin_page() )
+		if( $url_type == 'backoffice' || ( $url_type === NULL  && is_admin_page() ) )
 		{	// Back-office:
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'action=new';
 			}
 			else
 			{	// The editing Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->get_ID();
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'p='.$this->get_ID();
 			}
 		}
 		else
@@ -411,11 +425,11 @@ class LinkItem extends LinkOwner
 			if( $this->is_temp() )
 			{	// New creating Item:
 				$item_Blog = & $this->get_Blog();
-				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
+				return url_add_param( $item_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit', $glue );
 			}
 			else
 			{	// The editing Item:
-				return $this->Item->get_permanent_url();
+				return $this->Item->get_permanent_url( '', '', $glue );
 			}
 		}
 	}

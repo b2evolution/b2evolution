@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -832,7 +832,7 @@ function antispam_suspect_check_by_data( $data = array() )
 				// Check by IP address:
 				$IPRangeCache = & get_IPRangeCache();
 				$IPRange = & $IPRangeCache->get_by_ip( $data_item, false, false );
-				$is_suspected = ( $IPRange && $IPRange->get( 'status' ) == 'suspect' );
+				$is_suspected = ( $IPRange && in_array( $IPRange->get( 'status' ), array( 'suspect', 'very_suspect' ) ) );
 				break;
 
 			case 'domain':
@@ -1062,11 +1062,13 @@ function aipr_status_titles( $include_false_statuses = true )
 {
 	$status_titles = array();
 	$status_titles['trusted'] = T_('Trusted');
+	$status_titles['probably_ok'] = T_('Probably OK');
 	if( $include_false_statuses )
 	{ // Include Unknown status
 		$status_titles[''] = T_('Unknown');
 	}
 	$status_titles['suspect'] = T_('Suspect');
+	$status_titles['very_suspect'] = T_('Very Suspect');
 	$status_titles['blocked'] = T_('Blocked');
 
 	return $status_titles;
@@ -1081,10 +1083,12 @@ function aipr_status_titles( $include_false_statuses = true )
 function aipr_status_colors()
 {
 	return array(
-			''        => '999999',
-			'trusted' => '00CC00',
-			'suspect' => 'FFAA00',
-			'blocked' => 'FF0000',
+			''             => '999999',
+			'trusted'      => '00CC00',
+			'probably_ok'  => '00FFFF',
+			'suspect'      => 'FFAA00',
+			'very_suspect' => 'FF8000',
+			'blocked'      => 'FF0000',
 		);
 }
 
@@ -1097,10 +1101,12 @@ function aipr_status_colors()
 function aipr_status_icons()
 {
 	return array(
-			''        => get_icon( 'bullet_white', 'imgtag', array( 'title' => aipr_status_title( '' ) ) ),
-			'trusted' => get_icon( 'bullet_green', 'imgtag', array( 'title' => aipr_status_title( 'trusted' ) ) ),
-			'suspect' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => aipr_status_title( 'suspect' ) ) ),
-			'blocked' => get_icon( 'bullet_red', 'imgtag', array( 'title' => aipr_status_title( 'blocked' ) ) )
+			''             => get_icon( 'bullet_white', 'imgtag', array( 'title' => aipr_status_title( '' ) ) ),
+			'trusted'      => get_icon( 'bullet_green', 'imgtag', array( 'title' => aipr_status_title( 'trusted' ) ) ),
+			'probably_ok'  => get_icon( 'bullet_cyan', 'imgtag', array( 'title' => aipr_status_title( 'probably_ok' ) ) ),
+			'suspect'      => get_icon( 'bullet_orange', 'imgtag', array( 'title' => aipr_status_title( 'suspect' ) ) ),
+			'very_suspect' => get_icon( 'bullet_redorange', 'imgtag', array( 'title' => aipr_status_title( 'very_suspect' ) ) ),
+			'blocked'      => get_icon( 'bullet_red', 'imgtag', array( 'title' => aipr_status_title( 'blocked' ) ) )
 		);
 }
 
@@ -1483,11 +1489,11 @@ function antispam_get_whois( $query = NULL, $window_height = NULL )
 				$result['rawdata'][$i] = str_replace( $matches[2][0], $ip_range_text, $result['rawdata'][$i] );
 			}
 		}
-		$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+		$winfo .= format_to_output( implode( "\n", $result['rawdata'] ) );
 	}
 	else
 	{
-		$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+		$winfo = format_to_output( implode( "\n", $whois->Query['errstr'] ) )."<br></br>";
 	}
 	$winfo .= '</pre>';
 

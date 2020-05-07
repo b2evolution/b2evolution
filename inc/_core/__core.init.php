@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -57,7 +57,9 @@ $db_config['aliases'] = array(
 		'T_pluginevents'           => $tableprefix.'pluginevents',
 		'T_pluginsettings'         => $tableprefix.'pluginsettings',
 		'T_pluginusersettings'     => $tableprefix.'pluginusersettings',
+		'T_plugingroupsettings'    => $tableprefix.'plugingroupsettings',
 		'T_settings'               => $tableprefix.'settings',
+		'T_social__network'        => $tableprefix.'social__network',
 		'T_users'                  => $tableprefix.'users',
 		'T_users__fielddefs'       => $tableprefix.'users__fielddefs',
 		'T_users__fieldgroups'     => $tableprefix.'users__fieldgroups',
@@ -72,6 +74,7 @@ $db_config['aliases'] = array(
 		'T_users__profile_visit_counters' => $tableprefix.'users__profile_visit_counters',
 		'T_users__tag'             => $tableprefix.'users__tag',
 		'T_users__usertag'         => $tableprefix.'users__usertag',
+		'T_users__social_network'  => $tableprefix.'users__social_network',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
@@ -130,13 +133,14 @@ $ctrl_mappings = array(
 		'groups'           => 'users/groups.ctrl.php',
 		'organizations'    => 'users/organizations.ctrl.php',
 		'accountclose'     => 'users/account_close.ctrl.php',
-		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
 		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
 		'campaigns'        => 'email_campaigns/campaigns.ctrl.php',
 		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
+		'customize'        => 'customize/customize.ctrl.php',
+		'pro_only'         => 'pro_only/pro_only.ctrl.php',
 	);
 
 
@@ -1179,6 +1183,22 @@ class _core_Module extends Module
 				)
 			);
 
+			if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
+			{	// If current User has an access to backoffice and can view settings:
+				$entries['site']['entries'][] = array( 'separator' => true );
+				$entries['site']['entries']['settings'] = array(
+					'text' => T_('Site Settings').'&hellip;',
+					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
+				);
+				if( $Settings->get( 'site_skins_enabled' ) )
+				{	// Display menu item of site skin only when it is enabled:
+					$entries['site']['entries']['skin'] = array(
+						'text' => T_('Site skin').'&hellip;',
+						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
+					);
+				}
+			}
+
 			// More site options:
 			if( $perm_users_view )
 			{
@@ -1224,18 +1244,15 @@ class _core_Module extends Module
 					}
 
 					$entries['site']['entries']['email']['entries'] += array(
-								'settings' => array(
-									'text' => T_('Settings').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
-								'blocked' => array(
-									'text' => T_('Addresses').'&hellip;',
-									'href' => $admin_url.'?ctrl=email' ),
 								'sent' => array(
 									'text' => T_('Sent').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=sent' ),
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
+								'blocked' => array(
+										'text' => T_('Addresses').'&hellip;',
+										'href' => $admin_url.'?ctrl=email' ),
 								);
 				}
 
@@ -1307,27 +1324,32 @@ class _core_Module extends Module
 							'text' => T_('Open b2evolution.net'),
 							'href' => 'http://b2evolution.net/',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'forums' => array(
 							'text' => T_('Open Support forums'),
 							'href' => 'http://forums.b2evolution.net/',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'manual' => array(
 							'text' => T_('Open Online manual'),
 							'href' => get_manual_url( NULL ),
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'sep' => array( 'separator' => true ),
 					'twitter' => array(
 							'text' => T_('b2evolution on twitter'),
 							'href' => 'http://twitter.com/b2evolution',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'facebook' => array(
 							'text' => T_('b2evolution on facebook'),
 							'href' => 'http://www.facebook.com/b2evolution',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						)
 					)
 				);
@@ -1350,6 +1372,7 @@ class _core_Module extends Module
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
 							'edit_front'   => NULL,
 							'edit_back'    => NULL,
+							'edit_widgets' => NULL,
 							'propose'      => NULL,
 							'view_back'    => NULL,
 							'view_history' => NULL,
@@ -1383,7 +1406,7 @@ class _core_Module extends Module
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
-				{	// If current user has a permission to edit a current viewing post:
+				{	// If current user has a permission to edit the post currently viewed:
 					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
@@ -1392,7 +1415,8 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange' ) ) )
+				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange', 'widget_page' ) ) &&
+				    $perm_admin_restricted )
 				{	// If current user has a permission to edit a current editing/viewing/proposing post:
 					if( $disp != 'edit' &&
 					    $Blog->get_setting( 'in_skin_editing' ) &&
@@ -1402,6 +1426,8 @@ class _core_Module extends Module
 						$entries['page']['entries']['edit_front'] = array(
 								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
 								'href' => $edit_item_url,
+								'shortcut' => 'f2',
+								'shortcut-top' => 'f2'
 							);
 					}
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
@@ -1412,7 +1438,19 @@ class _core_Module extends Module
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+									'shortcut' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut-top' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
+
+							if( $disp == 'widget_page' )
+							{
+								$entries['page']['entries']['edit_widgets'] = array(
+									'text' => T_('Edit widgets in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID,
+									'shortcut' => 'f2',
+									'shortcut-top' => 'f2',
+								);
+							}
 						}
 						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 						{	// Menu item to view post in back-office:
@@ -1424,7 +1462,7 @@ class _core_Module extends Module
 						if( $perm_admin_restricted && ( $item_history_url = $menu_Item->get_history_url() ) )
 						{
 							$entries['page']['entries']['view_history'] = array(
-								'text' => T_('View History').'&hellip;',
+								'text' => T_('View Change History').'&hellip;',
 								'href' => $item_history_url,
 							);
 						}
@@ -1440,6 +1478,57 @@ class _core_Module extends Module
 					if( isset( $entries['page'] ) )
 					{	// Set a title when at least one menu item is allowed for current User:
 						$entries['page']['text'] = T_('Page');
+					}
+				}
+				elseif( ! is_admin_page() &&
+					$perm_admin_restricted &&
+					( ( $disp == 'posts' && has_featured_Item( 'posts' ) ) || ( $disp == 'front' && has_featured_Item( 'front' ) ) ) )
+				{
+					// Get Featured/Intro Item:
+					$featured_intro_Item = & get_featured_Item( $disp, NULL, true );
+
+					if( $Blog->get_setting( 'in_skin_editing' ) &&
+					    $edit_item_url = $featured_intro_Item->get_edit_url() )
+					{	// Display menu entry to edit the post in front-office:
+						$entries['page']['entries']['edit_front'] = array(
+								'text' => sprintf( T_('Edit "%s" in Front-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $edit_item_url,
+								'shortcut' => 'f2',
+								'shortcut-top' => 'f2',
+							);
+					}
+					if( $featured_intro_Item->ID > 0 )
+					{	// Display menu entries to edit and view the post in back-office:
+						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $featured_intro_Item ) )
+						{	// Menu item to edit post in back-office:
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
+									'shortcut' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut-top' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+								);
+						}
+						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{	// Menu item to view post in back-office:
+							$entries['page']['entries']['view_back'] = array(
+									'text' => T_('View in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && ( $item_history_url = $featured_intro_Item->get_history_url() ) )
+						{
+							$entries['page']['entries']['view_history'] = array(
+								'text' => T_('View Change History').'&hellip;',
+								'href' => $item_history_url,
+							);
+						}
+						if( $disp != 'proposechange' && ( $propose_change_item_url = $featured_intro_Item->get_propose_change_url() ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $propose_change_item_url,
+								);
+						}
 					}
 				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
@@ -1483,6 +1572,16 @@ class _core_Module extends Module
 
 					$entries['blog']['entries'][] = array( 'separator' => true );
 
+					$contents_submenu = array();
+
+					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					{ // Workflow view
+						$contents_submenu['workflow'] = array(
+								'text' => T_('Workflow view').'&hellip;',
+								'href' => $items_url.'&amp;tab=tracker',
+							);
+					}
+
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
 						global $cat, $Item;
@@ -1500,34 +1599,47 @@ class _core_Module extends Module
 						{	// No selected category and item/post:
 							$manual_view_cat_param = '';
 						}
-						$entries['blog']['entries']['manual'] = array(
+						$contents_submenu['manual'] = array(
 								'text' => T_('Manual view').'&hellip;',
 								'href' => $items_url.'&amp;tab=manual'.$manual_view_cat_param,
 							);
 					}
 
-					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-					{ // Workflow view
-						$entries['blog']['entries']['workflow'] = array(
-								'text' => T_('Workflow view').'&hellip;',
-								'href' => $items_url.'&amp;tab=tracker',
-							);
+					$contents_submenu['full'] = array(
+							'text' => T_('All').'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+
+					$contents_submenu['summary'] = array(
+							'text' => T_('Summary').'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+
+					$type_tabs = get_item_type_tabs();
+					foreach( $type_tabs as $type_tab => $type_tab_name )
+					{
+						$type_tab_key = 'type_'.str_replace( ' ', '_', utf8_strtolower( $type_tab ) );
+						$contents_submenu[ $type_tab_key ] = array(
+							'text' => T_( $type_tab_name ).'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=type&amp;tab_type='.urlencode( $type_tab ).'&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
 					}
 
 					$entries['blog']['entries']['posts'] = array(
-							'text' => T_('Contents').'&hellip;',
+							'text' => T_('Contents'),
 							'href' => $items_url,
+							'entries' => $contents_submenu,
 						);
 					$display_separator = true;
 				}
 
 				$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID );
 				if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
-				{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
+				{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
 							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore'
-								// Set url to meta comments page if user has a perm to view only meta comments:
+								// Set url to internal comments page if user has a perm to view only internal comments:
 								.( $perm_comments ? '' : '&amp;tab3=meta' ),
 						);
 					$display_separator = true;
@@ -1583,6 +1695,14 @@ class _core_Module extends Module
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,
+										),
+									'popup' => array(
+											'text' => T_('Popups').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup'.$blog_param,
+										),
+									'metadata' => array(
+											'text' => T_('Meta data').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=metadata'.$blog_param,
 										),
 									'more' => array(
 											'text' => T_('More').'&hellip;',
@@ -1685,25 +1805,25 @@ class _core_Module extends Module
 		if( ! is_admin_page() && ! empty( $Blog ) )
 		{	// Only front-office collection pages:
 
+			if( $perm_admin_restricted &&
+			    ( ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) ||
+			      $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			  )
+			{	// If current user has an access to back-office and to edit site or collection properties:
+				global $Session;
+				$customizer_mode = $Session->get( 'customizer_mode_'.$Blog->ID );
+				$entries['skin'] = array(
+					'text'         => '<span class="fa fa-sliders"></span> '.T_('Customize'),
+					'href'         => $Blog->get( 'customizer_url', ( $customizer_mode ? array( 'mode' => 'disable' ) : array() ) ),
+					'entry_class'  => 'rwdhide',
+					'class'        => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
+					'shortcut'     => 'f4',
+					'shortcut-top' => 'f4',
+				);
+			}
+
 			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
-
-				// Display an option to turn on/off containers display:
-				global $Session;
-				$containers_status = $Session->get( 'display_containers_'.$Blog->ID );
-				$entries['containers'] = array(
-					'text'        => '<span class="fa fa-cubes"></span> '.T_('Widgets'),
-					'href'        => url_add_param( regenerate_url( 'display_containers' ), 'display_containers='.( $containers_status ? 'hide' : 'show' ) ),
-					'entry_class' => 'rwdhide',
-					'class'       => ( $containers_status ? 'active' : '' ),
-				);
-
-				$entries['skin'] = array(
-					'text' => '<span class="fa fa-sliders"></span> '.T_('Skin'),
-					'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID,
-					'entry_class' => 'rwdhide',
-				);
-
 				// Display menu item "Features" with depending on $disp:
 				global $disp, $disp_detail;
 				switch( $disp )
@@ -1902,6 +2022,35 @@ class _core_Module extends Module
 			);
 		}
 
+		// Collection locales:
+		if( isset( $Blog ) && count( $coll_locales = $Blog->get_locales() ) )
+		{
+			global $locales, $current_locale;
+
+			$dev_entries[] = array(
+					'separator' => true,
+				);
+
+			$current_coll_locale = get_param( 'coll_locale' ) != '' ? get_param( 'coll_locale' ) : $current_locale;
+			foreach( $coll_locales as $coll_locale_key => $linked_coll_ID )
+			{
+				if( ! isset( $locales[ $coll_locale_key ] ) || ! $locales[ $coll_locale_key ]['enabled'] )
+				{	// Skip wrong or disabled locale:
+					continue;
+				}
+
+				$is_selected = ( $current_coll_locale == $coll_locale_key );
+				$dev_entries[] = array(
+					'text' => ( $is_selected ? '&#10003; ' : '' ).$locales[ $coll_locale_key ]['name'],
+					'href' => $is_selected ?
+						// Url to edit collection locales list:
+						$admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID :
+						// Url to change locale of the current collection:
+						url_add_param( regenerate_url( 'coll_locale' ), 'coll_locale='.urlencode( $coll_locale_key ) ),
+				);
+			}
+		}
+
 		if( ! empty( $dev_entries ) )
 		{ // Add Dev menu if at least one entry is should be displayed
 			$entries['dev'] = array(
@@ -1917,7 +2066,7 @@ class _core_Module extends Module
 		$userprefs_entries = array(
 			'name' => array(
 					'text' => $current_User->get_avatar_imgtag( 'crop-top-32x32', '', 'left' ).'&nbsp;'
-										.$current_User->get_preferred_name()
+										.$current_User->get( 'login' )
 										.'<br />&nbsp;<span class="note">'.$current_user_Group->get_name().'</span>',
 					'href' => get_user_profile_url(),
 				),
@@ -1967,7 +2116,7 @@ class _core_Module extends Module
 		}
 
 		$entries['userprefs'] = array(
-				'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
+				'text'    => '<strong>'.$current_User->get_colored_login().'</strong>',
 				'href'    => get_user_profile_url(),
 				'entries' => $userprefs_entries,
 			);
@@ -2316,7 +2465,15 @@ class _core_Module extends Module
 					'href' => '?ctrl=skins&amp;tab=system' ),
 				'plugins' => array(
 					'text' => T_('Plugins'),
-					'href' => '?ctrl=plugins'),
+					'href' => '?ctrl=plugins',
+					'entries' => array(
+						'general' => array(
+							'text' => T_('General settings'),
+							'href' => '?ctrl=plugins' ),
+						'shared' => array(
+							'text' => T_('Settings for shared containers'),
+							'href' => '?ctrl=plugins&amp;tab=shared' )
+					) ),
 				'remotepublish' => array(
 					'text' => T_('Remote Publishing'),
 					'href' => '?ctrl=remotepublish',

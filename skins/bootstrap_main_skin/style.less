@@ -11,7 +11,7 @@
 // div.widget_core_coll_tagline {
 	// margin-bottom: 30px;
 // }
-.evo_container__front_page_primary {
+.evo_container__front_page_main_area {
 	padding-bottom: 30px;
 	.evo_widget {
 		margin-top: 30px;
@@ -34,7 +34,7 @@
 		}
 	}
 }
-.evo_container__front_page_secondary {
+.evo_container__front_page_secondary_area {
 	padding-top: 30px;
 }
 
@@ -123,15 +123,15 @@ body.pictured {
 		position: absolute;
 		top: 100%;
 	}
+	// To avoid issue on scroll page we must disable 100% height for pictured layout on enabled widgets designer mode:
+	&.dev_designer_mode {
+		height: auto;
+		.secondary_area {
+			position: initial;
+		}
+	}
 }
 .evo_pictured_layout {
-	//position: fixed;
-	// top: 0;
-	// left: 0;
-	// right: 0;
-	// bottom: 0;
-	// width: 100%;
-	// height: 100%;
 	display: table;
 	height: 100%;
 	min-height: 100%;
@@ -146,9 +146,28 @@ body.pictured {
 		width: 100%;
 	}
 }
+
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	// body.disp_front .slide-top {
+		// right: 29px;
+	// }
+	
+@media (min-width: 640px) and (min-device-width: 640px) {
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	body.disp_front .slide-top {
+		right: 29px;
+	}
+}
+	
 @media only screen and (max-width: 640px) {
+	// Important for preventing white gap in .main_page_wrapper on this viewport size
+	// Since we break #bg_picture on this size, height: 100% is not needed anymore
+	html {
+		height: auto;
+	}
+	
 	body.disp_front {
-		.sitewide_header {
+		#evo_site_header {
 			margin-bottom: 0;
 		}
 		.evo_pictured_layout {
@@ -164,6 +183,25 @@ body.pictured {
 			margin-top: 0;
 			margin-bottom: 0;
 		}
+		
+		.slide-top {
+			right: 8px;
+		}
+	}
+}
+
+@media only screen and (min-device-width: 1024px) {
+body.pictured {
+	#skin_wrapper.skin_wrapper_loggedin {
+		// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+		margin-top: 0;
+		padding-top: 27px;
+		}
+	}
+}
+@media (min-width: 640px) and (max-device-width: 1024px) {
+	.btn.slide-top.logged_in_margin_top {
+		top: 35px;
 	}
 }
 
@@ -217,11 +255,6 @@ div.extended_search_form {
 			margin-right: 10px;
 		}
 	}
-}
-
-// Form elements on item edit page
-label.control-label[for=post_title] {
-	width: auto;
 }
 
 // A form to create a new message/thread
@@ -401,11 +434,19 @@ div.action_messages, div.log_container {
 		display: table-cell;
 		margin: 0;
 		padding: 20px 0 0;
+		+ .btn {
+			margin: -10px 0 0 30px;
+		}
 	}
 	.btn-group {
 		display: table-cell;
 		padding: 20px 0 10px 30px;
 		vertical-align: middle;
+	}
+	.evo_post_read_status {
+		display: table-cell;
+		vertical-align: middle;
+		padding: 20px 2px 0 0;
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -139,6 +139,10 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 	 */
 	function init_display( $params )
 	{
+		$params = array_merge( array(
+				'profile_menu_link_text' => 'avatar_name',
+			), $params );
+
 		parent::init_display( $params );
 
 		// Disable "allow blockcache" because this widget uses the selected items
@@ -156,7 +160,8 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 		global $current_User, $disp, $Blog;
 
 		if( ! is_logged_in() )
-		{ // Only logged in users can see this menu item
+		{	// Only logged in users can see this menu item:
+			$this->display_debug_message( 'Hidden(Not logged in)' );
 			return false;
 		}
 
@@ -176,11 +181,13 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 
 		if( empty( $current_Blog ) )
 		{	// Don't use this widget without current collection:
+			$this->display_debug_message( 'Hidden(No collection)' );
 			return false;
 		}
 
 		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
 		{	// Don't use this widget because current user has no access to the collection:
+			$this->display_debug_message( 'Hidden(No access)' );
 			return false;
 		}
 
@@ -200,8 +207,9 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 				'thumb_size'        => $this->disp_params['profile_picture_size'],
 				'link_class'        => '$link_class$',
 				'blog_ID'           => $current_Blog->ID,
+				'link_text'         => $this->disp_params['profile_menu_link_text'],
 			) );
-		echo $this->get_layout_menu_link( '', '', $highlight_current, $menu_link_template );
+		echo $this->get_layout_standalone_menu_link( '', '', $highlight_current, $menu_link_template );
 
 		return true;
 	}

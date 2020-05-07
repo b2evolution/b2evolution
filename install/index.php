@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -382,6 +382,13 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_end'   => "</div>\n",
 	);
 
+require_js( '#jquery#' );
+require_js( '#bootstrap#' );
+require_css( '#bootstrap_css#' );
+require_css( 'b2evo_helper_screens.min.css' );
+// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+init_fontawesome_icons( 'fontawesome-glyphicons' );
+
 header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
 
@@ -397,11 +404,7 @@ if( $display != 'cli' )
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script src="../rsc/js/jquery.min.js"></script>
-		<!-- Bootstrap -->
-		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
-		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
-		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
+		<?php include_headlines() /* Add javascript and css files included above */ ?>
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">
@@ -747,7 +750,7 @@ switch( $action )
 			</form>
 		<?php
 
-		display_base_config_recap();
+		display_base_config_recap( true );
 		echo_install_button_js();
 		break;
 
@@ -803,85 +806,21 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		track_step( 'installer-options' );
+		load_funcs( 'collections/_demo_content.funcs.php' );
 		?>
 
 		<form action="index.php" method="get" class="evo_form__install">
-			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+			<h2><?php echo T_('b2evolution installation options') ?></h2>
+			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
+
+			<input type="hidden" name="locale" value="'.$default_locale.'" />
 			<input type="hidden" name="confirmed" value="0" />
 			<input type="hidden" name="installer_version" value="10" />
 			<input type="hidden" name="action" value="newdb" />
 
-			<h2><?php echo T_('b2evolution installation options') ?></h2>
-
-			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
-
-			<div class="checkbox">
-				<label>
-					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-					<?php echo T_('Install sample collections &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.') ?>
-				</label>
-				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
-					<?php
-					echo T_('Which demo collections would you like to install?');
-
-					// Display the collections to select which install
-					$collections = array(
-							'home'   => T_('Home'),
-							'a'      => T_('Blog A'),
-							'b'      => T_('Blog B'),
-							'photos' => T_('Photos'),
-							'forums' => T_('Forums'),
-							'manual' => T_('Manual'),
-							'group'  => T_('Tracker'),
-						);
-
-					// Allow all modules to set what collections should be installed
-					$module_collections = modules_call_method( 'get_demo_collections' );
-					if( ! empty( $module_collections ) )
-					{
-						foreach( $module_collections as $module_key => $module_colls )
-						{
-							foreach( $module_colls as $module_coll_key => $module_coll_title )
-							{
-								$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
-							}
-						}
-					}
-
-					foreach( $collections as $coll_index => $coll_title )
-					{ // Display the checkboxes to select what demo collection to install
-					?>
-					<div class="checkbox" style="margin-left:1em">
-						<label>
-							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
-							<?php echo $coll_title; ?>
-						</label>
-					</div>
-					<?php } ?>
-				</div>
-			</div>
-
-			<div class="checkbox" style="margin-top: 15px">
-				<label>
-					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
-					<?php echo T_('Create a sample organization');?>
-				</label>
-			</div>
-
-			<div class="checkbox" style="margin-top: 15px">
-				<label>
-					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
-					<?php echo T_('Create demo users (in addition to the admin account)');?>
-				</label>
-				<div id="create_demo_users_options" style="margin:10px 0 0 20px">
-					<div class="checkbox" style="margin-left: 1em">
-						<label>
-							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />
-							<?php echo T_('Create sample private messages between users');?>
-						</label>
-					</div>
-				</div>
-			</div>
+			<?php
+			echo echo_installation_options();
+			?>
 
 			<?php
 			if( $allow_install_test_features )
@@ -890,15 +829,17 @@ switch( $action )
 				<div class="checkbox" style="margin-top:15px">
 					<label>
 						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
-						<?php echo T_('Also install all test features.')?>
+						<?php echo T_('Also install all test features.').get_manual_link( 'install-test-features' ); ?>
 					</label>
 				</div>
-			<?php } ?>
+			<?php
+			}
+			?>
 
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
-					<?php echo T_('This is a local / test / intranet installation.')?>
+					<?php echo T_('This is a local / test / intranet installation.').get_manual_link( 'local-test-intranet-install-checkbox' ); ?>
 				</label>
 			</div>
 
@@ -925,17 +866,6 @@ switch( $action )
 			</p>
 		</form>
 
-		<script>
-			jQuery( '#create_sample_contents' ).click( function()
-			{
-				jQuery( '#create_sample_contents_options' ).toggle();
-			} );
-
-			jQuery( '#create_demo_users' ).click( function()
-			{
-				jQuery( '#create_demo_users_options' ).toggle();
-			} );
-		</script>
 		<?php
 		break;
 
@@ -983,14 +913,14 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
-		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true ); // during auto install this param can be 'full', 'minisite', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
+		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
 
-		if( $create_sample_contents == 'all' )
-		{ // Override create sample organization and demo user setting
-			$create_sample_organization = true;
+		if( $create_sample_contents == 'full' )
+		{	// Override create sample organization and demo user setting:
+			$create_demo_organization = true;
 			$create_demo_users = true;
 			$create_demo_messages = true;
 		}

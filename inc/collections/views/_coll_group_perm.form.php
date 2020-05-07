@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -51,29 +51,23 @@ $SQL = get_coll_group_perms_SQL( $edited_Blog, $keywords );
 
 <?php
 
-$Results = new Results( $SQL->get(), 'collgroup_' );
-
-if( ! empty( $keywords ) )
-{ // Display a button to reset the filters
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID, T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
+$Results = new Results( $SQL->get(), 'section_' );
 
 // Button to export user permissions into CSV file:
-$Results->global_icon( T_('Export CSV'), '', $admin_url.'?ctrl=coll_settings&amp;action=export_groupperms&amp;blog='.$edited_Blog->ID.( empty( $keywords ) ? '' : '&amp;keywords='.urlencode( $keywords ) ), T_('Export CSV'), 3, 3, array( 'class' => 'action_icon btn-default' ) );
+$Results->global_icon( TB_('Export CSV'), '', $admin_url.'?ctrl=coll_settings&amp;action=export_groupperms&amp;blog='.$edited_Blog->ID.( empty( $keywords ) ? '' : '&amp;keywords='.urlencode( $keywords ) ), TB_('Export CSV'), 3, 3, array( 'class' => 'action_icon btn-default' ) );
 
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
 
-$Results->title = T_('Group permissions').get_manual_link('advanced-group-permissions');
+$Results->title = TB_('Group permissions').get_manual_link('advanced-group-permissions');
 
 $Results->filter_area = array(
 	'submit' => 'actionArray[filter1]',
 	'callback' => 'filter_collobjectlist',
 	'url_ignore' => 'results_collgroup_page,keywords1,keywords2',
-	'presets' => array(
-		'all' => array( T_('All users'), regenerate_url( 'action,results_collgroup_page,keywords1,keywords2', 'action=edit' ) ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', TB_('All users'), '?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID, 'action=edit' );
 
 // Initialize Results object:
 colls_groups_perms_results( $Results, array(
@@ -87,7 +81,7 @@ echo '</div>';
 
 // Permission note:
 // fp> TODO: link
-echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.TB_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
 $form_buttons = array();
 
@@ -99,7 +93,7 @@ if( ! empty( $Results->rows ) )
 	{
 		$grp_IDs[] = $row->grp_ID;
 	}
-	$form_buttons[] = array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[update]', TB_('Save Changes!'), 'SaveButton' );
 }
 $Form->hidden( 'group_IDs', implode( ',', $grp_IDs) );
 

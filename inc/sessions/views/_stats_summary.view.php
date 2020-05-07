@@ -7,13 +7,13 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $AdminUI, $hit_type_color, $Hit, $Settings, $localtimenow;
+global $blog, $sec_ID, $admin_url, $AdminUI, $hit_type_color, $Hit, $Settings, $localtimenow;
 
 // All diagarm and table columns for current page:
 $diagram_columns = array(
@@ -48,6 +48,10 @@ $res_hits = get_hits_results_global( $hits_summary_mode );
 
 if( count( $res_hits ) )
 {
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
+
 	// Display diagram for live or aggregated data:
 	display_hits_diagram( 'global', $diagram_columns, $res_hits );
 
@@ -75,7 +79,7 @@ if( count( $res_hits ) )
 	{
 		$diagram_col_url_params = empty( $diagram_column_data['link_data'][0] ) ? '' : '&amp;hit_type='.$diagram_column_data['link_data'][0];
 		$diagram_col_url_params .= empty( $diagram_column_data['link_data'][1] ) ? '' : '&amp;agent_type='.$diagram_column_data['link_data'][1];
-		echo '<th style="background-color:#'.$diagram_column_data['color'].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits'.$diagram_col_url_params.'&amp;blog='.$blog.'">'.$diagram_column_data['title'].'</a></th>';
+		echo '<th style="background-color:#'.$diagram_column_data['color'].'"><a href="'.$admin_url.'?ctrl=stats&amp;tab=hits'.$diagram_col_url_params.$section_params.'">'.$diagram_column_data['title'].'</a></th>';
 	}
 	echo '<th class="lastcol">'.T_('Total').'</th>';
 	echo '</tr>';
@@ -86,8 +90,8 @@ if( count( $res_hits ) )
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 		if( $last_date == 0 ) $last_date = $this_date;	// that'll be the first one
 
-		$link_text = $admin_url.'?ctrl=stats&amp;tab=hits&amp;datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&amp;datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&amp;blog='.$blog;
-		$link_text_total_day = $admin_url.'?ctrl=stats&amp;tab=hits&amp;datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&amp;datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&amp;blog='.$blog;
+		$link_text = $admin_url.'?ctrl=stats&amp;tab=hits&amp;datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&amp;datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$section_params;
+		$link_text_total_day = $admin_url.'?ctrl=stats&amp;tab=hits&amp;datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&amp;datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$section_params;
 
 
 		if( $last_date != $this_date )
@@ -106,7 +110,7 @@ if( count( $res_hits ) )
 					echo date( 'D '.locale_datefmt(), $last_date );
 					if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
 					{	// Display a link to prune hits only for live data and if current user has a permission:
-						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
+						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$section_params.'&amp;'.url_crumb('stats') ) );
 					}
 				?></td><?php
 				foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
@@ -162,8 +166,8 @@ if( count( $res_hits ) )
 	{ // We had a day pending:
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
 
-		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
-		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).'&blog='.$blog;
+		$link_text = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$section_params;
+		$link_text_total_day = $admin_url.'?ctrl=stats&tab=hits&datestartinput='.urlencode( date( locale_datefmt() , $last_date ) ).'&datestopinput='.urlencode( date( locale_datefmt(), $last_date ) ).$section_params;
 
 		// Check if current data are live and not aggregated:
 		$is_live_data = true;
@@ -178,7 +182,7 @@ if( count( $res_hits ) )
 				echo date( 'D '.locale_datefmt(), $this_date );
 				if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
 				{	// Display a link to prune hits only for live data and if current user has a permission:
-					echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb('stats') ) );
+					echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$section_params.'&amp;'.url_crumb('stats') ) );
 				}
 				?></td><?php
 				foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
@@ -203,7 +207,7 @@ if( count( $res_hits ) )
 	}
 
 	// Total numbers:
-	$link_text_total = $admin_url.'?ctrl=stats&tab=hits&blog='.$blog;
+	$link_text_total = $admin_url.'?ctrl=stats&tab=hits'.$section_params;
 	?>
 
 	<tr class="total">

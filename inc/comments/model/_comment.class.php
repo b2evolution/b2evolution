@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -142,7 +142,13 @@ class Comment extends DataObject
 	 */
 	var $anon_notify_last;
 
-	var $nofollow;
+	/**
+	 * Active values for attribute "rel" of author URL link
+	 */
+	var $author_url_nofollow;
+	var $author_url_ugc;
+	var $author_url_sponsored;
+
 	/**
 	 * @var string
 	 */
@@ -231,7 +237,9 @@ class Comment extends DataObject
 			// echo 'null comment';
 			$this->rating = NULL;
 			$this->featured = 0;
-			$this->nofollow = 1;
+			$this->author_url_nofollow = 1;
+			$this->author_url_ugc = 1;
+			$this->author_url_sponsored = 0;
 			$this->notif_status = 'noreq';
 			$this->in_reply_to_cmt_ID = 0;
 			$this->set_renderers( array( 'default' ) );
@@ -263,7 +271,9 @@ class Comment extends DataObject
 			$this->renderers = $db_row->comment_renderers;
 			$this->rating = $db_row->comment_rating;
 			$this->featured = $db_row->comment_featured;
-			$this->nofollow = $db_row->comment_nofollow;
+			$this->author_url_nofollow = isset( $db_row->comment_author_url_nofollow ) ? $db_row->comment_author_url_nofollow : 1;
+			$this->author_url_ugc = isset( $db_row->comment_author_url_ugc ) ? $db_row->comment_author_url_ugc : 1;
+			$this->author_url_sponsored = isset( $db_row->comment_author_url_sponsored ) ? $db_row->comment_author_url_sponsored : 0;
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
 			$this->anon_notify = $db_row->comment_anon_notify;
@@ -915,6 +925,8 @@ class Comment extends DataObject
 	 */
 	function get_author_name_anonymous( $format = 'htmlbody', $params = array() )
 	{
+		global $Plugins;
+
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before' => '',
@@ -929,6 +941,12 @@ class Comment extends DataObject
 		}
 
 		$author_name = $this->dget( 'author', $format );
+
+		// Call plugins to filter name of anonymous user:
+		$Plugins->trigger_event( 'FilterCommentAuthor', array(
+			'data' => & $author_name,
+			'Comment' => & $this,
+		) );
 
 		if( is_null( $params['rel'] ) )
 		{ // Set default rel:
@@ -1139,7 +1157,7 @@ class Comment extends DataObject
 		}
 
 		if( $params['after_user'] == '#' && $this->is_meta() )
-		{	// Don't display a commenter type for meta comment, because only memebers can create them:
+		{	// Don't display a commenter type for internal comment, because only memebers can create them:
 			$params['after_user'] = '';
 		}
 
@@ -1190,14 +1208,6 @@ class Comment extends DataObject
 					break;
 			}
 		}
-
-		$hook_params = array(
-			'data' => & $r,
-			'Comment' => & $this,
-			'makelink' => ! empty($params['link_to']),
-		);
-
-		$Plugins->trigger_event( 'FilterCommentAuthor', $hook_params );
 
 		return $r;
 	}
@@ -1389,9 +1399,22 @@ class Comment extends DataObject
 		if( $makelink )
 		{
 			$r .= '<a ';
-			if( $this->nofollow )
+			$rel_values = array();
+			if( $this->get( 'author_url_nofollow' ) )
 			{
-				$r .= 'rel="nofollow" ';
+				$rel_values[] = 'nofollow';
+			}
+			if( $this->get( 'author_url_ugc' ) )
+			{
+				$rel_values[] = 'ugc';
+			}
+			if( $this->get( 'author_url_sponsored' ) )
+			{
+				$rel_values[] = 'sponsored';
+			}
+			if( ! empty( $rel_values ) )
+			{
+				$r .= 'rel="'.implode( ' ', $rel_values ).'" ';
 			}
 			if( ! empty( $link_class ) )
 			{
@@ -1550,7 +1573,7 @@ class Comment extends DataObject
 		echo '" title="'.$title.'"';
 		echo empty( $class ) ? '' : ' class="'.$class.'"';
 		if( $this->is_meta() )
-		{ // Edit meta comment by ajax
+		{ // Edit internal comment by ajax
 			echo ' onclick="return edit_comment( \'form\', '.$this->ID.' )"';
 		}
 		echo '>'.$text.'</a>';
@@ -1724,10 +1747,18 @@ class Comment extends DataObject
 		else
 		{
 			// JS confirm is required only when the comment is not in the recycle bin yet
-			$display_js_confirm = ( $this->status == 'trash' );
+			// ...or comment is an internal comment where it cannot be recycled
+			$display_js_confirm = ( $this->status == 'trash' ) || $this->is_meta();
 			if( $display_js_confirm && ( $confirm_text == '#' ) )
 			{ // Set js confirm text on comment delete action
-				$confirm_text = TS_('You are about to delete this comment!\\nThis cannot be undone!');
+				if( $this->is_meta() )
+				{
+					$confirm_text = TS_('Are you sure you want to DELETE this Internal Comment?\\nThis cannot be undone!');
+				}
+				else
+				{
+					$confirm_text = TS_('You are about to delete this comment!\\nThis cannot be undone!');
+				}
 			}
 
 			if( $button )
@@ -1972,7 +2003,7 @@ class Comment extends DataObject
 			), $params );
 
 		if( $this->is_meta() )
-		{	// Don't allow voting on meta comments:
+		{	// Don't allow voting on internal comments:
 			return;
 		}
 
@@ -2042,6 +2073,7 @@ class Comment extends DataObject
 				'before_title'          => ' &nbsp; ',
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
+				'title_text'            => NULL, // NULL - Use default title text
 				'title_yes'             => T_('Cast a helpful vote!'),
 				'title_yes_voted'       => T_('You sent a "helpful" vote.'),
 				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
@@ -2049,12 +2081,31 @@ class Comment extends DataObject
 				'title_no'              => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'        => T_('You sent a "not helpful" vote.'),
 				'title_empty'           => T_('No user votes yet.'),
-				'class'                 => '',
+				'title_own'             => T_('You cannot vote on own Item.'),
+				'class'                 => 'nowrap',
 				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
+				'display_noopinion'     => true,
+				'display_score'         => false,
+				'icon_like_active'        => 'thumb_up',
+				'icon_like_noactive'      => 'thumb_up_disabled',
+				'icon_noopinion_active'   => 'ban',
+				'icon_noopinion_noactive' => 'ban_disabled',
+				'icon_dontlike_active'    => 'thumb_down',
+				'icon_dontlike_noactive'  => 'thumb_down_disabled',
+				'display_noactive'        => false, // Display not active icons, when current User is owner of this Item
+				'display_like'            => true,
+				'display_noopinion'       => true,
+				'display_dontlike'        => true,
+				'icon_like_active'        => 'thumb_up',
+				'icon_like_noactive'      => 'thumb_up_disabled',
+				'icon_noopinion_active'   => 'ban',
+				'icon_noopinion_noactive' => 'ban_disabled',
+				'icon_dontlike_active'    => 'thumb_down',
+				'icon_dontlike_noactive'  => 'thumb_down_disabled',
 			), $params );
 
 		if( $this->is_meta() )
-		{	// Don't allow voting on meta comments:
+		{	// Don't allow voting on internal comments:
 			return;
 		}
 
@@ -2072,44 +2123,82 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
 
 		if( $current_User->ID == $this->author_user_ID )
-		{ // Display only vote summary for users on their own comments
-			$params['result_title_undecided'] = T_('Helpfulness:');
-			$params['after_result'] = '.';
-			$result_summary = $this->get_vote_summary( 'helpful', $params );
-			echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+		{	// Display only vote summary/score for users on their own comments:
+			if( $params['display_noactive'] && $params['display_like'])
+			{	// Display disabled 'Like' icon:
+				echo get_icon( $params['icon_like_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
+
+			if( $params['display_noactive'] && $params['display_noopinion'] )
+			{	// Display disabled 'No opinion' icon:
+				echo get_icon( $params['icon_noopinion_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
+
+			if( $params['display_score'] )
+			{	// Display score:
+				echo '<span class="vote_score">'.$this->get( 'helpful_addvotes' ).'</span>';
+			}
+			else
+			{	// Display summary:
+				$params['result_title_undecided'] = T_('Helpfulness:');
+				$params['after_result'] = '.';
+				$result_summary = $this->get_vote_summary( 'helpful', $params );
+				echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+			}
+
+			if( $params['display_noactive'] && $params['display_dontlike'] )
+			{	// Display disabled 'Don't like' icon:
+				echo get_icon( $params['icon_dontlike_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
 		}
 		else
 		{ // Display form to vote
 			$vote_result = $this->get_vote_helpful_disabled();
 
-			if( !$vote_result['is_voted'] )
-			{ // Current user didn't vote on this comment
-				$title_text = $params['helpful_text'];
+			if( $params['title_text'] === NULL )
+			{	// Use default title text:
+				if( ! $vote_result['is_voted'] )
+				{ // Current user didn't vote on this comment
+					$title_text = $params['helpful_text'];
+				}
+				else
+				{ // Display vote summary if user already voted on this comment
+					$title_text = $this->get_vote_summary( 'helpful', $params );
+				}
+				$title_text .= ' ';
 			}
 			else
-			{ // Display vote summary if user already voted on this comment
-				$title_text = $this->get_vote_summary( 'helpful', $params );
+			{	// Use custom title text:
+				$title_text = $params['title_text'];
 			}
 
 			display_voting_form( array(
 					'vote_type'             => 'comment',
 					'vote_ID'               => $this->ID,
 					'skin_ID'               => $params['skin_ID'],
+					'display_noopinion'     => $params['display_noopinion'],
+					'display_score'         => $params['display_score'],
 					'display_inappropriate' => false,
 					'display_spam'          => false,
-					'title_text'            => $title_text.' ',
+					'title_text'            => $title_text,
 					'title_like'            => $params['title_yes'],
 					'title_like_voted'      => $params['title_yes_voted'],
 					'title_noopinion'       => $params['title_noopinion'],
 					'title_noopinion_voted' => $params['title_noopinion_voted'],
 					'title_dontlike'        => $params['title_no'],
 					'title_dontlike_voted'  => $params['title_no_voted'],
+					'icon_like_active'        => $params['icon_like_active'],
+					'icon_like_noactive'      => $params['icon_like_noactive'],
+					'icon_noopinion_active'   => $params['icon_noopinion_active'],
+					'icon_noopinion_noactive' => $params['icon_noopinion_noactive'],
+					'icon_dontlike_active'    => $params['icon_dontlike_active'],
+					'icon_dontlike_noactive'  => $params['icon_dontlike_noactive'],
 				) );
 		}
 
@@ -2492,7 +2581,7 @@ class Comment extends DataObject
 						$tmp_params['class'] .= ' last-child';
 					}
 				}
-				if( $next_status_in_row[0] == $first_status_in_row[0] )
+				if( isset( $next_status_in_row[0] ) && isset( $first_status_in_row[0] ) && $next_status_in_row[0] == $first_status_in_row[0] )
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
@@ -2502,7 +2591,10 @@ class Comment extends DataObject
 				}
 				$r .= $this->next_status_link( $tmp_params, true, $status[0] );
 			}
-			$prev_status = $next_status_in_row[0];
+			if( isset( $next_status_in_row[0] ) )
+			{
+			    $prev_status = $next_status_in_row[0];
+			}
 		}
 
 		$prev_status = '';
@@ -2532,7 +2624,11 @@ class Comment extends DataObject
 				}
 				$r .= $this->next_status_link( $tmp_params, false, $status[0] );
 			}
-			$prev_status = $next_status_in_row[0];
+			if( isset( $next_status_in_row[0] ) )
+			{
+			    $prev_status = $next_status_in_row[0];
+			}
+			
 		}
 
 		return $r;
@@ -2608,7 +2704,7 @@ class Comment extends DataObject
 	 * Note: This actually only returns the URL, to get a real link, use Comment::get_permanent_link()
 	 *
 	 * @param string glue between url params
-	 * @param string Anchor for meta comment
+	 * @param string Anchor for internal comment
 	 */
 	function get_permanent_url( $glue = '&amp;', $meta_anchor = '#' )
 	{
@@ -2656,14 +2752,17 @@ class Comment extends DataObject
 				$text = get_icon( 'permalink' ).T_('Permalink');
 				break;
 
+			case '#icon':
 			case '#icon#':
 				$text = get_icon( 'permalink' );
 				break;
 
+			case '#text':
 			case '#text#':
 				$text = T_('Permalink');
 				break;
 
+			case '#item':
 			case '#item#':
 				$comment_Item = & $this->get_Item();
 				$text = $comment_Item->get_title( array( 'link_type' => 'none' ) );
@@ -2713,14 +2812,14 @@ class Comment extends DataObject
 
 		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') );
 		if( $use_cache )
-		{ // the format/comment can be cached:
+		{	// the format/comment can be cached:
 			if( empty( $CommentList ) )
-			{ // set comments Blog from comment Item
+			{	// set comments Blog from comment Item
 				$this->get_Item();
 				$comments_Blog = & $this->Item->get_Blog();
 			}
 			else
-			{ // set comments Blog from CommentList
+			{	// set comments Blog from CommentList
 				$comments_Blog = & $CommentList->Blog;
 			}
 			$comment_renderers = $this->get_renderers_validated();
@@ -2734,15 +2833,15 @@ class Comment extends DataObject
 			$CommentPrerenderingCache = & get_CommentPrerenderingCache();
 
 			if( isset($CommentPrerenderingCache[$format][$this->ID][$cache_key]) )
-			{ // already in PHP cache.
+			{	// already in PHP cache.
 				$r = $CommentPrerenderingCache[$format][$this->ID][$cache_key];
 				// Save memory, typically only accessed once.
 				unset($CommentPrerenderingCache[$format][$this->ID][$cache_key]);
 			}
 			else
-			{ // try loading into Cache
+			{	// try loading into Cache
 				if( ! isset($CommentPrerenderingCache[$format]) )
-				{ // only do the prefetch loading once.
+				{	// only do the prefetch loading once.
 					$CommentPrerenderingCache[$format] = array();
 
 					$SQL = new SQL( 'Preload prerendered comments content ('.$format.')' );
@@ -2768,7 +2867,7 @@ class Comment extends DataObject
 						$row_cache_key = $row->cmpr_format.'/'.$row->cmpr_renderers;
 
 						if( ! isset($CommentPrerenderingCache[$format][$row->cmpr_cmt_ID]) )
-						{ // init list
+						{	// init list
 							$CommentPrerenderingCache[$format][$row->cmpr_cmt_ID] = array();
 						}
 
@@ -2793,7 +2892,7 @@ class Comment extends DataObject
 			$r = format_to_output( $data, $format );
 
 			if( $use_cache )
-			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
+			{	// save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
 				global $servertimenow;
 				$DB->query( 'REPLACE INTO T_comments__prerendering ( cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered, cmpr_datemodified )
 					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $comment_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered comment content' );
@@ -2856,6 +2955,32 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get excerpt, derived from {@link Comment::$content}.
+	 *
+	 * @param int Maximum length
+	 * @param string Tail to use, when string gets cropped. Its length gets
+	 *               substracted from the total length (with HTML entities
+	 *               being decoded). Default is "&hellip;" (HTML entity)
+	 * @return string
+	 */
+	function get_excerpt( $params = array() )
+	{
+		$params = array_merge( array(
+				'format' => 'htmlbody',
+				'maxlen' => 254,
+				'tail'   => '&hellip;',
+			), $params );
+
+		$content = $this->get_prerendered_content( $params['format'] );
+
+		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
+		$content = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $content );
+
+		return excerpt( $content, $params['maxlen'], $params['tail'] );
+	}
+
+
+	/**
 	 * Template function: display content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
@@ -2891,7 +3016,8 @@ class Comment extends DataObject
 				{	// This method is used to attach several files by quick uploader JS button:
 					$TemporaryIDCache = & get_TemporaryIDCache();
 					if( ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $this->temp_link_owner_ID, false, false ) ) &&
-					    $TemporaryID->type == 'comment' )
+					    ( ( $this->get( 'type' ) != 'meta' && $TemporaryID->type == 'comment' ) ||
+					      ( $this->get( 'type' ) == 'meta' && $TemporaryID->type == 'metacomment' ) ) )
 					{	// Get all links of the temporary object which is used for new creating comment:
 						$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
 						$attachments = & $LinkOwner->get_Links();
@@ -3182,13 +3308,13 @@ class Comment extends DataObject
 				$s = T_('Webmention from %s');
 				break;
 
-			case 'meta': // Display a meta comment:
+			case 'meta': // Display an internal comment:
 				$href = '';
 				if( $params['linked_type'] )
 				{	// Make a comment type as link to permanent url:
 					$href = 'href="'.$this->get_permanent_url().'"';
 				}
-				return sprintf( T_('<a %s>Meta comment</a> from %s'), $href, $author );
+				return sprintf( T_('<a %s>Internal comment</a> from %s'), $href, $author );
 		}
 
 		return sprintf( $s, $author );
@@ -3269,6 +3395,20 @@ class Comment extends DataObject
 		}
 
 		echo mysql2date( $format, $this->date, $useGM );
+	}
+
+
+	/**
+	 * Get creation time of Comment. This should replace Comment::date() and Comment::time()
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_creation_time( $format = '', $useGM = false )
+	{
+		$format = locale_resolve_datetime_fmt( $format );
+
+		return mysql2date( $format, $this->date, $useGM );
 	}
 
 
@@ -3498,7 +3638,7 @@ class Comment extends DataObject
 			), $params );
 
 		if( $this->is_meta() )
-		{	// Don't display a status banner of meta comments:
+		{	// Don't display a status banner of internal comments:
 			return;
 		}
 
@@ -4093,16 +4233,16 @@ class Comment extends DataObject
 			}
 		}
 		else
-		{	// Get the notify users for META comments:
+		{	// Get the notify users for INTERNAL comments:
 
-			// Get list of users who want to be notified when his login is mentioned in the meta comment content by @user's_login:
+			// Get list of users who want to be notified when his login is mentioned in the internal comment content by @user's_login:
 			$mentioned_user_IDs = get_mentioned_user_IDs( 'meta_comment', $this->get( 'content' ), $already_notified_user_IDs );
 			foreach( $mentioned_user_IDs as $mentioned_user_ID )
 			{
 				$notify_users[ $mentioned_user_ID ] = 'meta_comment_mentioned';
 			}
 
-			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' meta comments and would like to recieve notifications' );
+			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' internal comments and would like to recieve notifications' );
 			$meta_SQL->SELECT( 'user_ID' );
 			$meta_SQL->FROM( 'T_users' );
 			$meta_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
@@ -4114,7 +4254,7 @@ class Comment extends DataObject
 				      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 			// Check if users have access to the back-office:
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
-			// Check if the users would like to receive notifications about new meta comments:
+			// Check if the users would like to receive notifications about new internal comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
 			// Check if users are activated:
 			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
@@ -4147,7 +4287,7 @@ class Comment extends DataObject
 			}
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
-			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
+			// Select users which have permission to the edited_Item internal comments and would like to recieve notifications:
 			$notify_list = $DB->get_col( $meta_SQL );
 
 			// Preprocess list:
@@ -4280,7 +4420,7 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get( 'email' );
+			$reply_to = NULL; // Don't allow to reply to registered User:
 			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
@@ -4349,8 +4489,8 @@ class Comment extends DataObject
 					break;
 
 				case 'meta':
-					/* TRANS: Subject of the mail to send on new meta comments. First %s is author login, the second %s is the item's title. */
-					$subject = sprintf( T_( '%s posted a new meta comment on "%s"' ), $author_name, $comment_Item->get('title') );
+					/* TRANS: Subject of the mail to send on new internal comments. First %s is author login, the second %s is the item's title. */
+					$subject = sprintf( T_( '%s posted a new internal comment on "%s"' ), $author_name, $comment_Item->get('title') );
 					break;
 
 				default:
@@ -4397,10 +4537,10 @@ class Comment extends DataObject
 
 				case 'blog_subscription': // blog subscription
 				case 'comment_mentioned': // user was mentioned in the comment content
-				case 'meta_comment_mentioned': // user was mentioned in the meta comment content
+				case 'meta_comment_mentioned': // user was mentioned in the internal comment content
 				case 'item_subscription': // item subscription for registered user
 				case 'anon_subscription': // item subscription for anonymous user
-				case 'meta_comment': // meta comment notification
+				case 'meta_comment': // internal comment notification
 					$user_reply_to = NULL;
 					break;
 
@@ -4433,16 +4573,22 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
+			$email_headers = array();
+			if( ! empty( $user_reply_to ) )
+			{	// Allow to reply only to anonymous user and when it is allowed depending on notify user type:
+				$email_headers['Reply-To'] = $user_reply_to;
+			}
+
 			if( $notify_User )
 			{	// Send the email to registered User:
 				// Note: Note activated users won't get notification email
-				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, $email_headers );
 			}
 			else
 			{	// Send the email to anonymous user:
 				$email_template_params['comment_ID'] = $anon_Comment->ID;
 				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
-				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, $email_headers );
 			}
 
 			if( $send_mail_result )
@@ -4532,7 +4678,7 @@ class Comment extends DataObject
 					$commented_Item->get( 'title' ) );
 
 				// Send the email:
-				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
 					$commented_Item->display_notification_message( T_('Sending email notification to assigned user.') );
@@ -4629,7 +4775,7 @@ class Comment extends DataObject
 		}
 
 		if( $this->is_meta() )
-		{	// Meta comments have no spam voting
+		{	// Internal comments have no spam voting
 			return;
 		}
 
@@ -5312,13 +5458,13 @@ class Comment extends DataObject
 		$commented_Item = & $this->get_Item();
 
 		if( $this->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
-			{	// Change meta comment status to 'protected' if user has no perm to view them:
+			{	// Change internal comment status to 'protected' if user has no perm to view them:
 				$comment_allowed_status = 'protected';
 			}
 			else
-			{	// Do not restrict if meta comment and user has the proper permission:
+			{	// Do not restrict if internal comment and user has the proper permission:
 				$comment_allowed_status = $current_status;
 			}
 		}
@@ -5474,7 +5620,8 @@ class Comment extends DataObject
 			return;
 		}
 
-		if( $TemporaryID->type != 'comment' )
+		if( ( $this->get( 'type' ) != 'meta' && $TemporaryID->type != 'comment' ) ||
+		    ( $this->get( 'type' ) == 'meta' && $TemporaryID->type != 'metacomment' ) )
 		{	// Wrong temporary object:
 			return;
 		}

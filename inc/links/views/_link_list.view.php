@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -40,7 +40,7 @@ if( empty( $Blog ) )
 
 if( ! isset( $fieldset_prefix ) )
 {	// Define default fieldset prefix:
-	// (used to display several fieldset on same page, e.g. for normal and meta comments)
+	// (used to display several fieldset on same page, e.g. for normal and internal comments)
 	$fieldset_prefix = '';
 }
 
@@ -103,6 +103,9 @@ $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_res
 $compact_results_params['body_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['body_start'] );
 $compact_results_params['no_results_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['no_results_start'] );
 
+// Disable flush because it breaks layout when comment form is called from widget "Item Comment Form":
+$compact_results_params['disable_evo_flush'] = true;
+
 $Results->display( $compact_results_params );
 
 // Print out JavaScript to change a link position:
@@ -134,6 +137,7 @@ switch( $link_owner_type )
 		break;
 
 	case 'comment':
+	case 'metacomment':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'c' ).$LinkOwner->get_ID().'/';
 		break;
@@ -160,8 +164,10 @@ display_dragdrop_upload_button( array(
 		'listElement'      => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
-				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-					.'<div>#button_text#</div>'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'	// Main dropzone
+					// The div below is not necessary because were making the main dropzone transparent so
+					// the upload button below will not be covered when the main dropzone is "displayed" on drop ((see qq-hide-dropzone doc)):
+					//.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 					.'<div>#button_text#</div>'
@@ -190,7 +196,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" )',
+		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).add( jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).find( "textarea.link_attachment_dropzone" ) )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,

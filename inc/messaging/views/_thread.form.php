@@ -40,7 +40,7 @@ if( !isset( $params ) )
 }
 $params = array_merge( array(
 	'form_class_thread' => 'fform',
-	'form_title' => T_('New thread').( is_admin_page() ? get_manual_link( 'messages-new-thread' ) : '' ),
+	'form_title' => TB_('New thread').( is_admin_page() ? get_manual_link( 'messages-new-thread' ) : '' ),
 	'form_action' => NULL,
 	'form_name' => 'thread_checkchanges',
 	'form_layout' => 'compact',
@@ -60,7 +60,7 @@ $Form->switch_template_parts( $params['skin_form_params'] );
 
 if( is_admin_page() )
 {
-	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
+	$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 }
 
 $Form->begin_form( $params['form_class_thread'], $params['form_title'], array( 'onsubmit' => 'return check_form_thread()') );
@@ -76,8 +76,8 @@ $Form->begin_form( $params['form_class_thread'], $params['form_title'], array( '
 
 if( $params['allow_select_recipients'] )
 {	// User can select recipients
-	$Form->text_input( 'thrd_recipients', $edited_Thread->recipients, $params['cols'], T_('Recipients'),
-		'<noscript>'.T_('Enter usernames. Separate with comma (,)').'</noscript>',
+	$Form->text_input( 'thrd_recipients', $edited_Thread->recipients, $params['cols'], TB_('Recipients'),
+		'<noscript>'.TB_('Enter usernames. Separate with comma (,)').'</noscript>',
 		array(
 			'maxlength'=> 255,
 			'required'=>true,
@@ -86,14 +86,14 @@ if( $params['allow_select_recipients'] )
 
 	echo '<div id="multiple_recipients">';
 	$Form->radio( 'thrdtype', $params['thrdtype'], array(
-									array( 'discussion', T_( 'Start a group discussion' ) ),
-									array( 'individual', T_( 'Send individual messages' ) )
-								), T_('Multiple recipients'), true );
+									array( 'discussion', TB_( 'Start a group discussion' ) ),
+									array( 'individual', TB_( 'Send individual messages' ) )
+								), TB_('Multiple recipients'), true );
 	echo '</div>';
 }
 else
 {	// No available to select recipients, Used in /contact.php
-	$Form->info( T_('Recipients'), $edited_Thread->recipients );
+	$Form->info( TB_('Recipients'), $edited_Thread->recipients );
 	if( $recipients_selected )
 	{
 		foreach( $recipients_selected as $recipient )
@@ -104,7 +104,7 @@ else
 	}
 }
 
-$Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], T_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input large' ) );
+$Form->text_input( 'thrd_title', $edited_Thread->title, $params['cols'], TB_('Subject'), '', array( 'maxlength'=> 255, 'required'=>true, 'class'=>'wide_input large' ) );
 
 // Display plugin captcha for message form before textarea:
 $Plugins->display_captcha( array(
@@ -153,7 +153,7 @@ $form_inputstart = $Form->inputstart;
 $form_inputend = $Form->inputend;
 $Form->inputstart .= $message_toolbar;
 $Form->inputend = $quick_setting_switch.$Form->inputend;
-$Form->textarea_input( 'msg_text', $edited_Message->original_text, 10, T_('Message'), array(
+$Form->textarea_input( 'msg_text', $edited_Message->original_text, 10, TB_('Message'), array(
 		'cols' => $params['cols'],
 		'required' => true
 	) );
@@ -168,7 +168,7 @@ $current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_
 $message_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $current_renderers, array( 'setting_name' => 'msg_apply_rendering' ) );
 if( !empty( $message_renderer_checkboxes ) )
 {
-	$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
+	$Form->info( TB_('Text Renderers'), $message_renderer_checkboxes );
 }
 
 // ####################### ATTACHMENTS/LINKS #########################
@@ -195,8 +195,8 @@ $Plugins->display_captcha( array(
 
 // display submit button, but only if enabled
 $Form->end_form( array(
-		array( 'submit', 'actionArray[preview]', /* TRANS: Verb */ T_('Preview'), 'SaveButton btn-info' ),
-		array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
+		array( 'submit', 'actionArray[preview]', /* TRANS: Verb */ TB_('Preview'), 'SaveButton btn-info' ),
+		array( 'submit', 'actionArray[create]', TB_('Send message'), 'SaveButton' )
 	) );
 
 if( $params['allow_select_recipients'] )
@@ -346,7 +346,7 @@ if( $action == 'preview' )
 	 * Author:
 	 */
 	$Results->cols[] = array(
-			'th' => T_('Author'),
+			'th' => TB_('Author'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center top #msg_ID#',
 			'td' => '%col_msg_author( #msg_user_ID#, #msg_datetime# )%'
@@ -355,7 +355,7 @@ if( $action == 'preview' )
 	 * Message:
 	 */
 	$Results->cols[] = array(
-			'th' => T_('Message'),
+			'th' => TB_('Message'),
 			'td_class' => 'left top message_text',
 			'td' => '@get_content()@@get_images()@@get_files()@',
 		);
@@ -363,7 +363,7 @@ if( $action == 'preview' )
 	 * Read?:
 	 */
 	$Results->cols[] = array(
-		'th' => T_('Read?'),
+		'th' => TB_('Read?'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'top',
 		'td' => '%col_msg_read_by( #msg_ID# )%',

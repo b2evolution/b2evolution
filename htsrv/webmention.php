@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -67,6 +67,11 @@ if( ! preg_match( '#/([a-z0-9\-_]+)[^/]*$#', $target, $item_url ) ||
 if( ! $target_Item->can_receive_webmentions() )
 {	// If collection of the target Item doesn't support accepting webmentions:
 	webmention_response( 400, 'Webmentions are disabled' );
+}
+
+if( is_same_url( $source, $target_Item->get_permanent_url( '', '', '&' ) ) )
+{	// If the posted URL is a permanent URL of the target Item:
+	webmention_response( 400, 'Permanent URL of this Item' );
 }
 
 // Initialize new Comment for webmention:

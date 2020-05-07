@@ -7,13 +7,13 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url, $AdminUI, $agent_type_color, $Settings, $localtimenow;
+global $blog, $sec_ID, $admin_url, $rsc_url, $AdminUI, $agent_type_color, $Settings, $localtimenow;
 
 // All diagarm and table columns for current page:
 $diagram_columns = array(
@@ -40,6 +40,10 @@ $res_hits = get_hits_results_robot( $hits_summary_mode );
 
 if( count( $res_hits ) )
 {
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
+
 	// Display diagram for live or aggregated data:
 	display_hits_diagram( 'robot', $diagram_columns, $res_hits );
 

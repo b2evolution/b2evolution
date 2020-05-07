@@ -7,14 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
-init_jqplot_js();
+init_jqplot_js( 'blog' );
 
 /**
  * coll_activity_stats_Widget Class.

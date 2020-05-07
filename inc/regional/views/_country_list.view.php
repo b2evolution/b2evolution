@@ -159,15 +159,15 @@ function filter_countries( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_countries',
-	'presets' => array(
-		'all'       => array( T_('All'), $admin_url.'?ctrl=countries' ),
-		'unknown'   => array( T_('Unknown'), $admin_url.'?ctrl=countries&amp;status=unknown' ),
-		'trusted'   => array( T_('Trusted'), $admin_url.'?ctrl=countries&amp;status=trusted' ),
-		'suspect'   => array( T_('Suspect'), $admin_url.'?ctrl=countries&amp;status=suspect' ),
-		'blocked'   => array( T_('Blocked'), $admin_url.'?ctrl=countries&amp;status=blocked' ),
-		'preferred' => array( T_('Preferred'), $admin_url.'?ctrl=countries&amp;pref=1' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all'      , T_('All'), $admin_url.'?ctrl=countries' );
+$Results->register_filter_preset( 'unknown'  , T_('Unknown'), $admin_url.'?ctrl=countries&amp;status=unknown' );
+$Results->register_filter_preset( 'trusted'  , T_('Trusted'), $admin_url.'?ctrl=countries&amp;status=trusted' );
+$Results->register_filter_preset( 'suspect'  , T_('Suspect'), $admin_url.'?ctrl=countries&amp;status=suspect' );
+$Results->register_filter_preset( 'blocked'  , T_('Blocked'), $admin_url.'?ctrl=countries&amp;status=blocked' );
+$Results->register_filter_preset( 'preferred', T_('Preferred'), $admin_url.'?ctrl=countries&amp;pref=1' );
+
 
 $Results->cols[] = array(
 						'th' => T_('Code'),

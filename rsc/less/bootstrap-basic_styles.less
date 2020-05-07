@@ -6,6 +6,7 @@
 @import "inc/text_styles.inc.less";
 @import "inc/image_styles.inc.less";
 @import "inc/block_styles.inc.less";
+@import "inc/blockquote.inc.less";
 
 @import "inc/sprite_flags.inc.less";
 @import "inc/sprite_icons.inc.less";
@@ -51,11 +52,9 @@ div.filters .filter_item {
 		display: inline-block;
 	}
 	.evo_cat_meta {
-		font-weight: bold;
-		color: #000;
 		list-style: square;
 		margin-left: 20px;
-		label, a {
+		> label, > a {
 			font-weight: bold;
 			color: #000;
 		}
@@ -73,7 +72,7 @@ div.filters .filter_item {
 
 // ---------------- //
 
-// Meta comments:
+// Internal comments:
 .evo_comment__meta {
 	border: 2px solid @status_color_meta;
 	&:last-child {
@@ -150,6 +149,9 @@ div#publish_buttons {
 	.quick-publish {
 		margin-left: 5px;
 	}
+	.PreviewButton {
+		margin-right: 10px;
+	}
 }
 .publish_buttons_wrapper {
 	div#publish_buttons.affix {
@@ -167,4 +169,6 @@ tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
 // Set fixed width for color selector to don't use full width:
 .input-group.colorpicker-component {
 	width: 100px;
+	display: inline-table;
+	vertical-align: middle;
 }

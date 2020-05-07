@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
@@ -280,6 +280,11 @@ function postcats_get_byID( $post_ID )
 {
 	global $DB, $cache_postcats;
 
+	if( empty( $post_ID ) )
+	{
+		return array();
+	}
+
 	if( ! is_array( $cache_postcats ) )
 	{	// Initialize cache array first time:
 		$cache_postcats = array();
@@ -423,19 +428,4 @@ function get_allow_cross_posting()
 	global $Settings;
 	return $Settings->get( 'cross_posting' ) + ( 2 *  $Settings->get( 'cross_posting_blogs' ) );
 }
-
-
-/**
- * In-skin display of a Chapter.
- * It is a wrapper around the skin '_cat_list.inc.php' file.
- *
- * @param Object Chapter
- */
-function cat_inskin_display( $Chapter )
-{
-	skin_include( '_cat_list.inc.php', array(
-					'Chapter' => $Chapter,
-				) );
-}
-
 ?>

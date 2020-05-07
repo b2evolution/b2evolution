@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -605,8 +605,10 @@ function url_same_protocol( $url, $other_url = NULL )
  * @param string existing url
  * @param string|array Params to add (string as-is) or array, which gets urlencoded.
  * @param string delimiter to use for more params
+ * @param boolean true by default for extra security checking
+ * @return string URL with added param
  */
-function url_add_param( $url, $param, $glue = '&amp;' )
+function url_add_param( $url, $param, $glue = '&amp;', $prevent_quotes = true )
 {
 	if( empty( $param ) )
 	{
@@ -634,8 +636,8 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 		$param = implode( $glue, $param_list );
 	}
 
-	if( strpos( $param, '"' ) !== false ||
-	    strpos( $param, '\'' ) !== false )
+	if( $prevent_quotes &&
+	    ( strpos( $param, '"' ) !== false || strpos( $param, '\'' ) !== false ) )
 	{	// Don't allow chars " and ' in new set params:
 		debug_die( 'Invalid chars in params <b>'.format_to_output( $param, 'htmlbody' ).'</b> for <code>url_add_param()</code> !' );
 	}
@@ -1086,5 +1088,142 @@ function url_check_same_domain( $main_url, $check_url )
 	$same_domain = ( ( $check_url_host == null ) || ( $check_url_host == $main_url_host ) );
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
+}
+
+
+/**
+ * Check redirect URL if it is a part of redirect URLs in email log content
+ *
+ * Used to check redirect_to URLs from email message
+ *
+ * @param string Redirect URL
+ * @param string Email log content, NULL - if we need to get email log message from DB by email log ID and key
+ * @param string Email log ID
+ * @param string Email log key
+ * @return boolean TRUE if the requested URL can be used as redirect URL for the email log
+ */
+function check_redirect_url_by_email_log( $redirect_to, $email_log_message = NULL, $email_log_ID = NULL, $email_log_key = NULL )
+{
+	global $baseurl;
+
+	if( empty( $redirect_to ) )
+	{	// No URL to check:
+		return false;
+	}
+
+	if( stripos( $redirect_to, $baseurl ) === 0 )
+	{	// Allow redirect url if it is started with same domain as base url:
+		return true;
+	}
+
+	if( $email_log_message === NULL &&
+	    ! empty( $email_log_ID ) &&
+	    ! empty( $email_log_key ) )
+	{	// Try to get email log message from DB if it is not provided yet:
+		global $DB;
+		$SQL = new SQL( 'Get message of email log #'.$email_log_ID.' to check redirect url' );
+		$SQL->SELECT( 'emlog_message' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $email_log_ID ) );
+		$SQL->WHERE_and( 'emlog_key = '.$DB->quote( $email_log_key ) );
+		$email_log_message = $DB->get_var( $SQL );
+	}
+
+	if( empty( $email_log_message ) )
+	{	// Email log message is not provided and not found in DB:
+		return false;
+	}
+
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( $redirect_to ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// Additional check for case when URLs are encoded to html entities:
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( str_replace( '&', '&amp;', $redirect_to ) ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// The redirect URL is not allowed:
+	return false;
+}
+
+
+/**
+ * Get current URL
+ *
+ * @param string Exclude params separated by comma
+ * @return string
+ */
+function get_current_url( $exclude_params = NULL )
+{
+	$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' )
+		.$_SERVER['HTTP_HOST']
+		.$_SERVER['REQUEST_URI'];
+
+	if( $exclude_params !== NULL )
+	{	// Exclude params from current url:
+		$current_url = clear_url( $current_url, $exclude_params );
+	}
+
+	return $current_url;
+}
+
+
+/**
+ * Remove parameters from URL
+ *
+ * @param string Original URL
+ * @param string Parameters which should be removed from URL (separated by comma)
+ * @return string Cleared URL
+ */
+function clear_url( $url, $exclude_params )
+{
+	$exclude_params = str_replace( ',', '|', preg_quote( $exclude_params ) );
+	$url = preg_replace( '/((\?)|&(amp;)?)('.$exclude_params.')=[^&]+/i', '$2', $url );
+	return rtrim( preg_replace( '/\?(&(amp;)?)+/', '?', $url ), '?' );
+}
+
+
+/**
+ * Keep only allowed noredir params from current URL in the given URL
+ *
+ * @param string Given URL
+ * @param string Separator between URL params
+ * @param array Additional noredir params for config var $noredir_params. Used for Item's switchable params
+ * @return string Given URL with allowed noredir params which are found in current URL
+ */
+function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = array() )
+{
+	global $noredir_params;
+
+	$all_noredir_params = is_array( $custom_noredir_params ) ? $custom_noredir_params : array();
+	if( is_array( $noredir_params ) )
+	{	// Merge config and custom noredir params:
+		$all_noredir_params = array_merge( $noredir_params, $all_noredir_params );
+	}
+
+	if( empty( $all_noredir_params ) )
+	{	// No allowed params:
+		return $url;
+	}
+
+	// Get all params from the given URL:
+	preg_match_all( '#(&(amp;)?|\?)([^=]+)=[^&]*#', $url, $url_params );
+	$url_params = isset( $url_params[3] ) ? $url_params[3] : array();
+
+	$allowed_params = array();
+	foreach( $_GET as $param => $value )
+	{	// Check each GET param:
+		if( in_array( $param, $all_noredir_params ) && // If param is allowed by config $noredir_params
+		    ! in_array( $param, $url_params ) ) // If param is NOT defined in the given URL yet
+		{
+			$allowed_params[ $param ] = $value;
+		}
+	}
+
+	// Append allowed params from current URL to the given URL:
+	return url_add_param( $url, $allowed_params, $glue );
 }
 ?>

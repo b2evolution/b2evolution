@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -195,9 +195,9 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 	}
 
 	if( $params['disp_meta_comments'] )
-	{	// We requested to display meta comments
+	{	// We requested to display internal comments
 		if( $Item->can_see_meta_comments() )
-		{	// User can see meta comments
+		{	// User can see internal comments
 			$type_list[] = 'meta';
 			if( !empty( $params['comments_title_text'] ) )
 			{
@@ -209,7 +209,7 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			}
 		}
 		else
-		{	// User cannot see meta comments
+		{	// User cannot see internal comments
 			$params['disp_meta_comments'] = false;
 		}
 		echo '<a id="comments"></a>';
@@ -238,22 +238,22 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			echo $params['after_section_title'];
 		}
 
-		// // Display the meta comments info ?
+		// // Display the internal comments info ?
 		if( $params['disp_meta_comment_info'] // If we want it
-			&& ! $params['disp_meta_comments']  // If we're not displaying the full list of meta comments anyways
-			&& $Item->can_see_meta_comments() ) // If we have permission to view meta comment of the collection
-		{	// Display the meta comments info:
+			&& ! $params['disp_meta_comments']  // If we're not displaying the full list of internal comments anyways
+			&& $Item->can_see_meta_comments() ) // If we have permission to view internal comment of the collection
+		{	// Display the internal comments info:
 			global $admin_url;
 			echo '<div class="evo_comment__meta_info">';
 			$meta_comments_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 			$meta_comments_url = $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments';
 			if( $meta_comments_count > 0 )
-			{	// Display a badge with meta comments count if at least one exists for this Item:
-				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d meta comments'), $meta_comments_count ).'</a>';
+			{	// Display a badge with internal comments count if at least one exists for this Item:
+				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d internal comments'), $meta_comments_count ).'</a>';
 			}
 			elseif( $Item->can_meta_comment() )
-			{	// No meta comments yet, Display a button to add new meta comment:
-				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add meta comment').'</a>';
+			{	// No internal comments yet, Display a button to add new internal comment:
+				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add internal comment').'</a>';
 			}
 			echo '</div>';
 		}
@@ -438,6 +438,8 @@ if( $params['disp_comment_form'] && // if enabled by skin param
 			'p' => $Item->ID,
 			'blog' => $Blog->ID,
 			'reply_ID' => param( 'reply_ID', 'integer', 0 ),
+			'quote_post' => param( 'quote_post', 'integer', 0 ),
+			'quote_comment' => param( 'quote_comment', 'integer', 0 ),
 			'disp' => $disp,
 			'params' => $params );
 		display_ajax_form( $json_params );
@@ -450,112 +452,5 @@ if( $params['disp_comment_form'] && // if enabled by skin param
 	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
 // ---------------------- END OF COMMENT FORM ---------------------
-
-// ----------- Register for item's comment notification -----------
-if( is_logged_in() && $Item->can_comment( NULL ) )
-{
-	if( $params['disp_notification'] )
-	{	// Display notification link:
-
-		echo $params['notification_before'];
-
-		global $DB;
-		global $UserSettings;
-
-		$notification_icon = get_icon( 'notification' );
-
-		$not_subscribed = true;
-		$creator_User = $Item->get_creator_User();
-
-		if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
-		{
-			$sql = 'SELECT count( sub_user_ID )
-							FROM (
-								SELECT DISTINCT sub_user_ID
-								FROM T_subscriptions
-								WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0
-
-								UNION
-
-								SELECT user_ID
-								FROM T_coll_settings AS opt
-								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
-								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
-								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
-								LEFT JOIN T_users ON ( user_grp_ID = bloggroup_group_ID )
-								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = user_ID )
-								WHERE opt.cset_coll_ID = '.$Blog->ID.'
-									AND opt.cset_name = "opt_out_comment_subscription"
-									AND opt.cset_value = 1
-									AND user_ID = '.$current_User->ID.'
-									AND ( sub_comments IS NULL OR sub_comments <> 0 )
-
-								UNION
-
-								SELECT sug_user_ID
-								FROM T_coll_settings AS opt
-								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
-								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
-								LEFT JOIN T_coll_group_perms ON ( bloggroup_blog_ID = opt.cset_coll_ID AND bloggroup_ismember = 1 )
-								LEFT JOIN T_users__secondary_user_groups ON ( sug_grp_ID = bloggroup_group_ID )
-								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = sug_user_ID )
-								WHERE opt.cset_coll_ID = '.$Blog->ID.'
-									AND opt.cset_name = "opt_out_comment_subscription"
-									AND opt.cset_value = 1
-									AND sug_user_ID = '.$current_User->ID.'
-									AND ( sub_comments IS NULL OR sub_comments <> 0 )
-
-								UNION
-
-								SELECT bloguser_user_ID
-								FROM T_coll_settings AS opt
-								INNER JOIN T_blogs ON ( blog_ID = opt.cset_coll_ID AND blog_advanced_perms = 1 )
-								INNER JOIN T_coll_settings AS sub ON ( sub.cset_coll_ID = opt.cset_coll_ID AND sub.cset_name = "allow_subscriptions" AND sub.cset_value = 1 )
-								LEFT JOIN T_coll_user_perms ON ( bloguser_blog_ID = opt.cset_coll_ID AND bloguser_ismember = 1 )
-								LEFT JOIN T_subscriptions ON ( sub_coll_ID = opt.cset_coll_ID AND sub_user_ID = bloguser_user_ID )
-								WHERE opt.cset_coll_ID = '.$Blog->ID.'
-									AND opt.cset_name = "opt_out_comment_subscription"
-									AND opt.cset_value = 1
-									AND bloguser_user_ID = '.$current_User->ID.'
-									AND ( sub_comments IS NULL OR sub_comments <> 0 )
-							) AS users';
-
-			if( $DB->get_var( $sql ) > 0 )
-			{
-				echo '<p class="text-center">'.$notification_icon.' <span>'.T_( 'You are receiving notifications when anyone comments on any post.' );
-				echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
-				$not_subscribed = false;
-			}
-		}
-
-		if( $not_subscribed && ( $creator_User->ID == $current_User->ID ) && ( $UserSettings->get( 'notify_published_comments', $current_User->ID ) != 0 ) )
-		{
-			echo '<p class="text-center">'.$notification_icon.' <span>'.$params['notification_text'];
-			echo ' <a href="'.$Blog->get('subsurl').'">'.T_( 'Click here to manage your subscriptions.' ).'</a></span></p>';
-			$not_subscribed = false;
-		}
-		if( $not_subscribed && $Blog->get_setting( 'allow_item_subscriptions' ) )
-		{
-			if( get_user_isubscription( $current_User->ID, $Item->ID ) )
-			{
-				echo '<p class="text-center">'.$notification_icon.' <span>'.$params['notification_text2'];
-				echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></span></p>';
-			}
-			else
-			{
-				echo '<p class="text-center"><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'" class="btn btn-default">'.$notification_icon.' '.$params['notification_text3'].'</a></p>';
-			}
-		}
-
-		echo $params['notification_after'];
-	}
-}
-
-
-if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
-{	// user is allowed to see comments
-	// Display link for comments feed:
-	$Item->feedback_feed_link( '_rss2', '<nav class="evo_post_feedback_feed_msg"><p class="text-center">', '</p></nav>', $params['feed_title'] );
-}
 
 ?>

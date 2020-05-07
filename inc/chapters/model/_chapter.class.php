@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -633,6 +633,7 @@ class Chapter extends DataObject
 		// BLOCK CACHE INVALIDATION:
 		$chapter_Blog = $this->get_Blog();
 		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+		BlockCache::invalidate_key( 'cat_ID', $this->ID ); // Chaper has changed
 
 		return true;
 	}
@@ -705,6 +706,84 @@ class Chapter extends DataObject
 
 		$this->set_param( 'last_touched_ts', 'date', date( 'Y-m-d H:i:s', $localtimenow ) );
 		$this->dbupdate();
+	}
+
+
+	/**
+	 * Returns a permalink link to the Category
+	 *
+	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
+	 *
+	 * @param array
+	 */
+	function get_permanent_link( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'text'        => '#name',	// possible special values: ...
+				'title'       => '',
+				'class'       => '',
+				'nofollow'    => false,
+			), $params );
+
+
+		// Get item permanent URL:
+		$url = $this->get_permanent_url();
+
+		$text = $params['text'];
+		switch( $text )
+		{
+			case '#linkicon':
+				$text = get_icon( 'permalink' );
+				break;
+
+			case '#text':
+				$text = T_('Permalink');
+				break;
+
+			case '#linkicon+text':
+				$text = get_icon( 'permalink' ).T_('Permalink');
+				break;
+
+			case '#expandicon':
+				$text = get_icon( 'file_message' );
+				break;
+
+			case '#name':
+				$text = format_to_output( $this->get( 'name' ) );
+				break;
+
+			case '#expandicon+name':
+				$text = get_icon( 'expand' ).format_to_output( $this->get( 'name' ) );
+				break;
+
+			case '#open+arrow':
+				$text = T_('Open').' &raquo;';
+				break;
+
+			case '#view+arrow':
+				$text = T_('View').' &raquo;';
+				break;
+		}
+
+		$title = $params['title'];
+		if( $title == '#' )
+		{	// Use default title for link:
+			$title = T_('Permanent link to category');
+		}
+
+		$class = $params['class'];
+
+		// Build a permanent link to Item:
+		$r = '<a href="'.$url.'"'
+				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
+				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+				.( $params['nofollow'] ? ' rel="nofollow"' : '' )
+			.'>'
+				.str_replace( '$name$', format_to_output( $this->get( 'name' ) ), $text )
+			.'</a>';
+
+		return $r;
 	}
 
 
@@ -905,6 +984,53 @@ class Chapter extends DataObject
 
 
 	/**
+	 * Get File of a first found image by positions
+	 *
+	 * @return object|NULL File
+	 */
+	function & get_image_File()
+	{
+		// Try to get a file by ID:
+		$FileCache = & get_FileCache();
+		if( ! ( $cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false ) ) )
+		{	// This chapter has no image file or it is broken:
+			$r = NULL;
+			return $r;
+		}
+
+		if( ! $cat_image_File->is_image() )
+		{	// The file must be an image:
+			$r = NULL;
+			return $r;
+		}
+
+		return $cat_image_File;
+	}
+
+
+	/**
+	 * Get URL of a first found image by positions
+	 *
+	 * @param array Parameters
+	 * @return string|NULL Image URL or NULL if it doesn't exist
+	 */
+	function get_image_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'size' => 'original',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File() ) )
+		{	// Wrong image file:
+			return NULL;
+		}
+
+		// Get image URL for requested size:
+		$img_attribs = $image_File->get_img_attribs( $params['size'] );
+	}
+
+
+	/**
 	 * Get image tag of this chapter
 	 *
 	 * @param array Params
@@ -913,37 +1039,53 @@ class Chapter extends DataObject
 	function get_image_tag( $params = array() )
 	{
 		$params = array_merge( array(
-				'before'        => '', // HTML code before image tag
-				'before_legend' => '', // HTML code before image legeng(info under image tag image desc is not empty)
-				'after_legend'  => '', // HTML code after image legeng
-				'after'         => '', // HTML code after image tag
+				'before'        => '',		// HTML code before image tag
+				'before_classes'=> '',		// Allow injecting additional classes into 'before'
+				'before_legend' => '',		// HTML code before image legeng(info under image tag image desc is not empty)
+				'after_legend'  => '',		// HTML code after image legeng
+				'after'         => '',		// HTML code after image tag
 				'size'          => 'crop-48x48', // Image thumbnail size
-				'link_to'       => '', // Url for a link, Use 'original' for full image file url, Empty value to don't make a link
+				'sizes'         => NULL,	// simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
+				'link_to'       => '',		// URL for a link ; '#category_url' for category URL ; 'original' for full image file url ; Empty for no link
 				'link_title'    => $this->get( 'description' ), // Title of the link, can be text or #title# or #desc#
-				'link_rel'      => '', // Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
-				'class'         => '', // Image class
-				'align'         => '', // Image align
+				'link_rel'      => '',		// Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
+				'class'         => '',		// Image class
+				'align'         => '',		// Image align
 				'alt'           => $this->get( 'name' ), // Image alt
-				'desc'          => '#', // Image description, used in legeng under image tag, '#' - use current description of the file
-				'size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
-				'tag_size'      => NULL, // Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
-				                         // Example: ( $tag_size = '160' ) => width="160" height="160"
-				                         // ( $tag_size = '160x320' ) => width="160" height="320"
-				                         // NULL - use size defined by the thumbnail
-				                         // 'none' - don't use attributes "width" & "height"
+				'desc'          => '#',		// Image description, used in legeng under image tag, '#' - use current description of the file
+				'size_x'        => 1,		// Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'tag_size'      => NULL,	// Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
+				                         	// Example: ( $tag_size = '160' ) => width="160" height="160"
+				                         	// ( $tag_size = '160x320' ) => width="160" height="320"
+				                         	// NULL - use size defined by the thumbnail
+				                         	// 'none' - don't use attributes "width" & "height"
+				'placeholder'   => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 			), $params );
+
+		if( ! empty( $params['before_classes'] ) )
+		{	// Inject additional classes into 'before':
+			$params['before'] = update_html_tag_attribs( $params['before'], array( 'class' => $params['before_classes'] ) );
+		}
 
 		// Try to get a file by ID:
 		$FileCache = & get_FileCache();
 		$cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false );
-		if( ! $cat_image_File )
-		{	// This chapter has no image file or it is broken:
-			return '';
+		if( ! $cat_image_File // This chapter has no image file or it is broken
+			|| ! $cat_image_File->is_image() ) // The file is NOT an image
+		{	// Display placeholder:
+			$placeholder_html = $params['placeholder'];
+			switch( $placeholder_html )
+			{
+				case '#folder_icon';
+					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-folder-o"></i></a></div>';
+					break;
+			}
+			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
 		}
 
-		if( ! $cat_image_File->is_image() )
-		{	// The file must be an image:
-			return '';
+		if( $params['link_to'] == '#category_url' )
+		{	// We want to link to the category URL:
+			$params['link_to'] = $this->get_permanent_url();
 		}
 
 		return $cat_image_File->get_tag( $params['before'],
@@ -960,7 +1102,33 @@ class Chapter extends DataObject
 				$params['desc'],
 				'',
 				$params['size_x'],
-				$params['tag_size'] );
+				$params['tag_size'],
+				'',
+				true,
+				$params['sizes'] );
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'fit-1280x720',
+				'size_2x'  => 'fit-2560x1440',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Don't provide css for wrong image file:
+			return '';
+		}
+
+		return $image_File->get_background_image_css( $params );
 	}
 
 

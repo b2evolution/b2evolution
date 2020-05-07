@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -353,8 +353,13 @@ class tinymce_plugin extends Plugin
 			return false;
 		}
 
+		if( empty( $params['target_object'] ) )
+		{	// Target object must be defined:
+			return false;
+		}
+
 		$params = array_merge( array(
-				'temp_ID' => NULL,
+				'temp_ID' => NULL,  // Temporary LinkOwnerID
 			), $params );
 
 		switch( $params['target_type'] )
@@ -369,8 +374,13 @@ class tinymce_plugin extends Plugin
 				$this->target_ID = $edited_Item->ID;
 				$this->temp_ID = $params['temp_ID'];
 
-				if( ! empty( $edited_Item ) && ! $edited_Item->get_type_setting( 'allow_html' ) )
+				if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 				{	// Only when HTML is allowed in post:
+					return false;
+				}
+
+				if( $edited_Item->get_type_setting( 'use_text' ) == 'never' )
+				{	// Only when text is allowed for current item type:
 					return false;
 				}
 
@@ -424,6 +434,7 @@ class tinymce_plugin extends Plugin
 				$edited_Item = & $edited_Comment->get_Item();
 				$this->target_type = 'Comment';
 				$this->target_ID = $edited_Comment->ID;
+				$this->temp_ID = $params['temp_ID'];
 
 				if( ! empty( $Blog ) && ! $Blog->get_setting( 'allow_html_comment' ) )
 				{	// Only when HTML is allowed in comment:
@@ -433,7 +444,7 @@ class tinymce_plugin extends Plugin
 				$item_Blog = & $edited_Item->get_Blog();
 
 				if( $edited_Comment->is_meta() )
-				{	// Do not use TinyMCE for meta comments, never!
+				{	// Do not use TinyMCE for internal comments, never!
 					return false;
 				}
 
@@ -627,9 +638,9 @@ class tinymce_plugin extends Plugin
 							jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
 							jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
 							// Hide the plugin toolbars that allow to insert html tags
-							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).hide();
-							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).addClass( 'disabled' );
-							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar, .evo_mermaid_toolbar' ).hide();
+							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark, #block_renderer_evo_mermaid' ).addClass( 'disabled' );
+							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark, input#renderer_evo_mermaid' ).each( function()
 							{
 								if( jQuery( this ).is( ':checked' ) )
 								{
@@ -652,9 +663,9 @@ class tinymce_plugin extends Plugin
 							jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
 							jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
 							// Show the plugin toolbars that allow to insert html tags
-							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).show();
-							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).removeClass( 'disabled' );
-							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar, .evo_mermaid_toolbar' ).show();
+							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark, #block_renderer_evo_mermaid' ).removeClass( 'disabled' );
+							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark, input#renderer_evo_mermaid' ).each( function()
 							{
 								if( jQuery( this ).hasClass( 'checked' ) )
 								{
@@ -792,6 +803,20 @@ class tinymce_plugin extends Plugin
 								}
 							}
 
+							// Try to add custom shortcuts from page:
+							tmce_init.init_instance_callback = function( ed ) {
+									if( window.shortcut_keys )
+									{
+										for( var i = 0; i < window.shortcut_keys.length; i++ )
+										{
+											var key = window.shortcut_keys[i];
+											ed.shortcuts.add( key, 'b2evo shortcut key: ' + key, function() {
+												window.shortcut_handler( key );
+											} );
+										}
+									}
+								}
+
 							tmce_init.setup = function( ed )
 							{
 								ed.on( 'init', tmce_init.oninit );
@@ -806,10 +831,11 @@ class tinymce_plugin extends Plugin
 									jQuery.ajax(
 									{
 										type: 'POST',
-										url: '<?php echo $this->get_htsrv_url( 'update_content', array(), '&' ); ?>',
+										url: '<?php echo $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' ); ?>',
 										data:
 										{
 											'content': textarea.val(),
+											'crumb_tinymce': '<?php echo get_crumb( 'tinymce' ); ?>',
 										},
 										success: function( result )
 										{
@@ -1393,13 +1419,16 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * AJAX callback to update content for WYSIWYG mode
+	 * AJAX callback to convert content for WYSIWYG mode
 	 *
 	 * @param array Params
 	 */
-	function htsrv_update_content( $params )
+	function htsrv_convert_content_to_wysiwyg( $params )
 	{
-		global $Plugins;
+		global $Plugins, $Session;
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tinymce' );
 
 		$content = param( 'content', 'raw' );
 
@@ -1425,7 +1454,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'update_content' );
+		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'convert_content_to_wysiwyg' );
 	}
 
 

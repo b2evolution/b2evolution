@@ -21,7 +21,7 @@ class bootstrap_gallery_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.11.4';
+	var $version = '7.1.5';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -54,7 +54,7 @@ class bootstrap_gallery_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -98,6 +98,26 @@ class bootstrap_gallery_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_secondary_area' => NULL,
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -116,7 +136,8 @@ class bootstrap_gallery_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -133,13 +154,6 @@ class bootstrap_gallery_Skin extends Skin
 						'label' => T_('Thumbnail size inside Album'),
 						'note' => T_('Select thumbnail size for images inside Albums') . ' (disp=single).',
 						'defaultvalue' => 'fit-640x480',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size in Media index'),
-						'note' => T_('Select thumbnail size for Media index images') . ' (disp=mediaidx).',
-						'defaultvalue' => 'fit-256x256',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
@@ -174,25 +188,21 @@ class bootstrap_gallery_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 						'transparency' => true,
@@ -328,77 +338,40 @@ class bootstrap_gallery_Skin extends Skin
 
 		// Skin specific initializations:
 
+		// **** Image Viewing / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Image Viewing / END ****
+
+		// **** Page Styles / START ****
+		// Page text size:
+		$this->dynamic_style_rule( 'page_text_size', '#skin_wrapper { font-size: $setting_value$ }' );
+		// Page text color:
+		$this->dynamic_style_rule( 'page_text_color', '#skin_wrapper { color: $setting_value$ }' );
+		// Page link color:
+		$this->dynamic_style_rule( 'page_link_color',
+			'#skin_wrapper .container a:not(.btn .active) { color: $setting_value$ }'.
+			'ul li a:not(.btn) { color: $setting_value$ }'.
+			'ul li a:not(.btn) {background-color: transparent }'.
+			'.ufld_icon_links a:not(.btn) {color: #fff !important}'
+		);
+		// Current tab text color:
+		$this->dynamic_style_rule( 'current_tab_text_color', 'ul.nav.nav-tabs li a.selected { color: $setting_value$ }' );
+		// Page background color:
+		$this->dynamic_style_rule( 'page_bg_color', '#skin_wrapper { background-color: $setting_value$ }' );
+		// **** Page Styles / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
+
 		// Add custom CSS:
 		$custom_css = '';
-
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'."\n";
-		}
 
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
-
-		// Text size <=== THIS IS A WORK IN PROGRESS
-		$custom_styles = array();
-		if( $text_size = $this->get_setting( 'page_text_size' ) )
-		{
-			$custom_styles[] = 'font-size: '.$text_size;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		$custom_styles = array();
-		// Text color
-		if( $text_color = $this->get_setting( 'page_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Link color
-		$custom_styles = array();
-		if( $text_color = $this->get_setting( 'page_link_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
-		}
-
-		// Current tab text color
-		$custom_styles = array();
-		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	ul.nav.nav-tabs li a.selected { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Page background color
-		$custom_styles = array();
-		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
-		{
-			$custom_styles[] = 'background-color: '.$bg_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
 
 		global $thumbnail_sizes;
 		$posts_thumb_size = $this->get_setting( 'posts_thumb_size' );

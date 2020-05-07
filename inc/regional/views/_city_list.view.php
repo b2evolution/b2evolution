@@ -141,10 +141,8 @@ function filter_cities( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_cities',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=cities' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=cities' );
 
 
 if( $current_User->check_perm( 'options', 'edit', false ) )

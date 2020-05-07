@@ -86,7 +86,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 	$Form->textarea_input( 'content', $new_Item->get( 'content' ), 16, NULL, array(
 			'cols'  => 50 ,
 			'id'    => 'itemform_post_content',
-			'class' => 'autocomplete_usernames'
+			'class' => 'autocomplete_usernames link_attachment_dropzone'
 		) );
 	$Form->switch_layout( NULL );
 	?>
@@ -113,7 +113,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 
 
 	// =================================== INSTRUCTION ====================================
-	if( $new_Item->get_type_setting( 'front_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
+	if( $new_Item->get_type_setting( 'front_order_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
 	{
 		echo '<br><div class="alert alert-info fade in evo_instruction">'.$new_Item->get_type_setting( 'instruction' ).'</div>';
 	}

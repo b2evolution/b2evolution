@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -22,7 +22,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
@@ -761,6 +760,10 @@ class Form extends Widget
 		{ // Use default field start
 			$r = $this->fieldstart;
 		}
+		if( ! empty( $this->_common_params['hide'] ) && $this->_common_params['hide'] )
+		{	// Hidden field
+			$r = preg_replace( '/>$/', ' style="display:none">', $r );
+		}
 
 		if( count( $field_classes ) > 0 )
 		{
@@ -929,6 +932,7 @@ class Form extends Widget
 				'class'     => 'fieldset',
 				'fold'      => false, // TRUE to enable folding for this fieldset
 				'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+				'default_fold' => NULL, // Set default "fold" value for current fieldset
 			), $field_params );
 
 		if( $field_params['fold'] )
@@ -939,12 +943,17 @@ class Form extends Widget
 				global $UserSettings, $Collection, $Blog, $ctrl;
 				if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 				{ // Get user setting value
-					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
+					$value = $UserSettings->get( 'fold_'.$field_params['id'] );
 				}
 				else
 				{ // Get user-collection setting
-					$value = intval( $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID ) );
+					$value = $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID );
 				}
+				if( $value === NULL && $field_params['default_fold'] !== NULL )
+				{	// Use custom default value for this fieldset:
+					$value = $field_params['default_fold'];
+				}
+				$value = intval( $value );
 				if( $value === 1 )
 				{
 					$field_params['class'] = trim( $field_params['class'].' folded' );
@@ -960,6 +969,7 @@ class Form extends Widget
 		}
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
+		unset( $field_params['default_fold'] );
 
 		if( ! empty( $this->fieldset_title ) )
 		{	// Replace text part of fieldset title with provided html code:
@@ -2061,7 +2071,7 @@ class Form extends Widget
 	 * @param boolean an optional indicating whether the box is disabled or not
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
+	function checkbox( $field_name, $field_checked, $field_label = '', $field_note = '',
 											$field_class = '', $field_value = 1, $field_disabled = false )
 	{
 		$field_params = array();
@@ -2641,7 +2651,12 @@ class Form extends Widget
 	{
 		global $edited_User;
 
-		if( isset($field_params['allow_none']) )
+		if( isset($field_params['required']) )
+		{	// 'allow_none' param value should depend on 'required' param value:
+			$allow_none = !$field_params['required'];
+			unset( $field_params['allow_none'] );
+		}
+		elseif( isset($field_params['allow_none']) )
 		{
 			$allow_none = $field_params['allow_none'];
 			unset( $field_params['allow_none'] );
@@ -3092,23 +3107,6 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_textarea_input form-control';
-
-		if( isset($field_params['maxlength']) )
-		{ // attach event to the textarea to accomplish max length:
-			$this->append_javascript['textarea_maxlength'.$field_name] = '
-				if( typeof jQuery == "function" )
-				{
-				jQuery("#'.$field_params['id'].'").bind( "keyup", function(event)
-					{
-						if( this.value.length > '.$field_params['maxlength'].' )
-						{
-							this.value = this.value.substr(0,'.$field_params['maxlength'].');
-							event.preventDefault();
-						}
-					} );
-				}';
-			unset($field_params['maxlength']); // not a HTML attribute for textarea
-		}
 
 		$r = $this->begin_field();
 		$r .= $input_prefix;
@@ -3728,15 +3726,6 @@ class Form extends Widget
 			// Merge defaults from $field_params:
 			$loop_radio = array_merge( $field_params, $loop_radio );
 
-			if( $field_lines )
-			{ // Start of radio option for multi line format
-				$r .= $this->radio_newline_start;
-			}
-			else
-			{ // Start of radio option for single line format
-				$r .= $this->radio_oneline_start;
-			}
-
 			// Defaults:
 			if( ! isset( $loop_radio['type'] ) )  $loop_radio['type'] = 'radio';
 			if( ! isset( $loop_radio['class'] ) ) $loop_radio['class'] = $this->inputclass_radio; // 'radio'
@@ -3745,6 +3734,11 @@ class Form extends Widget
 			{ // build unique id:
 				$loop_radio['id'] = Form::get_valid_id( $field_params['name'].'_radio_'.( ++$count_options ) );
 			}
+
+			// Start of radio option for multi/single line format:
+			$r .= str_replace( '$radio_option_class$',
+				( isset( $loop_radio['class'] ) ? $loop_radio['class'] : '' ),
+				( $field_lines ? $this->radio_newline_start : $this->radio_oneline_start ) );
 
 			if( isset($loop_radio['checked']) )
 			{ // convert boolean:
@@ -3811,7 +3805,7 @@ class Form extends Widget
 	 * @param mixed required set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '', $field_required = false )
+	function radio( $field_name, $field_value, $field_options, $field_label = '', $field_lines = false, $field_note = '', $field_required = false )
 	{
 		$new_field_options = array();
 
@@ -3827,11 +3821,11 @@ class Form extends Widget
 			}
 			if( isset($l_options[4]) )
 			{ // Convert "inline attribs" to "params" array
-				preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+				preg_match_all( '#(\w+)=([\'"])(.*?)\2#', $l_options[4], $matches, PREG_SET_ORDER );
 
 				foreach( $matches as $l_set_nr => $l_match )
 				{
-					$new_field_options[$l_key][$l_match[1]] = $l_match[2];
+					$new_field_options[$l_key][$l_match[1]] = $l_match[3];
 				}
 			}
 
@@ -3997,7 +3991,7 @@ class Form extends Widget
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$field_params = array_merge( array(
-				'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+				'field_item_start' => '<div class="file_select_item" data-item-value="%value%" data-file-url="%url%">',
 				'field_item_end' => '</div>',
 				'size_name' => 'crop-64x64',
 				'class' => '',
@@ -4059,7 +4053,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+			$r .= '<button type="button" class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -4088,7 +4082,8 @@ class Form extends Widget
 							root = field_object.data( "root" );
 							path = field_object.data( "path" );
 
-							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
+							var func_window = ( window.top == window.self ? window : window.parent );
+							func_window.openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
 								"90%", "80%", true, fsel_title, "", true );
 							jQuery.ajax(
 							{
@@ -4103,11 +4098,12 @@ class Form extends Widget
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
 									"field_name": field_object.attr( "name" ),
 									"file_type": field_object.data( "fileType" ),
+									"iframe_name": ( window.frameElement == null ? "" : window.frameElement.id ),
 								},
 								success: function(result)
 								{
 									result = ajax_debug_clear( result );
-									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
+									func_window.openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
 								}
 							} );
 							return false;
@@ -4207,10 +4203,16 @@ class Form extends Widget
 										// Trigger change so bozo validator will pickup the change
 										inputField.trigger( "change" );
 
+										if( typeof( parent.evo_customizer_update_style ) == "function" )
+										{	// Update style in designer customizer mode if it is enabled currently:
+											parent.evo_customizer_update_style( inputField );
+										}
+
 										// close modal if single item select
 										if( maxLength == 1 )
 										{
-											closeModalWindow();
+											var func_window = ( window.top == window.self ? window : window.parent );
+											func_window.closeModalWindow();
 										}
 									}
 							});
@@ -4255,6 +4257,11 @@ class Form extends Widget
 							}
 							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
 							inputField.trigger( "change" );
+
+							if( typeof( parent.evo_customizer_update_style ) == "function" )
+							{	// Update style in designer customizer mode if it is enabled currently:
+								parent.evo_customizer_update_style( inputField );
+							}
 
 							return false;
 						}
@@ -4447,6 +4454,19 @@ class Form extends Widget
 		{ // Set html attribute "required" (used to highlight input with red border/shadow by bootstrap)
 			$field_params['required'] = $field_params['input_required'];
 			unset( $field_params['input_required'] );
+		}
+
+		if( isset( $field_params['disabled'] ) )
+		{	// Set html attribute "disabled":
+			if( empty( $field_params['disabled'] ) )
+			{	// Don't set attribute if it must be not disabled:
+				unset( $field_params['disabled'] );
+			}
+			elseif( $field_params['disabled'] === true )
+			{	// Use proper string value instead of boolean:
+				$field_params['disabled'] = 'disabled';
+			}
+			// else use the passed value
 		}
 
 		$r = $input_prefix
@@ -4756,6 +4776,11 @@ class Form extends Widget
 			unset($field_params['required']);
 		}
 
+		if( isset($field_params['hide']) )
+		{
+			$this->_common_params['hide'] = $field_params['hide'];
+			unset($field_params['hide']);
+		}
 
 		if( !empty($field_params['name']) )
 		{
@@ -4938,7 +4963,7 @@ class Form extends Widget
 	 *
 	 * @param object Object of the links owner
 	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
-	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
 	 */
 	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
 	{
@@ -4962,8 +4987,8 @@ class Form extends Widget
 			case 'Comment':
 				$Comment = $object;
 				$comment_Item = & $Comment->get_Item();
-				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
-				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments', $Comment ) || ! $comment_Item->can_attach( $Comment->temp_link_owner_ID, $Comment->type ) )
+				{	// Comment attachments must be allowed by collection setting depending on user type(anonymous, registered, member and etc.).:
 					return;
 				}
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
@@ -5005,6 +5030,138 @@ class Form extends Widget
 
 		// Insert image modal window:
 		echo_image_insert_modal();
+	}
+
+
+	/**
+	 * Locale selector
+	 *
+	 * @param string Field name
+	 * @param string Main locale value
+	 * @param array Extra locale values
+	 * @param string Field label
+	 * @param string Field note
+	 * @param array Params
+	 * @return 
+	 */
+	function locale_selector( $field_name, $main_locale, $extra_locales, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $locales;
+
+		$BlogCache = & get_BlogCache();
+		$link_Blog = & $BlogCache->get_by_ID( $field_params['link_coll_ID'], false, false );
+		unset( $field_params['link_coll_ID'] );
+
+		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
+
+		$r = $this->begin_field();
+
+		$r .= '<table class="evo_locale_selector table table-striped table-hover table-condensed table-bordered">';
+
+		// Table header:
+		$r .= '<thead><tr>'
+				.'<th>'.T_('Locale').'</th>'
+				.'<th>'.T_('Main').'</th>'
+				.'<th>'.T_('Extra').'</th>'
+				.( $link_Blog ? '<th>'.T_('Link with').'</th>' : '' )
+			.'</tr></thead>';
+
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( ! $locale_data['enabled'] )
+			{	// Skip disabled locale:
+				continue;
+			}
+
+			// Locale row with radio, checkbox and name:
+			$r .= '<tr data-locale="'.$locale_key.'">'
+					.'<td>'.T_( $locale_data['name'] ).'</td>'
+					.'<td class="center"><input type="radio" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
+					.'<td class="center"><input type="checkbox" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( in_array( $locale_key, $extra_locales ) ? ' checked="checked"' : '' ).' /></td>'
+					.( $link_Blog ? '<td class="evo_coll_link_locale_selector">'.$link_Blog->get_link_locale_selector( $field_name, $locale_key ).'</td>' : '' )
+				.'</tr>';
+		}
+
+		$r .= '</table>';
+
+		// JavaScript for autoselecting extra locale:
+		$r .= '<script type="text/javascript">
+			jQuery( "input[type=radio][name='.$field_name.']" ).click( function()
+			{
+				if( jQuery( this ).is( ":checked" ) )
+				{
+					jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\'][value=\'" + jQuery( this ).val() + "\']" ).prop( "checked", true );
+				}
+			} );
+			jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				if( ! jQuery( this ).is( ":checked" ) && jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					return false;
+				}
+			} );';
+		if( $link_Blog )
+		{	// JavaScript to link with collections:
+			$r .= 'jQuery( "input[type=radio][name='.$field_name.'], input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				var locale_row = jQuery( this ).closest( "tr" );
+				var current_locale = locale_row.data( "locale" );
+				var coll_locale_selector = jQuery( "select[name=\''.$field_name.'_link_coll[" + current_locale + "]\']" );
+				if( jQuery( this ).is( ":checked" ) || jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					if( coll_locale_selector.length )
+					{
+						coll_locale_selector.hide();
+						if( coll_locale_selector.next( "span" ).length )
+						{
+							coll_locale_selector.next( "span" ).show();
+						}
+						else
+						{
+							coll_locale_selector.after( "<span>'.TS_('N/A').'</span>" );
+						}
+					}
+				}
+				else
+				{
+					if( coll_locale_selector.length )
+					{	// Show selector from cache:
+						coll_locale_selector.show();
+						coll_locale_selector.next( "span" ).hide();
+					}
+					else
+					{	// Load selector by AJAX:
+						jQuery.ajax(
+						{
+							url: "'.get_htsrv_url().'async.php",
+							type: "POST",
+							data: {
+								action: "get_link_locale_selector",
+								coll_ID: '.$link_Blog->ID.',
+								coll_locale: current_locale,
+								field_name: "'.$field_name.'",
+							},
+							success: function( result )
+							{
+								locale_row.find( "td.evo_coll_link_locale_selector" ).html( ajax_debug_clear( result ) );
+							},
+						} );
+					}
+				}
+			} );';
+		}
+		$r .= '
+		</script>';
+
+		$r .= $this->end_field();
+
+		return $this->display_or_return( $r );
 	}
 }
 

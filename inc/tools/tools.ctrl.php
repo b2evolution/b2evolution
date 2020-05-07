@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
@@ -30,7 +30,7 @@ if( $current_User->check_perm( 'options', 'edit' ) &&
     ( $action != 'utf8check' && $action != 'utf8upgrade' ) &&
     system_check_charset_update() )
 { // DB charset is required to update
-	$Messages->add( sprintf( T_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
+	$Messages->add( sprintf( TB_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
 }
 
 param( 'tab', 'string', '', true );
@@ -52,7 +52,7 @@ if( ! empty($tab) )
 		$tab_Plugin = & $Plugins->get_by_ID( $match[1] );
 		if( ! $tab_Plugin )
 		{ // Plugin does not exist
-			$Messages->add( sprintf( T_( 'The plugin with ID %d could not get instantiated.' ), $tab_plugin_ID ), 'error' );
+			$Messages->add( sprintf( TB_( 'The plugin with ID %d could not get instantiated.' ), $tab_plugin_ID ), 'error' );
 			$tab_plugin_ID = false;
 			$tab_Plugin = false;
 			$tab = '';
@@ -93,54 +93,54 @@ if( empty( $tab ) )
 	{
 		case 'del_itemprecache':
 			// Clear pre-rendered item cache (DB)
-			$template_log_title = T_('Clear pre-rendered item cache (DB)');
+			$template_log_title = TB_('Clear pre-rendered item cache (DB)');
 			$template_action = $action;
 			break;
 
 		case 'del_commentprecache':
 			// Clear pre-rendered comment cache (DB)
-			$template_log_title = T_('Clear pre-rendered comment cache (DB)');
+			$template_log_title = TB_('Clear pre-rendered comment cache (DB)');
 			$template_action = $action;
 			break;
 
 		case 'del_messageprecache':
 			// Clear pre-rendered message cache (DB)
-			$template_log_title = T_('Clear pre-rendered message cache (DB)');
+			$template_log_title = TB_('Clear pre-rendered message cache (DB)');
 			$template_action = $action;
 			break;
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			$template_log_title = T_('Clear full page caches (/cache/* directories)');
+			$template_log_title = TB_('Clear full page caches (/cache/* directories)');
 			$template_action = $action;
 			break;
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			$template_log_title = T_('Clear thumbnail caches (?evocache directories)');
+			$template_log_title = TB_('Clear thumbnail caches (?evocache directories)');
 			$template_action = $action;
 			break;
 
 		case 'repair_cache':
 			// Repair cache
-			$template_log_title = T_('Repair /cache/* directory structure');
+			$template_log_title = TB_('Repair /cache/* directory structure');
 			$template_action = $action;
 			break;
 
 		case 'optimize_tables':
 			// Optimize MyISAM & InnoDB tables
-			$template_log_title = T_('OPTIMIZE database tables');
+			$template_log_title = TB_('OPTIMIZE database tables');
 			$template_action = $action;
 			break;
 
 		case 'check_tables':
 			// Check ALL database tables
-			$template_log_title = T_('CHECK database tables');
+			$template_log_title = TB_('CHECK database tables');
 			$template_action = $action;
 			break;
 
 		case 'analyze_tables':  // Analize ALL database tables
-			$template_log_title = T_('ANALYZE database tables');
+			$template_log_title = TB_('ANALYZE database tables');
 			$template_action = $action;
 			break;
 
@@ -156,31 +156,31 @@ if( empty( $tab ) )
 
 		case 'delete_orphan_comments':
 			// delete orphan orphan comments with no matching Item
-			$template_log_title = T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.');
+			$template_log_title = TB_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.');
 			$template_action = $action;
 			break;
 
 		case 'delete_orphan_comment_uploads':
 			// delete orphan comment upload, older than 24 hours
-			$template_log_title = T_('Find and delete all orphan comment Uploads - Disk &amp; DB.');
+			$template_log_title = TB_('Find and delete all orphan comment Uploads - Disk &amp; DB.');
 			$template_action = $action;
 			break;
 
 		case 'delete_orphan_files':
 			// delete orphan File objects with no matching file on disk
-			$template_log_title = T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.');
+			$template_log_title = TB_('Find and delete all orphan File objects (with no matching file on disk) - DB only.');
 			$template_action = $action;
 			break;
 
 		case 'delete_orphan_file_roots':
 			// delete orphan file roots with no matching Blog or User entry in the database
-			$template_log_title = T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.');
+			$template_log_title = TB_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.');
 			$template_action = $action;
 			break;
 
 		case 'prune_hits_sessions':
 			// Prune old hits & sessions
-			$template_log_title = T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.');
+			$template_log_title = TB_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.');
 			$template_action = $action;
 			break;
 
@@ -191,13 +191,13 @@ if( empty( $tab ) )
 			$perm_management = param( 'perm_management', 'array:string' );
 			if( empty( $perm_management ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Permission management') ), 'error' );
+				$Messages->add( sprintf( TB_('Please selected at least one option of the setting "%s".'), TB_('Permission management') ), 'error' );
 			}
 
 			$allow_access = param( 'allow_access', 'array:string' );
 			if( empty( $allow_access ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Allow access to') ), 'error' );
+				$Messages->add( sprintf( TB_('Please selected at least one option of the setting "%s".'), TB_('Allow access to') ), 'error' );
 			}
 
 			if( param_errors_detected() )
@@ -215,9 +215,9 @@ if( empty( $tab ) )
 			$num_comments = param( 'num_comments', 'string', 0 );
 			$num_posts = param( 'num_posts', 'string', 0 );
 
-			if( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
-				param_check_number( 'num_comments', T_('Comments per post must be a number'), true ) &&
-				param_check_number( 'num_posts', T_('"How many posts" field must be a number'), true ) ) )
+			if( ! ( param_check_number( 'blog_ID', TB_('Blog ID must be a number'), true ) &&
+				param_check_number( 'num_comments', TB_('Comments per post must be a number'), true ) &&
+				param_check_number( 'num_posts', TB_('"How many posts" field must be a number'), true ) ) )
 			{ // param errors
 				$action = 'show_create_comments';
 				break;
@@ -228,7 +228,7 @@ if( empty( $tab ) )
 			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( $selected_Blog == NULL )
 			{
-				$Messages->add( T_( 'Blog ID must be a valid Blog ID!' ), 'error' );
+				$Messages->add( TB_( 'Blog ID must be a valid Blog ID!' ), 'error' );
 				$action = 'show_create_comments';
 				break;
 			}
@@ -241,8 +241,8 @@ if( empty( $tab ) )
 			$blog_ID = param( 'blog_ID', 'string', 0 );
 			$num_posts = param( 'num_posts', 'string', 0 );
 
-			if( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
-				param_check_number( 'num_posts', T_('"How many posts" field must be a number'), true ) ) )
+			if( ! ( param_check_number( 'blog_ID', TB_('Blog ID must be a number'), true ) &&
+				param_check_number( 'num_posts', TB_('"How many posts" field must be a number'), true ) ) )
 			{ // param errors
 				$action = 'show_create_posts';
 				break;
@@ -253,7 +253,7 @@ if( empty( $tab ) )
 			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( $selected_Blog == NULL )
 			{
-				$Messages->add( T_( 'Blog ID must be a valid Blog ID!' ), 'error' );
+				$Messages->add( TB_( 'Blog ID must be a valid Blog ID!' ), 'error' );
 				$action = 'show_create_posts';
 				break;
 			}
@@ -267,9 +267,9 @@ if( empty( $tab ) )
 			$min_revisions = param( 'min_revisions', 'string', 0 );
 			$max_revisions = param( 'max_revisions', 'string', 0 );
 
-			if( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
-					param_check_number( 'min_revisions', T_('Minimum number of revisions field must be a number'), true ) &&
-					param_check_number( 'max_revisions', T_('Maximum number of revisions filed must be a number'), true ) ) )
+			if( ! ( param_check_number( 'blog_ID', TB_('Blog ID must be a number'), true ) &&
+					param_check_number( 'min_revisions', TB_('Minimum number of revisions field must be a number'), true ) &&
+					param_check_number( 'max_revisions', TB_('Maximum number of revisions filed must be a number'), true ) ) )
 			{ // param errors
 				$action = 'show_create_revisions';
 				break;
@@ -280,7 +280,7 @@ if( empty( $tab ) )
 			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( $selected_Blog == NULL )
 			{
-				$Messages->add( T_('Blog ID must be a valid Blog ID!'), 'error' );
+				$Messages->add( TB_('Blog ID must be a valid Blog ID!'), 'error' );
 				$action = 'show_create_revisions';
 				break;
 			}
@@ -291,18 +291,18 @@ if( empty( $tab ) )
 
 		case 'create_sample_users':
 			$num_users = param( 'num_users', 'string', 0 );
-			param_check_number( 'num_users', T_('"How many users" field must be a number'), true );
+			param_check_number( 'num_users', TB_('"How many users" field must be a number'), true );
 
 			$user_groups = param( 'user_groups', 'array:integer' );
 			if( empty( $user_groups ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
+				$Messages->add( sprintf( TB_('Please select at least one option of the setting "%s".'), TB_('Create new users in') ), 'error' );
 			}
 
 			$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
 			if( empty( $advanced_user_perms ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
+				$Messages->add( sprintf( TB_('Please select at least one option of the setting "%s".'), TB_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
 			}
 
 			if( param_errors_detected() )
@@ -317,20 +317,20 @@ if( empty( $tab ) )
 
 		case 'recreate_itemslugs':
 			// Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.
-			$template_log_title = T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.');
+			$template_log_title = TB_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.');
 			$template_action = $action;
 			break;
 
 		case 'recreate_autogenerated_excerpts':
 			// Recreating of autogenerated excerpts
-			$template_log_title = T_('Recreate autogenerated excerpts - DB only.');
+			$template_log_title = TB_('Recreate autogenerated excerpts - DB only.');
 			$template_action = $action;
 			break;
 
 		case 'convert_item_content_separators':
 			// Convert item content separators to new format
 			// Execute these actions inside template in order to see the process
-			$template_log_title = T_('Convert item content separators to [teaserbreak] and [pagebreak] - DB only.');
+			$template_log_title = TB_('Convert item content separators to [teaserbreak] and [pagebreak] - DB only.');
 			$template_action = $action;
 			break;
 
@@ -339,7 +339,7 @@ if( empty( $tab ) )
 
 			if( $confirmed )
 			{
-				$template_log_title = T_('Remove all Item version - DB only.');
+				$template_log_title = TB_('Remove all Item version - DB only.');
 				$template_action = $action;
 			}
 			else
@@ -353,7 +353,7 @@ if( empty( $tab ) )
 
 			if( $confirmed )
 			{
-				$template_log_title = T_('Resize all images in the media directory');
+				$template_log_title = TB_('Resize all images in the media directory');
 				$template_action = $action;
 			}
 			else
@@ -367,7 +367,7 @@ if( empty( $tab ) )
 				DELETE T_items__tag FROM T_items__tag
 				  LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
 				 WHERE itag_itm_ID IS NULL');
-			$Messages->add( sprintf(T_('Removed %d obsolete tag entries.'), $DB->rows_affected), 'success' );
+			$Messages->add( sprintf(TB_('Removed %d obsolete tag entries.'), $DB->rows_affected), 'success' );
 			break;
 
 		case 'view_phpinfo':
@@ -406,7 +406,7 @@ if( empty( $tab ) )
 			// Create sample base domains:
 			$num_basedomains = param( 'num_basedomains', 'string', 0 );
 
-			if( ! param_check_number( 'num_basedomains', T_('"How many base domains" field must be a number'), true ) )
+			if( ! param_check_number( 'num_basedomains', TB_('"How many base domains" field must be a number'), true ) )
 			{	// Stop action because of param error:
 				$action = 'show_create_basedomains';
 				break;
@@ -422,10 +422,10 @@ if( empty( $tab ) )
 			$num_words = param( 'num_words', 'string', 0 );
 			$max_users = param( 'max_users', 'string', 0 );
 
-			if( ! ( param_check_number( 'num_loops', T_('"How many loops" field must be a number'), true ) &&
-				param_check_number( 'num_messages', T_('"How many messages in each conversation" field must be a number'), true ) &&
-				param_check_number( 'num_words', T_('"How many words in each message" field must be a number'), true ) &&
-				param_check_number( 'max_users', T_('"Max # of participants in a conversation" field must be a number'), true ) ) )
+			if( ! ( param_check_number( 'num_loops', TB_('"How many loops" field must be a number'), true ) &&
+				param_check_number( 'num_messages', TB_('"How many messages in each conversation" field must be a number'), true ) &&
+				param_check_number( 'num_words', TB_('"How many words in each message" field must be a number'), true ) &&
+				param_check_number( 'max_users', TB_('"Max # of participants in a conversation" field must be a number'), true ) ) )
 			{ // param errors
 				$action = 'show_create_messages';
 				break;
@@ -437,12 +437,12 @@ if( empty( $tab ) )
 
 		case 'create_sample_campaigns':
 			$num_campaigns = param( 'num_campaigns', 'string', 0 );
-			param_check_number( 'num_campaigns', T_('"How many email campaigns" field must be a number'), true );
+			param_check_number( 'num_campaigns', TB_('"How many email campaigns" field must be a number'), true );
 
 			$campaign_lists = param( 'campaign_lists', 'array:integer' );
 			if( empty( $campaign_lists ) )
 			{	// At least one option must be selected:
-				$Messages->add_to_group( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Create new email campaigns in') ), 'error', T_('Validation errors:') );
+				$Messages->add_to_group( sprintf( TB_('Please select at least one option of the setting "%s".'), TB_('Create new email campaigns in') ), 'error', TB_('Validation errors:') );
 			}
 
 			if( param_errors_detected() )
@@ -460,20 +460,20 @@ if( empty( $tab ) )
 		case 'test_flush':
 			// Execute a testing of flush inside template in order to see a process
 			$template_action = 'test_flush';
-			$template_title = T_('Log of test flush').get_manual_link( 'test-flush-tool' );
+			$template_title = TB_('Log of test flush').get_manual_link( 'test-flush-tool' );
 			break;
 
 		case 'utf8check':
-			//$template_log_title = T_('Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)');
+			//$template_log_title = TB_('Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)');
 			load_funcs('_core/model/db/_upgrade.funcs.php');
-			$template_log_title = T_('Normalizing DB charsets...');
+			$template_log_title = TB_('Normalizing DB charsets...');
 			$template_action = $action;
 			break;
 
 		case 'utf8upgrade':
 			// Check/Upgrade DB to UTF-8
 			load_funcs('_core/model/db/_upgrade.funcs.php');
-			$template_log_title = T_('Normalizing DB charsets...');
+			$template_log_title = TB_('Normalizing DB charsets...');
 			$template_action = $action;
 			break;
 
@@ -497,7 +497,7 @@ if( empty( $tab ) )
 			if( ! $Messages->has_errors() )
 			{
 				$Settings->dbupdate();
-				$Messages->add( T_('Site settings updated.'), 'success' );
+				$Messages->add( TB_('Site settings updated.'), 'success' );
 			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -508,19 +508,19 @@ if( empty( $tab ) )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
 switch( $tab3 )
 {
 	case 'import':
-		$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+		$AdminUI->breadcrumbpath_add( TB_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'import-tab' );
 		break;
 
 	case 'test':
-		$AdminUI->breadcrumbpath_add( T_('Testing'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+		$AdminUI->breadcrumbpath_add( TB_('Testing'), $admin_url.'?ctrl=tools&amp;tab3=import' );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'testing-tools' );
@@ -528,7 +528,7 @@ switch( $tab3 )
 
 	case 'tools':
 	default:
-		$AdminUI->breadcrumbpath_add( T_('Tools'), $admin_url.'?ctrl=tools' );
+		$AdminUI->breadcrumbpath_add( TB_('Tools'), $admin_url.'?ctrl=tools' );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'tools-tab' );

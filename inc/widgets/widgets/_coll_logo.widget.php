@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -52,7 +52,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Logo title');
+		return T_('Logo');
 	}
 
 
@@ -233,8 +233,9 @@ class coll_logo_Widget extends ComponentWidget
 		}
 
 		if( $check_file != 'title' && empty( $image_url ) )
-		{
-			return true;
+		{	// If no image file:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no logo image to display.' );
+			return false;
 		}
 
 		$this->init_display( $params );
@@ -285,6 +286,22 @@ class coll_logo_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			$this->disp_title( $message );
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 
