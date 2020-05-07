@@ -77,17 +77,6 @@ function evo_prevent_key_enter( selector )
 
 
 /**
- * Render comment ratings to star buttons
- */
-function evo_render_star_rating( params )
-{
-	jQuery( '#comment_rating' ).each( function( index ) {
-			jQuery( this ).html( '' ).raty( params );
-		} );
-}
-
-
-/**
  * Open link attachment modal window
  * @param string link_owner_type 
  * @param integer link_owner_ID 

@@ -11,6 +11,16 @@
  * Depends on: jQuery, jQuery.raty
  */
 
+/**
+ * Render comment ratings to star buttons
+ */
+function evo_render_star_rating( params )
+{
+	jQuery( '#comment_rating' ).each( function( index ) {
+			jQuery( this ).html( '' ).raty( params );
+		} );
+}
+
 jQuery( document ).ready( function()
 {
 	if( typeof( evo_comment_rating_config ) == 'undefined' )
