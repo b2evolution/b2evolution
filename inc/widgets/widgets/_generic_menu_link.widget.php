@@ -122,29 +122,45 @@ class generic_menu_link_Widget extends ComponentWidget
 				// Buttons:
 				if( $is_active_link )
 				{	// Class for active button:
-					return empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
+					$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
 				}
-				// Class for normal(not active) button:
-				return empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
+				else
+				{	// Class for normal(not active) button:
+					$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
+				}
+				break;
 
 			case 'tabs':
 				// Tabs:
 				if( $is_active_link )
 				{	// Class for active tab:
-					return trim( $this->disp_params['tab_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] ) );
+					$link_class = $this->disp_params['tab_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] );
 				}
-				// Class for normal(not active) tab:
-				return trim( $this->disp_params['tab_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] ) );
+				else
+				{	// Class for normal(not active) tab:
+					$link_class = $this->disp_params['tab_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] );
+				}
+				break;
 
 			default:
 				// List:
 				if( $is_active_link )
 				{	// Class for active link:
-					return trim( $this->disp_params['link_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] ) );
+					$link_class = $this->disp_params['link_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] );
 				}
-				// Class for normal(not active) link:
-				return trim( $this->disp_params['link_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] ) );
+				else
+				{	// Class for normal(not active) link:
+					$link_class = $this->disp_params['link_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] );
+				}
+				break;
 		}
+
+		if( ! empty( $this->disp_params['link_type'] ) )
+		{	// Append class per link type:
+			$link_class .= ' evo_widget_'.$this->code.'_'.$this->disp_params['link_type'];
+		}
+
+		return trim( $link_class );
 	}
 
 

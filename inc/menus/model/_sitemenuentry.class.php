@@ -28,6 +28,7 @@ class SiteMenuEntry extends DataObject
 	var $menu_ID;
 	var $parent_ID;
 	var $order;
+	var $user_pic_size;
 	var $text;
 	var $type;
 	var $coll_logo_size;
@@ -37,7 +38,16 @@ class SiteMenuEntry extends DataObject
 	var $item_slug;
 	var $url;
 	var $visibility = 'always';
+	var $access = 'perms';
+	var $show_badge = 1;
 	var $highlight = 1;
+	var $hide_empty = 0;
+
+	/**
+	 * Error message if current User has no access to requested URL
+	 * Useful when it is used from widget Menu
+	 */
+	var $url_error = NULL;
 
 	/**
 	 * Collection
@@ -76,6 +86,7 @@ class SiteMenuEntry extends DataObject
 			$this->menu_ID = $db_row->ment_menu_ID;
 			$this->parent_ID = $db_row->ment_parent_ID;
 			$this->order = $db_row->ment_order;
+			$this->user_pic_size = $db_row->ment_user_pic_size;
 			$this->text = $db_row->ment_text;
 			$this->type = $db_row->ment_type;
 			$this->coll_logo_size = $db_row->ment_coll_logo_size;
@@ -85,7 +96,10 @@ class SiteMenuEntry extends DataObject
 			$this->item_slug = $db_row->ment_item_slug;
 			$this->url = $db_row->ment_url;
 			$this->visibility = $db_row->ment_visibility;
+			$this->access = $db_row->ment_access;
+			$this->show_badge = $db_row->ment_show_badge;
 			$this->highlight = $db_row->ment_highlight;
+			$this->hide_empty = $db_row->ment_hide_empty;
 		}
 	}
 
@@ -122,6 +136,10 @@ class SiteMenuEntry extends DataObject
 		// Order:
 		param( 'ment_order', 'integer', NULL );
 		$this->set_from_Request( 'order', NULL, true );
+
+		// Profile picture before text:
+		param( 'ment_user_pic_size', 'string' );
+		$this->set_from_Request( 'user_pic_size' );
 
 		// Text:
 		param( 'ment_text', 'string' );
@@ -185,9 +203,21 @@ class SiteMenuEntry extends DataObject
 		param( 'ment_visibility', 'string' );
 		$this->set_from_Request( 'visibility' );
 
+		// Show to:
+		param( 'ment_access', 'string' );
+		$this->set_from_Request( 'access' );
+
+		// Show badge:
+		param( 'ment_show_badge', 'integer', 0 );
+		$this->set_from_Request( 'show_badge' );
+
 		// Highlight:
 		param( 'ment_highlight', 'integer', 0 );
 		$this->set_from_Request( 'highlight' );
+
+		// Hide if empty:
+		param( 'ment_hide_empty', 'integer', 0 );
+		$this->set_from_Request( 'hide_empty' );
 
 
 		if( ! empty( $menu_Item_from_ID ) && ! empty( $menu_Item_from_slug ) && ( $menu_Item_from_ID->ID != $menu_Item_from_slug->ID ) )
@@ -338,7 +368,7 @@ class SiteMenuEntry extends DataObject
 	 */
 	function get_text( $force_default = false )
 	{
-		global $thumbnail_sizes;
+		global $thumbnail_sizes, $current_User;;
 
 		$entry_Blog = & $this->get_Blog();
 
@@ -429,7 +459,6 @@ class SiteMenuEntry extends DataObject
 					$text = T_('My visits');
 					if( is_logged_in() )
 					{
-						global $current_User;
 						$text .= ' <span class="badge badge-info">'.$current_User->get_profile_visitors_count().'</span>';
 					}
 					break;
@@ -475,11 +504,23 @@ class SiteMenuEntry extends DataObject
 					break;
 
 				case 'myprofile':
-					$text = T_('My profile');
+					$text = '$username$';
 					break;
 
 				case 'admin':
 					$text = T_('Admin').' &raquo;';
+					break;
+
+				case 'messages':
+					$text = T_('Messages');
+					break;
+
+				case 'contacts':
+					$text = T_('Contacts');
+					break;
+
+				case 'flagged':
+					$text = T_('Flagged Items');
 					break;
 
 				default:
@@ -487,12 +528,61 @@ class SiteMenuEntry extends DataObject
 			}
 		}
 
-		$coll_logo_size = $this->get( 'coll_logo_size' );
-		if( ! empty( $coll_logo_size ) &&
-		    isset( $thumbnail_sizes[ $coll_logo_size ] ) &&
-		    ( $coll_logo_File = $entry_Blog->get( 'collection_image' ) ) )
-		{	// Display collection logo before Menu text:
+		if( is_logged_in() )
+		{	// Replace masks:
+			if( strpos( $text, '$username$' ) !== false )
+			{	// Friendly name:
+				$username = $current_User->get_colored_login( array( 'login_text' => 'name' ) );
+				$text = str_replace( '$username$', $username, $text );
+			}
+			if( strpos( $text, '$login$' ) !== false )
+			{	// Login:
+				$login = $current_User->get_colored_login( array( 'login_text' => 'login' ) );
+				$text = str_replace( '$login$', $login, $text );
+			}
+		}
+
+		// Profile picture before text:
+		if( in_array( $this->get( 'type' ), array( 'logout', 'myprofile', 'visits', 'profile', 'avatar', 'useritems', 'usercomments' ) ) &&
+		    is_logged_in() &&
+		    ( $user_pic_size = $this->get( 'user_pic_size' ) ) &&
+		    isset( $thumbnail_sizes[ $user_pic_size ] ) )
+		{
+			$text = $current_User->get_avatar_imgtag( $user_pic_size, 'avatar_before_login_middle' ).$text;
+		}
+
+		// Collection logo before link text:
+		if( ! in_array( $this->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ) &&
+				( $coll_logo_size = $this->get( 'coll_logo_size' ) ) &&
+				isset( $thumbnail_sizes[ $coll_logo_size ] ) &&
+				( $coll_logo_File = $entry_Blog->get( 'collection_image' ) ) )
+		{
 			$text = $coll_logo_File->get_thumb_imgtag( $coll_logo_size ).' '.$text;
+		}
+
+		// Badge with count of unread messages or flagged items:
+		if( $this->get( 'show_badge' ) )
+		{
+			switch( $this->get( 'type' ) )
+			{
+				case 'messages':
+					// Show badge with count of uread messages:
+					$unread_messages_count = get_unread_messages_count();
+					if( $unread_messages_count > 0 )
+					{	// If at least one unread message:
+						$text .= ' <span class="badge badge-important">'.$unread_messages_count.'</span>';
+					}
+					break;
+
+				case 'flagged':
+					// Show badge with count of flagged items:
+					$flagged_items_count = $current_User->get_flagged_items_count();
+					if( $flagged_items_count > 0 )
+					{	// If at least one flagged item:
+						$text .= ' <span class="badge badge-warning">'.$flagged_items_count.'</span>';
+					}
+					break;
+			}
 		}
 
 		return $text;
@@ -510,11 +600,13 @@ class SiteMenuEntry extends DataObject
 
 		if( empty( $entry_Blog ) )
 		{	// We cannot use this menu entry without current collection:
+			$this->url_error = 'No Collection';
 			return false;
 		}
 
 		if( $this->get( 'visibility' ) == 'access' && ! $entry_Blog->has_access() )
 		{	// Don't use this menu entry because current user has no access to the collection:
+			$this->url_error = 'No access';
 			return false;
 		}
 
@@ -554,6 +646,7 @@ class SiteMenuEntry extends DataObject
 			case 'latestcomments':
 				if( ! $entry_Blog->get_setting( 'comments_latest' ) )
 				{	// This page is disabled:
+					$this->url_error = 'Disabled';
 					return false;
 				}
 				return $entry_Blog->get( 'lastcommentsurl' );
@@ -567,6 +660,7 @@ class SiteMenuEntry extends DataObject
 			case 'login':
 				if( is_logged_in() )
 				{	// Don't display this link for already logged in users:
+					$this->url_error = 'Not logged in';
 					return false;
 				}
 				global $Settings;
@@ -575,6 +669,7 @@ class SiteMenuEntry extends DataObject
 			case 'logout':
 				if( ! is_logged_in() )
 				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
 					return false;
 				}
 				return get_user_logout_url( $entry_Blog->ID );
@@ -585,6 +680,7 @@ class SiteMenuEntry extends DataObject
 			case 'profile':
 				if( ! is_logged_in() )
 				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
 					return false;
 				}
 				return get_user_profile_url( $entry_Blog->ID );
@@ -592,6 +688,7 @@ class SiteMenuEntry extends DataObject
 			case 'avatar':
 				if( ! is_logged_in() )
 				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
 					return false;
 				}
 				return get_user_avatar_url( $entry_Blog->ID );
@@ -684,6 +781,46 @@ class SiteMenuEntry extends DataObject
 				}
 				global $admin_url;
 				return $admin_url;
+
+			case 'messages':
+			case 'contacts':
+				switch( $this->get( 'access' ) )
+				{
+					case 'loggedin':
+						if( ! is_logged_in() )
+						{	// User is not logged in:
+							$this->url_error = 'Not logged in';
+							return false;
+						}
+						break;
+					case 'perms':
+						global $current_User;
+						if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply', false ) )
+						{	// User has no access for messaging:
+							$this->url_error = 'No access';
+							return false;
+						}
+						break;
+				}
+				return $this->get( 'type' ) == 'messages'
+					// Messages:
+					? $entry_Blog->get( 'threadsurl' )
+					// Contacts:
+					: $entry_Blog->get( 'contactsurl' );
+
+			case 'flagged':
+				if( ! is_logged_in() )
+				{	// Only logged in user can flag items:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				global $current_User;
+				if( $this->get( 'hide_empty' ) && $current_User->get_flagged_items_count() == 0 )
+				{	// Hide this menu if current user has no flagged posts yet:
+					$this->url_error = 'No flagged posts';
+					return false;
+				}
+				return $entry_Blog->get( 'flaggedurl' );
 		}
 
 		return false;
@@ -809,6 +946,15 @@ class SiteMenuEntry extends DataObject
 			case 'admin':
 				// This is never highlighted:
 				return false;
+
+			case 'messages':
+				return $disp == 'messages' || ( $disp == 'threads' && ( ! isset( $_GET['disp'] ) || $_GET['disp'] != 'msgform' ) );
+
+			case 'contacts':
+				return $disp == 'contacts';
+
+			case 'flagged':
+				return $disp == 'flagged';
 		}
 
 		return false;

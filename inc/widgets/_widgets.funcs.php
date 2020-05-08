@@ -73,8 +73,8 @@ function get_default_widgets( $coll_type = '', $context = array() )
 		'coll_type' => '-main', // Don't add widgets to Menu container for Main collections
 		array(  5, 15000, 'basic_menu_link', 'coll_type' => '-minisite', 'params' => array( 'link_type' => 'home' ) ),
 		array(  7, 15000, 'mustread_menu_link', 'is_pro' => true, 'coll_type' => '-main,minisite' ),
-		array(  8, 15000, 'flag_menu_link', 'coll_type' => 'forum,group', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
-		array(  8, 15000, 'flag_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged pages') ) ),
+		array(  8, 15000, 'basic_menu_link', 'coll_type' => 'forum,group', 'params' => array( 'link_type' => 'flagged', 'link_text' => T_('Flagged topics') ) ),
+		array(  8, 15000, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'flagged', 'link_text' => T_('Flagged pages') ) ),
 		array( 10, 15000, 'basic_menu_link', 'install' => $context['init_as_blog_b'], 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
 		array( 13, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
 		array( 15, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
@@ -88,7 +88,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 		array( 33, 15000, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'catdir' ) ),
 		array( 35, 15000, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
 		array( 37, 15000, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
-		array( 50, 15000, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
+		array( 50, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
 		array( 60, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact', 'show_badge' => 0 ), 'enabled' => ( $coll_type == 'minisite' ) ),
 		array( 70, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
 		array( 80, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'register' ) ),
@@ -450,8 +450,8 @@ function get_default_widgets( $coll_type = '', $context = array() )
 	$default_widgets['mobile_tools_menu'] = array(
 		'skin_type' => 'mobile',
 		array( 10, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ) ),
-		array( 20, 15000, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ) ),
-		array( 30, 15000, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ) ),
+		array( 20, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'messages' ) ),
+		array( 30, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ) ),
 		array( 50, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'logout' ) ),
 	);
 
@@ -664,7 +664,8 @@ function get_default_widgets( $coll_type = '', $context = array() )
 				'widget_css_class' => 'visible-xs',
 				'widget_link_class'=> 'bg-white',
 			) ),
-		array( $tmp_widget_order + 40, 15260, 'msg_menu_link', 'params' => array(
+		array( $tmp_widget_order + 40, 15260, 'basic_menu_link', 'params' => array(
+				'link_type'        => 'messages',
 				'widget_css_class' => 'visible-xs',
 			) ),
 		array( $tmp_widget_order + 50, 15260, 'basic_menu_link', 'params' => array(
@@ -712,10 +713,12 @@ function get_default_widgets( $coll_type = '', $context = array() )
 				'link_type' => 'register',
 				'widget_link_class' => 'hidden-xs bg-white',
 			) ),
-		array( 30, 15260, 'profile_menu_link', 'params' => array(
+		array( 30, 15260, 'basic_menu_link', 'params' => array(
+				'link_type'            => 'myprofile',
 				'profile_picture_size' => 'crop-top-32x32',
 			) ),
-		array( 40, 15260, 'msg_menu_link', 'params' => array(
+		array( 40, 15260, 'basic_menu_link', 'params' => array(
+				'link_type'         => 'messages',
 				'widget_link_class' => 'hidden-xs',
 			) ),
 		array( 50, 15260, 'basic_menu_link', 'params' => array(

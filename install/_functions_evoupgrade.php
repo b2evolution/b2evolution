@@ -12598,7 +12598,53 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 16020, 'Dummy upgrade block, just to force execution of the upgrade procedure to insert new template "Content List with Thumbnail"..' ) )
 	{	// part of 7.1.3-beta
 		upg_task_end();
-		
+	}
+
+	if( upg_task_start( 16030, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
+	{	// part of 7.1.5-stable
+		db_upgrade_cols( 'T_menus__entry', array(
+			'ADD' => array(
+				'ment_user_pic_size' => 'VARCHAR(32) COLLATE ascii_general_ci NULL AFTER ment_order',
+				'ment_access'        => 'ENUM( "any", "loggedin", "perms" ) COLLATE ascii_general_ci NOT NULL DEFAULT "perms" AFTER ment_visibility',
+				'ment_show_badge'    => 'TINYINT(1) NOT NULL DEFAULT 1 AFTER ment_access',
+				'ment_hide_empty'    => 'TINYINT(1) NOT NULL DEFAULT 0',
+			),
+		) );
+		// Convert menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget:
+		// (update to proper param 'link_type' because these widgets had no this param before)
+		$menu_widgets_SQL = new SQL( 'Get menu widgets before converting' );
+		$menu_widgets_SQL->SELECT( 'wi_ID, wi_code, wi_params' );
+		$menu_widgets_SQL->FROM( 'T_widget__widget' );
+		$menu_widgets_SQL->WHERE( 'wi_code IN ( "msg_menu_link", "flag_menu_link", "profile_menu_link" )' );
+		$menu_widgets = $DB->get_results( $menu_widgets_SQL );
+		foreach( $menu_widgets as $menu_widget )
+		{
+			$menu_widget_params = empty( $menu_widget->wi_params ) ? array() : unserialize( $menu_widget->wi_params );
+			if( $menu_widget->wi_code == 'msg_menu_link' )
+			{
+				if( ! isset( $menu_widget_params['link_type'] ) )
+				{	// Link type may be not set yet:
+					$menu_widget_params['link_type'] = 'messages';
+				}
+			}
+			elseif( $menu_widget->wi_code == 'flag_menu_link' )
+			{
+				$menu_widget_params['link_type'] = 'flagged';
+			}
+			else
+			{
+				$menu_widget_params['link_type'] = 'myprofile';
+				if( empty( $menu_widget_params['profile_picture_size'] ) )
+				{	// Sset default picture profile size if it was not set yet:
+					$menu_widget_params['profile_picture_size'] = 'crop-top-15x15';
+				}
+			}
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_code = "basic_menu_link",
+				      wi_params = '.$DB->quote( serialize( $menu_widget_params ) ).'
+				WHERE wi_ID = '.$menu_widget->wi_ID );
+		}
+		upg_task_end();
 	}
 
 	/*

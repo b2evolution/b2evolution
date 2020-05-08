@@ -115,8 +115,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		$current_link_type = $this->get_param( 'link_type', $default_link_type );
 
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
-		$coll_id_is_disabled = ( in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
-			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
+		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
+		$coll_id_is_disabled = in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar', 'messages', 'contacts' ) );
 
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -128,6 +128,21 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'options' => $this->link_types,
 					'defaultvalue' => $default_link_type,
 				),
+				'coll_logo_size' => array(
+					'type' => 'select',
+					'label' => T_('Collection logo before link text'),
+					'options' => get_available_thumb_sizes( T_('No logo') ),
+					'defaultvalue' => '',
+					'hide' => in_array( $current_link_type, array( 'item', 'admin', 'url' ) ),
+				),
+				'profile_picture_size' => array(
+					'label' => T_('Profile picture before text'),
+					'note' => '',
+					'type' => 'select',
+					'options' => get_available_thumb_sizes( T_('No picture') ),
+					'defaultvalue' => '',
+					'hide' => ! in_array( $current_link_type, array( 'logout', 'myprofile', 'visits', 'profile', 'avatar', 'useritems', 'usercomments' ) ),
+				),
 				'link_text' => array(
 					'label' => T_('Link text'),
 					'note' => T_( 'Text to use for the link (leave empty for default).' ),
@@ -135,23 +150,25 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'size' => 20,
 					'defaultvalue' => '',
 				),
-				'coll_logo_size' => array(
-					'type' => 'select',
-					'label' => T_('Collection logo before link text'),
-					'options' => get_available_thumb_sizes( T_('No logo') ),
-					'defaultvalue' => '',
+				'show_badge' => array(
+					'label' => T_('Show Badge'),
+					'note' => T_('Show a badge with count.'),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+					'hide' => ! in_array( $current_link_type, array( 'messages', 'flagged' ) ),
 				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
 					'note' => T_( 'Leave empty for current collection.' )
-						.( $coll_id_is_disabled ? ' <span class="red">'.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+						.( $msg_Blog ? ' <span class="evo_setting_coll_disabled red"'.( $coll_id_is_disabled ? '' : ' style="display:none"' ).'>'
+							.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
 								'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
 								'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
-					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
+					'disabled' => $coll_id_is_disabled && $msg_Blog ? 'disabled' : false,
 					'hide' => in_array( $current_link_type, array( 'item', 'admin', 'url' ) ),
 				),
 				'cat_ID' => array(
@@ -162,16 +179,6 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'size' => 5,
 					'defaultvalue' => '',
 					'hide' => ! in_array( $current_link_type, array( 'recentposts', 'postnew' ) ),
-				),
-				'visibility' => array(
-					'label' => T_( 'Visibility' ),
-					'note' => '',
-					'type' => 'radio',
-					'options' => array(
-							array( 'always', T_( 'Always show (cacheable)') ),
-							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
-					'defaultvalue' => 'always',
-					'field_lines' => true,
 				),
 				// fp> TODO: ideally we would have a link icon to go click on the destination...
 				'item_ID' => array(
@@ -191,6 +198,17 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'defaultvalue' => '',
 					'hide' => ( $current_link_type != 'url' ),
 				),
+				'show_to' => array(
+					'label' => T_('Show to'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array( array( 'any', T_('All users') ),
+										array( 'loggedin', T_('Logged in users') ),
+										array( 'perms', T_('Users with permissions only') ) ),
+					'defaultvalue' => 'perms',
+					'field_lines' => true,
+					'hide' => ! in_array( $current_link_type, array( 'messages', 'contacts' ) ),
+				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current'),
 					'note' => '',
@@ -200,6 +218,23 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 							array( 'no', T_('Do not try to highlight (cacheable)') )
 						),
 					'defaultvalue' => 'yes',
+					'field_lines' => true,
+				),
+				'hide_empty' => array(
+					'label' => T_('Hide if empty'),
+					'note' => T_('Check to hide this menu if the list is empty.'),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+					'hide' => ( $current_link_type != 'flagged' ),
+				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
+					'defaultvalue' => 'always',
 					'field_lines' => true,
 				),
 			), parent::get_param_definitions( $params ) );
@@ -218,14 +253,44 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		return 'jQuery( "#'.$this->get_param_prefix().'link_type" ).change( function()
 		{
 			var link_type_value = jQuery( this ).val();
+			// Hide/Show Profile picture size:
+			jQuery( "#ffield_'.$this->get_param_prefix().'profile_picture_size" ).toggle( link_type_value == "logout" ||
+				link_type_value == "myprofile" ||
+				link_type_value == "visits" ||
+				link_type_value == "profile" ||
+				link_type_value == "avatar" ||
+				link_type_value == "useritems" ||
+				link_type_value == "usercomments" );
+			if( link_type_value == "myprofile" && jQuery( "#'.$this->get_param_prefix().'profile_picture_size" ).val() == "" )
+			{	// Set default picture size for "View my profile":
+				jQuery( "#'.$this->get_param_prefix().'profile_picture_size" ).val( "crop-top-15x15" );
+			}
 			// Hide/Show collection ID:
-			jQuery( "#ffield_'.$this->get_param_prefix().'blog_ID" ).toggle( link_type_value != "item" && link_type_value != "admin" && link_type_value != "url" );
+			jQuery( "#ffield_'.$this->get_param_prefix().'blog_ID, #ffield_'.$this->get_param_prefix().'coll_logo_size" ).toggle( link_type_value != "item" && link_type_value != "admin" && link_type_value != "url" );
+			if( jQuery( ".evo_setting_coll_disabled" ).length )
+			{	// Hide/Show info for disabled collection:
+				var coll_disabled = link_type_value == "ownercontact" ||
+					link_type_value == "owneruserinfo" ||
+					link_type_value == "myprofile" ||
+					link_type_value == "profile" ||
+					link_type_value == "avatar" ||
+					link_type_value == "messages" ||
+					link_type_value == "contacts";
+				jQuery( ".evo_setting_coll_disabled" ).toggle( coll_disabled );
+				jQuery( "#'.$this->get_param_prefix().'blog_ID" ).prop( "disabled", coll_disabled );
+			}
 			// Hide/Show category ID:
 			jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).toggle( link_type_value == "recentposts" || link_type_value == "postnew" );
 			// Hide/Show item ID:
 			jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).toggle( link_type_value == "item" );
 			// Hide/Show URL:
 			jQuery( "#ffield_'.$this->get_param_prefix().'url" ).toggle( link_type_value == "url" );
+			// Hide/Show setting "Show to":
+			jQuery( "#ffield_'.$this->get_param_prefix().'show_to" ).toggle( link_type_value == "messages" || link_type_value == "contacts" );
+			// Hide/Show setting "Show Badge":
+			jQuery( "#ffield_'.$this->get_param_prefix().'show_badge" ).toggle( link_type_value == "messages" || link_type_value == "flagged" );
+			// Hide/Show setting "Hide if empty":
+			jQuery( "#ffield_'.$this->get_param_prefix().'hide_empty" ).toggle( link_type_value == "flagged" );
 		} );';
 	}
 
@@ -262,6 +327,16 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 		$this->init_display( $params );
 
+		if( isset( $this->disp_params['link_text_'.$this->disp_params['link_type']] ) )
+		{	// Use custom link text per type from skin side:
+			// (used by site skins with param like 'link_text_myprofile' => '$login$' where we need to force friendly username to login)
+			$link_text = $this->disp_params['link_text_'.$this->disp_params['link_type']];
+		}
+		else
+		{	// Use normal link text:
+			$link_text = $this->disp_params['link_text'];
+		}
+
 		// Initialize Menu Entry object to build a menu link/button:
 		load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
 		$SiteMenuEntry = new SiteMenuEntry();
@@ -269,11 +344,15 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		$SiteMenuEntry->set( 'cat_ID', $this->disp_params['cat_ID'] );
 		$SiteMenuEntry->set( 'item_ID', $this->disp_params['item_ID'] );
 		$SiteMenuEntry->set( 'coll_logo_size', $this->disp_params['coll_logo_size'] );
+		$SiteMenuEntry->set( 'user_pic_size', $this->disp_params['profile_picture_size'] );
 		$SiteMenuEntry->set( 'type', $this->disp_params['link_type'] );
-		$SiteMenuEntry->set( 'text', $this->disp_params['link_text'] );
+		$SiteMenuEntry->set( 'text', $link_text );
 		$SiteMenuEntry->set( 'url', $this->disp_params['link_href'] );
 		$SiteMenuEntry->set( 'visibility', $this->disp_params['visibility'] );
+		$SiteMenuEntry->set( 'access', $this->disp_params['show_to'] );
+		$SiteMenuEntry->set( 'show_badge', $this->disp_params['show_badge'] );
 		$SiteMenuEntry->set( 'highlight', ( $this->disp_params['highlight_current'] == 'yes' ) );
+		$SiteMenuEntry->set( 'hide_empty', $this->disp_params['hide_empty'] );
 
 		if( ! ( $entry_Blog = & $SiteMenuEntry->get_Blog() ) )
 		{	// We cannot use this widget without a current collection:
@@ -283,7 +362,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 		if( ! ( $url = $SiteMenuEntry->get_url() ) )
 		{	// Don't display this menu entry because of some restriction for current User or by general settings:
-			$this->display_debug_message();
+			$this->display_debug_message( empty( $SiteMenuEntry->url_error ) ? '' : 'Hidden('.$SiteMenuEntry->url_error.')' );
 			return false;
 		}
 
@@ -326,6 +405,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					// Note: also beware of the source param.
 					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
 					// (which could have been shared between several pages):
+					$this->BlockCache->abort_collect();
+				}
+				break;
+
+			case 'messages':
+			case 'flagged':
+				if( $SiteMenuEntry->get( 'show_badge' ) && isset( $this->BlockCache ) )
+				{	// Do not cache if bage is displayed because the number of unread messages are always changing:
 					$this->BlockCache->abort_collect();
 				}
 				break;

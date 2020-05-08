@@ -52,7 +52,12 @@ function get_menu_types()
 				'useritems'    => T_('View my posts/items').' (disp=useritems)',
 				'usercomments' => T_('View my comments').' (disp=usercomments)',
 			),
+			T_('Messaging') => array(
+				'messages' => T_('Private messages'),
+				'contacts' => T_('Messaging contacts'),
+			),
 			T_('Other') => array(
+				'flagged' => T_('Flagged Items'),
 				'postnew' => T_('Create new Item').' (disp=edit)',
 				'admin'   => T_('Go to Back-Office'),
 				'url'     => T_('Go to any URL'),

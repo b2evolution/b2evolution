@@ -28,7 +28,7 @@ echo '<div id="evo_site_header">';
 			'item_end'            => '',
 			'item_selected_start' => '',
 			'item_selected_end'   => '',
-			'profile_menu_link_text' => 'avatar_force_login',
+			'link_text_myprofile' => '$login$',
 		) );
 	// ----------------------------- END OF "Site Header" CONTAINER -----------------------------
 

@@ -62,13 +62,15 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
   font-weight: normal;
 }
-#evo_site_header a.user {
-  color: #ccc;
+#evo_site_header a.evo_widget_basic_menu_link_myprofile {
   position: relative;
   padding-left: 49px;
+}
+#evo_site_header a.evo_widget_basic_menu_link_myprofile .user {
+  color: #ccc;
   font-weight: normal;
 }
-#evo_site_header a.user img {
+#evo_site_header a.evo_widget_basic_menu_link_myprofile img {
   position: absolute;
   top: 0;
   left: 12px;
@@ -100,7 +102,7 @@ body {
   padding: 0;
   display: inline-block;
 }
-#evo_site_header .evo_widget.widget_core_msg_menu_link .badge {
+#evo_site_header .evo_widget .evo_widget_basic_menu_link_messages .badge {
   margin-top: -3px;
 }
 #evo_site_header .evo_widget.widget_core_site_logo a:hover {

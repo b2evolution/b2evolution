@@ -955,7 +955,7 @@ textarea.form_textarea_input {
 div.widget_core_user_profile_pics {
   text-align: center;
 }
-.widget_core_profile_menu_link ul li a img {
+.evo_widget_basic_menu_link_myprofile ul li a img {
   vertical-align: middle;
   border-radius: 4px;
 }

@@ -59,8 +59,8 @@ else
 							'item_selected_start' => '',
 							'item_selected_end'   => '',
 							'link_selected_class' => 'btn btn-default active btn-sm ',
-							'link_default_class' => 'btn btn-default btn-sm ',
-							'profile_menu_link_text' => 'avatar_force_login',
+							'link_default_class'  => 'btn btn-default btn-sm ',
+							'link_text_myprofile' => '$login$',
 						) );
 					// ----------------------------- END OF "Right Navigation" CONTAINER -----------------------------
 				?>

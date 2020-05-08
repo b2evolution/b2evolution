@@ -326,6 +326,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$original_form_fieldstart_checkbox = $Form->fieldstart_checkbox;
 			$Form->fieldstart_checkbox = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_checkbox );
 		}
+		if( isset( $Form->fieldstart_radio ) )
+		{
+			$original_form_fieldstart_radio = $Form->fieldstart_radio;
+			$Form->fieldstart_radio = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_radio );
+		}
 	}
 
 	switch( $parmeta['type'] )
@@ -747,6 +752,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $original_form_fieldstart_checkbox ) )
 	{	// Revert original field start html code:
 		$Form->fieldstart_checkbox = $original_form_fieldstart_checkbox;
+	}
+	if( isset( $original_form_fieldstart_radio ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart_radio = $original_form_fieldstart_radio;
 	}
 
 	if( $outer_most && $has_array_type )

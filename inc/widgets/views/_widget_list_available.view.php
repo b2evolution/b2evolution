@@ -95,9 +95,6 @@ $core_componentwidget_defs = array(
 		),
 	'menu_item' => array(
 			'basic_menu_link',   // Menu link or button
-			'msg_menu_link',     // Messaging Menu link or button
-			'flag_menu_link',    // Flagged Items Menu link or button
-			'profile_menu_link', // My Profile Menu link or button
 			'embed_menu',        // Embed Menu
 			'colls_list_public', // Collections list
 			'colls_list_owner',  // Same owner's collections list
