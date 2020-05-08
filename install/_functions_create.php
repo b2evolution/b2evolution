@@ -1705,6 +1705,43 @@ function create_default_templates( $is_task = true )
 			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
 
+		// Item attachments:
+		'item_details_files_list' => array(
+			'name'     => 'Item Details: Attachments: List',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=<div class="item_attachments"><ul class="bFiles">|
+				before_attach=<li>|
+				before_attach_size=<span class="file_size">(|
+				after_attach_size=)</span>|
+				after_attach=</li>|
+				after=</ul></div>|
+				file_link_format=$file_name$|
+				display_download_icon=1|
+				file_link_text=title|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
+		'item_details_files_buttons' => array(
+			'name'     => 'Item Details: Attachments: Buttons',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=|
+				before_attach=|
+				before_attach_size=(|
+				after_attach_size=)|
+				after_attach=|
+				after=|
+				attach_format=$file_link$|
+				file_link_format=$icon$ <b>Download Now!</b><br />$file_name$ $file_size$ $file_desc$|
+				display_download_icon=1|
+				file_link_text=title|
+				file_link_class=btn btn-success|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
 
 		// Content List widget:
 		'content_list' => array(

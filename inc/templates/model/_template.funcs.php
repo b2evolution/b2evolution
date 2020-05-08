@@ -867,6 +867,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->get_feedback_link( $params );
 			break;
 
+		case 'Item:files':
+			echo $rendered_Item->get_files( $params );
+			break;
+
 		case 'Item:flag_icon':
 			echo $rendered_Item->get_flag( $params );
 			break;
@@ -918,7 +922,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 				), $params ) );
 			break;
-			
+
 		case 'Item:issue_date':
 			$rendered_Item->issue_date( $params );
 			break;
