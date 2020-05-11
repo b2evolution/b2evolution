@@ -64,8 +64,8 @@ if( empty( $view ) )
 {	// If view is not defined try to get it from user settings per collection or set default:
 	$view = $UserSettings->get( 'customizer_view_'.$blog );
 	if( empty( $view ) )
-	{	// Display collection skin settings by default:
-		$view = 'coll_skin';
+	{	// Display collection widget settings by default:
+		$view = 'coll_widgets';
 	}
 	memorize_param( 'view', 'string', '', $view );
 }
