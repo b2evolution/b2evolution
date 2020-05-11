@@ -417,6 +417,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_front_order_short_title  SMALLINT NULL,
 			ityp_front_order_instruction  SMALLINT NULL,
 			ityp_front_order_attachments  SMALLINT NULL,
+			ityp_front_order_workflow     SMALLINT NULL,
 			ityp_front_order_text         SMALLINT NULL,
 			ityp_front_order_tags         SMALLINT NULL,
 			ityp_front_order_excerpt      SMALLINT NULL,

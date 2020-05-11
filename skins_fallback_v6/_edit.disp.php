@@ -110,23 +110,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $edited_Item->can_edit_workflow( 'status' ) )
-		{	// Allow workflow status if current user can edit this property:
-			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-		}
-		if( $edited_Item->can_edit_workflow( 'status' ) )
-		{	// Allow workflow user if current user can edit this property:
-			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
-		}
-		if( $edited_Item->can_edit_workflow( 'priority' ) )
-		{	// Allow workflow priority if current user can edit this property:
-			$Form->hidden( 'item_priority', $edited_Item->priority );
-		}
-		if( $edited_Item->can_edit_workflow( 'deadline' ) )
-		{	// Allow workflow deadline if current user can edit this property:
-			$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
-			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
-		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
@@ -334,6 +317,52 @@ $Form->begin_form( 'inskin', '', $form_params );
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
 						$Form->attachments_fieldset( $edited_Item );
+					}
+					break;
+
+				case 'workflow':
+					// Workflow properties:
+					if( ! $edited_Item->can_edit_workflow() )
+					{	// Don't display workflow properties if current user has no permission:
+						break;
+					}
+
+					if( $front_edit_field_is_visible )
+					{	// Display only if it is visible on front-office:
+						$Form->begin_line( T_('Workflow') );
+
+						$edited_Item->display_workflow_field( 'status', $Form, array( 'hide_label' => true ) );
+
+						$edited_Item->display_workflow_field( 'user', $Form, array(
+								'hide_label'  => true,
+								'placeholder' => 'Assignee',
+							) );
+
+						$edited_Item->display_workflow_field( 'priority', $Form, array( 'hide_label' => true ) );
+
+						$edited_Item->display_workflow_field( 'deadline', $Form, array( 'hide_label' => true ) );
+
+						$Form->end_line();
+					}
+					else
+					{	// Print hidden fields in order to don't lost changes on switching from back-office edit form:
+						if( $edited_Item->can_edit_workflow( 'status' ) )
+						{	// Allow workflow status if current user can edit this property:
+							$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
+						}
+						if( $edited_Item->can_edit_workflow( 'status' ) )
+						{	// Allow workflow user if current user can edit this property:
+							$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+						}
+						if( $edited_Item->can_edit_workflow( 'priority' ) )
+						{	// Allow workflow priority if current user can edit this property:
+							$Form->hidden( 'item_priority', $edited_Item->priority );
+						}
+						if( $edited_Item->can_edit_workflow( 'deadline' ) )
+						{	// Allow workflow deadline if current user can edit this property:
+							$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
+							$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
+						}
 					}
 					break;
 
