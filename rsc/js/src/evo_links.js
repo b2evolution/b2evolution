@@ -29,7 +29,7 @@ function evo_link_initialize_fieldset( fieldset_prefix )
 		jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable(
 		{	// Make the attachments fieldset wrapper resizable:
 			minHeight: 80,
-			handles: 's',
+			zIndex: 0,
 			resize: function( e, ui )
 			{	// Limit max height by table of attachments:
 				jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height() );
