@@ -275,17 +275,27 @@ if( $fm_FileRoot )
 		// Dereference any /../ just to make sure, and CHECK if directory exists:
 		$ads_list_path = get_canonical_path( $non_canonical_list_path );
 
-		if( !is_dir( $ads_list_path ) )
-		{ // This should never happen, but just in case the diretory does not exist:
-			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
-			$path = '';		// fp> added
-			$ads_list_path = NULL;
-		}
-		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
+		if( ! preg_match( '#^'.preg_quote( $fm_FileRoot->ads_path, '#' ).'#', $ads_list_path ) )
 		{ // cwd is OUTSIDE OF root!
 			$Messages->add( TB_( 'You are not allowed to go outside your root directory!' ), 'error' );
 			$path = '';		// fp> added
 			$ads_list_path = $fm_FileRoot->ads_path;
+		}
+
+		if( $ajax_request &&
+		    ! is_dir( $ads_list_path ) &&
+		    ! file_exists( $ads_list_path ) &&
+		    $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+		{	// Try to create the requested directory automatically if current User
+			// has a permission and when this is a request e.g. for an import folder:
+			mkdir_r( $ads_list_path );
+		}
+
+		if( ! is_dir( $ads_list_path ) )
+		{	// This may happens when a requested folder e.g. /media/import/users/ doesn't exist:
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$path = '';		// fp> added
+			$ads_list_path = NULL;
 		}
 		elseif( $ads_list_path != $non_canonical_list_path )
 		{	// We have reduced the absolute path, we should also reduce the relative $path (used in urls params)
