@@ -6031,6 +6031,7 @@ class Blog extends DataObject
 			case 'forum':
 				$default_post_types = array(); // Don't install the default Item Types(see above) for forums collection.
 				$default_post_types[] = 'Forum Topic';
+				$default_post_types[] = 'Task';
 				break;
 
 			case 'manual':
@@ -6040,6 +6041,7 @@ class Blog extends DataObject
 			case 'group':
 				$default_post_types[] = 'Forum Topic';
 				$default_post_types[] = 'Bug Report';
+				$default_post_types[] = 'Task';
 				break;
 
 			default: // 'std'

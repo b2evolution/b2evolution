@@ -12652,6 +12652,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 16040, 'Creating default item type "Task"...' ) )
+	{	// part of 7.1.5-stable
+		$SQL = new SQL( 'Check at least one item type with name "Task" for existence' );
+		$SQL->SELECT( 'ityp_ID' );
+		$SQL->FROM( 'T_items__type' );
+		$SQL->WHERE( 'ityp_name = "Task"' );
+		$SQL->LIMIT( 1 );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Create one default item type "Task":
+			$r = $DB->query( 'INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_template_name, ityp_allow_html, ityp_front_order_title, ityp_front_order_attachments, ityp_front_order_workflow, ityp_front_order_text, ityp_front_order_location )
+					VALUES ( "Task", "post", "single", 0, 10, 30, 20, 80, 90 )' );
+			if( $r && $DB->insert_id > 0 )
+			{	// Enable new created item type all forum and tracker:
+				$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
+					SELECT '.$DB->insert_id.', blog_ID
+					  FROM T_blogs
+					 WHERE blog_type IN ( "forum", "group" )' );
+			}
+		}
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

@@ -435,6 +435,11 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'usage'           => 'post',
 			'use_short_title' => 'optional',
 		);
+	$post_types[] = array(
+			'name'                 => 'Task',
+			'allow_html'           => 0,
+			'front_order_workflow' => 20,
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -467,6 +472,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'use_coordinates'          => 'never',
 			'front_order_title'        => 10,
 			'front_order_attachments'  => 30,
+			'front_order_workflow'     => NULL,
 			'front_order_text'         => 80,
 			'front_order_location'     => 90,
 		);
