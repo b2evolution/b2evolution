@@ -439,8 +439,8 @@ class tinymce_plugin extends Plugin
 				$edited_Comment = & $params['target_object'];
 				$edited_Item = & $edited_Comment->get_Item();
 				$this->target_type = 'Comment';
-				$this->target_ID = $edited_Comment->ID;
-				$this->temp_ID = $params['temp_ID'];
+				$this->target_ID   = $edited_Comment->ID;
+				$this->temp_ID     = $params['temp_ID'];
 
 				if( ! empty( $Blog ) && ! $Blog->get_setting( 'allow_html_comment' ) )
 				{	// Only when HTML is allowed in comment:
@@ -822,17 +822,26 @@ class tinymce_plugin extends Plugin
 
 		// B2evo plugin options
 		$init_options['collection']  = $this->collection;
-		$init_options['target_ID']   = empty( $this->target_ID ) ? 'undefined' : $this->target_ID;
-		$init_options['temp_ID']     = empty( $this->temp_ID ) ? 'undefined' : $this->temp_ID;
-		$init_options['target_type'] = empty( $this->target_type ) ? 'undefined' : format_to_js( $this->target_type );
+		$insert_inline_modal_params = array(
+			'request_from' => is_admin_page() ? 'back' : 'front',
+		);
+		if( ! empty( $this->target_ID ) )
+		{
+			$init_options['target_ID'] = $this->target_ID;
+			$insert_inline_modal_params['target_ID'] = $this->target_ID;
+		}
+		if( ! empty( $this->temp_ID ) )
+		{
+			$init_options['temp_ID'] = $this->temp_ID;
+		}
+		if( ! empty( $this->target_type ) )
+		{
+			$init_options['target_type'] = $this->target_type;
+			$insert_inline_modal_params['target_type'] = $this->target_type;
+		}
 
 		$init_options['rest_url']       = get_htsrv_url().'rest.php';
 		$init_options['anon_async_url'] = get_htsrv_url().'anon_async.php';
-		$insert_inline_modal_params = array(
-				'target_type'  => $this->target_type,
-				'target_ID'    => $this->target_ID,
-				'request_from' => is_admin_page() ? 'back' : 'front',
-			);
 
 		if( $Blog )
 		{

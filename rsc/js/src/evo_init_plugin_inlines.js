@@ -110,7 +110,7 @@ jQuery( document ).ready( function()
 											param_target_ID = temp_ID;
 										}
 										openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
-													evo_link_refresh_list( param_target_type, param_target_ID );
+													evo_link_refresh_list( param_target_type, param_target_ID, 'refresh' );
 													evo_link_fix_wrapper_height();
 												} );
 									}

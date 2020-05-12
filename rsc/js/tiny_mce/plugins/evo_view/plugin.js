@@ -96,7 +96,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 										target_ID = editor.getParam( 'temp_ID' );
 									}
 
-									evo_link_refresh_list( target_type, target_ID );
+									evo_link_refresh_list( target_type, target_ID, 'refresh' );
 									evo_link_fix_wrapper_height();
 								} );
 						}
