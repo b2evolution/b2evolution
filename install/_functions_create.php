@@ -853,9 +853,9 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 
 
 	task_begin( 'Creating default Post Statuses... ' );
-	$post_status = array( 'New', 'In Progress', 'Duplicate', 'Not A Bug', 'In Review', 'Fixed', 'Closed', 'OK' );
-
-	$DB->query( "INSERT INTO T_items__status ( pst_name )	VALUES ( '".implode( "' ),( '", $post_status )." ')" );
+	$post_status_with_order = array(" ( 'New', 10 ) ", " ( 'In Progress', 20 ) ", " ( 'Duplicate', 30 ) ", " ( 'Not A Bug', 40 ) ", " ( 'In Review', 50 ) ", " ( 'Fixed', 60 ) ", " ( 'Closed', 70 ) ", " ( 'OK', 80 ) ", );
+	
+	$DB->query( "INSERT INTO T_items__status ( pst_name, pst_order )	VALUES ". implode( ",", $post_status_with_order ) );
 	task_end();
 
 

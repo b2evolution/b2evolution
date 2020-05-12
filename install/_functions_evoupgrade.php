@@ -12680,6 +12680,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_add_col( 'T_items__status', 'pst_order', 'INT(11) NULL DEFAULT NULL' );
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 16060, 'Upgrading item status table...' ) )
+	{	// part of 7.1.5-stable
+		$DB->query( 'UPDATE T_items__status SET pst_order = 10 WHERE pst_name = "New"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 20 WHERE pst_name = "In Progress"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 30 WHERE pst_name = "Duplicate"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 40 WHERE pst_name = "Not A Bug"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 50 WHERE pst_name = "In Review"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 60 WHERE pst_name = "Fixed"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 70 WHERE pst_name = "Closed"' );
+		$DB->query( 'UPDATE T_items__status SET pst_order = 80 WHERE pst_name = "OK"' );
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
