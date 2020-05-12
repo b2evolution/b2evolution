@@ -423,6 +423,7 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'front_disp', 'front' );
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
