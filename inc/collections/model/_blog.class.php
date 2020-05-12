@@ -428,7 +428,7 @@ class Blog extends DataObject
 				global $DB;
 				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
 					 FROM T_items__type
-					WHERE ityp_name = "Forum Topic"' );
+					WHERE ityp_name = "Task"' );
 				if( $forum_topic_type_ID )
 				{ // Set default post type as "Forum Topic"
 					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
