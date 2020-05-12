@@ -12674,6 +12674,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 16050, 'Upgrading item status table...' ) )
+	{	// part of 7.1.5-stable
+		db_add_col( 'T_items__status', 'pst_order', 'INT(11) NULL DEFAULT NULL' );
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

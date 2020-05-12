@@ -685,6 +685,38 @@ switch( $action )
 		}
 		break;
 
+	case 'item_status_order_edit':
+		// Update order of a item status from list screen by clicking on the order column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemstatus' );
+
+		$item_status_order = param( 'new_item_status_order', 'string' );
+
+		// Make sure we got an pst_ID:
+		$item_status_ID = param( 'pst_ID', 'integer', true );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		if( $item_status_order === '-' || $item_status_order === '' )
+		{	// Set NULL for these values:
+			$item_status_order = NULL;
+		}
+		else
+		{	// Make an order to integer:
+			$item_status_order = intval( $item_status_order );
+		}
+
+		$ItemStatusCache = & get_ItemStatusCache();
+		if( $edited_ItemStatus = & $ItemStatusCache->get_by_ID( $item_status_ID, false ) )
+		{ // Update item status order if it exists in DB
+			$edited_ItemStatus->set( 'order', ( $item_status_order === '' ? NULL : $item_status_order ), true );
+			$edited_ItemStatus->dbupdate();
+			echo '<a href="#">'.( $item_status_order === NULL ? '-' : $item_status_order ).'</a>';
+		}
+		break;
+
 	case 'cat_ityp_ID_edit':
 		// Update default Item Type of a chapter from list screen by clicking on the order column:
 
