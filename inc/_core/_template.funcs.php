@@ -3279,7 +3279,7 @@ function display_password_indicator( $params = array() )
 {
 	global $Settings, $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
 
-	$password_indicator_config = array(
+	$password_indicator_config = array_merge( array(
 			'pass1_id'    => $dummy_fields[ 'pass1' ],
 			'pass2_id'    => $dummy_fields[ 'pass2' ],
 			'login_id'    => $dummy_fields[ 'login' ],
@@ -3300,7 +3300,7 @@ function display_password_indicator( $params = array() )
 			'msg_pwd_not_matching' => TS_('The second password is different from the first.'),
 			'min_pwd_len'          => (int) $Settings->get( 'user_minpwdlen' ),
 			'error_icon'           => get_icon( 'xross' ),
-		);
+		), $params );
 
 	expose_var_to_js( 'evo_init_password_indicator_config', evo_json_encode( $password_indicator_config ) );
 }

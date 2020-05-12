@@ -834,6 +834,11 @@ $login_Blog = & get_setting_Blog( 'login_blog_ID' );
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
 
+require_js_defer('#jquery#');
+require_js_defer( 'src/evo_init_password_indicator.js', 'rsc_url' );
+
 require $adminskins_path.'login/_reg_form.main.php';
+
+display_password_indicator( array( 'field_width' => $params['register_field_width'] ) );
 
 ?>

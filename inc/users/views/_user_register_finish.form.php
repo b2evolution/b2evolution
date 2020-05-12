@@ -171,10 +171,10 @@ $Form->end_form( array(
 
 // Display javascript password strength indicator bar
 display_password_indicator( array(
-			'pass1-id'    => 'edited_user_pass1',
-			'pass2-id'    => 'edited_user_pass2',
-			'login-id'    => 'edited_user_login',
-			'field-width' => $params['register_field_width'],
+			'pass1_id'    => 'edited_user_pass1',
+			'pass2_id'    => 'edited_user_pass2',
+			'login_id'    => 'edited_user_login',
+			'field_width' => $params['register_field_width'],
 	) );
 
 // Display javascript code to edit password:

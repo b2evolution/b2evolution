@@ -361,7 +361,7 @@ class user_register_standard_Widget extends ComponentWidget
 				$Form->end_form();
 
 				// Display javascript password strength indicator bar:
-				display_password_indicator( array( 'field-width' => $params['register_field_width'] ) );
+				display_password_indicator( array( 'field_width' => $params['register_field_width'] ) );
 
 				// Display javascript login validator:
 				display_login_validator();
