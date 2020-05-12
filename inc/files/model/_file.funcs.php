@@ -868,7 +868,6 @@ function rel_path_to_base( $path )
  */
 function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false, $action = 'view' )
 {
-	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
 	static $fm_highlight;
 	global $current_User;
@@ -884,7 +883,6 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	{	// This is not a recursive call (yet):
 		// Init:
 		$instance_ID++;
-		$js_closeClickIDs = array();
 		$ret = '<ul class="clicktree">';
 	}
 	else
@@ -921,38 +919,38 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
 
-		$r['string'] = '<span class="folder_in_tree"';
+		$r = '<span class="folder_in_tree"';
 
-		if( $ads_full_path == $ads_selected_full_path )
-		{ // This is the current open path
-			$r['opened'] = true;
+		if( strpos( $ads_selected_full_path, $ads_full_path ) === 0 )
+		{ // This is the current or parent open path
+			$dir_is_opened = true;
 
 			if( $fm_highlight && $fm_highlight == substr($rds_rel_path, 0, -1) )
 			{
-				$r['string'] .= ' id="fm_highlighted"';
+				$r .= ' id="fm_highlighted"';
 				unset($fm_highlight);
 			}
 		}
 		else
 		{
-	 		$r['opened'] = NULL;
+			$dir_is_opened = false;
 		}
 
-		$r['string'] .= '>';
+		$r .= '>';
 
 		if( $radios )
 		{ // Optional radio input to select this path:
 			$root_and_path = format_to_output( implode( '::', array($Root->ID, $rds_rel_path) ), 'formvalue' );
 
-			$r['string'] .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
+			$r .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
 
-			if( $r['opened'] )
+			if( $dir_is_opened )
 			{	// This is the current open path
-				$r['string'] .= ' checked="checked"';
+				$r .= ' checked="checked"';
 			}
 
 			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
-			$r['string'] .= ' /> &nbsp; &nbsp;';
+			$r .= ' /> &nbsp; &nbsp;';
 		}
 
 		// Folder Icon + Name:
@@ -966,56 +964,44 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		// Handle potential subdir:
 		if( ! $has_sub_dirs )
 		{	// No subdirs
-			$r['string'] .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).'&nbsp;'.$label.'</span>';
+			$r .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).$label.'</span>';
 		}
 		else
 		{ // Process subdirs
-			$r['string'] .= get_icon( 'collapse', 'imgtag', array( 'onclick' => 'toggle_clickopen(\''.$id_path.'\');',
-						'id' => 'clickimg_'.$id_path,
+			$r .= get_icon( $dir_is_opened ? 'collapse' : 'expand', 'imgtag', array(
+						'data-dir-path' => $Root->ID.':'.$rds_rel_path,
 						'style'=>'margin:0 2px'
 					) )
-				.'&nbsp;'.$label.'</span>'
-				.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+				.$label.'</span>';
 
-			while( $l_File = & $Nodelist->get_next( 'dir' ) )
-			{
-				$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path(), true );
+			if( $dir_is_opened )
+			{	// Load sub-directories only of currently opened directory:
+				$r .= //'<br>- '.$ads_full_path.'<br>- '.$ads_selected_full_path.'<br>- '.$rds_rel_path
+							'<ul class="clicktree">'."\n";
 
-				if( $rSub['opened'] )
-				{ // pass opened status on, if given
-					$r['opened'] = $rSub['opened'];
+				while( $l_File = & $Nodelist->get_next( 'dir' ) )
+				{
+					$r_sub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path(), true );
+
+					$r .= '<li>'.$r_sub.'</li>';
 				}
-
-				$r['string'] .= '<li>'.$rSub['string'].'</li>';
+				$r .= '</ul>';
 			}
-
-			if( !$r['opened'] )
-			{
-				$js_closeClickIDs[] = $id_path;
-			}
-			$r['string'] .= '</ul>';
 		}
 
-   	if( $is_recursing )
+		if( $is_recursing )
 		{
 			return $r;
 		}
 		else
 		{
-			$ret .= '<li>'.$r['string'].'</li>';
+			$ret .= '<li>'.$r.'</li>';
 		}
 	}
 
 	if( ! $is_recursing )
 	{
- 		$ret .= '</ul>';
-
-		if( ! empty($js_closeClickIDs) )
-		{ // there are IDs of checkboxes that we want to close
-			$ret .= "\n".'<script>toggle_clickopen( \''
-						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
-						."' );\n</script>";
-		}
+		$ret .= '</ul>';
 	}
 
 	return $ret;

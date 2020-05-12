@@ -1135,6 +1135,53 @@ switch( $action )
 		dbm_delete_itemprecache();
 		break;
 
+	case 'browse_subdirs':
+		// Load sub-directories for Files Browser:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		// Path to parent directory with root data:
+		param( 'path', 'filepath' );
+
+		if( ! preg_match( '#^([a-z]+)_(\d+):(.+)$#', $path, $path_data ) )
+		{	// Invalid path:
+			debug_die( 'Invalid path!' );
+		}
+
+		// Try to get File Root by requested path:
+		$FileRootCache = & get_FileRootCache();
+		$dir_FileRoot = & $FileRootCache->get_by_type_and_ID( $path_data[1], $path_data[2] );
+
+		// Check permission:
+		$current_User->check_perm( 'files', 'view', true, $dir_FileRoot );
+
+		$FileCache = & get_FileCache();
+		if( ! ( $dir_File = & $FileCache->get_by_root_and_path( $path_data[1], $path_data[2], $path_data[3] ) ) ||
+		    ! $dir_File->is_dir() )
+		{	// Invalid directory:
+			debug_die( 'Invalid directory!' );
+		}
+
+		// Create list to load sub-folders:
+		load_class( 'files/model/_filelist.class.php', 'Filelist' );
+		$dir_Filelist = new Filelist( $dir_FileRoot, trailing_slash( $dir_File->get_full_path() ) );
+		check_showparams( $dir_Filelist );
+		$dir_Filelist->load();
+		$dir_Filelist->sort( 'name' );
+
+		if( ! $dir_Filelist->count_dirs() )
+		{	// Wrong requested directory:
+			debug_die( 'No sub-directories!' );
+		}
+
+		// Return sub-directories of the requested directory:
+		while( $subdir_File = & $dir_Filelist->get_next( 'dir' ) )
+		{
+			echo '<li>'.get_directory_tree( $dir_FileRoot, $subdir_File->get_full_path(), $dir_File->get_full_path(), false, $subdir_File->get_rdfs_rel_path(), true ).'</li>';
+		}
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;

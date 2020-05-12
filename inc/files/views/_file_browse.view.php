@@ -249,9 +249,6 @@ if( isset( $edited_User ) )
 				{
 					echo '<td id="fm_dirtree">';
 
-					// Version with all roots displayed
-					//echo get_directory_tree( NULL, NULL, $ads_list_path );
-
 					// Version with only the current root displayed:
 					echo get_directory_tree( $fm_Filelist->_FileRoot, $fm_Filelist->_FileRoot->ads_path, $ads_list_path );
 
