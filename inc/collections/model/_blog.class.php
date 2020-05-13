@@ -5130,7 +5130,8 @@ class Blog extends DataObject
 
 			if( $verbose )
 			{	// Display how many containers are declared or scanned by the collection skin:
-				if( method_exists( $coll_Skin, 'get_declared_containers' ) )
+				$skin_declared_containers = $coll_Skin->get_declared_containers();
+				if( is_array( $skin_declared_containers ) )
 				{	// If skin has the declared widget containers:
 					$Messages->add( sprintf( T_('%d containers declared by skin "%s".'), $skin_containers_num, $coll_Skin->get_name() ), 'note' );
 				}

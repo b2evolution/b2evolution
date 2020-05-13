@@ -192,6 +192,32 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// This function MUST be overriden by custom skin and return proper Array like sample below.
+		// It is declared(without array return) here only to avoid errors during upgrade in case of older/badly written Skins.
+
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		/* Sample:
+		return array(
+				'sidebar_single'       => array( NT_('Sidebar Single'), 95 ),
+				'front_page_main_area' => NULL,
+			);
+		*/
+	}
+
+
+	/**
 	 * Get supported collection kinds.
 	 *
 	 * This should be overloaded in skins.
@@ -651,9 +677,10 @@ class Skin extends DataObject
 	{
 		if( is_null( $this->container_list ) )
 		{
-			if( method_exists( $this, 'get_declared_containers' ) )
+			$skin_declared_containers = $this->get_declared_containers();
+			if( is_array( $skin_declared_containers ) )
 			{	// Get default containers and containers what declared by this skin:
-				$this->container_list = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
+				$this->container_list = array_merge( get_skin_default_containers(), $skin_declared_containers );
 
 				foreach( $this->container_list as $wico_code => $wico_data )
 				{
