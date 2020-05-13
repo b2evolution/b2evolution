@@ -12647,6 +12647,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16035, 'Upgrading items type table...' ) )
+	{	// part of 7.1.5-stable
+		db_add_col( 'T_items__type', 'ityp_front_order_workflow', 'SMALLINT(6) NULL DEFAULT NULL AFTER ityp_front_order_attachments' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 16040, 'Creating default item type "Task"...' ) )
 	{	// part of 7.1.5-stable
 		$SQL = new SQL( 'Check at least one item type with name "Task" for existence' );
@@ -12685,12 +12691,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'UPDATE T_items__status SET pst_order = 60 WHERE pst_name = "Fixed"' );
 		$DB->query( 'UPDATE T_items__status SET pst_order = 70 WHERE pst_name = "Closed"' );
 		$DB->query( 'UPDATE T_items__status SET pst_order = 80 WHERE pst_name = "OK"' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 16070, 'Upgrading items type table...' ) )
-	{	// part of 7.1.5-stable
-		db_add_col( 'T_items__type', 'ityp_front_order_workflow', 'SMALLINT(6) NULL DEFAULT NULL AFTER ityp_front_order_attachments' );
 		upg_task_end();
 	}
 
