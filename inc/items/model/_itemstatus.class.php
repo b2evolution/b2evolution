@@ -72,6 +72,10 @@ class ItemStatus extends DataObject
 		// Name
 		param_string_not_empty( 'pst_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
+		
+		// Order
+		param( 'pst_order', 'integer', true );
+		$this->set_from_Request( 'order' );
 
 		return ! param_errors_detected();
 	}

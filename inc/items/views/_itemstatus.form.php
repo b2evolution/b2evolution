@@ -37,6 +37,7 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New post status') : TB_('Post st
 
 $Form->begin_fieldset( TB_('General') );
 	$Form->text_input( 'pst_name', $edited_ItemStatus->get( 'name' ), 30, TB_('Name'), '', array( 'required' => true ) );
+	$Form->text_input( 'pst_order', $edited_ItemStatus->get( 'order' ), 30, TB_('Order'), '', array( 'type' => 'number' ) );
 $Form->end_fieldset();
 
 /**
