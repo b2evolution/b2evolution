@@ -6040,8 +6040,7 @@ class Blog extends DataObject
 				break;
 
 			case 'group':
-				$default_post_types[] = 'Forum Topic';
-				$default_post_types[] = 'Bug Report';
+				$default_post_types = array(); // Don't install the default Item Types(see above) for Tracker collection.
 				$default_post_types[] = 'Task';
 				break;
 
