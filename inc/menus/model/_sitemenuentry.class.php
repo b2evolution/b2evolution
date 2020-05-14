@@ -368,7 +368,7 @@ class SiteMenuEntry extends DataObject
 	 */
 	function get_text( $force_default = false )
 	{
-		global $thumbnail_sizes, $current_User;;
+		global $thumbnail_sizes, $current_User;
 
 		$entry_Blog = & $this->get_Blog();
 
@@ -528,19 +528,8 @@ class SiteMenuEntry extends DataObject
 			}
 		}
 
-		if( is_logged_in() )
-		{	// Replace masks:
-			if( strpos( $text, '$username$' ) !== false )
-			{	// Friendly name:
-				$username = $current_User->get_colored_login( array( 'login_text' => 'name' ) );
-				$text = str_replace( '$username$', $username, $text );
-			}
-			if( strpos( $text, '$login$' ) !== false )
-			{	// Login:
-				$login = $current_User->get_colored_login( array( 'login_text' => 'login' ) );
-				$text = str_replace( '$login$', $login, $text );
-			}
-		}
+		// Replace masks:
+		$text = preg_replace_callback( '#\$([a-z]+)\$#', array( $this, 'callback_text_mask' ), $text );
 
 		// Profile picture before text:
 		if( in_array( $this->get( 'type' ), array( 'logout', 'myprofile', 'visits', 'profile', 'avatar', 'useritems', 'usercomments' ) ) &&
@@ -586,6 +575,33 @@ class SiteMenuEntry extends DataObject
 		}
 
 		return $text;
+	}
+
+
+	/**
+	 * Callback function to replace masks in menu text
+	 *
+	 * @param array Matches
+	 * @return string Text with replaced masks to proper values
+	 */
+	function callback_text_mask( $m )
+	{
+		global $current_User;
+
+		switch( $m[0] )
+		{
+			case '$username$':
+				return is_logged_in()
+					? $current_User->get_colored_login( array( 'login_text' => 'name' ) )
+					: '('.T_('anonymous').')';
+
+			case '$login$':
+				return is_logged_in()
+					? $current_User->get_colored_login( array( 'login_text' => 'login' ) )
+					: '('.T_('anonymous').')';
+		}
+
+		return $m[0];
 	}
 
 
