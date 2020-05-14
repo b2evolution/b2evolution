@@ -1916,7 +1916,16 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 
 	require_js_defer( '#jquery#', $relative_to ); // dependency
 	require_js_defer( 'voting.js', $relative_to );
-	expose_var_to_js( 'evo_voting_comment_url', "'".get_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type."'" );
+
+	$js_config = array(
+		'action_url' => url_add_param( get_htsrv_url().'anon_async.php', array(
+					'action'           => 'voting',
+					'vote_type'        => 'comment',
+					'b2evo_icons_type' => $b2evo_icons_type
+			) ),
+		);
+
+	expose_var_to_js( 'evo_init_comment_voting_config', evo_json_encode( $js_config ) );
 }
 
 
@@ -1936,7 +1945,16 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
 
 	require_js_defer( '#jquery#', $relative_to );
 	require_js_defer( 'voting.js', $relative_to );
-	expose_var_to_js( 'evo_item_voting_url', "'".get_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type."'" );
+
+	$js_config = array(
+		'action_url' => url_add_param( get_htsrv_url().'anon_async.php', array(
+				'action'           => 'voting',
+				'vote_type'        => 'item',
+				'b2evo_icons_type' => $b2evo_icons_type
+			) ),
+		);
+
+	expose_var_to_js( 'evo_init_item_voting_config', evo_json_encode( $js_config ) );
 }
 
 
