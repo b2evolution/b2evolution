@@ -21,7 +21,7 @@ load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
  *
  * @package evocore
  */
-class Menu
+class Menu extends Widget
 {
 	/**
 	 * The menu structure (array of arrays)
