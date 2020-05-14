@@ -3103,29 +3103,46 @@ function debug_die( $additional_info = '', $params = array() )
 			header($status_header);
 		}
 
-		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occurred!').'</h3>';
-		echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
-		echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
-		echo '</div>';
-
+		$too_many_connections = false;
 		if( ! empty( $additional_info ) )
-		{
-			echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
-			if( $debug || $display_errors_on_production )
-			{ // Display additional info only in debug mode or when it was explicitly set by display_errors_on_production setting because it can reveal system info to hackers and greatly facilitate exploits
-				echo '<h3>'.T_('Additional information about this error:').'</h3>';
-				echo $additional_info;
-			}
-			else
+		{	//Handling of "Too many connections":
+			$find_token = 'Too many connections';
+
+			if( preg_match( "/{$find_token}/i", $additional_info ) ) 
 			{
-				echo '<p><i>Enable debugging to get additional information about this error.</i></p>' . get_manual_link('debugging','How to enable debug mode?');
+				load_funcs( 'skins/_skin.funcs.php' );
+				$too_many_connections = true;
+				require skin_fallback_path( 'too_many_connections.main.php', 6 );
+				http_response_code( 503 );
 			}
+		}
+
+		if( ! $too_many_connections )
+		{
+			echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
+			echo '<h3 style="color:#f00;">'.T_('An unexpected error has occurred!').'</h3>';
+			echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
+			echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
 			echo '</div>';
 
-			// Append the error text to AJAX log if it is AJAX request
-			ajax_log_add( $additional_info, 'error' );
-			ajax_log_display();
+			if( ! empty( $additional_info ) )
+			{
+				echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
+				if( $debug || $display_errors_on_production )
+				{ // Display additional info only in debug mode or when it was explicitly set by display_errors_on_production setting because it can reveal system info to hackers and greatly facilitate exploits
+					echo '<h3>'.T_('Additional information about this error:').'</h3>';
+					echo $additional_info;
+				}
+				else
+				{
+					echo '<p><i>Enable debugging to get additional information about this error.</i></p>' . get_manual_link('debugging','How to enable debug mode?');
+				}
+				echo '</div>';
+
+				// Append the error text to AJAX log if it is AJAX request
+				ajax_log_add( $additional_info, 'error' );
+				ajax_log_display();
+			}
 		}
 	}
 
