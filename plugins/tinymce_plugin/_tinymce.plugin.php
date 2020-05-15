@@ -826,20 +826,14 @@ class tinymce_plugin extends Plugin
 		$insert_inline_modal_params = array(
 			'request_from' => is_admin_page() ? 'back' : 'front',
 		);
-		if( ! empty( $this->target_ID ) )
-		{
-			$init_options['target_ID'] = $this->target_ID;
-			$insert_inline_modal_params['target_ID'] = $this->target_ID;
-		}
-		if( ! empty( $this->temp_ID ) )
-		{
-			$init_options['temp_ID'] = $this->temp_ID;
-		}
-		if( ! empty( $this->target_type ) )
-		{
-			$init_options['target_type'] = $this->target_type;
-			$insert_inline_modal_params['target_type'] = $this->target_type;
-		}
+
+		$init_options['target_ID'] = isset( $this->target_ID ) ? $this->target_ID : NULL;
+		$insert_inline_modal_params['target_ID'] = isset( $this->target_ID ) ? $this->target_ID : NULL;
+	
+		$init_options['temp_ID'] = isset( $this->temp_ID ) ? $this->temp_ID : NULL;
+		
+		$init_options['target_type'] = isset( $this->target_type ) ? $this->target_type : NULL;
+		$insert_inline_modal_params['target_type'] = isset( $this->target_type ) ? $this->target_type : NULL;
 
 		$init_options['rest_url']       = get_htsrv_url().'rest.php';
 		$init_options['anon_async_url'] = get_htsrv_url().'anon_async.php';

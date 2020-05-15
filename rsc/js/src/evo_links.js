@@ -367,7 +367,7 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 			jQuery( '#' + prefix + 'attachments_fieldset_table' ).html( data.html );
 
 			// Initialize init_uploader( 'fieldset_' + prefix ) to display uploader button
-			if( window.evo_init_dragdrop_button_config['fieldset_' + prefix] )
+			if( window.evo_init_dragdrop_button_config && window.evo_init_dragdrop_button_config['fieldset_' + prefix] )
 			{
 				init_uploader( window.evo_init_dragdrop_button_config['fieldset_' + prefix] );
 			}
