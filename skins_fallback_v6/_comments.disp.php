@@ -98,4 +98,6 @@ while( $Comment = & $CommentList->get_next() )
 	<?php
 }	// End of comment loop.
 echo '</div>';
+
+echo_comment_moderate_js();
 ?>

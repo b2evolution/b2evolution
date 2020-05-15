@@ -558,4 +558,5 @@ if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['d
 	$Item->feedback_feed_link( '_rss2', '<nav class="evo_post_feedback_feed_msg"><p class="text-center">', '</p></nav>', $params['feed_title'] );
 }
 
+echo_comment_moderate_js();
 ?>
