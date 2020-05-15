@@ -453,4 +453,5 @@ if( $params['disp_comment_form'] && // if enabled by skin param
 }
 // ---------------------- END OF COMMENT FORM ---------------------
 
+echo_comment_moderate_js();
 ?>
