@@ -177,13 +177,17 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		foreach( $menu_entries as $MenuEntry )
+		echo $this->get_layout_menu_wrapper( 'start' );
+
+		foreach( $menu_entries as $SiteMenuEntry )
 		{
-			if( $url = $MenuEntry->get_url() )
+			if( $url = $SiteMenuEntry->get_url() )
 			{	// Display a layout with menu link only if it is not restricted by some permission for current User:
-				echo $this->get_layout_menu_link( $url, $MenuEntry->get_text(), $MenuEntry->is_active() );
+				echo $this->get_layout_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active() );
 			}
 		}
+
+		echo $this->get_layout_menu_wrapper( 'end' );
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
