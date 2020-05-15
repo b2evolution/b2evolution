@@ -591,6 +591,7 @@ class tinymce_plugin extends Plugin
 				// Load TinyMCE Javascript source file:
 				require_js_defer( '#tinymce#', 'blog', true );
 				require_js_defer( '#tinymce_jquery#', 'blog', true );
+				$this->require_js_defer( 'js/evo_init_plugin_tinymce.js', true );
 				$this->require_js_defer( 'js/evo_view_shortcodes.bmin.js', true );
 
 				$use_tinymce = $this->get_editor_state( $state_params );
