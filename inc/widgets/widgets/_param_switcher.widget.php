@@ -232,15 +232,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		// Get current param value and memorize it for regenerating url:
 		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
 
-		switch( $this->get_display_mode() )
-		{
-			case 'buttons':
-				echo $this->disp_params['button_group_start'];
-				break;
-			case 'tabs':
-				echo $this->disp_params['tabs_start'];
-				break;
-		}
+		echo $this->get_layout_menu_wrapper( 'start' );
 
 		$button_is_active_by_default = false;
 		$active_button_value = NULL;
@@ -289,15 +281,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			}
 		}
 
-		switch( $this->get_display_mode() )
-		{
-			case 'buttons':
-				echo $this->disp_params['button_group_end'];
-				break;
-			case 'tabs':
-				echo $this->disp_params['tabs_end'];
-				break;
-		}
+		echo $this->get_layout_menu_wrapper( 'end' );
 
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:

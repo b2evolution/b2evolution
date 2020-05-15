@@ -48,27 +48,20 @@ class generic_menu_link_Widget extends ComponentWidget
 		{
 			case 'buttons':
 				// "out-of list" button display:
-				$wrapper_start = '';
 				$item_end = '';
-				$wrapper_end = '';
 				break;
 
 			case 'tabs':
 				// Tabs display mode:
-				$wrapper_start = '';
 				$item_end = ( $is_active_link ? $this->disp_params['tab_selected_end'] : $this->disp_params['tab_end'] );
-				$wrapper_end = '';
 				break;
 
 			default:
 				// Classic menu link display:
-				$wrapper_start = $this->disp_params['list_start'];
 				$item_end = ( $is_active_link ? $this->disp_params['item_selected_end'] : $this->disp_params['item_end'] );
-				$wrapper_end = $this->disp_params['list_end'];
 		}
 
-		$r = $wrapper_start;
-		$r .= $this->get_menu_link_item_start( $is_active_link );
+		$r = $this->get_menu_link_item_start( $is_active_link );
 
 		// Get a link/button/tab from template:
 		$r .= str_replace(
@@ -77,9 +70,39 @@ class generic_menu_link_Widget extends ComponentWidget
 			$link_template );
 
 		$r .= $item_end;
-		$r .= $wrapper_end;
 
 		return $r;
+	}
+
+
+	/**
+	 * Get html layout for menu wrappers depending on current display mode
+	 *
+	 * @param string Type: 'start' or 'end' of the wrapper
+	 * @return string
+	 */
+	function get_layout_menu_wrapper( $type )
+	{
+		switch( $this->get_display_mode() )
+		{
+			case 'buttons':
+				// "out-of list" button display:
+				return $type == 'start'
+					? $this->disp_params['button_group_start']
+					: $this->disp_params['button_group_end'];
+
+			case 'tabs':
+				// Tabs display mode:
+				return $type == 'start'
+					? $this->disp_params['tabs_start']
+					: $this->disp_params['tabs_end'];
+
+			default:
+				// Classic menu link display:
+				return $type == 'start'
+					? $this->disp_params['list_start']
+					: $this->disp_params['list_end'];
+		}
 	}
 
 
@@ -213,7 +236,9 @@ class generic_menu_link_Widget extends ComponentWidget
 		$r = $this->disp_params['block_start'];
 		$r .= $this->disp_params['block_body_start'];
 
+		$r .= $this->get_layout_menu_wrapper( 'start' );
 		$r .= $this->get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template );
+		$r .= $this->get_layout_menu_wrapper( 'end' );
 
 		$r .= $this->disp_params['block_body_end'];
 		$r .= $this->disp_params['block_end'];
