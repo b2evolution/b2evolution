@@ -5968,22 +5968,21 @@ class Item extends ItemLight
 				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
+		if( $params['show_in_single_mode'] == false && is_single_page() )
+		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we don't want to display this link
+			return;
+		}
+
 		if( isset( $Blog ) &&
 		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
 		      ( $params['stay_in_same_collection'] == 'auto' && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) ) // follow 'allow_crosspost_urls' to stay in current collection
 		    ) )
 		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
 			$current_blog_ID = $Blog->ID;
-			$current_blog_URL = $Blog->get( 'url' );
 		}
 		else
 		{	// Use main collection of this Item:
 			$current_blog_ID = NULL;
-			$current_blog_URL = '';
-		}
-		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url( '', $current_blog_URL, '&', array(), $current_blog_ID ), $ReqURL ) )
-		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
-			return;
 		}
 
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
