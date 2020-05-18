@@ -12694,6 +12694,84 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16070, 'Converting widget "Common Navigation Links" into "Embed Menu" widget...' ) )
+	{	// part of 7.1.5-stable
+		$nav_widgets_SQL = new SQL( 'Get widgets "Common Navigation Links" before converting' );
+		$nav_widgets_SQL->SELECT( 'wi_ID, wi_params' );
+		$nav_widgets_SQL->FROM( 'T_widget__widget' );
+		$nav_widgets_SQL->WHERE( 'wi_code = "coll_common_links"' );
+		$nav_widgets = $DB->get_assoc( $nav_widgets_SQL );
+		if( ! empty( $nav_widgets ) )
+		{	// If at least one widget "Common Navigation Links" is found:
+			load_class( 'menus/model/_sitemenu.class.php', 'SiteMenu' );
+			load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
+			// widget_param_key => array( menu_entry_type, menu_entry_text ):
+			$nav_menu_entries = array(
+				'show_home'           => array( 'home', T_('Home') ),
+				'show_recently'       => array( 'recentposts', T_('Recently') ),
+				'show_search'         => array( 'search', T_('Search') ),
+				'show_postidx'        => array( 'postidx', T_('Post index') ),
+				'show_archives'       => array( 'arcdir', T_('Archives') ),
+				'show_categories'     => array( 'catdir', T_('Categories') ),
+				'show_mediaidx'       => array( 'mediaidx', T_('Photo index') ),
+				'show_latestcomments' => array( 'latestcomments', T_('Latest comments') ),
+				'show_owneruserinfo'  => array( 'owneruserinfo', T_('Owner details') ),
+				'show_ownercontact'   => array( 'ownercontact', T_('Contact') ),
+				'show_sitemap'        => array( 'sitemap', T_('Site map') ),
+			);
+			foreach( $nav_widgets as $nav_widget_ID => $nav_widget_params )
+			{
+				$nav_widget_params = empty( $nav_widget_params ) ? array() : unserialize( $nav_widget_params );
+
+				if( empty( $nav_widget_params ) )
+				{	// Set default params:
+					$nav_widget_params = array(
+						'show_home' => 1,
+						'show_recently' => 1,
+						'show_archives' => 1,
+						'show_categories' => 1,
+						'show_latestcomments' => 1,
+					);
+				}
+
+				// Create Menu for converting Widget:
+				$nav_SiteMenu = new SiteMenu();
+				$nav_SiteMenu->set( 'name', 'Common Navigation Links #'.$nav_widget_ID );
+				$nav_SiteMenu->dbinsert();
+				$menu_entry_order = 10;
+				foreach( $nav_menu_entries as $nav_widget_param => $nav_menu_entry_data )
+				{
+					if( empty( $nav_widget_params[ $nav_widget_param ] ) )
+					{	// Skip not enabled menu entry in old widget:
+						continue;
+					}
+					// Create only enabled menu entries:
+					$nav_SiteMenuEntry = new SiteMenuEntry();
+					$nav_SiteMenuEntry->set( 'menu_ID', $nav_SiteMenu->ID );
+					$nav_SiteMenuEntry->set( 'type', $nav_menu_entry_data[0] );
+					$nav_SiteMenuEntry->set( 'text', $nav_menu_entry_data[1] );
+					$nav_SiteMenuEntry->set( 'order', $menu_entry_order++ );
+					$nav_SiteMenuEntry->dbinsert();
+
+					// Remove old widget param:
+					unset( $nav_widget_params[ $nav_widget_param ] );
+				}
+
+				// Use new created Menu to converting widget:
+				$nav_widget_params['menu_ID'] = $nav_SiteMenu->ID;
+				// Old widget used only list mode:
+				$nav_widget_params['display_mode'] = 'list';
+
+				// Update widget to new params:
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_code = "embed_menu",
+					      wi_params = '.$DB->quote( serialize( $nav_widget_params ) ).'
+					WHERE wi_ID = '.$nav_widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
