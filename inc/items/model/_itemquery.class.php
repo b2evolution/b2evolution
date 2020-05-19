@@ -1173,8 +1173,8 @@ class ItemQuery extends SQL
 		{
 			$table_alias = $key.'_table';
 			$field_value = $table_alias.'.icfv_value';
-			if( strpos( $key, 'custom_double' ) === 0 )
-			{ // Double values should be compared as numbers and not like strings
+			if( strpos( $key, 'custom_double' ) === 0 || strpos( $key, 'custom_computed' ) === 0 )
+			{	// Double and computed values should be compared as numbers and not like strings
 				$field_value .= '+0';
 			}
 			if( in_array( $key, $orderby_array ) )
