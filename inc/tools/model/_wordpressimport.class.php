@@ -621,6 +621,7 @@ class WordpressImport extends AbstractImport
 						continue;
 					}
 					$user_ID = $User->ID;
+					$existing_users[ $author_login ] = $user_ID;
 					if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )
 					{
 						$UserSettings->set( 'created_fromIPv4', ip2int( $author['author_created_fromIPv4'] ), $user_ID );
@@ -1555,8 +1556,12 @@ class WordpressImport extends AbstractImport
 				foreach( $comments as $comment )
 				{
 					$comment_author_user_ID = 0;
-					if( !empty( $comment['comment_user_id'] ) && isset( $authors_IDs[ (string) $comment['comment_user_id'] ] ) )
-					{	// Author ID
+					if( ! empty( $comment['comment_user_login'] ) && isset( $existing_users[ $comment['comment_user_login'] ] ) )
+					{	// Get Author ID by login:
+						$comment_author_user_ID = $existing_users[ $comment['comment_user_login'] ];
+					}
+					elseif( ! empty( $comment['comment_user_id'] ) && isset( $authors_IDs[ (string) $comment['comment_user_id'] ] ) )
+					{	// Use Author ID from xml data:
 						$comment_author_user_ID = $authors_IDs[ (string) $comment['comment_user_id'] ];
 					}
 

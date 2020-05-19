@@ -556,6 +556,7 @@ function wpxml_parser( $file )
 				'comment_type'         => (string) $comment->comment_type,
 				'comment_parent'       => (string) $comment->comment_parent,
 				'comment_user_id'      => (int) $comment->comment_user_id,
+				'comment_user_login'   => (string) $evo_comment->comment_user_login,
 				'comment_status'             => (string) $evo_comment->comment_status,
 				'comment_IP_country'         => (string) $evo_comment->comment_IP_country,
 				'comment_rating'             => (int) $evo_comment->comment_rating,
