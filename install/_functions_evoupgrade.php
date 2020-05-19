@@ -12805,6 +12805,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				if( empty( $nav_widget_params ) )
 				{	// Set default params:
 					$nav_widget_params = array(
+						'title'                      => T_('User tools'),
 						'user_postnew_link_show'     => 1,
 						'user_postnew_link'          => T_('Write a new post...'),
 						'user_messaging_link_show'   => 1,
