@@ -12750,8 +12750,111 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					$nav_SiteMenuEntry->set( 'menu_ID', $nav_SiteMenu->ID );
 					$nav_SiteMenuEntry->set( 'type', $nav_menu_entry_data[0] );
 					$nav_SiteMenuEntry->set( 'text', $nav_menu_entry_data[1] );
-					$nav_SiteMenuEntry->set( 'order', $menu_entry_order++ );
+					$nav_SiteMenuEntry->set( 'order', $menu_entry_order );
 					$nav_SiteMenuEntry->dbinsert();
+					$menu_entry_order += 10;
+
+					// Remove old widget param:
+					unset( $nav_widget_params[ $nav_widget_param ] );
+				}
+
+				// Use new created Menu to converting widget:
+				$nav_widget_params['menu_ID'] = $nav_SiteMenu->ID;
+				// Old widget used only list mode:
+				$nav_widget_params['display_mode'] = 'list';
+
+				// Update widget to new params:
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_code = "embed_menu",
+					      wi_params = '.$DB->quote( serialize( $nav_widget_params ) ).'
+					WHERE wi_ID = '.$nav_widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16080, 'Converting widget "User Tools" into "Embed Menu" widget...' ) )
+	{	// part of 7.1.5-stable
+		$nav_widgets_SQL = new SQL( 'Get widgets "User Tools" before converting' );
+		$nav_widgets_SQL->SELECT( 'wi_ID, wi_params' );
+		$nav_widgets_SQL->FROM( 'T_widget__widget' );
+		$nav_widgets_SQL->WHERE( 'wi_code = "user_tools"' );
+		$nav_widgets = $DB->get_assoc( $nav_widgets_SQL );
+		if( ! empty( $nav_widgets ) )
+		{	// If at least one widget "User Tools" is found:
+			load_class( 'menus/model/_sitemenu.class.php', 'SiteMenu' );
+			load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
+			// widget_param_key => array( menu_entry_type, widget_param_for_text, {widget_param_for_show_badge} ):
+			$nav_menu_entries = array(
+				'user_postnew_link_show'     => array( 'postnew', 'user_postnew_link' ),
+				'user_messaging_link_show'   => array( 'messages', 'user_messaging_link', 'show_badge' ),
+				'user_contacts_link_show'    => array( 'contacts', 'user_contacts_link' ),
+				'user_view_link_show'        => array( 'myprofile', 'user_view_link' ),
+				'user_profile_link_show'     => array( 'profile', 'user_profile_link' ),
+				'user_picture_link_show'     => array( 'avatar', 'user_picture_link' ),
+				'user_password_link_show'    => array( 'password', 'user_password_link' ),
+				'user_preferences_link_show' => array( 'userprefs', 'user_preferences_link' ),
+				'user_subs_link_show'        => array( 'usersubs', 'user_subs_link' ),
+				'user_admin_link_show'       => array( 'admin', 'user_admin_link' ),
+				'user_logout_link_show'      => array( 'logout', 'user_logout_link' ),
+			);
+			foreach( $nav_widgets as $nav_widget_ID => $nav_widget_params )
+			{
+				$nav_widget_params = empty( $nav_widget_params ) ? array() : unserialize( $nav_widget_params );
+
+				if( empty( $nav_widget_params ) )
+				{	// Set default params:
+					$nav_widget_params = array(
+						'user_postnew_link_show'     => 1,
+						'user_postnew_link'          => T_('Write a new post...'),
+						'user_messaging_link_show'   => 1,
+						'show_badge'                 => 1,
+						'user_messaging_link'        => T_('My messages'),
+						'user_contacts_link_show'    => 1,
+						'user_contacts_link'         => T_('My contacts'),
+						'user_view_link_show'        => 1,
+						'user_view_link'             => T_('My profile'),
+						'user_profile_link_show'     => 1,
+						'user_profile_link'          => T_('Edit my profile'),
+						'user_picture_link_show'     => 1,
+						'user_picture_link'          => T_('Change my picture'),
+						'user_admin_link_show'       => 1,
+						'user_admin_link'            => T_('Admin area'),
+						'user_logout_link_show'      => 1,
+						'user_logout_link'           => T_('Log out'),
+					);
+				}
+
+				// Create Menu for converting Widget:
+				$nav_SiteMenu = new SiteMenu();
+				$nav_SiteMenu->set( 'name', 'User Tools #'.$nav_widget_ID );
+				$nav_SiteMenu->dbinsert();
+				$menu_entry_order = 10;
+				foreach( $nav_menu_entries as $nav_widget_param => $nav_menu_entry_data )
+				{
+					if( empty( $nav_widget_params[ $nav_widget_param ] ) )
+					{	// Skip not enabled menu entry in old widget:
+						continue;
+					}
+					// Create only enabled menu entries:
+					$nav_SiteMenuEntry = new SiteMenuEntry();
+					$nav_SiteMenuEntry->set( 'menu_ID', $nav_SiteMenu->ID );
+					$nav_SiteMenuEntry->set( 'type', $nav_menu_entry_data[0] );
+					if( isset( $nav_widget_params[ $nav_menu_entry_data[1] ] ) )
+					{	// Set text for menu entry:
+						$nav_SiteMenuEntry->set( 'text', $nav_widget_params[ $nav_menu_entry_data[1] ] );
+						// Remove old widget param:
+						unset( $nav_widget_params[ $nav_menu_entry_data[1] ] );
+					}
+					if( isset( $nav_menu_entry_data[2], $nav_widget_params[ $nav_menu_entry_data[2] ] ) )
+					{	// Set "Show Badge" for menu entry:
+						$nav_SiteMenuEntry->set( 'show_badge', $nav_widget_params[ $nav_menu_entry_data[2] ] );
+						// Remove old widget param:
+						unset( $nav_widget_params[ $nav_menu_entry_data[2] ] );
+					}
+					$nav_SiteMenuEntry->set( 'order', $menu_entry_order );
+					$nav_SiteMenuEntry->dbinsert();
+					$menu_entry_order += 10;
 
 					// Remove old widget param:
 					unset( $nav_widget_params[ $nav_widget_param ] );

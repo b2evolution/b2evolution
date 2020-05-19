@@ -709,6 +709,30 @@ class SiteMenuEntry extends DataObject
 				}
 				return get_user_avatar_url( $entry_Blog->ID );
 
+			case 'password':
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				return get_user_pwdchange_url( $entry_Blog->ID );
+
+			case 'userprefs':
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				return get_user_preferences_url( $entry_Blog->ID );
+
+			case 'usersubs':
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				return get_user_subs_url( $entry_Blog->ID );
+
 			case 'visits':
 				global $Settings, $current_User;
 				if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )

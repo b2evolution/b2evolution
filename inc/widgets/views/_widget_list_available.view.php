@@ -99,7 +99,6 @@ $core_componentwidget_defs = array(
 			'colls_list_public', // Collections list
 			'colls_list_owner',  // Same owner's collections list
 			'coll_common_links', // Common Navigation Links
-			'user_tools',        // User Tools
 		),
 	'navigation' => array(
 			'breadcrumb_path',              // Breadcrumb Path

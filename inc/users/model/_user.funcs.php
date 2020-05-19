@@ -1134,19 +1134,25 @@ function get_user_avatar_url( $blog_ID = NULL )
 
 /**
  * Get URL to change user password
+ *
+ * @param integer Collection ID for the requested Collection. NULL for current $Blog
+ * @return string URL
  */
-function get_user_pwdchange_url()
+function get_user_pwdchange_url( $coll_ID = NULL )
 {
-	return get_user_settings_url( 'pwdchange' );
+	return get_user_settings_url( 'pwdchange', NULL, $coll_ID );
 }
 
 
 /**
  * Get URL to edit user preferences
+ *
+ * @param integer Collection ID for the requested Collection. NULL for current $Blog
+ * @return string URL
  */
-function get_user_preferences_url()
+function get_user_preferences_url( $coll_ID = NULL )
 {
-	return get_user_settings_url( 'userprefs' );
+	return get_user_settings_url( 'userprefs', NULL, $coll_ID );
 }
 
 
@@ -1187,11 +1193,12 @@ function get_user_subs_link( $before = '', $after = '', $link_text = '', $link_t
 /**
  * Get url to set notificaitons/subscription screen
  *
+ * @param integer Collection ID for the requested Collection. NULL for current $Blog
  * @return string Url to subscription screen
  */
-function get_user_subs_url()
+function get_user_subs_url( $coll_ID = NULL )
 {
-	return get_user_settings_url( 'subs' );
+	return get_user_settings_url( 'subs', NULL, $coll_ID );
 }
 
 /**
