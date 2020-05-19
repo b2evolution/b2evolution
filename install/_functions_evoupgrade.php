@@ -12876,6 +12876,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16090, 'Installing new widget container "Site Map"...' ) )
+	{	// part of 7.1.5-stable
+		install_new_default_widgets( 'sitemap' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

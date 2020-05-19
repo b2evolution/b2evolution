@@ -3202,6 +3202,7 @@ function get_skin_default_containers()
 			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
 			'photo_index'               => array( NT_('Photo Index'), 190 ),
 			'search_area'               => array( NT_('Search Area'), 200 ),
+			'sitemap'                   => array( NT_('Site Map'), 210 ),
 		);
 }
 
