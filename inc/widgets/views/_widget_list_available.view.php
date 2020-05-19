@@ -103,6 +103,7 @@ $core_componentwidget_defs = array(
 		),
 	'navigation' => array(
 			'breadcrumb_path',              // Breadcrumb Path
+			'request_title',                // Request Title
 			'coll_search_form',             // Search Form
 			'site_logo',                    // Site logo
 			'cat_title',                    // Category Title
