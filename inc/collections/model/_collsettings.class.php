@@ -277,6 +277,7 @@ class CollectionSettings extends AbstractSettings
 			'search_include_cats'  => 1, // Include categories to results on disp=search
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
+			'search_include_metas' => 1, // Include meta/internal comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'search_include_files' => 1, // Include files to results on disp=search
 			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
@@ -309,6 +310,7 @@ class CollectionSettings extends AbstractSettings
 			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'search_result_template_item'      => 'search_result_item',
 			'search_result_template_comment'   => 'search_result_comment',
+			'search_result_template_meta'      => 'search_result_meta',
 			'search_result_template_file'      => 'search_result_file',
 			'search_result_template_category'  => 'search_result_category',
 			'search_result_template_tag'       => 'search_result_tag',

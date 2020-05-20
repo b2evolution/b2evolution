@@ -2327,6 +2327,23 @@ function create_default_templates( $is_task = true )
 </div>',
 		),
 
+		'search_result_meta' => array(
+			'name'     => 'Search Result: Internal comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] <span class="label label-info">Internal comment</span></div>
+		<div class="result_content">[Comment:excerpt]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
 		'search_result_file' => array(
 			'name'     => 'Search Result: File',
 			'context'  => 'search_result',
