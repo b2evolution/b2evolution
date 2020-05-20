@@ -62,8 +62,11 @@ include_footerlines(); // enables translation strings for js
 </div>
 
 <?php
-// Include ALL exposed JS variables into <script>:
-include_js_vars();
+// Check for existing the function because it may doesn't exist on autoupgrade process:
+if( function_exists( 'include_js_vars' ) )
+{	// Include ALL exposed JS variables into <script>:
+	include_js_vars();
+}
 ?>
 </body>
 </html>
