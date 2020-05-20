@@ -5649,7 +5649,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_image() )
+			if( ! isset( $params['image_attachment'] ) && $File->is_image() )
 			{ // Skip images (except those in the attachment position) because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;

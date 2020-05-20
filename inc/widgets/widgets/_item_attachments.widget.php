@@ -149,6 +149,7 @@ class item_attachments_Widget extends ComponentWidget
 
 		$this->disp_params = array_merge( array(
 				'widget_item_attachments_params' => array(),
+				'image_attachment' => true,
 			), $this->disp_params );
 
 		$item_files = render_template_code( $this->disp_params['template'], $this->disp_params );
