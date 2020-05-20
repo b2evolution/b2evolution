@@ -218,6 +218,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			break;
 
 		case 'comment':
+		case 'meta':
 			$searched_parts = array( 'item_title', 'content' );
 			break;
 
@@ -454,9 +455,10 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
  * @param array all quoted parts from the search term
  * @param string If logged in, comma separated Author IDs to filter, otherwise author user login
  * @param string Content age to consider
+ * @param string Type of comments: 'comment' - normal comments with types(comment,trackback,pingback,webmention), 'meta' - only meta/internal comments
  * @return array Results
  */
-function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $content_age = '' )
+function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $content_age = '', $type = 'comment' )
 {
 	global $DB, $Collection, $Blog;
 
@@ -476,6 +478,11 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
 	if( ! is_logged_in() && ! empty( $authors ) )
 	{
 		$search_filters['authors_login'] = $authors;
+	}
+
+	if( $type == 'meta' )
+	{	// Search only for meta/internal comments:
+		$search_filters['types'] = array( 'meta' );
 	}
 
 	$search_CommentList->set_filters( $search_filters );
@@ -518,7 +525,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
 			+ $scores_map['creation_date'];
 
 		$search_result[] = array(
-			'type' => 'comment',
+			'type' => $type, // 'comment' or 'meta'
 			'score' => $final_score,
 			'date' => $row->comment_date,
 			'ID' => $row->comment_ID,
@@ -754,7 +761,7 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
- * @param string What types to search: 'all', 'item', 'comment', 'category', 'tag'
+ * @param string What types to search: 'all', 'item', 'comment', 'meta', 'category', 'tag'
  *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'.
  *               An empty value is equivalent to 'all'.
  * @param string Post IDs to exclude from result, Separated with ','(comma)
@@ -772,7 +779,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		return array();
 	}
 
-	global $Collection, $Blog, $DB, $debug;
+	global $Collection, $Blog, $DB, $debug, $current_User;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
 	// Get quoted parts parts of the search query
@@ -817,6 +824,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 	{	// Search all result types:
 		$search_type_item     = true;
 		$search_type_comment  = true;
+		$search_type_meta     = true;
 		$search_type_category = true;
 		$search_type_tag      = true;
 		$search_type_file     = true;
@@ -826,6 +834,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		$searched_content_types = explode( ',', $searched_content_types );
 		$search_type_item       = in_array( 'item', $searched_content_types );
 		$search_type_comment    = in_array( 'comment', $searched_content_types );
+		$search_type_meta       = in_array( 'meta', $searched_content_types );
 		$search_type_category   = in_array( 'category', $searched_content_types );
 		$search_type_tag        = in_array( 'tag', $searched_content_types );
 		$search_type_file       = in_array( 'file', $searched_content_types );
@@ -839,7 +848,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 
 	$search_result = array();
 
-	if( $search_type_item )
+	if( $search_type_item &&
+	    $Blog->get_setting( 'search_include_posts' ) )
 	{	// Perform search on Items:
 		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts, $search_authors, $content_age );
 		$search_result = $item_search_result;
@@ -850,7 +860,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_comment )
+	if( $search_type_comment &&
+	    $Blog->get_setting( 'search_include_cmnts' ) )
 	{	// Perform search on Comments:
 		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age );
 		$search_result = array_merge( $search_result, $comment_search_result );
@@ -861,7 +872,22 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_category )
+	if( $search_type_meta &&
+	    $Blog->get_setting( 'search_include_metas' ) &&
+	    is_logged_in() &&
+	    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	{	// Perform search on Meta/Internal Comments:
+		$meta_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age, 'meta' );
+		$search_result = array_merge( $search_result, $meta_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $meta_search_result ).' Internal comments.</p>';
+			evo_flush();
+		}
+	}
+
+	if( $search_type_category &&
+	    $Blog->get_setting( 'search_include_cats' ) )
 	{	// Perform search on Chapters:
 		$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
 		$search_result = array_merge( $search_result, $cats_search_result );
@@ -872,7 +898,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_tag )
+	if( $search_type_tag &&
+	    $Blog->get_setting( 'search_include_tags' ) )
 	{	// Perform search on Tags:
 		$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
 		$search_result = array_merge( $search_result, $tags_search_result );
@@ -883,7 +910,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_file )
+	if( $search_type_file &&
+	    $Blog->get_setting( 'search_include_files' ) )
 	{
 		$files_search_result = search_and_score_files( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age );
 		$search_result = array_merge( $search_result, $files_search_result );
@@ -940,6 +968,10 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		{
 			$search_result[0]['nr_of_comments'] = count( $comment_search_result );
 		}
+		if( $search_type_meta )
+		{
+			$search_result[0]['nr_of_metas'] = count( $meta_search_result );
+		}
 		if( $search_type_category )
 		{
 			$search_result[0]['nr_of_cats'] = count( $cats_search_result );
@@ -968,7 +1000,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
  */
 function search_result_block( $params = array() )
 {
-	global $Collection, $Blog, $Session, $debug;
+	global $Collection, $Blog, $Session, $debug, $current_User;
 
 	$search_keywords = param( 's', 'string', '', true );
 	$search_authors = param( 'search_author', 'string', '' );
@@ -1011,6 +1043,12 @@ function search_result_block( $params = array() )
 		{	// Search comments:
 			$searched_content_types[] = 'comment';
 		}
+		if( $Blog->get_setting( 'search_include_metas' ) &&
+		    is_logged_in() &&
+		    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		{	// Search meta/internal comments:
+			$searched_content_types[] = 'meta';
+		}
 		if( $Blog->get_setting( 'search_include_cats' ) )
 		{	// Search categories:
 			$searched_content_types[] = 'category';
@@ -1023,7 +1061,7 @@ function search_result_block( $params = array() )
 		{	// Search files:
 			$searched_content_types[] = 'file';
 		}
-		$searched_content_types = count( $searched_content_types ) == 5 ? '' : implode( ',', $searched_content_types );
+		$searched_content_types = count( $searched_content_types ) == 6 ? '' : implode( ',', $searched_content_types );
 
 		if( ! empty( $search_content_type ) )
 		{
@@ -1053,6 +1091,10 @@ function search_result_block( $params = array() )
 			{
 				echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
 			}
+			if( isset( $search_result[0]['nr_of_metas'] ) )
+			{
+				echo '<li>'.sprintf( '%d internal comments', $search_result[0]['nr_of_metas'] ).'</li>';
+			}
 			if( isset( $search_result[0]['nr_of_cats'] ) )
 			{
 				echo '<li>'.sprintf( '%d chapters', $search_result[0]['nr_of_cats'] ).'</li>';
@@ -1077,11 +1119,6 @@ function search_result_block( $params = array() )
 	// Make sure we are not missing any display params:
 	$params = array_merge( array(
 			'no_match_message'      =>  '<p class="alert alert-info msg_nothing" style="margin: 2em 0">'.T_('Sorry, we could not find anything matching your request, please try to broaden your search.').'<p>',
-			'title_suffix_post'     => ' ('./* TRANS: noun */ T_('Post').')',
-			'title_suffix_comment'  => ' ('./* TRANS: noun */ T_('Comment').')',
-			'title_suffix_category' => ' ('./* TRANS: noun */ T_('Category').')',
-			'title_suffix_tag'      => ' ('./* TRANS: noun */ T_('Tag').')',
-			'title_suffix_file'     => ' ('./* TRANS: noun */ T_('File').')',
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
@@ -1163,6 +1200,7 @@ function search_result_block( $params = array() )
 					break;
 
 				case 'comment':
+				case 'meta':
 					$CommentCache->load_list( $object_ids );
 					break;
 
@@ -1218,7 +1256,8 @@ function search_result_block( $params = array() )
 				break;
 
 			case 'comment':
-				// Prepare to display a Comment:
+			case 'meta':
+				// Prepare to display a Comment or Meta/Internal Comment:
 
 				$Comment = $CommentCache->get_by_ID( $row['ID'], false );
 
@@ -1228,7 +1267,7 @@ function search_result_block( $params = array() )
 				}
 
 				$display_params = array(
-					'search_result_type'   => 'comment',
+					'search_result_type'   => $row['type'],
 					'search_result_object' => $Comment,
 				);
 				break;
@@ -1608,6 +1647,7 @@ function display_search_result( $params = array() )
 			break;
 
 		case 'comment':
+		case 'meta':
 			$render_template_objects['Comment'] = $params['search_result_object'];
 			break;
 

@@ -1220,6 +1220,7 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
 			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_metas', param( 'search_include_metas', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
 			// Scoring for posts:
@@ -1259,6 +1260,7 @@ class Blog extends DataObject
 			// Quick Templates for search results:
 			$this->set_setting( 'search_result_template_item', param( 'search_result_template_item', 'string' ) );
 			$this->set_setting( 'search_result_template_comment', param( 'search_result_template_comment', 'string' ) );
+			$this->set_setting( 'search_result_template_meta', param( 'search_result_template_meta', 'string' ) );
 			$this->set_setting( 'search_result_template_file', param( 'search_result_template_file', 'string' ) );
 			$this->set_setting( 'search_result_template_category', param( 'search_result_template_category', 'string' ) );
 			$this->set_setting( 'search_result_template_tag', param( 'search_result_template_tag', 'string' ) );
