@@ -12595,13 +12595,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 	
-	if( upg_task_start( 16020, 'Dummy upgrade block, just to force execution of the upgrade procedure to insert new template "Content List with Thumbnail"..' ) )
-	{	// part of 7.1.3-beta
-		upg_task_end();
-	}
-
-	if( upg_task_start( 16030, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
-	{	// part of 7.1.5-stable
+	
+	
+	if( upg_task_start( 16083, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
+	{	// part of 7.2
 		db_upgrade_cols( 'T_menus__entry', array(
 			'ADD' => array(
 				'ment_user_pic_size' => 'VARCHAR(32) COLLATE ascii_general_ci NULL AFTER ment_order',
@@ -12647,14 +12644,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16035, 'Upgrading items type table...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16084, 'Upgrading items type table...' ) )
+	{	// part of 7.2
 		db_add_col( 'T_items__type', 'ityp_front_order_workflow', 'SMALLINT(6) NULL DEFAULT NULL AFTER ityp_front_order_attachments' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16040, 'Creating default item type "Task"...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16085, 'Creating default item type "Task"...' ) )
+	{	// part of 7.2
 		$SQL = new SQL( 'Check at least one item type with name "Task" for existence' );
 		$SQL->SELECT( 'ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
@@ -12675,14 +12672,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 	
-	if( upg_task_start( 16050, 'Upgrading item status table...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16086, 'Upgrading item status table...' ) )
+	{	// part of 7.2
 		db_add_col( 'T_items__status', 'pst_order', 'INT(11) NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16060, 'Upgrading item status table...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16087, 'Upgrading item status table...' ) )
+	{	// part of 7.2
 		$DB->query( 'UPDATE T_items__status SET pst_order = 10 WHERE pst_name = "New"' );
 		$DB->query( 'UPDATE T_items__status SET pst_order = 20 WHERE pst_name = "In Progress"' );
 		$DB->query( 'UPDATE T_items__status SET pst_order = 30 WHERE pst_name = "Duplicate"' );
@@ -12694,8 +12691,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16070, 'Converting widget "Common Navigation Links" into "Embed Menu" widget...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16088, 'Converting widget "Common Navigation Links" into "Embed Menu" widget...' ) )
+	{	// part of 7.2
 		$nav_widgets_SQL = new SQL( 'Get widgets "Common Navigation Links" before converting' );
 		$nav_widgets_SQL->SELECT( 'wi_ID, wi_params' );
 		$nav_widgets_SQL->FROM( 'T_widget__widget' );
@@ -12773,8 +12770,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16080, 'Converting widget "User Tools" into "Embed Menu" widget...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16089, 'Converting widget "User Tools" into "Embed Menu" widget...' ) )
+	{	// part of 7.2
 		$nav_widgets_SQL = new SQL( 'Get widgets "User Tools" before converting' );
 		$nav_widgets_SQL->SELECT( 'wi_ID, wi_params' );
 		$nav_widgets_SQL->FROM( 'T_widget__widget' );
@@ -12877,7 +12874,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 16090, 'Installing new widget container "Site Map"...' ) )
-	{	// part of 7.1.5-stable
+	{	// part of 7.2
 		install_new_default_widgets( 'sitemap' );
 		upg_task_end();
 	}
