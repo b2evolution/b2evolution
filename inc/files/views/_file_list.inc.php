@@ -272,13 +272,13 @@ $Form->begin_form();
 			{
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
-					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_filename ) ) ).'&nbsp;';
+					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_filename ), 'data-toggle' => 'tooltip' ) ).'&nbsp;';
 					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
-				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_dirname ) ) ).'&nbsp;';
+				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_dirname ), 'data-toggle' => 'tooltip' ) ).'&nbsp;';
 				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
