@@ -870,7 +870,9 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:feedback_link':
-			echo $rendered_Item->get_feedback_link( $params );
+			echo $rendered_Item->get_feedback_link( array_merge( array(
+					'show_in_single_mode' => true,
+				), $params ) );
 			break;
 
 		case 'Item:files':

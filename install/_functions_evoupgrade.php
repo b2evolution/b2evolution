@@ -12594,9 +12594,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_modify_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet", "alt" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal"' );
 		upg_task_end();
 	}
-	
-	
-	
+
+	if( upg_task_start( 16011, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for Search Results...' ) )
+	{	// part of 7.1.5-stable
+		upg_task_end();
+	}
+
 	if( upg_task_start( 16083, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
 	{	// part of 7.2
 		db_upgrade_cols( 'T_menus__entry', array(
