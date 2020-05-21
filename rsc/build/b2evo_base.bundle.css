@@ -823,6 +823,9 @@ input.loader_img {
 .filter_item div.icon {
   height: 22px;
 }
+a {
+  word-break: break-all;
+}
 .visible-xs,
 .visible-sm,
 .visible-md,
