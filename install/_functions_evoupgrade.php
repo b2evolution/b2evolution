@@ -12597,6 +12597,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16011, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for Search Results...' ) )
+	{	// part of 7.1.5-stable
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
