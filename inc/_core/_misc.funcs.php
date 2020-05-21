@@ -7721,12 +7721,12 @@ function save_to_file( $data, $filename, $mode = 'a' )
 
 	if( ! ( $f = @fopen( $filename, $mode ) ) )
 	{	// Could not open file:
-		$evo_save_file_error_msg = T_('File could not be opened to put data!');
+		$evo_save_file_error_msg = T_('File could not be opened for writing data!');
 		return false;
 	}
 	if( ! @fwrite( $f, $data ) )
 	{	// Could not write data into file:
-		$evo_save_file_error_msg = T_('Data could not be put into the file!');
+		$evo_save_file_error_msg = T_('Data could not be written to the file!');
 		return false;
 	}
 	@fclose( $f );
