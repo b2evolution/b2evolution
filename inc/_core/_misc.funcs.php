@@ -7695,34 +7695,53 @@ function is_ip_url_domain( $url )
  */
 function save_to_file( $data, $filename, $mode = 'a' )
 {
-	global $Settings;
+	global $Settings, $evo_save_file_error_msg;
 
-	if( ! file_exists($filename) )
-	{	// Create target file
-		@touch( $filename );
+	if( ! file_exists( $filename ) )
+	{	// Try to create a target file:
+		if( ! @touch( $filename ) )
+		{	// If file could not be created:
+			$evo_save_file_error_msg = T_('File could not be created!');
+			return false;
+		}
 
 		// Doesn't work during installation
-		if( !empty($Settings) )
+		if( ! empty( $Settings ) )
 		{
-			$chmod = $Settings->get('fm_default_chmod_file');
-			@chmod( $filename, octdec($chmod) );
+			$chmod = $Settings->get( 'fm_default_chmod_file' );
+			@chmod( $filename, octdec( $chmod ) );
 		}
 	}
 
-	if( ! is_writable($filename) )
-	{
+	if( ! is_writable( $filename ) )
+	{	// File is not writable:
+		$evo_save_file_error_msg = T_('File is not writable!');
 		return false;
 	}
 
-	$f = @fopen( $filename, $mode );
-	$ok = @fwrite( $f, $data );
+	if( ! ( $f = @fopen( $filename, $mode ) ) )
+	{	// Could not open file:
+		$evo_save_file_error_msg = T_('File could not be opened to put data!');
+		return false;
+	}
+	if( ! @fwrite( $f, $data ) )
+	{	// Could not write data into file:
+		$evo_save_file_error_msg = T_('Data could not be put into the file!');
+		return false;
+	}
 	@fclose( $f );
 
-	if( $ok && file_exists($filename) )
-	{
-		return $filename;
+	if( ! file_exists( $filename ) )
+	{	// Additonal check for existing file on disk:
+		$evo_save_file_error_msg = T_('File doesn\'t exist!');
+		return false;
 	}
-	return false;
+
+	// Reset error log on success result:
+	$evo_save_file_error_msg = '';
+
+	// Return file name on success result:
+	return $filename;
 }
 
 
