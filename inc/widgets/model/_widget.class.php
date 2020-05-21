@@ -1152,7 +1152,10 @@ class ComponentWidget extends DataObject
 		if( $this->disp_params['block_display_title'] && !empty( $title ) )
 		{
 			$r = $this->disp_params['block_title_start'];
-			$r .= format_to_output( $title );
+			if( !isset( $this->disp_params['hide_header_title'] ) )
+			{
+				$r .= format_to_output( $title );
+			}
 			$r .= $this->disp_params['block_title_end'];
 
 			if( $display ) echo $r;

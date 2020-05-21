@@ -156,6 +156,9 @@ class item_attachments_Widget extends ComponentWidget
 
 		if( empty( $item_files ) )
 		{	// Don't display this widget when Item has no attachments:
+			$this->disp_params = array_merge( array(
+				'hide_header_title' => true,
+			), $this->disp_params );
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no attachments.' );
 			return false;
 		}
