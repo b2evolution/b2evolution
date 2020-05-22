@@ -75,7 +75,7 @@ class CollectionSettings extends AbstractSettings
 			'tinyurl_domain' => '',
 			'tinyurl_tag_source' => 'utm_source',
 			'tinyurl_tag_slug' => 'utm_campaign',
-			'tinyurl_tag_extra_term' => 'utm_keywords',
+			'tinyurl_tag_extra_term' => 'utm_term',
 
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
