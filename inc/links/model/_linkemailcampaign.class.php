@@ -58,8 +58,6 @@ class LinkEmailCampaign extends LinkOwner
 	 */
 	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			if( $assert )
@@ -71,10 +69,10 @@ class LinkEmailCampaign extends LinkOwner
 
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
-			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
 		}
 
-		return $current_User->check_perm( 'emails', $permlevel, $assert );
+		return check_user_perm( 'emails', $permlevel, $assert );
 	}
 
 	/**

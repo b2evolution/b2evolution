@@ -14,13 +14,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var User
- */
-global $DB, $current_User;
+global $DB;
 
 // Check minimum permission:
-if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 {
 	$Messages->add( 'Sorry, you are not allowed to view cotnacts!' );
 	header_redirect( $admin_url );

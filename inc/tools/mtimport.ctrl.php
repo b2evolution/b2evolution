@@ -30,8 +30,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $admin_url;
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 /**
  * @const IMPORT_SRC_DIR directory where to be imported files get searched for.
@@ -1327,7 +1327,7 @@ function fieldset_cats()
 		{ // run recursively through the cats
 			$current_blog_ID = $i_blog->blog_ID;
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
-			#if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
+			#if( ! check_user_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
 			echo "<h4>".$i_blog->blog_name."</h4>\n";
 			echo $ChapterCache->recurse( $callbacks, $current_blog_ID, NULL, 0, 0, array( 'sorted' => true) );
 		}

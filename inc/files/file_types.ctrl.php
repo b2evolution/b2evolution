@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 
 param( 'action', 'string' );
@@ -49,7 +49,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edited_Filetype = new Filetype();
 		$AdminUI->append_to_titlearea( TB_('Add a file type...') );
@@ -57,7 +57,7 @@ switch( $action )
 
 	case 'copy':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Duplicate a file type by prefilling create form:
 		param( 'ftyp_ID', 'integer', true );
@@ -71,7 +71,7 @@ switch( $action )
 		// Edit file type form...:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
@@ -86,7 +86,7 @@ switch( $action )
 		$edited_Filetype = new Filetype();
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_Filetype->load_from_Request() )
@@ -123,7 +123,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'filetype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
@@ -150,7 +150,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'filetype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );

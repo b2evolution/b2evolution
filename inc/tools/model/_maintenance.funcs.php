@@ -452,7 +452,7 @@ function dbm_display_result_messages( $results, $command_type, $display_messages
  */
 function dbm_delete_broken_posts()
 {
-	global $DB, $Messages, $current_User;
+	global $DB, $Messages;
 
 	$num_deleted = 0;
 

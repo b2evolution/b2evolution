@@ -12,7 +12,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 {
 	$Messages->add( 'Sorry, you are not allowed to view threads!' );
 	header_redirect( $admin_url );
@@ -127,7 +127,7 @@ switch( $action )
 
 	case 'delete': // Delete thread:
 		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'delete', true );
+		check_user_perm( 'perm_messaging', 'delete', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:

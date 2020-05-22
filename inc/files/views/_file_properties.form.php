@@ -22,7 +22,7 @@ global $blog, $filename_max_length;
 
 global $Settings, $admin_url;
 
-$edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() );
+$edit_allowed_perm = check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() );
 
 $Form = new Form( $admin_url, 'fm_properties_checkchanges' );
 

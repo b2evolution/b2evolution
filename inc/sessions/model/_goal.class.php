@@ -101,12 +101,7 @@ class Goal extends DataObject
 	 */
 	function check_perm( $action= 'view', $assert = true )
 	{
-		/**
-		* @var User
-		*/
-		global $current_User;
-
-		return $current_User->check_perm( 'stats', $action, $assert );
+		return check_user_perm( 'stats', $action, $assert );
 	}
 
 

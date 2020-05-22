@@ -47,10 +47,9 @@ else
 {	// No blog ID, we will check the global group perm
 	$perm_blog = NULL;
 }
-//pre_dump( $perm_blog );
 
 // Check permission (#2):
-$current_User->check_perm( 'files', 'view', true, $perm_blog );
+check_user_perm( 'files', 'view', true, $perm_blog );
 
 // Initialize Font Awesome
 init_fontawesome_icons();

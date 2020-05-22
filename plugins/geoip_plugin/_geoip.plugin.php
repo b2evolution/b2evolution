@@ -584,8 +584,7 @@ jQuery( document ).ready( function()
 			return;
 		}
 
-		global $current_User;
-		if( ! is_logged_in() || ! $current_User->check_perm( 'options', 'edit' ) )
+		if( ! check_user_perm( 'options', 'edit' ) )
 		{	// Current User must has a permission to run tools:
 			return;
 		}

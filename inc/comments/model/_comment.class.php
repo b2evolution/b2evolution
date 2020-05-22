@@ -728,7 +728,7 @@ class Comment extends DataObject
 	 */
 	function get_vote_spam_disabled()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		$result = array(
 				'is_voted' => false,
@@ -774,7 +774,7 @@ class Comment extends DataObject
 	 */
 	function get_vote_helpful_disabled()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		$result = array(
 				'is_voted' => false,
@@ -1463,10 +1463,9 @@ class Comment extends DataObject
 	 */
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
-		global $current_User;
 		if( $this->author_url( '', ' &bull; Url: <span id="commenturl_'.$this->ID.'" class="bUrl">', '' ) )
 		{ // There is an URL
-			if( ! $this->get_author_User() && $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			if( ! $this->get_author_User() && check_user_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
 			{ // Author is anonymous user and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
@@ -1515,14 +1514,10 @@ class Comment extends DataObject
 	 */
 	function can_be_edited()
 	{
-		global $current_User;
-
 		// Comment must be stored in DB:
 		return ! empty( $this->ID ) &&
-			// User must be logged in and activated:
-			is_logged_in( false ) &&
-			// User must has a permission to edit this Comment:
-			$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
+			// User must be logged in and activated and has a permission to edit this Comment:
+			check_user_perm( 'comment!CURSTATUS', 'edit', false, $this, false );
 	}
 
 
@@ -1595,11 +1590,11 @@ class Comment extends DataObject
 	 */
 	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
-		if( $check_perm && ! $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
+		if( $check_perm && ! check_user_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
 		{ // If current user has no permission to edit this comment
 			return false;
 		}
@@ -1641,13 +1636,13 @@ class Comment extends DataObject
 	 */
 	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
 		//$Item = & $this->get_Item();
 
-		if( $check_perm && ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		if( $check_perm && ! check_user_perm( 'spamblacklist', 'edit' ) )
 		{ // if current user has no permission to edit spams
 			return false;
 		}
@@ -1697,7 +1692,7 @@ class Comment extends DataObject
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true, $ajax_button = false, $confirm_text = '#', $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
@@ -1708,7 +1703,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
+		if( ! check_user_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
 		{ // If User has no permission to delete a comments:
 			return false;
 		}
@@ -1805,7 +1800,7 @@ class Comment extends DataObject
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) )
 		{
@@ -1813,7 +1808,7 @@ class Comment extends DataObject
 		}
 
 		if( ( $this->status == 'deprecated' ) // Already deprecated!
-		    || !$current_User->check_perm( 'comment!deprecated', 'moderate', false, $this ) )
+		    || ! check_user_perm( 'comment!deprecated', 'moderate', false, $this ) )
 		{ // User has no right to deprecated this comment:
 			return false;
 		}
@@ -1876,7 +1871,7 @@ class Comment extends DataObject
 				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
 
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$this->get_Item();
 
@@ -2011,7 +2006,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( !is_logged_in( false ) || !$current_User->check_perm( 'blog_vote_spam_comments', 'edit', false, $this->Item->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_vote_spam_comments', 'edit', false, $this->Item->get_blog_ID(), false ) )
 		{ // If User has no permission to vote spam
 			return false;
 		}
@@ -2225,7 +2220,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		global $current_User, $blog;
+		global $blog;
 
 		if( is_null( $current_status ) )
 		{ // Use status of comment if param is NULL
@@ -2256,7 +2251,7 @@ class Comment extends DataObject
 			}
 			else
 			{	// Check if current user can moderate this comment to the next/prev status:
-				$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+				$has_perm = check_user_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
 			}
 		}
 		if( $has_perm )
@@ -2283,7 +2278,7 @@ class Comment extends DataObject
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
@@ -2389,11 +2384,7 @@ class Comment extends DataObject
 	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		global $current_User;
-
-		if( ! is_logged_in( false ) ) return false;
-
-		if( !$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'comment!CURSTATUS', 'edit', false, $this, false ) )
 		{ // User has no permission to edit this comment
 			return false;
 		}
@@ -2451,8 +2442,6 @@ class Comment extends DataObject
 	 */
 	function next_status_link( $params, $raise, $current_status = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in( false ) ) return false;
 
 		$next_status_in_row = $this->get_next_status( $raise, $current_status );
@@ -2990,7 +2979,6 @@ class Comment extends DataObject
 	 */
 	function content( $format = 'htmlbody', $ban_urls = false, $show_attachments = true, $params = array() )
 	{
-		global $current_User;
 		global $Plugins;
 
 		// Make sure we are not missing any param:
@@ -3162,7 +3150,7 @@ class Comment extends DataObject
 
 		if( $ban_urls )
 		{ // add ban icons if user has edit permission for this comment
-			$ban_urls = $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
+			$ban_urls = check_user_perm( 'comment!CURSTATUS', 'edit', false, $this );
 		}
 
 		$output = $this->get_content( $format, $params );
@@ -4644,7 +4632,7 @@ class Comment extends DataObject
 	 */
 	function send_assignment_notification( $executed_by_userid = NULL )
 	{
-		global $current_User, $Messages, $UserSettings;
+		global $Messages, $UserSettings;
 
 		$notified_user_IDs = array();
 
@@ -5290,7 +5278,7 @@ class Comment extends DataObject
 	 */
 	function update_last_touched_date( $update_item_last_touched_ts = true, $update_item_contents_last_updated_ts = false )
 	{
-		global $localtimenow, $current_User;
+		global $localtimenow;
 
 		if( $this->is_meta() )
 		{ // Don't touch Item when this Comment is meta
@@ -5464,8 +5452,6 @@ class Comment extends DataObject
 	 */
 	function restrict_status( $update_status = false )
 	{
-		global $current_User;
-
 		// Store current status to display a warning:
 		$current_status = $this->get( 'status' );
 
@@ -5473,7 +5459,7 @@ class Comment extends DataObject
 
 		if( $this->is_meta() )
 		{	// Internal comment:
-			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
+			if( ! is_logged_in() || ( $commented_Item && ! check_user_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
 			{	// Change internal comment status to 'protected' if user has no perm to view them:
 				$comment_allowed_status = 'protected';
 			}

@@ -32,10 +32,6 @@ global $user_profile_only;
  * @var the action destination of the form (NULL for pagenow)
  */
 global $form_action;
-/**
- * @var instance of User class
- */
-global $current_User;
 
 if( $display_mode != 'js' )
 {
@@ -79,7 +75,7 @@ $Form->begin_fieldset( TB_('Delete user data').get_manual_link( 'delete-user-dat
 
 	$posts_created = $edited_User->get_num_posts();
 	// Get the number of comments created by the edited user, but count recycled comments only if user has global editall blogs permission
-	$comments_created = $edited_User->get_num_comments( '', $current_User->check_perm( 'blogs', 'editall', false ) );
+	$comments_created = $edited_User->get_num_comments( '', check_user_perm( 'blogs', 'editall', false ) );
 	$messages_sent = $edited_User->get_num_messages( 'sent' );
 
 	$delete_options = array();

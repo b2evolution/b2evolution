@@ -19,7 +19,7 @@ $activate_collection_toolbar = true;
 
 if( valid_blog_requested() )
 {
-	$current_User->check_perm( 'blog_cats', 'edit', true, $blog );
+	check_user_perm( 'blog_cats', 'edit', true, $blog );
 	$edited_Blog = & $Blog;
 }
 else
@@ -34,7 +34,7 @@ $ChapterCache = new ChapterCache();
 // Restrict to chapters of the specific blog:
 $subset_ID = $blog;
 
-$permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog );
+$permission_to_edit = check_user_perm( 'blog_cats', '', false, $blog );
 
 
 // ---- Below is a modified generic category list editor: -----
@@ -297,7 +297,7 @@ switch( $action )
 
 		// Control permission to edit source blog:
 		$edited_Blog = & $edited_Chapter->get_Blog();
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
+		if( ! check_user_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
 		{
 			debug_die( 'No permission to edit source collection.' );
 			/* die */
@@ -305,7 +305,7 @@ switch( $action )
 
 		// Control permission to edit destination blog:
 		param( 'cat_coll_ID', 'integer', true );
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $cat_coll_ID ) )
+		if( ! check_user_perm( 'blog_cats', '', false, $cat_coll_ID ) )
 		{
 			// fp> TODO: prevent move in UI.
 			$Messages->add( 'No permission to edit destination blog.', 'error' );	// NO TRANS b/c temporary

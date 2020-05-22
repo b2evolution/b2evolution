@@ -108,7 +108,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	}
 
 	$buttons = array();
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Allow to save menu if current User has a permission:
 		if( $action == 'copy' )
 		{
@@ -142,7 +142,7 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 	 */
 	function site_menu_entry_line( $SiteMenuEntry, $level )
 	{
-		global $line_class, $current_User, $Settings, $admin_url;
+		global $line_class, $Settings, $admin_url;
 		global $SiteMenuEntryCache;
 
 		global $Session;
@@ -160,7 +160,7 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		$r .= '<td class="right">'.$SiteMenuEntry->dget( 'order' ).'</td>';
 
 		// Name:
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{	// We have permission permission to edit:
 			$edit_url = regenerate_url( 'action,ment_ID', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=edit_entry' );
 			$r .= '<td class="nowrap">
@@ -208,7 +208,7 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 
 		// Actions
 		$r .= '<td class="lastcol shrinkwrap">';
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{	// We have permission permission to edit, so display action column:
 			$r .= action_icon( TB_('Edit...'), 'edit', $edit_url );
 			$r .= action_icon( TB_('New').'...', 'new', regenerate_url( 'action,ment_ID,blog', 'ment_parent_ID='.$SiteMenuEntry->ID.'&amp;action=new_entry' ) )
@@ -285,7 +285,7 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 			'th' => TB_('Highlight'),
 			'th_class' => 'shrinkwrap',
 		);
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// We have permission to edit, so display action column:
 		$Table->cols[] = array(
 				'th' => TB_('Actions'),

@@ -125,7 +125,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 				echo '<p>'.T_('You haven\'t set a default collection yet. Thus, you see this default page.').'</p>';
 
-				if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+				if( check_user_perm( 'blogs', 'create' ) )
 				{ // Display this link only for users who can create blog
 				?>
 				<ul class="pager"><li class="next"><a href="<?php echo $admin_url ?>?ctrl=collections&amp;tab=site_settings"><?php echo T_( 'Set a default collection' ) ?> <span aria-hidden="true">&rarr;</span></a></li></ul>
@@ -158,7 +158,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		</ul>
 
 		<?php
-			if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+			if( check_user_perm( 'blogs', 'create' ) )
 			{ // Display this link only for users who can create blog
 				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new collection' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
 			}

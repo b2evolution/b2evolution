@@ -53,7 +53,7 @@ $Form->begin_form( 'fform' );
 		$Form->info_field( TB_('Role'), $org_data[$org_ID]['role'] );
 	}
 
-	if( $edited_Organization->owner_user_ID == $current_User->ID || $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( $edited_Organization->owner_user_ID == $current_User->ID || check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// Display edit field if current user has a permission to edit order:
 		$Form->text_input( 'priority', $org_data[$org_ID]['priority'], 10, TB_('Order'), '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) );
 	}
@@ -63,7 +63,7 @@ $Form->begin_form( 'fform' );
 	}
 
 $buttons = array();
-if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+if( check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:
 	$buttons[] = array( 'submit', 'actionArray[link_user]', TB_('Edit'), 'SaveButton' );
 }

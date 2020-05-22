@@ -114,7 +114,7 @@ $Plugins->display_captcha( array(
 		'form_use_fieldset' => false,
 	) );
 
-if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+if( is_admin_page() && check_user_perm( 'files', 'view' ) )
 {	// If current user has a permission to view the files AND it is back-office:
 	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 	// Initialize this object as global because this is used in many link functions:

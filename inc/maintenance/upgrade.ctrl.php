@@ -17,18 +17,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var instance of User class
- */
-global $current_User;
-
-/**
  * @vars string paths
  */
 global $basepath, $upgrade_path, $install_path;
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'maintenance', 'upgrade', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'maintenance', 'upgrade', true );
 
 // Used in the upgrade process
 $script_start_time = $servertimenow;

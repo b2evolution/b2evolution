@@ -432,7 +432,7 @@ class User extends DataObject
 	{
 		if( $restriction['table'] == 'T_polls__question' )
 		{	// Check restriction for poll questions:
-			global $DB, $current_User, $admin_url;
+			global $DB, $admin_url;
 
 			// Get a count of poll questions
 			$polls_count_SQL = new SQL();
@@ -444,7 +444,7 @@ class User extends DataObject
 			if( $polls_count > 0 )
 			{	// Display this restriction as link to polls list with filter by this user login:
 				$msg = sprintf( $restriction['msg'], $polls_count );
-				if( is_logged_in() && $current_User->check_perm( 'polls', 'view' ) )
+				if( check_user_perm( 'polls', 'view' ) )
 				{	// Set a link to poll questions list with filter by this user if current user has a perm to view all polls:
 					$msg = '<a href="'.$admin_url.'?ctrl=polls&amp;owner='.$this->login.'">'.$msg.'</a>';
 				}
@@ -498,7 +498,7 @@ class User extends DataObject
 		// (Don't request it when we create new user from REST API)
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_full_access = check_user_perm( 'users', 'edit' );
 
 		// ---- Login checking / START ----
 		$edited_user_login = $this->check_login();
@@ -656,7 +656,7 @@ class User extends DataObject
 		global $current_User, $Session, $localtimenow;
 		global $is_api_request;
 
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_full_access = check_user_perm( 'users', 'edit' );
 		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
 
 		// TRUE when we create new user:
@@ -772,7 +772,7 @@ class User extends DataObject
 					}
 				}
 
-				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				if( check_user_perm( 'spamblacklist', 'edit' ) )
 				{ // User can edit IP ranges
 					// Update status of IP range in DB
 					$edited_iprange_status = param( 'edited_iprange_status', 'string' );
@@ -802,7 +802,7 @@ class User extends DataObject
 					}
 				}
 
-				if( $current_User->check_perm( 'stats', 'edit' ) )
+				if( check_user_perm( 'stats', 'edit' ) )
 				{ // User can edit Domains
 					$DomainCache = & get_DomainCache();
 
@@ -1899,7 +1899,7 @@ class User extends DataObject
 		global $current_User;
 		global $is_api_request;
 
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_full_access = check_user_perm( 'users', 'edit' );
 		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
 
 		// TRUE when we create new user:
@@ -4378,7 +4378,7 @@ class User extends DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB, $Plugins, $current_User, $localtimenow;
+		global $DB, $Plugins, $localtimenow;
 
 		$DB->begin();
 
@@ -5169,8 +5169,6 @@ class User extends DataObject
 	 */
 	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = NULL, $protocol = '' )
 	{
-		global $current_User;
-
 		/**
 		 * @var Link
 		 */
@@ -5189,7 +5187,7 @@ class User extends DataObject
 				) );
 		}
 
-		if( ( !$this->check_status( 'can_display_avatar' ) ) && !( is_admin_page() && is_logged_in( false ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+		if( ! $this->check_status( 'can_display_avatar' ) && ! ( is_admin_page() && check_user_perm( 'users', 'edit', false, NULL, false ) ) )
 		{ // if the user status doesn't allow to display avatar and current User is not an admin in admin interface, then show default avatar
 			return get_avatar_imgtag_default( $size, $class, $align, array(
 					'email'    => $this->get( 'email' ),
@@ -5539,7 +5537,7 @@ class User extends DataObject
 			return;
 		}
 
-		global $DB, $current_User;
+		global $DB;
 
 		$SQL = new SQL( 'Load values of user fields for User #'.$this->ID );
 		$SQL->SELECT( 'uf_ID, uf_varchar, ufgp_ID, ufgp_name, T_users__fielddefs.*' );
@@ -6558,7 +6556,7 @@ class User extends DataObject
 	 */
 	function get_deleted_blogs()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		// Get all own blogs of the edited user
 		$BlogCache = & get_BlogCache();
@@ -6568,7 +6566,7 @@ class User extends DataObject
 		$deleted_Blogs = array();
 		foreach( $user_Blogs as $user_Blog )
 		{
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $user_Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $user_Blog->ID ) )
 			{	// Current user has a permission to delete this blog
 				$deleted_Blogs[] = $user_Blog;
 			}
@@ -6585,7 +6583,7 @@ class User extends DataObject
 	 */
 	function delete_blogs()
 	{
-		global $DB, $UserSettings, $current_User;
+		global $DB, $UserSettings;
 
 		$DB->begin();
 
@@ -6619,7 +6617,7 @@ class User extends DataObject
 	 */
 	function get_deleted_posts( $type, $check_perm = true )
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		$ItemCache = & get_ItemCache();
 		$ItemCache->ID_array = array();
@@ -6641,7 +6639,7 @@ class User extends DataObject
 		$deleted_Items = array();
 		foreach( $user_Items as $user_Item )
 		{
-			if( ( ! $check_perm ) || $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $user_Item ) )
+			if( ( ! $check_perm ) || check_user_perm( 'item_post!CURSTATUS', 'delete', false, $user_Item ) )
 			{	// Current user has a permission to delete this item
 				$deleted_Items[] = $user_Item;
 			}
@@ -6852,7 +6850,7 @@ class User extends DataObject
 		foreach( $comments_IDs as $comment_ID )
 		{
 			if( ( $user_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false ) ) &&
-				  $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $user_Comment ) )
+				  check_user_perm( 'comment!CURSTATUS', 'delete', false, $user_Comment ) )
 			{ // Current user has a permission to delete this comment
 				return true;
 			}
@@ -6898,7 +6896,7 @@ class User extends DataObject
 			$deleted_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
 			if( $deleted_Comment &&
 			    ( $current_user_can_moderate ||
-			      $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $deleted_Comment ) ) )
+			      check_user_perm( 'comment!CURSTATUS', 'delete', false, $deleted_Comment ) ) )
 			{ // Current user has a permission to delete this comment
 				// Delete from DB
 				$result = $deleted_Comment->dbdelete( true, false );
@@ -6939,7 +6937,7 @@ class User extends DataObject
 		// Note: If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise
 		if( ! $current_User->can_moderate_user( $this->ID ) )
 		{ // Note: if users have delete messaging perms then they can delete any user messages ( Of course only if the delete action is available/displayed for them )
-			$current_User->check_perm( 'perm_messaging', 'delete', true );
+			check_user_perm( 'perm_messaging', 'delete', true );
 		}
 
 		$DB->begin();
@@ -7005,7 +7003,7 @@ class User extends DataObject
 		while( ( $iterator_Poll = & $PollCache->get_next() ) != NULL )
 		{	// Iterate through PollCache:
 			if( $current_user_can_moderate ||
-			    $current_User->check_perm( 'polls', 'edit', false, $iterator_Poll ) )
+			    check_user_perm( 'polls', 'edit', false, $iterator_Poll ) )
 			{ // Current user has a permission to delete this poll
 				// Delete the poll from DB:
 				$result = $iterator_Poll->dbdelete();
@@ -7057,7 +7055,7 @@ class User extends DataObject
 		{	// Make a link to page with user's posts:
 			global $current_User;
 			if( is_admin_page() && is_logged_in() &&
-			    ( $this->ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) ) )
+			    ( $this->ID == $current_User->ID || check_user_perm( 'users', 'view' ) ) )
 			{	// For back-office
 				global $admin_url;
 				$total_num_posts_url = $admin_url.'?ctrl=user&amp;user_tab=activity&amp;user_ID='.$this->ID;
@@ -7616,7 +7614,7 @@ class User extends DataObject
 			}
 
 			// Check permission if current user can edit the organization:
-			$perm_edit_orgs = ( is_logged_in() && $current_User->check_perm( 'orgs', 'edit', false, $user_Organization ) );
+			$perm_edit_orgs = check_user_perm( 'orgs', 'edit', false, $user_Organization );
 			if( ! $perm_edit_orgs && $user_Organization->get( 'accept' ) == 'no' )
 			{	// Skip this if current user cannot edit the organization and it has a setting to deny a member joining:
 				continue;
@@ -7937,8 +7935,6 @@ class User extends DataObject
 
 		if( ! isset( $this->flagged_items_count ) )
 		{	// Get it from DB only first time and then cache in var:
-			global $current_User;
-
 			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'flagged' );
 
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
@@ -7991,7 +7987,7 @@ class User extends DataObject
 			$SQL->WHERE( 'enlt_active = 1' );
 			$perm_conditions = array( 'enlt_perm_subscribe = "anyone"' );
 			$check_groups = array();
-			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+			if( check_user_perm( 'users', 'edit' ) )
 			{	// Allow to subscribe to forbidden newsletters by user admins:
 				$perm_conditions[] = 'enlt_perm_subscribe = "admin"';
 				$check_groups[] = $current_User->get( 'grp_ID' );

@@ -14,13 +14,13 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $current_User, $action, $edited_Newsletter;
+global $action, $edited_Newsletter;
 
 $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'newsletter_form' );
 
-if( ! $creating && $current_User->check_perm( 'emails', 'edit' ) )
+if( ! $creating && check_user_perm( 'emails', 'edit' ) )
 {	// Display a button to delete existing newsletter if current User has a perm:
 	$Form->global_icon( TB_('Delete this list!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'newsletter' ) ) );
 }
@@ -69,7 +69,7 @@ $Form->radio_input( 'enlt_perm_subscribe', $edited_Newsletter->get( 'perm_subscr
 $Form->end_fieldset();
 
 $buttons = array();
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// Display a button to create/update newsletter if current User has a perm:
 	if( $creating )
 	{	// Create:

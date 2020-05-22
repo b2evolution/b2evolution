@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $DB, $current_User, $Settings;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'options', 'edit', true );
 
 // Selected tab:
 $tab = param( 'tab', 'string', 'general' );

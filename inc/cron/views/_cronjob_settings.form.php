@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Settings, $current_User, $admin_url;
+global $Settings, $admin_url;
 
 $Form = new Form( NULL, 'cron_settings_checkchanges' );
 
@@ -35,21 +35,21 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 		{
 			case 'send-email-campaign':
 				// Send a chunk of x emails for the campaign:
-				if( $current_User->check_perm( 'emails', 'edit' ) )
+				if( check_user_perm( 'emails', 'edit' ) )
 				{	// Allow to edit email cron settings only if user has a permission:
 					$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, TB_('Chunk Size'), TB_('emails at a time'), array( 'maxlength' => 10 ) );
 				}
-				elseif( $current_User->check_perm( 'emails', 'view' ) )
+				elseif( check_user_perm( 'emails', 'view' ) )
 				{	// Only display setting value:
 					$Form->info( TB_('Chunk Size'), $Settings->get( 'email_campaign_chunk_size' ), TB_('emails at a time') );
 				}
 				$Form->duration_input( 'email_campaign_cron_repeat', $Settings->get( 'email_campaign_cron_repeat' ), TB_('Delay between chunks'), 'days', 'minutes', array( 'note' => TB_('timing between scheduled job runs') ) );
 				$Form->duration_input( 'email_campaign_cron_limited', $Settings->get( 'email_campaign_cron_limited' ), TB_('Delay in case all remaining recipients have reached max # of emails for the current day'), 'days', 'minutes', array( 'note' => TB_('timing between scheduled job runs') ) );
-				if( $current_User->check_perm( 'emails', 'edit' ) )
+				if( check_user_perm( 'emails', 'edit' ) )
 				{	// Allow to edit email cron settings only if user has a permission:
 					$Form->text_input( 'email_campaign_max_domain', $Settings->get( 'email_campaign_max_domain' ), 5, TB_('Max emails to same domain'), TB_('In each chunk, avoid sending too many emails to same recipient domain (Useful to avoid balcklisting from gmail.com, hotmail.com, etc.)'), array( 'maxlength' => 10 ) );
 				}
-				elseif( $current_User->check_perm( 'emails', 'view' ) )
+				elseif( check_user_perm( 'emails', 'view' ) )
 				{	// Only display setting value:
 					$Form->info( TB_('Max emails to same domain'), $Settings->get( 'email_campaign_max_domain' ) );
 				}
@@ -186,7 +186,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 }
 
 $buttons = array();
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {	// Allow to save cron settings only if user has a permission:
 	$buttons[] = array( 'submit', '', TB_('Save Changes!'), 'SaveButton' );
 }

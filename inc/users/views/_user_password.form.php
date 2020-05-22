@@ -94,7 +94,7 @@ else
 	$form_class = $params['form_class_user_pass'];
 }
 
-$has_full_access = $current_User->check_perm( 'users', 'edit' );
+$has_full_access = check_user_perm( 'users', 'edit' );
 
 
 $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );

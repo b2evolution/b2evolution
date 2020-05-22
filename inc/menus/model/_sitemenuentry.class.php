@@ -814,8 +814,7 @@ class SiteMenuEntry extends DataObject
 				break;
 
 			case 'admin':
-				global $current_User;
-				if( ! ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) ) )
+				if( ! check_user_perm( 'admin', 'restricted' ) && check_user_status( 'can_access_admin' ) )
 				{	// Don't allow admin url for users who have no access to backoffice:
 					return false;
 				}
@@ -834,8 +833,7 @@ class SiteMenuEntry extends DataObject
 						}
 						break;
 					case 'perms':
-						global $current_User;
-						if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply', false ) )
+						if( ! check_user_perm( 'perm_messaging', 'reply', false ) )
 						{	// User has no access for messaging:
 							$this->url_error = 'No access';
 							return false;

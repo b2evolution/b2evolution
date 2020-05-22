@@ -66,8 +66,6 @@ class LinkComment extends LinkOwner
 	 */
 	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
-		global $current_User;
-
 		$r = false;
 
 		if( $permlevel == 'add' )
@@ -82,9 +80,8 @@ class LinkComment extends LinkOwner
 		}
 		else
 		{	// Check permission for existing comment in DB:
-			$r = is_logged_in() && (
-			     ( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) ) ||
-			     $current_User->check_perm( 'blog_comments', $permlevel, $assert, $this->get_blog_ID() ) );
+			$r = ( $this->Comment->is_meta() && check_user_perm( 'meta_comment', $permlevel, $assert, $this->Comment ) ) ||
+			     check_user_perm( 'blog_comments', $permlevel, $assert, $this->get_blog_ID() );
 		}
 
 		if( ! $r && $assert )

@@ -2355,7 +2355,6 @@ function param_check_gender( $var, $required = false )
 {
 	if( empty( $GLOBALS[$var] ) )
 	{	// empty is OK if not required:
-		global $current_User;
 		if( $required )
 		{
 			param_error( $var, T_( 'Please select a gender.' ) );

@@ -700,7 +700,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Form:search_content_type':
-			global $Blog, $current_User;
+			global $Blog;
 
 			if( ! $Blog )
 			{
@@ -718,8 +718,7 @@ function render_template_callback( $var, $params, $objects = array() )
 				$content_type_options['comment'] = T_('Comments');
 			}
 			if( $Blog->get_setting( 'search_include_metas' ) &&
-			    is_logged_in() &&
-			    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID )  )
+			    check_user_perm( 'meta_comment', 'view', false, $Blog->ID )  )
 			{
 				$content_type_options['meta'] = T_('Internal comments');
 			}

@@ -339,8 +339,6 @@ class Link extends DataObject
 	 */
 	function can_be_file_deleted()
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// Not logged in user
 			return false;
@@ -354,7 +352,7 @@ class Link extends DataObject
 
 		if( ! ( $File = & $this->get_File() ) ||
 		    ! ( $FileRoot = & $File->get_FileRoot() ) ||
-		    ! $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		    ! check_user_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 		{	// Current user has no permission to edit this file
 			return false;
 		}

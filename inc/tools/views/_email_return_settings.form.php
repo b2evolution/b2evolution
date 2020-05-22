@@ -16,10 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -77,7 +73,7 @@ $Form->begin_fieldset( TB_('Settings to decode the returned emails').get_manual_
 	$Form->text_input( 'repath_username', $Settings->get( 'repath_username' ), 25,
 				TB_('Account Name'), TB_('User name for authenticating on your mail server. Usually it\'s your email address or a part before the @ sign.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );
 
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{
 		// Disply this fake hidden password field before real because Chrome ignores attribute autocomplete="off"
 		echo '<input type="password" name="password" value="" style="display:none" />';
@@ -106,7 +102,7 @@ $Form->begin_fieldset( TB_('Settings to decode the returned emails').get_manual_
 
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

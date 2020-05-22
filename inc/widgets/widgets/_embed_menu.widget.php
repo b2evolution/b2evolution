@@ -95,7 +95,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$SiteMenuCache = & get_SiteMenuCache();
 		$SiteMenuCache->load_where( 'menu_translates_menu_ID IS NULL' );
@@ -109,7 +109,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 				),
 				'menu_ID' => array(
 					'label' => T_('Menu to display'),
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
 					'type' => 'select_object',
 					'object' => $SiteMenuCache,
 					'defaultvalue' => '',

@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 
 param( 'action', 'string' );
@@ -35,7 +35,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'submit', 'array:string', array() );
 		if( isset($submit['restore_defaults']) )

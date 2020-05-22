@@ -398,7 +398,7 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
-		global $Timer, $Session, $debug, $current_User;
+		global $Timer, $Session, $debug;
 
 		$params = array_merge( array(
 				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
@@ -447,7 +447,7 @@ class Skin extends DataObject
 		if( $display_debug_containers )
 		{ // Wrap container in visible container:
 			echo '<div class="dev-blocks dev-blocks--container"><div class="dev-blocks-name">';
-			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Display a link to edit this widget only if current user has a permission:
 				echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>';
 			}
@@ -1472,7 +1472,7 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Collection, $Blog, $Item, $current_User;
+					global $Collection, $Blog, $Item;
 
 					if( ! empty( $Item ) && $Item->can_receive_webmentions() )
 					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
@@ -1501,7 +1501,7 @@ class Skin extends DataObject
 						require_js_defer( '#jqueryUI#', 'blog' );
 					}
 
-					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					if( $Blog->get_setting( 'use_workflow' ) && check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
@@ -1774,9 +1774,8 @@ class Skin extends DataObject
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
-			global $current_User;
 			require_js_defer( '#jquery#', 'blog' );
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
 				add_js_headline( 'var b2evo_widget_edit_url = "'.get_admin_url( 'ctrl=widgets&action=edit&wi_ID=$wi_ID$&mode=customizer', '&' ).'";'

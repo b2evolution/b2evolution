@@ -31,7 +31,7 @@ $Form->begin_form( 'fform' );
 	echo '<p>'.sprintf( TB_('This will remove %s from the organization. Would you like to continue?'), $edited_User->get( 'preferredname' ) ).'</p>';
 
 $buttons = array();
-if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+if( check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to confirm removal of user from the organization
 	$buttons[] = array( 'submit', 'actionArray[unlink_user]', TB_('Continue'), 'SaveButton' );
 }

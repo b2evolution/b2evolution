@@ -99,7 +99,7 @@ class Session
 	 */
 	function __construct( $session_ID = NULL )
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
+		global $DB, $Debuglog, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
 		global $cookie_session, $cookie_expires;
 

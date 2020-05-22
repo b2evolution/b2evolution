@@ -84,7 +84,7 @@ $block_item_Widget->title .= get_manual_link( $is_collection_skin ? 'skins-for-t
 // Get what is the current skin ID from this kind of skin type
 $current_skin_ID = $is_collection_skin ? $edited_Blog->get( $skin_type.'_skin_ID', array( 'real_value' => true ) ) : $Settings->get( $skin_type.'_skin_ID', true );
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$block_item_Widget->global_icon( T_('Install new skin...'), 'new', $admin_url.'?ctrl=skins&amp;tab='.( $is_collection_skin ? 'coll_skin&amp;blog='.$edited_Blog->ID : 'site_skin' ).'&amp;action=new&amp;skin_type='.$skin_type.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','skinpage=selection','','&'), $admin_url)), T_('Install new').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	$block_item_Widget->global_icon( T_('Keep current skin!'), 'close', regenerate_url( 'skinpage' ), ' '.T_('Don\'t change'), 3, 4 );
@@ -94,7 +94,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 
 	echo '<div class="skin_selector_block">';
 
-	if( $current_User->check_perm( 'options', 'edit', false ) )
+	if( check_user_perm( 'options', 'edit', false ) )
 	{ // A link to install new skin:
 		echo '<a href="'.$admin_url.'?ctrl=skins&amp;tab='.( $is_collection_skin ? 'coll_skin' : 'site_skin' ).'&amp;action=new&amp;skin_type='.$skin_type.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( regenerate_url( '','skinpage=selection','','&' ), $admin_url ) ).'" class="skinshot skinshot_new">'
 				.get_icon( 'new' )

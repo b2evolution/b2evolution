@@ -103,7 +103,7 @@ $Results->title = TB_('Automations').get_manual_link( 'user-automations' );
 $Results->cols[] = array(
 		'th'    => TB_('Automation'),
 		'order' => 'autm_name',
-		'td'    => ( $current_User->check_perm( 'options', 'edit' )
+		'td'    => ( check_user_perm( 'options', 'edit' )
 			? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$"><b>$autm_name$</b></a>'
 			: '$autm_name$' ),
 	);

@@ -779,7 +779,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		return array();
 	}
 
-	global $Collection, $Blog, $DB, $debug, $current_User;
+	global $Collection, $Blog, $DB, $debug;
 	global $scores_map, $score_prefix, $score_map_key, $Debuglog;
 
 	// Get quoted parts parts of the search query
@@ -874,8 +874,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 
 	if( $search_type_meta &&
 	    $Blog->get_setting( 'search_include_metas' ) &&
-	    is_logged_in() &&
-	    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	    check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{	// Perform search on Meta/Internal Comments:
 		$meta_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age, 'meta' );
 		$search_result = array_merge( $search_result, $meta_search_result );
@@ -1000,7 +999,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
  */
 function search_result_block( $params = array() )
 {
-	global $Collection, $Blog, $Session, $debug, $current_User;
+	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
 	$search_authors = param( 'search_author', 'string', '' );
@@ -1044,8 +1043,7 @@ function search_result_block( $params = array() )
 			$searched_content_types[] = 'comment';
 		}
 		if( $Blog->get_setting( 'search_include_metas' ) &&
-		    is_logged_in() &&
-		    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		    check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 		{	// Search meta/internal comments:
 			$searched_content_types[] = 'meta';
 		}

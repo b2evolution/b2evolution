@@ -154,7 +154,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
+		if( ! check_user_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -177,7 +177,7 @@ switch( $action )
 			// add report and block contact ( it will be blocked if was already on this user contact list )
 			add_report_from( $user_ID, $report_status, $report_info );
 			$blocked_message = '';
-			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+			if( check_user_perm( 'perm_messaging', 'reply' ) )
 			{ // user has messaging permission, set/add this user as blocked contact
 				$contact_status = check_contact( $user_ID );
 				if( $contact_status == NULL )
@@ -213,7 +213,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
+		if( ! check_user_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -249,8 +249,8 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
-		    ! $current_User->check_status( 'can_edit_contacts' ) )
+		if( ! check_user_perm( 'perm_messaging', 'reply' ) ||
+		    ! check_user_status( 'can_edit_contacts' ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can manage your contacts. <b>See below:</b>' ) );

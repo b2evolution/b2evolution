@@ -189,7 +189,7 @@ class user_profile_pics_Widget extends ComponentWidget
 
 		if( $this->get_param( 'display_other' ) )
 		{	// Display additional pictures:
-			if( is_logged_in() && $current_User->check_status( 'can_view_user', $target_User->ID ) )
+			if( check_user_status( 'can_view_user', $target_User->ID ) )
 			{	// Only for logged in and activated users
 				$user_pictures = $target_User->get_avatar_Links();
 				if( count( $user_pictures ) > 0 )

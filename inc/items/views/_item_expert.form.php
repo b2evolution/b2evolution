@@ -14,10 +14,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var Item
  */
 global $edited_Item;
@@ -145,7 +141,7 @@ $Form->begin_form( '', '', $params );
 			$form_title_item_ID = TB_('New Item');
 		}
 	}
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Add an icon to edit item type if current user has a permission:
 		$item_type_edit_link = ' '.action_icon( TB_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ) );
 	}
@@ -203,7 +199,7 @@ $Form->begin_form( '', '', $params );
 	$Form->switch_layout( NULL );
 
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-	    $current_User->check_perm( 'files', 'view', false ) )
+	    check_user_perm( 'files', 'view', false ) )
 	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		// Initialize this object as global because this is used in many link functions:
@@ -283,7 +279,7 @@ $Form->begin_form( '', '', $params );
 		echo '</span>';
 	}
 	if( $edited_Item->get_type_setting( 'usage' ) == 'widget-page' &&
-	    $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	    check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{	// Display a button to edit widgets only if item type is used for page containers and current user has permission to edit widgets:
 		echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'" class="btn btn-primary">'.TB_('Edit widgets now').'</a>';
 	}
@@ -310,7 +306,7 @@ $Form->begin_form( '', '', $params );
 	if( count( $custom_fields ) )
 	{	// Display fieldset with custom fields only if at least one exists:
 		$custom_fields_title = TB_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
 			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
 					.action_icon( TB_('Edit fields...'), 'edit',
@@ -344,7 +340,7 @@ $Form->begin_form( '', '', $params );
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
 	$Form->hidden( 'slug_changed', 0 );
 	$edit_slug_link = '';
-	if( $edited_Item->ID > 0 && $current_User->check_perm( 'slugs', 'view' ) )
+	if( $edited_Item->ID > 0 && check_user_perm( 'slugs', 'view' ) )
 	{ // user has permission to view slugs:
 		$edit_slug_link = action_icon( TB_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, TB_('Edit slugs'), 3, 4 )
 			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this post"
@@ -367,7 +363,7 @@ $Form->begin_form( '', '', $params );
 	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
 	{	// Display tags:
 		$link_to_tags_manager = '';
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{ // Display a link to manage tags only when current use has the rights
 			$link_to_tags_manager = ' &ndash; <a href="'.$admin_url.'?ctrl=itemtags&amp;tag_item_ID='.$edited_Item->ID.'">'.TB_('Go to tags manager').'</a>';
 		}
@@ -524,7 +520,7 @@ $Form->begin_form( '', '', $params );
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	if( check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		// ####################### INTERNAL COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
@@ -657,7 +653,7 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{	// If current User has full access to edit other users,
 		// Display item's owner:
 		echo '<tr><td class="flabel_item_owner_login"><strong>'.TB_('Owner').':</strong></td><td>';
@@ -681,7 +677,7 @@ $Form->begin_form( '', '', $params );
 
 	echo '</table>';
 
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:
 		if( $edited_Item->get_type_setting( 'allow_featured' ) )
 		{ // Display featured
@@ -704,7 +700,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// Single/page view:
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:
 		if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
 		{	// We don't need this setting for intro, content block and special items:
@@ -719,7 +715,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// Issue date:
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:
 		echo '<div class="itemform_extra_radio">';
 		$Form->output = false;
@@ -841,7 +837,7 @@ $Form->begin_form( '', '', $params );
 			$Form->switch_layout( NULL );
 		}
 
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
 			{ // Display comment expiration
@@ -867,7 +863,7 @@ $Form->begin_form( '', '', $params );
 
 		// ################### USER TAGGING ###################
 		$Form->begin_fieldset( TB_('User Tagging').get_manual_link( 'post-user-tagging-panel' )
-						.( $current_User->check_perm( 'options', 'view' ) ? action_icon( TB_('User Tags'), 'edit', $admin_url.'?ctrl=usertags', TB_('User Tags'), 3, 4, array( 'class' => 'action_icon pull-right' ) ) : '' ),
+						.( check_user_perm( 'options', 'view' ) ? action_icon( TB_('User Tags'), 'edit', $admin_url.'?ctrl=usertags', TB_('User Tags'), 3, 4, array( 'class' => 'action_icon pull-right' ) ) : '' ),
 					array( 'id' => 'itemform_usertags', 'fold' => true ) );
 
 		$Form->switch_layout( 'table' );
@@ -894,7 +890,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	if( $is_not_content_block &&
-	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	    check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// Display goal tracking and notifications for item with type usage except of content block
 		// and if user has a permission to edit advanced properties of items:
 
@@ -1018,7 +1014,7 @@ $Form->begin_form( '', '', $params );
 	$quick_setting_url = $admin_url.'?ctrl=items&amp;prev_action='.$prev_action.( $item_ID > 0 ? '&amp;p='.$item_ID : '' )
 		.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'item' ).'&amp;action=';
 
-	if( $current_User->check_perm( 'blog_post!published', 'create', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!published', 'create', false, $Blog->ID ) )
 	{ // Display a link to show/hide quick button to publish the post ONLY if current user has a permission:
 		echo '<p>';
 		if( $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )

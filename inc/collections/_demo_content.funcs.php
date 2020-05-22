@@ -1023,7 +1023,6 @@ function get_demo_users( $create = false, $output = true, &$error_messages = NUL
 function get_demo_user( $login, $create = false, $output = true, &$error_messages = NULL )
 {
 	global $DB;
-	global $current_User;
 	global $user_timestamp;
 
 	// Get list of demo users:

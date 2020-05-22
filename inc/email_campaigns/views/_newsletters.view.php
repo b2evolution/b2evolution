@@ -32,7 +32,7 @@ $Results = new Results( $SQL->get(), 'enlt_', 'A', NULL, $count_SQL->get() );
 
 $Results->title = T_('Lists').get_manual_link( 'email-lists' );
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// Display a button to add newsletter if current User has a perm:
 	$Results->global_icon( T_('Create new list').'...', 'new', $admin_url.'?ctrl=newsletters&amp;action=new', T_('Create new list').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -47,8 +47,6 @@ $Results->cols[] = array(
 
 function newsletters_td_active( $enlt_ID, $enlt_active )
 {
-	global $current_User;
-
 	if( $enlt_active )
 	{	// If newsletter is active:
 		$active_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The list is active.') ) );
@@ -58,7 +56,7 @@ function newsletters_td_active( $enlt_ID, $enlt_active )
 		$active_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The list is not active.') ) );
 	}
 
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{	// Make icon to action link if current User has a perm to edit this:
 		global $admin_url;
 		return '<a href="'.$admin_url.'?ctrl=newsletters&amp;action='.( $enlt_active ? 'disactivate' : 'activate' )
@@ -156,7 +154,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( T_('Edit this list...'), 'properties', $admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID=$enlt_ID$' )
-			.( $current_User->check_perm( 'emails', 'edit' ) ?
+			.( check_user_perm( 'emails', 'edit' ) ?
 			// Display an action icon to delete newsletter if current User has a perm:
 			action_icon( T_('Delete this list!'), 'delete', regenerate_url( 'enlt_ID,action', 'enlt_ID=$enlt_ID$&amp;action=delete&amp;'.url_crumb( 'newsletter' ) ) ): '' )
 	);

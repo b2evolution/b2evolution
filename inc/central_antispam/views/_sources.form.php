@@ -59,9 +59,7 @@ $Results->title = TB_('Reports');
 
 function get_link_for_keyword( $id, $keyword )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+	if( check_user_perm( 'centralantispam', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_keyword = '<a href="'.regenerate_url( 'action,tab,casrc_ID', 'action=keyword_edit&amp;cakw_ID='.$id ).'">'.$keyword.'</a>';
 	}

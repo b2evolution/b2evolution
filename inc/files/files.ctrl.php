@@ -41,7 +41,7 @@ global $blog;
 global $filename_max_length, $dirpath_max_length;
 
 // Check permission:
-$current_User->check_perm( 'files', 'view', true, $blog ? $blog : NULL );
+check_user_perm( 'files', 'view', true, $blog ? $blog : NULL );
 
 $AdminUI->set_path( 'files', 'browse' );
 
@@ -111,7 +111,7 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 	{	// Found User, check perm:
 		if( $edited_User->ID != $current_User->ID )
 		{	// if not editing himself, must have user edit permission:
-			if( ! $current_User->check_perm( 'users', 'edit' ) )
+			if( ! check_user_perm( 'users', 'edit' ) )
 			{
 				$Messages->add( TB_('No permission to edit this user.'), 'error' );
 				unset( $edited_User );
@@ -175,7 +175,7 @@ if( ! empty( $root ) )
 { // We have requested a root folder by string:
 	$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
-	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) || ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
+	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) || ! check_user_perm( 'files', 'view', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones
 		$Messages->add( TB_('You don\'t have access to the requested root directory.'), 'error' );
 		$fm_FileRoot = false;
@@ -188,7 +188,7 @@ elseif( !empty($edited_User) )
 	/**
 	 * @var File
 	 */
-	if( ( $avatar_File = & $edited_User->get_avatar_File() ) && ( $current_User->check_perm( 'files', 'view', false, $avatar_File->get_FileRoot() ) ) )
+	if( ( $avatar_File = & $edited_User->get_avatar_File() ) && ( check_user_perm( 'files', 'view', false, $avatar_File->get_FileRoot() ) ) )
 	{
 		$fm_FileRoot = & $avatar_File->get_FileRoot();
 		$path = dirname( $avatar_File->get_rdfs_rel_path() ).'/';
@@ -205,7 +205,7 @@ elseif( !empty($LinkOwner) )
 		 * @var File
 		 */
 		$File = & $FileList->get_next();
-		if( !empty( $File ) && $current_User->check_perm( 'files', 'view', false, $File->get_FileRoot() ) )
+		if( !empty( $File ) && check_user_perm( 'files', 'view', false, $File->get_FileRoot() ) )
 		{	// Obtain and use file root of first file:
 			$fm_FileRoot = & $File->get_FileRoot();
 			$path = dirname( $File->get_rdfs_rel_path() ).'/';
@@ -213,7 +213,7 @@ elseif( !empty($LinkOwner) )
 	}
 }
 
-if( $fm_FileRoot && ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
+if( $fm_FileRoot && ! check_user_perm( 'files', 'view', false, $fm_FileRoot ) )
 {
 	$fm_FileRoot = false;
 };
@@ -244,7 +244,7 @@ if( ! $fm_FileRoot )
 	{
 		foreach( $available_Roots as $l_FileRoot )
 		{
-			if( $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+			if( check_user_perm( 'files', 'view', false, $l_FileRoot ) )
 			{
 				$fm_FileRoot = $l_FileRoot;
 				break;
@@ -285,7 +285,7 @@ if( $fm_FileRoot )
 		if( $ajax_request &&
 		    ! is_dir( $ads_list_path ) &&
 		    ! file_exists( $ads_list_path ) &&
-		    $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+		    check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 		{	// Try to create the requested directory automatically if current User
 			// has a permission and when this is a request e.g. for an import folder:
 			mkdir_r( $ads_list_path );
@@ -302,7 +302,7 @@ if( $fm_FileRoot )
 			$path = get_canonical_path( $path );
 		}
 
-		if( ( $Messages->count() == 0 ) && ( strlen( $ads_list_path ) > $dirpath_max_length ) && $current_User->check_perm( 'options', 'edit' ) )
+		if( ( $Messages->count() == 0 ) && ( strlen( $ads_list_path ) > $dirpath_max_length ) && check_user_perm( 'options', 'edit' ) )
 		{ // This folder absolute path exceed the max allowed length, a warning message must be displayed, if there were no other message yet. ( If there are other messages then this one should have been already added )
 			$Messages->add( sprintf( TB_( 'This folder has an access path that is too long and cannot be properly handled by b2evolution. Please check and increase the &laquo;%s&raquo; variable.'), '$dirpath_max_length' ), 'warning' );
 		}
@@ -383,7 +383,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 if( $action == 'createnew' )
 {
 	// Check permission:
-	$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
+	check_user_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 	// create new file/dir
 	param( 'create_type', 'string', true ); // 'file', 'dir'
@@ -409,7 +409,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
+		check_user_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{ // Directory creation is gloablly disabled:
@@ -471,7 +471,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
+		check_user_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 		if( ! $Settings->get( 'fm_enable_create_file' ) )
 		{ // File creation is gloablly disabled:
@@ -484,7 +484,7 @@ switch( $action )
 			$Messages->add( TB_('Cannot create a file without name.'), 'error' );
 			break;
 		}
-		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
+		if( $error_filename = validate_filename( $create_name, check_user_perm( 'files', 'all' ) ) )
 		{ // Not valid filename or extension
 			$Messages->add( $error_filename, 'error' );
 			syslog_insert( sprintf( 'The creating file %s has an unrecognized extension', '[['.$create_name.']]' ), 'warning', 'file' );
@@ -562,13 +562,13 @@ switch( $action )
 		}
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+ 		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
  		// Get the file we want to update:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 
 		// Check that the file is editable:
-		if( ! $edited_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		if( ! $edited_File->is_editable( check_user_perm( 'files', 'all' ) ) )
 		{
 			$Messages->add( sprintf( TB_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
 			break;
@@ -650,7 +650,7 @@ switch( $action )
 
 		if( $action == 'create_zip' )
 		{	// Check permission for action to create new ZIP archive:
-			$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+			check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 		}
 
 		if( !$selected_Filelist->count() )
@@ -752,7 +752,7 @@ switch( $action )
 		// Unpack selected ZIP archives:
 
 		// Check permission for action to edit files in the selected File Root:
-		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		if( ! $selected_Filelist->count() )
 		{
@@ -772,14 +772,14 @@ switch( $action )
 		// Rename/Move/Copy a file:
 
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
-		$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
+		$allow_locked_filetypes = check_user_perm( 'files', 'all' );
 
 		$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
 		if( $sources_Root )
@@ -970,7 +970,7 @@ switch( $action )
 		break;
 
 	case 'resize':
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -1032,7 +1032,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
@@ -1255,13 +1255,13 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit_allowed', true, $blog ? $blog : NULL );
+ 		check_user_perm( 'files', 'edit_allowed', true, $blog ? $blog : NULL );
 
  		// Get the file we want to edit:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 
 		// Check that the file is editable:
-		if( ! $edited_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		if( ! $edited_File->is_editable( check_user_perm( 'files', 'all' ) ) )
 		{
 			$Messages->add( sprintf( TB_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
 	 		// Leave special display mode:
@@ -1291,7 +1291,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
-		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$edited_File->load_meta();
@@ -1310,7 +1310,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
-		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		param( 'link_owner_type', 'string', '' );
 		param( 'link_owner_ID', 'integer', 0 );
@@ -1361,7 +1361,7 @@ switch( $action )
 
 			if( $new_name != $old_name)
 			{ // Name has changed...
-				$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
+				$allow_locked_filetypes = check_user_perm( 'files', 'all' );
 				if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $edited_File->get_dir(), $allow_locked_filetypes ) )
 				{
 					$error_occured = true;
@@ -1582,7 +1582,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
 			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';

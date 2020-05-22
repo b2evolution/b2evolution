@@ -153,8 +153,7 @@ function get_link_owner_type( $link_ID )
  */
 function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fieldset_prefix = '' )
 {
-	global $admin_url, $inc_path;
-	global $current_User, $action;
+	global $admin_url, $inc_path, $action;
 
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 	{	// Files module is not enabled:
@@ -213,13 +212,13 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	if( check_user_perm( 'admin', 'restricted' ) && check_user_perm( 'files', 'view' ) )
 	{	// Check if current user has a permission to back-office files manager:
 		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 		{	// Get first file of the Link Owner:
 			$linkowner_File = & $linkowner_FileList->get_next();
-			if( ! empty( $linkowner_File ) && $current_User->check_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
+			if( ! empty( $linkowner_File ) && check_user_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
 			{	// Obtain and use file root of first file:
 				$linkowner_FileRoot = & $linkowner_File->get_FileRoot();
 				$attach_files_url .= '&amp;root='.$linkowner_FileRoot->ID;
@@ -243,7 +242,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'refresh\', \''.$fieldset_prefix.'\' )' ) )
 
-			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
+			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || check_user_perm( 'admin', 'restricted' ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
 				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\', \''.$fieldset_prefix.'\' )' ) )
@@ -285,7 +284,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		expose_var_to_js( 'fieldset_'.$fieldset_prefix.$form_id, array( 'fieldset_prefix' => $fieldset_prefix, 'form_id' => $form_id ), 'evo_display_attachments_fieldset_config' );
 	}
 	
-	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
+	if( check_user_perm( 'admin', 'restricted' ) && check_user_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
 	{	// Check if current user has a permission to back-office files manager:
 
 		// Initialize JavaScript to build and open window:
@@ -329,7 +328,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
  */
 function display_attachments( & $LinkOwner, $params = array() )
 {
-	global $current_User, $redirect_to;
+	global $redirect_to;
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
@@ -369,7 +368,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo '</td><td class="nowrap left">';
 		echo $link_File->get_view_link();
 		echo '</td><td class="lastcol shrinkwrap">';
-		if( $current_User->check_perm( 'files', 'edit' ) )
+		if( check_user_perm( 'files', 'edit' ) )
 		{ // display delete link action
 			$delete_url = get_htsrv_url().'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
 			echo action_icon( T_('Remove'), 'remove', $delete_url );
@@ -492,7 +491,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 	 * @var File
 	 */
 	global $current_File;
-	global $LinkOwner, $current_User;
+	global $LinkOwner;
 	global $iframe_name, $admin_url, $blog;
 
 	$r = '';
@@ -518,7 +517,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 									 'data-link-id' => $link_ID ) );
 	}
 
-	if( $current_File && is_logged_in() && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+	if( $current_File && check_user_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{ // Locate file
 		$title = $current_File->dir_or_file( T_('Locate this directory!'), T_('Locate this file!') );
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
@@ -530,9 +529,9 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
-	if( $current_File && is_logged_in() &&
-	    $current_User->check_perm( 'admin', 'restricted' ) &&
-	    $current_User->check_perm( 'files', 'edit_allowed', false, $current_File->get_FileRoot() ) )
+	if( $current_File &&
+	    check_user_perm( 'admin', 'restricted' ) &&
+	    check_user_perm( 'files', 'edit_allowed', false, $current_File->get_FileRoot() ) )
 	{	// Edit file:
 		$title = T_('Edit properties...');
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
@@ -774,7 +773,7 @@ function get_file_links( $file_ID, $params = array() )
 				if( $Item = & $ItemCache->get_by_ID( $link->link_itm_ID, false ) )
 				{
 					$Collection = $Blog = $Item->get_Blog();
-					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
+					if( check_user_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
 					{ // Current user can edit the linked post
 						$r .= $params['post_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$link->link_itm_ID ).'">'.$Item->get( 'title' ).'</a>';
 					}
@@ -790,7 +789,7 @@ function get_file_links( $file_ID, $params = array() )
 				if( $Comment = & $CommentCache->get_by_ID( $link->link_cmt_ID, false ) )
 				{
 					$Item = $Comment->get_Item();
-					if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+					if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 					{ // Current user can edit the linked Comment
 						$r .= $params['comment_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;comment_ID='.$link->link_cmt_ID ).'">'.$Item->get( 'title' ).'</a>';
 					}
@@ -805,7 +804,7 @@ function get_file_links( $file_ID, $params = array() )
 			{ // File is linked to user
 				if( $User = & $UserCache->get_by_ID( $link->link_usr_ID, false ) )
 				{
-					if( $current_User->ID != $User->ID && !$current_User->check_perm( 'users', 'view' ) )
+					if( $current_User->ID != $User->ID && ! check_user_perm( 'users', 'view' ) )
 					{ // No permission to view other users in admin form
 						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->get_username().'</a>';
 					}
@@ -820,7 +819,7 @@ function get_file_links( $file_ID, $params = array() )
 			{	// File is linked to email campaign:
 				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $link->link_ecmp_ID, false ) )
 				{
-					if( ! $current_User->check_perm( 'emails', 'view' ) )
+					if( ! check_user_perm( 'emails', 'view' ) )
 					{	// Build a link to display an email campaign in edit back-office form:
 						$r .= $params['emailcampaign_prefix'].'<a href="?ctrl=campaigns&action=edit&tab=info&ecmp_ID='.$EmailCampaign->ID.'">'.$EmailCampaign->get( 'name' ).'</a>';
 					}
@@ -836,7 +835,7 @@ function get_file_links( $file_ID, $params = array() )
 				if( $Message = & $MessageCache->get_by_ID( $link->link_msg_ID, false ) )
 				{
 					$Thread = & $Message->get_Thread();
-					if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{	// Build a link to display a message in edit back-office form:
 						$r .= $params['message_prefix'].'<a href="?ctrl=messages&thrd_ID='.$Thread->ID.'">'.$Thread->get( 'title' ).' #'.$Message->ID.'</a>';
 					}

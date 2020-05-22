@@ -17,7 +17,7 @@ load_class( 'templates/model/_template.class.php', 'Template' );
 load_class( 'template/model/_templatecache.class.php', 'TemplateCache' );
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 param_action( 'list' );
 
@@ -65,7 +65,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'template' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( $edited_Template && $edited_Template->duplicate() )
 		{
@@ -84,7 +84,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'template' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request:
 		if( $edited_Template->load_from_Request() )
@@ -116,7 +116,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'template' );
 
 		// Check that current user has permission to edit menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'tpl_ID', 'integer', true );
@@ -155,7 +155,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'template' );
 
 		// Check that current user has permission to delete menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'tpl_ID', 'integer', true );

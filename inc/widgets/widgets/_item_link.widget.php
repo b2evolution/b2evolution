@@ -203,7 +203,7 @@ class item_link_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $current_User, $Item;
+		global $Collection, $Blog, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?

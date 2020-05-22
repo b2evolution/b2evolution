@@ -21,13 +21,8 @@ load_class( 'items/model/_itemtype.class.php', 'ItemType' );
  */
 global $AdminUI;
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
@@ -60,7 +55,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset($edited_Itemtype) )
 		{	// We don't have a model to use, start with blank object:
@@ -78,7 +73,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ityp_ID:
 		param( 'ityp_ID', 'integer', true );
@@ -95,7 +90,7 @@ switch( $action )
 		$edited_Itemtype = new ItemType();
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_Itemtype->load_from_Request() )
@@ -138,7 +133,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemtype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ityp_ID:
 		param( 'ityp_ID', 'integer', true );
@@ -178,7 +173,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemtype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ityp_ID:
 		param( 'ityp_ID', 'integer', true );
@@ -238,7 +233,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemtype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( $edited_Itemtype )
 		{ // Do only when item type exists in DB
@@ -270,7 +265,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemtype' );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		if( $edited_Itemtype )
 		{	// Do only when item type exists in DB:

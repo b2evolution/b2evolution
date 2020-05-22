@@ -60,6 +60,31 @@ function is_logged_in( $accept_not_active = true )
 
 
 /**
+ * Check a specific permission for current User.
+ * This is the MAIN permission check function that you should call to check any permission.
+ * This function will delegate to other functions when appropriate.
+ *
+ * @param string Permission name
+ * @param string Permission level
+ * @param boolean Execution will halt if this is !0 and permission is denied
+ * @param mixed Permission target (blog ID, array of cat IDs, Item, Comment...)
+ * @param boolean true if not active users are considerated as logged in users, false otherwise
+ * @return boolean FALSE if permission denied
+ */
+function check_user_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL, $accept_not_active = true )
+{
+	if( ! is_logged_in( $accept_not_active ) )
+	{	// Current User must be logged in:
+		return false;
+	}
+
+	global $current_User;
+
+	return $current_User->check_perm( $permname, $permlevel, $assert, $perm_target );
+}
+
+
+/**
  * Check if current User status permit the give action
  *
  * @param string action
@@ -68,12 +93,12 @@ function is_logged_in( $accept_not_active = true )
  */
 function check_user_status( $action, $target = NULL )
 {
-	global $current_User;
-
-	if( !is_logged_in() )
+	if( ! is_logged_in() )
 	{
 		return false;
 	}
+
+	global $current_User;
 
 	return $current_User->check_status( $action, $target );
 }
@@ -683,13 +708,13 @@ function use_in_skin_login()
  */
 function show_toolbar()
 {
-	global $current_User, $show_toolbar;
+	global $show_toolbar;
 
 	return (
 		// If evo toolbar is not disabled for specific page:
 		( ! isset( $show_toolbar ) || $show_toolbar === true ) &&
 		// If current user has a permisssion to view toolbar:
-		is_logged_in() && ( $current_User->check_perm( 'admin', 'toolbar' ) ) );
+		check_user_perm( 'admin', 'toolbar' ) );
 }
 
 
@@ -988,9 +1013,9 @@ function user_admin_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function get_user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#', $not_visible = '' )
 {
-	global $admin_url, $blog, $current_User;
+	global $admin_url, $blog;
 
-	if( is_logged_in() && ! $current_User->check_perm( 'admin', 'normal' ) )
+	if( ! check_user_perm( 'admin', 'normal' ) )
 	{ // If user should NOT see admin link:
 		return $not_visible;
 	}
@@ -1262,7 +1287,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 		return NULL;
 	}
 
-	if( !$User->check_status( 'can_display_link' ) && !( is_admin_page() && is_logged_in( false ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+	if( ! $User->check_status( 'can_display_link' ) && ! ( is_admin_page() && check_user_perm( 'users', 'edit', false, NULL, false ) ) )
 	{ // if the account status restrict to display user profile link and current User is not an admin in admin interface, then do not return identity url!
 		return NULL;
 	}
@@ -1277,7 +1302,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 		return NULL;
 	}
 
-	if( !$current_User->check_perm( 'user', 'view', false, $User ) )
+	if( ! check_user_perm( 'user', 'view', false, $User ) )
 	{ // if the current user status restrict to view other user profile
 		return NULL;
 	}
@@ -1287,7 +1312,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 		return $User->get_userpage_url( $blog_ID );
 	}
 
-	if( $current_User->check_status( 'can_access_admin' ) && ( ( $current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )
+	if( check_user_status( 'can_access_admin' ) && ( ( $current_User->ID == $user_ID ) || check_user_perm( 'users', 'view' ) ) )
 	{	// Go to backoffice profile:
 		return get_user_settings_url( $user_tab, $user_ID, $blog_ID );
 	}
@@ -1381,8 +1406,8 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
-		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
-				( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
+		if( ( $current_User->ID != $user_ID && ! check_user_perm( 'users', 'view' ) ) ||
+				( ! check_user_perm( 'admin', 'restricted' ) || ! check_user_status( 'can_access_admin' ) ) )
 		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
@@ -1506,14 +1531,14 @@ function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $
  */
 function get_user_messaging_url()
 {
-	global $current_User, $Collection, $Blog;
+	global $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
 		return false;
 	}
 
-	if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+	if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 	{	// No minimum permissions for messaging module
 		return false;
 	}
@@ -1570,7 +1595,7 @@ function get_user_contacts_link( $before = '', $after = '', $link_text = '#', $l
  */
 function get_user_contacts_url()
 {
-	global $current_User, $Collection, $Blog;
+	global $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
@@ -1592,13 +1617,11 @@ function get_user_contacts_url()
  */
 function userfield_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
 {
-	global $current_User;
-
 	$field_icon = '<span class="uf_icon_block">'
 			.get_userfield_icon( $ufdf_icon_name, $ufdf_code )
 		.'</span>';
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // We have permission to modify:
 		return $field_icon.'<a href="'.regenerate_url( 'action', 'ufdf_ID='.$ufdf_ID.'&amp;action=edit' ).'"><strong>'.T_( $ufdf_name ).'</strong></a>';
 	}
@@ -1733,10 +1756,10 @@ function profile_check_params( $params, $User = NULL )
 
 			if( param_check_valid_login( $dummy_fields[ $params['login'][1] ] ) )
 			{	// If login is valid
-				global $reserved_logins, $current_User;
+				global $reserved_logins;
 				if( ! empty( $reserved_logins ) &&
 				    in_array( $params['login'][0], $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				    ! check_user_perm( 'users', 'edit' ) )
 				{	// If new entered login is reserved and current logged in User cannot use this:
 					param_error( $dummy_fields[ $params['login'][1] ], T_('You cannot use this login because it is reserved.') );
 				}
@@ -1986,7 +2009,7 @@ function get_registration_template_required_fields( $template_code = NULL )
  */
 function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-top-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '', $show_avatar = true, $rel = NULL )
 {
-	global $current_User, $Settings;
+	global $Settings;
 
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $user_login );
@@ -2767,7 +2790,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
 
-		if( $action != 'view' && $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user', $edited_User->ID ) )
+		if( $action != 'view' && $current_User->ID != $edited_User->ID && check_user_status( 'can_report_user', $edited_User->ID ) )
 		{
 			global $user_tab;
 			// get current User report from edited User
@@ -2785,14 +2808,14 @@ function echo_user_actions( $Widget, $edited_User, $action )
 			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, $report_user_link_attribs );
 		}
 		if( $action != 'view' &&
-		   $current_User->check_perm( 'users', 'edit', false ) &&
+		   check_user_perm( 'users', 'edit', false ) &&
 		   ( $current_User->ID != $edited_User->ID ) &&
 		   ( $edited_User->ID != 1 ) )
 		{
 			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID, ' '.T_('Delete'), 3, 4, $link_attribs  );
 			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID, ' '.T_('Delete spammer'), 3, 4, $link_attribs );
 		}
-		if( $current_User->check_perm( 'files', 'all', false ) )
+		if( check_user_perm( 'files', 'all', false ) )
 		{
 			$Widget->global_icon( T_('Files').'...', 'folder', $admin_url.'?ctrl=files&root=user_'.$current_User->ID.'&new_root=user_'.$edited_User->ID, ' '.T_('Files').'...', 3, 4, $link_attribs );
 		}
@@ -2841,7 +2864,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		$base_url = $Blog->gen_blogurl();
 	}
 
-	if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) )
+	if( $user_ID == $current_User->ID || check_user_perm( 'users', 'view' ) )
 	{	// If user is viewing own profile or has a permission to view all other users:
 		$users_sub_entries['profile'] = array(
 							'text' => T_('Profile'),
@@ -4177,7 +4200,7 @@ function get_userlist_filters_config( $Form = NULL )
 			);
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{
 		// Uses custom sender address:
 		$filters['custom_sender_email'] = array(
@@ -4237,7 +4260,7 @@ function get_userlist_filters_config( $Form = NULL )
 			'default_value' => '0:contains:',
 		);
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
+	if( check_user_perm( 'users', 'moderate' ) )
 	{	// If current user can moderate other users:
 
 		// User last seen:
@@ -4254,7 +4277,7 @@ function get_userlist_filters_config( $Form = NULL )
 			);
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{	// Allow "Report count" filter only for users with edit user permission:
 		$filters['report_count'] = array(
 				'label'         => T_('Report count'),
@@ -4325,7 +4348,7 @@ function get_userlist_filters_config( $Form = NULL )
 		}
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
+	if( check_user_perm( 'users', 'moderate' ) )
 	{	// Filter by user tags if current user can moderate other users:
 		$filters['tags'] = array(
 				'label'  => T_('User tags'),
@@ -4457,7 +4480,7 @@ function callback_filter_userlist( & $Form )
  */
 function callback_advanced_filter_userlist( & $Form )
 {
-	global $Settings, $current_User, $Collection, $Blog, $edited_EmailCampaign;
+	global $Settings, $Collection, $Blog, $edited_EmailCampaign;
 
 	// Get filters from config:
 	$filters = get_userlist_filters_config( $Form );
@@ -4585,14 +4608,14 @@ function user_country_visible()
  */
 function has_cross_country_restriction( $type = 'users', $subtype = '' )
 {
-	global $current_User, $Settings;
+	global $Settings;
 
 	if( !is_logged_in() )
 	{ // In case of anonymous users we can't check the country, so anonymous users can't have restriction because of this
 		return false;
 	}
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // current user has global 'edit users' permission, these users have no restriction
 		return false;
 	}
@@ -4623,14 +4646,14 @@ function has_cross_country_restriction( $type = 'users', $subtype = '' )
 					}
 					break;
 			}
-			return ! $current_User->check_perm( 'cross_country_allow_profiles' );
+			return ! check_user_perm( 'cross_country_allow_profiles' );
 
 		case 'contact': // Check retsriction on contact
-			return ! $current_User->check_perm( 'cross_country_allow_contact' );
+			return ! check_user_perm( 'cross_country_allow_contact' );
 
 		case 'any': // Check if there is any retsriction
 		default:
-			return !( $current_User->check_perm( 'cross_country_allow_profiles' ) && $current_User->check_perm( 'cross_country_allow_contact' ) );
+			return !( check_user_perm( 'cross_country_allow_profiles' ) && check_user_perm( 'cross_country_allow_contact' ) );
 	}
 }
 
@@ -5728,7 +5751,7 @@ function user_report_form( $params = array() )
 			'cancel_url' => '',
 		), $params );
 
-	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! $current_User->check_status( 'can_report_user', $params['user_ID'] ) )
+	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! check_user_status( 'can_report_user', $params['user_ID'] ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
 		return;
 	}
@@ -5803,9 +5826,7 @@ function user_report_form( $params = array() )
  */
 function echo_user_organization_js()
 {
-	global $current_User;
-
-	if( ! $current_User->check_perm( 'orgs', 'create' ) )
+	if( ! check_user_perm( 'orgs', 'create' ) )
 	{	// Check this min permission, because even owner of one organization can accept it:
 		return;
 	}
@@ -5827,9 +5848,9 @@ function echo_user_organization_js()
  */
 function echo_user_add_organization_js( $edited_Organization )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
-	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( ! check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// User must has an edit perm to add user to organization:
 		return;
 	}
@@ -5854,9 +5875,9 @@ function echo_user_add_organization_js( $edited_Organization )
  */
 function echo_user_edit_membership_js( $edited_Organization )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
-	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( ! check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// User must has an edit perm to edit user in organization:
 		return;
 	}
@@ -5882,9 +5903,9 @@ function echo_user_edit_membership_js( $edited_Organization )
  */
 function echo_user_remove_membership_js( $edited_Organization )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
-	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( ! check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// User must has an edit perm to remove user in organization:
 		return;
 	}
@@ -6264,8 +6285,7 @@ function user_sent_emails_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( ! $current_User->check_perm( 'users', 'moderate' ) || ! $current_User->check_perm( 'emails', 'view' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) || ! check_user_perm( 'emails', 'view' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -6301,7 +6321,7 @@ function user_sent_emails_results_block( $params = array() )
 	$emails_Results->title = $params['results_title'];
 	$emails_Results->no_results_text = $params['results_no_text'];
 
-	if( $params['action'] != 'view' && $emails_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+	if( $params['action'] != 'view' && $emails_Results->get_total_rows() > 0 && check_user_perm( 'emails', 'edit' ) )
 	{	// Display action icon to delete all records if at least one record exists & user has a permission:
 		$emails_Results->global_icon( sprintf( T_('Delete all emails sent to the User %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_sent_emails&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -6354,8 +6374,7 @@ function user_email_returns_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( ! $current_User->check_perm( 'users', 'moderate' ) || ! $current_User->check_perm( 'emails', 'view' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) || ! check_user_perm( 'emails', 'view' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -6390,7 +6409,7 @@ function user_email_returns_results_block( $params = array() )
 	$email_returns_Results->title = $params['results_title'];
 	$email_returns_Results->no_results_text = $params['results_no_text'];
 
-	if( $params['action'] != 'view' && $email_returns_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+	if( $params['action'] != 'view' && $email_returns_Results->get_total_rows() > 0 && check_user_perm( 'emails', 'edit' ) )
 	{	// Display action icon to delete all records if at least one record exists & user has a permission:
 		$email_returns_Results->global_icon( sprintf( T_('Delete all email returns from the User\'s email address %s'), $edited_User->get( 'email' ) ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_email_returns&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb( 'user' ), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -6442,8 +6461,7 @@ function user_reports_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -6631,7 +6649,7 @@ function merge_users( $merging_user_ID, $remaining_user_ID )
  */
 function user_reports_results( & $reports_Results, $params = array() )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
 	$reports_Results->cols[] = array(
 		'th' => T_('Date and time'),
@@ -6663,7 +6681,7 @@ function user_reports_results( & $reports_Results, $params = array() )
 		'td' => '$urep_info$',
 	);
 
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{ // Allow actions if current user has a permission to edit the users
 		$reports_Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -6773,17 +6791,10 @@ function users_results_block( $params = array() )
 			'display_delspam_info' => false,
 		), $params );
 
-	global $current_User;
-	if( ! $params['force_check_user'] )
-	{
-		if( ! is_logged_in() )
-		{ // Only logged in users can access to this function
-			return;
-		}
-		if( ! $current_User->check_perm( 'users', 'view' ) )
-		{ // Check minimum permission:
-			return;
-		}
+	if( ! $params['force_check_user'] &&
+	    ! check_user_perm( 'users', 'view' ) )
+	{	// Check minimum permission to view users:
+		return;
 	}
 
 	global $DB, $UserSettings, $Settings, $Session, $action, $admin_url, $action;
@@ -6865,13 +6876,13 @@ function users_results_block( $params = array() )
 		{	// show "activated users" filter only on admin interface:
 			$UserList->register_filter_preset( 'activated', T_('Activated users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
 
-			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+			if( check_user_perm( 'users', 'edit' ) )
 			{	// Show "Reported Users" filter only to users with edit user permission:
 				$UserList->register_filter_preset( 'reported', T_('Reported users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
 			}
 		}
 
-		if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+		if( is_admin_page() && check_user_perm( 'users', 'edit' ) )
 		{	// Settings for default user list filters:
 			$UserList->filter_area['advanced_defaults_jsfunc'] = 'evo_users_list_default_filters()';
 			// Initialize JavaScript for AJAX loading of popup window to change default filters on users list:
@@ -6889,7 +6900,7 @@ function users_results_block( $params = array() )
 
 	$UserList->global_icon( T_('Import Users'), 'new', $admin_url.'?ctrl=users&amp;action=csv', T_('Import Users').' &raquo;', 3, 4 );
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add user
@@ -6905,7 +6916,7 @@ function users_results_block( $params = array() )
 	{	// Display a button to add user to the organization:
 		$OrganizationCache = & get_OrganizationCache();
 		if( $Organization = & $OrganizationCache->get_by_ID( $params['org_ID'], false, false ) &&
-		    $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
+		    check_user_perm( 'orgs', 'edit', false, $Organization ) )
 		{	// If current user has a perm to edit the organization:
 			$UserList->global_icon( T_('Add user'), 'new', '#', T_('Add user'), 3, 4, array(
 					'class'   => 'action_icon btn-primary',
@@ -6932,7 +6943,7 @@ function users_results_block( $params = array() )
 
 	$user_list_buttons = array();
 
-	if( $params['display_btn_tags'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_btn_tags'] && check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add/remove tags from/to users:
 		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return add_remove_userlist_tags()">'
 				.format_to_output( T_('Add/Remove tags...') )
@@ -6941,7 +6952,7 @@ function users_results_block( $params = array() )
 		echo_userlist_tags_js();
 	}
 
-	if( $params['display_btn_account_status'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_btn_account_status'] && check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to set user account status:
 		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return set_account_status()">'
 				.format_to_output( T_('Set account status...') )
@@ -6950,7 +6961,7 @@ function users_results_block( $params = array() )
 		echo_userlist_set_account_status_js();
 	}
 
-	if( $params['display_btn_change_groups'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_btn_change_groups'] && check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to change user groups:
 		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return change_groups()">'
 				.format_to_output( T_('Change groups...') )
@@ -6959,7 +6970,7 @@ function users_results_block( $params = array() )
 		echo_userlist_change_groups_js();
 	}
 
-	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_automation'] && check_user_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add users to an automation:
 		$user_list_buttons[] = '<a href="#" class="btn btn-primary" onclick="return add_userlist_automation()">'
 				.format_to_output( T_('Add users to Automation...') )
@@ -6968,7 +6979,7 @@ function users_results_block( $params = array() )
 		echo_userlist_automation_js();
 	}
 
-	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_newsletter'] && check_user_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to change users of email campaign OR Create new email campaign for current selection:
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
@@ -7006,7 +7017,7 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Buttons and info to delete spammers:
 		if( $params['display_btn_delspam'] )
 		{	// Button to go to list with confirmation before spammers deleting:
@@ -7050,7 +7061,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User, $collections_Module, $admin_url;
+	global $Settings, $collections_Module, $admin_url;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -7142,7 +7153,7 @@ function users_results( & $UserList, $params = array() )
 		 * Group columns:
 		 */
 		$UserList->grp_cols[] = array(
-				'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
+				'td_class' => 'firstcol'.(check_user_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 				'td_colspan' => -1,  // nb_colds - 1
 				'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$" class="label label-primary">$grp_name$</a>'
 								.'~conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )~',
@@ -7230,7 +7241,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_nickname'] )
 	{ // Display nickname
 		$nickname_editing = $Settings->get( 'nickname_editing' );
-		if( $nickname_editing != 'hidden' && $current_User->check_perm( 'users', 'edit' ) )
+		if( $nickname_editing != 'hidden' && check_user_perm( 'users', 'edit' ) )
 		{
 			$UserList->cols[] = array(
 					'th' => T_('Nickname'),
@@ -7380,7 +7391,7 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	if( $params['display_source'] && $current_User->check_perm( 'users', 'edit', false ) )
+	if( $params['display_source'] && check_user_perm( 'users', 'edit', false ) )
 	{ // Display source
 		$UserList->cols[] = array(
 				'th' => T_('Source'),
@@ -7731,7 +7742,7 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	if( is_logged_in() && ! $current_User->check_perm( 'users', 'moderate' ) )
+	if( is_logged_in() && ! check_user_perm( 'users', 'moderate' ) )
 	{ // Current user has no permissions to moderate the users
 		if( isset( $userlist_col_reputaion ) )
 		{ // Display the reported users
@@ -7892,10 +7903,10 @@ function user_td_email( $email, $link_type = NULL, $user_row = NULL )
 
 function user_td_grp_actions( & $row )
 {
-	global $usedgroups, $Settings, $current_User;
+	global $usedgroups, $Settings;
 
 	$r = '';
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{
 		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=edit&amp;grp_ID='.$row->grp_ID ) );
 
@@ -8019,12 +8030,10 @@ function user_td_pm( $user_ID, $user_login )
 
 function user_td_status( $user_status, $user_ID )
 {
-	global $current_User;
-
 	$user_status_icons = get_user_status_icons( true );
 	$status_content = $user_status_icons[ $user_status ];
 
-	if( is_admin_page() && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	if( is_admin_page() && ( check_user_perm( 'users', 'edit' ) ) )
 	{ // current User is an administrator and view is displayed on admin interface, return link to user admin tab
 		return '<a href="'.get_user_identity_url( $user_ID, 'admin' ).'">'.$status_content.'</a>';
 	}
@@ -8042,7 +8051,7 @@ function user_td_status( $user_status, $user_ID )
  */
 function user_td_subscribed_list( $lists, $user_email = '' )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( empty( $lists ) )
 	{
@@ -8064,7 +8073,7 @@ function user_td_subscribed_list( $lists, $user_email = '' )
 
 		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
-			if( $current_User->check_perm( 'emails', 'view' ) )
+			if( check_user_perm( 'emails', 'view' ) )
 			{	// Display a newsletter as link if current use has a permission to view newsletters list:
 				$user_email_filter = ( empty( $user_email ) ? '' : '&amp;filter=new&amp;keywords='.rawurlencode( $user_email ) );
 				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'&amp;tab=subscribers'.$user_email_filter.'"'
@@ -8109,7 +8118,7 @@ function user_td_pass_status( $pass_driver )
  */
 function user_td_user_tags( $tags )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( empty( $tags ) )
 	{
@@ -8124,7 +8133,7 @@ function user_td_user_tags( $tags )
 	{
 		if( $loop_Tag = $UserTagCache->get_by_ID( $tag_ID, false ) )
 		{
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
 				$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
 			}
@@ -8150,7 +8159,7 @@ function user_td_user_tags( $tags )
 */
 function user_td_reg_country( $user_ID, $country_code, $country_name )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$flag = country_flag( $country_code, $country_name, 'w16px', 'flag', '', false, true, '', false );
 	if( empty( $flag ) )
@@ -8158,7 +8167,7 @@ function user_td_reg_country( $user_ID, $country_code, $country_name )
 		$flag = '?';
 	}
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // Only users with edit all users permission can see the 'Sessions' tab
 		$flag = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=sessions&amp;user_ID='.$user_ID.'">'.$flag.'</a>';
 	}
@@ -8257,7 +8266,7 @@ function user_td_actions( $user_ID )
 	{
 		$r .= get_icon( 'edit', 'noimg' );
 	}
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{ // Current user can edit all users
 		$r .= action_icon( T_('Duplicate this user...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=new&amp;user_ID='.$user_ID.'&amp;user_tab=profile' ) );
 		if( $user_ID != 1 && $user_ID != $current_User->ID )
@@ -8283,12 +8292,10 @@ function user_td_actions( $user_ID )
  */
 function user_td_org_actions( $org_ID, $user_ID )
 {
-	global $current_User;
-
 	$r = '';
 	$OrganizationCache = & get_OrganizationCache();
 	if( ( $user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false ) ) &&
-	    $current_User->check_perm( 'orgs', 'edit', false, $user_Organization ) )
+	    check_user_perm( 'orgs', 'edit', false, $user_Organization ) )
 	{ // Current user can edit membership information:
 		$link_params = array(
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
@@ -8366,12 +8373,10 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
  */
 function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 {
-	global $current_User;
-
 	$OrganizationCache = & get_OrganizationCache();
 	$Organization = & $OrganizationCache->get_by_ID( $org_ID );
 
-	if( $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
+	if( check_user_perm( 'orgs', 'edit', false, $Organization ) )
 	{	// Set the spec params for icon if user can edit the organization:
 		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
 	}
@@ -8399,7 +8404,7 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
  */
 function user_td_email_status( $emadr_status, $emadr_ID )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( empty( $emadr_status ) )
 	{	// If email address does not exist in DB:
@@ -8408,7 +8413,7 @@ function user_td_email_status( $emadr_status, $emadr_ID )
 
 	$status_content = emadr_get_status_icon( $emadr_status ).' '.emadr_get_status_title( $emadr_status );
 
-	if( is_admin_page() && $emadr_ID > 0 && $current_User->check_perm( 'emails', 'view' ) )
+	if( is_admin_page() && $emadr_ID > 0 && check_user_perm( 'emails', 'view' ) )
 	{	// Return a link to view email address details if current User has a permission:
 		return '<a href="'.$admin_url.'?ctrl=email&amp;emadr_ID='.$emadr_ID.'">'.$status_content.'</a>';
 	}
@@ -8445,9 +8450,8 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_st
 
 		case 'send_error':
 		case 'cannot_send': // This status doesn't exist in DB!
-			global $current_User;
 			$status_text = ( $csnd_status == 'cannot_send' ? T_('Cannot send') : T_('Send error') );
-			if( ! empty( $csnd_emlog_ID ) && $current_User->check_perm( 'emails', 'view' ) )
+			if( ! empty( $csnd_emlog_ID ) && check_user_perm( 'emails', 'view' ) )
 			{	// Make a link to view details of error sending:
 				$status_text = '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.$status_text.'</a>';
 			}
@@ -8561,7 +8565,7 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
  */
 function user_domain_info_display( $field_title, $field_key, $domain_name, & $Form )
 {
-	global $current_User, $admin_url, $UserSettings;
+	global $admin_url, $UserSettings;
 
 	if( ! is_logged_in() )
 	{	// Only for logged in users:
@@ -8569,8 +8573,8 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, & $Fo
 	}
 
 	$domain_name_formatted = format_to_output( $domain_name );
-	$display_user_domain = ( ! empty( $domain_name ) && $current_User->check_perm( 'stats', 'list' ) );
-	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	$display_user_domain = ( ! empty( $domain_name ) && check_user_perm( 'stats', 'list' ) );
+	$perm_stat_edit = check_user_perm( 'stats', 'edit' );
 	if( $display_user_domain )
 	{	// Get Domain:
 		$DomainCache = & get_DomainCache();
@@ -8773,7 +8777,7 @@ function display_user_groups_selectors( & $User, & $Form )
 
 	$GroupCache = & get_GroupCache();
 	$group_where_sql = '';
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
+	if( ! check_user_perm( 'users', 'edit' ) )
 	{	// Show the limited list for moderators:
 		$group_where_sql = 'grp_level < '.$current_User->get_Group()->get( 'level' );
 	}

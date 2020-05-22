@@ -85,7 +85,7 @@ $Form->begin_fieldset( TB_('Collection base URL').get_admin_badge().get_manual_l
 			array( 'allow_both', sprintf( TB_('Allow both %s and %s as valid URLs'), '<code>http</code>', '<code>https</code>' ) )
 		);
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
 
 		$Form->radio( 'http_protocol', $edited_Blog->get_setting( 'http_protocol' ), $http_protocol_options, TB_('SSL'), true );
@@ -317,7 +317,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( TB_('Cookie Settings').get_admin_badge().get_manual_link( 'collection-cookie-settings' ) );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// If current user has a permission to edit collection advanced admin settings:
 		$Form->switch_layout( 'none' );
 		$Form->output = false;
@@ -347,7 +347,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( TB_('Assets URLs / CDN support').get_admin_badge().get_manual_link( 'assets-url-cdn-settings' ) );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
 		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url;
 

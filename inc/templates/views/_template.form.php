@@ -93,7 +93,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->textarea( 'tpl_template_code', $edited_Template->get( 'template_code' ), 20, TB_('Template code'), '', 80, '', true );
 
 	$buttons = array();
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Allow to save template if current User has a permission:
 		if( $action == 'copy' )
 		{

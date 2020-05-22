@@ -267,12 +267,12 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 		}
 		$current_User = & $UserCache->get_by_login($login);
 		// check and don't login if the current user account was closed
-		if( $current_User->check_status( 'is_closed' ) )
+		if( check_user_status( 'is_closed' ) )
 		{ // user account was closed
 			unset( $current_User );
 			$login_error = T_('This account is closed. You cannot log in.');
 		}
-		elseif( $Settings->get('system_lock') && !$current_User->check_perm( 'users', 'edit' ) )
+		elseif( $Settings->get('system_lock') && ! check_user_perm( 'users', 'edit' ) )
 		{ // System is locked for maintenance and current user has no permission to log in this mode
 			unset( $current_User );
 			$login_error = T_('You cannot log in at this time because the system is under maintenance. Please try again in a few moments.');
@@ -299,7 +299,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 				}
 			}
 
-			if( $Settings->get('system_lock') && $current_User->check_perm( 'users', 'edit' ) )
+			if( $Settings->get('system_lock') && check_user_perm( 'users', 'edit' ) )
 			{ // System is locked for maintenance but current user has permission to log in, Display a message about this mode
 				$Messages->add( T_('The site is currently locked for maintenance.').' '.sprintf( T_('Click <a %s>here</a> to access lock settings.'), 'href="'.$admin_url.'?ctrl=tools"' ), 'warning' );
 			}
@@ -386,7 +386,7 @@ elseif( $Session->has_User() /* logged in */
 
 	if( $Settings->get('system_lock') )
 	{ // System is locked for maintenance
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{ // Current user is a "super admin"
 			if( ! $Messages->count() )
 			{ // If there are no other messages yet, display a warning about the system lock

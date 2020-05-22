@@ -161,14 +161,14 @@ class maintenance_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $AdminUI, $current_User, $auto_upgrade_from_any_url;
+		global $AdminUI, $auto_upgrade_from_any_url;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! check_user_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'maintenance', 'backup' ) )
+		if( check_user_perm( 'maintenance', 'backup' ) )
 		{
 			// Display Backup tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
@@ -178,7 +178,7 @@ class maintenance_Module extends Module
 							) );
 		}
 
-		if( $current_User->check_perm( 'maintenance', 'upgrade' ) )
+		if( check_user_perm( 'maintenance', 'upgrade' ) )
 		{
 			// Display Updates tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(

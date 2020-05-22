@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $admin_url, $current_User, $Blog;
+global $edited_Blog, $admin_url, $Blog;
 
 
 $Form = new Form( NULL, 'coll_other_checkchanges' );
@@ -102,7 +102,7 @@ $Form->begin_fieldset( TB_('Search results').get_manual_link( 'search-results-ot
 	$TemplateCache = & get_TemplateCache();
 	$TemplateCache->load_by_context( $context );
 	$template_options = $TemplateCache->get_code_option_array();
-	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+	$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.'&amp;blog='.$Blog->ID, NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => TB_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'search_result_template_item', $edited_Blog->get_setting( 'search_result_template_item' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Item') ), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'search_result_template_comment', $edited_Blog->get_setting( 'search_result_template_comment' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Comment') ), NULL, array( 'input_suffix' => $template_input_suffix ) );

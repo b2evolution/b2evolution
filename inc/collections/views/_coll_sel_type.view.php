@@ -32,7 +32,7 @@ if( $blog_kinds = get_collection_kinds() )
 	$coll_url_suffix = get_param( 'sec_ID' ) ? '&amp;sec_ID='.get_param( 'sec_ID' ) : '';
 	foreach( $blog_kinds as $kind => $info )
 	{
-		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
+		if( $kind == 'main' && ! check_user_perm( 'blog_admin', 'editAll', false ) )
 		{ // Non-collection admin should not be able to create Home/Main collections
 			continue;
 		}

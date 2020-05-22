@@ -261,7 +261,7 @@ if( ( $current_User->ID == $edited_User->ID ) || $can_moderate_user )
 
 	$more_content = '';
 
-	if( $action != 'view' && $current_User->check_perm( 'files', 'view' ) )
+	if( $action != 'view' && check_user_perm( 'files', 'view' ) )
 	{	// If current user can edit this User:
 		$more_content .= '<a href="'.$admin_url.'?ctrl=files&amp;user_ID='.$edited_User->ID.'">';
 		$more_content .= TB_( 'Use the file manager to assign a new profile picture' ).'</a>';

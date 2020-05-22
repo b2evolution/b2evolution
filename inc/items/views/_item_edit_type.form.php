@@ -25,7 +25,7 @@ $SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID AND itc_
 $item_type_perm_levels = array( 'standard', 'restricted', 'admin' );
 foreach( $item_type_perm_levels as $i => $item_type_perm_level )
 {
-	if( ! $current_User->check_perm( 'blog_item_type_'.$item_type_perm_level, 'edit', false, $Blog->ID ) )
+	if( ! check_user_perm( 'blog_item_type_'.$item_type_perm_level, 'edit', false, $Blog->ID ) )
 	{
 		unset( $item_type_perm_levels[ $i ] );
 	}
@@ -90,7 +90,7 @@ $Results->cols[] = array(
 		'td_class' => 'center %conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, " info", "" )%'
 	);
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {	// Add aactions if current user has a permission:
 	$Results->cols[] = array(
 			'th' => TB_('Actions'),

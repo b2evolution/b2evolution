@@ -2391,28 +2391,27 @@ class Plugins
 		{
 			if( is_admin_page() )
 			{ // Display info about no renderer plugins only in backoffice
-				global $current_User;
-				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
+				if( check_user_perm( 'admin', 'normal' ) )
 				{
 					global $admin_url;
 					switch( $setting_name )
 					{
 						case 'msg_apply_rendering':
-							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'perm_messaging', 'reply' ) && check_user_perm( 'options', 'edit' ) )
 							{ // Check if current user can edit the messaging settings
 								$settings_url = $admin_url.'?ctrl=msgsettings&amp;tab=renderers';
 							}
 							break;
 
 						case 'email_apply_rendering':
-							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'perm_messaging', 'reply' ) && check_user_perm( 'options', 'edit' ) )
 							{ // Check if current user can edit the email settings
 								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
 							}
 							break;
 
 						case 'shared_apply_rendering':
-							if( $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'options', 'edit' ) )
 							{	// Check if current user can edit the plugin settings for shared container:
 								$settings_url = $admin_url.'?ctrl=plugins&amp;tab=shared';
 							}
@@ -2421,7 +2420,7 @@ class Plugins
 						case 'coll_apply_comment_rendering':
 						case 'coll_apply_rendering':
 						default:
-							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
+							if( ! empty( $setting_Blog ) && check_user_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
 								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$setting_Blog->ID;
 							}

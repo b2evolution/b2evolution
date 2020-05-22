@@ -3939,9 +3939,9 @@ class Plugin
 	 */
 	function get_help_file()
 	{
-		global $default_locale, $plugins_path, $current_User;
+		global $default_locale, $plugins_path;
 
-		if( empty( $current_User ) || !$current_User->check_perm( 'options', 'view', false ) )
+		if( ! check_user_perm( 'options', 'view' ) )
 		{ // README gets displayed through plugins controller, which requires these perms
 			// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
 			return false;
@@ -3995,9 +3995,9 @@ class Plugin
 	 */
 	function get_edit_settings_url()
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! $current_User->check_perm( 'options', 'edit', false ) )
+		if( ! check_user_perm( 'options', 'edit', false ) )
 		{
 			return false;
 		}

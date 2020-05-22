@@ -17,7 +17,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $current_User, $display_mode, $antispamsrv_host, $antispamsrv_tos_url;
+global $Settings, $display_mode, $antispamsrv_host, $antispamsrv_tos_url;
 global $keyword;
 
 global $row_stats;	// for hit functions
@@ -157,7 +157,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : TB_('Confirm ban & dele
 			{ // This comment was already deleted
 				continue;
 			}
-			if( !$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $affected_Comment ) )
+			if( ! check_user_perm( 'comment!CURSTATUS', 'edit', false, $affected_Comment ) )
 			{ // no permission to delete
 				$no_perms_count[$comment_status] = $no_perms_count[$comment_status] + 1;
 				continue;
@@ -193,7 +193,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : TB_('Confirm ban & dele
 	$res_affected_users = $DB->get_results( $sql, OBJECT, 'Find matching users' );
 	if( $DB->num_rows != 0 )
 	{
-		if( ! $current_User->check_perm( 'users', 'view', false ) )
+		if( ! check_user_perm( 'users', 'view', false ) )
 		{ // current user has no permission to view users
 			printf( '<p>'.TB_('There are %d matching <strong>users</strong> but you have no permission to see them.').'</p>', $DB->num_rows );
 		}
@@ -211,7 +211,7 @@ $Form->begin_form( 'fform', $display_mode == 'js' ? '' : TB_('Confirm ban & dele
 				</tr></thead>
 			 	<?php
 			 	$count = 0;
-				$current_user_edit_perm = $current_User->check_perm( 'users', 'edit', false );
+				$current_user_edit_perm = check_user_perm( 'users', 'edit', false );
 				foreach( $res_affected_users as $row_stats )
 				{ // Display affected users
 					$affected_User = new User($row_stats);

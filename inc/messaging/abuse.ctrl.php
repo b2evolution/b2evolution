@@ -6,13 +6,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'messaging/model/_thread.class.php', 'Thread' );
 load_class( 'messaging/model/_message.class.php', 'Message' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-if( !$current_User->check_perm( 'perm_messaging', 'abuse' ) )
+if( ! check_user_perm( 'perm_messaging', 'abuse' ) )
 {
 	$Messages->add( 'Sorry, you are not allowed to abuse management!' );
 	header_redirect( $admin_url );
@@ -50,7 +45,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'messaging_threads' );
 
 		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'delete', true );
+		check_user_perm( 'perm_messaging', 'delete', true );
 
 		// Make sure we got an thrd_ID:
 		param( 'thrd_ID', 'integer', true );

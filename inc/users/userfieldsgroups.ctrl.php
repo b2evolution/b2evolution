@@ -15,13 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load Userfield class:
 load_class( 'users/model/_userfieldgroup.class.php', 'UserfieldGroup' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 // Set options path:
 $AdminUI->set_path( 'users', 'usersettings', 'userfields' );
@@ -47,7 +42,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		if( ! isset($edited_UserfieldGroup) )
 		{	// We don't have a model to use, start with blank object:
@@ -62,7 +57,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ufgp_ID:
 		param( 'ufgp_ID', 'integer', true );
@@ -78,7 +73,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'userfieldgroup' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// load data from request
 		if( $edited_UserfieldGroup->load_from_Request() )
@@ -116,7 +111,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'userfieldgroup' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ufgp_ID:
 		param( 'ufgp_ID', 'integer', true );
@@ -145,7 +140,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'userfieldgroup' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ufgp_ID:
 		param( 'ufgp_ID', 'integer', true );

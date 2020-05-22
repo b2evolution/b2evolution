@@ -16,10 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -43,7 +39,7 @@ $Form->begin_fieldset( TB_( 'Email envelope' ).get_manual_link( 'email-notificat
 	// Set notes for notifications sender settings which shows the users custom settings information
 	$notification_sender_email_note = '';
 	$notification_sender_name_note = '';
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // Show infomration and action buttons only for users with edit users permission
 		$users_url = url_add_param( $admin_url, 'ctrl=users&filter=new', '&' );
 		$redirect_to = rawurlencode( regenerate_url( '', '', '', '&' ) );
@@ -77,7 +73,7 @@ $Form->begin_fieldset( TB_( 'Email envelope' ).get_manual_link( 'email-notificat
 	$Form->fileselect( 'notification_logo_file_ID', $Settings->get( 'notification_logo_file_ID' ), TB_('Select site logo'), NULL, $fileselect_params );
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

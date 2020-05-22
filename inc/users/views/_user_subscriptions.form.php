@@ -186,7 +186,7 @@ $Form->begin_fieldset( TB_('Receiving private messages').( is_admin_page() ? get
 	}
 	elseif( ( $emails_msgform == 'adminset' ) )
 	{ // only administrator users can set and current User is in 'Administrators' group
-		$is_disabled_email_method = ( $disabled || ! $current_User->check_perm( 'users', 'edit' ) );
+		$is_disabled_email_method = ( $disabled || ! check_user_perm( 'users', 'edit' ) );
 		$messaging_options[] = array( 'enable_email', 1, TB_( 'emails through a message form that will NOT reveal my email address.' ).get_admin_badge( 'user' ), $UserSettings->get( 'enable_email', $edited_User->ID ), $is_disabled_email_method, $email_messaging_note );
 	}
 	elseif( ! empty( $email_messaging_note ) )
@@ -411,7 +411,7 @@ if( $notifications_mode != 'off' )
 					$post_subs = array();
 					$post_counter = 0;
 				}
-				if( is_admin_page() && $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
+				if( is_admin_page() && check_user_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
 				{ // Link title to back-office if user has a permission
 					$item_title = '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$row->blog_ID.'&amp;p='.$Item->ID.'">'.format_to_output( $Item->get( 'title' ) ).'</a>';
 				}
@@ -492,7 +492,7 @@ $Form->begin_fieldset( TB_('Receiving notifications').( is_admin_page() ? get_ma
 	{ // user is member of at least one collection
 		$notify_options[ TB_('Posts') ][] = array( 'edited_user_notify_post_assignment', 1, TB_('a post was assigned to me.'), $UserSettings->get( 'notify_post_assignment', $edited_User->ID ), $disabled );
 	}
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // current User is an administrator
 		$notify_options[ TB_('My account') ][] = array( 'edited_user_send_activation_reminder', 1, sprintf( TB_('my account was deactivated or is not activated for more than %s.').get_admin_badge( 'user' ), seconds_to_period( $Settings->get( 'activate_account_reminder_threshold' ) ) ), $UserSettings->get( 'send_activation_reminder', $edited_User->ID ), $disabled );
 	}
@@ -515,7 +515,7 @@ $Form->begin_fieldset( TB_('Receiving notifications').( is_admin_page() ? get_ma
 
 	$notify_options[ TB_('System maintenance') ][] = array( 'edited_user_notify_list_new_subscriber', 1, TB_('one of my Lists gets a new subscriber.'), $UserSettings->get( 'notify_list_new_subscriber', $edited_User->ID ), $disabled );
 	$notify_options[ TB_('System maintenance') ][] = array( 'edited_user_notify_list_lost_subscriber', 1, TB_('one of my Lists loses a subscriber.'), $UserSettings->get( 'notify_list_lost_subscriber', $edited_User->ID ), $disabled );
-	if( $current_User->check_perm( 'users', 'edit' ) && $edited_User->check_perm( 'options', 'view' ) )
+	if( check_user_perm( 'users', 'edit' ) && $edited_User->check_perm( 'options', 'view' ) )
 	{	// current User is an administrator and the edited user has a permission to automations:
 		$notify_options[ TB_('System maintenance') ][] = array( 'edited_user_notify_automation_owner', 1, TB_('one of my automations wants to notify me.'), $UserSettings->get( 'notify_automation_owner', $edited_User->ID ), $disabled );
 	}

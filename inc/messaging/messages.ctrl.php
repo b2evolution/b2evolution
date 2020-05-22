@@ -26,7 +26,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 {
 	$Messages->add( TB_('You are not allowed to view messages.') );
 	header_redirect( $admin_url );
@@ -41,7 +41,7 @@ param_action();
 global $perm_abuse_management;
 
 $tab = param( 'tab', 'string' );
-if( $tab == 'abuse' && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+if( $tab == 'abuse' && check_user_perm( 'perm_messaging', 'abuse' ) )
 {	// We go from abuse management and have a permissions
 	$perm_abuse_management = true;
 }
@@ -139,7 +139,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'messaging_messages' );
 
 		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'delete', true );
+		check_user_perm( 'perm_messaging', 'delete', true );
 
 		// Make sure we got an msg_ID:
 		param( 'msg_ID', 'integer', true );

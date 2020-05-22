@@ -429,7 +429,7 @@ body {
 	 */
 	function get_header_tabs()
 	{
-		global $Blog, $disp, $current_User;
+		global $Blog, $disp;
 
 		$header_tabs = array();
 
@@ -493,7 +493,7 @@ body {
 				}
 
 				if( $in_bloglist == 'member' &&
-						! $current_User->check_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
+						! check_user_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
 				{	// Only members have an access to this collection, Skip it:
 					continue;
 				}

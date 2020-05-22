@@ -584,8 +584,6 @@ class ItemListLight extends DataObjectList2
 	 */
 	function query_init()
 	{
-		global $current_User;
-
 		// Call reset to init the ItemQuery
 		// This prevents from adding the same conditions twice if the ItemQuery was already initialized
 		$this->reset();

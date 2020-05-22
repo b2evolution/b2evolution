@@ -146,7 +146,7 @@ class ItemLight extends DataObject
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
-		global $localtimenow, $default_locale, $current_User;
+		global $localtimenow, $default_locale;
 
 		// Call parent constructor:
 		parent::__construct( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
@@ -946,8 +946,8 @@ class ItemLight extends DataObject
 				}
 				else
 				{	// Main chapter is defined, we can show the page
-					global $Messages, $current_User;
-					if( is_logged_in() && $current_User->check_perm( 'blogs', 'editall' ) )
+					global $Messages;
+					if( check_user_perm( 'blogs', 'editall' ) )
 					{ // User has permission to all blogs posts and comments, display a message as note in order to allow update it
 						$message_type = 'note';
 					}
@@ -1958,9 +1958,9 @@ class ItemLight extends DataObject
 	 */
 	function get_history_url( $glue = '&amp;' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{ // Current user cannot see a history
 			return false;
 		}

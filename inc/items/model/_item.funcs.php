@@ -821,7 +821,6 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	// init allowed statuses array
 	$allowed_statuses = array();
 
-	$is_logged_in = is_logged_in( false );
 	$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_user_ID';
 	// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
 	// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
@@ -834,54 +833,54 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 				break;
 
 			case 'community': // It is always allowed for logged in users
-				$allowed = $is_logged_in;
+				$allowed = is_logged_in( false );
 				break;
 
 			case 'protected': // It is always allowed for members
-				$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
+				$allowed = check_user_perm( 'blog_ismember', 1, false, $req_blog, false );
 				break;
 
 			case 'private': // It is allowed for users who has global 'editall' permission
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+				$allowed = check_user_perm( 'blogs', 'editall', false, NULL, false );
 				if( ! $allowed && $dbprefix == 'comment_' )
 				{	// Allow the private comments for collection owner:
-					$allowed = ( $is_logged_in && $current_User->check_perm_blogowner( $req_blog ) );
+					$allowed = ( is_logged_in( false ) && $current_User->check_perm_blogowner( $req_blog ) );
 				}
-				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
+				if( !$allowed && check_user_perm( $perm_prefix.'private', 'create', false, $req_blog, false ) )
 				{ // Own private posts/comments are allowed if user can create private posts/comments
 					$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
 				}
 				break;
 
 			case 'review': // It is allowed for users who have permission to create comments with 'review' status and have at least 'lt' posts/comments edit perm
-				$allowed = ( $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'moderate', false, $req_blog ) );
-				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'create', false, $req_blog ) )
+				$allowed = check_user_perm( $perm_prefix.'review', 'moderate', false, $req_blog, false );
+				if( ! $allowed && check_user_perm( $perm_prefix.'review', 'create', false, $req_blog, false ) )
 				{ // Own posts/comments with 'review' status are allowed if user can create posts/comments with 'review' status
 					$where[] = ' ( '.$dbprefix."status = 'review' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
 				}
 				break;
 
 			case 'draft': // In back-office it is always allowed for users who may create posts/commetns with 'draft' status
-				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
-				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) )
+				$allowed = ( is_admin_page() && check_user_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
+				if( ! $allowed && check_user_perm( $perm_prefix.'draft', 'create', false, $req_blog, false ) )
 				{ // In front-office only authors may see their own draft posts/comments, but only if the have permission to create draft posts/comments
 					$where[] = ' ( '.$dbprefix."status = 'draft' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
 				}
 				break;
 
 			case 'deprecated': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
-				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
+				$allowed = ( is_admin_page() && check_user_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
 				// In front-office it is never allowed
 				break;
 
 			case 'redirected': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
-				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'redirected', 'create', false, $req_blog ) );
+				$allowed = ( is_admin_page() && check_user_perm( $perm_prefix.'redirected', 'create', false, $req_blog ) );
 				// In front-office it is never allowed
 				break;
 
 			case 'trash':
 				// Currently only users with global editall permissions are allowed to view/delete recycled comments
-				$allowed = ( ( $dbprefix == 'comment_' ) && is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
+				$allowed = ( ( $dbprefix == 'comment_' ) && is_admin_page() && check_user_perm( 'blogs', 'editall' ) );
 				// In front-office it is never allowed
 				break;
 
@@ -958,7 +957,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 
 	if( is_logged_in( false ) && $filter_by_perm )
 	{ // User is logged in and the account was activated
-		if( $current_User->check_perm( 'blogs', 'editall', false ) )
+		if( check_user_perm( 'blogs', 'editall', false ) )
 		{ // User has permission to all blogs posts and comments, we don't have to check blog specific permissions.
 			$allowed_statuses_cond = get_allowed_statuses_condition( $show_statuses, $dbprefix, NULL, $perm_prefix );
 			if( ! empty( $allowed_statuses_cond ) )
@@ -1228,7 +1227,7 @@ function recreate_autogenerated_excerpts( $continue_url, $remove_all = true, $de
  */
 function cat_select( $Form, $form_fields = true, $show_title_links = true, $params = array() )
 {
-	global $blog, $Blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $blog, $Blog, $current_blog_ID, $edited_Item, $cat_select_form_fields;
 	global $admin_url, $rsc_url;
 
 	if( get_post_cat_setting( $blog ) < 1 )
@@ -1285,7 +1284,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	// Init cat display param
 	$cat_display_params = array_merge( $params, array( 'total_count' => 0 ) );
 
-	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
+	if( check_user_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
 	{	// If collection cross posting is enabled, go through collections where current Item Type is enabled or current Item already uses categories of those collections:
@@ -1305,8 +1304,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 		foreach( $BlogCache->cache as $l_Blog )
 		{	// Run recursively through the categories of the detected collections:
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
-			    ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
+			if( ! check_user_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
+			    ! check_user_perm( 'blog_admin', '', false, $l_Blog->ID ) )
 			{	// Skip collection if current user has no appropriate permissions:
 				continue;
 			}
@@ -1537,7 +1536,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count, $params = array() )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item, $current_User;
+	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item;
 	global $creating, $cat_select_level, $cat_select_form_fields;
 
 	$params = array_merge( array(
@@ -1550,7 +1549,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count, $params = array(
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
 
-	if( $thisChapter->lock && !$current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
+	if( $thisChapter->lock && ! check_user_perm( 'blog_cats', '', false, $current_blog_ID ) )
 	{	// This chapter is locked and current user has no permission to edit the categories of this blog
 		return;
 	}
@@ -1677,14 +1676,14 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new( & $cat_display_params )
 {
-	global $blog, $Blog, $current_User;
+	global $blog, $Blog;
 
 	if( ! $cat_display_params['display_new'] )
 	{	// Don't display an input to create new category:
 		return '';
 	}
 
-	if( ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
+	if( ! check_user_perm( 'blog_cats', '', false, $blog ) )
 	{	// Current user cannot add/edit a categories for this blog
 		return '';
 	}
@@ -1757,7 +1756,7 @@ function cat_select_new( & $cat_display_params )
  */
 function attach_browse_tabs( $display_tabs3 = true )
 {
-	global $AdminUI, $Collection, $Blog, $current_User, $admin_url, $ItemTypeCache;
+	global $AdminUI, $Collection, $Blog, $admin_url, $ItemTypeCache;
 
 	if( empty( $Blog ) )
 	{ // No blog
@@ -1766,7 +1765,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 
 	$menu_entries = array();
 
-	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+	if( $Blog->get_setting( 'use_workflow' ) && check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{ // We want to use workflow properties for this blog:
 		$menu_entries['tracker'] = array(
 			'text' => T_('Workflow view'),
@@ -1832,7 +1831,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 
 	if( $display_tabs3 )
 	{
-		if( $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_comments', 'view', false, $Blog->ID ) )
 		{	// User has permission to edit published, draft or deprecated comments (at least one kind)
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'fullview' => array(
@@ -1844,7 +1843,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 				) );
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		if( check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 		{	// Initialize menu entry for Internal comments if current user has a permission:
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'meta' => array(
@@ -2080,7 +2079,7 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 {
 	$labels = array_merge( get_visibility_statuses('notes-array'), $labels );
 
-	global $current_User, $Collection, $Blog;
+	global $Collection, $Blog;
 
 	$mass_create_statuses = array( 'redirected' );
 
@@ -2088,7 +2087,7 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 
 	foreach( $labels as $status => $label )
 	{
-		if( $current_User->check_perm( 'blog_post!'.$status, 'create', false, $Blog->ID ) &&
+		if( check_user_perm( 'blog_post!'.$status, 'create', false, $Blog->ID ) &&
 		    ( !in_array( $status, $mass_create_statuses ) || !$mass_create ) )
 		{
 			$sharing_options[] = array( $status, $label[0].' <span class="notes">'.$label[1].'</span>' );
@@ -2180,7 +2179,7 @@ function load_publish_status( $creating = false )
  */
 function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
-	global $Collection, $Blog, $current_User, $UserSettings;
+	global $Collection, $Blog, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID, true, '', $edited_Item );
@@ -2254,7 +2253,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	// ---------- SAVE ----------
 	$save_hotkeys = array( 'ctrl+enter', 'command+enter' );
 	$next_action = ($creating ? 'create' : 'update');
-	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! $inskin && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
 		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'),
 				'SaveEditButton btn-status-'.$edited_Item->get( 'status' ), 'data-shortcut' => 'ctrl+s,command+s' ) );
@@ -3468,7 +3467,7 @@ function echo_autocomplete_tags( $params = array() )
  */
 function check_perm_posttype( $item_typ_ID, $post_extracats, $assert_post_type = true, $assert_permission = true )
 {
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	$ItemTypeCache = & get_ItemTypeCache();
 	$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
@@ -3483,7 +3482,7 @@ function check_perm_posttype( $item_typ_ID, $post_extracats, $assert_post_type =
 	}
 
 	// Check permission:
-	return $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', $assert_permission, $post_extracats );
+	return check_user_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', $assert_permission, $post_extracats );
 }
 
 
@@ -3563,7 +3562,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
  */
 function check_cross_posting( & $post_category, & $post_extracats, $prev_main_cat = NULL )
 {
-	global $Messages, $blog, $current_User;
+	global $Messages, $blog;
 	$result = true;
 
 	$post_category = param( 'post_category', 'integer', -1 );
@@ -3590,7 +3589,7 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 			continue;
 		}
 		$cat_blog = get_catblog( $cat );
-		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) ) )
+		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && check_user_perm( 'blog_admin', '', false, $cat_blog ) ) )
 		{ // this cat is not from the main category
 			$Messages->add( T_('You are not allowed to cross post to several collections.') );
 			$result = false;
@@ -3603,7 +3602,7 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 
 	// Check if post_category belongs to a collection different from the previous main cat collection
 	if( $prev_main_cat && ( $prev_cat_blog != $post_cat_blog ) &&
-			! ( $allow_cross_posting >= 2 && $current_User->check_perm( 'blog_admin', '', false, $prev_cat_blog ) && $current_User->check_perm( 'blog_admin', '', false, $post_cat_blog ) ) )
+			! ( $allow_cross_posting >= 2 && check_user_perm( 'blog_admin', '', false, $prev_cat_blog ) && check_user_perm( 'blog_admin', '', false, $post_cat_blog ) ) )
 	{
 		$Messages->add( T_('You are not allowed to move post between collections.') );
 		$result = false;
@@ -3686,8 +3685,7 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 
 	if( ! $post_category || in_array( 0, $post_extracats ) )	// if category key is 0 => means it is a new category
 	{
-		global $current_User;
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
+		if( ! check_user_perm( 'blog_cats', '', false, $Blog->ID ) )
 		{	// Current user cannot add a categories for this blog
 			check_categories_nosave( $post_category, $post_extracats, $Item, $from ); // set up the category parameters
 			$Messages->add( T_('You are not allowed to create a new category.'), 'error' );
@@ -3764,8 +3762,8 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 		$ingnored_length = strlen( $ignored_cats );
 		if( $ingnored_length > 2 )
 		{ // ingnore list is not empty
-			global $current_User, $admin_url;
-			if( $current_User->check_perm( 'options', 'view', false ) )
+			global $admin_url;
+			if( check_user_perm( 'options', 'view', false ) )
 			{
 				$cross_posting_text = '<a href="'.$admin_url.'?ctrl=collections&amp;tab=blog_settings">'.T_('cross-posting is disabled').'</a>';
 			}
@@ -3973,10 +3971,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	{	// Set filters to display only comments of the given Item:
 		if( $comment_type == 'meta' )
 		{	// Check if current user can sees internal comments of this item:
-			global $current_User;
 			$ItemCache = & get_ItemCache();
 			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $blog_ID ) )
+			if( ! $Item || ! check_user_perm( 'meta_comment', 'view', false, $blog_ID ) )
 			{ // Current user has no permissions to view internal comments
 				$comment_type = 'feedback';
 			}
@@ -4075,7 +4072,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  */
 function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
-	global $current_User, $localtimenow, $item_id;
+	global $localtimenow, $item_id;
 
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
@@ -4107,8 +4104,8 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 	}
 	echo '"'.$reply_level_style.'>';
 
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
-	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
+	    ( $Comment->is_meta() && check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
 	{	// User can moderate this comment OR Comment is meta and current user can view internal comments of the collection:
 		echo '<div class="panel-heading small">';
 		echo '<div>';
@@ -4202,12 +4199,12 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		echo '<div class="bCommentText">';
 		$Comment->rating();
 		$Comment->avatar( 'crop-top-80x80' );
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		if( check_user_perm( 'meta_comment', 'edit', false, $Comment ) )
 		{ // Put the comment content into this container to edit by ajax
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', 'true' );
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		if( check_user_perm( 'meta_comment', 'edit', false, $Comment ) )
 		{ // End of the container that is used to edit internal comment by ajax
 			echo '</div>';
 		}
@@ -4455,7 +4452,7 @@ function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params =
 function check_item_perm_edit( $post_ID, $do_redirect = true )
 {
 	global $Messages;
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	$user_can_edit = false;
 
@@ -4463,7 +4460,7 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	{ // Check permissions for editing of the current item:
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
-		$user_can_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
+		$user_can_edit = check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
 		$permission_message = T_('You don\'t have permission to edit this post');
 
 		if( $user_can_edit )
@@ -4487,7 +4484,7 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	else
 	{ // Check permissions for creating of a new item:
 		$perm_target = empty( $Blog ) ? NULL : $Blog->ID;
-		$user_can_edit = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $perm_target );
+		$user_can_edit = check_user_perm( 'blog_post_statuses', 'edit', false, $perm_target );
 		$permission_message = T_('You don\'t have permission to post into this blog');
 	}
 
@@ -4543,8 +4540,7 @@ function check_item_perm_create( $check_Blog = NULL )
 	}
 	else
 	{	// Check permissions for current user
-		global $current_User;
-		return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $check_Blog->ID );
+		return check_user_perm( 'blog_post_statuses', 'edit', false, $check_Blog->ID );
 	}
 
 	return true;
@@ -5267,7 +5263,7 @@ function items_manual_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User, $blog, $Collection, $Blog, $admin_url, $Session;
+	global $blog, $Collection, $Blog, $admin_url, $Session;
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
 
@@ -5316,7 +5312,7 @@ function items_manual_results_block( $params = array() )
 						$ChapterCache = & get_ChapterCache();
 						if( $updated_Chapter = & $ChapterCache->get_by_ID( $order_obj_ID, false ) )
 						{
-							if( $current_User->check_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
+							if( check_user_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
 							{ // Check permission to edit this Chapter
 								$updated_Chapter->set( 'order', intval( $new_value ) );
 								$updated_Chapter->dbupdate();
@@ -5330,7 +5326,7 @@ function items_manual_results_block( $params = array() )
 						$ItemCache = & get_ItemCache();
 						if( $updated_Item = & $ItemCache->get_by_ID( $order_obj_ID, false ) )
 						{
-							if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
+							if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
 							{ // Check permission to edit this Item
 								$updated_Item->update_order( $new_value, $cat_ID );
 							}
@@ -5432,13 +5428,7 @@ function items_created_results_block( $params = array() )
 			'action'               => '',
 		), $params );
 
-	if( !is_logged_in() )
-	{	// Only logged in users can access to this function
-		return;
-	}
-
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -5526,13 +5516,7 @@ function items_edited_results_block( $params = array() )
 			'results_no_text'      => T_('User has not edited any posts'),
 		), $params );
 
-	if( !is_logged_in() )
-	{	// Only logged in users can access to this function
-		return;
-	}
-
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -5798,7 +5782,7 @@ function get_item_version_title( $Version )
  */
 function items_results( & $items_Results, $params = array() )
 {
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -5822,7 +5806,7 @@ function items_results( & $items_Results, $params = array() )
 		), $params );
 
 	if( $params['display_selector'] &&
-	    is_logged_in() && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	    check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 	{	// Display item selector only if current User has a permission to edit:
 		$items_Results->cols[] = array(
 				'th' => '',
@@ -5849,7 +5833,7 @@ function items_results( & $items_Results, $params = array() )
 					'text' => get_mass_change_renderer_buttons( 'btn-xs' ),
 				),
 			);
-		if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		if( is_pro() && check_user_perm( 'options', 'edit' ) )
 		{	// Export Items only for PRO version:
 			$items_Results->list_mass_actions['mass_export'] = array(
 					'type'  => 'submit',
@@ -5998,9 +5982,9 @@ function items_results( & $items_Results, $params = array() )
  */
 function item_type_global_icons( $object_Widget )
 {
-	global $current_User, $admin_url, $DB, $Collection, $Blog, $Session;
+	global $admin_url, $DB, $Collection, $Blog, $Session;
 
-	if( is_logged_in() && ! empty( $Blog ) && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	if( ! empty( $Blog ) && check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 	{ // We have permission to add a post with at least one status:
 		$tab_type = ( get_param( 'tab' ) == 'type' ) ? get_param( 'tab_type' ) : '';
 
@@ -6030,8 +6014,8 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
-			if( $current_User->check_perm( 'admin', 'normal' ) &&
-			    $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'admin', 'normal' ) &&
+			    check_user_perm( 'options', 'edit' ) )
 			{	// Icon buttons for import:
 				$import_buttons = array(
 					'xml' => array(
@@ -6096,7 +6080,7 @@ function item_type_global_icons( $object_Widget )
 
 			foreach( $item_types as $item_type )
 			{
-				if( $current_User->check_perm( 'blog_item_type_'.$item_type->perm_level, 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_item_type_'.$item_type->perm_level, 'edit', false, $Blog->ID ) )
 				{ // We have the permission to create posts with this post type:
 					$object_Widget->global_icon( T_('Create multiple posts...'), 'new',
 						$admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID,
@@ -6334,7 +6318,7 @@ function display_mass_items_confirmation_panel()
  */
 function task_title_link( $Item, $display_flag = true, $display_status = false )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$col = '';
 	if( $display_status && is_logged_in() )
@@ -6388,7 +6372,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		$col .= '</a> ';
 	}
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item->get_blog_ID() ) )
+	if( check_user_perm( 'meta_comment', 'view', false, $Item->get_blog_ID() ) )
 	{	// Display icon of internal comments Only if current user can views internal comments:
 		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 		if( $metas_count > 0 )
@@ -6452,7 +6436,7 @@ function item_row_slug( $item_slug )
  */
 function item_row_status( $Item, $index, $cat_ID = NULL )
 {
-	global $current_User, $AdminUI, $Collection, $admin_url;
+	global $AdminUI, $Collection, $admin_url;
 
 	$Item->load_Blog();
 	$blog_ID = $Item->Blog->ID;
@@ -6462,7 +6446,7 @@ function item_row_status( $Item, $index, $cat_ID = NULL )
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 
-	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
+	if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' && !empty( $status_options ) )
 	{ // Use dropdown for bootstrap skin and if current user can edit this post
 		$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -6500,7 +6484,7 @@ function item_row_status( $Item, $index, $cat_ID = NULL )
  */
 function item_row_order( $Item )
 {
-	global $current_User, $ItemList, $Blog;
+	global $ItemList, $Blog;
 
 	if( isset( $ItemList, $ItemList->filters['cat_single'] ) &&
 	    ! empty( $ItemList->filters['cat_single'] ) )
@@ -6528,7 +6512,7 @@ function item_row_order( $Item )
 	{	// Don't allow to edit order because in such case we display a sum of orders from all extra categories of the Item:
 		return '<span data-toggle="tooltip" title="'.format_to_output( sprintf( T_('Several order numbers were found: %s. This will sort as %s.'), implode( '+', $Item->get_orders_by_coll_ID( $Blog->ID, true ) ), $item_order ), 'htmlattr' ).'">'.$item_order.'</span>';
 	}
-	elseif( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	elseif( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
 		return '<a href="#" rel="'.$Item->ID.'"'.$order_cat_attr.'>'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 	}
@@ -6547,9 +6531,7 @@ function item_row_order( $Item )
  */
 function item_row_checkbox( $Item )
 {
-	global $current_User;
-
-	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// Allow to select Item only if current User can edit it:
 		return '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" />';
 	}
@@ -6563,7 +6545,7 @@ function item_row_checkbox( $Item )
  */
 function item_edit_actions( $Item )
 {
-	global $admin_url, $blog, $current_User;
+	global $admin_url, $blog;
 
 	$r = '';
 
@@ -6583,7 +6565,7 @@ function item_edit_actions( $Item )
 		'title' => '#',
 		'class' => '' ) );
 
-	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Item only for PRO version:
 		$r .= action_icon( T_('Export this Item...'), 'download',
 			$admin_url.'?ctrl=exportxml&amp;action=export_item&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID.'&amp;'.url_crumb( 'item' ) );
@@ -6648,7 +6630,7 @@ function manual_display_chapters( $params = array() )
  */
 function manual_display_chapter_row( $Chapter, $level, $params = array() )
 {
-	global $line_class, $current_User, $Settings;
+	global $line_class, $Settings;
 	global $admin_url;
 	global $Session;
 
@@ -6660,8 +6642,8 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$perm_edit = $current_User->check_perm( 'blog_cats', '', false, $Chapter->blog_ID );
-	$perm_create_item = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Chapter->blog_ID );
+	$perm_edit = check_user_perm( 'blog_cats', '', false, $Chapter->blog_ID );
+	$perm_create_item = check_user_perm( 'blog_post_statuses', 'edit', false, $Chapter->blog_ID );
 
 	// Redirect to manual pages after adding/editing chapter
 	$redirect_page = '&amp;redirect_page=manual';
@@ -6764,7 +6746,7 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
  */
 function manual_display_post_row( $Item, $level, $params = array() )
 {
-	global $line_class, $current_User, $Settings;
+	global $line_class, $Settings;
 	global $admin_url;
 	global $Session;
 
@@ -6826,7 +6808,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 			'post_navigation' => 'same_category', // set a navigating through category
 			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
 		) ) );
-	if( $current_User->check_perm( 'slugs', 'view', false ) )
+	if( check_user_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
 		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
@@ -6840,7 +6822,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$order_value = T_('Alphabetic');
 	if( isset( $params['cat_order'] ) && $params['cat_order'] == 'manual' )
 	{
-		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Add availability to edit an order if current user can edit this item
 			$order_attrs .= ' id="order-item-'.$Item->ID.'" data-cat="'.$params['chapter_ID'].'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
@@ -6867,8 +6849,6 @@ function manual_display_post_row( $Item, $level, $params = array() )
  */
 function item_td_task_cell( $type, $Item, $editable = true )
 {
-	global $current_User;
-
 	switch( $type )
 	{
 		case 'priority':
@@ -6904,7 +6884,7 @@ function item_td_task_cell( $type, $Item, $editable = true )
 			$title = '';
 	}
 
-	if( $current_User && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) && $editable )
+	if( $editable && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item
 		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
 	}
@@ -6925,13 +6905,11 @@ function item_td_task_cell( $type, $Item, $editable = true )
  */
 function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
 {
-	global $current_User;
-
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $post_ID );
 
 	$class = 'shrinkwrap tskst_'.$post_pst_ID;
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item, Add a class to edit a priority by click from view list
 		$class .= ' '.$editable_class;
 	}

@@ -280,7 +280,7 @@ echo '<div class="panel panel-default evo_content_block">';
 			$posted_Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		$user_permission = is_logged_in() && ( $current_User->check_perm( 'meta_comment', 'edit', false, $posted_Comment ) );
+		$user_permission = check_user_perm( 'meta_comment', 'edit', false, $posted_Comment );
 		if( $user_permission )
 		{	// Put the internal comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$posted_Comment->ID.'" class="editable_comment_content">';
@@ -301,7 +301,7 @@ if( ( $secret == $posted_Comment->get( 'secret' ) ) && ( $secret != NULL ) )
 		$status_index = get_visibility_statuses( 'ordered-index', array( 'redirected' ) );
 
 		// delete button
-		if( $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $posted_Comment ) )
+		if( check_user_perm( 'comment!CURSTATUS', 'delete', false, $posted_Comment ) )
 		{
 			echo '<button type="submit" name="actionArray[delete]" class="btn btn-danger" title="'.T_('Delete this comment').'"/>';
 			echo get_icon( 'delete' ).' '.T_('Delete');
@@ -310,7 +310,7 @@ if( ( $secret == $posted_Comment->get( 'secret' ) ) && ( $secret != NULL ) )
 		}
 
 		// recycle button
-		if( ( $posted_Comment->get( 'status' ) != 'trash' ) && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $posted_Comment ) )
+		if( ( $posted_Comment->get( 'status' ) != 'trash' ) && check_user_perm( 'comment!CURSTATUS', 'delete', false, $posted_Comment ) )
 		{
 			echo '<button type="submit" name="actionArray[recycle]" class="btn btn-warning" title="'.T_('Recycle this comment').'"/>';
 			echo get_icon( 'recycle' ). ' '.T_('Recycle');
@@ -319,7 +319,7 @@ if( ( $secret == $posted_Comment->get( 'secret' ) ) && ( $secret != NULL ) )
 		}
 
 		// deprecate button
-		if( $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $posted_Comment ) )
+		if( check_user_perm( 'comment!CURSTATUS', 'edit', false, $posted_Comment ) )
 		{
 			if( $posted_Comment->status != 'deprecated' )
 			{
@@ -360,7 +360,7 @@ if( ( $secret == $posted_Comment->get( 'secret' ) ) && ( $secret != NULL ) )
 
 		if( $posted_Comment->author_url != null )
 		{
-			if( $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $posted_Comment ) )
+			if( check_user_perm( 'comment!CURSTATUS', 'delete', false, $posted_Comment ) )
 			{	// delete url button
 				echo '<button type="submit" name="actionArray[deleteurl]" class="btn btn-danger" title="'.T_('Delete comment URL').'" />';
 				echo get_icon( 'delete' ).' '.T_('Delete URL');
@@ -368,7 +368,7 @@ if( ( $secret == $posted_Comment->get( 'secret' ) ) && ( $secret != NULL ) )
 				echo "\n";
 			}
 
-			if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+			if( check_user_perm( 'spamblacklist', 'edit' ) )
 			{	// antispam tool button
 				echo '<button type="submit" name="actionArray[antispamtool]" class="btn btn-default" title="'.T_('Antispam tool').'" />';
 				echo get_icon( 'lightning' ).' '.T_('Antispam tool');

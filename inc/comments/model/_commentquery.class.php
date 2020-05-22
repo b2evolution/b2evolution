@@ -607,7 +607,7 @@ class CommentQuery extends SQL
 			return;
 		}
 
-		if( $current_User->check_perm( 'blogs', 'editall' ) )
+		if( check_user_perm( 'blogs', 'editall' ) )
 		{ // User has global permission one ach blog
 			return;
 		}

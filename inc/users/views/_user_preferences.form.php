@@ -122,7 +122,7 @@ switch( $multiple_sessions )
 		break;
 	default:
 		$multiple_sessions_field_hidden = false;
-		if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && !$current_User->check_perm( 'users', 'edit' ) )
+		if( ( $multiple_sessions == 'adminset_default_no' || $multiple_sessions == 'adminset_default_yes' ) && ! check_user_perm( 'users', 'edit' ) )
 		{
 			$multiple_sessions_field_disabled = true;
 		}
@@ -171,7 +171,7 @@ if( $action != 'view' )
 				'', 1, $multiple_sessions_field_disabled );
 	}
 
-	if( ( $current_User->ID == $edited_User->ID ) || ( $current_User->check_perm( 'users', 'edit' ) ) )
+	if( ( $current_User->ID == $edited_User->ID ) || ( check_user_perm( 'users', 'edit' ) ) )
 	{
 		$Form->radio_input( 'edited_user_timeout_sessions', $timeout_sessions_selected, array(
 					array(
@@ -236,7 +236,7 @@ if( $action != 'view' )
 }
 
 if( $Settings->get( 'account_close_enabled' ) && isset( $Blog ) &&
-    ( $current_User->ID == $edited_User->ID ) && ! $current_User->check_perm( 'users', 'edit', false ) )
+    ( $current_User->ID == $edited_User->ID ) && ! check_user_perm( 'users', 'edit', false ) )
 { // Display a linkt to close account
   // Admins cannot close own accounts from front office
 	$Form->info( '', '<a href="'.$Blog->get( 'closeaccounturl' ).'">'.TB_( 'I want to close my account...' ).'</a>' );

@@ -86,7 +86,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Set params for setting "Collection for Info Pages":
 		$BlogCache = & get_BlogCache();
@@ -145,7 +145,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 					),
 					'menu_ID' => array(
 						'label' => T_('Menu to display'),
-						'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
+						'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
 						'type' => 'select_object',
 						'object' => $SiteMenuCache,
 						'allow_none' => true,
@@ -546,7 +546,7 @@ body {
 	 */
 	function get_header_tabs_auto()
 	{
-		global $Blog, $disp, $current_User;
+		global $Blog, $disp;
 
 		$header_tabs = array();
 
@@ -610,7 +610,7 @@ body {
 				}
 
 				if( $in_bloglist == 'member' &&
-						! $current_User->check_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
+						! check_user_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
 				{	// Only members have an access to this collection, Skip it:
 					continue;
 				}

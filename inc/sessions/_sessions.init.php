@@ -131,16 +131,15 @@ class sessions_Module extends Module
 		 * @var Menu
 		 */
 		global $topleft_Menu;
-		global $current_User;
 		global $admin_url;
 		global $Collection, $Blog, $activate_collection_toolbar;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! check_user_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && $current_User->check_perm( 'stats', 'list', false, $Blog->ID ) )
+		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) && check_user_perm( 'stats', 'list', false, $Blog->ID ) )
 		{ // Permission to view stats for user's blogs:
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
@@ -172,7 +171,7 @@ class sessions_Module extends Module
 			$topleft_Menu->add_menu_entries( 'blog', $entries );
 		}
 
-		if( $current_User->check_perm( 'stats', 'view' ) )
+		if( check_user_perm( 'stats', 'view' ) )
 		{	// We have permission to view all stats
 			$entries = array(
 				'stats_separator' => array( 'separator' => true ),
@@ -238,22 +237,18 @@ class sessions_Module extends Module
 	function build_menu_1()
 	{
 		global $blog, $sec_ID, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! check_user_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'stats', 'list' ) )
+		if( check_user_perm( 'stats', 'list' ) )
 		{	// Permission to view stats for user's blogs:
 
 			// Initialize params to filter by selected collection and/or group:
@@ -301,7 +296,7 @@ class sessions_Module extends Module
 					'text' => T_('Top IPs'),
 					'href' => $admin_url.'?ctrl=stats&amp;tab=ips'.$section_params
 				) );
-			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+			if( check_user_perm( 'spamblacklist', 'view' ) )
 			{ // Display IP ranges only if current user has access to view Antispam tools
 				$ips_entries['ranges'] = array(
 					'text' => T_('IP Ranges'),
@@ -354,7 +349,7 @@ class sessions_Module extends Module
 							)
 						);
 
-			if( $current_User->check_perm( 'stats', 'view' ) ||
+			if( check_user_perm( 'stats', 'view' ) ||
 			    autoselect_blog( 'stats', 'view' ) )
 			{ // Viewing aggregate + Permission to view stats for ALL blogs:
 				$AdminUI->add_menu_entries(

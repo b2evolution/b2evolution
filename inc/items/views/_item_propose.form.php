@@ -161,7 +161,7 @@ $Form->begin_form( '', '', $params );
 	if( count( $custom_fields ) )
 	{	// Display fieldset with custom fields only if at least one exists:
 		$custom_fields_title = TB_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
 			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
 					.action_icon( TB_('Edit fields...'), 'edit',

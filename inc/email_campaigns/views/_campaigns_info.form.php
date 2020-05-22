@@ -19,7 +19,7 @@ global $admin_url, $tab, $edited_EmailCampaign;
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// Print out this fake button on top in order to use submit action "save" on press "Enter" key:
 	echo '<input type="submit" name="actionArray[save]" style="position:absolute;left:-1000px" />';
 }
@@ -139,7 +139,7 @@ $Form->begin_fieldset( TB_('Automations').get_manual_link( 'campaign-automations
 $Form->end_fieldset();
 
 $buttons = array();
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 	$buttons[] = array( 'submit', 'actionArray[save]', TB_('Save info'), 'SaveButton' );
 }

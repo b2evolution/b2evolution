@@ -103,7 +103,7 @@ $Form->begin_fieldset( TB_('Template').get_manual_link('collection-template') );
 $Form->end_fieldset();
 
 
-if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
 	$Form->begin_fieldset( TB_('Caching').get_admin_badge().get_manual_link('collection-cache-settings'), array( 'id' => 'caching' ) );
@@ -182,7 +182,7 @@ $Form->begin_fieldset( TB_('Software credits').get_manual_link('software-credits
 $Form->end_fieldset();
 
 
-if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
 	$Form->begin_fieldset( TB_('Skin and style').get_admin_badge().get_manual_link('skin-and-style') );

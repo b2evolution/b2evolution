@@ -14,8 +14,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $deferred_AdminToolActions;
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
 load_funcs( 'tools/model/_maintenance.funcs.php' );
@@ -26,7 +26,7 @@ load_funcs( 'tools/model/_system.funcs.php' );
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
 
-if( $current_User->check_perm( 'options', 'edit' ) &&
+if( check_user_perm( 'options', 'edit' ) &&
     ( $action != 'utf8check' && $action != 'utf8upgrade' ) &&
     system_check_charset_update() )
 { // DB charset is required to update
@@ -38,7 +38,7 @@ param( 'tab3', 'string', 'tools', true );
 
 if( $tab3 == 'import' )
 {	// Check permission for import pages:
-	$current_User->check_perm( 'options', 'edit', true );
+	check_user_perm( 'options', 'edit', true );
 }
 
 $tab_Plugin = NULL;
@@ -89,7 +89,7 @@ if( empty( $tab ) )
 		$Session->assert_received_crumb( 'tools' );
 
 		// fp> TODO: have an option to only PRUNE files older than for example 30 days
-		$current_User->check_perm('options', 'edit', true);
+		check_user_perm('options', 'edit', true);
 	}
 
 	set_max_execution_time( 0 );
@@ -488,10 +488,10 @@ if( empty( $tab ) )
 			// UPDATE general settings from tools:
 
 			// Check permission:
-			$current_User->check_perm( 'options', 'edit', true );
+			check_user_perm( 'options', 'edit', true );
 
 			// Lock system
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			if( check_user_perm( 'users', 'edit' ) )
 			{
 				$system_lock = param( 'system_lock', 'integer', 0 );
 				if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )

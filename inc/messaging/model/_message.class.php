@@ -775,7 +775,7 @@ class Message extends DataObject
 	{
 		global $current_User;
 
-		return $current_User->check_perm( 'perm_messaging', $action, $assert );
+		return check_user_perm( 'perm_messaging', $action, $assert );
 	}
 
 

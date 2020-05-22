@@ -18,7 +18,7 @@ load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
 load_class( 'menus/model/_sitemenuentrycache.class.php', 'SiteMenuEntryCache' );
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'site', 'menus' );
 
@@ -72,7 +72,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( $edited_SiteMenu && $edited_SiteMenu->duplicate() )
 		{
@@ -90,7 +90,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request:
 		if( $edited_SiteMenu->load_from_Request() )
@@ -113,7 +113,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to edit menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
@@ -139,7 +139,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to delete menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
@@ -187,7 +187,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menuentry' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request:
 		if( $edited_SiteMenuEntry->load_from_Request() )
@@ -210,7 +210,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menuentry' );
 
 		// Check that current user has permission to edit menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
@@ -236,7 +236,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menuentry' );
 
 		// Check that current user has permission to delete menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );

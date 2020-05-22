@@ -96,7 +96,7 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'item_details';
@@ -115,7 +115,7 @@ class item_small_print_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $TemplateCache->get_code_option_array(),
 					'defaultvalue' => 'item_details_smallprint_standard',
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
 							array( 'onclick' => 'return b2template_list_highlight( this )' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),

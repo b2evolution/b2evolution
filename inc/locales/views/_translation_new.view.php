@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var User
  */
-global $admin_url, $current_User;
+global $admin_url;
 
 global $edit_locale;
 

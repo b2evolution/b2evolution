@@ -34,7 +34,7 @@ $Form->begin_fieldset( sprintf( TB_('Plain-text for: %s'), $edited_EmailCampaign
 $Form->end_fieldset();
 
 $buttons = array();
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// User must has a permission to edit emails:
 	$buttons[] = array( 'submit', 'actionArray[save]', TB_('Save & continue').' >>', 'SaveButton' );
 	$buttons[] = array( 'submit', 'actionArray[resync]', TB_('Resync from HTML'), 'SaveButton btn-info', 'return confirm( \''.TS_('WARNING: if you continue, all manual edits you made to the plain-text version will be lost.').'\' )' );

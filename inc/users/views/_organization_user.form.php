@@ -44,7 +44,7 @@ $Form->begin_form( 'fform' );
 	$Form->text_input( 'priority', '', 32, TB_('Order'), '', array( 'maxlength' => 255, 'type' => 'number' ) );
 
 $buttons = array();
-if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+if( check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:
 	$buttons[] = array( 'submit', 'actionArray[link_user]', TB_('Add'), 'SaveButton' );
 }

@@ -484,7 +484,7 @@ function header_etag( $etag )
  */
 function get_request_title( $params = array() )
 {
-	global $MainList, $preview, $disp, $action, $current_User, $Collection, $Blog, $admin_url;
+	global $MainList, $preview, $disp, $action, $Collection, $Blog, $admin_url;
 
 	$r = array();
 
@@ -843,7 +843,7 @@ function get_request_title( $params = array() )
 				}
 
 				$title .= $params['edit_links_template']['before'];
-				if( $current_User->check_perm( 'admin', 'restricted' ) )
+				if( check_user_perm( 'admin', 'restricted' ) )
 				{
 					global $advanced_edit_link;
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_link['href'], ' '.T_('Advanced editing'), NULL, 3, array(
@@ -878,7 +878,7 @@ function get_request_title( $params = array() )
 					), $params['edit_links_template'] );
 
 				$title .= $params['edit_links_template']['before'];
-				if( $current_User->check_perm( 'admin', 'restricted' ) )
+				if( check_user_perm( 'admin', 'restricted' ) )
 				{
 					$advanced_edit_url = url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;blog='.$Blog->ID.'&amp;comment_ID='.$edited_Comment->ID );
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_url, ' '.T_('Advanced editing'), NULL, 3, array(

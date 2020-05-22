@@ -19,10 +19,6 @@ global $Collection, $Blog, $Session, $inc_path;
 global $action, $form_action;
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var Plugins
  */
 global $Plugins;
@@ -111,7 +107,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
 		$Form->hidden( 'trackback_url', $trackback_url );
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$Form->hidden( 'item_featured', $edited_Item->featured );
 			$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
@@ -135,9 +131,9 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	if( check_user_perm( 'admin', 'restricted' ) )
 	{ // These fields can be edited only by users which have an access to back-office
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // Time stamp field values
 			$Form->hidden( 'item_dateset', $edited_Item->get( 'dateset' ) );
 			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
@@ -154,7 +150,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-			$current_User->check_perm( 'files', 'view', false ) )
+			check_user_perm( 'files', 'view', false ) )
 	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		// Initialize this object as global because this is used in many link functions:

@@ -97,7 +97,7 @@ $Form->begin_fieldset( TB_('Email').get_manual_link('user-admin-email') );
 
 		$email_status = $edited_User->get_email_status();
 		$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $email_status ).'</div>';
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{
 			$Form->select_input_array( 'edited_email_status', $email_status, emadr_get_status_titles(), '<b class="evo_label_inline">'.TB_('Status').': </b>'.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors() ) );
 		}
@@ -245,7 +245,7 @@ $Form->begin_fieldset( TB_('Usage info').get_manual_link('user-admin-usage') );
 	// Number of comments created by the edited User
 	evo_flush(); // The following might take a while on systems with many comments
 	// Get the number of edited User comments, but count recycled comments only if the user has global editall blogs permission
-	$comments_created_num = $edited_User->get_num_comments( '', $current_User->check_perm( 'blogs', 'editall', false ) );
+	$comments_created_num = $edited_User->get_num_comments( '', check_user_perm( 'blogs', 'editall', false ) );
 	$comments_created = $comments_created_num;
 	if( $comments_created > 0 )
 	{
@@ -269,7 +269,7 @@ $Form->begin_fieldset( TB_('Usage info').get_manual_link('user-admin-usage') );
 		if( $messages_sent > 0 )
 		{
 			$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to user activity') ) ).'</a>';
-			if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+			if( check_user_perm( 'perm_messaging', 'abuse' ) )
 			{
 				$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.TB_('Go to abuse management').' &raquo;</a>';
 			}
@@ -280,7 +280,7 @@ $Form->begin_fieldset( TB_('Usage info').get_manual_link('user-admin-usage') );
 			}
 		}
 		$Form->info_field( '', $messages_sent );
-		if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+		if( $messages_received > 0 && check_user_perm( 'perm_messaging', 'abuse' ) )
 		{
 			$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to abuse management') ) ).'</a>';
 		}
@@ -341,7 +341,7 @@ $Form->begin_fieldset( TB_('Registration info').get_manual_link('user-admin-regi
 			$user_ip_address.( empty( $user_ip_address ) ? '' : ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$user_ip_address.'" class="btn btn-info middle" onclick="return get_whois_info(\''.$user_ip_address.'\');">'.get_icon( 'magnifier' ).'</a>' ) );
 	$Form->end_line( NULL, 'info' );
 
-	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+	if( check_user_perm( 'spamblacklist', 'view' ) )
 	{ // User can view IP ranges
 		// Get status and name of IP range
 		$IPRangeCache = & get_IPRangeCache();
@@ -349,7 +349,7 @@ $Form->begin_fieldset( TB_('Registration info').get_manual_link('user-admin-regi
 		{ // IP range exists in DB
 			$iprange_status = $IPRange->get( 'status' );
 			$iprange_name = $IPRange->get_name();
-			if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+			if( check_user_perm( 'spamblacklist', 'view' ) )
 			{	// Display IP range as link to edit form if current user has the permissions:
 				$iprange_name = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$iprange_name.'</a>';
 			}
@@ -359,7 +359,7 @@ $Form->begin_fieldset( TB_('Registration info').get_manual_link('user-admin-regi
 			$iprange_status = '';
 			$iprange_name = '';
 		}
-		$perm_spamblacklist = $current_User->check_perm( 'spamblacklist', 'edit' );
+		$perm_spamblacklist = check_user_perm( 'spamblacklist', 'edit' );
 		$Form->begin_line( TB_('IP range'), NULL, ( $perm_spamblacklist ? '' : 'info' ) );
 			$Form->info_field( '', $iprange_name );
 			$email_status_icon = '<div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>';
@@ -389,9 +389,9 @@ $Form->begin_fieldset( TB_('Registration info').get_manual_link('user-admin-regi
 		$Form->info_field( '<b class="evo_label_inline">'.TB_('Initial URI').': </b>', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
 	$Form->end_line( NULL, 'info' );
 
-	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	$perm_stat_edit = check_user_perm( 'stats', 'edit' );
 	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
-	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
+	$display_initial_referer = ( ! empty( $initial_referer ) && check_user_perm( 'stats', 'list' ) );
 	$Form->begin_line( TB_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
 		$Domain = & get_Domain_by_url( $initial_referer );
 		$initial_referer_formatted = format_to_output( $initial_referer );
@@ -485,7 +485,7 @@ jQuery( '#edited_user_status' ).change( function()
 } );
 
 <?php
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 { // START OF email status change script
 ?>
 var email_status_icons = new Array;
@@ -535,7 +535,7 @@ jQuery( 'input#edited_user_email' ).keyup( function()
 <?php } // END OF email status change script ?>
 
 <?php
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 { // User can edit IP ranges
 ?>
 var iprange_status_icons = new Array;
@@ -561,7 +561,7 @@ jQuery( '#edited_iprange_status' ).change( function()
 <?php } ?>
 
 <?php
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 { // User can edit Domain
 ?>
 var domain_status_icons = new Array;

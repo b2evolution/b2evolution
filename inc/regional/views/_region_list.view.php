@@ -128,7 +128,7 @@ $Results->filter_area = array(
 $Results->register_filter_preset( 'all', T_('All'), '?ctrl=regions' );
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Country'),
@@ -158,7 +158,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -203,7 +203,7 @@ function rgn_td_actions($rgn_enabled, $rgn_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),

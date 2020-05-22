@@ -780,12 +780,12 @@ function get_upload_restriction( $params = array() )
 			'ext_last_separator' => ' &amp; ',
 		), $params );
 
-	global $DB, $Settings, $current_User;
+	global $DB, $Settings;
 	$restrictNotes = array();
 
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty( $admins_can_manipulate_sensitive_files ) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( check_user_perm( 'files', 'all' ) && !empty( $admins_can_manipulate_sensitive_files ) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -870,7 +870,6 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 {
 	static $instance_ID = 0;
 	static $fm_highlight;
-	global $current_User;
 
 	// A folder might be highlighted (via "Locate this directory!")
 	if( ! isset($fm_highlight) )
@@ -897,7 +896,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		foreach( $_roots as $l_Root )
 		{
-			if( ! $current_User->check_perm( 'files', $action, false, $l_Root ) )
+			if( ! check_user_perm( 'files', $action, false, $l_Root ) )
 			{	// current user does not have permission to "view" (or other $action) this root
 				continue;
 			}
@@ -1251,7 +1250,7 @@ function is_absolute_pathname($path)
  */
 function file_controller_build_tabs()
 {
-	global $AdminUI, $current_User, $blog, $admin_url;
+	global $AdminUI, $blog, $admin_url;
 
 	$AdminUI->add_menu_entries(
 			'files',
@@ -1262,7 +1261,7 @@ function file_controller_build_tabs()
 					)
 				);
 
-	if( $current_User->check_perm( 'options', 'view' ) )
+	if( check_user_perm( 'options', 'view' ) )
 	{	// Permission to view settings:
 		$AdminUI->add_menu_entries(
 			'files',
@@ -1287,7 +1286,7 @@ function file_controller_build_tabs()
 			);
 	}
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Permission to edit settings:
 		$AdminUI->add_menu_entries(
 			'files',
@@ -1472,7 +1471,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		return NULL;
 	}
 
-	if( $check_perms && ( !isset( $current_User ) || $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+	if( $check_perms && ( !isset( $current_User ) || check_user_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 	{ // Permission check required but current User has no permission to upload:
 		return NULL;
 	}
@@ -2127,7 +2126,7 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 		return NULL;
 	}
 
-	if( $check_perms && ( !isset( $current_User ) || $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+	if( $check_perms && ( !isset( $current_User ) || check_user_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 	{	// Permission check required but current User has no permission to upload:
 		return NULL;
 	}
@@ -2343,7 +2342,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB, $admins_can_manipulate_sensitive_files;
+	global $blog, $Settings, $b2evo_icons_type, $DB, $admins_can_manipulate_sensitive_files;
 
 	$params = array_merge( array(
 			'before'                 => '',
@@ -2454,7 +2453,7 @@ function display_dragdrop_upload_button( $params = array() )
 	// Get list of allowed filetype extensions
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty($admins_can_manipulate_sensitive_files) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( check_user_perm( 'files', 'all' ) && !empty($admins_can_manipulate_sensitive_files) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -3064,8 +3063,7 @@ function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
 		{	// Halt the denied access:
 			debug_die( 'You have no permission to upload new files!' );
 		}
-		global $current_User;
-		return is_logged_in() && $current_User->check_perm( 'files', 'add', $assert, $FileRoot );
+		return check_user_perm( 'files', 'add', $assert, $FileRoot );
 	}
 	else
 	{	// Check perm when we upload new files for the object like Item, Comment, Message or EmailCampaign:
@@ -3191,11 +3189,11 @@ function file_td_name( & $File )
  */
 function file_td_actions( & $File )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( ! is_logged_in() ||
 			! ( $FileRoot = & $File->get_FileRoot() ) ||
-			! $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+			! check_user_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 	{	// User cannot edit files in the File Root:
 		return '';
 	}
@@ -3207,7 +3205,7 @@ function file_td_actions( & $File )
 	$action_crumb_url = $action_url.url_crumb( 'file' ).'&amp;';
 
 	$r = '';
-	if( $File->is_editable( $current_User->check_perm( 'files', 'all', false ) ) )
+	if( $File->is_editable( check_user_perm( 'files', 'all', false ) ) )
 	{
 		$r .= action_icon( T_('Edit file...'), 'edit', $action_crumb_url.'action=edit_file' );
 	}

@@ -32,10 +32,6 @@ global $user_profile_only;
  * @var the action destination of the form (NULL for pagenow)
  */
 global $form_action;
-/**
- * @var instance of User class
- */
-global $current_User;
 
 if( $display_mode != 'js' )
 {

@@ -100,7 +100,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		// Set URL to redirect after succesful action:
 		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog.( empty( $mode ) ? '' : '&mode='.$mode );
@@ -304,7 +304,7 @@ switch( $action )
 			case 'advanced':
 				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles', 'template', 'credits', 'meta' ) ) )
 				{ // Commit update to the DB:
-					if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+					if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 					{
 						$cache_status = param( 'cache_enabled', 'integer', 0 );
 						load_funcs( 'collections/model/_blog.funcs.php' );
@@ -351,7 +351,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog;
 
 		param( 'reset', 'boolean', '' );
@@ -391,7 +391,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		$update_redirect_url = $admin_url.'?ctrl=collections';
 
@@ -485,7 +485,7 @@ if( $action == 'dashboard' )
 	// load dashboard functions
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 
-	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
+	if( ! check_user_perm( 'blog_ismember', 'view', false, $blog ) )
 	{ // We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
 		unset( $Blog, $Collection );
@@ -539,7 +539,7 @@ if( $action == 'dashboard' )
 
 		foreach( $blog_moderation_statuses as $status )
 		{
-			if( ( $status !== $highest_publish_status ) && $current_User->check_perm( 'blog_comment!'.$status, 'edit', false, $blog ) )
+			if( ( $status !== $highest_publish_status ) && check_user_perm( 'blog_comment!'.$status, 'edit', false, $blog ) )
 			{
 				$user_modeartion_statuses[] = $status;
 			}
@@ -621,7 +621,7 @@ if( $action == 'dashboard' )
 		echo '<div class="row browse">';
 
 		// Block Group 1
-		$perm_options_edit = $current_User->check_perm( 'options', 'edit' );
+		$perm_options_edit = check_user_perm( 'options', 'edit' );
 
 		if( $perm_options_edit )
 		{
@@ -630,7 +630,7 @@ if( $action == 'dashboard' )
 			echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
 
 			$side_item_Widget = new Widget( 'side_item' );
-			$perm_blog_properties = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID );
+			$perm_blog_properties = check_user_perm( 'blog_properties', 'edit', false, $Blog->ID );
 
 			// Collection Analytics Block
 			if( $perm_options_edit )
@@ -676,7 +676,7 @@ if( $action == 'dashboard' )
 			if( $Blog->get( 'notes' ) )
 			{
 				$edit_link = '';
-				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 				{
 					$edit_link = action_icon( TB_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.TB_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
 				}
@@ -772,7 +772,7 @@ if( $action == 'dashboard' )
 				.( $have_comments_to_moderate || $have_posts_to_moderate ? ' col-md-pull-0 col-lg-6 col-lg-pull-0' : '' ).'">';
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		if( check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 		{	// If user has a perm to view internal comments of the collection:
 
 			// Latest Internal Comments Block
@@ -854,7 +854,7 @@ if( $action == 'dashboard' )
 			$nb_blocks_displayed++;
 
 			echo '<!-- Start of Recently Edited Post Block-->';
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{	// We have permission to add a post with at least one status:
 				$block_item_Widget->global_icon( TB_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, TB_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary btn-sm' ) );
 			}

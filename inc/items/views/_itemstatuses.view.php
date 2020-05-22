@@ -18,9 +18,7 @@ global $admin_url;
 
 function item_status_order( $item_status_order, $item_status_id )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'options', 'edit', true ) )
+	if( check_user_perm( 'options', 'edit', true ) )
 	{
 		return '<a href="#" rel="'.$item_status_id.'"'.'>'.( $item_status_order === NULL ? '-' : $item_status_order ).'</a>';
 	}
@@ -66,7 +64,7 @@ $Results->cols[] = array(
 		'extra' => array( 'rel' => '#pst_ID#' ),
 	);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 			'th' => T_('Actions'),

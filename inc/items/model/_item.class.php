@@ -747,7 +747,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow, $Blog, $Plugins;
+		global $default_locale, $localtimenow, $Blog, $Plugins;
 		global $item_typ_ID;
 
 		// LOCALE:
@@ -824,7 +824,7 @@ class Item extends ItemLight
 		}
 
 		// Single/page view:
-		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
 		    ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
 		{	// If user has a permission to edit advanced properties of items:
 			if( $this->get( 'status' ) == 'redirected' )
@@ -847,9 +847,8 @@ class Item extends ItemLight
 
 		// ISSUE DATE / TIMESTAMP:
 		$this->load_Blog();
-		if( is_logged_in() &&
-		    $current_User->check_perm( 'admin', 'restricted' ) &&
-		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{ // Allow to update timestamp fields only if user has a permission to edit such fields
 		  //    and also if user has an access to back-office
 			$item_dateset = param( 'item_dateset', 'integer', NULL );
@@ -955,7 +954,7 @@ class Item extends ItemLight
 		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
-		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 		}
@@ -980,7 +979,7 @@ class Item extends ItemLight
 			}
 
 			// Goal ID:
-			if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 			{	// If user has a permission to edit advanced properties of items:
 				$goal_ID = param( 'goal_ID', 'integer', NULL );
 				if( $goal_ID !== NULL )
@@ -998,7 +997,7 @@ class Item extends ItemLight
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
-		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
+		if( check_user_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{	// only admins can change the owner..
 			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) )
 			{	// If valid user login is entered:
@@ -1079,7 +1078,7 @@ class Item extends ItemLight
 		}
 
 		// EXPIRY DELAY:
-		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$expiry_delay = param_duration( 'expiry_delay' );
 			if( empty( $expiry_delay ) )
@@ -1262,8 +1261,6 @@ class Item extends ItemLight
 	 */
 	function load_workflow_from_Request()
 	{
-		global $current_User;
-
 		// Get Item's Collection for settings and permissions validation:
 		$item_Blog = & $this->get_Blog();
 
@@ -1728,7 +1725,7 @@ class Item extends ItemLight
 	 */
 	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array(), $comment_type = 'comment' )
 	{
-		global $current_User, $disp;
+		global $disp;
 
 		if( $comment_type == 'meta' && $this->can_meta_comment() )
 		{	// Meta comment are always allowed!
@@ -1792,7 +1789,7 @@ class Item extends ItemLight
 				return false;
 			}
 
-			if( is_logged_in() && ( $this->Blog->get( 'advanced_perms' ) ) && !$current_User->check_perm( 'blog_comment_statuses', 'create', false, $this->Blog->ID ) )
+			if( is_logged_in() && ( $this->Blog->get( 'advanced_perms' ) ) && ! check_user_perm( 'blog_comment_statuses', 'create', false, $this->Blog->ID ) )
 			{ // User doesn't have permission to create comments and advanced perms are enabled
 				if( $display )
 				{
@@ -1844,9 +1841,7 @@ class Item extends ItemLight
 			}
 		}
 
-		global $current_User;
-
-		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
+		return check_user_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
 	}
 
 
@@ -1857,14 +1852,7 @@ class Item extends ItemLight
 	 */
 	function can_meta_comment()
 	{
-		if( ! is_logged_in() )
-		{	// User must be logged in
-			return false;
-		}
-
-		global $current_User;
-
-		return $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
+		return check_user_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
 	}
 
 
@@ -1878,8 +1866,6 @@ class Item extends ItemLight
 	 */
 	function check_blog_settings( $settings_name, $settings_object = NULL )
 	{
-		global $current_User;
-
 		$this->load_Blog();
 
 		if( ( $settings_name == 'allow_attachments' )
@@ -1900,9 +1886,9 @@ class Item extends ItemLight
 			case 'registered':
 				return is_logged_in( false );
 			case 'member':
-				return (is_logged_in( false ) && $current_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) );
+				return check_user_perm( 'blog_ismember', 'view', false, $this->get_blog_ID(), false );
 			case 'moderator':
-				return (is_logged_in( false ) && $current_User->check_perm( 'blog_comments', 'edit', false, $this->get_blog_ID() ) );
+				return check_user_perm( 'blog_comments', 'edit', false, $this->get_blog_ID(), false );
 			default:
 				debug_die( 'Invalid blog '.$settings_name.' settings!' );
 		}
@@ -1921,7 +1907,7 @@ class Item extends ItemLight
 	 */
 	function can_attach( $link_tmp_ID = false, $comment_type = 'comment' )
 	{
-		global $Settings, $current_User;
+		global $Settings;
 
 		$attachments_quota_is_full = false;
 		if( is_logged_in() )
@@ -1936,7 +1922,7 @@ class Item extends ItemLight
 			$max_attachments = (int)$this->Blog->get_setting( 'max_attachments' );
 			if( $max_attachments > 0 )
 			{	// Check attachments quota only when Blog setting "Max # of attachments" is defined
-				global $DB, $current_User, $Session;
+				global $DB, $Session;
 
 				// Get a number of attachments for current user on this post
 				$link_tmp_ID = false;
@@ -6385,7 +6371,7 @@ class Item extends ItemLight
 								), $params );
 		*/
 
-		if( isset($current_User) &&	$current_User->check_perm( 'blog_comment!draft', 'moderate', false, $this->get_blog_ID() ) )
+		if( isset($current_User) &&	check_user_perm( 'blog_comment!draft', 'moderate', false, $this->get_blog_ID() ) )
 		{	// We have permission to edit comments:
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
@@ -6480,12 +6466,10 @@ class Item extends ItemLight
 	 */
 	function get_delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $actionurl = '#', $confirm_text = '#', $redirect_to = '' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $this ) )
-		{ // User has right to delete this post
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'delete', false, $this, false ) )
+		{	// User has no rights to delete this Item:
 			return false;
 		}
 
@@ -6574,7 +6558,7 @@ class Item extends ItemLight
 	 */
 	function get_copy_link( $params = array() )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$actionurl = $this->get_copy_url($params);
 		if( ! $actionurl )
@@ -6628,7 +6612,7 @@ class Item extends ItemLight
 	 */
 	function get_copy_url( $params = array() )
 	{
-		global $admin_url, $current_User;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
@@ -6654,12 +6638,12 @@ class Item extends ItemLight
 			{	// Current user can copy this post from Front-office
 				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&cp='.$this->ID );
 			}
-			else if( $current_User->check_perm( 'admin', 'restricted' ) )
+			else if( check_user_perm( 'admin', 'restricted' ) )
 			{	// Current user can copy this post from Back-office
 				$url = $admin_url.'?ctrl=items&amp;action=copy&amp;blog='.$this->Blog->ID.'&amp;p='.$this->ID;
 			}
 		}
-		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		else if( check_user_perm( 'admin', 'restricted' ) )
 		{	// Copy a post from Back-office
 			$url = $admin_url.'?ctrl=items&amp;action=copy&amp;blog='.$this->Blog->ID.'&amp;p='.$this->ID;
 			if( $params['save_context'] )
@@ -6917,24 +6901,17 @@ class Item extends ItemLight
 	 */
 	function can_link_version( $allow_new_item = false )
 	{
-		global $current_User;
-
 		if( ! $allow_new_item && ! $this->ID )
 		{	// Item must be saved in DB:
 			return false;
 		}
 
-		if( ! is_logged_in( false ) )
-		{	// User must be logged in
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false ) )
 		{	// User has no rights to edit this Item
 			return false;
 		}
 
-		if( ! is_admin_page() || ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! is_admin_page() || ! check_user_perm( 'admin', 'restricted' ) )
 		{	// This feature is allowed only for back-office yet
 			return false;
 		}
@@ -6956,7 +6933,7 @@ class Item extends ItemLight
 	 */
 	function get_edit_link( $params = array() )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$actionurl = $this->get_edit_url($params);
 		if( ! $actionurl )
@@ -6997,14 +6974,10 @@ class Item extends ItemLight
 	 */
 	function can_be_edited()
 	{
-		global $current_User;
-
 		// Item must be stored in DB:
 		return ! empty( $this->ID ) &&
-			// User must be logged in and activated:
-			is_logged_in( false ) &&
-			// User must has a permission to edit this Item:
-			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+			// User must be logged in and activated and has a permission to edit this Item:
+			check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false );
 	}
 
 
@@ -7016,7 +6989,7 @@ class Item extends ItemLight
 	 */
 	function get_edit_url( $params = array() )
 	{
-		global $admin_url, $current_User;
+		global $admin_url;
 
 		if( ! $this->can_be_edited() )
 		{	// Don't allow to edit this Item if it cannot be edited by curren User:
@@ -7034,7 +7007,7 @@ class Item extends ItemLight
 		$this->load_Blog();
 		$url = false;
 		if( $this->Blog->get_setting( 'in_skin_editing' ) &&
-		    ( ! $params['force_backoffice_editing'] || ! $current_User->check_perm( 'admin', 'restricted' ) ) &&
+		    ( ! $params['force_backoffice_editing'] || ! check_user_perm( 'admin', 'restricted' ) ) &&
 		    ( ! is_admin_page() || $params['force_in_skin_editing'] ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			if( check_item_perm_edit( $this->ID, false ) )
@@ -7042,7 +7015,7 @@ class Item extends ItemLight
 				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
 			}
 		}
-		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		else if( check_user_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
 			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
@@ -7125,19 +7098,14 @@ class Item extends ItemLight
 	 */
 	function get_propose_change_url( $params = array() )
 	{
-		global $admin_url, $current_User;
-
-		if( ! is_logged_in( false ) )
-		{	// User must be logged in and activated for this action:
-			return false;
-		}
+		global $admin_url;
 
 		if( ! $this->ID )
 		{	// Don't display this button in preview mode:
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID(), false ) )
 		{	// User has no right to propose a change for this Item:
 			return false;
 		}
@@ -7151,7 +7119,7 @@ class Item extends ItemLight
 		{	// We have a mode 'In-skin editing' for the current Blog
 			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=proposechange&p='.$this->ID );
 		}
-		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		else if( check_user_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office:
 			$url = $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
 			if( $params['save_context'] )
@@ -7215,9 +7183,9 @@ class Item extends ItemLight
 	 */
 	function get_changes_url( $glue = '&amp;' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{	// Current user cannot see item changes:
 			return false;
 		}
@@ -7253,19 +7221,12 @@ class Item extends ItemLight
 	 */
 	function get_merge_click_js()
 	{
-		global $current_User;
-
-		if( ! is_logged_in( false ) )
-		{	// Current User must be logged in and activated:
-			return false;
-		}
-
 		if( ! $this->ID )
 		{	// Item must be stored in DB:
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false ) )
 		{	// User has no right to edit this Item:
 			return false;
 		}
@@ -7350,8 +7311,6 @@ class Item extends ItemLight
 	 */
 	function get_next_status( $publish )
 	{
-		global $current_User;
-
 		if( !is_logged_in( false ) )
 		{
 			return false;
@@ -7369,7 +7328,7 @@ class Item extends ItemLight
 		while( !$has_perm && ( $publish ? ( $curr_index < 4 ) : ( $curr_index > 0 ) ) )
 		{
 			$curr_index = $publish ? ( $curr_index + 1 ) : ( $curr_index - 1 );
-			$has_perm = $current_User->check_perm( 'item_post!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			$has_perm = check_user_perm( 'item_post!'.$status_order[$curr_index][0], 'moderate', false, $this );
 		}
 		if( $has_perm )
 		{
@@ -7394,18 +7353,15 @@ class Item extends ItemLight
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( $this->status != 'draft' )
 		{
 			return false;
 		}
 
-		if( ! is_logged_in( false ) ) return false;
-
-		$this->load_Blog();
-		if( ! ($current_User->check_perm( 'item_post!published', 'edit', false, $this ))
-			|| ! ($current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) ) )
+		if( ! check_user_perm( 'item_post!published', 'edit', false, $this, false ) ||
+		    ! check_user_perm( 'blog_edit_ts', 'edit', false, $this->get_blog_ID(), false ) )
 		{ // User has no right to publish this post now:
 			return false;
 		}
@@ -7436,7 +7392,7 @@ class Item extends ItemLight
 	 */
 	function highest_publish_link( $params = array() )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( !is_logged_in( false ) )
 		{
@@ -7466,7 +7422,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! ($current_User->check_perm( 'item_post!'.$highest_status, 'edit', false, $this ) ) )
+		if( ! (check_user_perm( 'item_post!'.$highest_status, 'edit', false, $this ) ) )
 		{ // User has no right to edit this post
 			return false;
 		}
@@ -7641,12 +7597,10 @@ class Item extends ItemLight
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $redirect_to = '' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( ($this->status == 'deprecated') // Already deprecated!
-			|| ! ($current_User->check_perm( 'item_post!deprecated', 'edit', false, $this )) )
+		if( $this->status == 'deprecated' || // Already deprecated!
+		    ! check_user_perm( 'item_post!deprecated', 'edit', false, $this, false ) )
 		{ // User has no right to deprecated this post:
 			return false;
 		}
@@ -8393,7 +8347,7 @@ class Item extends ItemLight
 	{
 		global $current_User;
 
-		if( !isset( $current_User ) )
+		if( ! is_logged_in() )
 		{	// No logged in user
 			return;
 		}
@@ -9112,7 +9066,7 @@ class Item extends ItemLight
 			if( $this->get_type_setting( 'usage' ) == 'content-block' &&
 			    empty( $this->content_block_invalidate_reported ) )
 			{	// Display warning on updating of content block item:
-				global $admin_url, $current_User;
+				global $admin_url;
 
 				// Get items where currently updated content block is included:
 				$invalidated_items = $this->get_included_item_IDs( $this->ID.'|'.$this->get_slugs( '|' ) );
@@ -9127,9 +9081,8 @@ class Item extends ItemLight
 				// Display info message about invalidated cache:
 				$invalidate_message = TB_('INFO: you edited a content block.').' '
 					.sprintf( TB_('We invalidated %d pre-rendered Items that include the content block.'), $invalidated_items_num ).' ';
-				if( is_logged_in() &&
-				    $current_User->check_perm( 'admin', 'normal' ) &&
-				    $current_User->check_perm( 'options', 'view' ) )
+				if( check_user_perm( 'admin', 'normal' ) &&
+				    check_user_perm( 'options', 'view' ) )
 				{	// If current user has a permission to the clear tool:
 					$Messages->add( $invalidate_message.sprintf( TB_('You may <a %s>invalidate the <b>complete</b> pre-rendering cache NOW</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=del_itemprecache&amp;'.url_crumb( 'tools' ).'" target="_blank"' ), 'note' );
 				}
@@ -9998,7 +9951,7 @@ class Item extends ItemLight
 	 */
 	function send_assignment_notification( $executed_by_userid = NULL )
 	{
-		global $current_User, $Messages, $UserSettings;
+		global $Messages, $UserSettings;
 
 		$notified_user_IDs = array();
 
@@ -12239,7 +12192,7 @@ class Item extends ItemLight
 			return 'read';
 		}
 
-		global $DB, $current_User;
+		global $DB;
 
 		$read_date = $this->get_user_data( 'item_date' );
 
@@ -12475,10 +12428,10 @@ class Item extends ItemLight
 	 */
 	function get_type_edit_link( $attr = 'link', $link_text = '', $link_title = '' )
 	{
-		global $admin_url, $current_User;
+		global $admin_url;
 
 		// Check if current user can edit the type of this item
-		$has_perm_edit = is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+		$has_perm_edit = check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this );
 
 		if( $has_perm_edit )
 		{ // Initialize url params only when current user has a permission to edit this
@@ -12904,8 +12857,6 @@ class Item extends ItemLight
 	 */
 	function get_flag( $params = array() )
 	{
-		global $current_User;
-
 		$params = array_merge( array(
 				'before'       => '',
 				'after'        => '',
@@ -13442,14 +13393,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! is_logged_in( false ) )
-		{	// If current user is not logged in or not activated:
-			return false;
-		}
-
-		global $current_User;
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false ) )
 		{	// If user has no perm to edit this Item:
 			return false;
 		}
@@ -13888,7 +13832,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
 		{	// User has no right to propose a change for this Item:
 
 			// Display a message:
@@ -14206,16 +14150,15 @@ class Item extends ItemLight
 	 */
 	function display_notification_message( $message, $log_messages = false, $message_type = 'note', $message_group = NULL )
 	{
-		global $current_User, $Messages;
+		global $Messages;
 
 		if( $log_messages == 'cron_job' )
 		{	// Log message for cron job:
 			cron_log_append( $message."\n", $message_type );
 		}
 		elseif( ! empty( $this->ID ) && // Item must be stored in DB
-			is_logged_in( false ) && // User must be logged in and activated
-			// User must be a collection admin
-			$current_User->check_perm( 'blog_admin', 'edit', false, $this->get_blog_ID() ) )
+			// User must be logged in and activated and be a collection admin
+			check_user_perm( 'blog_admin', 'edit', false, $this->get_blog_ID(), false ) )
 		{	// Display notification message only for collection admin:
 			if( $message_group === NULL )
 			{	// Set default group title:
@@ -14430,17 +14373,13 @@ class Item extends ItemLight
 	 */
 	function can_edit_workflow( $permname = 'any', $assert = false )
 	{
-		global $current_User;
-
 		$perm =
 			// Main Category must be defined for this Item in order to check permission in Collection of the Category:
 			! empty( $this->main_cat_ID ) &&
-			// User must be logged in:
-			is_logged_in() &&
 			// Workflow must be enabled for current Collection:
 			$this->get_coll_setting( 'use_workflow' ) &&
 			// Current User must has a permission to be assigned for tasks of the current Collection:
-			$current_User->check_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() );
+			check_user_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() );
 
 		if( $perm )
 		{	// Additional checking for several permissions when main checking is true:
@@ -14448,9 +14387,9 @@ class Item extends ItemLight
 			{
 				case 'any':
 					// Check if current User can edit at least one workflow property:
-					$perm = $current_User->check_perm( 'blog_workflow_status', 'edit', false, $this->get_blog_ID() ) ||
-						$current_User->check_perm( 'blog_workflow_user', 'edit', false, $this->get_blog_ID() ) ||
-						$current_User->check_perm( 'blog_workflow_priority', 'edit', false, $this->get_blog_ID() );
+					$perm = check_user_perm( 'blog_workflow_status', 'edit', false, $this->get_blog_ID() ) ||
+						check_user_perm( 'blog_workflow_user', 'edit', false, $this->get_blog_ID() ) ||
+						check_user_perm( 'blog_workflow_priority', 'edit', false, $this->get_blog_ID() );
 					break;
 				case 'deadline':
 					// Deadline has additional collection setting to be enabled:
@@ -14475,14 +14414,14 @@ class Item extends ItemLight
 				return $perm;
 			case 'status':
 				// Check if current User can edit the workflow status:
-				return $current_User->check_perm( 'blog_workflow_status', 'edit', $assert, $this->get_blog_ID() );
+				return check_user_perm( 'blog_workflow_status', 'edit', $assert, $this->get_blog_ID() );
 			case 'user':
 				// Check if current User can edit the workflow user:
-				return $current_User->check_perm( 'blog_workflow_user', 'edit', $assert, $this->get_blog_ID() );
+				return check_user_perm( 'blog_workflow_user', 'edit', $assert, $this->get_blog_ID() );
 			case 'priority':
 			case 'deadline':
 				// Check if current User can edit the workflow priority or deadline:
-				return $current_User->check_perm( 'blog_workflow_priority', 'edit', $assert, $this->get_blog_ID() );
+				return check_user_perm( 'blog_workflow_priority', 'edit', $assert, $this->get_blog_ID() );
 			default:
 				// Wrong request:
 				debug_die( 'Unhandled Item workflow permission name "'.$permname.'"' );

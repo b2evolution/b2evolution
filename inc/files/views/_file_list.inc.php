@@ -28,10 +28,6 @@ global $lFile;
  */
 global $fm_flatmode;
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var UserSettings
  */
 global $UserSettings;
@@ -169,8 +165,8 @@ $Form->begin_form();
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
 
 	// Set FileList perms
-	$all_perm = $current_User->check_perm( 'files', 'all', false );
-	$edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
+	$all_perm = check_user_perm( 'files', 'all', false );
+	$edit_allowed_perm = check_user_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
 
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
@@ -502,7 +498,7 @@ $Form->begin_form();
 	// -------------
 	// Quick upload with drag&drop button:
 	// --------------
-	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( $Settings->get( 'upload_enabled' ) && check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{	// Upload is enabled and we have permission to use it...
 	?>
 		<tr class="evo_fileuploader_form listfooter firstcol lastcol">
@@ -660,9 +656,9 @@ $Form->begin_form();
 			}
 
 			if( ( $fm_Filelist->get_root_type() == 'collection' || ( ! empty( $Blog )
-						&& $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
+						&& check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
 				&& $mode != 'upload'
-				&& $current_User->check_perm( 'admin', 'normal' ) )
+				&& check_user_perm( 'admin', 'normal' ) )
 			{ // We are browsing files for a collection:
 				// User must have access to admin permission
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
@@ -736,7 +732,7 @@ $Form->begin_form();
 			 * CREATE FILE/FOLDER CREATE PANEL:
 			 */
 			if( ( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
-						&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+						&& check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 			{	// dir or file creation is enabled and we're allowed to add files:
 				global $create_type;
 
