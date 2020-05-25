@@ -928,23 +928,6 @@ $Form->begin_form( '', '', $params );
 			echo action_icon( '', 'activate', $quick_setting_url.'show_quick_button', T_('Never show the quick "Publish!" button.'), 3, 4 );
 		}
 		echo '</p>';
-
-		// CALL PLUGINS NOW:
-		ob_start();
-		$admin_editor_params = array(
-				'target_type'             => 'Item',
-				'target_object'           => $edited_Item,
-				'content_id'              => 'itemform_post_content',
-				'edit_layout'             => 'expert_quicksettings',
-				'quicksetting_item_start' => '<p id="quicksetting_wysiwyg_switch">',
-				'quicksetting_item_end'   => '</p>'
-			);
-		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
-		{
-			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
-		}
-		$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
-		$quick_setting_switch = ob_get_flush();
 	}
 
 	// Display a link to reset default settings for current user on this screen:

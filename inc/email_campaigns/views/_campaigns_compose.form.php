@@ -51,17 +51,6 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 			'edit_layout'   => 'expert',
 		) );
 
-	echo '<div style="margin: 7px 0 0 5px; display: flex; align-items: center;">';
-	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-			'target_type'   => 'EmailCampaign',
-			'target_object' => $edited_EmailCampaign,
-			'content_id'    => 'ecmp_email_text',
-			'edit_layout'   => 'expert_quicksettings',
-		) );
-	$quick_setting_switch = ob_get_flush();
-	echo '</div>';
-
 	echo '</div>';
 	echo '</div>';
 	$email_plugin_buttons = ob_get_clean();
