@@ -12600,6 +12600,40 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16012, 'Updating site skins...' ) )
+	{	// part of 7.1.5-stable
+		$SQL = new SQL( 'Get site skins for update "Grouping" setting' );
+		$SQL->SELECT( 'skin_id.set_value AS skin_ID, set_grouping.set_value AS setting_grouping, set_menu_type.set_value AS setting_menu_type' );
+		$SQL->FROM( 'T_settings AS skin_id' );
+		$SQL->FROM_add( 'INNER JOIN T_skins__skin ON skin_ID = skin_id.set_value' );
+		$SQL->FROM_add( 'LEFT JOIN T_settings AS set_grouping ON set_grouping.set_name = CONCAT( "skin", skin_ID, "_grouping" )' );
+		$SQL->FROM_add( 'LEFT JOIN T_settings AS set_menu_type ON set_menu_type.set_name = CONCAT( "skin", skin_ID, "_menu_type" )' );
+		$SQL->WHERE( 'skin_id.set_name LIKE "%_skin_ID"' );
+		$SQL->WHERE_and( 'skin_class IN( "bootstrap_site_dropdown_Skin", "bootstrap_site_navbar_Skin", "bootstrap_site_tabs_Skin" )' );
+		$site_skins = $DB->get_results( $SQL );
+		foreach( $site_skins as $site_skin )
+		{
+			if( $site_skin->setting_grouping !== NULL )
+			{	// Remove old setting "Grouping":
+				$DB->query( 'DELETE FROM T_settings
+					WHERE set_name = '.$DB->quote( 'skin'.$site_skin->skin_ID.'_grouping' ) );
+			}
+
+			if( $site_skin->setting_menu_type !== NULL )
+			{	// Don't update if "Menu type" was saved in DB:
+				continue;
+			}
+
+			if( $site_skin->setting_grouping === NUll || $site_skin->setting_grouping == 1 )
+			{	// Set value in DB only for option "Automatic - Grouped collection list",
+				// because "Automatic - Collection list" is used by default:
+				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+					VALUES ( '.$DB->quote( 'skin'.$site_skin->skin_ID.'_menu_type' ).', "auto_grouped" )' );
+			}
+		}
+		upg_task_end();
+	}
+
 	if( upg_task_start( 16083, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
 	{	// part of 7.2
 		db_upgrade_cols( 'T_menus__entry', array(

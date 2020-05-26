@@ -1606,7 +1606,8 @@ class ItemLight extends DataObject
 
 			case 'admin_view':
 				// View in admin
-				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+				global $admin_url;
+				$url = $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
 				break;
 
 			case 'edit_view_url':

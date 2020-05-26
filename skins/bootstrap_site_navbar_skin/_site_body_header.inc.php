@@ -51,8 +51,6 @@ else
 <?php
 			if( ( $header_tabs = $site_Skin->get_header_tabs() ) !== false )
 			{	// Display the grouped header tabs:
-				$header_tabs = $site_Skin->get_header_tabs();
-
 				foreach( $header_tabs as $s => $header_tab )
 				{	// Display level 0 tabs:
 ?>
