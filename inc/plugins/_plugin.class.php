@@ -1095,6 +1095,8 @@ class Plugin
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
+	 * 
+	 * Be careful, this is used inside an output buffer in some places.
 	 *
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.

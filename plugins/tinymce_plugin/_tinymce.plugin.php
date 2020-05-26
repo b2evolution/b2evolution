@@ -344,9 +344,6 @@ class tinymce_plugin extends Plugin
 	{
 		global $disable_tinymce_for_frontoffice_comment_form;
 
-		// Initialize JavaScript to build and open window, used in insert inline modals:
-		echo_modalwindow_js();
-
 		if( empty( $params['content_id'] ) )
 		{	// Value of html attribute "id" of textarea where tinymce is applied
 			// Don't allow empty id:
