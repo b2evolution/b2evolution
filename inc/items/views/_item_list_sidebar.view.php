@@ -35,8 +35,9 @@ $pp = $ItemList->param_prefix;
 
 global $tab;
 global ${$pp.'flagged'}, ${$pp.'mustread'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'},
-		${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'}, ${$pp.'assgn'},
-		${$pp.'assgn_login'}, ${$pp.'status'}, ${$pp.'types'};
+		${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'},
+		${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'involves'}, ${$pp.'involves_login'},
+		${$pp.'status'}, ${$pp.'types'};
 
 $flagged = ${$pp.'flagged'};
 $mustread = ${$pp.'mustread'};
@@ -50,6 +51,8 @@ $author = ${$pp.'author'};
 $author_login = ${$pp.'author_login'};
 $assgn = ${$pp.'assgn'};
 $assgn_login = ${$pp.'assgn_login'};
+$involves = ${$pp.'involves'};
+$involves_login = ${$pp.'involves_login'};
 $status = ${$pp.'status'};
 $types = ${$pp.'types'};
 
@@ -304,6 +307,40 @@ if( $user_count )
 			echo '<li>'
 				.'<input type="radio" name="'.$pp.'author" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $author ? ' checked="checked"' : '' ).' /> '
 				.'<a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'">'
+					.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
+				.'</a>'
+			.'</li>';
+		}
+		echo '</ul>';
+	}
+}
+$Form->end_fieldset();
+
+// INVOLVES:
+// TODO: allow multiple selection
+// Load only first 21 users to know when we should display an input box instead of full users list
+$UserCache->load_blogmembers( $Blog->ID, 21 );
+$user_count = count( $UserCache->cache );
+$fold_involves = ( $ItemList->default_filters['involves'] == ( empty( $ItemList->filters['involves'] ) ? NULL : $ItemList->filters['involves'] ) );
+$Form->begin_fieldset( T_('Involves'), array( 'id' => 'items_filter_involves', 'fold' => true, 'default_fold' => $fold_involves ) );
+if( $user_count )
+{
+	if( $user_count > 20 )
+	{	// Display an input box to enter user login:
+		echo '<label for="'.$pp.'involves_login">'.T_('User').':</label> <input type="text" class="form-control middle autocomplete_login" value="'.format_to_output( $involves_login, 'formvalue' ).'" name="'.$pp.'involves_login" id="'.$pp.'involves_login" />';
+	}
+	else
+	{	// Display a list of users:
+		echo '<ul>'
+			.'<li>'
+				.'<input type="radio" name="'.$pp.'involves" value="0" class="radio"'.( empty( $involves ) ? ' checked="checked"' : '' ).' /> '
+				.'<a href="'.regenerate_url( $pp.'involves', $pp.'involves=0' ).'">'.T_('Any').'</a>'
+			.'</li>';
+		foreach( $UserCache->cache as $loop_User )
+		{
+			echo '<li>'
+				.'<input type="radio" name="'.$pp.'involves" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $involves ? ' checked="checked"' : '' ).' /> '
+				.'<a href="'.regenerate_url( $pp.'involves', $pp.'involves='.$loop_User->ID ).'">'
 					.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
 				.'</a>'
 			.'</li>';

@@ -631,6 +631,8 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_assignees( $this->filters['assignees'] );
 		$next_Query->where_assignees_logins( $this->filters['assignees_login'] );
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
+		$next_Query->where_involves( $this->filters['involves'] );
+		$next_Query->where_involves_logins( $this->filters['involves_login'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
 		// itemtype_usage param is kept only for the case when some custom types should be displayed

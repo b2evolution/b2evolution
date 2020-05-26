@@ -33,6 +33,8 @@ class ItemQuery extends SQL
 	var $author_login;
 	var $assignees;
 	var $assignees_login;
+	var $involved_user_IDs;
+	var $involved_user_logins;
 	var $statuses;
 	var $types;
 	var $itemtype_usage;
@@ -561,6 +563,67 @@ class ItemQuery extends SQL
 
 		$this->WHERE_and( '( '.$this->dbprefix.'creator_user_ID = '.$DB->quote( $author_assignee ).' OR '.
 											$this->dbprefix.'assigned_user_ID = '.$DB->quote( $author_assignee ).' )' );
+	}
+
+
+	/**
+	 * Restrict items that have any comment OR internal/meta comment by the specific users
+	 *
+	 * @param string List of user IDs to restrict to (must have been previously validated)
+	 */
+	function where_involves( $involved_user_IDs )
+	{
+		$this->involved_user_IDs = clear_ids_list( $involved_user_IDs );
+
+		if( empty( $this->involved_user_IDs ) )
+		{
+			return;
+		}
+
+		if( substr( $involved_user_IDs, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+		}
+
+		$this->FROM_add( 'INNER JOIN T_comments AS involved_id ON involved_id.comment_item_ID = post_ID' );
+		$this->WHERE_and( 'involved_id.comment_author_user_ID '.$eq.' ( '.$this->involved_user_IDs.' )' );
+	}
+
+
+	/**
+	 * Restrict items that have any comment OR internal/meta comment by the specific users
+	 *
+	 * @param string List of involved user logins to restrict to (must have been previously validated)
+	 */
+	function where_involves_logins( $involved_user_logins )
+	{
+		$this->involved_user_logins = $involved_user_logins;
+
+		if( empty( $this->involved_user_logins ) )
+		{
+			return;
+		}
+
+		if( substr( $involved_user_logins, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+			$involved_user_IDs = get_users_IDs_by_logins( substr( $this->involved_user_logins, 1 ) );
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+			$involved_user_IDs = get_users_IDs_by_logins( $this->involved_user_logins );
+		}
+
+		if( ! empty( $involved_user_IDs ) )
+		{	// Filter only if correct users are found by logins:
+			$this->FROM_add( 'INNER JOIN T_comments AS involved_login ON involved_login.comment_item_ID = post_ID' );
+			$this->WHERE_and( 'involved_login.comment_author_user_ID '.$eq.' ( '.$involved_user_IDs.' )' );
+		}
 	}
 
 

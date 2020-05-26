@@ -136,6 +136,8 @@ class ItemListLight extends DataObjectList2
 				'assignees' => NULL,
 				'assignees_login' => NULL,
 				'author_assignee' => NULL,
+				'involves' => NULL,
+				'involves_login' => NULL,
 				'lc' => 'all',									// Filter on requested locale
 				'keywords' => NULL,
 				'keyword_scope' => 'title,content', // What fields are used for searching: 'title', 'content'
@@ -260,6 +262,14 @@ class ItemListLight extends DataObjectList2
 			 * Restrict to selected author OR assignee:
 			 */
 			memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] );
+
+			/*
+			 * Restrict to selected involves:
+			 */
+			// List of involved user IDs to restrict to
+			memorize_param( $this->param_prefix.'involves', 'string', $this->default_filters['involves'], $this->filters['involves'] );
+			// List of involved user logins to restrict to
+			memorize_param( $this->param_prefix.'involves_login', 'string', $this->default_filters['involves_login'], $this->filters['involves_login'] );
 
 			/*
 			 * Restrict to selected locale:
@@ -446,6 +456,15 @@ class ItemListLight extends DataObjectList2
 
 
 		/*
+		 * Restrict to selected involves:
+		 */
+		// List of involved user IDs to restrict to
+		$this->filters['involves'] = param( $this->param_prefix.'involves', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['involves'], true );
+		// List of involved user logins to restrict to
+		$this->filters['involves_login'] = param( $this->param_prefix.'involves_login', '/^-?[A-Za-z0-9_\.]+(,[A-Za-z0-9_\.]+)*$/', $this->default_filters['involves_login'], true );
+
+
+		/*
 		 * Restrict to selected locale:
 		 */
 		$this->filters['lc'] = param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], true );
@@ -625,6 +644,8 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 		$this->ItemQuery->where_assignees_logins( $this->filters['assignees_login'] );
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
+		$this->ItemQuery->where_involves( $this->filters['involves'] );
+		$this->ItemQuery->where_involves_logins( $this->filters['involves_login'] );
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
 		$this->ItemQuery->where_types( $this->filters['types'] );
@@ -888,6 +909,8 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
 		$lastpost_ItemQuery->where_assignees_logins( $this->filters['assignees_login'] );
+		$lastpost_ItemQuery->where_involves( $this->filters['involves'] );
+		$lastpost_ItemQuery->where_involves_logins( $this->filters['involves_login'] );
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
 		$lastpost_ItemQuery->where_types( $this->filters['types'] );
@@ -983,6 +1006,10 @@ class ItemListLight extends DataObjectList2
 
 				'display_assignee'    => true,
 				'assignes_text'       => T_('Assigned to').': ',
+
+				'display_involves'    => true,
+				'involves_text'       => T_('Involves').': ',
+				'involves_nor_text'   => T_('All involves except').': ',
 
 				'display_locale'      => true,
 				'display_time'        => true,
@@ -1316,6 +1343,55 @@ class ItemListLight extends DataObjectList2
 						$params['group_mask'] );
 				}
 				$filter_class_i++;
+			}
+		}
+
+
+		// INVOLVES:
+		if( $params['display_involves'] )
+		{
+			if( ! empty( $this->filters['involves'] ) || ! empty( $this->filters['involves_login'] ) )
+			{
+				$involves = trim( $this->filters['involves'].','.get_users_IDs_by_logins( $this->filters['involves_login'] ), ',' );
+				$exclude_involves = false;
+				if( substr( $involves, 0, 1 ) == '-' )
+				{	// Authors are excluded
+					$involves = substr( $involves, 1 );
+					$exclude_involves = true;
+				}
+				$involves = preg_split( '~\s*,\s*~', $involves, -1, PREG_SPLIT_NO_EMPTY );
+				$involves_names = array();
+				if( $involves )
+				{
+					$UserCache = & get_UserCache();
+					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+					foreach( $involves as $involves_ID )
+					{
+						if( $tmp_User = $UserCache->get_by_ID( $involves_ID, false, false ) )
+						{
+							$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'involves='.$involves_ID ) ) : '';
+							$involves_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( $params['involves_text'], $tmp_User->get( 'login' ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask'] );
+						}
+					}
+					$filter_class_i++;
+				}
+				if( count( $involves_names ) > 0 )
+				{	// Display info of filter by involves
+					if( $exclude_involves )
+					{	// Exclude involves
+						$involves_names_string = $params['involves_nor_text'].implode( $params['separator_nor'], $involves_names );
+					}
+					else
+					{	// Filter by involves
+						$involves_names_string = implode( $params['separator_comma'], $involves_names );
+					}
+
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						array( $params['involves_text'], $params['before_items'].$involves_names_string.$params['after_items'] ),
+						$params['group_mask'] );
+				}
 			}
 		}
 
