@@ -140,7 +140,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 					'function'     => 'select',
 					'selected'     => ( $current_skin_ID == $iterator_Skin->ID ),
 					'select_url'   => $select_url,
-					'onclick'      => 'return confirm_skin_selection( this, "'.$iterator_Skin->type.'" )',
+					'onclick'      => ( $is_collection_skin ? 'return confirm_skin_selection( this, "'.$iterator_Skin->type.'" )' : '' ),
 					'function_url' => $preview_url,
 					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
 				) );
@@ -170,7 +170,7 @@ if( isset( $skins['partial'] ) )
 					'function'     => 'select',
 					'selected'     => ( $current_skin_ID == $iterator_Skin->ID ),
 					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'collection' ),
-					'onclick'      => 'return confirm_skin_selection( this, "'.$iterator_Skin->type.'" )',
+					'onclick'      => ( $is_collection_skin ? 'return confirm_skin_selection( this, "'.$iterator_Skin->type.'" )' : '' ),
 					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $iterator_Skin->folder ) ),
 					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
 				) );
@@ -198,7 +198,7 @@ if( isset( $skins['maybe'] ) )
 					'function'     => 'select',
 					'selected'     => ( $current_skin_ID == $iterator_Skin->ID ),
 					'select_url'   => $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID='.$iterator_Skin->ID.'&amp;'.url_crumb( 'collection' ),
-					'onclick'      => 'return confirm_skin_selection( this, "'.$iterator_Skin->type.'" )',
+					'onclick'      => ( $is_collection_skin ? 'return confirm_skin_selection( this, "'.$iterator_Skin->type.'" )' : '' ),
 					'function_url' => url_add_param( $edited_Blog->gen_blogurl(), 'tempskin='.rawurlencode( $iterator_Skin->folder ) ),
 					'highlighted'  => ( is_array( $fadeout_array ) && isset( $fadeout_array['skin_ID'] ) && in_array( $iterator_Skin->ID, $fadeout_array['skin_ID'] ) ),
 				) );
@@ -212,6 +212,8 @@ if( isset( $skins['maybe'] ) )
 // Flush fadeout
 $Session->delete( 'fadeout_array');
 
-// JavaScript code to confirm skin selection:
-echo_confirm_skin_selection_js( $skin_type );
+if( $is_collection_skin )
+{	// JavaScript code to confirm skin selection:
+	echo_confirm_skin_selection_js( $skin_type );
+}
 ?>
