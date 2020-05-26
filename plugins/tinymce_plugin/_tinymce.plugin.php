@@ -342,7 +342,6 @@ class tinymce_plugin extends Plugin
 	 */
 	function AdminDisplayEditorButton( & $params )
 	{
-		global $wysiwyg_toggle_switch_js_initialized;
 		global $disable_tinymce_for_frontoffice_comment_form;
 
 		// Initialize JavaScript to build and open window, used in insert inline modals:
@@ -402,9 +401,6 @@ class tinymce_plugin extends Plugin
 					}
 				}
 
-				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
-				$wysiwyg_checkbox_label = T_("Don't show this again for this Collection");
-
 				$state_params = array(
 						'type' => $params['target_type'],
 						'blog' => $Blog->ID,
@@ -417,9 +413,6 @@ class tinymce_plugin extends Plugin
 				$edited_EmailCampaign = & $params['target_object'];
 				$this->target_type = 'EmailCampaign';
 				$this->target_ID = $edited_EmailCampaign->ID;
-
-				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
-				$wysiwyg_checkbox_label = T_("Don't show this again when composing email campaigns");
 
 				$state_params = array(
 						'type'  => $params['target_type'],
@@ -469,9 +462,6 @@ class tinymce_plugin extends Plugin
 					}
 				}
 
-				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
-				$wysiwyg_checkbox_label = T_("Don't show this again for this Collection");
-
 				// Currently shares the same editor state as Item above:
 				$state_params = array(
 						'type' => $params['target_type'],
@@ -494,9 +484,6 @@ class tinymce_plugin extends Plugin
 					return false;
 				}
 
-				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_message' );
-				$wysiwyg_checkbox_label = T_("Don't show this again when composing private messages");
-
 				$state_params = array(
 						'type'    => $params['target_type'],
 						'message' => empty( $edited_Message ) ? NULL : $edited_Message->ID,
@@ -514,68 +501,15 @@ class tinymce_plugin extends Plugin
 			'plugin_code' => $this->code,
 		);
 
-		// Toggle switch configuration for JS function "toggle_switch_warning()":
-		$toggle_switch_warning_config = array(
-				'activate_link'   => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
-				'deactivate_link' => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ),
-			);
-		$tinymce_config['toggle_switch_warning'] = $toggle_switch_warning_config;
-
 		switch( $params['edit_layout'] )
 		{
-			case 'expert_quicksettings':
-				$params = array_merge( array(
-						'quicksetting_item_id'    => 'quicksetting_wysiwyg_switch',
-						'quicksetting_item_start' => '<span id="%quicksetting_id%">',
-						'quicksetting_item_end'   => '</span>'
-					), $params );
-
-				$params['quicksetting_item_start'] = str_replace( '%quicksetting_id%', $params['quicksetting_item_id'], $params['quicksetting_item_start'] );
-
-				$deactivate_warning_link = action_icon( '', 'deactivate', '', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'return toggle_switch_warning( false )' ) );
-				$activate_warning_link = action_icon( '', 'activate', '', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'return toggle_switch_warning( true )' ) );
-
-				echo $params['quicksetting_item_start'];
-				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $deactivate_warning_link : $activate_warning_link;
-				echo $params['quicksetting_item_end'];
-
-				$quicksettings_config = array(
-						'item_id'                 => $params['quicksetting_item_id'],
-						'activate_warning_link'   => $activate_warning_link,
-						'deactivate_warning_link' => $deactivate_warning_link,
-					);
-				$tinymce_config['expert_quicksettings'] = $quicksettings_config;
-
-				if( is_ajax_request() )
-				{
-					?>
-					<script>
-					jQuery( document ).ready( function() {
-							evo_init_tinymce( <?php echo evo_json_encode( $tinymce_config ); ?> );
-						} );
-					</script>
-					<?php
-				}
-				else
-				{
-					expose_var_to_js( 'tinymce_quicksettings_'.$params['content_id'], $tinymce_config, 'evo_tinymce_config' );
-				}
-
-				return true;
-
 			default:
 				// Get init params, depending on edit mode: simple|expert
 				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'], $params['target_type'] );
 
 				$toggle_editor_config = array(
-						'display_warning'        => ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ),
 						'save_state_html_url'    => $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ),
 						'save_state_wysiwyg_url' => $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
-						'toggle_warning_msg'     => T_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?'),
-						'warning_text'           => T_('WARNING'),
-						'wysiwyg_checkbox_label' => $wysiwyg_checkbox_label,
-						'btn_label_ok'           => T_('OK'),
-						'btn_label_cancel'       => T_('Cancel'),
 					);
 				$tinymce_config['toggle_editor'] = $toggle_editor_config;
 				?>
@@ -1073,38 +1007,6 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * AJAX callback to save WYSIWYG switch warning state (on or off).
-	 *
-	 * @param array Params
-	 */
-	function htsrv_save_wysiwyg_warning_state( $params )
-	{
-		if( ! isset( $params['on'] ) )
-		{ // Wrong request:
-			 return;
-		}
-
-		switch( $params['type'] )
-		{
-			case 'Item':
-			case 'Comment':
-				$this->UserSettings->set( 'show_wysiwyg_warning_'.intval( $params['blog'] ), intval( $params['on'] ) );
-				break;
-
-			case 'EmailCampaign':
-				$this->UserSettings->set( 'show_wysiwyg_warning_emailcampaign', intval( $params['on'] ) );
-				break;
-
-			case 'Message':
-				$this->UserSettings->set( 'show_wysiwyg_warning_message', intval( $params['on'] ) );
-				break;
-		}
-
-		$this->UserSettings->dbupdate();
-	}
-
-
-	/**
 	 * Get editor state
 	 *
 	 * @param array Params
@@ -1228,7 +1130,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'convert_content_to_wysiwyg' );
+		return array( 'save_editor_state', 'insert_inline'/*, 'get_item_content_css'*/, 'convert_content_to_wysiwyg' );
 	}
 
 

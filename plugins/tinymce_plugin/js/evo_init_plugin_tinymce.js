@@ -14,56 +14,8 @@ jQuery( document ).ready( function()
 {
 	window.evo_init_tinymce = function evo_init_tinymce( config )
 		{
-			if( config.toggle_switch_warning )
-			{
-				window.toggle_switch_warning = function toggle_switch_warning( state )
-					{
-						var activate_link   = config.toggle_switch_warning.activate_link;
-						var deactivate_link = config.toggle_switch_warning.deactivate_link;
-
-						// TODO: This changes settings so this should be a POST or PATCH request:
-						jQuery.get(
-							( state ? activate_link : deactivate_link ),
-							function( data )
-							{	// Fire wysiwyg warning state change event
-								jQuery( document ).trigger( 'wysiwyg_warning_changed', [ state ] );
-							} );
-
-						return false;
-					};
-			}
-
-			if( config.expert_quicksettings )
-			{
-				jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state )
-					{
-						jQuery( '#' + config.expert_quicksettings.item_id ).html( state ? config.expert_quicksettings.deactivate_warning_link : config.expert_quicksettings.activate_warning_link );
-					} );
-			}
-
 			if( config.toggle_editor )
 			{
-				window.evo_tinymce_display_toggle_editor_warning = window.evo_tinymce_display_toggle_editor_warning || config.toggle_editor.display_warning;
-
-				/**
-				 * Confirm switch to WYSIWYG if not disabled then toggle to
-				 */
-				window.confirm_switch = function confirm_switch( content_id )
-					{
-						if( jQuery( 'input[name=hideWarning]' ).is( ':checked' ) )
-						{	// Do not show warning again
-							window.toggle_switch_warning( false );
-						}
-
-						// switch to WYSIWYG
-						window.tinymce_plugin_toggleEditor( content_id, true );
-
-						// close the modal window
-						closeModalWindow();
-
-						return false;
-					};
-
 				/**
 				 * Toggles the TinyMCE editor
 				 */
@@ -137,10 +89,6 @@ jQuery( document ).ready( function()
 						}
 					};
 
-				jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-						window.evo_tinymce_display_toggle_editor_warning = state;
-					} );
-
 				jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
 					{
 						var content_id = jQuery( this ).parent().data( 'contentId' );
@@ -150,30 +98,7 @@ jQuery( document ).ready( function()
 							return false;
 						}
 
-						if( jQuery( this ).val() == 'WYSIWYG' )
-						{
-							
-							if( window.evo_tinymce_display_toggle_editor_warning )
-							{
-								evo_js_lang_close = config.toggle_editor.btn_label_cancel;
-								openModalWindow( '<p>' + config.toggle_editor.toggle_warning_msg + '</p>'
-									+ '<form>'
-									+ '<input type="checkbox" name="hideWarning" value="1"> ' + config.toggle_editor.wysiwyg_checkbox_label
-									+ '<input type="submit" name="submit" onclick="return window.confirm_switch( \'' + content_id + '\' );">'
-									+ '</form>',
-									'500px', '', true,
-									'<span class="text-danger">' + config.toggle_editor.warning_text + '</span>',
-									[ config.toggle_editor.btn_label_ok, 'btn-primary' ], true );
-							}
-							else
-							{
-								window.tinymce_plugin_toggleEditor( content_id );
-							}
-						}
-						else
-						{
-							window.tinymce_plugin_toggleEditor( content_id );
-						}
+						window.tinymce_plugin_toggleEditor( content_id );
 					} );
 			}
 
