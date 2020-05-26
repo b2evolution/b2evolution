@@ -57,12 +57,6 @@ class geoip_plugin extends Plugin
 
 
 	/**
-	 * URL to download the GeoIP data file
-	 * @var string
-	 */
-	var $geoip_download_url = '';
-
-	/**
 	 * URL to the GeoIP's legacy database download page
 	 * @var string
 	 */
@@ -84,7 +78,6 @@ class geoip_plugin extends Plugin
 		$this->long_desc = TB_('This plugin detects user\'s country at the moment the account is created');
 
 		$this->geoip_file_path = dirname( __FILE__ ).'/'.$this->geoip_file_name;
-		$this->geoip_download_url = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz';
 		$this->geoip_manual_download_url = 'https://dev.maxmind.com/geoip/geoip2/geolite2/';
 	}
 
@@ -111,9 +104,17 @@ class geoip_plugin extends Plugin
 		{
 			$datfile_info = '<span class="error text-danger">'.TB_('Not found').'</span>';
 		}
-		$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.TB_('Download update now!').'</a>';
+		if( $params['for_editing'] && $this->Settings->get( 'download_url' ) != '' )
+		{
+			$datfile_info .= ' - <a href="'.$admin_url.'?ctrl=tools&amp;action=geoip_download&amp;'.url_crumb( 'tools' ).'#geoip" class="btn btn-xs btn-warning">'.TB_('Download update now!').'</a>';
+		}
 
 		return array(
+			'download_url' => array(
+				'label' => TB_('DB Download URL'),
+				'note' => sprintf( TB_('Enter URL of %s for download'), '<code>GeoLite2-Country....tar.gz</code>' ),
+				'size' => 100,
+				),
 			'datfile' => array(
 				'label' => 'GeoLite2-Country.mmdb',
 				'type' => 'info',
@@ -811,12 +812,18 @@ jQuery( document ).ready( function()
 		// Display a process of downloading of GeoLite2-Country.mmdb
 		global $admin_url;
 
+		if( $this->Settings->get( 'download_url' ) == '' )
+		{	// If "DB Download URL" is not defined:
+			$this->print_tool_log( sprintf( TB_('Enter URL of %s for download'), '<code>GeoLite2-Country....tar.gz</code>' ), 'error' );
+			return;
+		}
+
 		$this->print_tool_log( sprintf( TB_('Downloading %s file from the url: %s ...'),
 			'<code>'.$this->geoip_file_name.'</code>',
-			'<a href="'.$this->geoip_download_url.'" target="_blank">'.$this->geoip_download_url.'</a>' ) );
+			'<a href="'.$this->Settings->get( 'download_url' ).'" target="_blank">'.$this->Settings->get( 'download_url' ).'</a>' ) );
 
 		// DOWNLOAD:
-		$gzip_contents = fetch_remote_page( $this->geoip_download_url, $info, 1800 );
+		$gzip_contents = fetch_remote_page( $this->Settings->get( 'download_url' ), $info, 1800 );
 		if( $gzip_contents === false || $info['status'] != 200 )
 		{	// Download failed
 			if( empty( $info['error'] ) )
@@ -848,8 +855,12 @@ jQuery( document ).ready( function()
 			return;
 		}
 
-		$gzip_tar_file_name = explode( '/', $this->geoip_download_url );
+		$gzip_tar_file_name = explode( '/', $this->Settings->get( 'download_url' ) );
 		$gzip_tar_file_name = $gzip_tar_file_name[ count( $gzip_tar_file_name ) - 1 ];
+		if( ! preg_match( '#\.tar\.gz$#', $gzip_tar_file_name ) )
+		{	// Set proper file name because file cannot be created from long url with specific chars like ?, & and etc.:
+			$gzip_tar_file_name = 'GeoIP-'.date( 'Y-m-d-His').'.tar.gz';
+		}
 		$gzip_tar_file_path = rtrim( sys_get_temp_dir(), '/' ).'/'.$gzip_tar_file_name;
 
 		if( ! save_to_file( $gzip_contents, $gzip_tar_file_path, 'w' ) )
