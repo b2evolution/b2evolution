@@ -298,27 +298,29 @@ $Form->begin_form( '', '', $params );
 
 	echo '<ul class="nav nav-tabs">';
 	
-	$active_tab_pane = ( ( $active_tab_pane_value == 'attachment' || empty( $active_tab_pane_value ) ) ) ? 'class="active"' : '';
+	$tab_panes = array();
 
-	echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+	$tab_panes[] = '#attachment';
+	
+	echo '<li><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
 
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
-	{
-		$active_tab_pane = ( $active_tab_pane_value == 'custom_fields' ) ? 'class="active"' : '';
+	{	
+		$tab_panes[] = '#custom_fields';
 		
-		echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
+		echo '<li><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
 	}
 
-	$active_tab_pane = ( $active_tab_pane_value == 'advance_properties' ) ? 'class="active"' : '';
+	$tab_panes[] = '#advance_properties';
 	
-	echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
+	echo '<li><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$active_tab_pane = ( $active_tab_pane_value == 'allowtrackbacks' ) ? 'class="active"' : '';
+		$tab_panes[] = '#allowtrackbacks';
 		
-		echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
+		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
 	}
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
@@ -327,9 +329,9 @@ $Form->begin_form( '', '', $params );
 	{
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		
-		$active_tab_pane = ( $active_tab_pane_value == 'internal_comments' ) ? 'class="active"' : '';
+		$tab_panes[] = '#internal_comments';
 		
-		echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
+		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
 	}
 
 	echo '</ul>';
@@ -1194,14 +1196,24 @@ if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 ?>
 <script>
 
-// If not any tab is active make by default attachment tab active
-if( $('.content-form-with-tab .nav-tabs .active > a').attr('href') == undefined )
-{ 
+<?php
+
+$js_tab_panes_array = json_encode($tab_panes);
+echo "var js_tab_panes_array = ". $js_tab_panes_array . ";\n";
+
+?>
+
+tab_href_value = jQuery( '.content-form-with-tab #itemform_tab_pane' ).val();
+
+// Check if database saved active tab pane value exits in the tab pane or not
+if( js_tab_panes_array.indexOf( tab_href_value ) == -1 )
+{
 	tab_href_value = '#attachment';
-	jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
-	jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
-    
-}
+}		    
+
+jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
+jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
+
 // Show attachment tab result summary in single line
 jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
 jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )

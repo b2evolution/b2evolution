@@ -8427,12 +8427,7 @@ function save_active_tab_pane_value( $blog_ID = NULL )
 	$value = ( isset( $tab_pane_value[ $key ] ) ) ? $tab_pane_value[ $key ] : '';
 	$value = trim( $value );
 	
-	if( ! empty( $value ) && $value[0] == '#' )
-	{
-		$value = substr($value, 1); 
-	}
-	
-	if( ! empty( $key ) )
+	if( ! empty( $key ) &&  ! empty( $value ) )
 	{
 		$setting_name = 'active_'.$key;
 
