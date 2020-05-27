@@ -97,6 +97,21 @@ function param_format( $value, $type = 'raw' )
 
 		case 'float':
 		case 'double':
+			// Remove all thousand separators:
+			$value = str_replace( array( ' ', '\'' ), '', $value );
+			if( preg_match( '/([\.,])\d+$/', $value, $dec_point ) )
+			{	// If value contains decimal point:
+				if( substr_count( $value, $dec_point[1] ) > 1 )
+				{	// If decimal point is used more than 1 time then consider this as thousand separator and remove them all:
+					$value = str_replace( $dec_point[1], '', $value );
+				}
+				else
+				{	// Remove decimal points what used as thousand separators:
+					$value = str_replace( array( ',', '.' ), '', $value );
+					$dec_point_pos = strlen( $value ) - strlen( $dec_point[0] ) + 1;
+					$value = substr( $value, 0, $dec_point_pos ).'.'.substr( $value, $dec_point_pos );
+				}
+			}
 			return floatval( $value );
 
 		default:
@@ -483,7 +498,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 							case 'float':
 							case 'double':
-								$regexp = '/^(\+|-)?[0-9]+(.[0-9]+)?$/';
+								$regexp = '/^(\+|-)?[0-9 \'.,]+([.,][0-9]+)?$/';
 								break;
 
 							default:
@@ -506,6 +521,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							}
 						}
 					}
+
+					// Format param:
+					$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 					// Change the variable type:
 					settype( $GLOBALS[$var], $type );
