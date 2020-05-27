@@ -37,7 +37,7 @@ global $tab;
 global ${$pp.'flagged'}, ${$pp.'mustread'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'},
 		${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'},
 		${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'involves'}, ${$pp.'involves_login'},
-		${$pp.'status'}, ${$pp.'types'};
+		${$pp.'status'}, ${$pp.'statuses'}, ${$pp.'types'};
 
 $flagged = ${$pp.'flagged'};
 $mustread = ${$pp.'mustread'};
@@ -54,6 +54,7 @@ $assgn_login = ${$pp.'assgn_login'};
 $involves = ${$pp.'involves'};
 $involves_login = ${$pp.'involves_login'};
 $status = ${$pp.'status'};
+$statuses = ${$pp.'statuses'};
 $types = ${$pp.'types'};
 
 
@@ -192,17 +193,16 @@ $ItemStatusCache = & get_ItemStatusCache();
 $ItemStatusCache->load_all(); // TODO: load for current blog only
 if( count( $ItemStatusCache->cache ) )
 {	// Display only if at least one status exists in DB:
-	$fold_status = ( $ItemList->default_filters['statuses'] == $ItemList->filters['statuses'] );
-	$Form->begin_fieldset( T_('Status'), array( 'id' => 'items_filter_status', 'fold' =>true, 'default_fold' => empty( $status ) ) );
+	$Form->begin_fieldset( T_('Status'), array( 'id' => 'items_filter_status', 'fold' =>true, 'default_fold' => empty( $status ) && empty( $statuses ) ) );
 	echo '<ul>';
 
-	echo '<li><input type="radio" name="'.$pp.'status" value="-" class="radio"'.( $status == '-' ? ' checked="checked"' : '' ).' />';
-	echo ' <a href="'.regenerate_url( $pp.'status', $pp.'status=-' ).'">'.T_('Without status').'</a></li>';
+	echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="-" class="radio"'.( $status == '-' || ( is_array( $statuses ) && in_array( '-', $statuses ) ) ? ' checked="checked"' : '' ).' />';
+	echo ' <a href="'.regenerate_url( $pp.'status,'.$pp.'statuses', $pp.'status=-' ).'">'.T_('Without status').'</a></li>';
 
 	foreach( $ItemStatusCache->cache as $loop_Obj )
 	{
-		echo '<li><input type="radio" name="'.$pp.'status" value="'.$loop_Obj->ID.'" class="radio"'.( $status == $loop_Obj->ID ? ' checked="checked"' : '' ).' />';
-		echo ' <a href="'.regenerate_url( $pp.'status', $pp.'status='.$loop_Obj->ID ).'">';
+		echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="'.$loop_Obj->ID.'" class="radio"'.( $status == $loop_Obj->ID || ( is_array( $statuses ) && in_array( $loop_Obj->ID, $statuses ) ) ? ' checked="checked"' : '' ).' />';
+		echo ' <a href="'.regenerate_url( $pp.'status,'.$pp.'statuses', $pp.'status='.$loop_Obj->ID ).'">';
 		$loop_Obj->disp('name');
 		echo '</a></li>';
 	}

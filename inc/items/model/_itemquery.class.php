@@ -648,7 +648,7 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific (extended) statuses
 	 *
-	 * @param string List of assignees to restrict to (must have been previously validated)
+	 * @param string List of statuses to restrict to (must have been previously validated)
 	 */
 	function where_statuses( $statuses )
 	{
@@ -677,6 +677,57 @@ class ItemQuery extends SQL
 		else
 		{
 			$this->WHERE_and( $this->dbprefix.'pst_ID IN ('.$this->statuses.')' );
+		}
+	}
+
+
+	/**
+	 * Restrict to specific (extended) statuses
+	 *
+	 * @param array Array of statuses to restrict to (must have been previously validated)
+	 */
+	function where_statuses_array( $statuses )
+	{
+		if( ! is_array( $statuses ) )
+		{	// Wrong data:
+			return;
+		}
+
+		$filter_without_status = false;
+		foreach( $statuses as $s => $status_ID )
+		{
+			if( $status_ID == '-' )
+			{	// Filter by "No status":
+				$filter_without_status = true;
+				unset( $statuses[ $s ] );
+				continue;
+			}
+
+			$status_ID = intval( $status_ID );
+
+			if( empty( $status_ID ) )
+			{	// Remove a not number value from list:
+				unset( $statuses[ $s ] );
+				continue;
+			}
+
+			// Update value to integer format:
+			$statuses[ $s ] = $status_ID;
+		}
+
+		$where_statuses = array();
+		if( $filter_without_status )
+		{	// Filter by "No status":
+			$where_statuses[] = $this->dbprefix.'pst_ID IS NULL';
+		}
+		if( ! empty( $statuses ) )
+		{	// Filter by specific statuses:
+			$where_statuses[] = $this->dbprefix.'pst_ID IN ( '.implode( ',', $statuses ).' )';
+		}
+
+		if( ! empty( $where_statuses ) )
+		{	// Apply filter by statuses:
+			$this->WHERE_and( implode( ' OR ', $where_statuses ) );
 		}
 	}
 

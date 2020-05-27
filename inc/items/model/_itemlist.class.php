@@ -635,6 +635,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_involves_logins( $this->filters['involves_login'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
+		$next_Query->where_statuses_array( $this->filters['statuses_array'] );
 		// itemtype_usage param is kept only for the case when some custom types should be displayed
 		$next_Query->where_itemtype_usage( ! empty( $itemtype_usage ) ? $itemtype_usage : $this->filters['itemtype_usage'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
