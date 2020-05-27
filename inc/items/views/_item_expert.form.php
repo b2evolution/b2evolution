@@ -336,7 +336,7 @@ $Form->begin_form( '', '', $params );
 
 	echo '</ul>';
 
-	echo '<div class="tab-content">';
+	echo '<div class="tab-content  evo_tab_pane_itemform_content">';
 
 	$attachment_tab = true;
 	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
