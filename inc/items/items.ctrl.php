@@ -1734,6 +1734,9 @@ switch( $action )
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
+		
+		// Update the active tab pane for current user
+		save_active_tab_pane_value( $Blog->ID );
 
 		// CREATE NEW POST:
 		load_class( 'items/model/_item.class.php', 'Item' );
@@ -1979,6 +1982,9 @@ switch( $action )
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
+		
+		// Update the active tab pane for current user
+		save_active_tab_pane_value( $Blog->ID );
 
 		// Get params to skip/force/mark notifications and pings:
 		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )

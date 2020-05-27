@@ -290,24 +290,35 @@ $Form->begin_form( '', '', $params );
 
 	$Form->end_fieldset();
 
-
-	echo '<input type="hidden" name="nav_tabs_selected" id="nav_tabs_selected" value="">';
+	global $UserSettings;
+	
+	$active_tab_pane_value = $UserSettings->get_collection_setting( 'active_tab_pane_itemform', $Blog->ID );
+	
+	echo '<input type="hidden" name="tab_pane_active[tab_pane_itemform]" id="itemform_tab_pane" value="'.$active_tab_pane_value.'">';
 
 	echo '<ul class="nav nav-tabs">';
+	
+	$active_tab_pane = ( ( $active_tab_pane_value == 'attachment' || empty( $active_tab_pane_value ) ) ) ? 'class="active"' : '';
 
-	echo '<li class="active"><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+	echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
 
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
 	{
-		echo '<li><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
+		$active_tab_pane = ( $active_tab_pane_value == 'custom_fields' ) ? 'class="active"' : '';
+		
+		echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
 	}
 
-	echo '<li><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
+	$active_tab_pane = ( $active_tab_pane_value == 'advance_properties' ) ? 'class="active"' : '';
+	
+	echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
+		$active_tab_pane = ( $active_tab_pane_value == 'allowtrackbacks' ) ? 'class="active"' : '';
+		
+		echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
 	}
 
 	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
@@ -315,7 +326,10 @@ $Form->begin_form( '', '', $params );
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
-		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
+		
+		$active_tab_pane = ( $active_tab_pane_value == 'internal_comments' ) ? 'class="active"' : '';
+		
+		echo '<li '.$active_tab_pane.'><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
 	}
 
 	echo '</ul>';
@@ -1160,6 +1174,8 @@ else
 echo_onchange_newcat();
 // Goal
 echo_onchange_goal_cat();
+// Fieldset folding
+echo_fieldset_folding_js();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 // JS code for merge button:
@@ -1177,21 +1193,27 @@ if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 // JS to post excerpt mode switching:
 ?>
 <script>
+
+// If not any tab is active make by default attachment tab active
+if( $('.content-form-with-tab .nav-tabs .active > a').attr('href') == undefined )
+{ 
+	tab_href_value = '#attachment';
+	jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
+	jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
+    
+}
 // Show attachment tab result summary in single line
 jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
 jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )
 {	// Do tab wise operations
 	tab_href_value = jQuery( event.target ).attr( "href" );
-	jQuery( '.content-form-with-tab #nav_tabs_selected' ).val( tab_href_value );
+	jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
 	if( tab_href_value === '#advance_properties' )
 	{
 		jQuery( window ).resize();
 	}
 });
-if( jQuery( '.content-form-with-tab #nav_tabs_selected' ).val() != '' )
-{	// Active earlier activated tab
-	jQuery( '.content-form-with-tab .nav-tabs a[href="' + jQuery( '#nav_tabs_selected' ).val() + '"]' ).tab( 'show' );
-}
+
 jQuery( '#post_excerpt' ).on( 'keyup', function()
 {
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:

@@ -8401,6 +8401,54 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 
 /**
+ * Save the values of active tab pane into DB
+ *
+ * @param integer Blog ID is used to save setting per blog, NULL- to don't save per blog
+ */
+function save_active_tab_pane_value( $blog_ID = NULL )
+{
+	if( ! is_logged_in() )
+	{ // Only loggedin users can fold fieldset
+		return;
+	}
+
+	$tab_pane_value = param( 'tab_pane_active', 'array:string' );
+
+	if( empty( $tab_pane_value ) )
+	{ // No tab pane value go from request, Exit here
+		return;
+	}
+
+	global $UserSettings;
+	
+	$key = ( is_array( $tab_pane_value ) ) ? array_key_first( $tab_pane_value ) : '';
+	$key = trim( $key );
+	
+	$value = ( isset( $tab_pane_value[ $key ] ) ) ? $tab_pane_value[ $key ] : '';
+	$value = trim( $value );
+	
+	if( ! empty( $value ) && $value[0] == '#' )
+	{
+		$value = substr($value, 1); 
+	}
+	
+	if( ! empty( $key ) )
+	{
+		$setting_name = 'active_'.$key;
+
+		if( $blog_ID !== NULL )
+		{ // Save setting per blog
+			$setting_name .= '_'.$blog_ID;
+		}
+		$UserSettings->set( $setting_name, $value );
+
+		// Update the folding setting for current user
+		$UserSettings->dbupdate();
+	}
+}
+
+
+/**
  * Get html code of bootstrap dropdown element
  *
  * @param array Params
