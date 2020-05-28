@@ -676,7 +676,7 @@ class Blog extends DataObject
 
 		if( param( 'user_prefix', 'string', NULL ) !== NULL )
 		{	// User profile page prefix:
-			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]*$#i', T_('User profile page prefix must be letters, digits or signs "-", "_".') );
+			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]*$#i', sprintf( T_('User profile page prefix can contain only letters, digits, %s or %s.'), '<code>-</code>', '<code>_</code>' ) );
 			$this->set_setting( 'user_prefix', get_param( 'user_prefix' ) );
 		}
 
