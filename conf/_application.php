@@ -26,6 +26,7 @@ $app_date = '2020-05-27';
 /**
  * Is this b2evolution PRO?
  * If the PRO modules are available some UI elements will be set up differently.
+ * This requires the PHP files for the PRO modules (otherwise there will be errors)
  * @global boolean
  */
 $app_pro = false;
