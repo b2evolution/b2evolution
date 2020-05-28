@@ -21,7 +21,7 @@ class nofollow_plugin extends Plugin
 	var $code = 'evo_nofollow';
 	var $name = 'Tag external links';
 	var $priority = 99;
-	var $version = '7.1.5';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

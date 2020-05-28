@@ -21,7 +21,7 @@ class content_blocks_plugin extends Plugin
 	var $name;
 	var $code = 'content_blocks';
 	var $priority = 102;
-	var $version = '7.1.5';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
