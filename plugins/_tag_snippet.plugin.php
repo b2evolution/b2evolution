@@ -62,6 +62,7 @@ class tag_snippet_plugin extends Plugin
 		return array(
 			'snippets' => array(
 				'label' => T_('Snippets'),
+				'note' => T_('Please note snippets defined here may be overridden per collection and per widget by same tag.'),
 				'type' => 'array',
 				'entries' => array(
 					'tag' => array(
@@ -92,9 +93,14 @@ class tag_snippet_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
+		global $admin_url;
+
 		return array_merge( array(
 			'snippets' => array(
 				'label' => T_('Snippets'),
+				'note' => sprintf( T_('Please note snippets defined here override snippets with same tag defined in <a %s>general settings of the plugin "%s"</a>, and they may be overridden per widget by same tag.'),
+						'href="'.$admin_url.'?ctrl=plugins&action=edit_settings&plugin_ID='.$this->ID.'"',
+						$this->name ),
 				'type' => 'array',
 				'entries' => array(
 					'tag' => array(
@@ -115,6 +121,48 @@ class tag_snippet_plugin extends Plugin
 					) ),
 			),
 		), parent::get_coll_setting_definitions( $params ) );
+	}
+
+
+	/**
+	 * Get definitions for widget specific editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_widget_param_definitions( $params )
+	{
+		global $Blog, $admin_url;
+
+		return array(
+			'title' => array(
+				'label' => T_('Block title'),
+				'note' => T_('Title to display in your skin.'),
+				'size' => 60,
+				'defaultvalue' => '',
+			),
+			'snippets' => array(
+				'label' => T_('Snippets'),
+				'note' => sprintf( T_('Please note snippets defined here override snippets with same tag defined in <a %s>current collection plugin settings</a> and in <a %s>general settings of the plugin "%s"</a>.'),
+						'href="'.$admin_url.'?ctrl=coll_settings&tab=plugins&plugin_group=widget&blog='.$Blog->ID.'"',
+						'href="'.$admin_url.'?ctrl=plugins&action=edit_settings&plugin_ID='.$this->ID.'"',
+						$this->name ),
+				'type' => 'array',
+				'entries' => array(
+					'tag' => array(
+						'label' => T_('Tag'),
+						'defaultvalue' => '',
+						'size' => 50,
+					),
+					'html_snippet' => array(
+						'label' => T_('HTML snippet'),
+						'type' => 'textarea',
+						'defaultvalue' => '',
+						'rows' => 4,
+					),
+				),
+			),
+		);
 	}
 
 
@@ -171,7 +219,8 @@ class tag_snippet_plugin extends Plugin
 			return false;
 		}
 
-		$widget_snippets = array();
+		$tag_snippets = array();
+		// 1) Use firsty General plugin setting:
 		$general_snippets = $this->get_setting( 'snippets', $Blog );
 		if( is_array( $general_snippets ) )
 		{
@@ -179,11 +228,11 @@ class tag_snippet_plugin extends Plugin
 			{
 				if( in_array( $general_snippet['tag'], $item_tags ) )
 				{
-					$widget_snippets[ $general_snippet['tag'] ] = $general_snippet['html_snippet'];
+					$tag_snippets[ $general_snippet['tag'] ] = $general_snippet['html_snippet'];
 				}
 			}
 		}
-		// Override general setting with settings per collection:
+		// 2) Override general settings with settings per collection:
 		$coll_snippets = $this->get_coll_setting( 'snippets', $Blog );
 		if( is_array( $coll_snippets ) )
 		{
@@ -191,12 +240,25 @@ class tag_snippet_plugin extends Plugin
 			{
 				if( in_array( $coll_snippet['tag'], $item_tags ) )
 				{
-					$widget_snippets[ $coll_snippet['tag'] ] = $coll_snippet['html_snippet'];
+					$tag_snippets[ $coll_snippet['tag'] ] = $coll_snippet['html_snippet'];
 				}
 			}
 		}
+		// 2) Override general and/or collection settings with settings per widget:
+		$widget_snippets = $this->get_widget_setting( 'snippets' );
+		if( is_array( $widget_snippets ) )
+		{
+			foreach( $widget_snippets as $widget_snippet )
+			{
+				if( in_array( $widget_snippet['tag'], $item_tags ) )
+				{
+					$tag_snippets[ $widget_snippet['tag'] ] = $widget_snippet['html_snippet'];
+				}
+			}
+		}
+		
 
-		if( empty( $widget_snippets ) )
+		if( empty( $tag_snippets ) )
 		{	// Don't display this widget when no snippets are defined for tags of the current Item::
 			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because no defined snippets for tags of this Item.' );
 			return false;
@@ -209,33 +271,13 @@ class tag_snippet_plugin extends Plugin
 		echo $this->widget_params['block_body_start'];
 
 		// Display snippets what found for tags of the current Item:
-		echo implode( ' ', $widget_snippets );
+		echo implode( ' ', $tag_snippets );
 
 		echo $this->widget_params['block_body_end'];
 
 		echo $this->widget_params['block_end'];
 
 		return true;
-	}
-
-
-	/**
-	 * Get definitions for widget specific editable params
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 * @param local params like 'for_editing' => true
-	 */
-	function get_widget_param_definitions( $params )
-	{
-		$r = array(
-			'title' => array(
-				'label' => T_('Block title'),
-				'note' => T_('Title to display in your skin.'),
-				'size' => 60,
-				'defaultvalue' => '',
-			),
-		);
-		return $r;
 	}
 }
 ?>
