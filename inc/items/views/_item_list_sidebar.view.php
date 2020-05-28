@@ -207,6 +207,24 @@ if( count( $ItemStatusCache->cache ) )
 		echo '</a></li>';
 	}
 	echo '</ul>';
+
+	// Buttons to check/uncheck all status filters:
+	echo '<div class="btn-group">';
+		echo '<button type="button" class="btn btn-default" data-check-all="'.$pp.'statuses[]">'.get_icon( 'check_all' ).'</button> ';
+		echo '<button type="button" class="btn btn-default" data-uncheck-all="'.$pp.'statuses[]">'.get_icon( 'uncheck_all' ).'</button>';
+	echo '</div>';
+	?>
+	<script>
+	jQuery( 'button[data-check-all]' ).click( function()
+	{	// Check all checkboxes by input name:
+		jQuery( 'input[name="' + jQuery( this ).data( 'check-all' ) + '"]' ).prop( 'checked', true );
+	} );
+	jQuery( 'button[data-uncheck-all]' ).click( function()
+	{	// Uncheck all checkboxes by input name:
+		jQuery( 'input[name="' + jQuery( this ).data( 'uncheck-all' ) + '"]' ).prop( 'checked', false );
+	} );
+	</script>
+	<?php
 	$Form->end_fieldset();
 }
 
