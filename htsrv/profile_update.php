@@ -201,7 +201,7 @@ switch( $action )
 		}
 		elseif( ! empty( $Blog ) )
 		{
-			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+			header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ), 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -238,7 +238,7 @@ switch( $action )
 		}
 		elseif( ! empty( $Blog ) )
 		{
-			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+			header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ), 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -271,7 +271,7 @@ switch( $action )
 		// Redirect so that a reload doesn't write to the DB twice:
 		if( ! empty( $Blog ) )
 		{
-			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+			header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ), 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -309,7 +309,7 @@ elseif( ! param_errors_detected() )
 
 			if( empty( $redirect_to ) )
 			{	// Redirect to display user page for cases when redirect param cannot be defined above by some reason:
-				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
+				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&', 'user_ID' => $current_User->ID, 'user_login' => $current_User->login ) );
 			}
 			break;
 		case 'upload_avatar':

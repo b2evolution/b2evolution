@@ -876,6 +876,17 @@ class Blog extends DataObject
 		// Tag posts per page:
 		$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 
+		if( param( 'user_prefix', 'string', NULL ) !== NULL )
+		{	// User profile page prefix:
+			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]*$#i', sprintf( T_('User profile page prefix can contain only letters, digits, %s or %s.'), '<code>-</code>', '<code>_</code>' ) );
+			$this->set_setting( 'user_prefix', get_param( 'user_prefix' ) );
+		}
+
+		if( param( 'user_links', 'string', NULL ) !== NULL )
+		{	// User profile URLs:
+			$this->set_setting( 'user_links', get_param( 'user_links' ) );
+		}
+
 		if( param( 'single_links', 'string', NULL ) !== NULL )
 		{ // Single post link type:
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
@@ -1430,6 +1441,7 @@ class Blog extends DataObject
 			$this->set_setting( 'tags_structured_data', param( 'tags_structured_data', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'canonical_user_urls', param( 'canonical_user_urls', 'integer', 0 ) );
 		}
 
 		if( in_array( 'credits', $groups ) )
@@ -3420,11 +3432,52 @@ class Blog extends DataObject
 			}
 
 			if( $this_Blog->get_setting( 'front_disp' ) == $disp_param )
-			{ // Get home page of this blog because front page displays current disp
+			{	// Get home page of this blog because front page displays current disp:
 				$url = $this_Blog->gen_blogurl( 'default' );
 			}
+			elseif( $disp_param == 'user' && ( isset( $params['user_login'] ) || isset( $params['user_ID'] ) ) )
+			{	// Use alias if user login or ID is provided:
+				$UserCache = & get_UserCache();
+				if( ! isset( $params['user_ID'] ) &&
+				    ( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_links' ) == 'prefix_id' ) )
+				{	// We need get user ID by login:
+					if( $param_User = & $UserCache->get_by_login( $params['user_login'] ) )
+					{	// Set user ID if it is detected by login:
+						$params['user_ID'] = $param_User->ID;
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_ID" for Blog->get( "userurl" )' );
+					}
+				}
+				if( ! isset( $params['user_login'] ) &&
+				    $this_Blog->get_setting( 'user_links' ) == 'prefix_login' )
+				{	// We need get user login by ID:
+					if( $param_User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
+					{	// Use login if user is detected in DB:
+						$params['user_login'] = $param_User->get( 'login' );
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_login" for Blog->get( "userurl" )' );
+					}
+				}
+
+				if( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_prefix' ) == '' )
+				{	// Use params E-g: ?disp=user&user_ID=4
+					$url = url_add_param( $this_Blog->gen_blogurl(), 'disp=user'.$params['glue'].'user_ID='.$params['user_ID'], $params['glue'] );
+				}
+				elseif( $this_Blog->get_setting( 'user_links' ) == 'prefix_id' )
+				{	// Use prefix with user ID:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_ID'] );
+				}
+				else // 'prefix_login'
+				{	// Use prefix with user login:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_login'] );
+				}
+			}
 			else
-			{ // Add disp param to blog's url when current disp is not a front page
+			{	// Add disp param to blog's url when current disp is not a front page:
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
 

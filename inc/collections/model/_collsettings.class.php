@@ -55,6 +55,10 @@ class CollectionSettings extends AbstractSettings
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
+		// User profile page settings:
+			'user_prefix' => 'user',
+			'user_links' => 'params',
+
 		// Single post settings:
 			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
@@ -147,6 +151,9 @@ class CollectionSettings extends AbstractSettings
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',							// fp> fp> we want this changed to prefix only for new blogs only
 			'tag_rel_attrib' => 1,						// rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
+
+		// User profile page settings:
+			'canonical_user_urls' => 1, // Redirect user profile pages to their canonical Url?
 
 		// Other filtered pages:
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages

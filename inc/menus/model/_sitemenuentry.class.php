@@ -668,7 +668,7 @@ class SiteMenuEntry extends DataObject
 				return $entry_Blog->get( 'lastcommentsurl' );
 
 			case 'owneruserinfo':
-				return url_add_param( $entry_Blog->get( 'userurl' ), 'user_ID='.$entry_Blog->owner_user_ID );
+				return $entry_Blog->get( 'userurl', array( 'user_ID' => $entry_Blog->owner_user_ID ) );
 
 			case 'ownercontact':
 				return $entry_Blog->get_contact_url();
@@ -810,7 +810,8 @@ class SiteMenuEntry extends DataObject
 				{	// Don't show this link for not logged in users:
 					return false;
 				}
-				return $entry_Blog->get( 'userurl' );
+				global $current_User;
+				return $entry_Blog->get( 'userurl', array( 'user_ID' => $current_User->ID, 'user_login' => $current_User->login ) );
 				break;
 
 			case 'admin':

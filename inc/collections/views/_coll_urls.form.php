@@ -592,6 +592,21 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
+$Form->begin_fieldset( TB_('User profile page URLs') . get_manual_link('user-profile-page-url-settings') );
+
+	$Form->text_input( 'user_prefix', $edited_Blog->get_setting( 'user_prefix' ), 30, TB_('Prefix'),
+		TB_('A prefix to be added to the URLs of the user profile pages'),
+		array( 'maxlength' => 120 ) );
+
+	$Form->radio( 'user_links', $edited_Blog->get_setting( 'user_links' ),
+		array(
+			array( 'params', TB_('Use params'), TB_('E-g: ').'<code>?disp=user&user_ID=4</code>' ),
+			array( 'prefix_id', TB_('Use prefix with user ID'), TB_('E-g: ').'<code>prefix:4</code>' ),
+			array( 'prefix_login', TB_('Use prefix with user login'), TB_('E-g: ').'<code>prefix:login</code>' ),
+		), TB_('User profile URLs'), true );
+
+$Form->end_fieldset();
+
 $Form->begin_fieldset( TB_('Single post URLs') . get_manual_link('single-post-url-settings') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
