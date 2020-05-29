@@ -1476,6 +1476,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
 
+	// Initialize for setup default widgets per collection:
+	$BlogCache = & get_BlogCache();
+
 	if( $install_collection_home )
 	{	// Install Home blog
 		$coll_error_messages = array();
