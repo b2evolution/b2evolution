@@ -102,6 +102,7 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

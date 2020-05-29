@@ -172,7 +172,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'category_text'     => '',
 					'categories_text'   => '',
 					'catdir_text'       => '',
-					'comments_text'     => T_('Latest Replies'),
+					'comments_text'     => '',
 					'front_text'        => '',
 					'posts_text'        => '',
 					'flagged_text'      => '',
