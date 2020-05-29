@@ -3764,21 +3764,21 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
  */
 function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
 {
-	// Require Fine Uploader js and css files:
 	require_js_defer( '#jquery#', $relative_to );
-	require_js_defer( 'multiupload/fine-uploader.js', $relative_to );
-	require_css( 'fine-uploader.css', $relative_to );
-	require_js_defer( 'src/evo_init_dragdrop_button.js', $relative_to );
-
 	// Used to make uploader area resizable:
 	require_js_defer( '#jqueryUI#', $relative_to );
-	require_js_defer( 'src/evo_init_attachment_fieldset.js', $relative_to );
 
 	if( $load_sortable_js )
-	{	// Load JS files to make the links table sortable:
-		require_js_defer( 'jquery/jquery.sortable.min.js', $relative_to );
-		require_js_defer( 'src/evo_init_link_sortable.js', $relative_to );
+	{	// Load JS file uploader with sortable feature for links/attachments:
+		require_js_defer( 'build/evo_fileuploader_sortable.bmin.js', $relative_to );
 	}
+	else
+	{	// Load JS file uploader:
+		require_js_defer( 'build/evo_fileuploader.bmin.js', $relative_to );
+	}
+
+	// Styles for file uploader:
+	require_css( 'fine-uploader.css', $relative_to );
 }
 
 
