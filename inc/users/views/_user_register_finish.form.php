@@ -91,7 +91,7 @@ $Form->text_input( 'edited_user_login', $edited_User->login, 22, /* TRANS: noun 
 if( ( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) ) &&
 		( $edited_User->get( 'pass_driver' ) != 'nopass' && ( ! isset( $edited_User->previous_pass_driver ) || $edited_User->previous_pass_driver != 'nopass' ) ) )
 {
-	if( ! $current_User->check_perm( 'users', 'edit' ) || $edited_User->ID == $current_User->ID )
+	if( ! check_user_perm( 'users', 'edit' ) || $edited_User->ID == $current_User->ID )
 	{	// Current user has no full access or editing his own password
 		$Form->password_input( 'current_user_pass', '', 20, TB_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:'.$params['register_field_width'].'px' ) );
 	}

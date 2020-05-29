@@ -3325,10 +3325,8 @@ class File extends DataObject
 	 */
 	function get_target_icon()
 	{
-		global $current_User;
-
 		$r = '';
-		if( $current_User->check_perm( 'files', 'view', false, $this->get_FileRoot() ) )
+		if( check_user_perm( 'files', 'view', false, $this->get_FileRoot() ) )
 		{	// Check permission
 			if( $this->is_dir() )
 			{	// Dir

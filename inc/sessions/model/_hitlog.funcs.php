@@ -33,18 +33,18 @@ function hits_results_block( $params = array() )
 		return;
 	}
 
-	global $blog, $sec_ID, $current_User;
+	global $blog, $sec_ID;
 
 	if( $blog == 0 )
 	{
-		if( ! $current_User->check_perm( 'stats', 'view' ) )
+		if( ! check_user_perm( 'stats', 'view' ) )
 		{ // Current user has no permission to view all stats (aggregated stats)
 			return;
 		}
 	}
 	else
 	{
-		if( ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
+		if( ! check_user_perm( 'stats', 'list', false, $blog ) )
 		{ // Current user has no permission to view the stats of the selected blog
 			return;
 		}
@@ -1015,7 +1015,7 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 
 	if( $display_messages )
 	{	// Display info:
-		$log_message = sprintf( TB_('Number of hitlog records that have a keyphrase that was not processed yet: %d'), intval( $ids['hits_num'] ) );
+		$log_message = sprintf( TB_('Number of hitlog records that have a keyphrase that were not processed yet: %d'), intval( $ids['hits_num'] ) );
 		$log_message .= ' <span class="note">(keyphrases='.$ids['keyphrases_num'].', min='.$ids['min'].', max='.$ids['max'].')('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_number' ) ).')</span>';
 		if( $display_messages === 'cron_job' )
 		{	// Log a message for cron job:
@@ -1033,6 +1033,7 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 
 		$Timer->start( 'extract_keyphrase_insert' );
 
+		// External keyphrases
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
 					SELECT h.hit_keyphrase, 1
 					FROM T_hitlog as h
@@ -1046,6 +1047,7 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 				T_track__keyphrase.keyp_count_refered_searches = T_track__keyphrase.keyp_count_refered_searches + 1';
 		$DB->query( $sql, ' Insert/Update external keyphrase' );
 
+		// Internal keyphrases
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_internal_searches)
 					SELECT h.hit_keyphrase, 1
 					FROM T_hitlog as h
@@ -1076,9 +1078,11 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 			}
 		}
 
+		$chunk = 1000;
+		$number_of_chunks = ceil( ( $ids['max'] - $ids['min'] ) / $chunk );
 		if( $display_messages )
 		{	// Display info:
-			$log_message = TB_('Updating hit logs table...').' ';
+			$log_message = TB_('Updating hit logs table...').' ('.$number_of_chunks.' chunks)';
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
 				cron_log_append( $log_message, NULL, '' );
@@ -1093,27 +1097,59 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 
 		$Timer->start( 'extract_keyphrase_update' );
 // TODO: this still takes too much time!
-		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
-				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
-				WHERE
-					h.hit_keyphrase = k.keyp_phrase
-					AND h.hit_keyphrase != ""
-					AND ( h.hit_ID >= '.$ids['min'].' )
-					AND ( h.hit_ID <= '.$ids['max'].' )
-					AND ( h.hit_keyphrase_keyp_ID IS NULL )';
-		$updated_keyphrases_num = $DB->query( $sql, 'Update hitlogs keyphrase id' );
-		$Timer->stop( 'extract_keyphrase_update' );
-		if( $display_messages )
-		{	// Display info:
-			$log_message = sprintf( TB_('%d records'), $updated_keyphrases_num );
-			$log_message .= ' <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_update' ) ).')</span>';
+// Let's try updating 1000 lines at a time.
+		$start = $ids['min'];
+		$i = 1;
+		while( $start <= $ids['max'] )
+		{
+			$stop = min( $start+$chunk-1, $ids['max'] ); // don't go over max 
+
+			$log_message = 'Doing chunk #'.$i.' from '.$start.' to '.$stop.'...';
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
 				cron_log_append( $log_message );
 			}
 			else
 			{	// Print out a message:
-				echo $log_message.'</p>';
+				echo '<br/>'.$log_message;
+				evo_flush();
+			}
+
+			$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
+					SET h.hit_keyphrase_keyp_ID = k.keyp_ID
+					WHERE	h.hit_keyphrase = k.keyp_phrase
+						AND h.hit_keyphrase != ""
+						AND ( h.hit_ID >= '.$start.' )
+						AND ( h.hit_ID <= '.$stop.' )
+						AND ( h.hit_keyphrase_keyp_ID IS NULL )';
+			$updated_keyphrases_num = $DB->query( $sql, 'Update hitlogs keyphrase id' );
+
+			$log_message = sprintf( TB_('%d records'), $updated_keyphrases_num );
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo $log_message;
+			}
+
+			$start += $chunk;
+			$i++;
+		}
+
+
+		$Timer->stop( 'extract_keyphrase_update' );
+		if( $display_messages )
+		{	// Display info:
+			$log_message = 'Finished <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_update' ) ).')</span>';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo '</p><p>'.$log_message.'</p>';
 				evo_flush();
 			}
 		}
@@ -1138,8 +1174,7 @@ function stats_goal_hit_extra_params( $ghit_params )
 		$ItemCache = & get_ItemCache();
 		if( $Item = & $ItemCache->get_by_ID( intval( $matches[1] ), false, false ) )
 		{ // Display a link to view with current item title
-			global $current_User;
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+			if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 			{ // Link to admin view
 				return $Item->get_title( array( 'link_type' => 'admin_view' ) );
 			}
@@ -1163,7 +1198,7 @@ function stats_goal_hit_extra_params( $ghit_params )
  */
 function display_hits_summary_panel( $diagram_columns = array() )
 {
-	global $ReqURL, $current_User;
+	global $ReqURL;
 
 	$hits_summary_mode = get_hits_summary_mode();
 
@@ -1190,7 +1225,7 @@ function display_hits_summary_panel( $diagram_columns = array() )
 		display_hits_filter_form( 'filter', $diagram_columns, $hits_summary_mode == 'aggregate' );
 	}
 
-	if( $current_User->check_perm( 'stats', 'edit' ) )
+	if( check_user_perm( 'stats', 'edit' ) )
 	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
 		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
 			.' class="btn btn-default pull-right">'

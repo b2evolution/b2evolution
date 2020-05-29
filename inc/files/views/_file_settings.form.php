@@ -232,7 +232,7 @@ $Form->begin_fieldset( TB_('Image options').get_manual_link( 'image-options' ) )
 
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Form->buttons( array(
 			array( 'submit', 'submit[update]', TB_('Save Changes!'), 'SaveButton' ),
@@ -242,7 +242,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Form->end_form();
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {	// TODO: better perm check
 	echo '<p class="note">'.TB_('See also:').' ';
 	echo TB_('Blog Settings').' &gt; '.TB_('Advanced').' &gt; '.TB_('Media directory location');

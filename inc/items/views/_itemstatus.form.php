@@ -175,9 +175,7 @@ $Results->cols[] = array(
 
 function get_name_for_itemtype( $id, $name )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemtypes&amp;ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}

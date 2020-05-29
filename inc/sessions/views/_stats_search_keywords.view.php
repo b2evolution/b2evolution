@@ -43,7 +43,7 @@ else
 	param( 'datestop', 'string', '', true );
 }
 
-if( $current_User->check_perm( 'stats', 'view' ) )
+if( check_user_perm( 'stats', 'view' ) )
 {	// Permission to view stats for ALL blogs:
 	param( 'goal_ID', 'integer', 0, true );
 	$goal_name = param( 'goal_name', 'string', NULL, true );
@@ -181,12 +181,12 @@ $Results->title = T_('Keyphrases').get_manual_link( 'search-keywords-list' );
  */
 function filter_keyphrases( & $Form )
 {
-	global $current_User, $datestart, $datestop;
+	global $datestart, $datestop;
 
 	$Form->date_input( 'datestartinput', $datestart, T_('From') );
 	$Form->date_input( 'datestopinput', $datestop, T_('to') );
 
-	if( $current_User->check_perm( 'stats', 'view' ) )
+	if( check_user_perm( 'stats', 'view' ) )
 	{	// Permission to view stats for ALL blogs:
 		global $goal_ID;
 		$GoalCache = & get_GoalCache();

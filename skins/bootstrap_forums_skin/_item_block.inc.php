@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
+global $Item, $preview, $dummy_fields, $cat, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend

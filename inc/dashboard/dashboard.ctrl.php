@@ -70,7 +70,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 $collection_count = get_table_count( 'T_blogs' );
-if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
+if( check_user_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
@@ -82,7 +82,7 @@ $AdminUI->disp_payload_end();
  * Administrative tasks
  */
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // We have some serious admin privilege:
 	/**
 	 * @var AbstractSettings

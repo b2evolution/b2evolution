@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '7.1.5';
+	var $version = '7.2.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -93,10 +93,8 @@ class quicktags_plugin extends Plugin
 			return false;
 		}
 
-		global $current_User;
-
 		// Allow html tags like <pre>, <img> and <a> only when current user has a permission for this:
-		$params['allow_restricted_html'] = ( is_logged_in() && $current_User->check_perm( 'blog_comments', 'edit', false, $item_Blog->ID ) );
+		$params['allow_restricted_html'] = ( check_user_perm( 'blog_comments', 'edit', false, $item_Blog->ID ) );
 
 		return $this->DisplayCodeToolbar( $params );
 	}

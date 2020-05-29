@@ -92,7 +92,7 @@ class item_attachments_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'item_details';
@@ -111,7 +111,7 @@ class item_attachments_Widget extends ComponentWidget
 				'type' => 'select',
 				'options' => $TemplateCache->get_code_option_array(),
 				'defaultvalue' => 'item_details_files_list',
-				'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+				'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 						.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
 						array( 'onclick' => 'return b2template_list_highlight( this )' ),
 						array( 'title' => T_('Manage templates').'...' ) ) : '' ),
@@ -149,12 +149,16 @@ class item_attachments_Widget extends ComponentWidget
 
 		$this->disp_params = array_merge( array(
 				'widget_item_attachments_params' => array(),
+				'image_attachment' => true,
 			), $this->disp_params );
 
 		$item_files = render_template_code( $this->disp_params['template'], $this->disp_params );
 
 		if( empty( $item_files ) )
 		{	// Don't display this widget when Item has no attachments:
+			$this->disp_params = array_merge( array(
+				'hide_header_title' => true,
+			), $this->disp_params );
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no attachments.' );
 			return false;
 		}

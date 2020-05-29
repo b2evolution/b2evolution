@@ -17,18 +17,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var instance of User class
- */
-global $current_User;
-
-/**
  * @vars string paths
  */
 global $basepath, $upgrade_path, $install_path;
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'maintenance', 'upgrade', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'maintenance', 'upgrade', true );
 
 // Used in the upgrade process
 $script_start_time = $servertimenow;
@@ -130,6 +125,11 @@ $AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
 $AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
 if( $tab == 'git' )
 {
+	if( ! $auto_upgrade_from_any_url )
+	{	// Deny upgrade from Git because upgrade from any URL is denied by config:
+		debug_die( 'Auto upgrade is not allowed from URL!' );
+	}
+
 	$AdminUI->breadcrumbpath_add( TB_('Upgrade from Git'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
 
 	// Set an url for manual page:
@@ -297,7 +297,7 @@ switch( $action )
 		}
 		else
 		{	// This must not happens because of redirect on checking above:
-			debug_die( 'Auto upgrade is not allowed!' );
+			debug_die( 'Auto upgrade is not allowed from URL!' );
 		}
 
 		// Check the download url for correct http, https, ftp URI
@@ -614,6 +614,10 @@ switch( $action )
 						echo '<p style="color:red"><strong>'.sprintf( TB_('Please restore the backup files from the &laquo;%s&raquo; package. The database was not changed.'), $backup_path ).'</strong></p>';
 						evo_flush();
 					}
+
+					// Flag to know files were upgraded, in order to don't include new files below,
+					// because they may contain new functions which are not loaded yet when this script was started:
+					$files_upgraded = true;
 				}
 			}
 			else
@@ -662,9 +666,16 @@ if( isset( $block_item_Widget ) )
 	$block_item_Widget->disp_template_replaced( 'block_end' );
 }
 
-$AdminUI->disp_payload_end();
+if( ! empty( $files_upgraded ) )
+{	// We cannot require new footer files because they may contain new functions
+	// which are not loaded yet when this script was started:
+	echo '<span class="small note">'.TB_('No footer is displayed here because we are in between 2 versions.').'</span>';
+}
+else
+{
+	$AdminUI->disp_payload_end();
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

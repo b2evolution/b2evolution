@@ -239,7 +239,7 @@ function skin_init( $disp )
 				// Keep ONLY allowed noredir params from current URL in the canonical URL:
 				$canonical_url = url_clear_noredir_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
-						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+						&& check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
 				{ // A revision of the post, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );
@@ -836,9 +836,9 @@ function skin_init( $disp )
 					}
 
 					// check if user status allow to view messages
-					if( !$current_User->check_status( 'can_view_messages' ) )
+					if( ! check_user_status( 'can_view_messages' ) )
 					{ // user status does not allow to view messages
-						if( $current_User->check_status( 'can_be_validated' ) )
+						if( check_user_status( 'can_be_validated' ) )
 						{ // user is logged in but his/her account is not activate yet
 							$Messages->add( T_( 'You must activate your account before you can read & send messages. <b>See below:</b>' ) );
 							header_redirect( get_activate_info_url(), 302 );
@@ -851,7 +851,7 @@ function skin_init( $disp )
 					}
 
 					// check if user permissions allow to view messages
-					if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{ // Redirect to the blog url for users without messaging permission
 						$Messages->add( 'You are not allowed to view Messages!' );
 						header_redirect( $Blog->gen_blogurl(), 302 );
@@ -887,9 +887,9 @@ function skin_init( $disp )
 						// will have exited
 					}
 
-					if( !$current_User->check_status( 'can_view_contacts' ) )
+					if( ! check_user_status( 'can_view_contacts' ) )
 					{ // user is logged in, but his status doesn't allow to view contacts
-						if( $current_User->check_status( 'can_be_validated' ) )
+						if( check_user_status( 'can_be_validated' ) )
 						{ // user is logged in but his/her account was not activated yet
 							// Redirect to the account activation page
 							$Messages->add( T_( 'You must activate your account before you can manage your contacts. <b>See below:</b>' ) );
@@ -914,7 +914,7 @@ function skin_init( $disp )
 					// Get action parameter from request:
 					$action = param_action();
 
-					if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{ // Redirect to the blog url for users without messaging permission
 						$Messages->add( 'You are not allowed to view Contacts!' );
 						$blogurl = $Blog->gen_blogurl();
@@ -945,7 +945,7 @@ function skin_init( $disp )
 										$Messages->add( 'User has been added to your contacts.', 'success' );
 									}
 								}
-								header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+								header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ) );
 							}
 							break;
 
@@ -978,7 +978,7 @@ function skin_init( $disp )
 									}
 									else
 									{ // Redirect to the user profile page
-										header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+										header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ) );
 									}
 								}
 							}
@@ -1061,9 +1061,9 @@ function skin_init( $disp )
 						// will have exited
 					}
 
-					if( !$current_User->check_status( 'can_view_threads' ) )
+					if( ! check_user_status( 'can_view_threads' ) )
 					{ // user status does not allow to view threads
-						if( $current_User->check_status( 'can_be_validated' ) )
+						if( check_user_status( 'can_be_validated' ) )
 						{ // user is logged in but his/her account is not activate yet
 							$Messages->add( T_( 'You must activate your account before you can read & send messages. <b>See below:</b>' ) );
 							header_redirect( get_activate_info_url(), 302 );
@@ -1079,7 +1079,7 @@ function skin_init( $disp )
 						// will have exited
 					}
 
-					if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{ // Redirect to the blog url for users without messaging permission
 						$Messages->add( 'You are not allowed to view Messages!' );
 						$blogurl = $Blog->gen_blogurl();
@@ -1114,7 +1114,7 @@ function skin_init( $disp )
 					{
 						case 'new':
 							// Check permission:
-							$current_User->check_perm( 'perm_messaging', 'reply', true );
+							check_user_perm( 'perm_messaging', 'reply', true );
 
 							global $edited_Thread, $edited_Message;
 
@@ -1155,7 +1155,7 @@ function skin_init( $disp )
 
 						default:
 							// Check permission:
-							$current_User->check_perm( 'perm_messaging', 'reply', true );
+							check_user_perm( 'perm_messaging', 'reply', true );
 							break;
 					}
 					break;
@@ -1221,7 +1221,7 @@ function skin_init( $disp )
 
 			if( is_logged_in() )
 			{ // User is already logged in
-				if( $current_User->check_status( 'can_be_validated' ) )
+				if( check_user_status( 'can_be_validated' ) )
 				{ // account is not active yet, redirect to the account activation page
 					$Messages->add( T_( 'You are logged in but your account is not activated. You will find instructions about activating your account below:' ) );
 					header_redirect( get_activate_info_url(), 302 );
@@ -1332,7 +1332,7 @@ function skin_init( $disp )
 				// will have exited
 			}
 
-			if( !$current_User->check_status( 'can_be_validated' ) )
+			if( ! check_user_status( 'can_be_validated' ) )
 			{ // don't display activateinfo screen
 				$after_email_validation = $Settings->get( 'after_email_validation' );
 				if( $after_email_validation == 'return_to_original' )
@@ -1358,7 +1358,7 @@ function skin_init( $disp )
 					$redirect_to = '';
 				}
 
-				if( $current_User->check_status( 'is_validated' ) )
+				if( check_user_status( 'is_validated' ) )
 				{
 					$Messages->add( T_( 'Your account has already been activated.' ) );
 				}
@@ -1449,6 +1449,15 @@ function skin_init( $disp )
 			// Check if current user has an access to view a profile of the requested user:
 			check_access_user_profile( $user_ID );
 
+			if( $Blog->get_setting( 'canonical_user_urls' ) && $redir == 'yes' )
+			{	// Check if current user profile URL can be canonical:
+				$canonical_url = $Blog->get( 'userurl', array( 'user_ID' => $user_ID, 'glue' => '&' ) );
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+				{	// Redirect to canonical user profile URL:
+					header_redirect( $canonical_url, true );
+				}
+			}
+
 			// Initialize users list from session cache in order to display prev/next links:
 			// It is used to navigate between users
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
@@ -1508,9 +1517,9 @@ function skin_init( $disp )
 				// will have exited
 			}
 
-			if( !$current_User->check_status( 'can_edit_post' ) )
+			if( ! check_user_status( 'can_edit_post' ) )
 			{
-				if( $current_User->check_status( 'can_be_validated' ) )
+				if( check_user_status( 'can_be_validated' ) )
 				{ // user is logged in but his/her account was not activated yet
 					// Redirect to the account activation page
 					$Messages->add( T_( 'You must activate your account before you can create & edit posts. <b>See below:</b>' ) );
@@ -1531,7 +1540,7 @@ function skin_init( $disp )
 			if( ! blog_has_cats( $Blog->ID ) )
 			{ // No categories are in this blog
 				$error_message = T_('Since this blog has no categories, you cannot post into it.');
-				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 				{ // If current user has a permission to create a category
 					$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID.'"');
 				}
@@ -1567,9 +1576,9 @@ function skin_init( $disp )
 				// will have exited
 			}
 
-			if( !$current_User->check_status( 'can_edit_comment' ) )
+			if( ! check_user_status( 'can_edit_comment' ) )
 			{
-				if( $current_User->check_status( 'can_be_validated' ) )
+				if( check_user_status( 'can_be_validated' ) )
 				{ // user is logged in but his/her account was not activated yet
 					// Redirect to the account activation page
 					$Messages->add( T_( 'You must activate your account before you can edit comments. <b>See below:</b>' ) );
@@ -1594,7 +1603,7 @@ function skin_init( $disp )
 			$edited_Comment = $CommentCache->get_by_ID( $comment_ID );
 			$comment_Item = $edited_Comment->get_Item();
 
-			if( ! $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment ) )
+			if( ! check_user_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment ) )
 			{ // If User has no permission to edit comments with this comment status:
 				$Messages->add( 'You are not allowed to edit the previously selected comment!' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
@@ -1615,9 +1624,6 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
-
-			// Init JS to quick upload several files:
-			init_fileuploader_js( 'blog' );
 			break;
 
 		case 'useritems':
@@ -1718,7 +1724,7 @@ function skin_init( $disp )
 			break;
 
 		case 'closeaccount':
-			global $current_User, $disp;
+			global $disp;
 			if( ! $Settings->get( 'account_close_enabled' ) )
 			{	// If an account closing page is disabled - Display 404 page with error message:
 				$disp = is_logged_in() ? 'profile' : 'login';
@@ -1729,7 +1735,7 @@ function skin_init( $disp )
 				$disp = 'login';
 				$Messages->add( T_('You must log in before you can close your account.'), 'error' );
 			}
-			elseif( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+			elseif( check_user_perm( 'users', 'edit', false ) )
 			{	// Don't allow admins close own accounts from front office:
 				$disp = 'profile';
 				$Messages->add( T_('You have user moderation privileges. In order to prevent mistakes, you cannot close your own account. Please ask the admin (or another admin) to remove your user moderation privileges before closing your account.'), 'error' );
@@ -3100,7 +3106,7 @@ function widget_page_containers( $item_ID, $params = array() )
  */
 function widget_container_customize_params( $params, $wico_code, $wico_name )
 {
-	global $Collection, $Blog, $Session, $current_User;
+	global $Collection, $Blog, $Session;
 
 	$params = array_merge( array(
 			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
@@ -3121,7 +3127,7 @@ function widget_container_customize_params( $params, $wico_code, $wico_name )
 					'data-name' => $wico_name,
 					'data-code' => $wico_code,
 				);
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Set data to know current user has a permission to edit this widget:
 				$designer_mode_data['data-can-edit'] = 1;
 			}
@@ -3202,6 +3208,7 @@ function get_skin_default_containers()
 			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
 			'photo_index'               => array( NT_('Photo Index'), 190 ),
 			'search_area'               => array( NT_('Search Area'), 200 ),
+			'sitemap'                   => array( NT_('Site Map'), 210 ),
 		);
 }
 

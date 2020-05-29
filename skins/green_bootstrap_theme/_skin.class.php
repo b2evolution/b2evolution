@@ -23,7 +23,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.5';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -1742,9 +1742,6 @@ class green_bootstrap_theme_Skin extends Skin
 			case 'front':
 				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
-
-				// Used to quick upload several files:
-				init_fileuploader_js( 'blog' );
 				break;
 
 			case 'posts':
@@ -1762,9 +1759,6 @@ class green_bootstrap_theme_Skin extends Skin
 						$bootstrap_manual_posts_text = $Chapter->get( 'name' );
 					}
 				}
-
-				// Used to quick upload several files for comment of intro post:
-				init_fileuploader_js( 'blog' );
 				break;
 		}
 
@@ -2321,7 +2315,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function display_posts_list_header( $title, $params = array() )
 	{
-		global $Blog, $current_User;
+		global $Blog;
 
 		$params = array_merge( array(
 				'actions' => '',
@@ -2347,12 +2341,10 @@ class green_bootstrap_theme_Skin extends Skin
 
 		// Check if current User can view workflow properties:
 		$can_view_workflow =
-			// User must be logged in:
-			is_logged_in() &&
 			// Workflow must be enabled for current Collection:
 			$Blog->get_setting( 'use_workflow' ) &&
 			// Current User must has a permission to be assigned for tasks of the current Collection:
-			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
+			check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
 
 		// Get template depending on permission of current User:
 		$template = ( $can_view_workflow ? 'workflow' : 'normal' );

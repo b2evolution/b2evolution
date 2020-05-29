@@ -21,7 +21,7 @@ load_class( 'users/model/_usertag.class.php', 'UserTag' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'users', 'usertags' );
 
@@ -49,14 +49,14 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edited_UserTag = new UserTag();
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 		break;
 
 	case 'create':
@@ -67,7 +67,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to create tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_UserTag->load_from_Request() )
@@ -90,7 +90,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an tag_ID:
 		param( 'utag_ID', 'integer', true );
@@ -116,7 +116,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an tag_ID:
 		param( 'utag_ID', 'integer', true );
@@ -148,7 +148,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$user_ID = param( 'user_ID', 'integer', 0, true );
 
@@ -182,7 +182,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$old_tag_ID = param( 'old_tag_ID', 'integer', 0, true );
 
@@ -238,7 +238,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$DB->query( 'DELETE T_users__usertag FROM T_users__usertag
 				LEFT JOIN T_users ON uutg_user_ID = user_ID

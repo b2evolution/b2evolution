@@ -61,8 +61,6 @@ class LinkItem extends LinkOwner
 	 */
 	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			if( $assert )
@@ -74,16 +72,16 @@ class LinkItem extends LinkOwner
 
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
-			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
 		}
 
 		if( $this->is_temp() )
 		{	// Check permission for new creating item:
-			return $current_User->check_perm( 'blog_post_statuses', $permlevel, $assert, $this->get_blog_ID() );
+			return check_user_perm( 'blog_post_statuses', $permlevel, $assert, $this->get_blog_ID() );
 		}
 		else
 		{	// Check permission for existing item in DB:
-			return $current_User->check_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
+			return check_user_perm( 'item_post!CURSTATUS', $permlevel, $assert, $this->Item );
 		}
 	}
 

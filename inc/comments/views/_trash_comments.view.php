@@ -13,9 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $current_User;
-
-$current_User->check_perm( 'blogs', 'editall', true );
+check_user_perm( 'blogs', 'editall', true );
 
 param_action( 'emptytrash', true );
 

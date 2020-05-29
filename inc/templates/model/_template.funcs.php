@@ -701,7 +701,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Form:search_content_type':
 			global $Blog;
-			
+
 			if( ! $Blog )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Blog is not defined at this moment.</span>';
@@ -716,6 +716,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			if( $Blog->get_setting( 'search_include_cmnts' ) )
 			{
 				$content_type_options['comment'] = T_('Comments');
+			}
+			if( $Blog->get_setting( 'search_include_metas' ) &&
+			    check_user_perm( 'meta_comment', 'view', false, $Blog->ID )  )
+			{
+				$content_type_options['meta'] = T_('Internal comments');
 			}
 			if( $Blog->get_setting( 'search_include_files' ) )
 			{
@@ -864,7 +869,9 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:feedback_link':
-			echo $rendered_Item->get_feedback_link( $params );
+			echo $rendered_Item->get_feedback_link( array_merge( array(
+					'show_in_single_mode' => true,
+				), $params ) );
 			break;
 
 		case 'Item:files':

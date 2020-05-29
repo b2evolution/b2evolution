@@ -128,7 +128,7 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $current_User, $DB;
+		global $Collection, $Blog, $DB;
 
 		$this->init_display( $params );
 

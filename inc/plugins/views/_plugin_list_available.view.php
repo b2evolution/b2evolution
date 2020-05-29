@@ -17,10 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var Plugins
  */
 global $admin_Plugins;
@@ -148,7 +144,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 		$Table->display_col_start();
 			$registrations = $admin_Plugins->count_regs($loop_Plugin->classname);
 
-			if( $current_User->check_perm( 'options', 'edit', false )
+			if( check_user_perm( 'options', 'edit', false )
 					&& ( ! isset( $loop_Plugin->number_of_installs )
 					     || $registrations < $loop_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet and user has "edit options" perms

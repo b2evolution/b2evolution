@@ -17,10 +17,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'tools/model/_system.funcs.php' );
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
-if( $current_User->check_perm( 'options', 'edit' ) && system_check_charset_update() )
+if( check_user_perm( 'options', 'edit' ) && system_check_charset_update() )
 { // DB charset is required to update
 	$Messages->add( sprintf( TB_('WARNING: Your database and/or some of your tables have a different charset/collation than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
 }

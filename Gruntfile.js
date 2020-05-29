@@ -434,6 +434,30 @@ module.exports = function(grunt) {
 				src: 'rsc/js/evo_helpdesk_widget.js',
 				dest: 'rsc/js/evo_helpdesk_widget.min.js',
 			},
+			evo_fileuploader: {
+				options: {
+					banner: '/* This file includes ALL files that are used for quick file uploader */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/multiupload/fine-uploader.js',
+					'rsc/js/src/evo_init_dragdrop_button.js',
+					'rsc/js/src/evo_init_attachment_fieldset.js',
+				],
+				dest: 'rsc/js/build/evo_fileuploader.bmin.js'
+			},
+			evo_fileuploader_sortable: {
+				options: {
+					banner: '/* This file includes ALL files that are used for quick file uploader with sortable feature for attachments */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/build/evo_fileuploader.bmin.js',
+					'rsc/js/jquery/jquery.sortable.min.js',
+					'rsc/js/src/evo_init_link_sortable.js',
+				],
+				dest: 'rsc/js/build/evo_fileuploader_sortable.bmin.js'
+			},
 		},
 
 		// Markdown to HTML

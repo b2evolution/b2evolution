@@ -32,7 +32,7 @@ $tab3 = param( 'tab3', 'string', '', true );
 
 $AdminUI->set_path( 'users', $tab == 'stats' ? 'stats' : 'users', $tab3 == 'duplicates' ? 'duplicates' : 'list' );
 
-if( !$current_User->check_perm( 'users', 'view' ) )
+if( ! check_user_perm( 'users', 'view' ) )
 { // User has no permissions to view: he can only edit his profile
 
 	if( isset($user_ID) && $user_ID != $current_User->ID )
@@ -65,7 +65,7 @@ if( ! is_null($user_ID) )
 	}
 	elseif( $action == 'list' )
 	{ // 'list' is default, $user_ID given
-		if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'edit' ) )
+		if( $user_ID == $current_User->ID || check_user_perm( 'users', 'edit' ) )
 		{
 			$action = 'edit';
 		}
@@ -78,7 +78,7 @@ if( ! is_null($user_ID) )
 
 	if( $action != 'list' )
 	{ // check edit permissions
-		if( ! $current_User->check_perm( 'users', 'edit' )
+		if( ! check_user_perm( 'users', 'edit' )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( TB_('You have no permission to edit other users!'), 'error' );
@@ -335,7 +335,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check required permission
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			// get the type of the removable sender customization
 			$type = param( 'type', 'string', true );
@@ -385,7 +385,7 @@ if( !$Messages->has_errors() )
 		case 'campaign':
 			// Select the recipients for email campaign:
 
-			$current_User->check_perm( 'emails', 'edit', true );
+			check_user_perm( 'emails', 'edit', true );
 
 			// Memorize action param to keep newsletter mode on change filters:
 			memorize_param( 'action', 'string', true, $action );
@@ -419,7 +419,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'options', 'view', true );
+			check_user_perm( 'options', 'view', true );
 
 			param( 'autm_ID', 'integer', true );
 			param( 'enlt_ID', 'integer', true );
@@ -450,7 +450,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			param( 'add_user_tags', 'string', '' );
 			param( 'remove_user_tags', 'string', '' );
@@ -486,7 +486,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			param( 'account_status', 'string', '' );
 
@@ -527,7 +527,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			$primary_grp_ID = param( 'grp_ID', 'integer' );
 			$add_secondary_grp_ID = param( 'add_secondary_grp_ID', 'integer' );
@@ -643,7 +643,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			$users = explode( ',', param( 'users', 'string' ) );
 
@@ -693,7 +693,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'view', true );
+			check_user_perm( 'users', 'view', true );
 
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
 			$UserList = new UserList( 'admin' );
@@ -743,7 +743,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'view', true );
+			check_user_perm( 'users', 'view', true );
 
 			// Do export:
 			load_funcs( 'pro_only/model/_pro_user.funcs.php' );
@@ -766,7 +766,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			// Do import:
 			load_funcs( 'pro_only/model/_pro_user.funcs.php' );
@@ -790,7 +790,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'users' );
 
 			// Check permission:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			$filters = array();
 			for( $i = 1; $i <= 10; $i++ )
@@ -865,7 +865,7 @@ else
 
 			$AdminUI->breadcrumbpath_add( TB_('List'), '?ctrl=users' );
 			$AdminUI->top_block = get_user_quick_search_form();
-			if( $current_User->check_perm( 'users', 'moderate' ) )
+			if( check_user_perm( 'users', 'moderate' ) )
 			{	// Include to edit user level
 				require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			}

@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( '_core/ui/_table.class.php', 'Table' );
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-global $edited_Itemtype, $thumbnail_sizes, $admin_url, $Blog, $current_User;
+global $edited_Itemtype, $thumbnail_sizes, $admin_url, $Blog;
 
 // Determine if we are creating or updating...
 global $action;
@@ -69,7 +69,7 @@ $Form->begin_fieldset( TB_('General').get_manual_link('item-type-general') );
 	$TemplateCache = & get_TemplateCache();
 	$TemplateCache->load_by_context( $context );
 	$template_options = array( NULL => sprintf( TB_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
-	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+	$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.'&amp;blog='.$Blog->ID, NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => TB_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'ityp_template_excerpt', $edited_Itemtype->get( 'template_excerpt' ), $template_options, TB_('Template for Excerpt display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'ityp_template_normal', $edited_Itemtype->get( 'template_normal' ), $template_options, TB_('Template for Teaser display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
@@ -568,9 +568,7 @@ $Results->cols[] = array(
 
 function get_name_for_itemstatus( $id, $name )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemstatuses&amp;pst_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}

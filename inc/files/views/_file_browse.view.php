@@ -23,10 +23,6 @@ global $fm_Filelist;
  */
 global $fm_flatmode;
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -155,7 +151,7 @@ if( isset( $edited_User ) )
 					$file_roots = array();
 					foreach( $rootlist as $l_FileRoot )
 					{	// Put all available file roots in grouped array:
-						if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+						if( ! check_user_perm( 'files', 'view', false, $l_FileRoot ) )
 						{	// Skip this file root, because current user has no permissions to view it:
 							continue;
 						}
@@ -193,7 +189,7 @@ if( isset( $edited_User ) )
 								}
 								$file_root_group_key = $file_root['type'];
 							}
-							if( ( $file_root_group_key == 'user' && $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+							if( ( $file_root_group_key == 'user' && check_user_perm( 'users', 'moderate' ) && check_user_perm( 'files', 'all' ) )
 							    || $file_root_group_key == 'collection' )
 							{	// Selector for more collections or users:
 								echo '<li><a href="#" data-type="'.$file_root_group_key.'">'.T_('Other...').'</a></li>'."\n";

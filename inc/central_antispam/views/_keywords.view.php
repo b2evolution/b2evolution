@@ -23,7 +23,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $central_antispam_Module, $UserSettings, $admin_url, $current_User;
+global $central_antispam_Module, $UserSettings, $admin_url;
 
 $keywords = param( 'keywords', 'string', '', true );
 $status = param( 'status', 'string', '', true );
@@ -105,7 +105,7 @@ $Results->cols[] = array(
 		'order' => 'cakw_status',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'jeditable_cell cakeyword_status_edit',
-		'td' =>  /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
+		'td' =>  /* Check permission: */check_user_perm( 'centralantispam', 'edit' ) ?
 			/* Current user can edit keyword */'<a href="#" rel="$cakw_status$" style="color:#FFF">%ca_get_keyword_status_title( #cakw_status# )%</a>' :
 			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',
 		'extra' => array ( 'style' => 'background-color: %ca_get_keyword_status_color( "#cakw_status#" )%;color:#FFF', 'format_to_output' => false ),
@@ -185,7 +185,7 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+if( check_user_perm( 'centralantispam', 'edit' ) )
 {	// Check permission to edit central antispam keyword:
 	// Print JS to edit status of central antispam keyword:
 	echo_editable_column_js( array(

@@ -57,7 +57,7 @@ $Results = new Results( $SQL->get(), 'emadr_', '---D', $UserSettings->get( 'resu
 
 $Results->title = T_('Email addresses').get_manual_link( 'email-addresses' );
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// Check permission to edit emails:
 	$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -120,7 +120,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'emadr_status',
 		'td' => '$emadr_status$',
-		'td' => /* Check permission: */$current_User->check_perm( 'emails', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'emails', 'edit' ) ?
 			/* Current user can edit emails */'<a href="#" rel="$emadr_status$">%emadr_get_status_title( #emadr_status# )%</a>' :
 			/* No edit, only view the status */'%emadr_get_status_title( #emadr_status# )%',
 		'th_class' => 'shrinkwrap',
@@ -230,7 +230,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( T_('Filter the returned emails by this email address...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;email=$emadr_address$' )
-			.( $current_User->check_perm( 'emails', 'edit' )
+			.( check_user_perm( 'emails', 'edit' )
 			? action_icon( T_('Edit this email address...'), 'properties', $admin_url.'?ctrl=email&amp;emadr_ID=$emadr_ID$' )
 			.action_icon( T_('Delete this email address!'), 'delete', url_decode_special_symbols( regenerate_url( 'emadr_ID,action', 'emadr_ID=$emadr_ID$&amp;action=blocked_delete&amp;'.url_crumb('email_blocked') ) ) )
 			: '' )
@@ -239,7 +239,7 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 { // Check permission to edit emails:
 	// Print JS to edit an email status
 	echo_editable_column_js( array(

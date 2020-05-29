@@ -79,7 +79,7 @@ function wp_getauthors($m)
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm('users', 'view') )
+	if( ! check_user_perm('users', 'view') )
 	{
 		return xmlrpcs_resperror( 5, T_('You have no permission to view other users!') );
 	}
@@ -210,7 +210,7 @@ function wp_getpagelist( $m )
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
-	if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 	{	// These statuses require member status:
 		$statuses = array_merge( $statuses, array( 'draft', 'deprecated' ) );
 	}
@@ -395,32 +395,32 @@ function wp_getpagestatuslist( $m )
 
 	$status_list = array();
 
-	if( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!published', 'edit', false, $Blog->ID ) )
 	{
 		$status_list[ wp_or_b2evo_item_status('published', 'wp') ] = new xmlrpcval(T_('Published')) ;
 	}
 
-	if( $current_User->check_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!protected', 'edit', false, $Blog->ID ) )
 	{	// Not supported by WP, maps to 'private'
 		$status_list[ wp_or_b2evo_item_status('protected', 'wp') ] = new xmlrpcval(T_('Protected')) ;
 	}
 
-	if( $current_User->check_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!private', 'edit', false, $Blog->ID ) )
 	{
 		$status_list[ wp_or_b2evo_item_status('private', 'wp') ] = new xmlrpcval(T_('Private')) ;
 	}
 
-	if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 	{
 		$status_list[ wp_or_b2evo_item_status('draft', 'wp') ] = new xmlrpcval(T_('Draft')) ;
 	}
 
-	if( $current_User->check_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!deprecated', 'edit', false, $Blog->ID ) )
 	{
 		$status_list[ wp_or_b2evo_item_status('deprecated', 'wp') ] = new xmlrpcval(T_('Deprecated')) ;
 	}
 
-	if( $current_User->check_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!redirected', 'edit', false, $Blog->ID ) )
 	{	// Not supported by WP, maps to 'published'
 		$status_list[ wp_or_b2evo_item_status('redirected', 'wp') ] = new xmlrpcval(T_('Redirected')) ;
 	}
@@ -481,7 +481,7 @@ function wp_getpostformats( $m )
 
 	foreach( $nopost_item_type_IDs as $ityp_ID => $ityp_usage )
 	{
-		if( ! $current_User->check_perm( 'blog_'.$ityp_usage, 'edit', false, $Blog->ID ) )
+		if( ! check_user_perm( 'blog_'.$ityp_usage, 'edit', false, $Blog->ID ) )
 		{	// No permission to use this post type:
 			$exclude_posttype_IDs[] = $ityp_ID;
 		}
@@ -741,7 +741,7 @@ function wp_newcategory( $m )
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
+	if( ! check_user_perm( 'blog_cats', '', false, $Blog->ID ) )
 	{
 		return xmlrpcs_resperror( 5, 'You are not allowed to add or edit categories in this blog.' );
 	}
@@ -809,7 +809,7 @@ function wp_deletecategory( $m )
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+	if( ! check_user_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 5, 'You are not allowed to delete categories in this blog.' );
 	}
@@ -885,7 +885,7 @@ function wp_getcommentstatuslist( $m )
 		}
 	}
 
-	if( $current_User->check_perm('blog_comment!trash', '', false, $Blog->ID) )
+	if( check_user_perm('blog_comment!trash', '', false, $Blog->ID) )
 	{
 		$statuses[] = new xmlrpcval('trash');
 	}
@@ -1207,7 +1207,7 @@ function wp_editcomment( $m )
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment ) )
+	if( ! check_user_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment ) )
 	{	// Permission denied
 		return xmlrpcs_resperror(3);
 	}
@@ -1273,7 +1273,7 @@ function wp_deletecomment( $m )
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $edited_Comment ) )
+	if( ! check_user_perm( 'comment!CURSTATUS', 'delete', false, $edited_Comment ) )
 	{	// Permission denied
 		return xmlrpcs_resperror(3);
 	}

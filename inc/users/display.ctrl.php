@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 $AdminUI->set_path( 'users', 'usersettings', 'display' );
 
@@ -26,7 +26,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'display' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// UPDATE display settings:
 		param( 'use_gravatar', 'integer', 0 );

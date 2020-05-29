@@ -138,7 +138,7 @@ class item_seen_by_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $Item, $current_User, $DB;
+		global $Collection, $Blog, $Item, $DB;
 
 		$this->init_display( $params );
 
@@ -154,7 +154,7 @@ class item_seen_by_Widget extends ComponentWidget
 			return false;
 		}
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{	// Don't display this widget if user is NOT logged in OR user has no permission to edit this Item:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no user permission.' );
 			return false;

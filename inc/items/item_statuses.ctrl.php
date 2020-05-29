@@ -19,7 +19,7 @@ load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
 
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
@@ -50,7 +50,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset( $edited_ItemStatus ) )
 		{	// We don't have a model to use, start with blank object:
@@ -66,7 +66,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an pst_ID:
 		param( 'pst_ID', 'integer', true );
@@ -83,7 +83,7 @@ switch( $action )
 		$edited_ItemStatus = new ItemStatus();
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_ItemStatus->load_from_Request() )
@@ -125,7 +125,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemstatus' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an pst_ID:
 		param( 'pst_ID', 'integer', true );
@@ -149,7 +149,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemstatus' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an pst_ID:
 		param( 'pst_ID', 'integer', true );

@@ -79,7 +79,7 @@ $Results->filter_area = array(
 	);
 $Results->register_filter_preset( 'all', T_('All'), '?ctrl=currencies' );
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Code'),
@@ -139,7 +139,7 @@ function curr_td_actions($curr_enabled, $curr_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 			'th' => T_('Actions'),

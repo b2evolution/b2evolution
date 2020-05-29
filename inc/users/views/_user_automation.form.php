@@ -32,10 +32,6 @@ global $user_profile_only;
  * @var the action destination of the form (NULL for pagenow)
  */
 global $form_action;
-/**
- * @var instance of User class
- */
-global $current_User;
 
 // Begin payload block:
 $this->disp_payload_begin();

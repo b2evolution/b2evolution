@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.5';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -333,9 +333,6 @@ class bootstrap_manual_Skin extends Skin
 			case 'front':
 				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
-
-				// Used to quick upload several files:
-				init_fileuploader_js( 'blog' );
 				break;
 
 			case 'posts':
@@ -353,9 +350,6 @@ class bootstrap_manual_Skin extends Skin
 						$bootstrap_manual_posts_text = $Chapter->get( 'name' );
 					}
 				}
-
-				// Used to quick upload several files for comment of intro post:
-				init_fileuploader_js( 'blog' );
 				break;
 		}
 

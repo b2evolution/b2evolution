@@ -138,7 +138,7 @@ function blogger_editpost($m)
 	}
 
 	// We need to be able to edit this post:
-	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{
 		return xmlrpcs_resperror( 3 ); // Permission denied
 	}
@@ -416,7 +416,7 @@ function blogger_getrecentposts( $m )
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
-	if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 	{	// These statuses require member status:
 		$statuses = array_merge( $statuses, array( 'draft', 'deprecated' ) );
 	}

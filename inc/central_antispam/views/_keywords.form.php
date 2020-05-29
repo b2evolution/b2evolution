@@ -74,9 +74,7 @@ if( ! $creating )
 
 	function get_link_for_url( $id, $url )
 	{
-		global $current_User;
-
-		if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+		if( check_user_perm( 'centralantispam', 'edit' ) )
 		{ // Not reserved id AND current User has permission to edit the global settings
 			$ret_url = '<a href="'.regenerate_url( 'action,tab,cakw_ID', 'action=source_edit&amp;tab=reporters&amp;casrc_ID='.$id ).'">'.$url.'</a>';
 		}

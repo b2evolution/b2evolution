@@ -55,6 +55,10 @@ class CollectionSettings extends AbstractSettings
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
+		// User profile page settings:
+			'user_prefix' => 'user',
+			'user_links' => 'params',
+
 		// Single post settings:
 			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
@@ -75,7 +79,7 @@ class CollectionSettings extends AbstractSettings
 			'tinyurl_domain' => '',
 			'tinyurl_tag_source' => 'utm_source',
 			'tinyurl_tag_slug' => 'utm_campaign',
-			'tinyurl_tag_extra_term' => 'utm_keywords',
+			'tinyurl_tag_extra_term' => 'utm_term',
 
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
@@ -147,6 +151,9 @@ class CollectionSettings extends AbstractSettings
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',							// fp> fp> we want this changed to prefix only for new blogs only
 			'tag_rel_attrib' => 1,						// rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
+
+		// User profile page settings:
+			'canonical_user_urls' => 1, // Redirect user profile pages to their canonical Url?
 
 		// Other filtered pages:
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
@@ -277,6 +284,7 @@ class CollectionSettings extends AbstractSettings
 			'search_include_cats'  => 1, // Include categories to results on disp=search
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
+			'search_include_metas' => 1, // Include meta/internal comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'search_include_files' => 1, // Include files to results on disp=search
 			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
@@ -309,6 +317,7 @@ class CollectionSettings extends AbstractSettings
 			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'search_result_template_item'      => 'search_result_item',
 			'search_result_template_comment'   => 'search_result_comment',
+			'search_result_template_meta'      => 'search_result_meta',
 			'search_result_template_file'      => 'search_result_file',
 			'search_result_template_category'  => 'search_result_category',
 			'search_result_template_tag'       => 'search_result_tag',

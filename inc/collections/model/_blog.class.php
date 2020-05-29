@@ -580,7 +580,7 @@ class Blog extends DataObject
 			}
 			if( $new_sec_ID != $this->get( 'sec_ID' ) )
 			{	// If section has been changed to new:
-				if( ! $current_User->check_perm( 'blogs', 'create', false, $new_sec_ID ) )
+				if( ! check_user_perm( 'blogs', 'create', false, $new_sec_ID ) )
 				{
 					param_error( 'sec_ID', T_('You don\'t have a permission to create a collection in this section.') );
 				}
@@ -876,6 +876,17 @@ class Blog extends DataObject
 		// Tag posts per page:
 		$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 
+		if( param( 'user_prefix', 'string', NULL ) !== NULL )
+		{	// User profile page prefix:
+			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]*$#i', sprintf( T_('User profile page prefix can contain only letters, digits, %s or %s.'), '<code>-</code>', '<code>_</code>' ) );
+			$this->set_setting( 'user_prefix', get_param( 'user_prefix' ) );
+		}
+
+		if( param( 'user_links', 'string', NULL ) !== NULL )
+		{	// User profile URLs:
+			$this->set_setting( 'user_links', get_param( 'user_links' ) );
+		}
+
 		if( param( 'single_links', 'string', NULL ) !== NULL )
 		{ // Single post link type:
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
@@ -1029,7 +1040,7 @@ class Blog extends DataObject
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
-			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			if( check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// We have permission to edit advanced admin settings:
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 				if( $this->get_setting( 'in_skin_editing' ) )
@@ -1220,6 +1231,7 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
 			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_metas', param( 'search_include_metas', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
 			// Scoring for posts:
@@ -1259,6 +1271,7 @@ class Blog extends DataObject
 			// Quick Templates for search results:
 			$this->set_setting( 'search_result_template_item', param( 'search_result_template_item', 'string' ) );
 			$this->set_setting( 'search_result_template_comment', param( 'search_result_template_comment', 'string' ) );
+			$this->set_setting( 'search_result_template_meta', param( 'search_result_template_meta', 'string' ) );
 			$this->set_setting( 'search_result_template_file', param( 'search_result_template_file', 'string' ) );
 			$this->set_setting( 'search_result_template_category', param( 'search_result_template_category', 'string' ) );
 			$this->set_setting( 'search_result_template_tag', param( 'search_result_template_tag', 'string' ) );
@@ -1322,7 +1335,7 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_comments', param( 'allow_comments', 'string', 'any' ) );
 			$this->set_setting( 'allow_view_comments', param( 'allow_view_comments', 'string', 'any' ) );
 			$new_feedback_status = param( 'new_feedback_status', 'string', 'draft' );
-			if( $new_feedback_status != $this->get_setting( 'new_feedback_status' ) && ( $new_feedback_status != 'published' || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			if( $new_feedback_status != $this->get_setting( 'new_feedback_status' ) && ( $new_feedback_status != 'published' || check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
@@ -1340,12 +1353,12 @@ class Blog extends DataObject
 			$this->set_setting( 'rating_question', param( 'rating_question', 'text' ) );
 			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
 			$blog_allowtrackbacks = param( 'blog_allowtrackbacks', 'integer', 0 );
-			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
 			}
 			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
-			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{	// Only admin can turn ON this setting
 				$this->set_setting( 'webmentions', $blog_webmentions );
 			}
@@ -1428,6 +1441,7 @@ class Blog extends DataObject
 			$this->set_setting( 'tags_structured_data', param( 'tags_structured_data', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'canonical_user_urls', param( 'canonical_user_urls', 'integer', 0 ) );
 		}
 
 		if( in_array( 'credits', $groups ) )
@@ -1443,8 +1457,8 @@ class Blog extends DataObject
 		/*
 		 * ADVANCED ADMIN SETTINGS
 		 */
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ||
-		    ( $this->ID == 0 && $current_User->check_perm( 'blogs', 'create', false, $this->sec_ID ) ) )
+		if( check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ||
+		    ( $this->ID == 0 && check_user_perm( 'blogs', 'create', false, $this->sec_ID ) ) )
 		{	// We have permission to edit advanced admin settings,
 			// OR user is creating/coping new collection in section where he has an access:
 			if( ( $blog_urlname = param( 'blog_urlname', 'string', NULL ) ) !== NULL )
@@ -1475,7 +1489,7 @@ class Blog extends DataObject
 				}
 			}
 		}
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+		if( check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 		{	// We have permission to edit advanced admin settings:
 
 			if( in_array( 'cache', $groups ) )
@@ -1721,7 +1735,7 @@ class Blog extends DataObject
 				$this->set_setting( 'tinyurl_tag_extra_term', param( 'tinyurl_tag_extra_term', 'string', NULL ), true );
 			}
 
-			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// Cookies:
 				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
 				if( get_param( 'cookie_domain_type' ) == 'custom' )
@@ -1755,7 +1769,7 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{ // Assets URLs / CDN:
 
 				// Check all assets types url settings:
@@ -2778,8 +2792,6 @@ class Blog extends DataObject
 	 */
 	function get_allowed_item_status( $status = NULL, $perm_target = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			return $this->get_max_allowed_status( $status );
@@ -2807,7 +2819,7 @@ class Blog extends DataObject
 			{	// All next statuses are allowed for this collection:
 				$max_status_is_allowed = true;
 			}
-			if( $status_is_allowed && $max_status_is_allowed && $current_User->check_perm( 'blog_post!'.$status_key, 'create', false, $this->ID ) )
+			if( $status_is_allowed && $max_status_is_allowed && check_user_perm( 'blog_post!'.$status_key, 'create', false, $this->ID ) )
 			{	// This status is allowed for this collection and current has a permission:
 				$allowed_status = $status_key;
 				break;
@@ -2885,7 +2897,7 @@ class Blog extends DataObject
 	 */
 	function get_media_dir( $create = true )
 	{
-		global $media_path, $current_User, $Messages, $Settings, $Debuglog;
+		global $media_path, $Messages, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
@@ -2917,7 +2929,7 @@ class Blog extends DataObject
 		if( $create && ! is_dir( $mediadir ) )
 		{
 			// Display absolute path to blog admin and relative path to everyone else
-			$msg_mediadir_path = ( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) ? $mediadir : rel_path_to_base( $mediadir );
+			$msg_mediadir_path = check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ? $mediadir : rel_path_to_base( $mediadir );
 
 			// TODO: Link to some help page(s) with errors!
 			if( ! is_writable( dirname($mediadir) ) )
@@ -3141,10 +3153,9 @@ class Blog extends DataObject
 				return $this->gen_baseurl();
 
 			case 'customizer_url':
-				if( is_logged_in() &&
-				    ( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) ||
-				      $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
-				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
+				if( check_user_perm( 'blog_properties', 'edit', false, $this->ID ) ||
+				    ( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) ) )
+				{	// Return customizer URL only if current User can edit skin settings of collection or site:
 					$customizing_url = isset( $params['customizing_url'] ) ? $params['customizing_url'] : get_current_url();
 					if( $customizing_url == '#baseurl#' )
 					{	// Use base URL of this collection:
@@ -3421,11 +3432,52 @@ class Blog extends DataObject
 			}
 
 			if( $this_Blog->get_setting( 'front_disp' ) == $disp_param )
-			{ // Get home page of this blog because front page displays current disp
+			{	// Get home page of this blog because front page displays current disp:
 				$url = $this_Blog->gen_blogurl( 'default' );
 			}
+			elseif( $disp_param == 'user' && ( isset( $params['user_login'] ) || isset( $params['user_ID'] ) ) )
+			{	// Use alias if user login or ID is provided:
+				$UserCache = & get_UserCache();
+				if( ! isset( $params['user_ID'] ) &&
+				    ( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_links' ) == 'prefix_id' ) )
+				{	// We need get user ID by login:
+					if( $param_User = & $UserCache->get_by_login( $params['user_login'] ) )
+					{	// Set user ID if it is detected by login:
+						$params['user_ID'] = $param_User->ID;
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_ID" for Blog->get( "userurl" )' );
+					}
+				}
+				if( ! isset( $params['user_login'] ) &&
+				    $this_Blog->get_setting( 'user_links' ) == 'prefix_login' )
+				{	// We need get user login by ID:
+					if( $param_User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
+					{	// Use login if user is detected in DB:
+						$params['user_login'] = $param_User->get( 'login' );
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_login" for Blog->get( "userurl" )' );
+					}
+				}
+
+				if( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_prefix' ) == '' )
+				{	// Use params E-g: ?disp=user&user_ID=4
+					$url = url_add_param( $this_Blog->gen_blogurl(), 'disp=user'.$params['glue'].'user_ID='.$params['user_ID'], $params['glue'] );
+				}
+				elseif( $this_Blog->get_setting( 'user_links' ) == 'prefix_id' )
+				{	// Use prefix with user ID:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_ID'] );
+				}
+				else // 'prefix_login'
+				{	// Use prefix with user login:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_login'] );
+				}
+			}
 			else
-			{ // Add disp param to blog's url when current disp is not a front page
+			{	// Add disp param to blog's url when current disp is not a front page:
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
 
@@ -3777,7 +3829,7 @@ class Blog extends DataObject
 	 */
 	function create( $kind = '' )
 	{
-		global $DB, $Messages, $basepath, $admin_url, $current_User, $Settings;
+		global $DB, $Messages, $basepath, $admin_url, $Settings;
 		$DB->begin();
 
 		// DB INSERT
@@ -3938,7 +3990,7 @@ class Blog extends DataObject
 		}
 
 		$blog_urlname = param( 'blog_urlname', 'string', true );
-		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $duplicated_coll_ID ) )
+		if( ! check_user_perm( 'blog_admin', 'edit', false, $duplicated_coll_ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
 			// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
 			// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
@@ -5573,8 +5625,6 @@ class Blog extends DataObject
 		    ( ! is_logged_in() && $this->get_setting( 'post_anonymous' ) ) )
 		{	// Only logged in and activated users can write a Post,
 			// Or anonymous user can post if it is allowed with collection setting:
-			global $current_User;
-
 			$ChapterCache = & get_ChapterCache();
 			$selected_Chapter = $ChapterCache->get_by_ID( $cat_ID, false, false );
 			if( $selected_Chapter &&
@@ -5584,7 +5634,7 @@ class Blog extends DataObject
 				return '';
 			}
 
-			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
+			if( ! is_logged_in() || check_user_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
@@ -5601,7 +5651,7 @@ class Blog extends DataObject
 					}
 					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
-				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
+				elseif( check_user_perm( 'admin', 'restricted' ) )
 				{	// Edit a post from Back-office
 					global $admin_url;
 					$url = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$this->ID;
@@ -5651,10 +5701,8 @@ class Blog extends DataObject
 
 		if( is_logged_in( false ) )
 		{	// Only logged in and activated users can write a Post
-			global $current_User;
-
-			if( $current_User->check_perm( 'admin', 'restricted' ) &&
-			    $current_User->check_perm( 'blog_cats', 'edit', false, $this->ID ) )
+			if( check_user_perm( 'admin', 'restricted' ) &&
+			    check_user_perm( 'blog_cats', 'edit', false, $this->ID ) )
 			{	// Check permissions to create a new chapter in this blog
 				global $admin_url;
 				$url = $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$this->ID;
@@ -5753,9 +5801,7 @@ class Blog extends DataObject
 		}
 		elseif( $allow_access == 'members' )
 		{ // Check if current user is member of this blog
-			global $current_User;
-
-			if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+			if( ! check_user_perm( 'blog_ismember', 'view', false, $this->ID ) )
 			{ // Force disp to restrict access for current user
 				$disp = 'access_denied';
 
@@ -7370,7 +7416,7 @@ class Blog extends DataObject
 	 */
 	function get_link_locale_selector( $field_name, $locale, $restrict_used_locales = true )
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		if( $restrict_used_locales &&
 		    ( $this->get( 'locale' ) == $locale ||
@@ -7381,7 +7427,7 @@ class Blog extends DataObject
 
 		$linked_colls = $this->get_locales( 'coll' );
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'editall' ) )
+		if( ! check_user_perm( 'blogs', 'editall' ) )
 		{	// Display only the stored value because current User has no permission to edit all collections:
 			if( isset( $linked_colls[ $locale ] ) )
 			{	// Get the linked collection:

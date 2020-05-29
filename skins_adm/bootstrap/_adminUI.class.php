@@ -833,7 +833,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_bloglist_buttons( $title = '' )
 	{
-		global $blog, $current_User, $admin_url;
+		global $blog, $admin_url;
 
 		$max_buttons = 7;
 
@@ -907,7 +907,7 @@ class AdminUI extends AdminUI_general
 		if( $this->coll_list_disp_sections )
 		{	// Check if filter by section is used currently:
 			$sec_ID = param( 'sec_ID', 'integer', 0 );
-			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
+			if( ! is_logged_in() || ! ( check_user_perm( 'stats', 'view' ) || check_user_perm( 'section', 'view', false, $sec_ID ) ) )
 			{
 				$sec_ID = 0;
 				set_param( 'sec_ID', 0 );
@@ -946,7 +946,7 @@ class AdminUI extends AdminUI_general
 		}
 
 		// Button to add new collection:
-		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		if( $this->coll_list_disp_add && check_user_perm( 'blogs', 'create' ) )
 		{	// Display a button to add new collection if it is requested and current user has a permission
 			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.format_to_output( T_('New Collection'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 		}
@@ -996,7 +996,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function display_customizer_tabs( $params = array() )
 	{
-		global $Blog, $Settings, $current_User;
+		global $Blog, $Settings;
 
 		$params = array_merge( array(
 				'action_links'   => '',
@@ -1019,7 +1019,7 @@ class AdminUI extends AdminUI_general
 
 		// Site:
 		if( $Settings->get( 'site_skins_enabled' ) &&
-				$current_User->check_perm( 'options', 'edit' ) )
+				check_user_perm( 'options', 'edit' ) )
 		{	// If current User can edit site skin settings:
 			$tabs['site'] = array(
 				'text' => T_('Site'),
@@ -1027,7 +1027,7 @@ class AdminUI extends AdminUI_general
 			);
 		}
 		// Collection:
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+		if( check_user_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
 		{	// If current User can edit current collection settings:
 			$tabs['coll'] = array(
 				'text' => $tab_Blog->get( 'shortname' ),

@@ -687,7 +687,7 @@ jQuery( document ).ready( function()
 	// Add classes for first and last roundbuttons, because css pseudo-classes don't support to exclude hidden elements
 	window.update_moderation_buttons = function update_moderation_buttons( selector, raise_status, lower_status )
 		{
-			var parent_selector = config.button_class_group;
+			var parent_selector = config.button_class_group + ' ';
 			if( typeof( selector ) != 'undefined' )
 			{
 				parent_selector = selector + ' ' + parent_selector;

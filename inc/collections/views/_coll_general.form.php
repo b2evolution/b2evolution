@@ -167,7 +167,7 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 
 		if( get_table_count( 'T_users__organization' ) === 0 )
 		{
-			if( $current_User->check_perm( 'orgs', 'create', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
+			if( check_user_perm( 'orgs', 'create', false ) && check_user_perm( 'blog_admin', 'editall', false ) )
 			{	// Permission to create organizations
 				$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
 						TB_( 'Create demo organization' ), TB_( 'Create a demo organization if none exists.' ) );
@@ -176,7 +176,7 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 
 		if( get_table_count( 'T_users', 'user_ID != 1' ) === 0 )
 		{
-			if( $current_User->check_perm( 'users', 'edit', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
+			if( check_user_perm( 'users', 'edit', false ) && check_user_perm( 'blog_admin', 'editall', false ) )
 			{	// Permission to edit users
 				$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
 						TB_( 'Create demo users' ), TB_( 'Create demo users as comment authors.' ) );
@@ -194,8 +194,8 @@ $Form->begin_fieldset( TB_('Branding').get_manual_link( 'collection-settings-bra
 	$blog_shortname = $action == 'copy' ? NULL : $edited_Blog->get( 'shortname' );
 	$Form->text( 'blog_shortname', $blog_shortname, 15, TB_('Short name'), TB_('Will be used in selection menus and throughout the admin interface.'), 255 );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) ||
-	    $current_User->check_perm( 'blogs', 'create', false, $edited_Blog->sec_ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) ||
+	    check_user_perm( 'blogs', 'create', false, $edited_Blog->sec_ID ) )
 	{ // Permission to edit advanced admin settings
 		$blog_urlname = $action == 'copy' ? NULL : $edited_Blog->get( 'urlname' );
 		$Form->text( 'blog_urlname', $blog_urlname, 20, TB_('URL "filename"'),
@@ -287,7 +287,7 @@ if( ! $is_creating )
 	$Form->begin_fieldset( TB_('Language / locale').get_manual_link( 'coll-locale-settings' ), array( 'id' => 'language' ) );
 		if( $number_enabled_locales > 1 )
 		{ // More than 1 locale
-			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
+			$blog_locale_note = ( check_user_perm( 'options', 'view' ) ) ?
 				'<a href="'.$admin_url.'?ctrl=regional">'.TB_('Regional settings').' &raquo;</a>' : '';
 		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), array_keys( $edited_Blog->get_locales() ), TB_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
 
@@ -313,7 +313,7 @@ if( ! $is_creating )
 		{ // Only one locale
 			echo '<p>';
 			echo sprintf( TB_( 'This collection uses %s.' ), '<b>'.$locales[ $edited_Blog->get( 'locale' ) ]['name'].'</b>' );
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{
 				echo ' '.sprintf( TB_( 'Go to <a %s>Regional Settings</a> to enable additional locales.' ), 'href="'.$admin_url.'?ctrl=regional"' );
 			}
@@ -351,7 +351,7 @@ $Form->begin_fieldset( TB_('Collection permissions').get_manual_link( 'collectio
 	{
 		$owner_User = & $edited_Blog->get_owner_User();
 	}
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
 		// fp> Note: There are 2 reasons why we don't provide a select here:
 		// 1. If there are 1000 users, it's a pain.

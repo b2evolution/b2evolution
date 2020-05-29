@@ -689,10 +689,6 @@ class collections_Module extends Module
 	function build_menu_1()
 	{
 		global $blog, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		global $Settings;
 		/**
@@ -700,12 +696,12 @@ class collections_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{ // don't show these menu entries if user hasn't at least admin restricted permission
 			return;
 		}
 
-		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+		$perm_admin_normal = check_user_perm( 'admin', 'normal' );
 
 		$site_menu = array(
 			'text' => T_('Site'),
@@ -718,7 +714,7 @@ class collections_Module extends Module
 		);
 		if( $perm_admin_normal )
 		{ // User has an access to backoffice
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // User has an access to view settings
 				$site_menu['entries']['settings'] = array(
 					'text' => T_('Site Settings'),
@@ -754,14 +750,14 @@ class collections_Module extends Module
 					);
 				}
 			}
-			if( $current_User->check_perm( 'slugs', 'view' ) )
+			if( check_user_perm( 'slugs', 'view' ) )
 			{ // User has an access to view slugs
 				$site_menu['entries']['slugs'] = array(
 					'text' => T_('Slugs'),
 					'href' => $admin_url.'?ctrl=slugs'
 				);
 			}
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // User has an access to view settings
 				$site_menu['entries']['tags'] = array(
 					'text' => T_('Tags'),
@@ -791,10 +787,6 @@ class collections_Module extends Module
 	function build_menu_2()
 	{
 		global $loc_transinfo, $ctrl, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
@@ -815,8 +807,8 @@ class collections_Module extends Module
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
-		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
+		$perm_comments = check_user_perm( 'blog_comments', 'view', false, $blog );
+		$perm_cats = check_user_perm( 'blog_cats', '', false, $blog );
 
 		// Posts
 		$collection_menu_entries['posts'] = array(
@@ -825,7 +817,7 @@ class collections_Module extends Module
 			);
 		$last_group_menu_entry = 'posts';
 
-		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
+		if( $perm_comments || check_user_perm( 'meta_comment', 'view', false, $blog ) )
 		{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
@@ -850,7 +842,7 @@ class collections_Module extends Module
 
 		$AdminUI->add_menu_entries( 'collections', $collection_menu_entries );
 
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+		if( check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 		{ // Display these menus only when some blog is selected and current user has an access to edit the blog properties
 
 			// BLOG SETTINGS:
@@ -956,7 +948,7 @@ class collections_Module extends Module
 					),
 				) );
 
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // Manage skins
 				$AdminUI->add_menu_entries( array( 'collections', 'skin' ), array(
 					'manage_skins' => array(
@@ -965,7 +957,7 @@ class collections_Module extends Module
 				) );
 			}
 
-			if( $current_User->check_perm( 'options', 'view', false, $blog ) )
+			if( check_user_perm( 'options', 'view', false, $blog ) )
 			{ // Post Types & Statuses
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'types' => array(
@@ -1000,7 +992,7 @@ class collections_Module extends Module
 					) );
 			}
 
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // Check if current user has a permission to view the common settings of the blogs
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'blog_settings' => array(
@@ -1022,22 +1014,18 @@ class collections_Module extends Module
 	function build_menu_3()
 	{
 		global $blog, $loc_transinfo, $ctrl, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! check_user_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
 			$AdminUI->add_menu_entries( 'options', array(
 					'misc' => array(
@@ -1167,7 +1155,7 @@ class collections_Module extends Module
 				// Check permission:
 				$LinkOwner->check_perm( 'edit', true );
 
-				if( $current_User->check_perm( 'files', 'edit' ) )
+				if( check_user_perm( 'files', 'edit' ) )
 				{	// If current User has permission to edit/delete files:
 					// Get number of objects where this file is attached to:
 					// TODO: attila>this must be handled with a different function
@@ -1187,7 +1175,7 @@ class collections_Module extends Module
 
 						$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-						if( $current_User->check_perm( 'files', 'edit' ) )
+						if( check_user_perm( 'files', 'edit' ) )
 						{ // current User has permission to edit/delete files
 							$file_name = $linked_File->get_name();
 							$links_count--;
@@ -1644,7 +1632,7 @@ class collections_Module extends Module
 				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
 				// Check perms:
-				$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+				check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 				if( empty( $item_tags ) && $edited_Item->get_type_setting( 'use_tags' ) == 'required' )
 				{	// Tags must be entered:

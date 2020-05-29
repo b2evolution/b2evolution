@@ -151,6 +151,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<iframe id="evo_customizer__updater" name="evo_customizer__updater" style="display:none"></iframe>
 		<div id="evo_customizer__vtoggler" class="evo_customizer__vtoggler"></div>
 	</div>
+	<?php include_footerlines(); /* Add JavaScript and CSS files included by plugins and skin */ ?>
 </body>
 </html><?php
 $Timer->stop( 'customize.php' );

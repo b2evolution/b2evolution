@@ -4634,7 +4634,7 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset, $current_User;
+	global $current_charset;
 	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
 	$params = array_merge( array(
@@ -7695,34 +7695,53 @@ function is_ip_url_domain( $url )
  */
 function save_to_file( $data, $filename, $mode = 'a' )
 {
-	global $Settings;
+	global $Settings, $evo_save_file_error_msg;
 
-	if( ! file_exists($filename) )
-	{	// Create target file
-		@touch( $filename );
+	if( ! file_exists( $filename ) )
+	{	// Try to create a target file:
+		if( ! @touch( $filename ) )
+		{	// If file could not be created:
+			$evo_save_file_error_msg = T_('File could not be created!');
+			return false;
+		}
 
 		// Doesn't work during installation
-		if( !empty($Settings) )
+		if( ! empty( $Settings ) )
 		{
-			$chmod = $Settings->get('fm_default_chmod_file');
-			@chmod( $filename, octdec($chmod) );
+			$chmod = $Settings->get( 'fm_default_chmod_file' );
+			@chmod( $filename, octdec( $chmod ) );
 		}
 	}
 
-	if( ! is_writable($filename) )
-	{
+	if( ! is_writable( $filename ) )
+	{	// File is not writable:
+		$evo_save_file_error_msg = T_('File is not writable!');
 		return false;
 	}
 
-	$f = @fopen( $filename, $mode );
-	$ok = @fwrite( $f, $data );
+	if( ! ( $f = @fopen( $filename, $mode ) ) )
+	{	// Could not open file:
+		$evo_save_file_error_msg = T_('File could not be opened for writing data!');
+		return false;
+	}
+	if( ! @fwrite( $f, $data ) )
+	{	// Could not write data into file:
+		$evo_save_file_error_msg = T_('Data could not be written to the file!');
+		return false;
+	}
 	@fclose( $f );
 
-	if( $ok && file_exists($filename) )
-	{
-		return $filename;
+	if( ! file_exists( $filename ) )
+	{	// Additonal check for existing file on disk:
+		$evo_save_file_error_msg = T_('File doesn\'t exist!');
+		return false;
 	}
-	return false;
+
+	// Reset error log on success result:
+	$evo_save_file_error_msg = '';
+
+	// Return file name on success result:
+	return $filename;
 }
 
 
@@ -9814,8 +9833,8 @@ function insert_image_links_block( $params )
 			}
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& ( ( $edited_Item && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) ) || ( empty( $edited_Item ) && $params['temp_ID'] ) )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& ( ( $edited_Item && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) ) || ( empty( $edited_Item ) && $params['temp_ID'] ) )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9840,8 +9859,8 @@ function insert_image_links_block( $params )
 			}
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& check_user_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9859,8 +9878,8 @@ function insert_image_links_block( $params )
 			$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'emails', 'edit', false )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& check_user_perm( 'emails', 'edit', false )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9878,8 +9897,8 @@ function insert_image_links_block( $params )
 			$edited_Message = $MessageCache->get_by_ID( $params['target_ID'], false, false );
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'perm_messaging', 'reply' )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& check_user_perm( 'perm_messaging', 'reply' )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new messages we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9951,7 +9970,7 @@ function get_csv_line( $row, $delimiter = ';', $enclosure = '"', $eol = "\n" )
  */
 function display_importer_upload_panel( $params = array() )
 {
-	global $admin_url, $current_User, $media_path;
+	global $admin_url, $media_path;
 
 	$params = array_merge( array(
 			'folder'                 => '',
@@ -9992,14 +10011,14 @@ function display_importer_upload_panel( $params = array() )
 
 	$FileRootCache = & get_FileRootCache();
 	$FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
-	$import_perm_view = $current_User->check_perm( 'files', 'view', false, $FileRoot );
+	$import_perm_view = check_user_perm( 'files', 'view', false, $FileRoot );
 	if( $import_perm_view )
 	{ // Current user must has access to the import dir
-		if( $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		if( check_user_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 		{ // User has full access
 			$import_title = T_('Upload/Manage import files');
 		}
-		else if( $current_User->check_perm( 'files', 'add', false, $FileRoot ) )
+		else if( check_user_perm( 'files', 'add', false, $FileRoot ) )
 		{ // User can only upload the files to import root
 			$import_title = T_('Upload import files');
 		}

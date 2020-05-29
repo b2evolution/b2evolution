@@ -24,8 +24,6 @@ global $AdminUI;
  */
 global $Collection, $Blog;
 
-global $current_User;
-
 global $CommentList;
 
 $pp = $CommentList->param_prefix;

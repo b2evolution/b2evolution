@@ -69,10 +69,6 @@ class FileRoot
 	 */
 	function __construct( $root_type, $root_in_type_ID, $create = true )
 	{
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Messages;
 		global $Settings, $Debuglog;
 		global $Collection, $Blog;

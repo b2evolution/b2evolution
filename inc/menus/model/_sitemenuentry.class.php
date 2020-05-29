@@ -668,7 +668,7 @@ class SiteMenuEntry extends DataObject
 				return $entry_Blog->get( 'lastcommentsurl' );
 
 			case 'owneruserinfo':
-				return url_add_param( $entry_Blog->get( 'userurl' ), 'user_ID='.$entry_Blog->owner_user_ID );
+				return $entry_Blog->get( 'userurl', array( 'user_ID' => $entry_Blog->owner_user_ID ) );
 
 			case 'ownercontact':
 				return $entry_Blog->get_contact_url();
@@ -708,6 +708,30 @@ class SiteMenuEntry extends DataObject
 					return false;
 				}
 				return get_user_avatar_url( $entry_Blog->ID );
+
+			case 'password':
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				return get_user_pwdchange_url( $entry_Blog->ID );
+
+			case 'userprefs':
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				return get_user_preferences_url( $entry_Blog->ID );
+
+			case 'usersubs':
+				if( ! is_logged_in() )
+				{	// Current user must be logged in:
+					$this->url_error = 'Not logged in';
+					return false;
+				}
+				return get_user_subs_url( $entry_Blog->ID );
 
 			case 'visits':
 				global $Settings, $current_User;
@@ -786,12 +810,12 @@ class SiteMenuEntry extends DataObject
 				{	// Don't show this link for not logged in users:
 					return false;
 				}
-				return $entry_Blog->get( 'userurl' );
+				global $current_User;
+				return $entry_Blog->get( 'userurl', array( 'user_ID' => $current_User->ID, 'user_login' => $current_User->login ) );
 				break;
 
 			case 'admin':
-				global $current_User;
-				if( ! ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) ) )
+				if( ! check_user_perm( 'admin', 'restricted' ) && check_user_status( 'can_access_admin' ) )
 				{	// Don't allow admin url for users who have no access to backoffice:
 					return false;
 				}
@@ -810,8 +834,7 @@ class SiteMenuEntry extends DataObject
 						}
 						break;
 					case 'perms':
-						global $current_User;
-						if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply', false ) )
+						if( ! check_user_perm( 'perm_messaging', 'reply', false ) )
 						{	// User has no access for messaging:
 							$this->url_error = 'No access';
 							return false;

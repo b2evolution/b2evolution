@@ -21,7 +21,7 @@ global $AdminUI;
 $AdminUI->set_path( 'email', 'newletters' );
 
 // Check permission:
-$current_User->check_perm( 'emails', 'view', true );
+check_user_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
 load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
@@ -32,7 +32,7 @@ $tab = param( 'tab', 'string', 'general', true );
 
 if( $tab == 'automations' )
 {	// Check other permission for automations:
-	$current_User->check_perm( 'options', 'view', true );
+	check_user_perm( 'options', 'view', true );
 }
 
 if( param( 'enlt_ID', 'integer', '', true ) )
@@ -53,7 +53,7 @@ switch( $action )
 		// New Newsletter:
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$edited_Newsletter = new Newsletter();
 		break;
@@ -66,7 +66,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Load data from request:
 		if( $edited_Newsletter->load_from_Request() )
@@ -91,7 +91,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -119,7 +119,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -152,7 +152,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -177,7 +177,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -258,7 +258,7 @@ switch( $action )
 						'text' => TB_('Subscribers'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
 				) );
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{	// If current user has a permissions to view options:
 				$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
 						'automations' => array(

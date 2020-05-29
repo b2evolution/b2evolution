@@ -166,7 +166,7 @@ if( !empty( $template_action ) )
 }
 
 
-if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
+if( check_user_perm( 'users', 'edit' ) && empty( $action ) )
 { // Setting to lock system
 	global $Settings;
 
@@ -183,7 +183,7 @@ if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 				'note' => T_('check this to prevent login (except for admins) and sending comments/messages. This prevents the DB from receiving updates (other than logging)').'<br />'.
 				          T_('Note: for a more complete lock down, rename the file /conf/_maintenance.html to /conf/maintenance.html (complete lock) or /conf/imaintenance.html (gives access to /install)') ) );
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{
 		$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 	}
@@ -194,7 +194,7 @@ if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 }
 
 // TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // default admin actions:
 	global $Settings;
 

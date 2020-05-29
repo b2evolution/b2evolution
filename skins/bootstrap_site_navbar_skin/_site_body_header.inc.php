@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl, $Settings, $Blog, $disp, $current_User, $site_Skin;
+global $baseurl, $Settings, $Blog, $disp, $site_Skin;
 
 $notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 &&
@@ -51,8 +51,6 @@ else
 <?php
 			if( ( $header_tabs = $site_Skin->get_header_tabs() ) !== false )
 			{	// Display the grouped header tabs:
-				$header_tabs = $site_Skin->get_header_tabs();
-
 				foreach( $header_tabs as $s => $header_tab )
 				{	// Display level 0 tabs:
 ?>

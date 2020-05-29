@@ -166,7 +166,7 @@ switch( $display_mode )
 {
 	case 'js' : // js response needed
 // fp> when does this happen -- should be documented
-		if( !$current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+		if( ! check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 		{	// user doesn't have permissions
 			$Messages->add( TB_('You do not have permission to perform this action' ) );
 // fp>does this only happen when we try to edit settings. The hardcoded 'closeWidgetSettings' response looks bad.
@@ -176,7 +176,7 @@ switch( $display_mode )
 
 	case 'normal':
 	default : // take usual approach
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 		// Initialize JS for color picker field on the edit plugin settings form:
 		init_colorpicker_js();
 }

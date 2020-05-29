@@ -36,7 +36,7 @@ $Results->cols[] = array(
 						'td' => '% {Obj}->get_icon() %',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Extensions'),
@@ -110,7 +110,7 @@ $Results->cols[] = array(
 						'td' => '%display_perm( #ftyp_allowed# )%',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 
 	$Results->cols[] = array(

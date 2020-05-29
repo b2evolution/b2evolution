@@ -16,8 +16,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'cron/_cron.funcs.php' );
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'options', 'cron', 'list' );
 
@@ -40,7 +40,7 @@ switch( $action )
 {
 	case 'new':
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		load_class( 'cron/model/_cronjob.class.php', 'Cronjob' );
 		$edited_Cronjob = new Cronjob();
@@ -52,7 +52,7 @@ switch( $action )
 	case 'edit':
 	case 'copy':
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		if( ( $action == 'edit' && $edited_Cronjob->get_status() != 'pending' ) ||
 		    ( $action == 'copy' && $edited_Cronjob->get_status() != 'error' ) )
@@ -74,7 +74,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'crontask' );
 
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		if( !empty( $edited_Cronjob ) )
 		{ // It is a copy action, we should save the fields "key" & "params"
@@ -115,7 +115,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'crontask' );
 
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		if( $edited_Cronjob->load_from_Request() )
 		{	// We could load data from form without errors:
@@ -144,7 +144,7 @@ switch( $action )
 		param( 'ctsk_ID', 'integer', true );
 
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		// TODO: prevent deletion of running tasks.
 		$DB->begin();
@@ -190,7 +190,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'cronsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$cron_jobs = get_cron_jobs_config( 'name' );
 		foreach( $cron_jobs as $cron_job_key => $cron_job_name )
@@ -217,7 +217,7 @@ switch( $action )
 			{
 				case 'send-email-campaign':
 					// Send a chunk of x emails for the campaign:
-					if( $current_User->check_perm( 'emails', 'edit' ) )
+					if( check_user_perm( 'emails', 'edit' ) )
 					{	// Allow to edit email cron setting "Chunk Size" only if user has a permission:
 						$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
 					}

@@ -662,14 +662,14 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
  */
 function blocked_emails_memorize( $email )
 {
-	global $current_User, $cache_blocked_emails;
+	global $cache_blocked_emails;
 
 	if( empty( $email ) )
 	{ // Empty email, Exit here
 		return;
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'view' ) )
+	if( check_user_perm( 'users', 'view' ) )
 	{ // User has permissions to view other users
 		if( mail_is_blocked( $email ) )
 		{ // Check if the email address is blocked
@@ -1671,12 +1671,11 @@ function emails_sent_log_results( & $emails_Results, $params = array() )
 
 	if( $params['display_actions'] )
 	{	// Display Actions column:
-		global $current_User;
 		$emails_Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => ( $current_User->check_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
+				'td' => ( check_user_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
 			);
 	}
 }
@@ -1703,12 +1702,12 @@ function emret_td_address( $emret_address )
  */
 function emret_td_actions( $emret_ID, $emret_address )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
 	$r = action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID='.$emret_ID )
 		.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords='.$emret_address );
 
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{
 		$r .= action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=return&amp;action=returned_delete&amp;emret_ID='.$emret_ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'email' ), '', 1, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this record?').'\');' ) );
 	}

@@ -51,17 +51,6 @@ $Form->begin_fieldset( sprintf( TB_('Compose message for: %s'), $edited_EmailCam
 			'edit_layout'   => 'expert',
 		) );
 
-	echo '<div style="margin: 7px 0 0 5px; display: flex; align-items: center;">';
-	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-			'target_type'   => 'EmailCampaign',
-			'target_object' => $edited_EmailCampaign,
-			'content_id'    => 'ecmp_email_text',
-			'edit_layout'   => 'expert_quicksettings',
-		) );
-	$quick_setting_switch = ob_get_flush();
-	echo '</div>';
-
 	echo '</div>';
 	echo '</div>';
 	$email_plugin_buttons = ob_get_clean();
@@ -94,7 +83,7 @@ $Form->attachments_fieldset( $edited_EmailCampaign );
 
 
 $buttons = array();
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 	$buttons[] = array( 'submit', 'actionArray[save]', TB_('Save & continue').' >>', 'SaveButton' );
 }

@@ -44,9 +44,8 @@ if( ! is_array( $legend_icons ) )
 }
 
 // ------------------------------- START OF POSTS ASSIGNED TO CURRENT USER -------------------------------
-if( is_logged_in() &&
-    $Blog->get_setting( 'use_workflow' ) &&
-    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+if( $Blog->get_setting( 'use_workflow' ) &&
+    check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 {	// Only if current User can be assigned to tasks of the current Collection:
 	$assigned_ItemList = new ItemList2( $Blog, NULL, NULL, 15, 'ItemCache', 'assigned_' );
 	$assigned_ItemList->set_filters( array(

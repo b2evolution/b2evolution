@@ -85,7 +85,7 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 		// Get available templates:
 		$context = 'search_form';
 		$TemplateCache = & get_TemplateCache();
@@ -103,7 +103,7 @@ class coll_search_form_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $TemplateCache->get_code_option_array(),
 					'defaultvalue' => 'search_form_simple',
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
 							array( 'onclick' => 'return b2template_list_highlight( this )' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),

@@ -983,8 +983,7 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 
 	if( is_admin_page() || empty( $Blog ) )
 	{ // Backoffice part
-		global $current_User;
-		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) )
+		if( check_user_perm( 'admin', 'restricted' ) && check_user_status( 'can_access_admin' ) )
 		{ // User must has an access to backoffice
 			global $admin_url;
 			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );

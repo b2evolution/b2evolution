@@ -41,7 +41,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '7.1.5';
+	var $version = '7.2.0';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -518,7 +518,7 @@ class twitter_plugin extends Plugin
 		{ // User settings
 			$redirect_to = url_add_param( $admin_url, 'ctrl=user&user_tab=advanced&user_ID='.$target_id );
 
-			if( isset( $current_User ) && ( !$current_User->check_perm( 'users', 'edit' ) ) && ( $target_id != $current_User->ID ) )
+			if( isset( $current_User ) && ( ! check_user_perm( 'users', 'edit' ) ) && ( $target_id != $current_User->ID ) )
 			{ // user is only allowed to update him/herself
 				$Messages->add( T_('You are only allowed to update your own profile!'), 'error' );
 				header_redirect( $redirect_to );

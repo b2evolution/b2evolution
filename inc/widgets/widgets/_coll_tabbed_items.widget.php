@@ -82,7 +82,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'content_list_master';
@@ -137,7 +137,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 					'type' => 'select',
 					'options' => $template_options,
 					'defaultvalue' => 'content_tabs',
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
 							array( 'onclick' => 'return b2template_list_highlight( this )' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),

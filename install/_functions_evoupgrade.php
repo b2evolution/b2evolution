@@ -12594,14 +12594,48 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_modify_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet", "alt" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal"' );
 		upg_task_end();
 	}
-	
-	if( upg_task_start( 16020, 'Dummy upgrade block, just to force execution of the upgrade procedure to insert new template "Content List with Thumbnail"..' ) )
-	{	// part of 7.1.3-beta
+
+	if( upg_task_start( 16011, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for Search Results...' ) )
+	{	// part of 7.1.5-stable
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16030, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
+	if( upg_task_start( 16012, 'Updating site skins...' ) )
 	{	// part of 7.1.5-stable
+		$SQL = new SQL( 'Get site skins for update "Grouping" setting' );
+		$SQL->SELECT( 'skin_id.set_value AS skin_ID, set_grouping.set_value AS setting_grouping, set_menu_type.set_value AS setting_menu_type' );
+		$SQL->FROM( 'T_settings AS skin_id' );
+		$SQL->FROM_add( 'INNER JOIN T_skins__skin ON skin_ID = skin_id.set_value' );
+		$SQL->FROM_add( 'LEFT JOIN T_settings AS set_grouping ON set_grouping.set_name = CONCAT( "skin", skin_ID, "_grouping" )' );
+		$SQL->FROM_add( 'LEFT JOIN T_settings AS set_menu_type ON set_menu_type.set_name = CONCAT( "skin", skin_ID, "_menu_type" )' );
+		$SQL->WHERE( 'skin_id.set_name LIKE "%_skin_ID"' );
+		$SQL->WHERE_and( 'skin_class IN( "bootstrap_site_dropdown_Skin", "bootstrap_site_navbar_Skin", "bootstrap_site_tabs_Skin" )' );
+		$site_skins = $DB->get_results( $SQL );
+		foreach( $site_skins as $site_skin )
+		{
+			if( $site_skin->setting_grouping !== NULL )
+			{	// Remove old setting "Grouping":
+				$DB->query( 'DELETE FROM T_settings
+					WHERE set_name = '.$DB->quote( 'skin'.$site_skin->skin_ID.'_grouping' ) );
+			}
+
+			if( $site_skin->setting_menu_type !== NULL )
+			{	// Don't update if "Menu type" was saved in DB:
+				continue;
+			}
+
+			if( $site_skin->setting_grouping === NUll || $site_skin->setting_grouping == 1 )
+			{	// Set value in DB only for option "Automatic - Grouped collection list",
+				// because "Automatic - Collection list" is used by default:
+				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+					VALUES ( '.$DB->quote( 'skin'.$site_skin->skin_ID.'_menu_type' ).', "auto_grouped" )' );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16083, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
+	{	// part of 7.2
 		db_upgrade_cols( 'T_menus__entry', array(
 			'ADD' => array(
 				'ment_user_pic_size' => 'VARCHAR(32) COLLATE ascii_general_ci NULL AFTER ment_order',
@@ -12647,14 +12681,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16035, 'Upgrading items type table...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16084, 'Upgrading items type table...' ) )
+	{	// part of 7.2
 		db_add_col( 'T_items__type', 'ityp_front_order_workflow', 'SMALLINT(6) NULL DEFAULT NULL AFTER ityp_front_order_attachments' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16040, 'Creating default item type "Task"...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16085, 'Creating default item type "Task"...' ) )
+	{	// part of 7.2
 		$SQL = new SQL( 'Check at least one item type with name "Task" for existence' );
 		$SQL->SELECT( 'ityp_ID' );
 		$SQL->FROM( 'T_items__type' );
@@ -12675,14 +12709,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 	
-	if( upg_task_start( 16050, 'Upgrading item status table...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16086, 'Upgrading item status table...' ) )
+	{	// part of 7.2
 		db_add_col( 'T_items__status', 'pst_order', 'INT(11) NULL DEFAULT NULL' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16060, 'Upgrading item status table...' ) )
-	{	// part of 7.1.5-stable
+	if( upg_task_start( 16087, 'Upgrading item status table...' ) )
+	{	// part of 7.2
 		$DB->query( 'UPDATE T_items__status SET pst_order = 10 WHERE pst_name = "New"' );
 		$DB->query( 'UPDATE T_items__status SET pst_order = 20 WHERE pst_name = "In Progress"' );
 		$DB->query( 'UPDATE T_items__status SET pst_order = 30 WHERE pst_name = "Duplicate"' );
@@ -12697,6 +12731,194 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 16070, 'Installing new widgets/containers...' ) )
 	{	// part of 7.1.5-stable
 		install_new_default_widgets( 'comment_list', 'request_title' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16088, 'Converting widget "Common Navigation Links" into "Embed Menu" widget...' ) )
+	{	// part of 7.2
+		$nav_widgets_SQL = new SQL( 'Get widgets "Common Navigation Links" before converting' );
+		$nav_widgets_SQL->SELECT( 'wi_ID, wi_params' );
+		$nav_widgets_SQL->FROM( 'T_widget__widget' );
+		$nav_widgets_SQL->WHERE( 'wi_code = "coll_common_links"' );
+		$nav_widgets = $DB->get_assoc( $nav_widgets_SQL );
+		if( ! empty( $nav_widgets ) )
+		{	// If at least one widget "Common Navigation Links" is found:
+			load_class( 'menus/model/_sitemenu.class.php', 'SiteMenu' );
+			load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
+			// widget_param_key => array( menu_entry_type, menu_entry_text ):
+			$nav_menu_entries = array(
+				'show_home'           => array( 'home', T_('Home') ),
+				'show_recently'       => array( 'recentposts', T_('Recently') ),
+				'show_search'         => array( 'search', T_('Search') ),
+				'show_postidx'        => array( 'postidx', T_('Post index') ),
+				'show_archives'       => array( 'arcdir', T_('Archives') ),
+				'show_categories'     => array( 'catdir', T_('Categories') ),
+				'show_mediaidx'       => array( 'mediaidx', T_('Photo index') ),
+				'show_latestcomments' => array( 'latestcomments', T_('Latest comments') ),
+				'show_owneruserinfo'  => array( 'owneruserinfo', T_('Owner details') ),
+				'show_ownercontact'   => array( 'ownercontact', T_('Contact') ),
+				'show_sitemap'        => array( 'sitemap', T_('Site map') ),
+			);
+			foreach( $nav_widgets as $nav_widget_ID => $nav_widget_params )
+			{
+				$nav_widget_params = empty( $nav_widget_params ) ? array() : unserialize( $nav_widget_params );
+
+				if( empty( $nav_widget_params ) )
+				{	// Set default params:
+					$nav_widget_params = array(
+						'show_home' => 1,
+						'show_recently' => 1,
+						'show_archives' => 1,
+						'show_categories' => 1,
+						'show_latestcomments' => 1,
+					);
+				}
+
+				// Create Menu for converting Widget:
+				$nav_SiteMenu = new SiteMenu();
+				$nav_SiteMenu->set( 'name', 'Common Navigation Links #'.$nav_widget_ID );
+				$nav_SiteMenu->dbinsert();
+				$menu_entry_order = 10;
+				foreach( $nav_menu_entries as $nav_widget_param => $nav_menu_entry_data )
+				{
+					if( empty( $nav_widget_params[ $nav_widget_param ] ) )
+					{	// Skip not enabled menu entry in old widget:
+						continue;
+					}
+					// Create only enabled menu entries:
+					$nav_SiteMenuEntry = new SiteMenuEntry();
+					$nav_SiteMenuEntry->set( 'menu_ID', $nav_SiteMenu->ID );
+					$nav_SiteMenuEntry->set( 'type', $nav_menu_entry_data[0] );
+					$nav_SiteMenuEntry->set( 'text', $nav_menu_entry_data[1] );
+					$nav_SiteMenuEntry->set( 'order', $menu_entry_order );
+					$nav_SiteMenuEntry->dbinsert();
+					$menu_entry_order += 10;
+
+					// Remove old widget param:
+					unset( $nav_widget_params[ $nav_widget_param ] );
+				}
+
+				// Use new created Menu to converting widget:
+				$nav_widget_params['menu_ID'] = $nav_SiteMenu->ID;
+				// Old widget used only list mode:
+				$nav_widget_params['display_mode'] = 'list';
+
+				// Update widget to new params:
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_code = "embed_menu",
+					      wi_params = '.$DB->quote( serialize( $nav_widget_params ) ).'
+					WHERE wi_ID = '.$nav_widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16089, 'Converting widget "User Tools" into "Embed Menu" widget...' ) )
+	{	// part of 7.2
+		$nav_widgets_SQL = new SQL( 'Get widgets "User Tools" before converting' );
+		$nav_widgets_SQL->SELECT( 'wi_ID, wi_params' );
+		$nav_widgets_SQL->FROM( 'T_widget__widget' );
+		$nav_widgets_SQL->WHERE( 'wi_code = "user_tools"' );
+		$nav_widgets = $DB->get_assoc( $nav_widgets_SQL );
+		if( ! empty( $nav_widgets ) )
+		{	// If at least one widget "User Tools" is found:
+			load_class( 'menus/model/_sitemenu.class.php', 'SiteMenu' );
+			load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
+			// widget_param_key => array( menu_entry_type, widget_param_for_text, {widget_param_for_show_badge} ):
+			$nav_menu_entries = array(
+				'user_postnew_link_show'     => array( 'postnew', 'user_postnew_link' ),
+				'user_messaging_link_show'   => array( 'messages', 'user_messaging_link', 'show_badge' ),
+				'user_contacts_link_show'    => array( 'contacts', 'user_contacts_link' ),
+				'user_view_link_show'        => array( 'myprofile', 'user_view_link' ),
+				'user_profile_link_show'     => array( 'profile', 'user_profile_link' ),
+				'user_picture_link_show'     => array( 'avatar', 'user_picture_link' ),
+				'user_password_link_show'    => array( 'password', 'user_password_link' ),
+				'user_preferences_link_show' => array( 'userprefs', 'user_preferences_link' ),
+				'user_subs_link_show'        => array( 'usersubs', 'user_subs_link' ),
+				'user_admin_link_show'       => array( 'admin', 'user_admin_link' ),
+				'user_logout_link_show'      => array( 'logout', 'user_logout_link' ),
+			);
+			foreach( $nav_widgets as $nav_widget_ID => $nav_widget_params )
+			{
+				$nav_widget_params = empty( $nav_widget_params ) ? array() : unserialize( $nav_widget_params );
+
+				if( empty( $nav_widget_params ) )
+				{	// Set default params:
+					$nav_widget_params = array(
+						'title'                      => T_('User tools'),
+						'user_postnew_link_show'     => 1,
+						'user_postnew_link'          => T_('Write a new post...'),
+						'user_messaging_link_show'   => 1,
+						'show_badge'                 => 1,
+						'user_messaging_link'        => T_('My messages'),
+						'user_contacts_link_show'    => 1,
+						'user_contacts_link'         => T_('My contacts'),
+						'user_view_link_show'        => 1,
+						'user_view_link'             => T_('My profile'),
+						'user_profile_link_show'     => 1,
+						'user_profile_link'          => T_('Edit my profile'),
+						'user_picture_link_show'     => 1,
+						'user_picture_link'          => T_('Change my picture'),
+						'user_admin_link_show'       => 1,
+						'user_admin_link'            => T_('Admin area'),
+						'user_logout_link_show'      => 1,
+						'user_logout_link'           => T_('Log out'),
+					);
+				}
+
+				// Create Menu for converting Widget:
+				$nav_SiteMenu = new SiteMenu();
+				$nav_SiteMenu->set( 'name', 'User Tools #'.$nav_widget_ID );
+				$nav_SiteMenu->dbinsert();
+				$menu_entry_order = 10;
+				foreach( $nav_menu_entries as $nav_widget_param => $nav_menu_entry_data )
+				{
+					if( empty( $nav_widget_params[ $nav_widget_param ] ) )
+					{	// Skip not enabled menu entry in old widget:
+						continue;
+					}
+					// Create only enabled menu entries:
+					$nav_SiteMenuEntry = new SiteMenuEntry();
+					$nav_SiteMenuEntry->set( 'menu_ID', $nav_SiteMenu->ID );
+					$nav_SiteMenuEntry->set( 'type', $nav_menu_entry_data[0] );
+					if( isset( $nav_widget_params[ $nav_menu_entry_data[1] ] ) )
+					{	// Set text for menu entry:
+						$nav_SiteMenuEntry->set( 'text', $nav_widget_params[ $nav_menu_entry_data[1] ] );
+						// Remove old widget param:
+						unset( $nav_widget_params[ $nav_menu_entry_data[1] ] );
+					}
+					if( isset( $nav_menu_entry_data[2], $nav_widget_params[ $nav_menu_entry_data[2] ] ) )
+					{	// Set "Show Badge" for menu entry:
+						$nav_SiteMenuEntry->set( 'show_badge', $nav_widget_params[ $nav_menu_entry_data[2] ] );
+						// Remove old widget param:
+						unset( $nav_widget_params[ $nav_menu_entry_data[2] ] );
+					}
+					$nav_SiteMenuEntry->set( 'order', $menu_entry_order );
+					$nav_SiteMenuEntry->dbinsert();
+					$menu_entry_order += 10;
+
+					// Remove old widget param:
+					unset( $nav_widget_params[ $nav_widget_param ] );
+				}
+
+				// Use new created Menu to converting widget:
+				$nav_widget_params['menu_ID'] = $nav_SiteMenu->ID;
+				// Old widget used only list mode:
+				$nav_widget_params['display_mode'] = 'list';
+
+				// Update widget to new params:
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_code = "embed_menu",
+					      wi_params = '.$DB->quote( serialize( $nav_widget_params ) ).'
+					WHERE wi_ID = '.$nav_widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16090, 'Installing new widget container "Site Map"...' ) )
+	{	// part of 7.2
+		install_new_default_widgets( 'sitemap' );
 		upg_task_end();
 	}
 

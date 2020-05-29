@@ -1061,6 +1061,9 @@ div.filters .filter_item {
 div.filters .filter_item div {
   margin: 0;
 }
+a {
+  word-break: break-all;
+}
 .widget_core_coll_category_list label {
   font-weight: normal;
 }
@@ -3793,6 +3796,12 @@ div.results .status_meta span {
 }
 .search_title a {
   text-decoration: underline;
+}
+.search_title .label a {
+  color: #FFF;
+}
+.search_title .label a:hover {
+  color: #abc6e0;
 }
 .search_result {
   padding: 15px 15px 5px;

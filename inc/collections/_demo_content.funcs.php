@@ -1023,7 +1023,6 @@ function get_demo_users( $create = false, $output = true, &$error_messages = NUL
 function get_demo_user( $login, $create = false, $output = true, &$error_messages = NULL )
 {
 	global $DB;
-	global $current_User;
 	global $user_timestamp;
 
 	// Get list of demo users:
@@ -1476,6 +1475,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
+
+	// Initialize for setup default widgets per collection:
+	$BlogCache = & get_BlogCache();
 
 	if( $install_collection_home )
 	{	// Install Home blog
@@ -3593,7 +3595,6 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$categories = array(
 				'bug'             => array( TD_('Bug'), 'order' => 10 ),
 				'feature_request' => array( TD_('Feature Request'), 'order' => 20 ),
-				'recipes'         => array( TD_('Recipes'), 'default_item_type' => 'Recipe' ),
 			);
 
 			// Additional sample Items:
@@ -3665,6 +3666,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Prepend additional sample Items before generic Items:
 			$demo_items = array_merge( $top_demo_items, $demo_items );
+
+			// Don't install the following demo Items:
+			$exclude_demo_items = array(
+					'mongolian_beef',
+					'stuffed_peppers',
+					'custom_fields_example',
+					'another_custom_fields_example',
+					'child_post_example',
+				);
 			break;
 	}
 

@@ -605,6 +605,30 @@ function get_default_widgets( $coll_type = '', $context = array() )
 			) ),
 	);
 
+	/* Site Map */
+	$default_widgets['sitemap'] = array(
+		array( 10, 16090, 'embed_menu', 'params' => array(
+				'title'        => T_('Common links'),
+				'menu_ID'      => get_default_site_menu_ID( 'Site Map - Common links' ),
+				'display_mode' => 'list',
+			) ),
+		array( 20, 16090, 'coll_page_list', 'params' => array(
+				'title'     => T_('Pages'),
+				'order_by'  => 'title',
+				'order_dir' => 'ASC',
+				'limit'     => '',
+			) ),
+		array( 30, 16090, 'coll_category_list', 'params' => array(
+				'title' => T_('Categories'),
+			) ),
+		array( 40, 16090, 'coll_post_list', 'params' => array(
+				'title'     => T_('Posts'),
+				'order_by'  => 'title',
+				'order_dir' => 'ASC',
+				'limit'     => '',
+			) ),
+	);
+
 	// **** SHARED CONTAINERS ***** //
 
 	/* Site Header */

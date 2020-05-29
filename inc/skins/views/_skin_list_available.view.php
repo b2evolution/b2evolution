@@ -72,7 +72,7 @@ else
 
 $block_item_Widget->title = $block_title.get_manual_link( 'installing-skins' );
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$block_item_Widget->global_icon( T_('Cancel installation!'), 'close', $redirect_to );
 }

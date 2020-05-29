@@ -80,7 +80,7 @@ switch( $action )
 			$check_permlevel = ( $action == 'delete' ) ? 'delete' : 'edit';
 		}
 		// Check permission:
-		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
+		check_user_perm( $check_permname, $check_permlevel, true, $edited_Comment );
 
 		if( $action == 'edit' || $action == 'switch_view' )
 		{	// Restrict comment status by parent item:
@@ -113,26 +113,26 @@ switch( $action )
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
+		check_user_perm( 'blog_post!draft', 'edit', true, $blog );
 		break;
 
 	case 'trash_delete':
 		param( 'blog_ID', 'integer', 0 );
 
 		// Check permission:
-		$current_User->check_perm( 'blogs', 'editall', true );
+		check_user_perm( 'blogs', 'editall', true );
 		break;
 
 	case 'emptytrash':
 		// Check permission:
-		$current_User->check_perm( 'blogs', 'all', true );
+		check_user_perm( 'blogs', 'all', true );
 		break;
 
 	case 'list':
 	case 'mass_delete':
 		if( $action == 'mass_delete' )
 		{ // Check permission:
-			$current_User->check_perm( 'blogs', 'all', true );
+			check_user_perm( 'blogs', 'all', true );
 		}
 
 		// Check permission:
@@ -170,7 +170,7 @@ switch( $action )
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission for spam voting
-		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
+		check_user_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
 
 		if( $edited_Comment !== false )
 		{ // The comment still exists
@@ -207,7 +207,7 @@ switch( $tab3 )
 
 	case 'meta':
 		// Check permission for internal comments:
-		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
+		check_user_perm( 'meta_comment', 'view', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( TB_('Internal comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
@@ -258,11 +258,11 @@ switch( $action )
 
 		// Check if current User can edit special comment settings which are allowed only from back-office:
 		$can_edit_backoffice_settings = ( param( 'from', 'string' ) == 'backoffice' &&
-			$current_User->check_perm( 'admin', 'restricted' ) );
+			check_user_perm( 'admin', 'restricted' ) );
 
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
-			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
+			if( check_user_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
 			{	// Only admins can change the author
 				if( param_check_not_empty( 'comment_author_login', TB_('Please enter valid author login.') ) && param_check_login( 'comment_author_login', true ) )
 				{
@@ -315,8 +315,8 @@ switch( $action )
 
 					if( ($current_User->ID == $dest_Item_Blog_User->ID &&
 						$current_User->ID == $comment_Item_Blog_User->ID ) ||
-						( $current_User->check_perm( 'blog_admin', 'edit', false, $dest_Item_Blog->ID ) &&
-						$current_User->check_perm( 'blog_admin', 'edit', false, $comment_Item_Blog->ID ) ) )
+						( check_user_perm( 'blog_admin', 'edit', false, $dest_Item_Blog->ID ) &&
+						check_user_perm( 'blog_admin', 'edit', false, $comment_Item_Blog->ID ) ) )
 					{ // current user is the owner of both the source and the destination blogs or current user is admin for both blogs
 						$edited_Comment->set_Item( $dest_Item );
 					}
@@ -397,8 +397,8 @@ switch( $action )
 		param_check_not_empty( 'content', TB_('Empty comment content is not allowed.') );
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
-		if( $current_User->check_perm( 'admin', 'restricted' ) &&
-		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // We use user date
 			param_date( 'comment_issue_date', TB_('Please enter a valid comment date.'), true );
 			if( strlen(get_param('comment_issue_date')) )
@@ -796,8 +796,6 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Init JS to quick upload several files:
-	init_fileuploader_js();
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation

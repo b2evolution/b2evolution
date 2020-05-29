@@ -131,8 +131,6 @@ function get_id_coll_from_prefix( $prefix )
  */
 function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -141,7 +139,7 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -238,8 +236,6 @@ function check_default_create_comment_perm( $blog_ID, $perm_statuses )
  */
 function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -248,7 +244,7 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 	$default_status = NULL;
@@ -340,8 +336,6 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
  */
 function coll_perm_edit( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -350,7 +344,7 @@ function coll_perm_edit( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -387,8 +381,6 @@ function coll_perm_edit( $row, $prefix )
  */
 function coll_perm_edit_cmt( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -397,7 +389,7 @@ function coll_perm_edit_cmt( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -435,8 +427,6 @@ function coll_perm_edit_cmt( $row, $prefix )
  */
 function coll_perm_item_type( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -445,7 +435,7 @@ function coll_perm_item_type( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -481,8 +471,6 @@ function coll_perm_item_type( $row, $prefix )
  */
 function perm_check_all( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -491,7 +479,7 @@ function perm_check_all( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 

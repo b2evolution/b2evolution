@@ -17,22 +17,17 @@ load_class( 'sessions/model/_goal.class.php', 'Goal' );
 load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
 load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
-/**
- * @var User
- */
-global $current_User;
-
 global $collections_Module;
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
 // Do we have permission to view all stats (aggregated stats) ?
-$perm_view_all = $current_User->check_perm( 'stats', 'view' );
+$perm_view_all = check_user_perm( 'stats', 'view' );
 
 // Section ID:
 param( 'sec_ID', 'integer', 0, true );
-if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+if( ! $perm_view_all && ! check_user_perm( 'section', 'view', false, $sec_ID ) )
 {
 	forget_param( 'sec_ID' );
 	unset( $sec_ID );
@@ -75,7 +70,7 @@ if( $blog == 0 )
 }
 
 // Check permission to view current blog
-$current_User->check_perm( 'stats', 'list', true, $blog );
+check_user_perm( 'stats', 'list', true, $blog );
 
 if( param( 'goal_ID', 'integer', '', true) )
 { // Load goal:
@@ -107,7 +102,7 @@ switch( $action )
 	case 'new':
 	case 'copy':
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		if( ! isset( $edited_Goal ) )
 		{	// We don't have a model to use, start with blank object:
@@ -124,7 +119,7 @@ switch( $action )
 		// Edit goal form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -140,7 +135,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
@@ -179,7 +174,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -208,7 +203,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -239,7 +234,7 @@ switch( $action )
 		// New goal category form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		if( ! isset( $edited_GoalCategory ) )
 		{ // We don't have a model to use, start with blank object:
@@ -256,7 +251,7 @@ switch( $action )
 		// Edit goal category form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'gcat_ID', 'integer', true );
@@ -272,7 +267,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goalcat' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// load data from request
 		if( $edited_GoalCategory->load_from_Request() )
@@ -313,7 +308,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goalcat' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'gcat_ID', 'integer', true );
@@ -343,7 +338,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goalcat' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'gcat_ID', 'integer', true );
@@ -382,7 +377,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'aggregate' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
 
@@ -401,7 +396,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goals' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		param( 'date', 'integer', true ); // Required!
 		if( $r = Hitlist::prune_goal_hits( $date ) )

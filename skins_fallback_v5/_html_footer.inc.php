@@ -50,6 +50,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	// Include ALL exposed JS variables into <script>:
 	include_js_vars();
+
+	//Add javascript and css files included by plugins and skin
+	include_footerlines();
 ?>
 </body>
 </html>

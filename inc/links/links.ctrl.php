@@ -283,8 +283,6 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
-// Init JS to quick upload several files:
-init_fileuploader_js( 'rsc_url', ( $action == 'edit_links' ) );
 
 $AdminUI->disp_html_head();
 $AdminUI->disp_body_top( false );

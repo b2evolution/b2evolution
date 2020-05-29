@@ -77,7 +77,7 @@ user_prevnext_links( array(
 	) );
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
-$has_full_access = $current_User->check_perm( 'users', 'edit' );
+$has_full_access = check_user_perm( 'users', 'edit' );
 $has_moderate_access = $current_User->can_moderate_user( $edited_User->ID );
 $edited_user_perms = array( 'edited-user', 'edited-user-required' );
 $new_user_creating = ( $edited_User->ID == 0 );
@@ -413,7 +413,7 @@ if( $action != 'view' )
 			if( ! empty( $org_ID ) )
 			{	// $org_ID can be 0 for case when user didn't select an organization yet
 				$user_Organization = & $OrganizationCache->get_by_ID( $org_ID );
-				$perm_edit_orgs = $current_User->check_perm( 'orgs', 'edit', false, $user_Organization );
+				$perm_edit_orgs = check_user_perm( 'orgs', 'edit', false, $user_Organization );
 			}
 
 			// Display a button to remove user from organization

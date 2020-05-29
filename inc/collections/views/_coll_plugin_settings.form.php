@@ -25,7 +25,7 @@ global $Collection, $Blog;
  */
 global $Plugins;
 
-global $current_User, $admin_url;
+global $admin_url;
 $plugin_group = param( 'plugin_group', 'string', 'rendering' );
 
 $Form = new Form( NULL, 'plugin_settings_checkchanges', 'post', 'accordion' );
@@ -33,7 +33,7 @@ $Form = new Form( NULL, 'plugin_settings_checkchanges', 'post', 'accordion' );
 // PluginUserSettings
 load_funcs('plugins/_plugin.funcs.php');
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {	// Display this message only if current user has permission to manage the plugins
 	echo '<p class="alert alert-info">'
 			.sprintf( TB_('Here you can configure some plugins individually for each blog. To manage your installed plugins go <a %s>here</a>.'),

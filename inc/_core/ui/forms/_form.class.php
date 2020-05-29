@@ -4965,8 +4965,6 @@ class Form extends Widget
 	 */
 	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
 	{
-		global $current_User;
-
 		// Get object type to initialize link owner
 		$object_type = get_class( $object );
 

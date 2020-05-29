@@ -2,9 +2,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $current_User;
-
-$can_edit_user_level = is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'moderate' );
+$can_edit_user_level = is_admin_page() && check_user_perm( 'users', 'moderate' );
 $user_funcs_config = array(
 	'msg_select_remaining_account' => T_('Please select a remaining account!'),
 	'can_edit_user_level' => $can_edit_user_level,

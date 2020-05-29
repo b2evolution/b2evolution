@@ -108,7 +108,7 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New Menu Entry') : TB_('Menu Ent
 		), TB_('Visibility'), true );
 
 	$buttons = array();
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Allow to save menu if current User has a permission:
 		$buttons[] = array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton' );
 	}

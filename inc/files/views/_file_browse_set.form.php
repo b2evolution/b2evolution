@@ -62,7 +62,7 @@ $Form->begin_form( 'fform', TB_('Display settings').get_manual_link('file-manage
 				array( 'value'=>'regexp', 'label'=>TB_('With regular expressions') ) ), TB_('Filter box') );
 	$Form->end_fieldset();
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {	// TODO: better perm check
   /**
 	 * @var FileRoot

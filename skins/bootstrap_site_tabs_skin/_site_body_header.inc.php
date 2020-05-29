@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl, $Settings, $Blog, $disp, $current_User, $site_Skin;
+global $baseurl, $Settings, $Blog, $disp, $site_Skin;
 
 $notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 &&
@@ -76,10 +76,8 @@ else
 <?php
 				}
 
-			if( $site_Skin->get_setting( 'grouping' ) )
+			if( ( $header_tabs = $site_Skin->get_header_tabs() ) !== false )
 			{	// Display the grouped header tabs:
-				$header_tabs = $site_Skin->get_header_tabs();
-
 				foreach( $header_tabs as $s => $header_tab )
 				{	// Display level 0 tabs:
 ?>
@@ -166,9 +164,7 @@ else
 		</div><?php // END OF <div class="container-fluid level1"> ?>
 
 <?php
-if( $site_Skin->get_setting( 'grouping' ) &&
-    isset( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) &&
-    count( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) > 1 )
+if( $site_Skin->has_sub_menus() )
 {	// Display sub menus of the selected level 0 tab only when at least two exist:
 ?>
 <div class="container-fluid level2">

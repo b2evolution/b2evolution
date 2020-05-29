@@ -49,6 +49,9 @@ function get_menu_types()
 				'visits'       => T_('View my visits').' (disp=visits)',
 				'profile'      => T_('Edit my profile').' (disp=profile)',
 				'avatar'       => T_('Edit my profile picture').' (disp=avatar)',
+				'password'     => T_('Change my password').' (disp=pwdchange)',
+				'userprefs'    => T_('Change my preferences').' (disp=userprefs)',
+				'usersubs'     => T_('Notifications & Subscriptions').' (disp=subs)',
 				'useritems'    => T_('View my posts/items').' (disp=useritems)',
 				'usercomments' => T_('View my comments').' (disp=usercomments)',
 			),
@@ -99,5 +102,71 @@ function get_site_menu_type_title( $type )
 	}
 
 	return $type;
+}
+
+
+/**
+ * Get Site Menu ID by menu name or create default/demo Menu with entries
+ *
+ * @param string Site Menu name
+ * @return integer|FALSE Site Menu ID, FALSE if new menu cannot be created
+ */
+function get_default_site_menu_ID( $menu_name )
+{
+	global $DB;
+
+	if( ! $DB->get_var( 'SHOW TABLES LIKE "T_menus__menu"' ) )
+	{	// The Menus tables still doesn't exist, probably this is a call from old upgrade version:
+		return false;
+	}
+
+	$SiteMenuCache = & get_SiteMenuCache();
+	if( $SiteMenu = & $SiteMenuCache->get_by_name( $menu_name, false, false ) )
+	{	// Use existing Menu:
+		return $SiteMenu->ID;
+	}
+
+	load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
+
+	// Try to create Menu to Sitemap:
+	$SiteMenu = new SiteMenu();
+	$SiteMenu->set( 'name', $menu_name );
+	if( ! $SiteMenu->dbinsert() )
+	{
+		return false;
+	}
+
+	// Set default/demo menu entries depending on requested name:
+	switch( $menu_name )
+	{
+		case 'Site Map - Common links':
+			$menu_entries = array(
+				array( 'type' => 'home', 'text' => T_('Home') ),
+				array( 'type' => 'recentposts', 'text' => T_('Recently') ),
+				array( 'type' => 'arcdir', 'text' => T_('Archives') ),
+				array( 'type' => 'mediaidx', 'text' => T_('Photo index') ),
+				array( 'type' => 'latestcomments', 'text' => T_('Latest comments') ),
+				array( 'type' => 'owneruserinfo', 'text' => T_('Owner details') ),
+				array( 'type' => 'ownercontact', 'text' => T_('Contact') ),
+			);
+			break;
+	}
+
+	if( isset( $menu_entries ) )
+	{	// Create default/demo menu entries:
+		$menu_entry_order = 10;
+		foreach( $menu_entries as $menu_entry )
+		{
+			$SiteMenuEntry = new SiteMenuEntry();
+			$SiteMenuEntry->set( 'menu_ID', $SiteMenu->ID );
+			$SiteMenuEntry->set( 'type', $menu_entry['type'] );
+			$SiteMenuEntry->set( 'text', $menu_entry['text'] );
+			$SiteMenuEntry->set( 'order', $menu_entry_order );
+			$SiteMenuEntry->dbinsert();
+			$menu_entry_order += 10;
+		}
+	}
+
+	return $SiteMenu->ID;
 }
 ?>

@@ -14,10 +14,10 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check permission:
-$current_User->check_perm( 'files', 'view', true );
+check_user_perm( 'files', 'view', true );
 
 // Check permission:
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'options', 'edit', true );
 
 
 //param( 'action', 'string' );

@@ -197,7 +197,7 @@ class Filetype extends DataObject
 	 */
 	function is_allowed( $IGNORE_allow_locked = NULL )
 	{
-		global $current_User, $admins_can_manipulate_sensitive_files;
+		global $admins_can_manipulate_sensitive_files;
 
 		if( !is_logged_in( false ) )
 		{ // Anonymous Users can only manipulate this filetype if it's open for all.
@@ -217,7 +217,7 @@ class Filetype extends DataObject
 		}
 
 		// Check if current user is an admin (i-e: is in a group that allows all file manipulations)
-		return $current_User->check_perm( 'files', 'all' );
+		return check_user_perm( 'files', 'all' );
 	}
 
 

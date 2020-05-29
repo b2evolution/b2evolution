@@ -124,9 +124,9 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function request_required_files()
 	{
-		global $Item, $current_User;
+		global $Item;
 
-		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			init_tokeninput_js( 'blog' );
 			require_js_defer( '#jquery#', 'blog' );
@@ -160,7 +160,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $current_User;
+		global $Item;
 
 		$this->init_display( $params );
 
@@ -261,9 +261,8 @@ class item_tags_Widget extends ComponentWidget
 		}
 
 		if( $this->get_param( 'allow_edit' ) &&
-		    is_logged_in() &&
-		    $current_User->check_perm( 'admin', 'restricted' ) &&
-		    $current_User->check_perm( 'options', 'edit' ) )
+		    check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'options', 'edit' ) )
 		{	// Use different style for edit mode, make tag icon as link to edit item tag in back-office:
 			global $admin_url, $ReqURL;
 			$tags_params['before_tag'] = '<span>'.action_icon( T_('Edit tag'), 'tag', $admin_url.'?ctrl=itemtags&amp;action=edit&amp;tag_ID=$tag_ID$&amp;return_to='.rawurlencode( $ReqURL ) );

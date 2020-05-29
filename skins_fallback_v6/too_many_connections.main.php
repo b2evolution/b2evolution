@@ -9,15 +9,13 @@
 	</head>
 
 	<body>
-		<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">
-			<h1 style="color:#f00;">503 The server is currently overloaded.</h1>
+		<div>
+			<h1>503 The server is currently overloaded.</h1>
 			<p>Please try again in a few minutes.</p>
 		</div>
 
-		<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">
-			<h3>Error details:</h3> 
-			<?php echo  $additional_info;?>
+		<div style="background-color: #ddd; padding: 1ex; margin: 1ex;">
+			<?php echo $additional_info; ?>
 		</div>
-
 	</body>
 </html>

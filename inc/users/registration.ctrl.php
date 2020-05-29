@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 $AdminUI->set_path( 'users', 'usersettings', 'registration' );
 
@@ -26,7 +26,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'registration' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// keep old newusers_canregister setting value to check if we need to invalidate pagecaches
 		$old_newusers_canregister = $Settings->get( 'newusers_canregister' );

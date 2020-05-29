@@ -401,6 +401,7 @@ if( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
 	// EXIT here.
 }
 
-evo_uploader_error( T_('The file could not be saved!') );
+// Display log error message from the called function save_to_file() above:
+evo_uploader_error( empty( $evo_save_file_error_msg ) ? T_('The file could not be saved!') : $evo_save_file_error_msg );
 // EXIT here.
 ?>

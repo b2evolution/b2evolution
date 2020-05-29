@@ -1086,7 +1086,7 @@ function locale_overwritefromDB()
  */
 function locale_updateDB()
 {
-	global $locales, $DB, $Settings, $Messages, $action, $current_User, $admin_url;
+	global $locales, $DB, $Settings, $Messages, $action, $admin_url;
 	global $saved_params;
 
 	$templocales = $locales;
@@ -1195,7 +1195,7 @@ function locale_updateDB()
 				foreach( $main_locale_coll_IDs as $main_locale_coll_ID )
 				{
 					$locale_Blog = & $BlogCache->get_by_ID( $main_locale_coll_ID );
-					$coll_url = $current_User->check_perm( 'blog_properties', 'edit', false, $main_locale_coll_ID )
+					$coll_url = check_user_perm( 'blog_properties', 'edit', false, $main_locale_coll_ID )
 						? $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$locale_Blog->ID.'#fieldset_wrapper_language'
 						: $locale_Blog->get( 'url' );
 					$warning_message .= '<li><a href="'.$coll_url.'">'.$locale_Blog->get( 'name' ).'</a></li>';
@@ -1224,7 +1224,7 @@ function locale_updateDB()
 				foreach( $extra_locale_coll_IDs as $extra_locale_coll_ID )
 				{
 					$locale_Blog = & $BlogCache->get_by_ID( $extra_locale_coll_ID );
-					$coll_url = $current_User->check_perm( 'blog_properties', 'edit', false, $extra_locale_coll_ID )
+					$coll_url = check_user_perm( 'blog_properties', 'edit', false, $extra_locale_coll_ID )
 						? $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$locale_Blog->ID.'#fieldset_wrapper_language'
 						: $locale_Blog->get( 'url' );
 					$warning_message .= '<li><a href="'.$coll_url.'">'.$locale_Blog->get( 'name' ).'</a></li>';

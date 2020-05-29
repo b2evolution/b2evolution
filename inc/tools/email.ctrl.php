@@ -13,16 +13,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var User
- */
-global $current_User;
-
 global $DB;
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'emails', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'emails', 'view', true );
 
 load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
 load_funcs('tools/model/_email.funcs.php');
@@ -68,7 +63,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		switch( $tab3 )
 		{
@@ -279,7 +274,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		load_funcs( 'cron/model/_decode_returned_emails.funcs.php');
 		load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
@@ -346,7 +341,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Test SMTP connection
 		$test_mail_messages = smtp_connection_test();
@@ -363,7 +358,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Test email sending:
 		if( $action == 'test_email_smtp' )
@@ -383,7 +378,7 @@ switch( $action )
 		// Form to create new Email Address:
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Init Email Address to show on the form
 		$edited_EmailAddress = new EmailAddress();
@@ -396,7 +391,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email_blocked' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$action = 'blocked_edit';
 		if( !isset( $edited_EmailAddress ) )
@@ -425,7 +420,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email_blocked' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an emadr_ID:
 		param( 'emadr_ID', 'integer', true );
@@ -447,7 +442,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an emlog_ID:
 		param( 'emlog_ID', 'integer', 0, true );
@@ -485,7 +480,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		param( 'emret_ID', 'integer', 0 );
 		param( 'redirect_to', 'url', $admin_url.'?ctrl=email&tab=return' );
@@ -552,7 +547,7 @@ switch( $tab )
 
 			case 'test':
 				// Check permission:
-				$current_User->check_perm( 'emails', 'edit', true );
+				check_user_perm( 'emails', 'edit', true );
 
 				$AdminUI->breadcrumbpath_add( TB_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
@@ -623,7 +618,7 @@ switch( $tab )
 					if( empty( $repath_cron ) )
 					{ // Display a warning if cron job "Process the return path inbox" doesn't exist:
 						$repath_warning = TB_('There is no scheduled job configured to process your Return Path inbox.');
-						if( $current_User->check_perm( 'options', 'edit' ) )
+						if( check_user_perm( 'options', 'edit' ) )
 						{ // Suggest a link to create a job if current user has a permission:
 							$repath_warning .= ' '.sprintf( TB_('<a %s>Click here</a> to create such a job.'), ' href="'.$admin_url.'?ctrl=crontab&amp;action=new&amp;cjob_type=process-return-path-inbox"' );
 						}
@@ -637,7 +632,7 @@ switch( $tab )
 
 			case 'test':
 				// Check permission:
-				$current_User->check_perm( 'emails', 'edit', true );
+				check_user_perm( 'emails', 'edit', true );
 
 				$AdminUI->breadcrumbpath_add( TB_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 

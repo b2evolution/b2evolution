@@ -484,7 +484,7 @@ function header_etag( $etag )
  */
 function get_request_title( $params = array() )
 {
-	global $MainList, $preview, $disp, $action, $current_User, $Collection, $Blog, $admin_url;
+	global $MainList, $preview, $disp, $action, $Collection, $Blog, $admin_url;
 
 	$r = array();
 
@@ -843,7 +843,7 @@ function get_request_title( $params = array() )
 				}
 
 				$title .= $params['edit_links_template']['before'];
-				if( $current_User->check_perm( 'admin', 'restricted' ) )
+				if( check_user_perm( 'admin', 'restricted' ) )
 				{
 					global $advanced_edit_link;
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_link['href'], ' '.T_('Advanced editing'), NULL, 3, array(
@@ -878,7 +878,7 @@ function get_request_title( $params = array() )
 					), $params['edit_links_template'] );
 
 				$title .= $params['edit_links_template']['before'];
-				if( $current_User->check_perm( 'admin', 'restricted' ) )
+				if( check_user_perm( 'admin', 'restricted' ) )
 				{
 					$advanced_edit_url = url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;blog='.$Blog->ID.'&amp;comment_ID='.$edited_Comment->ID );
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_url, ' '.T_('Advanced editing'), NULL, 3, array(
@@ -1372,15 +1372,21 @@ function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, 
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
- * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
+ * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
  */
-function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
+function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines', $async = false )
 {
 	static $required_css;
-	global $dequeued_headlines;
+	global $dequeued_headlines, $dequeued_footerlines;
 
-	if( isset( $dequeued_headlines[ $css_file ] ) )
-	{ // Don't require this file if it was dequeued before this request
+	if( $position == 'headlines' && isset( $dequeued_headlines[ $css_file ] ) )
+	{	// Don't require this file if it was dequeued before this request
+		return;
+	}
+	elseif( $position == 'footerlines' && isset( $dequeued_footerlines[ $css_file ] ) )
+	{	// Don't require this file if it was dequeued before this request
 		return;
 	}
 
@@ -1397,25 +1403,65 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 	// Get library url of CSS file by alias name
 	$css_url = get_require_url( $css_file, $relative_to, $subfolder, $version );
 
-	// Add to headlines, if not done already:
+	// Add to headlines/footerlines, if not done already:
 	if( empty( $required_css ) || ! in_array( strtolower( $css_url ), $required_css ) )
 	{
 		$required_css[] = strtolower( $css_url );
 
-		$stylesheet_tag = '<link type="text/css" rel="stylesheet"';
+		$stylesheet_tag = '';
+
+		if( $async )
+		{
+			$stylesheet_tag .= '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"';
+			$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
+			$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
+			$stylesheet_tag .= ' href="'.$css_url.'" />';
+			$stylesheet_tag .= '<noscript>';
+		}
+		
+		$stylesheet_tag .= '<link type="text/css" rel="stylesheet"';
 		$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
 		$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
 		$stylesheet_tag .= ' href="'.$css_url.'" />';
 
+		if( $async )
+		{
+			$stylesheet_tag .= '</noscript>';
+		}
+
 		if( $output )
-		{ // Print stylesheet tag right here
+		{	// Print stylesheet tag right here
 			echo $stylesheet_tag;
 		}
 		else
-		{ // Add stylesheet tag to <head>
-			add_headline( $stylesheet_tag, $css_file, $relative_to );
+		{	// Add stylesheet tag to <head>
+			if($position == 'headlines' )
+			{
+				add_headline( $stylesheet_tag, $css_file, $relative_to );
+			}
+			elseif( $position == 'footerlines' )
+			{
+				add_footerline( $stylesheet_tag, $css_file, $relative_to );
+			}
 		}
 	}
+}
+
+
+/**
+ * Require CSS file to load asynchronously
+ *
+ * @param string Alias, url or filename (relative to rsc/css) for CSS file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string title.  The title for the link tag
+ * @param string media.  ie, 'print'
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head> or <body>
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ */
+function require_css_async( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines' )
+{
+	require_css( $css_file, $relative_to, $title, $media, $version, $output, $position, true );
 }
 
 
@@ -1656,6 +1702,40 @@ function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogr
 
 
 /**
+ * Add a footerline, which then gets output before the </body> tag.
+ * If you want to include CSS or JavaScript files, please use
+ * {@link require_css()} and {@link require_js_async()} and {@link require_js_defer()} instead.
+ * This avoids duplicates and allows caching/concatenating those files
+ * later (not implemented yet)
+ *
+ * @param string HTML tag like <script></script> or <link />
+ * @param string File name (used to index)
+ * @param boolean|string Group headlines by this group in order to allow use files with same names from several places
+ */
+function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#nogroup' )
+{
+	global $footerlines, $dequeued_footerlines;
+
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
+
+	if( is_null( $file_name ) )
+	{	// Use auto index if file name is not defined:
+		$footerlines[ $group_relative_to ][] = $footerline;
+	}
+	else
+	{	// Try to add footerline with file name to array:
+		if( isset( $dequeued_footerlines[ $group_relative_to ][ $file_name ] ) || isset( $dequeued_footerlines[ '#anygroup#' ][ $file_name ] ) )
+		{	// Don't require this file if it was dequeued before this request:
+			return;
+		}
+		// Use file name as key index in $headline array:
+		$footerlines[ $group_relative_to ][ $file_name ] = $footerline;
+	}
+}
+
+
+/**
  * Add a Javascript headline.
  * This is an extra function, to provide consistent wrapping and allow to bundle it
  * (i.e. create a bundle with all required JS files and these inline code snippets,
@@ -1670,6 +1750,20 @@ function add_js_headline($headline)
 
 
 /**
+ * Add a Javascript footerline.
+ * This is an extra function, to provide consistent wrapping and allow to bundle it
+ * (i.e. create a bundle with all required JS files and these inline code snippets,
+ *  in the correct order).
+ * @param string Javascript
+ */
+function add_js_footerline($footerline)
+{
+	add_footerline("<script>\n\t/* <![CDATA[ */\n\t\t"
+		.$footerline."\n\t/* ]]> */\n\t</script>");
+}
+
+
+/**
  * Add a CSS headline.
  * This is an extra function, to provide consistent wrapping and allow to bundle it
  * (i.e. create a bundle with all required JS files and these inline code snippets,
@@ -1679,6 +1773,19 @@ function add_js_headline($headline)
 function add_css_headline($headline)
 {
 	add_headline("<style type=\"text/css\">\n\t".$headline."\n\t</style>");
+}
+
+
+/**
+ * Add a CSS footerline.
+ * This is an extra function, to provide consistent wrapping and allow to bundle it
+ * (i.e. create a bundle with all required CSS code snippets,
+ *  in the correct order).
+ * @param string CSS
+ */
+function add_css_footerline($footerline)
+{
+	add_footerline("<style type=\"text/css\">\n\t".$footerline."\n\t</style>");
 }
 
 
@@ -2236,25 +2343,50 @@ function include_headlines()
  */
 function include_footerlines()
 {
-	global $js_translations;
-	if( empty( $js_translations ) )
-	{ // nothing to do
-		return;
-	}
-	$r = '';
+	global $js_translations, $footerlines;
 
-	foreach( $js_translations as $string => $translation )
-	{ // output each translation
-		if( $string != $translation )
-		{ // this is translated
-			$r .= '<div><span class="b2evo_t_string">'.$string.'</span><span class="b2evo_translation">'.$translation.'</span></div>'."\n";
+	if( !empty( $js_translations ) )
+	{
+		$r = '';
+
+		foreach( $js_translations as $string => $translation )
+		{ // output each translation
+			if( $string != $translation )
+			{ // this is translated
+				$r .= '<div><span class="b2evo_t_string">'.$string.'</span><span class="b2evo_translation">'.$translation.'</span></div>'."\n";
+			}
+		}
+		if( $r )
+		{ // we have some translations
+			echo '<div id="b2evo_translations" style="display:none;">'."\n";
+			echo $r;
+			echo '</div>'."\n";
 		}
 	}
-	if( $r )
-	{ // we have some translations
-		echo '<div id="b2evo_translations" style="display:none;">'."\n";
-		echo $r;
-		echo '</div>'."\n";
+
+	if( $footerlines )
+	{
+		if( isset( $footerlines['#nogroup#'] ) )
+		{	// Move no group head lines to the end in order to print them after files,
+			// because Safari and Firefox rewrite css of <style> with css of loaded files if they are printed after <style> in <head>:
+			$footerlines_nogroup = $footerlines['#nogroup#'];
+			unset( $footerlines['#nogroup#'] );
+			$footerlines['#nogroup#'] = $footerlines_nogroup;
+		}
+		$all_footerlines = array();
+		foreach( $footerlines as $group_footerlines )
+		{	// Go through each group to include all footerlines:
+			foreach( $group_footerlines as $footerline )
+			{
+				$all_footerlines[] = $footerline;
+			}
+		}
+
+		if( ! empty( $all_footerlines ) )
+		{	// Include headlines only if at least one headline is found in any group:
+			echo "\n\t<!-- footerlines: -->\n\t".implode( "\n\t", $all_footerlines );
+			echo "\n\n";
+		}
 	}
 }
 
@@ -3632,21 +3764,21 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
  */
 function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
 {
-	// Require Fine Uploader js and css files:
-	require_js_defer( '#jquery#', $relative_to );
-	require_js_defer( 'multiupload/fine-uploader.js', $relative_to );
-	require_css( 'fine-uploader.css', $relative_to );
-	require_js_defer( 'src/evo_init_dragdrop_button.js', $relative_to );
-
+	require_js_defer( '#jquery#', $relative_to, true );
 	// Used to make uploader area resizable:
-	require_js_defer( '#jqueryUI#', $relative_to );
-	require_js_defer( 'src/evo_init_attachment_fieldset.js', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to, true );
 
 	if( $load_sortable_js )
-	{	// Load JS files to make the links table sortable:
-		require_js_defer( 'jquery/jquery.sortable.min.js', $relative_to );
-		require_js_defer( 'src/evo_init_link_sortable.js', $relative_to );
+	{	// Load JS file uploader with sortable feature for links/attachments:
+		require_js_defer( 'build/evo_fileuploader_sortable.bmin.js', $relative_to, true );
 	}
+	else
+	{	// Load JS file uploader:
+		require_js_defer( 'build/evo_fileuploader.bmin.js', $relative_to, true );
+	}
+
+	// Styles for file uploader:
+	require_css( 'fine-uploader.css', $relative_to, NULL, NULL, '#', true );
 }
 
 

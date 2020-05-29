@@ -43,7 +43,7 @@ $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 $spammers_warning = '<span class="red"$attrs$>'.get_icon( 'warning_yellow' ).' '.TB_('Warning: this makes your site a preferred target for spammers!').'<br /></span>';
 
 // Permission to edit advanced admin settings
-$perm_blog_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID );
+$perm_blog_admin = check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID );
 
 $Form = new Form( NULL, 'coll_comments_checkchanges' );
 

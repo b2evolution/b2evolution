@@ -308,10 +308,10 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 {
 	global $Settings, $current_User, $basepath, $upgrade_path;
 
-	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
+	if( ! check_user_perm( 'files', 'all' ) )
 	{	// No permission to unzip files:
 		$error = '<span class="text-danger">'.TB_('You don\'t have permission to UNZIP files automatically on the server.').'</span>';
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{	// Link to edit permissions:
 			global $admin_url;
 			$error .= ' ('.sprintf( TB_('You can change this <a %s>here</a>'), 'href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file"' ).')';

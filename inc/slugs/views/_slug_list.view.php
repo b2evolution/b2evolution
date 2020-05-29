@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Slug
  */
-global $Sug, $current_User, $admin_url;
+global $Sug, $admin_url;
 
 $SQL = new SQL();
 
@@ -81,8 +81,8 @@ $Results->register_filter_preset( 'all', T_('All'), '?ctrl=slugs' );
 
 function get_slug_link( $Slug )
 {
-	global $current_User, $admin_url;
-	if( $current_User->check_perm( 'slugs', 'edit') )
+	global $admin_url;
+	if( check_user_perm( 'slugs', 'edit') )
 	{
 		return '<strong><a href="'.$admin_url.'?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit">'.$Slug->get('title').'</a></strong>';
 	}
@@ -240,11 +240,6 @@ $Results->cols[] = array(
  */
 function get_target_coll( $Slug )
 {
-	/**
-	* @var User
-	*/
-	global $current_User;
-
 	switch( $Slug->type )
 	{
 		case 'item':
@@ -260,8 +255,8 @@ function get_target_coll( $Slug )
 			switch( $Slug->get( 'type') )
 			{
 				case 'item':
-					$allow_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $target );
-					$allow_view = $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $target );
+					$allow_edit = check_user_perm( 'item_post!CURSTATUS', 'edit', false, $target );
+					$allow_view = check_user_perm( 'item_post!CURSTATUS', 'view', false, $target );
 					break;
 				// Other types permission check write here
 			}
@@ -296,7 +291,7 @@ $Results->cols[] = array(
 			'td_class' => 'small left',
 		);
 
-if( $current_User->check_perm( 'slugs', 'edit' ) )
+if( check_user_perm( 'slugs', 'edit' ) )
 {
 	$Results->cols[] = array(
 				'th' => T_('Actions'),

@@ -1061,6 +1061,9 @@ div.filters .filter_item {
 div.filters .filter_item div {
   margin: 0;
 }
+a {
+  word-break: break-all;
+}
 .widget_core_coll_category_list label {
   font-weight: normal;
 }

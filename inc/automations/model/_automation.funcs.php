@@ -76,9 +76,7 @@ function autm_get_status_title( $status )
  */
 function autm_td_tied_lists( $newsletters )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{	// Make icon to action link if current User has a perm to edit this:
 		global $admin_url;
 		$r = '';
@@ -181,11 +179,11 @@ function autm_td_users_actions( $autm_ID, $user_ID, $user_login, $step_ID, $step
  */
 function autm_td_status( $autm_ID, $autm_status, $url_params = '' )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
 	$r = autm_get_status_title( $autm_status );
 
-	if( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Display action icon to toggle automation status:
 		$r .= ' '.action_icon( '', ( $autm_status == 'active' ? 'pause' : 'play' ),
 			$admin_url.'?ctrl=automations&amp;action='.( $autm_status == 'active' ? 'status_paused' : 'status_active' )
@@ -397,12 +395,12 @@ function step_td_num_users_queued( $step_ID, $autm_ID, $num_users_queued, $step_
  */
 function step_td_label( $step_ID, $step_label, $step_type, $step_info )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$step_type_title = step_get_type_title( $step_type );
 
 	// Display step type title as:
-	$r = $current_User->check_perm( 'options', 'edit' )
+	$r = check_user_perm( 'options', 'edit' )
 		// link to edit page if current user has a permission:
 		? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'"><b>'.$step_type_title.'</b></a>: '
 		// plain text if current user has no permission:
@@ -412,7 +410,7 @@ function step_td_label( $step_ID, $step_label, $step_type, $step_info )
 	{
 		case 'send_campaign':
 			// Display email campaign title as:
-			$r .= $current_User->check_perm( 'emails', 'edit' )
+			$r .= check_user_perm( 'emails', 'edit' )
 				// link to edit page if current user has a permission:
 				? '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=send&amp;ecmp_ID='.intval( $step_info ).'">'.$step_label.'</a>'
 				// plain text if current user has no permission:
@@ -422,7 +420,7 @@ function step_td_label( $step_ID, $step_label, $step_type, $step_info )
 		case 'subscribe':
 		case 'unsubscribe':
 			// Display newsletter name as:
-			$r .= $current_User->check_perm( 'emails', 'edit' )
+			$r .= check_user_perm( 'emails', 'edit' )
 				// link to edit page if current user has a permission:
 				? '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.intval( $step_info ).'">'.$step_label.'</a>'
 				// plain text if current user has no permission:
@@ -431,7 +429,7 @@ function step_td_label( $step_ID, $step_label, $step_type, $step_info )
 
 		case 'start_automation':
 			// Display automation name as:
-			$r .= $current_User->check_perm( 'options', 'edit' )
+			$r .= check_user_perm( 'options', 'edit' )
 				// link to edit page if current user has a permission:
 				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;tab=settings&amp;autm_ID='.intval( $step_info ).'">'.$step_label.'</a>'
 				// plain text if current user has no permission:
@@ -439,7 +437,7 @@ function step_td_label( $step_ID, $step_label, $step_type, $step_info )
 			break;
 
 		default:
-			$r = $current_User->check_perm( 'options', 'edit' )
+			$r = check_user_perm( 'options', 'edit' )
 				// link to edit page if current user has a permission:
 				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$step_ID.'"><b>'.$step_type_title.'</b>: '.$step_label.'</a>'
 				// plain text if current user has no permission:
@@ -576,7 +574,7 @@ function echo_requeue_automation_js()
  */
 function automation_results_block( $params = array() )
 {
-	global $admin_url, $current_User, $DB;
+	global $admin_url, $DB;
 
 	$params = array_merge( array(
 		'enlt_ID'               => NULL, // Newsletter ID
@@ -614,7 +612,7 @@ function automation_results_block( $params = array() )
 
 	$Results = new Results( $SQL->get(), $params['results_prefix'], 'A', NULL, $count_SQL->get() );
 
-	if( $params['display_create_button'] && $current_User->check_perm( 'options', 'edit' ) )
+	if( $params['display_create_button'] && check_user_perm( 'options', 'edit' ) )
 	{	// User must has a permission to add new automation:
 		//$Results->global_icon( TB_('New automation'), 'new', regenerate_url( 'action', 'action=new' ), TB_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 		$Results->global_icon( TB_('New automation'), 'new', $admin_url.'?ctrl=automations&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), TB_('New automation').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
@@ -633,7 +631,7 @@ function automation_results_block( $params = array() )
 	$Results->cols[] = array(
 			'th'    => TB_('Name'),
 			'order' => 'autm_name',
-			'td'    => ( $current_User->check_perm( 'options', 'edit' )
+			'td'    => ( check_user_perm( 'options', 'edit' )
 				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$"><b>$autm_name$</b></a>'
 				: '$autm_name$' ),
 		);
@@ -661,7 +659,7 @@ function automation_results_block( $params = array() )
 			'td_class' => 'shrinkwrap',
 		);
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Display actions column only if current user has a permission to edit options:
 		$Results->cols[] = array(
 				'th'       => TB_('Actions'),

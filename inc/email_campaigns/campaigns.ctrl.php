@@ -15,8 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'emails', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
@@ -50,7 +50,7 @@ switch( $action )
 		// New Email Campaign form:
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Check if at least one newsletter is active:
 		$NewsletterCache = & get_NewsletterCache();
@@ -72,7 +72,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$new_EmailCampaign = new EmailCampaign();
 
@@ -101,7 +101,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$current_tab = param( 'current_tab', 'string', 'info' );
 
@@ -150,7 +150,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Update the plain-text message field from HTML message:
 		$edited_EmailCampaign->update_plaintext( true );
@@ -173,7 +173,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$current_tab = param( 'current_tab', 'string', 'info' );
 
@@ -195,21 +195,6 @@ switch( $action )
 		// We have EXITed already at this point!!
 		break;
 
-	case 'hide_wysiwyg_warning':
-	case 'show_wysiwyg_warning':
-		global $UserSettings;
-
-		// Show/hide warning when switching from markup to WYSIWYG
-		$Session->assert_received_crumb( 'campaign' );
-
-		// Check that this action request is not a CSRF hacked request:
-		$UserSettings->set( 'show_wysiwyg_warning_emailcampaign', ( $action == 'show_wysiwyg_warning' ? 1: 0 ) );
-		$UserSettings->dbupdate();
-
-		// REDIRECT / EXIT
-		header_redirect( $admin_url.'?ctrl=campaigns&action=edit&ecmp_ID='.$edited_EmailCampaign->ID.'&tab=compose' );
-		break;
-
 	case 'create_for_users':
 	case 'update_users':
 		// Select new users for campaigns, Go from controller 'users'
@@ -218,7 +203,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$newsletter_ID = param( 'newsletter', 'integer', 0 );
 		$NewsletterCache = & get_NewsletterCache();
@@ -276,7 +261,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		if( $edited_EmailCampaign && $edited_EmailCampaign->duplicate() )
 		{
@@ -293,7 +278,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		param( 'from', 'string', '' );
 
@@ -341,7 +326,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		param( 'from', 'string', '' );
 
@@ -379,7 +364,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an ecmp_ID:
 		param( 'ecmp_ID', 'integer', true );
@@ -416,7 +401,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Test email address
 		param( 'test_email_address', 'string', '' );
@@ -466,7 +451,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Check campaign before sending
 		$edited_EmailCampaign->check();
@@ -509,7 +494,7 @@ switch( $action )
 			break;
 		}
 
-		if( ! $current_User->check_perm( 'options', 'view' ) )
+		if( ! check_user_perm( 'options', 'view' ) )
 		{	// No access to view cron jobs:
 			$Messages->add( TB_('Sorry, you don\'t have permission to view scheduled jobs.' ), 'warning' );
 			$action = 'edit';
@@ -557,7 +542,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaigns_plugins' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		load_funcs( 'plugins/_plugin.funcs.php' );
 
@@ -659,8 +644,6 @@ switch( $action )
 				$AdminUI->set_page_manual_link( 'campaign-compose-panel' );
 				// Require colorbox js:
 				require_js_helper( 'colorbox' );
-				// Init JS to quick upload several files:
-				init_fileuploader_js();
 				break;
 			case 'plaintext':
 				$AdminUI->set_page_manual_link( 'campaign-plaintext-panel' );

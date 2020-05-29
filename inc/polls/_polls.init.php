@@ -378,14 +378,14 @@ class polls_Module extends Module
 	 */
 	function build_menu_2()
 	{
-		global $admin_url, $current_User, $AdminUI;
+		global $admin_url, $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{	// User must has an access to back-office:
 			return;
 		}
 
-		if( $current_User->check_perm( 'polls', 'create' ) )
+		if( check_user_perm( 'polls', 'create' ) )
 		{	// User has an access at least to view and edit own polls:
 			$AdminUI->add_menu_entries( array( 'site' ), array(
 				'polls' => array(

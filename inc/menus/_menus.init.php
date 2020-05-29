@@ -119,14 +119,14 @@ class menus_Module extends Module
 	 */
 	function build_menu_2()
 	{
-		global $admin_url, $current_User, $AdminUI;
+		global $admin_url, $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{	// User must has an access to back-office:
 			return;
 		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{	// User has an access to view system settings:
 			$AdminUI->add_menu_entries( array( 'site' ), array(
 				'menus' => array(

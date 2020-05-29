@@ -62,7 +62,7 @@ function check_blocked_contacts( $recipients_list )
 		return NULL;
 	}
 
-	if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
+	if( check_user_perm( 'perm_messaging', 'delete' ) )
 	{ // user with delete messaging permission are allowed to send private messages to anyone who has access to read them.
 		return NULL;
 	}
@@ -71,7 +71,7 @@ function check_blocked_contacts( $recipients_list )
 
 	$SQL->SELECT( 'u.user_login' );
 
-	if( $current_User->check_perm( 'perm_messaging', 'write', false ) )
+	if( check_user_perm( 'perm_messaging', 'write', false ) )
 	{ // get blocked contacts for user with write permission
 		$sub_SQL = new SQL();
 
@@ -153,7 +153,7 @@ function set_contact_blocked( $user_ID, $blocked )
  */
 function create_new_thread()
 {
-	global $Settings, $current_User, $Messages, $edited_Thread, $edited_Message, $action, $Plugins;
+	global $Settings, $Messages, $edited_Thread, $edited_Message, $action, $Plugins;
 
 	// Insert new thread:
 	$edited_Thread = new Thread();
@@ -161,7 +161,7 @@ function create_new_thread()
 	$edited_Message->Thread = & $edited_Thread;
 
 	// Check permission:
-	$current_User->check_perm( 'perm_messaging', 'reply', true );
+	check_user_perm( 'perm_messaging', 'reply', true );
 
 	if( $Settings->get('system_lock') )
 	{ // System is locked for maintenance, All users cannot send a message
@@ -224,14 +224,14 @@ function create_new_thread()
  */
 function create_new_message( $thrd_ID )
 {
-	global $Settings, $current_User, $Messages, $edited_Message, $action, $Plugins;
+	global $Settings, $Messages, $edited_Message, $action, $Plugins;
 
 	// Insert new message:
 	$edited_Message = new Message();
 	$edited_Message->thread_ID = $thrd_ID;
 
 	// Check permission:
-	$current_User->check_perm( 'perm_messaging', 'reply', true );
+	check_user_perm( 'perm_messaging', 'reply', true );
 
 	if( $Settings->get('system_lock') )
 	{ // System is locked for maintenance, All users cannot send a message
@@ -386,7 +386,7 @@ function get_messages_link_to( $thread_ID = NULL, $user_ID = NULL )
  */
 function get_messaging_sub_entries( $is_admin )
 {
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	if( $is_admin )
 	{
@@ -406,7 +406,7 @@ function get_messaging_sub_entries( $is_admin )
 									'href' => $url.'contacts' ),
 							);
 
-	if( $is_admin && $current_User->check_perm( 'options', 'edit' ) )
+	if( $is_admin && check_user_perm( 'options', 'edit' ) )
 	{
 		$messaging_sub_entries[ 'msgsettings' ] = array(
 				'text' => T_('Settings'),
@@ -427,7 +427,7 @@ function get_messaging_sub_entries( $is_admin )
 					),
 			);
 	}
-	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+	if( check_user_perm( 'perm_messaging', 'abuse' ) )
 	{
 		$messaging_sub_entries[ 'abuse' ] = array(
 													'text' => T_('Abuse Management'),
@@ -1989,8 +1989,7 @@ function threads_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) || !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) || ! check_user_perm( 'perm_messaging', 'reply' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -2010,7 +2009,7 @@ function threads_results_block( $params = array() )
 		}
 	}
 
-	global $DB, $current_User, $AdminUI;
+	global $DB, $AdminUI;
 
 	param( 'user_tab', 'string', '', true );
 	param( 'user_ID', 'integer', 0, true );
@@ -2022,7 +2021,7 @@ function threads_results_block( $params = array() )
 	);
 
 	// Check permission:
-	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+	if( check_user_perm( 'perm_messaging', 'abuse' ) )
 	{
 		// Create result set:
 		$threads_user_filter = ( $params['messages_type'] == 'received' ? 'received_user_ID' : 'sent_user_ID' );
@@ -2107,8 +2106,6 @@ function received_threads_results_block( $params = array() )
  */
 function threads_results( & $threads_Results, $params = array() )
 {
-	global $current_User;
-
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'abuse_management' => 0, // 1 - abuse management mode
@@ -2163,7 +2160,7 @@ function threads_results( & $threads_Results, $params = array() )
 
 	if( $params['display_actions'] )
 	{	// Display Actions column
-		if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
+		if( check_user_perm( 'perm_messaging', 'delete' ) )
 		{	// We have permission to modify:
 			$threads_Results->cols[] = array(
 					'th' => T_('Del'),
