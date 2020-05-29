@@ -3595,7 +3595,6 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$categories = array(
 				'bug'             => array( TD_('Bug'), 'order' => 10 ),
 				'feature_request' => array( TD_('Feature Request'), 'order' => 20 ),
-				'recipes'         => array( TD_('Recipes'), 'default_item_type' => 'Recipe' ),
 			);
 
 			// Additional sample Items:
@@ -3667,6 +3666,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Prepend additional sample Items before generic Items:
 			$demo_items = array_merge( $top_demo_items, $demo_items );
+
+			// Don't install the following demo Items:
+			$exclude_demo_items = array(
+					'mongolian_beef',
+					'stuffed_peppers',
+					'custom_fields_example',
+					'another_custom_fields_example',
+					'child_post_example',
+				);
 			break;
 	}
 
