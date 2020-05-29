@@ -1624,9 +1624,6 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
-
-			// Init JS to quick upload several files:
-			init_fileuploader_js( 'blog' );
 			break;
 
 		case 'useritems':

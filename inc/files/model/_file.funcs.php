@@ -2435,6 +2435,9 @@ function display_dragdrop_upload_button( $params = array() )
 		return;
 	}
 
+	// Initialize quick uploader:
+	init_fileuploader_js( ( is_admin_page() ? 'rsc_url' : 'blog' ), ( $LinkOwner !== NULL /* Sortable only attached files */ ) );
+
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
 	$quick_upload_url = get_htsrv_url().'quick_upload.php'
 		.'?b2evo_icons_type='.$b2evo_icons_type

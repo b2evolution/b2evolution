@@ -1507,9 +1507,6 @@ class Skin extends DataObject
 						init_datepicker_js( 'blog' );
 					}
 
-					// Used to quick upload several files:
-					init_fileuploader_js( 'blog' );
-
 					// Used to change link position:
 					require_js_defer( 'backoffice.js', 'blog' );
 					break;
@@ -1547,9 +1544,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters:
 					require_js_defer( 'functions.js', 'blog' );
-
-					// Init JS to quick upload several files:
-					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_contacts':
@@ -1695,9 +1689,6 @@ class Skin extends DataObject
 					{	// Only if user wants this:
 						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
-
-					// Used to quick upload several files:
-					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1723,9 +1714,6 @@ class Skin extends DataObject
 
 					// Used to switch to advanced editing:
 					require_js_defer( 'backoffice.js', 'blog' );
-
-					// Used to quick upload several files:
-					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_useritems':

@@ -3215,8 +3215,6 @@ if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit'
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Init JS to quick upload several files:
-	init_fileuploader_js();
 }
 
 if( in_array( $action, array( 'new', 'new_version', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )

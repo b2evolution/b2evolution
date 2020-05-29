@@ -644,8 +644,6 @@ switch( $action )
 				$AdminUI->set_page_manual_link( 'campaign-compose-panel' );
 				// Require colorbox js:
 				require_js_helper( 'colorbox' );
-				// Init JS to quick upload several files:
-				init_fileuploader_js();
 				break;
 			case 'plaintext':
 				$AdminUI->set_page_manual_link( 'campaign-plaintext-panel' );

@@ -1711,8 +1711,6 @@ if( $mode != 'modal' )
 {
 	// require colorbox js
 	require_js_helper( 'colorbox' );
-	// Init JS to quick upload several files:
-	init_fileuploader_js( 'rsc_url', false );
 
 	if( $mode == 'upload' || $mode == 'import' )
 	{ // Add css to remove spaces around window

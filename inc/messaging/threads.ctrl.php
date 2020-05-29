@@ -191,8 +191,6 @@ switch( $action )
 
 		// Require colorbox js:
 		require_js_helper( 'colorbox' );
-		// Init JS to quick upload several files:
-		init_fileuploader_js();
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'conversations-list' );

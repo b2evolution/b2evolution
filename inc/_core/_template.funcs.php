@@ -3764,21 +3764,21 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
  */
 function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
 {
-	require_js_defer( '#jquery#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to, true );
 	// Used to make uploader area resizable:
-	require_js_defer( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to, true );
 
 	if( $load_sortable_js )
 	{	// Load JS file uploader with sortable feature for links/attachments:
-		require_js_defer( 'build/evo_fileuploader_sortable.bmin.js', $relative_to );
+		require_js_defer( 'build/evo_fileuploader_sortable.bmin.js', $relative_to, true );
 	}
 	else
 	{	// Load JS file uploader:
-		require_js_defer( 'build/evo_fileuploader.bmin.js', $relative_to );
+		require_js_defer( 'build/evo_fileuploader.bmin.js', $relative_to, true );
 	}
 
 	// Styles for file uploader:
-	require_css( 'fine-uploader.css', $relative_to );
+	require_css( 'fine-uploader.css', $relative_to, NULL, NULL, '#', true );
 }
 
 
