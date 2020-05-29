@@ -402,5 +402,6 @@ $debug_pwd = \'set a password here\';
 ?>
 <!-- b2evo-install-action:<?php echo $action ?> -->
 <!-- b2evo-install-end -->
+	<?php include_footerlines(); /* Add JavaScript and CSS files included by plugins and skin */ ?>
 	</body>
 </html>

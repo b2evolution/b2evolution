@@ -71,14 +71,14 @@ class prism_plugin extends Plugin
 		$ItemCache = & get_ItemCache();
 		$comment_Item = & $ItemCache->get_by_ID( $params['comment_item_ID'], false );
 		if( !$comment_Item )
-		{ // Incorrect item
+		{	// Incorrect item
 			return false;
 		}
 
 		$item_Blog = & $comment_Item->get_Blog();
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
 		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
-		{ // render code blocks in comment
+		{	// render code blocks in comment
 			$params['content' ] = & $params['comment'];
 			$this->FilterItemContents( $params );
 		}
@@ -92,7 +92,7 @@ class prism_plugin extends Plugin
 	{
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
-		{ // render code blocks in message
+		{	// render code blocks in message
 			$this->FilterItemContents( $params );
 		}
 	}
@@ -196,7 +196,7 @@ class prism_plugin extends Plugin
 		$content = isset( $block[3] ) ? trim( $block[3] ) : '';
 
 		if( empty( $content ) )
-		{ // Don't render if no code content
+		{	// Don't render if no code content
 			return '';
 		}
 
@@ -206,7 +206,7 @@ class prism_plugin extends Plugin
 		// Language:
 		$lang = strtolower( preg_replace( '/.*lang="?([a-z]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
 		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'html', 'markup', 'apacheconf' ) ) )
-		{ // Use Markup for unknown language
+		{	// Use Markup for unknown language
 			$lang = '';
 		}
 
@@ -230,7 +230,7 @@ class prism_plugin extends Plugin
 		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$content.'</code>';
 
 		if( $type == 'codeblock' )
-		{ // Set special template and attributes only for codeblock
+		{	// Set special template and attributes only for codeblock
 
 			// Detect number of start line:
 			$line = intval( preg_replace( '/.*line="?(-?[0-9]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
@@ -270,13 +270,13 @@ class prism_plugin extends Plugin
 		$content = $block[6];
 
 		if( empty( $block[1] ) )
-		{ // [codespan]
+		{	// [codespan]
 			$code_tag = 'codespan';
 			// codespan doesn't provide line numbers
 			$line = '';
 		}
 		else
-		{ // [codeblock]
+		{	// [codeblock]
 			$code_tag = 'codeblock';
 			// Detect number of start line:
 			preg_match( '/.*data-start="(-?[0-9]+)".*/i', html_entity_decode( $block[1] ), $line );
@@ -328,12 +328,12 @@ class prism_plugin extends Plugin
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
+		{	// Don't load css/js files when plugin is not enabled
 			return;
 		}
 
 		$this->require_js_async( 'js/prism.min.js' );
-		$this->require_css( 'css/prism.min.css' );
+		$this->require_css( 'css/prism.min.css', false, 'footerlines' );
 	}
 
 
@@ -350,7 +350,7 @@ class prism_plugin extends Plugin
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
 			$this->require_js_async( 'js/prism.min.js' );
-			$this->require_css( 'css/prism.min.css' );
+			$this->require_css( 'css/prism.min.css', false, 'footerlines' );
 		}
 	}
 
@@ -364,7 +364,7 @@ class prism_plugin extends Plugin
 	function DisplayCommentToolbar( & $params )
 	{
 		if( !empty( $params['Comment'] ) )
-		{ // Comment is set, get Blog from comment
+		{	// Comment is set, get Blog from comment
 			$Comment = & $params['Comment'];
 			if( !empty( $Comment->item_ID ) )
 			{
@@ -374,10 +374,10 @@ class prism_plugin extends Plugin
 		}
 
 		if( empty( $Blog ) )
-		{ // Comment is not set, try global Blog
+		{	// Comment is not set, try global Blog
 			global $Collection, $Blog;
 			if( empty( $Blog ) )
-			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
+			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
@@ -436,16 +436,16 @@ class prism_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		if( !empty( $params['Item'] ) )
-		{ // Item is set, get Blog from post
+		{	// Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
 			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
-		{ // Item is not set, try global Blog
+		{	// Item is not set, try global Blog
 			global $Collection, $Blog;
 			if( empty( $Blog ) )
-			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
 		}

@@ -67,6 +67,7 @@ if( $action == 'exit' )
 				</div>
 			</div>
 		</div>
+		<?php include_footerlines(); /* Add JavaScript and CSS files included by plugins and skin */ ?>
 	</body>
 	</html>
 	<?php
