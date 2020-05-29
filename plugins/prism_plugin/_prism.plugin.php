@@ -333,7 +333,7 @@ class prism_plugin extends Plugin
 		}
 
 		$this->require_js_async( 'js/prism.min.js' );
-		$this->require_css( 'css/prism.min.css', false, 'footerlines' );
+		$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
 	}
 
 

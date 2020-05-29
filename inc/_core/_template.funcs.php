@@ -1374,8 +1374,9 @@ function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, 
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
  * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
  */
-function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines' )
+function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines', $async = false )
 {
 	static $required_css;
 	global $dequeued_headlines, $dequeued_footerlines;
@@ -1407,10 +1408,26 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 	{
 		$required_css[] = strtolower( $css_url );
 
-		$stylesheet_tag = '<link type="text/css" rel="stylesheet"';
+		$stylesheet_tag = '';
+
+		if( $async )
+		{
+			$stylesheet_tag .= '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"';
+			$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
+			$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
+			$stylesheet_tag .= ' href="'.$css_url.'" />';
+			$stylesheet_tag .= '<noscript>';
+		}
+		
+		$stylesheet_tag .= '<link type="text/css" rel="stylesheet"';
 		$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
 		$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
 		$stylesheet_tag .= ' href="'.$css_url.'" />';
+
+		if( $async )
+		{
+			$stylesheet_tag .= '</noscript>';
+		}
 
 		if( $output )
 		{	// Print stylesheet tag right here
@@ -1428,6 +1445,23 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 			}
 		}
 	}
+}
+
+
+/**
+ * Require CSS file to load asynchronously
+ *
+ * @param string Alias, url or filename (relative to rsc/css) for CSS file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string title.  The title for the link tag
+ * @param string media.  ie, 'print'
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head> or <body>
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ */
+function require_css_async( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines' )
+{
+	require_css( $css_file, $relative_to, $title, $media, $version, $output, $position, true );
 }
 
 

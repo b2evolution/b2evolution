@@ -4726,11 +4726,26 @@ class Plugin
 	 * @param string Name of CSS file relative to current plugin folder
 	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
 	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
 	 */
-	function require_css( $css_file, $output = false, $position = 'headlines' )
+	function require_css( $css_file, $output = false, $position = 'headlines', $async = false )
 	{
 		global $app_version_long;
-		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position );
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, $async );
+	}
+
+
+	/**
+	 * Require CSS file to load asynchronously
+	 * 
+	 * @param string Name of CSS file relative to current plugin folder
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_css_async( $css_file, $output = false, $position = 'headlines' )
+	{
+		global $app_version_long;
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, true );
 	}
 
 
