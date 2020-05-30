@@ -577,7 +577,9 @@ class custom_tags_plugin extends Plugin
 				'btn_title_close_all_tags' => T_('Close all tags'),
 			);
 
-		expose_var_to_js( 'custom_tags_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_custom_tags_toolbar_config' );
+		// Toolbar plugins extending this plugin will also use the same JS var evo_init_custom_tags_toolbar_config.
+		// We prefix the config params with the plugin code to avoid overriding existing params.
+		expose_var_to_js( $this->code.'_'.$params['js_prefix'], $js_config, 'evo_init_custom_tags_toolbar_config' );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $js_code_prefix.'toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
