@@ -214,33 +214,7 @@ if( $site_Skin->has_sub_menus() )
 { // Check if "Back to Top" button is enabled
 ?>
 <a class="btn btn-primary slide-top<?php echo ( show_toolbar() ? ' slide-top-toolbar' : '' ).( $site_Skin->get_setting( 'fixed_header' ) ? ' slide-top-fixed-header' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
-
-<script type="text/javascript">
-	// Scroll to Top
-	// ======================================================================== /
-	// browser window scroll ( in pixels ) after which the "scroll to top" link is show
-	var offset = 400,
-	// browser window scroll (in pixels) after which the "scroll to top" link opacity is reduced
-	offset_opacity = 1200,
-	// duration of the top scrolling animatiion (in ms)
-	scroll_top_duration = 700,
-	// grab the "back to top" link
-	$slide_top = jQuery( '.slide-top' );
-	
-	// hide or show the "scroll to top" link
-	jQuery( window ).scroll( function()
-	{
-		( jQuery( this ).scrollTop() > offset ) ? $slide_top.addClass( 'slide-top-visible' ) : $slide_top.removeClass( 'slide-top-visible' );
-	});
-
-	// Smooth scroll to top
-	$slide_top.on( 'click', function(event)
-	{
-		event.preventDefault();
-		jQuery( 'body, html' ).animate(
-		{
-			scrollTop: 0,
-		}, scroll_top_duration );
-	} );
-</script>
-<?php } ?>
+<?php
+}
+expose_var_to_js( 'evo_init_scroll_to_top', true );
+?>

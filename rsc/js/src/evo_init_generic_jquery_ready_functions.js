@@ -12,7 +12,36 @@
  */
 jQuery( document ).ready( function() 
 {
+	// Scroll to Top
+	if( typeof( evo_init_scroll_to_top ) != 'undefined' )
+	{
+		// browser window scroll ( in pixels ) after which the "scroll to top" link is show
+		// setting this variable directly under window as this is also referenced by slidedown.init.js
+		window.offset = 400,
+		// browser window scroll (in pixels) after which the "scroll to top" link opacity is reduced
+		offset_opacity = 1200,
+		// duration of the top scrolling animatiion (in ms)
+		scroll_top_duration = 700,
+		// grab the "back to top" link
+		$slide_top = jQuery( '.slide-top' );
+		
+		// hide or show the "scroll to top" link
+		jQuery( window ).scroll( function()
+		{
+			( jQuery( this ).scrollTop() > offset ) ? $slide_top.addClass( 'slide-top-visible' ) : $slide_top.removeClass( 'slide-top-visible' );
+		});
 
+		// Smooth scroll to top
+		$slide_top.on( 'click', function(event)
+		{
+			event.preventDefault();
+			jQuery( 'body, html' ).animate(
+			{
+				scrollTop: 0,
+			}, scroll_top_duration );
+		} );
+	}
+	
 	// Datepicker
 	if( typeof( evo_init_datepicker ) != 'undefined' )
 	{
