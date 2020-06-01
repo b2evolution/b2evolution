@@ -860,9 +860,11 @@ if( $action == 'view' )
 }
 elseif( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
+	echo '<span class="btn-group">';
 	echo '<input type="button" class="btn btn-default" value="'.T_('Check all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\' ).prop( \'checked\', true );" /> '.
 		'<input type="button" class="btn btn-default" value="'.T_('Uncheck all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).prop( \'checked\', false );" /> '.
-		'<input type="button" class="btn btn-default" value="'.T_('Reverse').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).each( function() { this.checked = !this.checked } );" /> ';
+		'<input type="button" class="btn btn-default" value="'.T_('Reverse').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).each( function() { this.checked = !this.checked } );" />';
+	echo '</span> ';
 
 	echo T_('With checked posts').': ';
 
@@ -870,8 +872,10 @@ elseif( $allow_items_list_form )
 	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
 	echo_status_dropdown_button_js( 'post' );
 
+	echo ' <span class="btn-group">';
 	$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
 	$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
+	echo '</span> ';
 	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Items only for PRO version:
 		$Form->button( array( 'submit', 'actionArray[mass_export]', T_('Export to XML') ) );
