@@ -1001,6 +1001,7 @@ class ItemListLight extends DataObjectList2
 				'display_status'      => true,
 				'status_text'         => T_('Status').': ',
 				'statuses_text'       => T_('Statuses').': ',
+				'statuses_nor_text'   => T_('All but '),
 
 				'display_itemtype'    => true,
 				'type_text'           => T_('Item Type').': ',
@@ -1419,7 +1420,7 @@ class ItemListLight extends DataObjectList2
 		}
 
 
-		// EXTRA STATUSES:
+		// EXTRA(WORKFLOW/TASK) STATUSES:
 		if( $params['display_status'] )
 		{
 			if( ! empty( $this->filters['statuses'] ) || ! empty( $this->filters['statuses_array'] ) )
@@ -1431,31 +1432,60 @@ class ItemListLight extends DataObjectList2
 				{	// Filter by array of statuses is used currently:
 					$filter_statuses = $this->filters['statuses_array'];
 					$filter_status_param = $this->param_prefix.'statuses';
+					$task_status_separator = $params['separator_or'];
+					$task_status_prefix = '';
 				}
-				else
+				elseif( ! empty( $this->filters['statuses'] ) )
 				{	// Filter by list/string of statuses is used currently:
 					$filter_statuses = explode( ',', $this->filters['statuses'] );
 					$filter_status_param = $this->param_prefix.'status';
+					if( strlen( $filter_statuses[0] ) > 1 &&
+					    substr( $filter_statuses[0], 0, 1 ) == '-' )
+					{	// Filter to exclude by statuses:
+						$filter_statuses[0] = substr( $filter_statuses[0], 1 );
+						$task_status_separator = $params['separator_nor'];
+						$task_status_prefix = $params['statuses_nor_text'];
+						$params['status_text'] = $params['statuses_text'];
+					}
+					else
+					{	// Filter to include by statuses:
+						$task_status_separator = $params['separator_or'];
+						$task_status_prefix = '';
+					}
+				}
+				else
+				{	// No filters by status:
+					$filter_statuses = array();
 				}
 				$ItemStatusCache = & get_ItemStatusCache();
+				$task_status_titles = array();
 				foreach( $filter_statuses as $filter_status )
 				{
 					if( $filter_status == '-' )
 					{	// Without status:
 						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $filter_status_param.'=-' ) ) : '';
-						$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						$task_status_titles[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask_nogroup'] );
 					}
 					elseif( $ItemStatus = & $ItemStatusCache->get_by_ID( $filter_status, false, false ) )
 					{	// Specific status:
 						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $filter_status_param.'='.$ItemStatus->ID ) ) : '';
-						$title_array[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						$task_status_titles[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( $params['status_text'], $ItemStatus->get_name(), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
 							$params['filter_mask'] );
 					}
 				}
-				$filter_class_i++;
+				if( count( $task_status_titles ) > 0 )
+				{
+					$task_status_titles_string = $task_status_prefix.implode( $task_status_separator, $task_status_titles );
+					$title_array['task_statuses'] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $task_status_titles ) > 1 ?
+							array( $params['statuses_text'], $params['before_items'].$task_status_titles_string.$params['after_items'] ) :
+							array( $params['status_text'], $task_status_titles_string ) ),
+						$params['group_mask'] );
+					$filter_class_i++;
+				}
 			}
 		}
 

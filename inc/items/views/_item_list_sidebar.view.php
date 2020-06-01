@@ -198,10 +198,21 @@ if( count( $ItemStatusCache->cache ) )
 
 	echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="-" class="radio"'.( $status == '-' || ( is_array( $statuses ) && in_array( '-', $statuses ) ) ? ' checked="checked"' : '' ).' />';
 	echo ' <a href="'.regenerate_url( $pp.'status,'.$pp.'statuses', $pp.'status=-' ).'">'.T_('Without status').'</a></li>';
+	if( ! empty( $status ) )
+	{
+		if( substr( $status, 0, 1 ) == '-' )
+		{
+			$status = substr( $status, 1 );
+		}
+		if( ! empty( $status ) )
+		{
+			$statuses = explode( ',', $status );
+		}
+	}
 
 	foreach( $ItemStatusCache->cache as $loop_Obj )
 	{
-		echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="'.$loop_Obj->ID.'" class="radio"'.( $status == $loop_Obj->ID || ( is_array( $statuses ) && in_array( $loop_Obj->ID, $statuses ) ) ? ' checked="checked"' : '' ).' />';
+		echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="'.$loop_Obj->ID.'" class="radio"'.( is_array( $statuses ) && in_array( $loop_Obj->ID, $statuses ) ? ' checked="checked"' : '' ).' />';
 		echo ' <a href="'.regenerate_url( $pp.'status,'.$pp.'statuses', $pp.'status='.$loop_Obj->ID ).'">';
 		$loop_Obj->disp('name');
 		echo '</a></li>';
