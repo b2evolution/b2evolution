@@ -221,8 +221,9 @@ if( count( $ItemStatusCache->cache ) )
 
 	// Buttons to check/uncheck all status filters:
 	echo '<div class="btn-group">';
-		echo '<button type="button" class="btn btn-default" data-check-all="'.$pp.'statuses[]">'.get_icon( 'check_all' ).'</button> ';
-		echo '<button type="button" class="btn btn-default" data-uncheck-all="'.$pp.'statuses[]">'.get_icon( 'uncheck_all' ).'</button>';
+		echo '<button type="button" class="btn btn-xs btn-default" data-check-all="'.$pp.'statuses[]">'.get_icon( 'check_all', 'imgtag', array( 'class' => 'middle' ) ).'</button> ';
+		echo '<button type="button" class="btn btn-xs btn-default" data-uncheck-all="'.$pp.'statuses[]">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => 'middle' ) ).'</button>';
+		echo '<button type="button" class="btn btn-xs btn-default" data-check-reverse="'.$pp.'statuses[]">'.get_icon( 'refresh', 'imgtag', array( 'class' => 'middle' ) ).'</button>';
 	echo '</div>';
 	?>
 	<script>
@@ -233,6 +234,10 @@ if( count( $ItemStatusCache->cache ) )
 	jQuery( 'button[data-uncheck-all]' ).click( function()
 	{	// Uncheck all checkboxes by input name:
 		jQuery( 'input[name="' + jQuery( this ).data( 'uncheck-all' ) + '"]' ).prop( 'checked', false );
+	} );
+	jQuery( 'button[data-check-reverse]' ).click( function()
+	{	// Reverse checkboxes by input name:
+		jQuery( 'input[name="' + jQuery( this ).data( 'check-reverse' ) + '"]' ).prop( 'checked', function( i, val ) { return ! val; } );
 	} );
 	</script>
 	<?php
