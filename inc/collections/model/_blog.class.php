@@ -1229,6 +1229,7 @@ class Blog extends DataObject
 
 			// Search results:
 			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
+			$this->set_setting( 'search_enable', param( 'search_enable', 'integer', 0 ) );
 			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
 			$this->set_setting( 'search_sort_by', param( 'search_sort_by', 'string' ) );
 			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );

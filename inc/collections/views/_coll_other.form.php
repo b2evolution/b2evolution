@@ -33,6 +33,7 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 
 $Form->begin_fieldset( TB_('Search results').get_manual_link( 'search-results-other' ) );
+	$Form->checkbox( 'search_enable', $edited_Blog->get_setting( 'search_enable' ), TB_('Enable search') );
 	$Form->text( 'search_per_page', $edited_Blog->get_setting( 'search_per_page' ), 4, TB_('Results per page'), '', 4 );
 	$Form->radio( 'search_sort_by', $edited_Blog->get_setting( 'search_sort_by' ), array(
 			array( 'score', TB_('Score') ),

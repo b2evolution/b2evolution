@@ -280,6 +280,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Other settings:
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
+			'search_enable' => 1,
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'search_sort_by'       => 'score', // Sort type of results on disp=search ('score', 'date')
 			'search_include_cats'  => 1, // Include categories to results on disp=search
