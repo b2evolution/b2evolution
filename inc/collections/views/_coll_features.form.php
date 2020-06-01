@@ -34,6 +34,8 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( TB_('Post list').get_manual_link('item-list-features') );
 
+	$Form->checkbox( 'postlist_enable', $edited_Blog->get_setting( 'postlist_enable' ), TB_('Enable Post list') );
+
 	// Display the 3 orderby fields with order direction
 	for( $order_index = 0; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
 	{ // The order fields:

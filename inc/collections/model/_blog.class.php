@@ -1082,6 +1082,9 @@ class Blog extends DataObject
 				$this->set_setting( 'orderdir_2', param( 'orderdir_2', 'string', '' ) );
 			}
 
+			$postlist_enable = param( 'postlist_enable', 'integer', 0 );
+			$this->set_setting( 'postlist_enable', $postlist_enable );
+
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
 

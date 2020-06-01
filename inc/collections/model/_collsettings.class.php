@@ -50,6 +50,7 @@ class CollectionSettings extends AbstractSettings
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
 			'permalinks'      => 'single',				// single, archive, subchap
+			'postlist_enable' => 1,
 
 		// Page 2,3,4..; settings:
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages

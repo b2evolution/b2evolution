@@ -2639,6 +2639,12 @@ function skin_opengraph_tags()
 			break;
 
 		case 'posts':
+			if( ! $Blog->get_setting( 'postlist_enable' ) )
+			{	// If post list is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-post-list-disabled';
+			}
 			$intro_Item = & get_featured_Item( $disp, NULL, true );
 			if( $intro_Item )
 			{
