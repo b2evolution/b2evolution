@@ -470,9 +470,9 @@ class markdown_plugin extends Plugin
 
 		$js_config = array(
 				'js_prefix' => $params['js_prefix'],
-				'enable_text_styles' => $text_styles_enabled,
-				'enable_links'       => $links_enabled,
-				'enable_images'      => $images_enabled,
+				'enable_text_styles' => (int) $text_styles_enabled,
+				'enable_links'       => (int) $links_enabled,
+				'enable_images'      => (int) $images_enabled,
 
 				'btn_title_bold'   => T_('Bold'),
 				'btn_title_italic' => T_('Italic'),
