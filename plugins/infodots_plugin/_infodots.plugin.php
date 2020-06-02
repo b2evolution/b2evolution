@@ -95,17 +95,17 @@ class infodots_plugin extends Plugin
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
+		{	// Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		$this->require_css( 'infodots.css' );
+		$this->require_css_async( 'infodots.css', false, 'footerlines' );
 
 		// Bubbletip
-		require_js_defer( '#jquery#', 'blog' );
-		require_js_defer( 'jquery/jquery.bubbletip.min.js', 'blog' );
-		require_css( 'jquery/jquery.bubbletip.css', 'blog' );
-		$this->require_js_defer( 'infodots.init.js' );
+		require_js_defer( '#jquery#', 'blog', false, '#', 'footerlines' );
+		require_js_defer( 'jquery/jquery.bubbletip.min.js', 'blog', false, '#', 'footerlines' );
+		require_css_async( 'jquery/jquery.bubbletip.css', 'blog', NULL, NULL, '#', false, 'footerlines' );
+		$this->require_js_defer( 'infodots.init.js', false, 'footerlines' );
 	}
 
 
@@ -260,36 +260,36 @@ class infodots_plugin extends Plugin
 		$link_ID = intval( $matches[3] );
 
 		if( empty( $link_ID ) || empty( $matches ) || empty( $this->object_ID ) )
-		{ // Skip this incorrect match
+		{	// Skip this incorrect match
 			return;
 		}
 
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
 		if( ! $Link )
-		{ // Inform about invalid Link ID
+		{	// Inform about invalid Link ID
 			return '<div style="color:#F00"><b>'.T_('Invalid Link ID').' - '.$matches[0].'</b></div>';
 		}
 
 		if( $this->dot_numbers === NULL )
-		{ // Init dot numbers array first time
+		{	// Init dot numbers array first time
 			$this->dot_numbers = array();
 		}
 
 		if( ! isset( $this->dot_numbers[ $link_ID ] ) )
-		{ // Start to calculate number of the dots for current Link object
+		{	// Start to calculate number of the dots for current Link object
 			$this->dot_numbers[ $link_ID ] = 1;
 		}
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
-		{ // Load dots only once
+		{	// Load dots only once
 			if( $this->dots === NULL )
-			{ // Init dots array first time
+			{	// Init dots array first time
 				$this->dots = array();
 			}
 
 			if( ! isset( $this->dots[ $link_ID ] ) )
-			{ // Init sub array for each Link
+			{	// Init sub array for each Link
 				$this->dots[ $link_ID ] = array();
 			}
 
@@ -301,17 +301,17 @@ class infodots_plugin extends Plugin
 		}
 
 		if( $only_load_dot )
-		{ // Exit here to don't execute a code below
+		{	// Exit here to don't execute a code below
 			return;
 		}
 
 		$dot_num = $this->dot_numbers[ $link_ID ];
 		if( empty( $matches[6] ) )
-		{ // No defined width
+		{	// No defined width
 			$tooltip_width = '';
 		}
 		else
-		{ // Set css style for width
+		{	// Set css style for width
 			$tooltip_width = substr( $matches[6], 1 );
 			$tooltip_width = ( strlen( intval( $tooltip_width ) ) == strlen( $tooltip_width ) ? $tooltip_width.'px' : $tooltip_width );
 			$tooltip_width = ' style="width:'.$tooltip_width.'"';
@@ -321,7 +321,7 @@ class infodots_plugin extends Plugin
 		$this->dot_numbers[ $link_ID ]++;
 
 		// Print this element that will be used for tooltip of the dot
-		return '<div class="infodots_info" id="infodot_'.$link_ID.'_'.$dot_num.'"'.$dot_xy.$tooltip_width.'>'
+		return '<div class="infodots_info" id="infodot_'.$link_ID.'_'.$dot_num.'"'.$dot_xy.$tooltip_width.' style="display:none">'
 				.balance_tags( $matches[7] )
 			.'</div>'."\n";
 	}
@@ -358,7 +358,7 @@ class infodots_plugin extends Plugin
 	function render_infodots( & $params, $content )
 	{
 		if( empty( $params['File'] ) || empty( $params['Link'] ) )
-		{ // Check input data
+		{	// Check input data
 			return;
 		}
 
@@ -366,12 +366,12 @@ class infodots_plugin extends Plugin
 		$Link = $params['Link'];
 
 		if( ! $File->is_image() )
-		{ // This plugin works only with image files
+		{	// This plugin works only with image files
 			return;
 		}
 
 		if( ( $LinkOwner = & $Link->get_LinkOwner() ) === false || ( $Collection = $Blog = & $LinkOwner->get_Blog() ) === false )
-		{ // Couldn't get Blog object
+		{	// Couldn't get Blog object
 			return;
 		}
 
@@ -380,25 +380,25 @@ class infodots_plugin extends Plugin
 
 		if( $File->get_image_size( 'width' ) < $this->get_coll_setting( 'coll_min_width', $Blog ) ||
 		    $thumbnail_width < $this->get_coll_setting( 'coll_min_width', $Blog ) )
-		{ // Don't draw a dot on image if width is less than setting value
+		{	// Don't draw a dot on image if width is less than setting value
 			return;
 		}
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
-		{ // Load the info dots if they were not loaded before:
+		{	// Load the info dots if they were not loaded before:
 			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" (data-)?xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
 				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}
 
 		if( empty( $this->dots[ $Link->ID ] ) )
-		{ // No dots for this Link
+		{	// No dots for this Link
 			return;
 		}
 
 		$before_image = '<div class="infodots_image">'."\n";
 		foreach( $this->dots[ $Link->ID ] as $d => $dot )
-		{ // Init html element for each dot
+		{	// Init html element for each dot
 			$before_image .= '<div class="infodots_dot" rel="infodot_'.$Link->ID.'_'.( $d + 1 ).'" style="left:'.$dot['x'].';top:'.$dot['y'].'"></div>'."\n";
 		}
 
