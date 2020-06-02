@@ -4760,10 +4760,10 @@ class Plugin
 	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
 	 *                'immediate' or FALSE to load javascript immediately
 	 */
-	function require_js( $js_file, $output = false, $async_defer = false )
+	function require_js( $js_file, $output = false, $async_defer = false, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'absolute', $async_defer, $output, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'absolute', $async_defer, $output, $this->version.'+'.$app_version_long, $position );
 	}
 
 
@@ -4773,9 +4773,9 @@ class Plugin
 	 * @param string Name of JavaScript file relative to plugin folder
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js_async( $js_file, $output = false )
+	function require_js_async( $js_file, $output = false, $position = 'headlines' )
 	{
-		$this->require_js( $js_file, $output, 'async' );
+		$this->require_js( $js_file, $output, 'async', $position );
 	}
 
 
@@ -4785,9 +4785,9 @@ class Plugin
 	 * @param string Name of JavaScript file relative to plugin folder
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js_defer( $js_file, $output = false )
+	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
 	{
-		$this->require_js( $js_file, $output, 'defer' );
+		$this->require_js( $js_file, $output, 'defer', $position );
 	}
 
 

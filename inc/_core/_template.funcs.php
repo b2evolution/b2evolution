@@ -1269,7 +1269,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#' )
+function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#', $position = 'headlines' )
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
@@ -1289,7 +1289,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 	{	// Dependency : ensure jQuery is loaded
 		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
 		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
-		require_js_defer( '#jquery#', $relative_to, false, $version );
+		require_js_defer( '#jquery#', $relative_to, false, $version, $position );
 	}
 
 	// Get library url of JS file by alias name
@@ -1319,7 +1319,14 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 		}
 		else
 		{ // Add script tag to <head>
-			add_headline( $script_tag, $js_file, $relative_to );
+			if( $position == 'headlines' )
+			{
+				add_headline( $script_tag, $js_file, $relative_to );
+			}
+			elseif( $position == 'footerlines' )
+			{
+				add_footerline( $script_tag, $js_file, $relative_to );
+			}
 		}
 	}
 
@@ -1340,9 +1347,9 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#' )
+function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
-	require_js( $js_file, $relative_to, 'async', $output, $version );
+	require_js( $js_file, $relative_to, 'async', $output, $version, $position );
 }
 
 
@@ -1354,9 +1361,9 @@ function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, 
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#' )
+function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
-	require_js( $js_file, $relative_to, 'defer', $output, $version );
+	require_js( $js_file, $relative_to, 'defer', $output, $version, $position );
 }
 
 

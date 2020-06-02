@@ -2397,11 +2397,12 @@ class Skin extends DataObject
 	 * this function is used to add unique version number for each skin
 	 *
 	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 * @param string Position where the CSS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_css( $css_file )
+	function require_css( $css_file, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_css( $this->get_url().$css_file, 'absolute', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_css( $this->get_url().$css_file, 'absolute', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long, $position );
 	}
 
 
@@ -2415,11 +2416,12 @@ class Skin extends DataObject
 	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
 	 *                'immediate' or FALSE to load javascript immediately
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js( $js_file, $async_defer = false, $output = false )
+	function require_js( $js_file, $async_defer = false, $output = false, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_js( $this->get_url().$js_file, 'absolute', $async_defer, $output, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_js( $this->get_url().$js_file, 'absolute', $async_defer, $output, $this->folder.'+'.$this->version.'+'.$app_version_long, $position );
 	}
 
 
@@ -2428,10 +2430,11 @@ class Skin extends DataObject
 	 *
 	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js_async( $js_file, $output = false )
+	function require_js_async( $js_file, $output = false, $position = 'headlines' )
 	{
-		$this->require_js( $js_file, 'async', $output );
+		$this->require_js( $js_file, 'async', $output, $position );
 	}
 
 
@@ -2440,10 +2443,11 @@ class Skin extends DataObject
 	 *
 	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js_defer( $js_file, $output = false )
+	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
 	{
-		$this->require_js( $js_file, 'defer', $output );
+		$this->require_js( $js_file, 'defer', $output, $position );
 	}
 
 
