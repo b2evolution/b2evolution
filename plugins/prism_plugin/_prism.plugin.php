@@ -345,39 +345,33 @@ class prism_plugin extends Plugin
 	{
 		global $Collection, $Blog, $disp;
 
-		$load_assets = $this->get_coll_setting('load_plugin_assets', $Blog);
+		$load_assets = $this->get_coll_setting( 'load_plugin_assets', $Blog );
 		switch( $disp )
 		{
 			case 'single':
 			case 'page':
-				global $Item;
+				/*global $Item;
 				if( $Item )
 				{	// Check if this plugin is enabled for the Item:
 					if( !in_array( $this->code, $Item->get_renderers() ) )
 					{
 						return false;
 					}
-				}
+				}*/
 				$r = 'single';
 				break;
 
 			case 'posts':
-				$r = 'posts';
-				break;
-
 			case 'comments':
-				$r = 'comments';
-				break;
-	
 			case 'front':
-				$r = 'front';
+				$r = $disp;
 				break;
 
 			default:
 				$r = 'other_disps';
 		}
 
-		return isset($load_assets[$r]) && $load_assets[$r];
+		return ! empty( $load_assets[ $r ] );
 	}
 
 
@@ -393,8 +387,8 @@ class prism_plugin extends Plugin
 
 		if( ( $ctrl == 'campaigns' ) && ( get_param( 'tab' ) == 'send' ) && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
-			$this->require_css( 'css/prism.min.css', false, 'footerlines' );
+			$this->require_js_defer( 'js/prism.min.js', false, 'footerlines' );
+			$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
 		}
 	}
 
@@ -409,7 +403,6 @@ class prism_plugin extends Plugin
 	function SkinEndHtmlBody( & $params )
 	{
 		global $Collection, $Blog;
-		global $Item;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
@@ -417,10 +410,10 @@ class prism_plugin extends Plugin
 		{	// Don't load css/js files when plugin is not enabled
 			return;
 		}
-		
+
 		if( $this->load_assets() )
 		{
-			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
+			$this->require_js_defer( 'js/prism.min.js', false, 'footerlines' );
 			$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
 		}
 	}
