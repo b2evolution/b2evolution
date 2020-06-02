@@ -120,7 +120,7 @@ class content_block_Widget extends ComponentWidget
 		$template_options = $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 				.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-				array( 'onclick' => 'return b2template_list_highlight( this )' ),
+				array( 'target' => '_blank' ),
 				array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
 		$ItemTypeCache = & get_ItemTypeCache();

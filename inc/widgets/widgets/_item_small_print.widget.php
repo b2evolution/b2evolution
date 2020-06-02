@@ -117,7 +117,7 @@ class item_small_print_Widget extends ComponentWidget
 					'defaultvalue' => 'item_details_smallprint_standard',
 					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'target' => '_blank' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 					'class' => 'evo_template_select',
 				),
