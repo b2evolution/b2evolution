@@ -350,6 +350,14 @@ class prism_plugin extends Plugin
 		{
 			case 'single':
 			case 'page':
+				global $Item;
+				if( $Item )
+				{	// Check if this plugin is enabled for the Item:
+					if( !in_array( $this->code, $Item->get_renderers() ) )
+					{
+						return false;
+					}
+				}
 				$r = 'single';
 				break;
 
@@ -374,15 +382,34 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 * Event handler: Called right after displaying the admin page footer.
 	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterPageFooter( & $params )
+	{
+		global $ctrl;
+
+		if( ( $ctrl == 'campaigns' ) && ( get_param( 'tab' ) == 'send' ) && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
+			$this->require_css( 'css/prism.min.css', false, 'footerlines' );
+		}
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the end of the generated page.
 	 *
 	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead( & $params )
+	function SkinEndHtmlBody( & $params )
 	{
 		global $Collection, $Blog;
+		global $Item;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
@@ -395,24 +422,6 @@ class prism_plugin extends Plugin
 		{
 			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
 			$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
-		}
-	}
-
-
-	/**
-	 * Event handler: Called when ending the admin html head section.
-	 *
-	 * @param array Associative array of parameters
-	 * @return boolean did we do something?
-	 */
-	function AdminEndHtmlHead( & $params )
-	{
-		global $ctrl;
-
-		if( $this->load_assets() && ( $ctrl == 'campaigns' ) && ( get_param( 'tab' ) == 'send' ) && $this->get_email_setting( 'email_apply_rendering' ) )
-		{	// Load this only on form to preview email campaign:
-			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
-			$this->require_css( 'css/prism.min.css', false, 'footerlines' );
 		}
 	}
 
