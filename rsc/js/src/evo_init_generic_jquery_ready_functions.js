@@ -87,13 +87,13 @@ jQuery( document ).ready( function()
 		var comment_reply_items = Object.values(evo_init_comment_reply_config);
 		for( var i = 0; i < comment_reply_items.length; i++ )
 		{
-			(function() {
+			//(function() {
 				var config = comment_reply_items[i];
 
-				jQuery( 'a.comment_reply' ).click( function()
+				jQuery( document ).on( 'click', 'a.comment_reply', function()
 				{	// The click action for the links "Reply to this comment"
 					var comment_ID = jQuery( this ).attr( 'rel' );
-					
+
 					// Remove data of a previous comment
 					jQuery( 'a.comment_reply_current' ).remove();
 					jQuery( 'input[name=reply_ID]' ).remove();
@@ -107,7 +107,7 @@ jQuery( document ).ready( function()
 					jQuery( this ).addClass( 'active' ).html( config.link_back_current_comment_msg );
 
 					// Scroll to the comment form
-					jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
+					jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_' + config.item_ID ).offset().top - 30 );
 
 					return false;
 				} );
@@ -121,7 +121,7 @@ jQuery( document ).ready( function()
 
 					return false;
 				} );
-			} );
+			//} );
 		}
 	}
 
