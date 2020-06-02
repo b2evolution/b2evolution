@@ -4759,6 +4759,7 @@ class Plugin
 	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
 	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
 	 *                'immediate' or FALSE to load javascript immediately
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
 	function require_js( $js_file, $output = false, $async_defer = false, $position = 'headlines' )
 	{
@@ -4772,6 +4773,7 @@ class Plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
 	function require_js_async( $js_file, $output = false, $position = 'headlines' )
 	{
@@ -4784,6 +4786,7 @@ class Plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
 	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
 	{
