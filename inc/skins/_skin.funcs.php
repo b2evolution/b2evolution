@@ -2658,6 +2658,14 @@ function skin_opengraph_tags()
 				}
 			}
 
+		case 'search':
+			if( ! $Blog->get_setting( 'search_enable' ) )
+			{	// If search is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-search-disabled';
+			}
+
 		default:
 			if( $Blog )
 			{
