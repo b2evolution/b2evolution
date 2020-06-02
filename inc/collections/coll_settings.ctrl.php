@@ -149,6 +149,7 @@ switch( $action )
 			case 'features':
 			case 'contact':
 			case 'userdir':
+			case 'search':
 			case 'other':
 			case 'popup':
 			case 'metadata':
@@ -1100,6 +1101,13 @@ else
 			$AdminUI->set_page_manual_link( 'features-user-directory' );
 			break;
 
+		case 'search':
+			$AdminUI->set_path( 'collections', 'features', $tab );
+			$AdminUI->breadcrumbpath_add( TB_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
+			$AdminUI->breadcrumbpath_add( TB_('Search'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+			$AdminUI->set_page_manual_link( 'features-search' );
+			break;
+
 		case 'other':
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( TB_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
@@ -1226,6 +1234,9 @@ else
 					break;
 				case 'userdir':
 					$AdminUI->disp_view( 'collections/views/_coll_user_dir.form.php' );
+					break;
+				case 'search':
+					$AdminUI->disp_view( 'collections/views/_coll_search.form.php' );
 					break;
 				case 'other':
 					$AdminUI->disp_view( 'collections/views/_coll_other.form.php' );

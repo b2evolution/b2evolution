@@ -1224,8 +1224,8 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_lastseen_cheat', param( 'userdir_lastseen_cheat', 'integer', 0 ) );
 		}
 
-		if( in_array( 'other', $groups ) )
-		{ // we want to load the other settings:
+		if( in_array( 'search', $groups ) )
+		{ // we want to load the search settings:
 
 			// Search results:
 			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
@@ -1279,6 +1279,10 @@ class Blog extends DataObject
 			$this->set_setting( 'search_result_template_file', param( 'search_result_template_file', 'string' ) );
 			$this->set_setting( 'search_result_template_category', param( 'search_result_template_category', 'string' ) );
 			$this->set_setting( 'search_result_template_tag', param( 'search_result_template_tag', 'string' ) );
+		}
+
+		if( in_array( 'other', $groups ) )
+		{ // we want to load the other settings:
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );

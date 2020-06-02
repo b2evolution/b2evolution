@@ -870,6 +870,9 @@ class collections_Module extends Module
 							'userdir' => array(
 								'text' => T_('User directory'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),
+							'search' => array(
+								'text' => T_('Search'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=search&amp;blog='.$blog ),
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
