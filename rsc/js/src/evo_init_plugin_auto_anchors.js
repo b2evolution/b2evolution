@@ -23,7 +23,7 @@ jQuery( document ).ready( function()
 			if( jQuery( this ).attr( 'id' ) && jQuery( this ).hasClass( 'evo_auto_anchor_header' ) )
 			{	// Only if it has id attribute and it was genereated by this plugin
 				var current_url = location.href.replace( /#.+$/, '' ) + '#' + jQuery( this ).attr( 'id' );
-				jQuery( this ).append( ' <a href="' + current_url + '" class="evo_auto_anchor_link"><span class="fa fa-link"></span></a>' );
+				jQuery( this ).append( ' <a href="' + current_url + '" class="evo_auto_anchor_link" style="visibility:hidden"><span class="fa fa-link"></span></a>' );
 			}
 		} );
 

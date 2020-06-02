@@ -140,7 +140,8 @@ class auto_anchors_plugin extends Plugin
 			return;
 		}
 
-		$this->require_css( 'auto_anchors.css' );
+		$this->require_css_async( 'auto_anchors.css', false, 'footerlines' );
+
 		// JS for initialize anchor icons and for better scrolling:
 		// NOTE: we need this on each page because content bloc items may be included as widget even on front page!
 		expose_var_to_js( 'evo_plugin_auto_anchors_settings', '{
