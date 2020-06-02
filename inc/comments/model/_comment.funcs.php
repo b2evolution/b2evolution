@@ -924,43 +924,15 @@ function echo_comment_reply_js( $Item )
 		return false;
 	}
 
-?>
-<script>
-jQuery( 'a.comment_reply' ).click( function()
-{	// The click action for the links "Reply to this comment"
-	var comment_ID = jQuery( this ).attr( 'rel' );
+	$js_config = array(
+			'item_ID' => $Item->ID,
+			'reply_button_msg' => T_('Reply to this comment'),
+			'link_back_url' => url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ),
+			'link_back_specifc_comment_msg' => T_('You are currently replying to a specific comment'),
+			'link_back_current_comment_msg' => TS_('You are currently replying to this comment'),
+		);
 
-	// Remove data of a previous comment
-	jQuery( 'a.comment_reply_current' ).remove();
-	jQuery( 'input[name=reply_ID]' ).remove();
-	jQuery( 'a.comment_reply' ).removeClass( 'active' )
-		.html( '<?php echo TS_('Reply to this comment') ?>' );
-
-	// Add data for a current comment
-	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
-	var hidden_reply_ID = '<input type="hidden" name="reply_ID" value="' + comment_ID + '" />';
-	jQuery( '#evo_comment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
-
-	jQuery( this ).addClass( 'active' )
-		.html( '<?php echo TS_('You are currently replying to this comment') ?>' );
-	// Scroll to the comment form
-	jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
-
-	return false;
-} );
-
-jQuery( document ).on( 'click', 'a.comment_reply_current', function()
-{	// The click action for a link "You are currently replying to a specific comment"
-	var comment_ID = jQuery( this ).attr( 'rel' );
-
-	// Scroll to the comment
-	jQuery( window ).scrollTop( jQuery( 'a#c' + comment_ID ).offset().top - 10 );
-
-	return false;
-} );
-</script>
-<?php
-
+	expose_var_to_js('item_'.$Item->ID, $js_config, 'evo_init_comment_reply_config');
 }
 
 

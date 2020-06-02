@@ -81,6 +81,50 @@ jQuery( document ).ready( function()
 		jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } );
 	}
 
+	// Comment Reply
+	if( typeof( evo_init_comment_reply_config ) != 'undefined' )
+	{
+		var comment_reply_items = Object.values(evo_init_comment_reply_config);
+		for( var i = 0; i < comment_reply_items.length; i++ )
+		{
+			(function() {
+				var config = comment_reply_items[i];
+
+				jQuery( 'a.comment_reply' ).click( function()
+				{	// The click action for the links "Reply to this comment"
+					var comment_ID = jQuery( this ).attr( 'rel' );
+					
+					// Remove data of a previous comment
+					jQuery( 'a.comment_reply_current' ).remove();
+					jQuery( 'input[name=reply_ID]' ).remove();
+					jQuery( 'a.comment_reply' ).removeClass( 'active' ).html( config.reply_button_msg );
+
+					// Add data for a current comment
+					var link_back_comment = '<a href="' + config.link_back_url + '#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '">'
+							+ config.link_back_specifc_comment_msg + '</a>';
+					var hidden_reply_ID = '<input type="hidden" name="reply_ID" value="' + comment_ID + '" />';
+					jQuery( '#evo_comment_form_id_' + config.item_ID ).prepend( link_back_comment + hidden_reply_ID );
+					jQuery( this ).addClass( 'active' ).html( config.link_back_current_comment_msg );
+
+					// Scroll to the comment form
+					jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
+
+					return false;
+				} );
+
+				jQuery( document ).on( 'click', 'a.comment_reply_current', function()
+				{	// The click action for a link "You are currently replying to a specific comment"
+					var comment_ID = jQuery( this ).attr( 'rel' );
+
+					// Scroll to the comment
+					jQuery( window ).scrollTop( jQuery( 'a#c' + comment_ID ).offset().top - 10 );
+
+					return false;
+				} );
+			} );
+		}
+	}
+
 	// disp=download
 	if( typeof( evo_disp_download_delay_config ) != 'undefined' )
 	{
