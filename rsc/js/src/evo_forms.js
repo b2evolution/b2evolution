@@ -19,3 +19,18 @@ jQuery( document ).on( 'keydown', 'textarea, input', function ( e )
 		jQuery( this ).closest( "form" ).submit();
 	}
 } );
+
+// Check/Uncheck/Reverse all checkboxes by input name:
+jQuery( document ).on( 'click', 'button[data-checkbox-control]', function()
+{
+	var checked_state = true;
+	switch( jQuery( this ).data( 'checkbox-control-type' ) )
+	{
+		case 'uncheck':
+			checked_state = false;
+			break;
+		case 'reverse':
+			checked_state = function( i, val ) { return ! val };
+	}
+	jQuery( 'input[name="' + jQuery( this ).data( 'checkbox-control' ) + '"]' ).prop( 'checked', checked_state );
+} );

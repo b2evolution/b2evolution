@@ -37,7 +37,7 @@ global $tab;
 global ${$pp.'flagged'}, ${$pp.'mustread'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'},
 		${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'},
 		${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'involves'}, ${$pp.'involves_login'},
-		${$pp.'status'}, ${$pp.'statuses'}, ${$pp.'types'};
+		${$pp.'status'}, ${$pp.'statuses'}, ${$pp.'types'}, ${$pp.'renderers'};
 
 $flagged = ${$pp.'flagged'};
 $mustread = ${$pp.'mustread'};
@@ -56,6 +56,7 @@ $involves_login = ${$pp.'involves_login'};
 $status = ${$pp.'status'};
 $statuses = ${$pp.'statuses'};
 $types = ${$pp.'types'};
+$renderers = ${$pp.'renderers'};
 
 
 load_funcs( 'skins/_skin.funcs.php' );
@@ -219,28 +220,9 @@ if( count( $ItemStatusCache->cache ) )
 	}
 	echo '</ul>';
 
-	// Buttons to check/uncheck all status filters:
-	echo '<div class="btn-group">';
-		echo '<button type="button" class="btn btn-xs btn-default" data-check-all="'.$pp.'statuses[]">'.get_icon( 'check_all', 'imgtag', array( 'class' => 'middle' ) ).'</button> ';
-		echo '<button type="button" class="btn btn-xs btn-default" data-uncheck-all="'.$pp.'statuses[]">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => 'middle' ) ).'</button>';
-		echo '<button type="button" class="btn btn-xs btn-default" data-check-reverse="'.$pp.'statuses[]">'.get_icon( 'refresh', 'imgtag', array( 'class' => 'middle' ) ).'</button>';
-	echo '</div>';
-	?>
-	<script>
-	jQuery( 'button[data-check-all]' ).click( function()
-	{	// Check all checkboxes by input name:
-		jQuery( 'input[name="' + jQuery( this ).data( 'check-all' ) + '"]' ).prop( 'checked', true );
-	} );
-	jQuery( 'button[data-uncheck-all]' ).click( function()
-	{	// Uncheck all checkboxes by input name:
-		jQuery( 'input[name="' + jQuery( this ).data( 'uncheck-all' ) + '"]' ).prop( 'checked', false );
-	} );
-	jQuery( 'button[data-check-reverse]' ).click( function()
-	{	// Reverse checkboxes by input name:
-		jQuery( 'input[name="' + jQuery( this ).data( 'check-reverse' ) + '"]' ).prop( 'checked', function( i, val ) { return ! val; } );
-	} );
-	</script>
-	<?php
+	// Buttons to check/uncheck/reverse all status filters:
+	$Form->checkbox_controls( $pp.'statuses' );
+
 	$Form->end_fieldset();
 }
 
@@ -424,6 +406,32 @@ $Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
 	'itemlist_prefix' => $pp,       // Prefix of the ItemList object
 ) );
 $Form->end_fieldset();
+
+// RENDERER PLUGINS:
+global $Plugins;
+$renderer_plugins = $Plugins->get_renderer_options( NULL, array(
+	'setting_name' => 'coll_apply_rendering',
+	'Blog'         => $Blog,
+) );
+if( count( $renderer_plugins ) )
+{	// Display only if at least one renderer plugin is allowed to be selected/unselected per Item of the current Collection:
+	$Form->begin_fieldset( T_('Uses Renderer'), array( 'id' => 'items_filter_renderer', 'fold' => true, 'default_fold' => empty( $renderers ) ) );
+	echo '<ul>';
+
+	foreach( $renderer_plugins as $renderer_plugin )
+	{
+		echo '<li><input type="checkbox" name="'.$pp.'renderers[]" value="'.format_to_output( $renderer_plugin['code'], 'formvalue' ).'" class="checkbox"'.( is_array( $renderers ) && in_array( $renderer_plugin['code'], $renderers ) ? ' checked="checked"' : '' ).' />';
+		echo ' <a href="'.regenerate_url( $pp.'renderers', $pp.'renderers[]='.$renderer_plugin['code'] ).'">';
+		echo $renderer_plugin['name'];
+		echo '</a></li>';
+	}
+	echo '</ul>';
+
+	// Buttons to check/uncheck/reverse all renderer plugin filters:
+	$Form->checkbox_controls( $pp.'renderers' );
+
+	$Form->end_fieldset();
+}
 
 $Form->end_form();
 

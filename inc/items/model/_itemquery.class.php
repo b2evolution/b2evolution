@@ -1226,6 +1226,53 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific renderer plugins
+	 *
+	 * @param array Renderer plugin codes
+	 */
+	function where_renderers( $renderers )
+	{
+		global $DB, $Plugins;
+
+		if( empty( $renderers ) )
+		{	// No filters:
+			return;
+		}
+
+		foreach( $renderers as $r => $renderer )
+		{	// Escape chars:
+			$renderers[ $r ] = $DB->escape( $renderer );
+		}
+
+		$sql_conditions = array();
+
+		if( isset( $Plugins, $this->Blog ) )
+		{	// Get default renderer plugins for current Collection:
+			$default_renderers = $Plugins->validate_renderer_list( array( 'default' ), array(
+				'setting_name' => 'coll_apply_rendering',
+				'Blog'         => $this->Blog,
+			) );
+			if( ! empty( $default_renderers ) )
+			{
+				foreach( $renderers as $renderer )
+				{
+					if( in_array( $renderer, $default_renderers ) )
+					{	// If at least one default renderer plugin is used to filter then get items which still use default renderers:
+						$sql_conditions[] = $this->dbprefix.'renderers = "default"';
+						break;
+					}
+				}
+			}
+		}
+
+		// Filter by selected renderers:
+		$sql_conditions[] = $this->dbprefix.'renderers REGEXP "(^|\.)('.implode( '|', $renderers ).')(\.|$)"';
+
+		$this->WHERE_and( implode( ' OR ', $sql_conditions ) );
+	}
+
+
+	/**
 	 * Generate order by clause
 	 *
 	 * @param $order_by

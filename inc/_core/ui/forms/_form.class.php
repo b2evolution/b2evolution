@@ -2122,6 +2122,34 @@ class Form extends Widget
 
 
 	/**
+	 * Control icon/buttons to check/uncheck/reverse all checkboxes by input name
+	 *
+	 * @param string the name of the checkbox
+	 * @param array Additional parameters
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function checkbox_controls( $field_name, $params = array() )
+	{
+		$params = array_merge( array(
+				'before_buttons' => '<div class="btn-group">',
+				'after_buttons'  => '</div>',
+				'button_class'   => 'btn btn-default btn-xs',
+				'icon_class'     => 'middle',
+			), $params );
+
+		$r = $params['before_buttons'];
+
+		$r .= '<button type="button" class="'.$params['button_class'].'" data-checkbox-control="'.$field_name.'[]" data-checkbox-control-type="check">'.get_icon( 'check_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button> ';
+		$r .= '<button type="button" class="'.$params['button_class'].'" data-checkbox-control="'.$field_name.'[]" data-checkbox-control-type="uncheck">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
+		$r .= '<button type="button" class="'.$params['button_class'].'" data-checkbox-control="'.$field_name.'[]" data-checkbox-control-type="reverse">'.get_icon( 'refresh', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
+
+		$r .= $params['after_buttons'];
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
 	 * Builds the form field
 	 *
 	 * @param string the class to use for the form tag

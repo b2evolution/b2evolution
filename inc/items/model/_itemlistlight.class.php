@@ -161,6 +161,7 @@ class ItemListLight extends DataObjectList2
 				'posts' => $this->limit,
 				'page' => 1,
 				'featured' => NULL,
+				'renderers' => NULL,
 			) );
 	}
 
@@ -332,6 +333,11 @@ class ItemListLight extends DataObjectList2
 			 */
 			// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
 			memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
+
+			/*
+			 * Restrict to selected renderer plugins:
+			 */
+			memorize_param( $this->param_prefix.'renderers', 'array:string', $this->default_filters['renderers'], $this->filters['renderers'] );
 
 			/*
 			 * OLD STYLE orders:
@@ -559,6 +565,11 @@ class ItemListLight extends DataObjectList2
 						, true, false, true, false );	// Array of sharings to restrict to
 
 		/*
+		 * Restrict to selected renderer plugins:
+		 */
+		$this->filters['renderers'] = param( $this->param_prefix.'renderers', 'array:string', $this->default_filters['renderers'], true );
+
+		/*
 		 * Ordering:
 		 */
 		$this->filters['order'] = param( $this->param_prefix.'order', '/^(asc|desc)([ ,](asc|desc))*$/i', $this->default_filters['order'], true );		// ASC or DESC
@@ -669,6 +680,7 @@ class ItemListLight extends DataObjectList2
 			$this->ItemQuery->where_locale_visibility();
 		}
 		$this->ItemQuery->where_mustread( $this->filters['mustread'] );
+		$this->ItemQuery->where_renderers( $this->filters['renderers'] );
 
 
 		/*
@@ -927,6 +939,7 @@ class ItemListLight extends DataObjectList2
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$lastpost_ItemQuery->where_visibility( $this->filters['visibility_array'] );
 		$lastpost_ItemQuery->where_locale_visibility();
+		$lastpost_ItemQuery->where_renderers( $this->filters['renderers'] );
 
 		/*
 		 * order by stuff:
@@ -1022,6 +1035,10 @@ class ItemListLight extends DataObjectList2
 				'display_limit'       => true,
 				'display_flagged'     => true,
 				'display_mustread'    => true,
+
+				'display_renderer'    => true,
+				'renderer_text'       => T_('Renderer').': ',
+				'renderers_text'      => T_('Renderers').': ',
 
 				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
 				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
@@ -1704,6 +1721,36 @@ class ItemListLight extends DataObjectList2
 				$title_array['mustread'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 					array( T_('Must read'), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
 					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+
+		// RENDERERS:
+		if( $params['display_renderer'] &&
+		    ! empty( $this->filters['renderers'] ) )
+		{
+			global $Plugins;
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			$task_renderer_titles = array();
+			foreach( $this->filters['renderers'] as $renderer_plugin_code )
+			{
+				if( $renderer_Plugin = & $Plugins->get_by_code( $renderer_plugin_code, false, false ) )
+				{
+					$renderer_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'renderers='.$renderer_Plugin->code ) ) : '';
+					$task_renderer_titles[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( $params['renderer_text'], $renderer_Plugin->name, $renderer_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+			}
+			if( count( $task_renderer_titles ) > 0 )
+			{
+				$task_renderer_titles_string = implode( $params['separator_or'], $task_renderer_titles );
+				$title_array['task_renderers'] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $task_renderer_titles ) > 1 ?
+						array( $params['renderers_text'], $params['before_items'].$task_renderer_titles_string.$params['after_items'] ) :
+						array( $params['renderer_text'], $task_renderer_titles_string ) ),
+					$params['group_mask'] );
 				$filter_class_i++;
 			}
 		}
