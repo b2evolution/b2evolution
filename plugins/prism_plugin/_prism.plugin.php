@@ -36,6 +36,30 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Define here default custom settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'load_plugin_assets' => array(
+				'label' => T_('Load plugin JS/CSS on'),
+				'type' => 'checklist',
+				'options' => array(
+					array( 'single', sprintf( T_('%s, %s, if enabled'), 'disp=single', 'disp=page'), 1 ),
+					array( 'posts', 'disp=posts', 0 ),
+					array( 'comments', 'disp=comments', 0 ),
+					array( 'front', 'disp=front', 0 ),
+					array( 'other_disps', T_('other disps'), 0 ),
+				)
+			),
+		);
+	}
+
+
+	/**
 	 * Filters out the custom tag that would not validate, PLUS escapes the actual code.
 	 *
 	 * @param mixed $params
@@ -315,6 +339,41 @@ class prism_plugin extends Plugin
 
 
 	/**
+	 * Check if plugin JS or CSS should be loaded based on the current $disp
+	 */
+	function load_assets()
+	{
+		global $Collection, $Blog, $disp;
+
+		$load_assets = $this->get_coll_setting('load_plugin_assets', $Blog);
+		switch( $disp )
+		{
+			case 'single':
+			case 'page':
+				$r = 'single';
+				break;
+
+			case 'posts':
+				$r = 'posts';
+				break;
+
+			case 'comments':
+				$r = 'comments';
+				break;
+	
+			case 'front':
+				$r = 'front';
+				break;
+
+			default:
+				$r = 'other_disps';
+		}
+
+		return isset($load_assets[$r]) && $load_assets[$r];
+	}
+
+
+	/**
 	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
 	 *
 	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
@@ -331,9 +390,12 @@ class prism_plugin extends Plugin
 		{	// Don't load css/js files when plugin is not enabled
 			return;
 		}
-
-		$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
-		$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
+		
+		if( $this->load_assets() )
+		{
+			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
+			$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
+		}
 	}
 
 
@@ -347,7 +409,7 @@ class prism_plugin extends Plugin
 	{
 		global $ctrl;
 
-		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
+		if( $this->load_assets() && ( $ctrl == 'campaigns' ) && ( get_param( 'tab' ) == 'send' ) && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
 			$this->require_js_async( 'js/prism.min.js', false, 'footerlines' );
 			$this->require_css( 'css/prism.min.css', false, 'footerlines' );
