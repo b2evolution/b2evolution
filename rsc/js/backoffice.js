@@ -334,16 +334,26 @@ function b2template_list_highlight( obj )
 		link_url += '&highlight=' + selected_template;
 	}
 
-	if( window.self !== window.top )
+	var new_target = link.attr('target');
+	
+	if ( new_target === undefined ) 
 	{
-		window.top.location = link_url;
+		if( window.self !== window.top )
+		{
+			window.top.location = link_url;
+		}
+		else
+		{
+			window.location = link_url;
+		}
 	}
 	else
 	{
-		window.location = link_url;
+		window.open( link_url, new_target );
 	}
+
 	return false;
-} 
+}
 
 
 /**

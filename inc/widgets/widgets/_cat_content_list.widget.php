@@ -99,7 +99,7 @@ class cat_content_list_Widget extends ComponentWidget
 		$template_options = array( NULL => T_('No template') ) + $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 				.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-				array( 'target' => '_blank' ),
+				array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 				array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
 		// Get all catgories of the widget Collection:
