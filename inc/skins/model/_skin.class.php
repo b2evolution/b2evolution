@@ -2402,7 +2402,7 @@ class Skin extends DataObject
 	function require_css( $css_file, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_css( $this->get_url().$css_file, 'absolute', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long, $position );
+		require_css( $this->get_url().$css_file, 'absolute', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long, false, $position );
 	}
 
 
