@@ -345,7 +345,8 @@ class prism_plugin extends Plugin
 	{
 		global $Collection, $Blog, $disp, $evo_renderers_used_in_current_page;
 
-		if( isset( $evo_renderers_used_in_current_page[ $this->ID ] ) )
+		if( is_array( $evo_renderers_used_in_current_page ) &&
+		    in_array( $this->code, $evo_renderers_used_in_current_page ) )
 		{	// Load load CSS/JS files if this plugin is used on the current page by any Item, Comment, etc.:
 			return true;
 		}

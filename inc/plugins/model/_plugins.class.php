@@ -1342,7 +1342,7 @@ class Plugins
 
 
 	/**
-	 * Render the content of an item by calling the relevant renderer plugins.
+	 * Render the content of an item, Comment, Message, Widget by calling the relevant renderer plugins.
 	 *
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
@@ -1350,6 +1350,7 @@ class Plugins
 	 *        'entityencoded', 'xml', 'htmlfeed' and 'text' are supported.
 	 * @param array Additional params to the Render* methods (e.g. "Item" for items).
 	 *              Do not use "data" or "format" here, because it gets used internally.
+	 * @param string Prefix of render function: 'Render' - for rendering at save in DB time, 'Display' - for rendering at display on screen time
 	 * @return string rendered content
 	 */
 	function render( & $content, $renderers, $format, $params, $event_prefix = 'Render' )
@@ -1411,6 +1412,7 @@ class Plugins
 		{	// Initialize array for curently used renderer plugins once:
 			$evo_renderers_used_in_current_page = array();
 		}
+		$evo_renderers_used_in_current_page += $renderers;
 
 		foreach( $renderer_Plugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
@@ -1418,10 +1420,6 @@ class Plugins
 			if( $loop_RendererPlugin->is_renderer_enabled( $apply_rendering_value, $renderers ) )
 			{ // Plugin is enabled to call method
 				$this->call_method( $loop_RendererPlugin->ID, $event, $params );
-				if( ! isset( $evo_renderers_used_in_current_page[ $loop_RendererPlugin->ID ] ) )
-				{	// Collect only enabled rendered plugin:
-					$evo_renderers_used_in_current_page[ $loop_RendererPlugin->ID ] = $loop_RendererPlugin->code;
-				}
 			}
 		}
 
