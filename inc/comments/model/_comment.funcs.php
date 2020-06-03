@@ -914,25 +914,20 @@ function echo_comment_reply_js( $Item )
 {
 	global $Collection, $Blog;
 
-	if( !isset( $Blog ) )
-	{
-		return false;
-	}
-
-	if( !$Blog->get_setting( 'threaded_comments' ) )
-	{
+	if( ! isset( $Blog ) || ! $Blog->get_setting( 'threaded_comments' ) )
+	{	// If threaded comments are not enabled for current Collection:
 		return false;
 	}
 
 	$js_config = array(
 			'item_ID' => $Item->ID,
-			'reply_button_msg' => T_('Reply to this comment'),
+			'reply_button_msg' => TS_('Reply to this comment'),
 			'link_back_url' => url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ),
-			'link_back_specifc_comment_msg' => T_('You are currently replying to a specific comment'),
+			'link_back_specific_comment_msg' => TS_('You are currently replying to a specific comment'),
 			'link_back_current_comment_msg' => TS_('You are currently replying to this comment'),
 		);
 
-	expose_var_to_js('item_'.$Item->ID, $js_config, 'evo_init_comment_reply_config');
+	expose_var_to_js( 'evo_init_comment_reply_config', $js_config );
 }
 
 
