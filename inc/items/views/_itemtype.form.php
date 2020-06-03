@@ -783,7 +783,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 				custom_field_type_inputs = custom_field_type_inputs.replace( cf_field_regexp, '$1 selected="selected"' );
 			}
 		}
-		custom_field_type_inputs = custom_field_type_inputs.replace( /(<input type="checkbox"[^>]+name="cf_(required|meta|public)[^"]+")/, '$1 checked="checked"' );
+		custom_field_type_inputs = custom_field_type_inputs.replace( /(<input type="checkbox"[^>]+name="cf_(required|meta|public)[^"]+")/g, '$1 checked="checked"' );
 	}
 
 	// Insert a row of new adding field:
