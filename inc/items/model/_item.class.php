@@ -4241,10 +4241,26 @@ class Item extends ItemLight
 
 			if( get_param( 'preview' ) === 1 && get_param( 'preview_block' ) === 1 )
 			{	// Display orange debug wrapper around included content-block Item:
+				// Item debug info with Title + Slug:
+				$title_debug_info = '<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get( 'urltitle' ).')';
+				if( $item_edit_url = $content_Item->get_edit_url() )
+				{	// Link to edit Item if current User has a permission:
+					$title_debug_info = '<a href="'.$item_edit_url.'">'.$title_debug_info.'</a>';
+				}
+				// Content Template debug info with Name + Code:
+				$TemplateCache = & get_TemplateCache();
+				if( $content_Template = & $TemplateCache->get_localized_by_code( $tag_template, false, false ) )
+				{	// Display template info:
+					$template_debug_info = '<b>'.$content_Template->get( 'name' ).'</b> ('.$content_Template->get( 'code' ).')';
+					if( check_user_perm( 'options', 'edit' ) )
+					{	// Link to edit Template if current User has a permission:
+						$template_debug_info = '<a href="'.get_admin_url( 'ctrl=templates&amp;action=edit&amp;tpl_ID='.$content_Template->ID ).'">'.$template_debug_info.'</a>';
+					}
+					$title_debug_info .= ' / '.$template_debug_info;
+				}
 				$current_tag_item_content = '<div class="dev-blocks dev-blocks--content-block">'."\n"
 					.'<div class="dev-blocks-name">'
-						.$content_Item->get_edit_link( array( 'before' => '<span class="dev-blocks-action">', 'after' => '</span>', 'text' => T_('Edit') ) )
-						.'<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get( 'urltitle' ).')'
+						.$title_debug_info
 					.'</div>'."\n"
 					.$current_tag_item_content."\n"
 				.'</div>';

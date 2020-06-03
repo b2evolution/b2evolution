@@ -24,22 +24,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function render_template_code( $code, & $params, $objects = array(), & $used_template_tags = NULL )
 {
-	global $current_locale;
-
 	$TemplateCache = & get_TemplateCache();
-	if( ! ( $Template = & $TemplateCache->get_by_code( $code, false, false ) ) )
-	{
-		return false;
-	}
-
-	// Check if the template has a child matching the current locale:
-	$localized_templates = $Template->get_localized_templates( $current_locale );
-	if( ! empty( $localized_templates ) )
-	{	// Use localized template:
-		$Template = & $localized_templates[0];
-	}
-
-	if( $Template )
+	if( $Template = & $TemplateCache->get_localized_by_code( $code, false, false ) )
 	{	// Render variables in available Template:
 		return render_template( $Template->template_code, $params, $objects, $used_template_tags );
 	}
