@@ -44,11 +44,11 @@ class prism_plugin extends Plugin
 	function get_custom_setting_definitions( & $params )
 	{
 		return array(
-			'load_plugin_assets' => array(
-				'label' => T_('Load plugin JS/CSS on'),
+			'force_load_assets' => array(
+				'label' => T_('Force loading plugin JS/CSS on'),
 				'type' => 'checklist',
 				'options' => array(
-					array( 'single', sprintf( T_('%s, %s, if enabled'), 'disp=single', 'disp=page'), 1 ),
+					array( 'single', 'disp=single, disp=page', 0 ),
 					array( 'posts', 'disp=posts', 0 ),
 					array( 'comments', 'disp=comments', 0 ),
 					array( 'front', 'disp=front', 0 ),
@@ -343,35 +343,32 @@ class prism_plugin extends Plugin
 	 */
 	function load_assets()
 	{
-		global $Collection, $Blog, $disp;
+		global $Collection, $Blog, $disp, $evo_renderers_used_in_current_page;
 
-		$load_assets = $this->get_coll_setting( 'load_plugin_assets', $Blog );
+		if( isset( $evo_renderers_used_in_current_page[ $this->ID ] ) )
+		{	// Load load CSS/JS files if this plugin is used on the current page by any Item, Comment, etc.:
+			return true;
+		}
+
+		// Force to load CSS/JS files even if this plugin is NOT used on the current page:
+		$force_load_assets = $this->get_coll_setting( 'force_load_assets', $Blog );
 		switch( $disp )
 		{
 			case 'single':
 			case 'page':
-				/*global $Item;
-				if( $Item )
-				{	// Check if this plugin is enabled for the Item:
-					if( !in_array( $this->code, $Item->get_renderers() ) )
-					{
-						return false;
-					}
-				}*/
-				$r = 'single';
+				$asset_disp = 'single';
 				break;
 
 			case 'posts':
 			case 'comments':
 			case 'front':
-				$r = $disp;
+				$asset_disp = $disp;
 				break;
 
 			default:
-				$r = 'other_disps';
+				$asset_disp = 'other_disps';
 		}
-
-		return ! empty( $load_assets[ $r ] );
+		return ! empty( $force_load_assets[ $asset_disp ] );
 	}
 
 

@@ -1354,8 +1354,6 @@ class Plugins
 	 */
 	function render( & $content, $renderers, $format, $params, $event_prefix = 'Render' )
 	{
-		// echo implode(',',$renderers);
-
 		$params['data'] = & $content;
 		$params['format'] = $format;
 
@@ -1407,14 +1405,23 @@ class Plugins
 			$setting_Blog = & get_setting_Blog( 'default_blog_ID' );
 		}
 
+		// Collect all renderer plugins used in current page in order to know when we really need to load their JS/CSS files:
+		global $evo_renderers_used_in_current_page;
+		if( ! is_array( $evo_renderers_used_in_current_page ) )
+		{	// Initialize array for curently used renderer plugins once:
+			$evo_renderers_used_in_current_page = array();
+		}
+
 		foreach( $renderer_Plugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code, ':';
-
 			$apply_rendering_value = $loop_RendererPlugin->get_coll_setting( 'coll_apply_rendering', $setting_Blog );
 			if( $loop_RendererPlugin->is_renderer_enabled( $apply_rendering_value, $renderers ) )
 			{ // Plugin is enabled to call method
 				$this->call_method( $loop_RendererPlugin->ID, $event, $params );
+				if( ! isset( $evo_renderers_used_in_current_page[ $loop_RendererPlugin->ID ] ) )
+				{	// Collect only enabled rendered plugin:
+					$evo_renderers_used_in_current_page[ $loop_RendererPlugin->ID ] = $loop_RendererPlugin->code;
+				}
 			}
 		}
 
