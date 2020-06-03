@@ -32,5 +32,31 @@ jQuery( document ).on( 'click', 'button[data-checkbox-control]', function()
 		case 'reverse':
 			checked_state = function( i, val ) { return ! val };
 	}
-	jQuery( 'input[name="' + jQuery( this ).data( 'checkbox-control' ) + '"]' ).prop( 'checked', checked_state );
+	var checkboxes = jQuery( this ).data( 'checkbox-control' ) == '$all$'
+		? jQuery( this ).closest( 'form' ).find( 'input[type=checkbox]' )
+		: jQuery( 'input[type=checkbox][name="' + jQuery( this ).data( 'checkbox-control' ) + '[]"]' );
+	checkboxes.prop( 'checked', checked_state );
+} );
+
+// Surround styles for checkboxes:
+jQuery( document ).on( 'mouseover mouseout', 'button[data-checkbox-control]', function( e )
+{
+	var control_type = jQuery( this ).data( 'checkbox-control-type' );
+	var checkboxes = jQuery( this ).data( 'checkbox-control' ) == '$all$'
+		? jQuery( this ).closest( 'form' ).find( 'input[type=checkbox]' )
+		: jQuery( 'input[type=checkbox][name="' + jQuery( this ).data( 'checkbox-control' ) + '[]"]' );
+	checkboxes.each( function()
+	{
+		if( e.type == 'mouseout' )
+		{	// Remove surround style on mouse out:
+			jQuery( this ).unwrap( '.checkbox_surround' );
+		}
+		else if( jQuery( this ).parent( 'span.checkbox_surround' ).length == 0 && (
+			( control_type == 'check' && ! jQuery( this ).prop( 'checked' ) ) ||
+			( control_type == 'uncheck' && jQuery( this ).prop( 'checked' ) ) ||
+			( control_type == 'reverse' ) ) )
+		{	// Add surround style only when it is needed:
+			jQuery( this ).wrap( '<span class="checkbox_surround"></span>' );
+		}
+	} );
 } );

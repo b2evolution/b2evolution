@@ -163,7 +163,7 @@ class ResultSel extends Results
 
 		if( $can_edit )
 		{ // links to check all and uncheck all
-			echo $this->Form->check_all();
+			echo $this->Form->checkbox_controls( '$all$', array( 'button_class' => 'btn btn-default' ) );
 		}
 
 		if( check_user_perm( 'selections', 'view' ) )
@@ -241,12 +241,12 @@ function selection_checkbox( $item_ID, $param_prefix )
 
 	if( check_user_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
-		$r .= '<span name="surround_check" class="checkbox_surround_init"><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value="'.$item_ID.'"';
+		$r .= '<input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value="'.$item_ID.'"';
 		if( in_array( $item_ID, $cols_check ) )
 		{	// already in selection:
 			$r .= ' checked="checked" ';
 		}
-		$r .= ' /></span>';
+		$r .= ' />';
 	}
 	else
 	{	// User CANNOT edit:

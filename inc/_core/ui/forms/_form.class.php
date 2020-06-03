@@ -75,11 +75,6 @@ class Form extends Widget
 	var $hiddens = array();
 
 	/**
-	 * Do we need to add javascript for check/uncheck all functionality
-	 */
-	var $check_all = false;
-
-	/**
 	 * Additional Javascript to append to the form, in {@link Form::end_form()}.
 	 *
 	 * @access protected
@@ -2099,36 +2094,23 @@ class Form extends Widget
 
 	/**
 	 * Return links to check and uncheck all check boxes of the form
+	 * 
+	 * @deprecated use Form::checkbox_controls() instead
 	 */
 	function check_all()
 	{
-		// Need to add event click on links at the form end.
-		$this->check_all = true;
-
-		$r = '<span class="btn-group">';
-
-		// fp> This is "name=" and I mean it!!! The JS is looking for all elements with this name!
-		$r .= '<a name="check_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
-				//.T_('Check all').' '
-				.get_icon( 'check_all', 'imgtag', NULL, true )
-				.'</a> <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
-				//.T_('Uncheck all').' '
-				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
-
-		$r .= '</span>';
-
-		return $r;
+		return $this->checkbox_controls( '$all$', array( 'button_class' => 'btn btn-default' ) );
 	}
 
 
 	/**
 	 * Control icon/buttons to check/uncheck/reverse all checkboxes by input name
 	 *
-	 * @param string the name of the checkbox
+	 * @param string Field name of the checkbox, '$all$' - to control all checkboxes of this Form
 	 * @param array Additional parameters
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox_controls( $field_name, $params = array() )
+	function checkbox_controls( $field_name = '$all$', $params = array() )
 	{
 		$params = array_merge( array(
 				'before_buttons' => '<div class="btn-group">',
@@ -2139,9 +2121,11 @@ class Form extends Widget
 
 		$r = $params['before_buttons'];
 
-		$r .= '<button type="button" class="'.$params['button_class'].'" data-checkbox-control="'.$field_name.'[]" data-checkbox-control-type="check">'.get_icon( 'check_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button> ';
-		$r .= '<button type="button" class="'.$params['button_class'].'" data-checkbox-control="'.$field_name.'[]" data-checkbox-control-type="uncheck">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
-		$r .= '<button type="button" class="'.$params['button_class'].'" data-checkbox-control="'.$field_name.'[]" data-checkbox-control-type="reverse">'.get_icon( 'refresh', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
+		$button_tag_start = '<button type="button" class="'.format_to_output( $params['button_class'], 'htmlattr' ).'" data-checkbox-control="'.format_to_output( $field_name, 'htmlattr' ).'" data-checkbox-control-type';
+
+		$r .= $button_tag_start.'="check">'.get_icon( 'check_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button> ';
+		$r .= $button_tag_start.'="uncheck">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
+		$r .= $button_tag_start.'="reverse">'.T_('Invert').'</button>';
 
 		$r .= $params['after_buttons'];
 
@@ -2374,12 +2358,6 @@ class Form extends Widget
 					if( typeof init_dynamicSelect == "function" )
 					{
 						jQuery( document ).bind( "ready", init_dynamicSelect );
-						';
-						if( $this->check_all )
-						{ // Init check_all event on check_all links
-							$r .= 'jQuery( document ).bind( "ready", init_check_all );';
-						}
-						$r .= '
 					}
 					';
 
@@ -2419,11 +2397,11 @@ class Form extends Widget
 	 * @param string name
 	 * @param string label
 	 * @param boolean true to surround checkboxes if they are required
-	 * @param boolean true add a surround_check span, used by check_all mouseover
+	 * @param boolean true add a surround_check span, used by check_all mouseover @deprecated
 	 * @param array Params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false, $field_params = array() )
+	function checklist( $options, $field_name, $field_label, $required = false, $dummy = NULL, $field_params = array() )
 	{
 		$field_params = array_merge( array(
 				'wide' => false,
@@ -2470,16 +2448,6 @@ class Form extends Widget
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
 			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'"'.$extra_attribs.'>';
 
-			if( $add_highlight_spans )
-			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
-				$r .= '<span name="surround_check" class="checkbox_surround_init">';
-				$after_field_highlight = '</span>';
-			}
-			else
-			{
-				$after_field_highlight = '';
-			}
-
 			$after_field = '';
 			if( param_has_error( $field_name ) )
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
@@ -2510,8 +2478,6 @@ class Form extends Widget
 			$r .= ' class="'.$this->inputclass_checkbox.'" />';
 
 			$r .= $after_field;
-
-			$r .= $after_field_highlight;
 
 			$r .= ' '.$option[2];
 

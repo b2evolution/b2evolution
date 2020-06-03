@@ -186,7 +186,6 @@ $Form->begin_form();
 		/********************    Checkbox:    *******************/
 
 		echo '<td class="checkbox firstcol">';
-		echo '<span name="surround_check" class="checkbox_surround_init">';
 		echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 					name="fm_selected[]" value="'.format_to_output( $lFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_'.$countFiles.'"';
 		if( $checkall || $selected_Filelist->contains( $lFile ) )
@@ -194,7 +193,6 @@ $Form->begin_form();
 			echo ' checked="checked"';
 		}
 		echo ' />';
-		echo '</span>';
 
 		/***********  Hidden info used by Javascript:  ***********/
 
@@ -641,7 +639,7 @@ $Form->begin_form();
 
 		<?php
 		echo '<div id="evo_multi_file_selector" class="pull-left"'.( $countFiles == 0 ? ' style="display:none"' : '' ).'>';
-			echo $Form->check_all();
+			$Form->checkbox_controls( 'fm_selected', array( 'button_class' => 'btn btn-default' ) );
 			$Form->add_crumb( 'file' );
 
 			$field_options = array();
