@@ -829,15 +829,14 @@ if( $inskin && !empty( $Blog ) )
 
 // Display reg form:
 
+// Use skin of default Collection for login/registration:
+if( ! ( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) ) )
+{	// Don't allow registration standard form without specific Collection for login/registration:
+	$Messages->add( sprintf( T_('Collection ID #%d does not exist for login/registration.'), intval( $Settings->get( 'login_blog_ID' ) ) ), 'error' );
+	header_redirect( $baseurl );
+}
 $SkinCache = & get_SkinCache();
-if( $login_Blog = & get_setting_Blog( 'login_blog_ID', NULL, false, false, true ) )
-{	// Use skin of default Collection for login/registration or of first found Collection:
-	$Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
-}
-else
-{	// Get first found Skin:
-	$Skin = & $SkinCache->get_first();
-}
+$Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
 
 require_js_defer('#jquery#');
 require_js_defer( 'src/evo_init_password_indicator.js', 'rsc_url' );
