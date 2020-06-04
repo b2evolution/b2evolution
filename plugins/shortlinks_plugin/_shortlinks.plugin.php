@@ -230,7 +230,7 @@ class shortlinks_plugin extends Plugin
 				( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
 				( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
-				( \]\] | \)\) )                    # Lookahead for )) or ]]
+				( \]{2,} | \){2,} )                # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
 			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
@@ -244,7 +244,7 @@ class shortlinks_plugin extends Plugin
 				( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
 				( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
-				( \]\] | \)\) )                    # Lookahead for )) or ]]
+				( \]{2,} | \){2,} )                # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
 			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
@@ -351,7 +351,7 @@ class shortlinks_plugin extends Plugin
 					'.$search_anchor_slug_itemid.'
 					(?=
 						( \s .*? )?                 # Custom link text instead of post or chapter title with optional style classes
-						( \)\) | \]\] )             # Lookahead for )) or ]]
+						( \){2,} | \]{2,} )             # Lookahead for )) or ]]
 					)
 				/x'.$regexp_modifier; // x = extended (spaces + comments allowed)
 			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
@@ -412,7 +412,7 @@ class shortlinks_plugin extends Plugin
 						( \s \.[a-z0-9_\-\.]+ )? # Style classes started and separated with dot (Optional)
 						( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
 						( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
-						( \]\] | \)\) )          # Lookahead for )) or ]]
+						( \]{2,} | \){2,} )      # Lookahead for )) or ]]
 						*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
 
 					$content = replace_content_outcode_shorttags( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
@@ -432,10 +432,15 @@ class shortlinks_plugin extends Plugin
 	 */
 	function callback_replace_bracketed_urls( $m )
 	{
-		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[7] == '))' ) )
+		if( ! ( $m[1] == '[[' && substr( $m[7], 0, 2 ) == ']]' ) &&
+		    ! ( $m[1] == '((' && substr( $m[7], 0, 2 ) == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
+		}
+
+		if( strlen( $m[7] ) > 2 )
+		{	// Fix Custom link text with appending chars ] or ) if it is ended with chars ] or ):
+			$m[6] .= substr( $m[7], 0, -2 );
 		}
 
 		// Clear custom link text:
@@ -475,10 +480,15 @@ class shortlinks_plugin extends Plugin
 	{
 		global $blog, $evo_charset, $admin_url;
 
-		if( ! ( $m[1] == '[[' && $m[5] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[5] == '))' ) )
+		if( ! ( $m[1] == '[[' && substr( $m[5], 0, 2 ) == ']]' ) &&
+		    ! ( $m[1] == '((' && substr( $m[5], 0, 2 ) == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
+		}
+
+		if( strlen( $m[5] ) > 2 )
+		{	// Fix Custom link text with appending chars ] or ) if it is ended with chars ] or ):
+			$m[4] .= substr( $m[5], 0, -2 );
 		}
 
 		$ItemCache = & get_ItemCache();
@@ -1020,7 +1030,7 @@ class shortlinks_plugin extends Plugin
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( (https?://|//).+/ ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
-					( \]\] | \)\) ) # Lookahead for )) or ]]
+					( \]{2,} | \){2,} ) # Lookahead for )) or ]]
 					*ix', // x = extended (spaces + comments allowed)
 				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
@@ -1031,7 +1041,7 @@ class shortlinks_plugin extends Plugin
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( /(.+/)? ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
-					( \]\] | \)\) ) # Lookahead for )) or ]]
+					( \]{2,} | \){2,} ) # Lookahead for )) or ]]
 					*ix', // x = extended (spaces + comments allowed)
 				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
@@ -1048,8 +1058,8 @@ class shortlinks_plugin extends Plugin
 	 */
 	function optimize_urls_callback( $m )
 	{
-		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[7] == '))' ) )
+		if( ! ( $m[1] == '[[' && substr( $m[7], 0, 2 ) == ']]' ) &&
+		    ! ( $m[1] == '((' && substr( $m[7], 0, 2 ) == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
 		}
@@ -1059,6 +1069,11 @@ class shortlinks_plugin extends Plugin
 		{	// This is an absolute URL but this is an external URLs,
 			// don't optimize this URL to slug:
 			return $m[0];
+		}
+
+		if( strlen( $m[7] ) > 2 )
+		{	// Fix Custom link text with appending chars ] or ) if it is ended with chars ] or ):
+			$m[6] .= substr( $m[7], 0, -2 );
 		}
 
 		$slug = $m[5];

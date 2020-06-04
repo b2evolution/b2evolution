@@ -943,6 +943,11 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 		foreach( $matches[0] as $l => $l_matching )
 		{	// Build arrays with a source code of the matching blocks and with temporary replacement
+			if( substr( $l_matching[0], 1, 1 ) == '[' )
+			{	// Exception for match out short tags,
+				// We should not replace a char(usually a space) before short tag like [image:123]:
+				$l_matching[0] = substr( $l_matching[0], 1 );
+			}
 			$evo_non_matching_blocks[ $level ][ '?'.$l.$unique_replacement.$l.'?' ] = $l_matching[0];
 		}
 
