@@ -408,68 +408,86 @@ jQuery( document ).ready( function()
 
 		window.resize_coll_activity_stat_widget = function resize_coll_activity_stat_widget()
 			{
-				var	originalData = [], weekData = [], xLabels = [],
-					displayed = coll_activity_stats_widget_config['time_period'];
-
-				if( plot == undefined )
+				var charts = Object.values( window.activity_stats_widgets );
+				for( var m = 0; m < charts.length; m++ )
 				{
-					plot = jQuery( '#canvasbarschart' ).data( 'plot' );
-					xLabels = plot.axes.xaxis.ticks.slice(0);
-					for( var i = 0; i < plot.series.length; i++ )
+					var plot = charts[m];
+
+					if( plot._original == undefined )
 					{
-						originalData.push( plot.series[i].data.slice(0) );
+						
+						plot._display = coll_activity_stats_widget_config['time_period'];
+						plot._original = {
+							data: [],
+							xLabels: [],
+						};
+
+						for( var i = 0; i < plot.series.length; i++ )
+						{
+							plot._original.data.push(plot.series[i].data);
+						}
+						plot._original.xLabels = plot.axes.xaxis.ticks;
 					}
 
-					if( originalData[0].length == 7 )
+					if( plot._week == undefined )
 					{
-						weekData = originalData;
+						plot._week = {
+							data: [],
+							xLabels: [],
+						}
+	
+						if( plot._original.xLabels.length == 7 )
+						{	// Already weekly data:
+							plot._week = plot._original;
+						}
+						else
+						{	// Extract last week data:
+							for( var i = 0; i < plot._original.data.length; i++ )
+							{
+								var weekSeries = [];
+								for( var j = 7, k = 1; j > 0; j--, k++ )
+								{
+									weekSeries.unshift( [ j, plot._original.data[i][plot._original.data[i].length - k][1] ] );
+								}
+								plot._week.data.push( weekSeries );
+								plot._week.xLabels = plot._original.xLabels.slice( -7 );
+							}
+						}
+					}
+
+					if( jQuery( plot.target ).width() < 650 )
+					{	// Switch to last week's view:
+						if( plot._display != 'last_week' )
+						{
+							for( var i = 0; i < plot.series.length; i++ )
+							{
+								plot.series[i].data = plot._week.data[i];
+							}
+							plot.axes.xaxis.ticks = plot._week.xLabels;
+							plot._display = 'last_week';
+						}
 					}
 					else
-					{
-						for( var i = 0; i < originalData.length; i++ )
+					{	// Switch to last month's view:
+						if( plot._display != 'last_month' )
 						{
-							var weekSeries = [];
-							for( var j = 7, k = 1; j > 0; j--, k++ )
+							for( var i = 0; i < plot.series.length; i++ )
 							{
-								weekSeries.unshift( [ j, originalData[i][originalData[i].length - k][1] ] );
+								plot.series[i].data = plot._original.data[i];
 							}
-							weekData.push( weekSeries );
+							plot.axes.xaxis.ticks = plot._original.xLabels;
+							plot._display = 'last_month';
 						}
 					}
-				}
 
-				if( jQuery( '#canvasbarschart' ).width() < 650 )
-				{
-					if( displayed != 'last_week' )
-					{
-						for( var i = 0; i < plot.series.length; i++ )
-						{
-							plot.series[i].data = weekData[i];
-						}
-						plot.axes.xaxis.ticks = xLabels.slice( -7 );
-						displayed = 'last_week';
-					}
+					plot.replot( { resetAxes: true } );
 				}
-				else
-				{
-					if( displayed != 'last_month' )
-					{
-						for( var i = 0; i < plot.series.length; i++ )
-						{
-							plot.series[i].data = originalData[i];
-						}
-						plot.axes.xaxis.ticks = xLabels;
-						displayed = 'last_month';
-					}
-				}
-				
-				plot.replot( { resetAxes: true } );
 			};
 
 		jQuery( window ).resize( function()
 			{
-				clearTimeout( coll_activity_stats_widget_resize_timer );
-				coll_activity_stats_widget_resize_timer = setTimeout( resize_coll_activity_stat_widget, 100 );
+				clearTimeout( window.coll_activity_stats_widget_resize_timer );
+				window.coll_activity_stats_widget_resize_timer = setTimeout( window.resize_coll_activity_stat_widget, 100 );
 			} );
 	}
 

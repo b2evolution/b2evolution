@@ -85,7 +85,7 @@ function CanvasBarsChart( $chart, $init_js_callback = NULL, $canvas_id = 'canvas
 			return '#'.$color;
 		}, $chart['series_color'] );
 
-	$canvas_charts_config_data = array(
+	$js_config = array(
 			'canvas_id'             => $canvas_id,
 			'jqplot_data'           => $jqplot_data,
 			'jqplot_labels'         => $jqplot_legend,
@@ -101,7 +101,7 @@ function CanvasBarsChart( $chart, $init_js_callback = NULL, $canvas_id = 'canvas
 			'link_data'             => isset( $chart['link_data'] ),
 		);
 
-	expose_var_to_js( 'canvas_charts_config_data', json_encode( $canvas_charts_config_data ) );
+	expose_var_to_js( $canvas_id, $js_config, 'evo_init_canvas_charts_config' );
 
 	echo '<div id="'.$canvas_id.'" style="height: '.$chart['canvas_bg']['height'].'px; width: '.$chart['canvas_bg']['width'].'px; margin: auto 35px;"></div>';
 }

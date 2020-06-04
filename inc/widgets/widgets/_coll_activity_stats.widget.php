@@ -138,7 +138,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 	{
 		parent::init_display( $params );
 
-		$this->disp_params['block_body_start'] = '<div">';
+		$this->disp_params['block_body_start'] = '<div>';
 		$this->disp_params['block_body_end'] = '</div>';
 	}
 
@@ -269,7 +269,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		CanvasBarsChart( $chart, 'resize_coll_activity_stat_widget' );
+		CanvasBarsChart( $chart, 'resize_coll_activity_stat_widget', 'activity_stats_widget_'.$this->ID );
 
 		echo $this->disp_params['block_body_end'];
 
@@ -279,7 +279,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 				'time_period' => $this->disp_params['time_period'],
 			);
 
-		expose_var_to_js( 'coll_activity_stats_widget_config', json_encode( $coll_activity_stats_config ) );
+		expose_var_to_js( 'coll_activity_stats_widget_config', evo_json_encode( $coll_activity_stats_config ) );
 
 		return true;
 	}
