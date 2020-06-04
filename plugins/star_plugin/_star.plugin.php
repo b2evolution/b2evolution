@@ -105,7 +105,7 @@ class star_plugin extends Plugin
 	 */
 	function render_stars( $content )
 	{
-		return replace_content_outcode( '#\[stars:([\d\.]+)(/\d+)?\]#', array( $this, 'get_stars_template' ), $content, 'replace_content_callback' );
+		return replaced_outside_code_tags( '#\[stars:([\d\.]+)(/\d+)?\]#', array( $this, 'get_stars_template' ), $content, 'replace_content_callback' );
 	}
 
 

@@ -144,7 +144,7 @@ class shortlinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		// Replace the create post links with simple text if current user has no perm to create a post:
-		$content = replace_content_outcode( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
+		$content = replaced_outside_code_tags( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -232,7 +232,7 @@ class shortlinks_plugin extends Plugin
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
 				( \]{2,} | \){2,} )                # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
-			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+			$content = replace_outside_code_and_short_tags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 		// -------- RELATIVE BRACKETED URLS -------- :
@@ -246,7 +246,7 @@ class shortlinks_plugin extends Plugin
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
 				( \]{2,} | \){2,} )                # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
-			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+			$content = replace_outside_code_and_short_tags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 /* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
@@ -334,7 +334,7 @@ class shortlinks_plugin extends Plugin
 			}
 
 			// Replace all found standalone words with links:
-			$content = replace_content_outcode_shorttags( $search_wikiwords, $replace_links, $content );
+			$content = replace_outside_code_and_short_tags( $search_wikiwords, $replace_links, $content );
 		}
 
 		// -------- BRACKETED WIKIWORDS -------- :
@@ -415,7 +415,7 @@ class shortlinks_plugin extends Plugin
 						( \]{2,} | \){2,} )      # Lookahead for )) or ]]
 						*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
 
-					$content = replace_content_outcode_shorttags( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
+					$content = replace_outside_code_and_short_tags( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 				}
 			}
 		}
@@ -425,7 +425,7 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for replace_content_outcode to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
+	 * Callback function for replaced_outside_code_tags to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
 	 *
 	 * @param array Matches of regexp
 	 * @return string A processed link to the requested URL
@@ -471,7 +471,7 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for replace_content_outcode to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
+	 * Callback function for replaced_outside_code_tags to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
 	 *
 	 * @param array Matches of regexp
 	 * @return string A processed link to post/chapter URL OR a suggestion text to create new post from unfound post urltitle
@@ -1026,7 +1026,7 @@ class shortlinks_plugin extends Plugin
 	{
 		if( ! empty( $this->link_types['abs_url_optimize'] ) )
 		{	// Optimize absolute URLs:
-			$content = replace_content_outcode_shorttags( '*
+			$content = replace_outside_code_and_short_tags( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( (https?://|//).+/ ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
@@ -1037,7 +1037,7 @@ class shortlinks_plugin extends Plugin
 
 		if( ! empty( $this->link_types['rel_url_optimize'] ) )
 		{	// Optimize relative URLs:
-			$content = replace_content_outcode_shorttags( '*
+			$content = replace_outside_code_and_short_tags( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( /(.+/)? ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
