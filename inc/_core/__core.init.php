@@ -1692,6 +1692,10 @@ class _core_Module extends Module
 											'text' => T_('User directory').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir'.$blog_param,
 										),
+									'search' => array(
+											'text' => T_('Search').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=search'.$blog_param,
+										),
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,

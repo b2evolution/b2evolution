@@ -2641,7 +2641,7 @@ function skin_opengraph_tags()
 		case 'posts':
 			if( ! $Blog->get_setting( 'postlist_enable' ) )
 			{	// If post list is disabled for current Collection:
-				global $disp;
+				global $disp_detail;
 				$disp = '404';
 				$disp_detail = '404-post-list-disabled';
 			}
@@ -2661,7 +2661,7 @@ function skin_opengraph_tags()
 		case 'search':
 			if( ! $Blog->get_setting( 'search_enable' ) )
 			{	// If search is disabled for current Collection:
-				global $disp;
+				global $disp_detail;
 				$disp = '404';
 				$disp_detail = '404-search-disabled';
 			}
