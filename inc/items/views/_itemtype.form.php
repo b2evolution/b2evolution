@@ -526,11 +526,13 @@ if( $current_ityp_ID )
 	$SQL->FROM( 'T_items__status' );
 	$SQL->FROM_add( 'JOIN T_items__type' );
 	$SQL->FROM_add( 'LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID' );
+	$SQL->ORDER_BY( 'pst_order' );
 	$SQL->WHERE( 'ityp_ID = '.$current_ityp_ID );
 }
 else
 {
 	$SQL->SELECT( 'pst_ID, pst_name, NULL AS its_ityp_ID' );
+	$SQL->ORDER_BY( 'pst_order' );
 	$SQL->FROM( 'T_items__status' );
 }
 
