@@ -1066,6 +1066,8 @@ function preg_match_outcode_callback( $content, $search, & $matches )
 /**
  * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks ``
  *
+ * @deprecated Use new function replaced_outside_code_tags()
+ *
  * @param array|string Search list
  * @param array|string Replace list or Callback function
  * @param string Source content
@@ -1074,6 +1076,22 @@ function preg_match_outcode_callback( $content, $search, & $matches )
  * @return string Replaced content
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
+{
+	return replaced_outside_code_tags( $search, $replace, $content, $replace_function_callback, $replace_function_type );
+}
+
+
+/**
+ * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks ``
+ *
+ * @param array|string Search list
+ * @param array|string Replace list or Callback function
+ * @param string Source content
+ * @param string Callback function name
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
+ * @return string Replaced content
+ */
+function replaced_outside_code_tags( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
 {
 	if( ! empty( $search ) )
 	{
@@ -1097,6 +1115,25 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 }
 
 
+
+/**
+ * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks `` AND also outside of short tags like [image:123]
+ *
+ * @deprecated Use new function replace_outside_code_and_short_tags()
+ *
+ * @param array|string Search list
+ * @param array|string Replace list or Callback function
+ * @param string Source content
+ * @param string Callback function name
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
+ * @return string Replaced content
+ */
+function replace_content_outcode_shorttags( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
+{
+	return replace_outside_code_and_short_tags( $search, $replace, $content, $replace_function_callback, $replace_function_type );
+}
+
+
 /**
  * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks `` AND also outside of short tags like [image:123]
  *
@@ -1107,7 +1144,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
  * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
  * @return string Replaced content
  */
-function replace_content_outcode_shorttags( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
+function replace_outside_code_and_short_tags( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
 {
 	if( ! empty( $search ) )
 	{
@@ -1195,10 +1232,10 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
  */
 function replace_content_callback( $content, $search, $replace_callback )
 {
-	global $evo_replace_content_outcode_callback;
+	global $evo_replaced_outside_code_tags_callback;
 
 	// Store here the requested callback function in order to use pre-processor function fix_replace_content_callback() before we call the original requested callback function:
-	$evo_replace_content_outcode_callback = $replace_callback;
+	$evo_replaced_outside_code_tags_callback = $replace_callback;
 
 	return preg_replace_callback( $search, 'fix_replace_content_callback', $content );
 }
@@ -1212,16 +1249,16 @@ function replace_content_callback( $content, $search, $replace_callback )
  */
 function fix_replace_content_callback( $m )
 {
-	global $evo_replace_content_outcode_callback;
+	global $evo_replaced_outside_code_tags_callback;
 
 	// Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
 	$m = fix_non_matching_blocks( $m );
 
 	// Call real function with fixed blocks in matches:
-	$result = call_user_func_array( $evo_replace_content_outcode_callback, array( $m ) );
+	$result = call_user_func_array( $evo_replaced_outside_code_tags_callback, array( $m ) );
 
 	// Clear temp var:
-	unset( $evo_replace_content_outcode_callback );
+	unset( $evo_replaced_outside_code_tags_callback );
 
 	return $result;
 }

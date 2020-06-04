@@ -173,7 +173,7 @@ class auto_anchors_plugin extends Plugin
 		load_funcs( 'locales/_charset.funcs.php' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks:
-		$content = replace_content_outcode( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
+		$content = replaced_outside_code_tags( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
 
 		return true;
 	}

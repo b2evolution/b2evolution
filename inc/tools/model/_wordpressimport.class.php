@@ -1376,7 +1376,7 @@ class WordpressImport extends AbstractImport
 								'<code>'.$File->_adfp_full_path.'</code>',
 								'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
 							// Replace this caption tag from content with b2evolution format:
-							$updated_post_content = replace_content_outcode( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$updated_post_content = replaced_outside_code_tags( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
 							$link_order++;
 						}
 						else
@@ -1397,7 +1397,7 @@ class WordpressImport extends AbstractImport
 						{	// Try to link File:
 							if( $link_ID = $this->link_by_URL( $img_url, 'inline', $link_order, $LinkOwner ) )
 							{	// Replace this img tag from content with b2evolution format:
-								$updated_post_content = replace_content_outcode( $img_matches[0][$i], '[image:'.$link_ID.']', $updated_post_content, 'replace_content', 'str' );
+								$updated_post_content = replaced_outside_code_tags( $img_matches[0][$i], '[image:'.$link_ID.']', $updated_post_content, 'replace_content', 'str' );
 							}
 						}
 					}
@@ -1508,7 +1508,7 @@ class WordpressImport extends AbstractImport
 							$evo_short_link = '[['.$link_Item->get( 'urltitle' ).' '.$link_matches[3][ $l ].']]';
 
 							// Replace a link tag with evo short link:
-							$item_content = replace_content_outcode( $link_matches[0][ $l ], $evo_short_link, $item_content, 'replace_content', 'str' );
+							$item_content = replaced_outside_code_tags( $link_matches[0][ $l ], $evo_short_link, $item_content, 'replace_content', 'str' );
 
 							// For log:
 							$converted_links[] = '<code>'.format_to_output( $link_matches[0][ $l ], 'htmlspecialchars' ).'</code> => <code>'.$evo_short_link.'</code>';

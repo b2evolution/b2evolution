@@ -310,6 +310,24 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		global $admin_url;
+
+		return array(
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "default_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Default collection to display</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "login_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Collection for login/registration</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "msg_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Collection for profiles/messaging</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "info_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Collection for shared content blocks</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+			);
+	}
+
+
+	/**
 	 * Compare two Blog based on the common blog order setting
 	 *
 	 * @param Blog A

@@ -829,10 +829,15 @@ if( $inskin && !empty( $Blog ) )
 
 // Display reg form:
 
-// Use skin of default Collection for login/registration:
-$login_Blog = & get_setting_Blog( 'login_blog_ID' );
 $SkinCache = & get_SkinCache();
-$Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
+if( $login_Blog = & get_setting_Blog( 'login_blog_ID', NULL, false, false, true ) )
+{	// Use skin of default Collection for login/registration or of first found Collection:
+	$Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
+}
+else
+{	// Get first found Skin:
+	$Skin = & $SkinCache->get_first();
+}
 
 require_js_defer('#jquery#');
 require_js_defer( 'src/evo_init_password_indicator.js', 'rsc_url' );
