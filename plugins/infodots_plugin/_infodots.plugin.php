@@ -321,7 +321,8 @@ class infodots_plugin extends Plugin
 		$this->dot_numbers[ $link_ID ]++;
 
 		// Print this element that will be used for tooltip of the dot
-		return '<div class="infodots_info" id="infodot_'.$link_ID.'_'.$dot_num.'"'.$dot_xy.$tooltip_width.' style="display:none">'
+		return '<div class="infodots_info" id="infodot_'.$link_ID.'_'.$dot_num.'"'.$dot_xy.$tooltip_width
+				.' style="display:none">' // We inline style="display:none" to make sure this doesn't display on screen BEFORE the CSS files are defer-loaded.
 				.balance_tags( $matches[7] )
 			.'</div>'."\n";
 	}
