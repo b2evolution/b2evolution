@@ -2244,20 +2244,20 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
  *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
  */
-function init_jqplot_js( $relative_to = 'rsc_url' )
+function init_jqplot_js( $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
-	require_js_defer( '#jquery#', $relative_to ); // dependency
-	require_js_defer( '#jqplot#', $relative_to );
-	require_js_defer( '#jqplot_barRenderer#', $relative_to );
-	require_js_defer( '#jqplot_canvasAxisTickRenderer#', $relative_to );
-	require_js_defer( '#jqplot_canvasTextRenderer#', $relative_to );
-	require_js_defer( '#jqplot_categoryAxisRenderer#', $relative_to );
-	require_js_defer( '#jqplot_enhancedLegendRenderer#', $relative_to );
-	require_js_defer( '#jqplot_highlighter#', $relative_to );
-	require_js_defer( '#jqplot_canvasOverlay#', $relative_to );
-	require_js_defer( '#jqplot_donutRenderer#', $relative_to );
-	require_css( '#jqplot_css#', $relative_to );
-	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
+	require_js_defer( '#jquery#', $relative_to, $output, $version, $position ); // dependency
+	require_js_defer( '#jqplot#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_barRenderer#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_canvasAxisTickRenderer#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_canvasTextRenderer#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_categoryAxisRenderer#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_enhancedLegendRenderer#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_highlighter#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_canvasOverlay#', $relative_to, $output, $version, $position );
+	require_js_defer( '#jqplot_donutRenderer#', $relative_to, $output, $version, $position );
+	require_css_async( '#jqplot_css#', $relative_to, NULL, NULL, $version, $output, $position );
+	require_css_async( 'jquery/jquery.jqplot.b2evo.css', $relative_to, NULL, NULL, $version, $output, $position );
 }
 
 

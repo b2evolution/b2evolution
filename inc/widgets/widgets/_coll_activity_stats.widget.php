@@ -14,8 +14,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
-init_jqplot_js( 'blog' );
-require_js_defer( 'src/evo_init_canvas_bar_chart.js', 'blog' );
 
 /**
  * coll_activity_stats_Widget Class.
@@ -279,6 +277,8 @@ class coll_activity_stats_Widget extends ComponentWidget
 				'time_period' => $this->disp_params['time_period'],
 			);
 
+		init_jqplot_js( 'blog', false, '#', 'footerlines' );
+		require_js_defer( 'src/evo_init_canvas_bar_chart.js', 'blog', false, '#', 'footerlines'  );
 		expose_var_to_js( 'coll_activity_stats_widget_config', evo_json_encode( $coll_activity_stats_config ) );
 
 		return true;
