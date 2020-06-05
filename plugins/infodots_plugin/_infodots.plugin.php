@@ -140,7 +140,7 @@ class infodots_plugin extends Plugin
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
 	 * to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
-	 * This html <div> is hidden by css .infodots_info { display: none; }. 
+	 * This html <div> is hidden by an inline CSS style="display: none;". 
 	 * This plugin event is called only once to render content.
 	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderItemAttachment" event.
 	 * 
@@ -206,7 +206,7 @@ class infodots_plugin extends Plugin
 	 * Renders code:
 	 * from [infodot:1234:40:60:20ex]html text[enddot]
 	 * to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
-	 * This html <div> is hidden by css .infodots_info { display: none; }. 
+	 * This html <div> is hidden by inline CSS style="display: none;". 
 	 * This plugin event is called only once to render content.
 	 * This only generates the content divs. The red dots themselves are added later to the evo_image_block divs, in the "RenderCommentAttachment" event.
 	 * 
@@ -227,7 +227,7 @@ class infodots_plugin extends Plugin
 
 	/**
 	 * Render infodots from like [infodot:1234:40:60:20ex]html text[enddot]
-	 *    to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="width:20ex:>html text</div>
+	 *    to <div class="infodots_info" id="infodot_1234_1" data-xy="40:60" style="display:none">html text</div>
 	 *
 	 * @param string Object ID: for example, 'itm_123', 'cmt_456'.
 	 * @param string Source content

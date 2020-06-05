@@ -83,6 +83,9 @@ module.exports = function(grunt) {
 
 					// evo helpdesk widget
 					'rsc/css/evo_helpdesk_widget.css': 'rsc/less/evo_helpdesk_widget.less',
+
+					// info dots plugin
+					'plugins/infodots_plugin/infodots.css': 'plugins/infodots_plugin/infodots.less',
 				}
 			},
 
@@ -204,7 +207,7 @@ module.exports = function(grunt) {
 			},
 			jqplot: {
 				src: [ 'rsc/css/jquery/jquery.jqplot.css', 'rsc/css/jquery/jquery.jqplot.b2evo.css' ],
-				dest: 'rsc/build/b2evo_jqplot.bmin.css'
+				dest: 'rsc/build/b2evo_jqplot.bmin.css',
 			}
 		},
 
