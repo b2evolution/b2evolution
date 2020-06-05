@@ -1273,13 +1273,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#', $position = 'headlines' )
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
-	global $dequeued_headlines;
 	global $use_defer;
-
-	if( isset( $dequeued_headlines[ $js_file ] ) )
-	{ // Don't require this file if it was dequeued before this request
-		return;
-	}
 
 	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
 	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
@@ -1389,16 +1383,6 @@ function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, 
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines', $async = false )
 {
 	static $required_css;
-	global $dequeued_headlines, $dequeued_footerlines;
-
-	if( $position == 'headlines' && isset( $dequeued_headlines[ $css_file ] ) )
-	{	// Don't require this file if it was dequeued before this request
-		return;
-	}
-	elseif( $position == 'footerlines' && isset( $dequeued_footerlines[ $css_file ] ) )
-	{	// Don't require this file if it was dequeued before this request
-		return;
-	}
 
 	// Which subfolder do we want to use in case of absolute paths? (doesn't appy to 'relative')
 	$subfolder = 'css';
@@ -1478,44 +1462,13 @@ function require_css_async( $css_file, $relative_to = 'rsc_url', $title = NULL, 
 /**
  * Dequeue a file from $headlines array by file name or alias
  *
+ * @deprecated We don't need this after implement proper ordering for headlines and footerlines
+ *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
  * @param boolean|string What group of headlines touch to dequeue
  */
 function dequeue( $file_name, $group_relative_to = '#anygroup#' )
 {
-	global $headlines, $dequeued_headlines;
-
-	if( ! is_array( $dequeued_headlines ) )
-	{	// Initialize array first time:
-		$dequeued_headlines = array();
-	}
-
-	// Convert boolean, NULL and etc. values to string format:
-	$group_relative_to = strval( $group_relative_to );
-
-	// Store each dequeued file in order to don't require this next time:
-	$dequeued_headlines[ $group_relative_to ][ $file_name ] = true;
-
-	if( $group_relative_to == '#anygroup#' )
-	{	// Dequeue the file from any group:
-		if( $headlines )
-		{
-			foreach( $headlines as $group_key => $group_headlines )
-			{
-				if( isset( $group_headlines[ $file_name ] ) )
-				{	// Dequeue this file:
-					unset( $headlines[ $group_key ][ $file_name ] );
-				}
-			}
-		}
-	}
-	else
-	{	// Dequeue the file only from requested group:
-		if( isset( $headlines[ $group_relative_to ][ $file_name ] ) )
-		{	// Dequeue this file:
-			unset( $headlines[ $group_relative_to ][ $file_name ] );
-		}
-	}
 }
 
 
@@ -1690,23 +1643,23 @@ function add_js_translation( $string, $translation )
  */
 function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogroup#' )
 {
-	global $headlines, $dequeued_headlines;
-
-	// Convert boolean, NULL and etc. values to string format:
-	$group_relative_to = strval( $group_relative_to );
-
-	if( is_null( $file_name ) )
-	{	// Use auto index if file name is not defined:
-		$headlines[ $group_relative_to ][] = $headline;
+	if( $file_name === NULL )
+	{	// Add inline code:
+		global $headline_inline_code;
+		$headline_inline_code[] = $headline;
 	}
 	else
-	{	// Try to add headline with file name to array:
-		if( isset( $dequeued_headlines[ $group_relative_to ][ $file_name ] ) || isset( $dequeued_headlines[ '#anygroup#' ][ $file_name ] ) )
-		{	// Don't require this file if it was dequeued before this request:
+	{	// Add include file:
+		global $headline_include_file, $headline_file_index;
+		// Convert boolean, NULL and etc. values to string format:
+		$group_relative_to = strval( $group_relative_to );
+		if( isset( $headline_file_index[ $group_relative_to ][ $file_name ] ) )
+		{	// Skip already included file from the same group:
 			return;
 		}
-		// Use file name as key index in $headline array:
-		$headlines[ $group_relative_to ][ $file_name ] = $headline;
+		$headline_include_file[] = $headline;
+		// Flag to don't include same file from same group twice:
+		$headline_file_index[ $group_relative_to ][ $file_name ] = true;
 	}
 }
 
@@ -1720,27 +1673,27 @@ function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogr
  *
  * @param string HTML tag like <script></script> or <link />
  * @param string File name (used to index)
- * @param boolean|string Group headlines by this group in order to allow use files with same names from several places
+ * @param boolean|string Group footerlines by this group in order to allow use files with same names from several places
  */
-function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#nogroup' )
+function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#nogroup#' )
 {
-	global $footerlines, $dequeued_footerlines;
-
-	// Convert boolean, NULL and etc. values to string format:
-	$group_relative_to = strval( $group_relative_to );
-
-	if( is_null( $file_name ) )
-	{	// Use auto index if file name is not defined:
-		$footerlines[ $group_relative_to ][] = $footerline;
+	if( $file_name === NULL )
+	{	// Add inline code:
+		global $footerline_inline_code;
+		$footerline_inline_code[] = $footerline;
 	}
 	else
-	{	// Try to add footerline with file name to array:
-		if( isset( $dequeued_footerlines[ $group_relative_to ][ $file_name ] ) || isset( $dequeued_footerlines[ '#anygroup#' ][ $file_name ] ) )
-		{	// Don't require this file if it was dequeued before this request:
+	{	// Add include file:
+		global $footerline_include_file, $footerline_file_index;
+		// Convert boolean, NULL and etc. values to string format:
+		$group_relative_to = strval( $group_relative_to );
+		if( isset( $footerline_file_index[ $group_relative_to ][ $file_name ] ) )
+		{	// Skip already included file from the same group:
 			return;
 		}
-		// Use file name as key index in $headline array:
-		$footerlines[ $group_relative_to ][ $file_name ] = $footerline;
+		$footerline_include_file[] = $footerline;
+		// Flag to don't include same file from same group twice:
+		$footerline_file_index[ $group_relative_to ][ $file_name ] = true;
 	}
 }
 
@@ -2308,31 +2261,24 @@ function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array(), $top_hot
  */
 function include_headlines()
 {
-	global $headlines;
+	global $headline_include_file, $headline_file_index, $headline_inline_code;
 
-	if( $headlines )
-	{
-		if( isset( $headlines['#nogroup#'] ) )
-		{	// Move no group head lines to the end in order to print them after files,
-			// because Safari and Firefox rewrite css of <style> with css of loaded files if they are printed after <style> in <head>:
-			$headlines_nogroup = $headlines['#nogroup#'];
-			unset( $headlines['#nogroup#'] );
-			$headlines['#nogroup#'] = $headlines_nogroup;
-		}
-		$all_headlines = array();
-		foreach( $headlines as $group_headlines )
-		{	// Go through each group to include all headlines:
-			foreach( $group_headlines as $headline )
-			{
-				$all_headlines[] = $headline;
-			}
-		}
+	$all_headlines = array();
+	if( is_array( $headline_include_file ) )
+	{	// Include files:
+		$all_headlines = $headline_include_file;
+		unset( $headline_include_file, $headline_file_index );
+	}
+	if( is_array( $headline_inline_code ) )
+	{	// Include inline codes:
+		$all_headlines = array_merge( $all_headlines, $headline_inline_code );
+		unset( $headline_inline_code );
+	}
 
-		if( ! empty( $all_headlines ) )
-		{	// Include headlines only if at least one headline is found in any group:
-			echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $all_headlines );
-			echo "\n\n";
-		}
+	if( ! empty( $all_headlines ) )
+	{	// Include headlines only if at least one headline is found in any group:
+		echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $all_headlines );
+		echo "\n\n";
 	}
 }
 
@@ -2346,7 +2292,7 @@ function include_headlines()
  */
 function include_footerlines()
 {
-	global $js_translations, $footerlines;
+	global $js_translations, $footerline_include_file, $footerline_file_index, $footerline_inline_code;
 
 	if( !empty( $js_translations ) )
 	{
@@ -2367,29 +2313,22 @@ function include_footerlines()
 		}
 	}
 
-	if( $footerlines )
-	{
-		if( isset( $footerlines['#nogroup#'] ) )
-		{	// Move no group head lines to the end in order to print them after files,
-			// because Safari and Firefox rewrite css of <style> with css of loaded files if they are printed after <style> in <head>:
-			$footerlines_nogroup = $footerlines['#nogroup#'];
-			unset( $footerlines['#nogroup#'] );
-			$footerlines['#nogroup#'] = $footerlines_nogroup;
-		}
-		$all_footerlines = array();
-		foreach( $footerlines as $group_footerlines )
-		{	// Go through each group to include all footerlines:
-			foreach( $group_footerlines as $footerline )
-			{
-				$all_footerlines[] = $footerline;
-			}
-		}
+	$all_footerlines = array();
+	if( is_array( $footerline_include_file ) )
+	{	// Include files:
+		$all_footerlines = $footerline_include_file;
+		unset( $footerline_include_file, $footerline_file_index );
+	}
+	if( is_array( $footerline_inline_code ) )
+	{	// Include inline codes:
+		$all_footerlines = array_merge( $all_footerlines, $footerline_inline_code );
+		unset( $footerline_inline_code );
+	}
 
-		if( ! empty( $all_footerlines ) )
-		{	// Include headlines only if at least one headline is found in any group:
-			echo "\n\t<!-- footerlines: -->\n\t".implode( "\n\t", $all_footerlines );
-			echo "\n\n";
-		}
+	if( ! empty( $all_footerlines ) )
+	{	// Include footerlines only if at least one footerline is found in any group:
+		echo "\n\t<!-- footerlines: -->\n\t".implode( "\n\t", $all_footerlines );
+		echo "\n\n";
 	}
 }
 
