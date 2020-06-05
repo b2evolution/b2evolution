@@ -83,13 +83,6 @@ class user_register_standard_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $admin_url;
-
-		// Get available templates:
-		$context = 'registration';
-		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_by_context( $context );
-
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
