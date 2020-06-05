@@ -2005,7 +2005,7 @@ class Item extends ItemLight
 		{	// Remove all unused inline images from the content:
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
-			$content = replaced_outside_code_tags( $unused_inline_images, '', $content, 'replace_content', 'str' );
+			$content = replace_outside_code_tags( $unused_inline_images, '', $content, 'replace_content', 'str' );
 			$Messages->add( T_('Invalid inline file placeholders won\'t be displayed.'), 'note' );
 		}
 
@@ -2145,7 +2145,7 @@ class Item extends ItemLight
 
 			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
 			{	// Don't use the content separators for intro items and if it is disabled by item type:
-				$r = replaced_outside_code_tags( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+				$r = replace_outside_code_tags( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
 			}
 
 			return $r;
@@ -2254,7 +2254,7 @@ class Item extends ItemLight
 
 			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
 			{	// Don't use the content separators for intro items and if it is disabled by item type:
-				$r = replaced_outside_code_tags( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+				$r = replace_outside_code_tags( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
 			}
 
 			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );

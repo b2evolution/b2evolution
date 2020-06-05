@@ -333,7 +333,7 @@ class Message extends DataObject
 					.$new_link_IDs[ $inlines[2][ $i ] ] // ID of new Link
 					.$inlines[3][ $i ].$inlines[4][ $i ].']';
 			}
-			$new_message_content = replaced_outside_code_tags( $search_inline_tags, $replace_inline_tags, $this->text, 'replace_content', 'str' );
+			$new_message_content = replace_outside_code_tags( $search_inline_tags, $replace_inline_tags, $this->text, 'replace_content', 'str' );
 
 			// Update message content in DB:
 			$this->set( 'text', $new_message_content );

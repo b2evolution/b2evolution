@@ -129,7 +129,7 @@ class table_contents_plugin extends Plugin
 		$this->current_content = $content;
 
 		// Replace `[toc]` short tag with nested/bullet list from all found header anchored tags:
-		$content = replaced_outside_code_tags( '#\[toc\]#i', array( $this, 'callback_render_toc' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#\[toc\]#i', array( $this, 'callback_render_toc' ), $content, 'replace_content_callback' );
 
 		return true;
 	}

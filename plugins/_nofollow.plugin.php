@@ -177,7 +177,7 @@ class nofollow_plugin extends Plugin
 
 		if( ! empty( $this->setting_rel_options ) || ! empty( $this->setting_target_options ) )
 		{	// Try to find links only of at least one rel option should be added:
-			$content = replaced_outside_code_tags( '#<a([^>]+href="https?://[^"]+"[^>]*)>(.+?)</a>#i', array( $this, 'callback_render_content' ), $content, 'replace_content_callback' );
+			$content = replace_outside_code_tags( '#<a([^>]+href="https?://[^"]+"[^>]*)>(.+?)</a>#i', array( $this, 'callback_render_content' ), $content, 'replace_content_callback' );
 		}
 
 		return false;

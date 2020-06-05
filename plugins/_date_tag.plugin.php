@@ -119,7 +119,7 @@ class date_tag_plugin extends Plugin
 	 */
 	function render_dates( $content )
 	{
-		return replaced_outside_code_tags( '#\[date(:([^\]]+))?\]#i', array( $this, 'get_date_text' ), $content, 'replace_content_callback' );
+		return replace_outside_code_tags( '#\[date(:([^\]]+))?\]#i', array( $this, 'get_date_text' ), $content, 'replace_content_callback' );
 	}
 
 
