@@ -161,6 +161,12 @@ class user_register_standard_Widget extends ComponentWidget
 
 		$render_template_objects = array();
 		$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
+
+		if( ! is_null( $params['register_form_params'] ) )
+		{	// Use another template param from skin:
+			$Form->switch_template_parts( $params['register_form_params'] );
+		}
+
 		$render_template_objects['Form'] = $Form;
 
 		if( $register_user = $Session->get('core.register_user') )
@@ -295,11 +301,6 @@ class user_register_standard_Widget extends ComponentWidget
 				$redirect_to = param( 'redirect_to', 'url', '' );
 				$return_to   = param( 'return_to', 'url', '' );
 				$widget      = param( 'widget', 'integer' );
-
-				if( ! is_null( $params['register_form_params'] ) )
-				{	// Use another template param from skin:
-					$Form->switch_template_parts( $params['register_form_params'] );
-				}
 
 				$Form->add_crumb( 'regform' );
 				$Form->hidden( 'inskin', true );
