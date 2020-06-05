@@ -144,7 +144,7 @@ class shortlinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		// Replace the create post links with simple text if current user has no perm to create a post:
-		$content = replaced_outside_code_tags( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -425,7 +425,7 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for replaced_outside_code_tags to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
+	 * Callback function for replace_outside_code_tags to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
 	 *
 	 * @param array Matches of regexp
 	 * @return string A processed link to the requested URL
@@ -471,7 +471,7 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for replaced_outside_code_tags to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
+	 * Callback function for replace_outside_code_tags to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
 	 *
 	 * @param array Matches of regexp
 	 * @return string A processed link to post/chapter URL OR a suggestion text to create new post from unfound post urltitle

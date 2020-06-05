@@ -202,7 +202,7 @@ class adjust_headings_plugin extends Plugin
 		$this->highest_level = NULL;
 
 		// Find the highest heading level in the current content:
-		replaced_outside_code_tags( '#</h([1-6])>#i', array( $this, 'callback_find_highest_heading' ), $content, 'replace_content_callback' );
+		replace_outside_code_tags( '#</h([1-6])>#i', array( $this, 'callback_find_highest_heading' ), $content, 'replace_content_callback' );
 
 		if( is_null( $this->highest_level ) || $this->highest_level == $this->setting_level )
 		{ // The html heading tags have not been detected in the content
@@ -211,7 +211,7 @@ class adjust_headings_plugin extends Plugin
 		}
 
 		// Replace the headings with new:
-		$content = replaced_outside_code_tags( '#<(/?)h([1-6])([^>]*)?>#i', array( $this, 'callback_adjust_headings' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#<(/?)h([1-6])([^>]*)?>#i', array( $this, 'callback_adjust_headings' ), $content, 'replace_content_callback' );
 
 		return $content;
 	}
