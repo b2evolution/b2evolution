@@ -202,6 +202,10 @@ module.exports = function(grunt) {
 				src: 'rsc/build/b2evo_helper_screens.css',
 				dest: 'rsc/build/b2evo_helper_screens.min.css',
 			},
+			jqplot: {
+				src: [ 'rsc/css/jquery/jquery.jqplot.css', 'rsc/css/jquery/jquery.jqplot.b2evo.css' ],
+				dest: 'rsc/build/b2evo_jqplot.bmin.css'
+			}
 		},
 
 		// Configuration for the uglify minifying tasks:
@@ -458,6 +462,24 @@ module.exports = function(grunt) {
 				],
 				dest: 'rsc/js/build/evo_fileuploader_sortable.bmin.js'
 			},
+			evo_jqplot: {
+				options: {
+					banner: '/* This file includes ALL files that are used for drawing charts using jqplot */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/jquery/jqplot/jquery.jqplot.min.js',
+					'rsc/js/jquery/jqplot/jqplot.barRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.canvasTextRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.canvasOverlay.min.js',
+					'rsc/js/jquery/jqplot/jqplot.categoryAxisRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.donutRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.enhancedLegendRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.highlighter.min.js',	
+				],
+				dest: 'rsc/js/build/evo_jqplot.bmin.js'
+			}
 		},
 
 		// Markdown to HTML

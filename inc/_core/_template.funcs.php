@@ -1268,6 +1268,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  *                'immediate' or FALSE to load javascript immediately
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
  */
 function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#', $position = 'headlines' )
 {
@@ -1346,6 +1347,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
  * @param boolean|string Is the file's path relative to the base path/url?
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
  */
 function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
@@ -1360,6 +1362,7 @@ function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, 
  * @param boolean|string Is the file's path relative to the base path/url?
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
  */
 function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
@@ -2243,21 +2246,14 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
  * Registers headlines required to jqPlot charts
  *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
  */
 function init_jqplot_js( $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
-	require_js_defer( '#jquery#', $relative_to, $output, $version, $position ); // dependency
-	require_js_defer( '#jqplot#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_barRenderer#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_canvasAxisTickRenderer#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_canvasTextRenderer#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_categoryAxisRenderer#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_enhancedLegendRenderer#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_highlighter#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_canvasOverlay#', $relative_to, $output, $version, $position );
-	require_js_defer( '#jqplot_donutRenderer#', $relative_to, $output, $version, $position );
-	require_css_async( '#jqplot_css#', $relative_to, NULL, NULL, $version, $output, $position );
-	require_css_async( 'jquery/jquery.jqplot.b2evo.css', $relative_to, NULL, NULL, $version, $output, $position );
+	require_js_defer( 'build/evo_jqplot.bmin.js', $relative_to, $output, $version, $position );
+	require_css_async( 'b2evo_jqplot.bmin.css', $relative_to, NULL, NULL, $version, $output, $position );
 }
 
 
