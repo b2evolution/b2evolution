@@ -191,6 +191,16 @@ class coll_search_form_Widget extends ComponentWidget
 			$widget_Blog = & $Blog;
 		}
 
+		if( ! $widget_Blog->get_setting( 'search_enable' ) )
+		{	// This page is disabled:
+			$coll_name = $widget_Blog->get( 'name' );
+			if( check_user_perm( 'blog_properties', 'edit', false, $widget_Blog->ID ) )
+			{	// Make collection name to edit properties:
+				$coll_name = '<a href="'.get_admin_url( 'ctrl=coll_settings&tab=search&blog='.$widget_Blog->ID ).'">'.$coll_name.'</a>';
+			}
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because a search form is disabled for Collection "'.$coll_name.'".' );
+			return false;
+		}
 
 		$TemplateCache = & get_TemplateCache();
 		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )

@@ -632,6 +632,11 @@ class SiteMenuEntry extends DataObject
 				return $entry_Blog->get( 'url' );
 
 			case 'recentposts':
+				if( ! $entry_Blog->get_setting( 'postlist_enable' ) )
+				{	// This page is disabled:
+					$this->url_error = 'Disabled';
+					return false;
+				}
 				if( $entry_Chapter = & $this->get_Chapter() )
 				{	// Use category url instead of default if the defined category is found in DB:
 					return $entry_Chapter->get_permanent_url();
@@ -639,6 +644,11 @@ class SiteMenuEntry extends DataObject
 				return $entry_Blog->get( 'recentpostsurl' );
 
 			case 'search':
+				if( ! $entry_Blog->get_setting( 'search_enable' ) )
+				{	// This page is disabled:
+					$this->url_error = 'Disabled';
+					return false;
+				}
 				return $entry_Blog->get( 'searchurl' );
 
 			case 'arcdir':
