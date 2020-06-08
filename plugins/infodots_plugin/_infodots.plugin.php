@@ -305,24 +305,23 @@ class infodots_plugin extends Plugin
 			return;
 		}
 
+		// We inline style="display:none" to make sure this doesn't display on screen BEFORE the CSS files are defer-loaded:
+		$tooltip_styles = array( 'display:none' );
+
 		$dot_num = $this->dot_numbers[ $link_ID ];
-		if( empty( $matches[6] ) )
-		{	// No defined width
-			$tooltip_width = '';
-		}
-		else
-		{	// Set css style for width
+		if( ! empty( $matches[6] ) )
+		{	// Set css style for width:
 			$tooltip_width = substr( $matches[6], 1 );
 			$tooltip_width = ( strlen( intval( $tooltip_width ) ) == strlen( $tooltip_width ) ? $tooltip_width.'px' : $tooltip_width );
-			$tooltip_width = ' style="width:'.$tooltip_width.'"';
+			$tooltip_styles[] = 'width:'.$tooltip_width;
 		}
 		$dot_xy = ' data-xy="'.$this->dots[ $link_ID ][ $dot_num - 1 ]['x'].':'.$this->dots[ $link_ID ][ $dot_num - 1 ]['y'].'"';
 
 		$this->dot_numbers[ $link_ID ]++;
 
 		// Print this element that will be used for tooltip of the dot
-		return '<div class="infodots_info" id="infodot_'.$link_ID.'_'.$dot_num.'"'.$dot_xy.$tooltip_width
-				.' style="display:none">' // We inline style="display:none" to make sure this doesn't display on screen BEFORE the CSS files are defer-loaded.
+		return '<div class="infodots_info" id="infodot_'.$link_ID.'_'.$dot_num.'"'.$dot_xy
+				.' style="'.implode( ';', $tooltip_styles ).'">' 
 				.balance_tags( $matches[7] )
 			.'</div>'."\n";
 	}
