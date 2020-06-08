@@ -779,7 +779,11 @@ class DB
 			$err_msg .= "</div>\n";
 		}
 
-		if( $this->halt_on_error )
+		if( $this->halt_on_error === 'throw' )
+		{	// Throw SQL error into Exception:
+			throw new Exception( $err_msg );
+		}
+		elseif( $this->halt_on_error )
 		{
 			if( function_exists('debug_die') )
 			{
