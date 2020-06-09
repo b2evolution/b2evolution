@@ -522,7 +522,7 @@ echo '</div>';
 $SQL = new SQL();
 if( $current_ityp_ID )
 {
-	$SQL->SELECT( 'pst_ID, pst_name, its_ityp_ID' );
+	$SQL->SELECT( 'pst_ID, pst_order, pst_name, its_ityp_ID' );
 	$SQL->FROM( 'T_items__status' );
 	$SQL->FROM_add( 'JOIN T_items__type' );
 	$SQL->FROM_add( 'LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID' );
@@ -531,7 +531,7 @@ if( $current_ityp_ID )
 }
 else
 {
-	$SQL->SELECT( 'pst_ID, pst_name, NULL AS its_ityp_ID' );
+	$SQL->SELECT( 'pst_ID, pst_order, pst_name, NULL AS its_ityp_ID' );
 	$SQL->ORDER_BY( 'pst_order' );
 	$SQL->FROM( 'T_items__status' );
 }
@@ -586,6 +586,11 @@ $Results->cols[] = array(
 		'th' => TB_('Name'),
 		'td' => '%get_name_for_itemstatus( #pst_ID#, #pst_name# )%'
 	);
+
+$Results->cols[] = array(
+		'th' => TB_('Order'),
+		'td' => '$pst_order$',
+	); 
 
 $display_params = array(
 		'page_url' => $admin_url.'?ctrl=itemtypes&ityp_ID='.$current_ityp_ID.'&action=edit'
