@@ -1189,7 +1189,8 @@ class MarkdownImport extends AbstractImport
 		}
 		catch( Exception $db_Exception )
 		{	// Catch SQL error:
-			$this->log( $db_Exception->getMessage(), 'error' );
+			$this->log( '<div style="background-color:#fdd;padding:1ex">'.$db_Exception->getMessage().'</div>', 'error' );
+			$this->log( '<p class="red">Stopping import of this file. Continue import at NEXT .md file...</p>' );
 		}
 		}
 
