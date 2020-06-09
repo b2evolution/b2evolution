@@ -1390,11 +1390,6 @@ class Skin extends DataObject
 					}
 					break;
 
-				case 'bootstrap_init_tooltips':
-					// JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions):
-					require_js_defer( 'src/evo_init_bootstrap_tooltips.js', 'blog' );
-					break;
-
 				case 'bootstrap_messages':
 					// Initialize $Messages Class to use Bootstrap styles:
 					$Messages->set_params( array(
