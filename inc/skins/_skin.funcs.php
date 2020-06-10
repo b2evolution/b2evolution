@@ -372,6 +372,13 @@ function skin_init( $disp )
 			break;
 
 		case 'posts':
+			if( ! $Blog->get_setting( 'postlist_enable' ) )
+			{	// If post list is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-post-list-disabled';
+				break;
+			}
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -623,6 +630,12 @@ function skin_init( $disp )
 			if( $Blog->get_setting( 'filtered_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
+			}
+			if( ! $Blog->get_setting( 'search_enable' ) )
+			{	// If search is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-search-disabled';
 			}
 			break;
 
@@ -2639,12 +2652,6 @@ function skin_opengraph_tags()
 			break;
 
 		case 'posts':
-			if( ! $Blog->get_setting( 'postlist_enable' ) )
-			{	// If post list is disabled for current Collection:
-				global $disp_detail;
-				$disp = '404';
-				$disp_detail = '404-post-list-disabled';
-			}
 			$intro_Item = & get_featured_Item( $disp, NULL, true );
 			if( $intro_Item )
 			{
@@ -2656,14 +2663,6 @@ function skin_opengraph_tags()
 					echo '<meta property="og:site_name" content="'.format_to_output( $intro_Item->get_Blog()->get( 'name' ), 'htmlattr' )."\" />\n";
 					break;
 				}
-			}
-
-		case 'search':
-			if( ! $Blog->get_setting( 'search_enable' ) )
-			{	// If search is disabled for current Collection:
-				global $disp_detail;
-				$disp = '404';
-				$disp_detail = '404-search-disabled';
 			}
 
 		default:
