@@ -45,6 +45,15 @@ function init_colorbox( this_obj )
 }
 jQuery( document ).ready( function()
 {
+	if( typeof( b2evo_colorbox_params_post ) == 'undefined' ||
+	    typeof( b2evo_colorbox_params_cmnt ) == 'undefined' || 
+	    typeof( b2evo_colorbox_params_user ) == 'undefined' || 
+	    typeof( b2evo_colorbox_params_other ) == 'undefined' )
+	{	// Don't initialize colorbox when configs are not defined:
+		// (This means colorbox is not desired for current back-office page or front-office Skin)
+		return;
+	}
+
 	// For post images:
 	b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
 	// For comment images:

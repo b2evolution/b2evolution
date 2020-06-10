@@ -307,6 +307,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_bootstrap_tooltips.js',
 					'rsc/js/src/evo_comment_funcs.js',
 					'rsc/js/src/evo_user_funcs.js',
+					'rsc/js/build/colorbox.bmin.js',
 				],
 				dest: 'rsc/js/build/evo_generic.bmin.js'
 			},

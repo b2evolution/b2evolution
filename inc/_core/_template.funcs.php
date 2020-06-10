@@ -1138,6 +1138,10 @@ function include_js_vars()
 		{
 			$var_value = evo_json_encode( $var_value, JSON_FORCE_OBJECT );
 		}
+		elseif( is_bool( $var_value ) )
+		{
+			$var_value = $var_value ? 'true' : 'false';
+		}
 		echo 'var '.$var_name.' = '.$var_value.";\n";
 	}
 
@@ -1577,7 +1581,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 
 				require_js_defer( '#jquery#', $relative_to );
 				// Initialize the colorbox settings:
-				add_js_headline(
+				add_js_footerline(
 					// For post images
 					$colorbox_params_post.';
 					'// For comment images
@@ -1588,7 +1592,9 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					.$colorbox_params_other.';' );
 				// TODO: translation strings for colorbox buttons
 
-				require_js_defer( 'build/colorbox.bmin.js', $relative_to );
+				// Do NOT require colorbox.bmin.js here because it is grunted in evo_generic.bmin.js:
+				// require_js_defer( 'build/colorbox.bmin.js', $relative_to );
+
 				if( is_admin_page() )
 				{
 					global $AdminUI;
