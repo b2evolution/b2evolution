@@ -1742,17 +1742,14 @@ class Skin extends DataObject
 			}
 		}
 
-		// Check if current page has a marketing popup container:
-		$marketing_popup_container_code = $Blog->get_marketing_popup_container();
-
 		// Load general JS file:
 		if( $this->get_api_version() >= 6 )
 		{ // Bootstrap skin
-			require_js_defer( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			require_js_defer( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
 		}
 		else
 		{ // Standard skin
-			require_js_defer( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
+			require_js_defer( 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )

@@ -7362,24 +7362,13 @@ class Blog extends DataObject
 				$marketing_popup_show_frequency = $this->get_setting( 'marketing_popup_show_period_val' )
 					.$this->get_setting( 'marketing_popup_show_period_unit' );
 			}
-			echo '<script type="text/javascript">
-			// <![CDATA[
-			jQuery( function()
-			{
-				ddexitpop.init(
-				{
-					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
-					fxclass: "'.$this->get_setting( 'marketing_popup_animation' ).'",
-					hideaftershow: '.( $this->get_setting( 'marketing_popup_show_repeat' ) ? 'false' : 'true' ).',
-					displayfreq: "'.$marketing_popup_show_frequency.'",
-				} )
-				jQuery( ".ddexitpop button.close" ).click( function()
-				{	// Hide popup on click top-right close icon button:
-					ddexitpop.hidepopup();
-				} )
-			} )
-			// ]]>
-			</script>';
+			expose_var_to_js( 'evo_ddexitpop_config', array(
+				'container_code' => $marketing_popup_container_code,
+				'animation'      => $this->get_setting( 'marketing_popup_animation' ),
+				'show_repeat'    => (boolean)$this->get_setting( 'marketing_popup_show_repeat' ),
+				'show_frequency' => $marketing_popup_show_frequency,
+			) );
+			require_js_defer( 'build/ddexitpop.bmin.js', 'blog', false, '#', 'footerlines' );
 		}
 	}
 

@@ -277,6 +277,13 @@ module.exports = function(grunt) {
 				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
 			},
+			// JS files that are used marketing popup container:
+			ddexitpop: {
+				options: { banner: '/* This includes ddexitpop files to initialize marketing popup container */\n' },
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/ddexitpop.js', 'rsc/js/src/evo_init_ddexitpop.js'],
+				dest: 'rsc/js/build/ddexitpop.bmin.js'
+			},
 			// JS files that may be used on ANY page of front-office and back-office
 			evo_generic: {
 				options: {
@@ -330,16 +337,6 @@ module.exports = function(grunt) {
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
-			// JS files that are used on front-office standard skins with ddexitpop:
-			evo_frontoffice_with_ddexitpop: {
-				options: {
-					banner: '/* This includes 11 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js, src/ddexitpop.js */\n'
-				},
-				nonull: true, // Display missing files
-				src: ['rsc/js/build/evo_frontoffice.bmin.js',
-							'rsc/js/src/ddexitpop.js'],
-				dest: 'rsc/js/build/evo_frontoffice-with-ddexitpop.bmin.js'
-			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
@@ -358,16 +355,6 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_forms.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
-			},
-			// JS files that are used on front-office bootstrap skins with ddexitpop:
-			evo_frontoffice_bootstrap_with_ddexitpop: {
-				options: {
-					banner: '/* This includes 11 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js, src/ddexitpop.js */\n'
-				},
-				nonull: true, // Display missing files
-				src: ['rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
-							'rsc/js/src/ddexitpop.js'],
-				dest: 'rsc/js/build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
