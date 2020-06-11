@@ -1595,6 +1595,7 @@ class Skin extends DataObject
 					if( can_use_hashed_password() )
 					{	// Include JS for client-side password hashing:
 						require_js_defer( 'build/sha1_md5.bmin.js', 'blog' );
+						require_js_defer( '#jquery#' );
 						require_js_defer( 'src/evo_init_display_login_js_handler.js', 'blog' );
 					}
 					break;
