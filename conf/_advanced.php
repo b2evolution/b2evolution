@@ -952,6 +952,18 @@ $library_local_urls = array(
 		'#hotkeys#' => array( 'hotkeys/hotkeys.min.js' ),
 	);
 
+/**
+ * JS files which contain other JS files in order to don't required them twice when main file is required on current page
+ *
+ * Key - Alias or relative path of main JS file, Value - array of bundled files inside the main JS file
+ */
+$bundled_js_files = array(
+	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
+		'#jquery#',
+		'#jquery_migrate#',
+		'#bootstrap#',
+	),
+);
 
 /**
  * Allow to send outbound pings on localhost

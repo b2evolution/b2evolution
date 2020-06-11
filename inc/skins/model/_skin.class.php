@@ -1352,9 +1352,17 @@ class Skin extends DataObject
 
 			switch( $feature )
 			{
+				case 'superbundle':
+					// Include jQuery + Bootstrap + General front-office scripts:
+					require_js_defer( 'build/bootstrap-evo_frontoffice-superbundle.bmin.js', 'blog' );
+					break;
+
 				case 'jquery':
 					// Include jQuery:
-					require_js_defer( '#jquery#', 'blog' );
+					if( ! in_array( 'superbundle', $features ) )
+					{	// Don't include when it is already bundled:
+						require_js_defer( '#jquery#', 'blog' );
+					}
 					break;
 
 				case 'font_awesome':
@@ -1364,7 +1372,10 @@ class Skin extends DataObject
 
 				case 'bootstrap':
 					// Include Bootstrap:
-					require_js_defer( '#bootstrap#', 'blog' );
+					if( ! in_array( 'superbundle', $features ) )
+					{	// Don't include when it is already bundled:
+						require_js_defer( '#bootstrap#', 'blog' );
+					}
 					require_css( '#bootstrap_css#', 'blog' );
 					break;
 
@@ -1743,14 +1754,16 @@ class Skin extends DataObject
 			}
 		}
 
-		// Load general JS file:
-		if( $this->get_api_version() >= 6 )
-		{ // Bootstrap skin
-			require_js_defer( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
-		}
-		else
-		{ // Standard skin
-			require_js_defer( 'build/evo_frontoffice.bmin.js', 'blog' );
+		if( ! in_array( 'superbundle', $features ) )
+		{	// Load general JS file only when it is not bundled above:
+			if( $this->get_api_version() >= 6 )
+			{ // Bootstrap skin
+				require_js_defer( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			}
+			else
+			{ // Standard skin
+				require_js_defer( 'build/evo_frontoffice.bmin.js', 'blog' );
+			}
 		}
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )

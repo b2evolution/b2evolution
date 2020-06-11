@@ -356,6 +356,20 @@ module.exports = function(grunt) {
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
+			// JS files(bundled with jQuery and Bootstrap) that are used on front-office bootstrap skins:
+			evo_frontoffice_bootstrap_superbundle: {
+				options: {
+					banner: '/* Includes files for bootstrap front-office skins */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/jquery.min.js',
+					'rsc/js/jquery/jquery-migrate.min.js',
+					'rsc/js/bootstrap/bootstrap.min.js',
+					'rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
+				],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice-superbundle.bmin.js'
+			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {

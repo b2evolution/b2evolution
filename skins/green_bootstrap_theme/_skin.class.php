@@ -1289,7 +1289,7 @@ class green_bootstrap_theme_Skin extends Skin
 	{
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
 				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
 				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
