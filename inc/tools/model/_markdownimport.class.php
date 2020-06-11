@@ -363,7 +363,7 @@ class MarkdownImport extends AbstractImport
 	 */
 	function execute()
 	{
-		global $Blog, $DB, $tableprefix, $media_path, $current_User, $localtimenow, $Plugins;
+		global $Blog, $DB, $tableprefix, $media_path, $media_url, $current_User, $localtimenow, $Plugins;
 
 		$folder_path = $this->get_data( 'path' );
 		$source_folder_zip_name = basename( $this->source );
@@ -775,7 +775,17 @@ class MarkdownImport extends AbstractImport
 			// Limit title by max possible length:
 			$item_title = utf8_substr( $item_title, 0, 255 );
 
-			$this->log( sprintf( TB_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>: ' ) );
+			// Get path to item source/md file:
+			$item_source_path = '<code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>';
+			if( $this->get_data( 'type' ) == 'dir' )
+			{	// Provide link to md file when import is from forder:
+				// (NOTE: We cannot provide link from ZIP arhive because temp extracted folder is deleted after import is done so urls are died)
+				$item_source_path = '<a href="'.$media_url.substr( $file_path, strlen( $media_path ) ).'" target="_blank">'.$item_source_path.'</a>';
+			}
+
+			$this->log( sprintf( 'Importing Item: %s', '"<b>'.$item_title.'</b>"<br/>'
+				//.'<a href="/'.$item_slug.'</a>' // We don't know the exact URL of the post yet. We will display a link later.
+				.'&nbsp; &nbsp; Source: '.$item_source_path ) );
 
 			if( in_array( $item_slug, $imported_slugs ) )
 			{	// Skip md file/post with same name from different folder/category:
@@ -993,6 +1003,12 @@ class MarkdownImport extends AbstractImport
 						'title_override' => $item_result_messages[ $last_msg_i ],
 						'link_type'      => ( $Item->get_permalink_type() == 'none' ? 'admin_view' : '#' ),
 						'link_target'    => '_blank',
+					) )
+					.$Item->get_history_link( array(
+						'before'     => ' ',
+						// Don't check permission because this link must be displayed even
+						// when import is called from CLI mode without logged in admin:
+						'check_perm' => false,
 					) );
 			}
 			$this->log( implode( ' -> ', $item_result_messages ) );
@@ -1232,6 +1248,10 @@ class MarkdownImport extends AbstractImport
 
 		// Commit changes before event_after_import() in order ot avoid unexpected rollback from there:
 		$DB->commit();
+
+		//TODO: CCC despite lots of progress log messages that are sent BEFORE the work is committed, and no error messages the changes are not written to DB at all anymore.
+		//TODO: HIGHEST PRIO: Fix "hidden rollback"
+		// see point A.2 C#11 from "LRT-364011-MD Importer still fails with unhandled exceptions on Glossary inserts (Duplicate entry)"
 
 		// Execute additonal actions after import, e.g. by extended classes:
 		$this->event_after_import();
@@ -1541,6 +1561,16 @@ class MarkdownImport extends AbstractImport
 		$SQL->FROM( 'T_slug' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON post_ID = slug_itm_ID AND slug_type = "item"' );
 		$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
+		// CCC: the slug is unique in the system, then the restriction by blog_ID is wrong here.
+		// a post that WAS in this blog as main category, but meanwhile only has it as secondary category should
+		// still be identified and updated here
+		// CCC: as discussed with FP we need to keep this but make an option
+		//
+		// if slug exists in different collection
+		// (x) terminate with error
+		// ( ) insert new slug-1 post
+		//
+		// TODO: point B) C#9 from "LRT-364011-MD Importer still fails with unhandled exceptions on Glossary inserts (Duplicate entry)"
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
 		$SQL->WHERE_and( 'slug_title REGEXP '.$DB->quote( '^'.$item_slug_base.'(-[0-9]+)?$' ) );
 		$SQL->ORDER_BY( 'slug_title' );
@@ -1550,7 +1580,28 @@ class MarkdownImport extends AbstractImport
 		if( $post_ID )
 		{	// Load Item by ID:
 			$ItemCache = & get_ItemCache();
-			$Item = & $ItemCache->get_by_ID( $post_ID, false, false );
+			if( $Item = & $ItemCache->get_by_ID( $post_ID, false, false ) )
+			{	// Display details of Item that will be updated:
+				// TODO: probably we need the same info for new creating Item,
+				//       then this log will be moved outside of this function,
+				//       after we call Item->dbinsert()/Item->dbupdate()
+				$this->log( '<br/>&nbsp; &nbsp; Details: '
+					.'<i>slug=</i>'
+					.'<a href="'.$Item->get_permanent_url().'" class="evo_log__slug" target="_blank"><code>'
+						.$item_slug
+					.'</code></a> '
+					.'<i>post_ID=</i>'
+					.'<a href="'.$Item->get_edit_url( array(
+							'force_backoffice_editing' => true, // Use back-office edit item url
+							'save_context'             => false, // Don't append param "redirect_to"
+							// Don't check permission because this link must be displayed even
+							// when import is called from CLI mode without logged in admin:
+							'check_perm'               => false,
+						) ).'" class="evo_log__title" target="_blank"><b>'
+						.$post_ID
+					.'</b></a>' );
+			}
+
 			return $Item;
 		}
 
@@ -1876,6 +1927,10 @@ class MarkdownImport extends AbstractImport
 			}
 		}
 
+		// TODO: CCC ### we don't want this by default - write back to MD source on request, but don't just unassign
+		// TODO: as discussed with FP, these should we written back to MD file
+		// see point C) C#9 from "LRT-364011-MD Importer still fails with unhandled exceptions on Glossary inserts (Duplicate entry)"
+		// disabling/commenting out for now
 		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, array_merge( $extra_cat_IDs, array( $Item->get( 'main_cat_ID' ) ) ) );
 		$no_yaml_message = ' ('.TB_('no longer in YAML block').')';
 		if( ! empty( $del_extra_cat_IDs ) )

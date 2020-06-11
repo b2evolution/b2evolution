@@ -7018,6 +7018,7 @@ class Item extends ItemLight
 				'glue'                     => '&amp;',
 				'force_in_skin_editing'    => false,
 				'force_backoffice_editing' => false,
+				'check_perm'               => true, // FALSE - if this link must be displayed even if current has no permission to view item history page
 			);
 
 		$this->load_Blog();
@@ -7026,12 +7027,12 @@ class Item extends ItemLight
 		    ( ! $params['force_backoffice_editing'] || ! check_user_perm( 'admin', 'restricted' ) ) &&
 		    ( ! is_admin_page() || $params['force_in_skin_editing'] ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
-			if( check_item_perm_edit( $this->ID, false ) )
+			if( ! $params['check_perm'] || check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
 				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
 			}
 		}
-		else if( check_user_perm( 'admin', 'restricted' ) )
+		else if( ! $params['check_perm'] || check_user_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
 			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
