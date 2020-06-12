@@ -2896,6 +2896,26 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .widget_core_item_workflow .evo_widget_item_workflow_form .controls {
   display: inline-block;
 }
+.checklist_items .checklist_item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.checklist_items .checklist_item label {
+  flex-grow: 1;
+}
+.checklist_items .checklist_item .checklist_item_delete {
+  margin-left: 3px;
+}
+.checklist_items .checklist_item:hover .checklist_item_delete {
+  visibility: visible !important;
+}
+.checklist_items .checklist_item input[type="checkbox"]:checked + .checklist_item_label {
+  text-decoration: line-through;
+}
+.checklist_item_input {
+  overflow-y: hidden;
+}
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
   top: 0;

@@ -300,6 +300,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_widget_coll_search_form.js',
 					'rsc/js/src/evo_init_autocomplete_login.js',
 					'rsc/js/src/evo_init_widget_poll.js',
+					'rsc/js/src/evo_init_widget_item_checklist_items.js',
 					'rsc/js/src/evo_init_plugin_auto_anchors.js',
 					'rsc/js/src/evo_init_plugin_custom_tags.js',
 					'rsc/js/src/evo_init_plugin_table_contents.js',

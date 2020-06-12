@@ -121,6 +121,15 @@ class ItemLight extends DataObject
 	var $tags = NULL;
 
 	/**
+	 * Array of checklist items
+	 * 
+	 * Lazy loaded.
+	 * @see ItemLight::get_checklist_items()
+	 * @var array
+	 */
+	var $checklist_items = NULL;
+
+	/**
 	 * Array of dbchanges flag to be able to check modifications, and execute update queries only when required
 	 * Note: Only those updates needs to be tracked in this var which are saved in a relational table ( e.g. tags, extracats )
 	 * @access protected
@@ -1895,6 +1904,30 @@ class ItemLight extends DataObject
 		}
 
 		return $this->tags;
+	}
+
+
+	/**
+	 * Get array of checklist items.
+	 *
+	 * @return array
+	 */
+	function get_checklist_items()
+	{
+		global $DB;
+
+		if( ! isset( $this->checklist_items ) )
+		{
+			// Build query to get the checklist items:
+			$checklist_SQL = new SQL( 'Get checklist items for Item #'.$this->ID );
+			$checklist_SQL->SELECT( 'check_ID, check_item_ID, check_checked, check_label' );
+			$checklist_SQL->FROM( 'T_checklist_items' );
+			$checklist_SQL->WHERE( 'check_item_ID = '.$DB->quote( $this->ID ) );
+			$checklist_SQL->ORDER_BY( 'check_ID' );
+			$this->checklist_items = $DB->get_results( $checklist_SQL );
+		}
+
+		return $this->checklist_items;
 	}
 
 

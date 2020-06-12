@@ -296,6 +296,24 @@ function & get_ItemTagCache()
 }
 
 /**
+ * Get the ChecklistItemCache
+ * 
+ * @return ChecklistItemCache
+ */
+function & get_ChecklistItemCache()
+{
+	global $ChecklistItemCache;
+
+	if( ! isset( $ChecklistItemCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_checklistitem.class.php', 'ChecklistItem' );
+		$ChecklistItemCache = new DataObjectCache( 'ChecklistItem', false, 'T_checklist_items', 'check_', 'check_ID', 'check_label' );
+	}
+
+	return $ChecklistItemCache;
+}
+
+/**
  * Get the CommentCache
  *
  * @return CommentCache
@@ -1660,6 +1678,86 @@ class collections_Module extends Module
 				{	// Exit here when AJAX request, so we don't need a redirect after this function:
 					exit(0);
 				}
+
+			case 'checklist_item':
+				global $DB;
+
+				load_class('items/model/_checklistitem.class.php', 'ChecklistItem' );
+
+				// Add/Update checklist item:
+				$item_action     = param( 'item_action', 'string', 'add' );
+				$item_ID         = param( 'item_ID', 'integer', true );
+				$checklist_ID    = param( 'check_ID', 'integer', NULL );
+
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				// Check perms:
+				check_user_perm( 'meta_comment', 'add', true, $edited_Item->get_blog_ID() );
+
+				if( $item_action == 'add' )
+				{
+					$checklist_label = param( 'check_label', 'string', true );
+
+					if( empty( $checklist_ID ) )
+					{
+						$checklistItem = new ChecklistItem();
+						$checklistItem->set_Item( $edited_Item );
+						$checklistItem->set( 'label', $checklist_label );
+						$checklistItem->dbsave();
+						$status = 'add';
+					}
+					else
+					{
+						$ChecklistItemCache = & get_ChecklistItemCache();
+						$checklistItem = & $ChecklistItemCache->get_by_ID( $checklist_ID );
+						if( $checklist_label != $checklistItem->label )
+						{
+							$checklistItem->set( 'label', $checklist_label );
+						}
+						$checklistItem->dbsave();
+						$status = 'update';
+					}
+
+					$response = array(
+							'status'      => $status,
+							'check_ID'    => $checklistItem->ID,
+							'check_label' => $checklistItem->label,
+						);
+				}
+				elseif( $item_action == 'toggle_check' )
+				{
+					$checklist_checked = param( 'check_checked', 'boolean', NULL );
+
+					$ChecklistItemCache = & get_ChecklistItemCache();
+					$checklistItem = & $ChecklistItemCache->get_by_ID( $checklist_ID );
+					if( isset( $checklist_checked ) )
+					{
+						$checklistItem->set( 'checked', $checklist_checked ? 1 : 0 );
+					}
+					$checklistItem->dbsave();
+					$status = 'toggle_check';
+
+					$response = array(
+							'status'        => $status,
+							'check_ID'      => $checklistItem->ID,
+							'check_checked' => $checklistItem->checked,
+						);
+				}
+				elseif( $item_action == 'delete' )
+				{
+					$ChecklistItemCache = & get_ChecklistItemCache();
+					$checklistItem = & $ChecklistItemCache->get_by_ID( $checklist_ID );
+
+					$response = array(
+							'status'   => 'delete',
+							'check_ID' => $checklist_ID,
+						);
+
+					$checklistItem->dbdelete();
+				}
+
+				exit( evo_json_encode( $response ) );
 		}
 	}
 }

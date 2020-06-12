@@ -1,0 +1,31 @@
+// Checklist Items widget
+
+.checklist_items {
+    .checklist_item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        label {
+            flex-grow: 1;
+        }
+
+        .checklist_item_delete {
+            margin-left: 3px;
+        }
+
+        // Show delete action icon on hover:
+        &:hover .checklist_item_delete {
+            visibility: visible !important;
+        }
+
+        // Strikeout checked items:
+        input[type="checkbox"]:checked + .checklist_item_label {
+            text-decoration: line-through;
+        }
+    }
+}
+
+.checklist_item_input {
+    overflow-y: hidden;
+}
