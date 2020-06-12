@@ -1909,6 +1909,7 @@ class MarkdownImport extends AbstractImport
 		}
 		$old_extra_cat_IDs = $Item->get( 'extra_cat_IDs' );
 
+		// Get extra categories from YAML block:
 		$extra_cat_IDs = array();
 		$specified_yaml_message = ' ('.TB_('specified in YAML block').')';
 		foreach( $value as $extra_cat_slug )
@@ -1927,10 +1928,25 @@ class MarkdownImport extends AbstractImport
 			}
 		}
 
+		// Keep old extra categories:
+		$ChapterCache = & get_ChapterCache();
+		$stored_db_message = ' ('.TB_('stored in DB').')';
+		foreach( $old_extra_cat_IDs as $old_extra_cat_ID )
+		{
+			if( ! in_array( $old_extra_cat_ID, $extra_cat_IDs ) &&
+			    ( $old_extra_Chapter = & $ChapterCache->get_by_ID( $old_extra_cat_ID, false, false ) ) )
+			{	// Inform only about existing old category and that is not in YAML block:
+				$extra_cat_IDs[] = $old_extra_Chapter->ID;
+				$cross_posted_message = ( $old_extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
+				$this->add_yaml_message( sprintf( TB_('Keep old extra category: %s'), $old_extra_Chapter->get_permanent_link().$stored_db_message.$cross_posted_message ), 'info' );
+			}
+		}
+
 		// TODO: CCC ### we don't want this by default - write back to MD source on request, but don't just unassign
 		// TODO: as discussed with FP, these should we written back to MD file
 		// see point C) C#9 from "LRT-364011-MD Importer still fails with unhandled exceptions on Glossary inserts (Duplicate entry)"
 		// disabling/commenting out for now
+		/*
 		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, array_merge( $extra_cat_IDs, array( $Item->get( 'main_cat_ID' ) ) ) );
 		$no_yaml_message = ' ('.TB_('no longer in YAML block').')';
 		if( ! empty( $del_extra_cat_IDs ) )
@@ -1949,7 +1965,7 @@ class MarkdownImport extends AbstractImport
 					$this->add_yaml_message( sprintf( TB_('Un-assigned old extra-category #%s because it doesn\'t exist.'), $del_extra_cat_ID.$no_yaml_message ), 'error' );
 				}
 			}
-		}
+		}*/
 
 		$Item->set( 'extra_cat_IDs', $extra_cat_IDs );
 	}
