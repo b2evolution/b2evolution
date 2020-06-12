@@ -30,6 +30,12 @@ class AbstractImport
 	var $log_cli_format = 'text';
 
 	/**
+	 * Log here what wrappers are opened currently
+	 * @var array Key - autoincremented started with 0, Value - wrapper types: 'list'
+	 */
+	private $log_wrappers = array();
+
+	/**
 	 * Get collection
 	 *
 	 * @param object|NULL|FALSE Collection
@@ -172,6 +178,93 @@ class AbstractImport
 		}
 
 		return $before.$message.$after;
+	}
+
+
+	/**
+	 * Log message inside list
+	 * Helper for quick log in list
+	 *
+	 * @param string Message
+	 * @param string Type: 'success', 'error', 'warning'
+	 */
+	function log_list( $message, $type = NULL )
+	{
+		$this->log_inside( 'list' );
+		$this->log( $message, $type );
+	}
+
+
+	/**
+	 * Start to log next messages inside requested wrapper
+	 * Print start of wrapper tag if it was not opened yet,
+	 * otherwise continue log in currently opened wrapper
+	 *
+	 * @param string Wrapper type
+	 */
+	function log_inside( $wrapper_type )
+	{
+		if( in_array( $wrapper_type, $this->log_wrappers ) )
+		{	// The requested wrapper is already opened,
+			// don't open this twice:
+			return;
+		}
+
+		// Flag to know the wrapper is already opened:
+		$this->log_wrappers[] = $wrapper_type;
+
+		switch( $wrapper_type )
+		{
+			case 'list':
+				$this->log( '<ul class="list-default" style="margin-bottom:0">' );
+				break;
+
+			case 'p':
+				$this->log( '<p>' );
+				break;
+		}
+	}
+
+
+	/**
+	 * Close last/currently opened log wrapper
+	 *
+	 * @return string|FALSE Type of last ended wrapper, FALSE - if no opened wrappers
+	 */
+	function close_log_wrapper()
+	{
+		if( empty( $this->log_wrappers ) )
+		{	// No opened wrappers
+			return false;
+		}
+
+		// Get last wrapper:
+		if( ! ( $last_wrapper_type = array_pop( $this->log_wrappers ) ) )
+		{	// No found last wrapper
+			return false;
+		}
+
+		switch( $last_wrapper_type )
+		{
+			case 'list':
+				$this->log( '</ul>' );
+				break;
+
+			case 'p':
+				$this->log( '</p>' );
+				break;
+		}
+
+		return $last_wrapper_type;
+	}
+
+
+	/**
+	 * Close ALL opened log wrappers
+	 */
+	function close_log_wrappers()
+	{
+		while( $this->close_log_wrapper() !== false );
 	}
 
 
