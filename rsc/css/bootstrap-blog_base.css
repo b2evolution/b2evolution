@@ -427,14 +427,26 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   display: flex;
   -ms-flex-direction: row;
       flex-direction: row;
-  -ms-flex-pack: justify;
-      justify-content: space-between;
 }
 .checklist_items .checklist_item label {
+  min-width: 0;
   -ms-flex-positive: 1;
       flex-grow: 1;
+  display: -ms-flexbox;
+  display: flex;
+}
+.checklist_items .checklist_item label input[type="checkbox"] {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+.checklist_items .checklist_item label .checklist_item_label {
+  -ms-flex-positive: 1;
+      flex-grow: 1;
+  word-break: break-all;
 }
 .checklist_items .checklist_item .checklist_item_delete {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   margin-left: 3px;
 }
 .checklist_items .checklist_item:hover .checklist_item_delete {

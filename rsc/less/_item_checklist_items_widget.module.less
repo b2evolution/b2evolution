@@ -4,19 +4,33 @@
     .checklist_item {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
 
         label {
+            // min-width set to 0 ensures the element doesn't auto-resize to the parent flex container, and wraps as needed.
+            min-width: 0;
             flex-grow: 1;
+            display: flex;
+
+            input[type="checkbox"] {
+                flex-shrink: 0;
+            }
+
+            .checklist_item_label {
+                flex-grow: 1;
+                word-break: break-all;
+            }
         }
 
         .checklist_item_delete {
+            flex-shrink: 0;
             margin-left: 3px;
         }
 
         // Show delete action icon on hover:
-        &:hover .checklist_item_delete {
-            visibility: visible !important;
+        &:hover {
+            .checklist_item_delete {
+                visibility: visible !important;
+            }
         }
 
         // Strikeout checked items:
