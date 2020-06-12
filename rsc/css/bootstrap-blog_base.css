@@ -442,7 +442,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .checklist_items .checklist_item label .checklist_item_label {
   -ms-flex-positive: 1;
       flex-grow: 1;
-  word-break: break-all;
+  word-break: break-word;
 }
 .checklist_items .checklist_item .checklist_item_delete {
   -ms-flex-negative: 0;
