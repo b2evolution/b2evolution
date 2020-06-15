@@ -1850,6 +1850,7 @@ function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#
 		if( $file_index === NULL || isset( $footerline_include_file[ $file_index ] ) )
 		{	// Use auto order/index:
 			$footerline_include_file[] = $footerline;
+			$file_index = max( array_keys( $footerline_include_file ) );
 		}
 		else
 		{	// Use specific order/index when it is requested and the index is free:
@@ -1858,7 +1859,7 @@ function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#
 		$footerline_include_file[] = $footerline;
 		// Flag to don't include same file from same group twice,
 		// Also store value as index/order in order to dequeue it quickly:
-		$footerline_file_index[ $group_relative_to ][ $file_name ] = array_key_last( $footerline_include_file );
+		$footerline_file_index[ $group_relative_to ][ $file_name ] = $file_index;
 	}
 }
 
