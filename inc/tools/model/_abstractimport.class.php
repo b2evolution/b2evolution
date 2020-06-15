@@ -187,11 +187,12 @@ class AbstractImport
 	 *
 	 * @param string Message
 	 * @param string Type: 'success', 'error', 'warning'
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
 	 */
-	function log_list( $message, $type = NULL )
+	function log_list( $message, $type = NULL, $type_html_tag = 'p' )
 	{
 		$this->log_inside( 'list' );
-		$this->log( $message, $type );
+		$this->log( $message, $type, $type_html_tag );
 	}
 
 

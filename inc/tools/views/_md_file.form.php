@@ -50,11 +50,10 @@ if( ! empty( $import_files ) )
 
 	// Import mode:
 	$import_type_value = param( 'import_type', $MarkdownImport->options_defs['import_type']['type'], NULL );
-	$import_type = $import_type_value === NULL ? $MarkdownImport->options_defs['import_type']['default'] : $import_type_value;
 	$i = 0;
 	foreach( $MarkdownImport->options_defs['import_type']['options'] as $option_value => $option )
 	{
-		$Form->radio_input( 'import_type', $import_type, array(
+		$Form->radio_input( 'import_type', $MarkdownImport->get_option( 'import_type' ), array(
 				array(
 					'value' => $option_value,
 					'label' => $option['title'],
@@ -66,9 +65,8 @@ if( ! empty( $import_files ) )
 		{
 			if( $sub_option['group'] == 'import_type' && $sub_option['subgroup'] == $option_value )
 			{
-				$sub_option_value = ( $import_type_value === NULL ? $sub_option['default'] : param( $sub_option_key, $sub_option['type'], 0 ) );
-				echo '<div id="checkbox_'.$sub_option_key.'"'.( $sub_option['subgroup'] == $import_type ? '' : ' style="display:none"' ).'>';
-				$Form->checkbox_input( $sub_option_key, $sub_option_value, '', array(
+				echo '<div id="checkbox_'.$sub_option_key.'"'.( $sub_option['subgroup'] == $MarkdownImport->get_option( 'import_type' ) ? '' : ' style="display:none"' ).'>';
+				$Form->checkbox_input( $sub_option_key, $MarkdownImport->get_option( $sub_option_key ), '', array(
 					'input_suffix' => $sub_option['title'],
 					'note'         => isset( $sub_option['note'] ) ? $sub_option['note'] : '',
 					'input_prefix' => '<span style="margin-left:25px"></span>') );
@@ -91,12 +89,25 @@ if( ! empty( $import_files ) )
 		{
 			$option_attrs['style'] = 'margin-left:'.( $option['indent'] * 20 ).'px';
 		}
-		$option_value = ( $import_type_value === NULL ? $option['default'] : param( $option_key, $option['type'], 0 ) );
-		$checklist_options[] = array( $option_key, '1', $option['title'], $option_value, ( isset( $option['disabled'] ) ? $option['disabled'] : NULL ), ( isset( $option['note'] ) ? $option['note'] : NULL ), NULL, NULL, $option_attrs );
+		$checklist_options[] = array( $option_key, '1', $option['title'], $MarkdownImport->get_option( $option_key ), ( isset( $option['disabled'] ) ? $option['disabled'] : NULL ), ( isset( $option['note'] ) ? $option['note'] : NULL ), NULL, NULL, $option_attrs );
 	}
 	if( ! empty( $checklist_options ) )
 	{
 		$Form->checklist( $checklist_options, 'md_options', TB_('Options') );
+	}
+
+	// Radio options:
+	foreach( $MarkdownImport->options_defs as $option_key => $option )
+	{
+		if( $option['group'] == 'radio' )
+		{	// Display here only radio options:
+			$radio_options = $option['options'];
+			foreach( $radio_options as $radio_option_value => $radio_option_data )
+			{
+				$radio_options[ $radio_option_value ] = array( 'value' => $radio_option_value ) + $radio_option_data;
+			}
+			$Form->radio_input( $option_key, $MarkdownImport->get_option( $option_key ), $radio_options, $option['title'], array( 'lines' => true ) );
+		}
 	}
 
 	$Form->end_fieldset();

@@ -124,6 +124,17 @@ class MarkdownImport extends AbstractImport
 				'type'    => 'integer',
 				'default' => 0,
 			),
+			// Import mode:
+			'slug_diff_coll' => array(
+				'group'   => 'radio',
+				'title'   => TB_('If filename/slug exists in a different collection'),
+				'options' => array(
+					'skip' => array( 'label' => sprintf( TB_('Display error and skip the %s file'), '<code>.md</code>' ) ),
+					'create' => array( 'label' => TB_('Create a new slug like xyz-1') ),
+				),
+				'type'    => 'string',
+				'default' => 'skip',
+			),
 		);
 
 		// Supported YAML fields:
@@ -826,8 +837,19 @@ class MarkdownImport extends AbstractImport
 			}
 
 			$item_slug = get_urltitle( $item_slug );
+			if( $this->get_option( 'import_type' ) == 'update' )
+			{	// For "update" mode try to find existing Item by slug:
+				$Item = & $this->get_Item( $item_slug );
+				if( $Item === false )
+				{	// Skip if Item is found by same slug but in another Collection:
+					$this->close_log_wrapper();
+					$this->log( '<br>' );
+					continue;
+				}
+			}
+
 			if( $this->get_option( 'import_type' ) != 'update' ||
-					! ( $Item = & $this->get_Item( $item_slug ) ) )
+			    ! $Item )
 			{	// Create new Item for not update mode or if it is not found by slug in the requested Collection:
 				$Item = new Item();
 				$Item->set( 'creator_user_ID', ( is_logged_in() ? $current_User->ID : 1/*Run from CLI mode by admin*/ )  );
@@ -917,7 +939,7 @@ class MarkdownImport extends AbstractImport
 			$item_is_updated_step_1 = false;
 
 			$item_result_messages = array();
-			$item_result_class = '';
+			$item_result_class = 'default';
 			$item_result_suffix = '';
 			if( empty( $Item->ID ) )
 			{	// Insert new Item:
@@ -952,45 +974,45 @@ class MarkdownImport extends AbstractImport
 					$Item->dbupdate( true, true, true, 
 						$this->get_option( 'force_item_update' ) || $item_content_was_changed/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      
 	// TODO: fp>yb: please give example of situation where we want to NOT create a new revision ? (I think we ALWAYS want to create a new revision)				
-				{	// Item has been updated successfully:
-					$item_is_updated_step_1 = true;
-					$item_result_class = 'warning';
-					if( $this->get_option( 'force_item_update' ) )
-					{	// If item update was forced:
-						$item_result_messages[] = /* TRANS: Result of imported Item */ TB_('Forced update');
+					{	// Item has been updated successfully:
+						$item_is_updated_step_1 = true;
+						$item_result_class = 'warning';
+						if( $this->get_option( 'force_item_update' ) )
+						{	// If item update was forced:
+							$item_result_messages[] = /* TRANS: Result of imported Item */ TB_('Forced update');
+						}
+						else
+						{	// Normal update because content or category was changed:
+							$item_result_messages[] = /* TRANS: Result of imported Item */ TB_('Has changed');
+						}
+						if( $prev_category_ID != $category_ID )
+						{	// If moved to different category:
+							$item_result_messages[] =/* TRANS: Result of imported Item */  TB_('Moved to different category');
+						}
+						if( $this->item_yaml_is_updated )
+						{	// If YAML fields were updated:
+							$item_result_messages[] =/* TRANS: Result of imported Item */  TB_('Updated YAML fields');
+						}
+						if( $item_content_was_changed )
+						{	// If content was changed:
+							$item_result_messages[] = /* TRANS: Result of imported Item */ TB_('New revision added to DB');
+							if( $prev_last_import_hash === NULL )
+							{	// Display additional warning when Item was edited manually:
+								global $admin_url;
+								$item_result_suffix = '. <br /><span class="label label-danger">'.TB_('CONFLICT').'</span> <b>'
+									.sprintf( TB_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'),
+										'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
+							}
+						}
+						$post_results_num['updated_success']++;
 					}
 					else
-					{	// Normal update because content or category was changed:
-						$item_result_messages[] = /* TRANS: Result of imported Item */ TB_('Has changed');
+					{	// Failed update:
+						// Don't translate because it should not happens:
+						$item_result_messages[] = 'Cannot be updated';
+						$item_result_class = 'danger';
+						$post_results_num['updated_failed']++;
 					}
-					if( $prev_category_ID != $category_ID )
-					{	// If moved to different category:
-						$item_result_messages[] =/* TRANS: Result of imported Item */  TB_('Moved to different category');
-					}
-					if( $this->item_yaml_is_updated )
-					{	// If YAML fields were updated:
-						$item_result_messages[] =/* TRANS: Result of imported Item */  TB_('Updated YAML fields');
-					}
-					if( $item_content_was_changed )
-					{	// If content was changed:
-						$item_result_messages[] = /* TRANS: Result of imported Item */ TB_('New revision added to DB');
-						if( $prev_last_import_hash === NULL )
-						{	// Display additional warning when Item was edited manually:
-							global $admin_url;
-							$item_result_suffix = '. <br /><span class="label label-danger">'.TB_('CONFLICT').'</span> <b>'
-								.sprintf( TB_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'),
-									'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
-						}
-					}
-					$post_results_num['updated_success']++;
-				}
-				else
-				{	// Failed update:
-					// Don't translate because it should not happens:
-					$item_result_messages[] = 'Cannot be updated';
-					$item_result_class = 'danger';
-					$post_results_num['updated_failed']++;
-				}
 				}
 			}
 
@@ -1491,43 +1513,64 @@ class MarkdownImport extends AbstractImport
 
 
 	/**
-	 * Get Item by slug in given Collection
+	 * Get Item by slug in given Collection if option "If filename/slug exists in a different collection" = "Create a new slug like xyz-1"
+	 * OR Skip Item by log error and return FALSE if the option = "Display error and skip the .md file"
 	 *
 	 * @param string Item slug
-	 * @return object|NULL Item object
+	 * @return object|NULL|FASLE Item object,
+	 *                           NULL - if Item is not found and we can create new,
+	 *                           FALSE - if Item must be skipped because it exists in another collection
 	 */
 	function & get_Item( $item_slug )
 	{
 		global $DB;
 
-		// Try to find Item by slug with suffix like "-123" in the requested Collection:
-		$item_slug_base = preg_replace( '/-\d+$/', '', $item_slug );
-		$SQL = new SQL( 'Find Item by slug base "'.$item_slug_base.'" in the Collection #'.$this->coll_ID );
-		$SQL->SELECT( 'post_ID' );
+		if( $this->get_option( 'slug_diff_coll' ) == 'create' )
+		{	// Try to find Item by slug with suffix like "-123" in the requested Collection:
+			$item_slug_base = preg_replace( '/-\d+$/', '', $item_slug );
+			$sql_title = 'Find Item by slug base "'.$item_slug_base.'" in the Collection #'.$this->coll_ID;
+		}
+		else
+		{	// Try to find Item by slug in ALL Collections:
+			$sql_title = 'Find Item by slug "'.$item_slug.'" in ALL Collections';
+		}
+		$SQL = new SQL( $sql_title );
+		$SQL->SELECT( 'post_ID, cat_blog_ID' );
 		$SQL->FROM( 'T_slug' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON post_ID = slug_itm_ID AND slug_type = "item"' );
 		$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = post_main_cat_ID' );
-		// CCC: the slug is unique in the system, then the restriction by blog_ID is wrong here.
-		// a post that WAS in this blog as main category, but meanwhile only has it as secondary category should
-		// still be identified and updated here
-		// CCC: as discussed with FP we need to keep this but make an option
-		//
-		// if slug exists in different collection
-		// (x) terminate with error
-		// ( ) insert new slug-1 post
-		//
-		// TODO: point B) C#9 from "LRT-364011-MD Importer still fails with unhandled exceptions on Glossary inserts (Duplicate entry)"
-		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
-		$SQL->WHERE_and( 'slug_title REGEXP '.$DB->quote( '^'.$item_slug_base.'(-[0-9]+)?$' ) );
+		if( $this->get_option( 'slug_diff_coll' ) == 'create' )
+		{ // Create a new slug like xyz-1 if filename/slug exists in a different collection:
+			$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
+			$SQL->WHERE_and( 'slug_title REGEXP '.$DB->quote( '^'.$item_slug_base.'(-[0-9]+)?$' ) );
+		}
+		else
+		{	// Display error and skip the .md file 
+			$SQL->WHERE( 'slug_title = '.$DB->quote( $item_slug ) );
+		}
 		$SQL->ORDER_BY( 'slug_title' );
 		$SQL->LIMIT( '1' );
-		$post_ID = intval( $DB->get_var( $SQL ) );
+		$post_data = $DB->get_row( $SQL );
 
-		if( $post_ID )
-		{	// Load Item by ID:
+		if( ! empty( $post_data ) )
+		{	// Item is found by slug
+			$post_coll_ID = $post_data->cat_blog_ID;
+			// Initalize a found Item by ID:
+			$post_ID = $post_data->post_ID;
 			$ItemCache = & get_ItemCache();
 			if( $Item = & $ItemCache->get_by_ID( $post_ID, false, false ) )
-			{	// Display details of Item that will be updated:
+			{	// If Item is found by ID
+
+				// Get URL to edit the Item:
+				$edit_item_url = $Item->get_edit_url( array(
+					'force_backoffice_editing' => true, // Use back-office edit item url
+					'save_context'             => false, // Don't append param "redirect_to"
+					// Don't check permission because this link must be displayed even
+					// when import is called from CLI mode without logged in admin:
+					'check_perm'               => false,
+				) );
+
+				// Display details of Item that will be updated:
 				// TODO: probably we need the same info for new creating Item,
 				//       then this log will be moved outside of this function,
 				//       after we call Item->dbinsert()/Item->dbupdate()
@@ -1537,20 +1580,33 @@ class MarkdownImport extends AbstractImport
 						.$item_slug
 					.'</code></a> '
 					.'<i>post_ID=</i>'
-					.'<a href="'.$Item->get_edit_url( array(
-							'force_backoffice_editing' => true, // Use back-office edit item url
-							'save_context'             => false, // Don't append param "redirect_to"
-							// Don't check permission because this link must be displayed even
-							// when import is called from CLI mode without logged in admin:
-							'check_perm'               => false,
-						) ).'" class="evo_log__title" target="_blank"><b>'
+					.'<a href="'.$edit_item_url.'" class="evo_log__title" target="_blank"><b>'
 						.$post_ID
 					.'</b></a>' );
-			}
 
-			return $Item;
+				if( $this->get_option( 'slug_diff_coll' ) == 'skip' &&
+						$post_coll_ID != $this->coll_ID )
+				{	// Skip Item with same slug in another Collection:
+					$BlogCahe = get_BlogCache();
+					$another_Blog = & $BlogCahe->get_by_ID( $post_coll_ID, false, false );
+					$this->log_list( sprintf( 'Skip this %s file because Item(%s) already exists with same slug in collection %s!',
+							'<code>.md</code>',
+							// Link to another Item with same slug:
+							( $Item ? '<a href="'.$edit_item_url.'" target="_blank">'.$Item->get( 'title' ).'</a>' : '#'.$post_ID ),
+							// Link to another Collection where Item is found by same slug:
+							( $another_Blog ? '<a href="'.$another_Blog->get( 'url' ).'" target="_blank">'.$another_Blog->get( 'name' ).'</a>' : '#'.$post_coll_ID )
+						), 'error', 'li' );
+					// Return FALSE in order to know we found Item by slug but in another Collection:
+					$r = false;
+					return $r;
+				}
+
+				// Return found Item:
+				return $Item;
+			}
 		}
 
+		// Return NULL in order to know we don't find Item by slug:
 		$r = NULL;
 		return $r;
 	}
@@ -2093,7 +2149,7 @@ class MarkdownImport extends AbstractImport
 			}
 			else
 			{
-				$this->log( '<ul class="list-default">' );
+				$this->log( '<ul class="list-default" style="margin-bottom:0">' );
 				foreach( $selected_options as $option_key => $option )
 				{
 					$this->log( '<li'.( $option[1] ? ' style="margin-left:'.( $option[1] * 10 ).'px"' : '' ).'>'.$option[0].'</li>' );
@@ -2101,6 +2157,15 @@ class MarkdownImport extends AbstractImport
 				$this->log( '</ul>' );
 			}
 		}
+		// Radio options:
+		foreach( $this->options_defs as $option_key => $option )
+		{
+			if( $option['group'] == 'radio' && $this->get_option( $option_key ) )
+			{	// Display here only radio options:
+				$this->log( '<b>'.$option['title'].':</b> '.$option['options'][ $this->get_option( $option_key ) ]['label'].'<br>' );
+			}
+		}
+		$this->log( '<br>' );
 
 		if( $this->get_data( 'errors' ) === false )
 		{	// Import the data and display a report on the screen:
