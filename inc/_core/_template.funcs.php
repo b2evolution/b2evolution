@@ -1806,6 +1806,7 @@ function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogr
 		if( $file_index === NULL || isset( $headline_include_file[ $file_index ] ) )
 		{	// Use auto order/index:
 			$headline_include_file[] = $headline;
+			$file_index = max( array_keys( $headline_include_file ) );
 		}
 		else
 		{	// Use specific order/index when it is requested and the index is free:
@@ -1813,7 +1814,7 @@ function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogr
 		}
 		// Flag to don't include same file from same group twice,
 		// Also store value as index/order in order to dequeue it quickly:
-		$headline_file_index[ $group_relative_to ][ $file_name ] = array_key_last( $headline_include_file );
+		$headline_file_index[ $group_relative_to ][ $file_name ] = $file_index;
 	}
 }
 
