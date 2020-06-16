@@ -8447,6 +8447,7 @@ class Item extends ItemLight
 
 		if( $post_comment_status == 'closed' || $post_comment_status == 'disabled' )
 		{	// Check if item type allows these options:
+			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
 			if( $post_comment_status == 'closed' && ! $ItemType->get( 'allow_closing_comments' ) )
 			{
@@ -8461,6 +8462,14 @@ class Item extends ItemLight
 		if( empty( $item_typ_ID ) )
 		{	// Use first item type by default for wrong request:
 			$item_typ_ID = 1;
+		}
+
+		// Set Item Type here in order to get item type settings below:
+		$this->set( 'ityp_ID', $item_typ_ID );
+
+		if( ! $this->get_type_setting( 'allow_html' ) )
+		{	// Strip HTML tags from content if HTML is not allowed for Item Type of this Item:
+			$post_content = utf8_strip_tags( $post_content );
 		}
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -8498,7 +8507,6 @@ class Item extends ItemLight
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
-		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $postcat_order );
 
