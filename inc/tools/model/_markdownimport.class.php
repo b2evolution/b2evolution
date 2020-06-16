@@ -954,7 +954,7 @@ class MarkdownImport extends AbstractImport
 			$item_result_suffix = '';
 			if( empty( $Item->ID ) )
 			{	// Insert new Item:
-				$this->log_list( '<li><span class="label label-info">INSERTING</span> Item in DB...</li>' );
+				$this->log_list( '<span class="label label-info">INSERTING</span> Item in DB...' );
 				if( $Item->dbinsert() )
 				{	// If post is inserted successfully:
 					$item_is_updated_step_1 = true;
@@ -979,7 +979,7 @@ class MarkdownImport extends AbstractImport
 				}
 				else
 				{
-					$this->log_list( '<li><span class="label label-info">UPDATING</span> Item in DB...</li>' );
+					$this->log_list( '<span class="label label-info">UPDATING</span> Item in DB...' );
 					if(
 					// This is UPDATE 1 of 3 (there is a 2nd UPDATE for [image:] tags. These tags cannot be created before the Item ID is known.):
 					$Item->dbupdate( true, true, true, 
@@ -1047,7 +1047,7 @@ class MarkdownImport extends AbstractImport
 			$this->log_list( '<li class="text-'.$item_result_class.'"><span class="label label-'.$item_result_class.'">RESULT</span> '
 					.implode( ' -> ', $item_result_messages )
 					.$item_result_suffix
-				.'</li>' );
+				.'</li>', NULL );
 
 			// Call plugin event after Item was imported:
 			$Plugins->trigger_event( 'ImporterAfterItemImport', array(
@@ -1121,18 +1121,18 @@ class MarkdownImport extends AbstractImport
 
 					if( $new_links_count > 0 || ( $item_is_updated_step_1 && $all_links_count > 0 ) )
 					{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
-						$this->log_list( '<li class="text-warning">' );
 						if( $new_links_count > 0 )
 						{	// Update content with new inline image tags:
-							$this->log( sprintf( TB_('%d new image files were linked to the Item'), $new_links_count )
-								.' -> './* TRANS: Result of imported Item */ TB_('Saving to DB').'.' );
+							$this->log_list( sprintf( TB_('%d new image files were linked to the Item'), $new_links_count )
+								.' -> './* TRANS: Result of imported Item */ TB_('Saving to DB').'.',
+								'text-warning' );
 						}
 						else
 						{	// Force to update content with inline image tags:
-							$this->log( TB_('No image file changes BUT Item Update is required')
-								.' -> './* TRANS: Result of imported Item */ TB_('Saving <code>[image:]</code> tags to DB').'.' );
+							$this->log_list( TB_('No image file changes BUT Item Update is required')
+								.' -> './* TRANS: Result of imported Item */ TB_('Saving <code>[image:]</code> tags to DB').'.',
+								'text-warning' );
 						}
-						$this->log( '</li>' );
 						if( ! $item_is_filtered_by_plugins )
 						{	// Filter title and content by renderer plugins:
 							$item_Blog = & $Item->get_Blog();
@@ -1157,10 +1157,7 @@ class MarkdownImport extends AbstractImport
 				if( ( $md_file_handle = @fopen( $file_path, 'w' ) ) &&
 				    fwrite( $md_file_handle, $this->item_file_content ) )
 				{	// Inform about updated file content:
-					$this->log_list( '<li class="text-warning"><span class="label label-warning">'.TB_('WARNING').'</span> '
-						.sprintf( 'The file %s was updated on disk (import folder).',
-							'<code>'.$item_slug.'.md</code>'
-						).'</li>' );
+					$this->log_list( sprintf( 'The file %s was updated on disk (import folder).', '<code>'.$item_slug.'.md</code>'), 'warning' );
 					// Close file handle:
 					fclose( $md_file_handle );
 					// Update file hash after changing of the file's content in order to don't update the Item twice on next import:
@@ -1170,10 +1167,7 @@ class MarkdownImport extends AbstractImport
 				}
 				else
 				{	// No file rights to write into the file:
-					$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '
-						.sprintf( 'Impossible to update file %s with fixed content, please check file permissions.',
-							'<code>'.$file_path.'</code>'
-						).'</li>' );
+					$this->log_list( sprintf( 'Impossible to update file %s with fixed content, please check file permissions.', '<code>'.$file_path.'</code>' ), 'error' );
 				}
 			}
 
@@ -1272,14 +1266,14 @@ class MarkdownImport extends AbstractImport
 
 		if( strpos( get_canonical_path( $file_source_path ), $source_folder_absolute_path ) !== 0 )
 		{	// Don't allow a traversal directory:
-			$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '.sprintf( 'Skipping file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>' );
+			$this->log_list( sprintf( 'Skipping file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ), 'error' );
 			// Skip it:
 			return false;
 		}
 
 		if( ! file_exists( $file_source_path ) )
 		{	// File doesn't exist
-			$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '.sprintf( TB_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</li>' );
+			$this->log_list( sprintf( TB_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ), 'error' );
 			// Skip it:
 			return false;
 		}
@@ -1307,19 +1301,19 @@ class MarkdownImport extends AbstractImport
 		{
 			if( ! empty( $file_data['link_ID'] ) )
 			{	// The found File is already linked to the Item:
-				$this->log_list( '<li>'.sprintf( TB_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
+				$this->log_list( sprintf( TB_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ) );
 				return array( 'ID' => $file_data['link_ID'], 'type' => 'old' );
 			}
 			else
 			{	// Try to link the found File object to the Item:
 				if( $link_ID = $File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
 				{	// If file has been linked to the post
-					$this->log_list( '<li class="text-warning">'.sprintf( TB_('File %s already exists in %s, it has been linked to this post as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>', '<code>'.$params['link_position'].'</code>' ).'</li>' );
+					$this->log_list( sprintf( TB_('File %s already exists in %s, it has been linked to this post as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>', '<code>'.$params['link_position'].'</code>' ), 'text-warning' );
 					return array( 'ID' => $link_ID, 'type' => 'new' );
 				}
 				else
 				{	// If file could not be linked to the post:
-					$this->log_list( '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
+					$this->log_list( sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ), 'text-warning' );
 					return false;
 				}
 			}
@@ -1350,7 +1344,7 @@ class MarkdownImport extends AbstractImport
 					}
 					else
 					{	// No change for same file:
-						$this->log_list( '<li>'.sprintf( TB_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
+						$this->log_list( sprintf( TB_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ) );
 						return array( 'ID' => $item_Link->ID, 'type' => 'old' );
 					}
 				}
@@ -1375,7 +1369,7 @@ class MarkdownImport extends AbstractImport
 				$replaced_File->set( 'alt', $params['file_alt'] );
 				if( ! $replaced_File->dbinsert() )
 				{	// Don't translate
-					$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '.sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>' );
+					$this->log_list( sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ), 'error' );
 					return false;
 				}
 			}
@@ -1383,7 +1377,7 @@ class MarkdownImport extends AbstractImport
 			// Try to replace old file with new:
 			if( ! copy_r( $file_source_path, $replaced_File->get_full_path() ) )
 			{	// No permission to replace file:
-				$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '.sprintf( TB_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>' );
+				$this->log_list( sprintf( TB_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ), 'error' );
 				return false;
 			}
 
@@ -1396,16 +1390,16 @@ class MarkdownImport extends AbstractImport
 
 			if( $replaced_link_ID !== NULL )
 			{	// Inform about replaced file:
-				$this->log_list( '<li class="text-warning">'.sprintf( TB_('File %s has been replaced in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
+				$this->log_list( sprintf( TB_('File %s has been replaced in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ), 'text-warning' );
 			}
 			elseif( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
 			{	// If file has been linked to the post
 				$replaced_link_type = 'new';
-				$this->log_list( '<li class="text-warning">'.sprintf( TB_('File %s already exists in %s, it has been updated and linked to this post as %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>', '<code>'.$params['link_position'].'</code>' ).'</li>' );
+				$this->log_list( sprintf( TB_('File %s already exists in %s, it has been updated and linked to this post as %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>', '<code>'.$params['link_position'].'</code>' ), 'text-warning' );
 			}
 			else
 			{	// If file could not be linked to the post:
-				$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>' );
+				$this->log_list( sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ), 'error' );
 				return false;
 			}
 
@@ -1421,7 +1415,7 @@ class MarkdownImport extends AbstractImport
 
 		if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
 		{	// No permission to copy to the destination folder
-			$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '.sprintf( TB_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>' );
+			$this->log_list( sprintf( TB_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ), 'error' );
 			return false;
 		}
 
@@ -1432,16 +1426,16 @@ class MarkdownImport extends AbstractImport
 
 		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
 		{	// If file has been linked to the post
-			$this->log_list( '<li class="text-success">'.sprintf( TB_('New file %s has been imported to %s as %s successfully.'),
+			$this->log_list( sprintf( TB_('New file %s has been imported to %s as %s successfully.'),
 				'<code>'.$source_file_relative_path.'</code>',
 				'<code>'.$File->get_rdfs_rel_path().'</code>'.
 					( $file_source_name == $File->get( 'name' ) ? '' : '<span class="note">('.TB_('Renamed').'!)</span>'),
 				'<code>'.$params['link_position'].'</code>'
-			).'</li>' );
+			), 'success' );
 		}
 		else
 		{	// If file could not be linked to the post:
-			$this->log_list( '<li class="text-warning">'.sprintf( 'New file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
+			$this->log_list( sprintf( 'New file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ), 'text-warning' );
 			return false;
 		}
 
@@ -1606,7 +1600,7 @@ class MarkdownImport extends AbstractImport
 							( $Item ? '<a href="'.$edit_item_url.'" target="_blank">'.$Item->get( 'title' ).'</a>' : '#'.$post_ID ),
 							// Link to another Collection where Item is found by same slug:
 							( $another_Blog ? '<a href="'.$another_Blog->get( 'url' ).'" target="_blank">'.$another_Blog->get( 'name' ).'</a>' : '#'.$post_coll_ID )
-						), 'error', 'li' );
+						), 'error' );
 					// Return FALSE in order to know we found Item by slug but in another Collection:
 					$r = false;
 					return $r;
@@ -1722,41 +1716,6 @@ class MarkdownImport extends AbstractImport
 
 
 	/**
-	 * Log message to report about importing YAML field
-	 *
-	 * @param string Message
-	 * @param string Type
-	 */
-	function log_yaml_field( $message, $type = 'error' )
-	{
-		switch( $type )
-		{
-			case 'error':
-				// Error message:
-				$label = '<span class="label label-danger">'.TB_('ERROR').'</span> ';
-				$class = 'text-danger';
-				break;
-			case 'warning':
-				// Warning message:
-				$label = '<span class="label label-warning">'.TB_('WARNING').'</span> ';
-				$class = 'text-warning';
-				break;
-			case 'info':
-				// Warning message:
-				$label = '<span class="label label-info">'.TB_('INFO').'</span> ';
-				$class = 'text-info';
-				break;
-			default:
-				// Normal message:
-				$label = '';
-				$class = '';
-		}
-		// Print message:
-		$this->log_list( '<li'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.$label.$message.'</li>' );
-	}
-
-
-	/**
 	 * Log message to report about importing Linked File
 	 *
 	 * @param string Type
@@ -1770,38 +1729,29 @@ class MarkdownImport extends AbstractImport
 		{
 			case 'error_link':
 			case 'error_image':
-				$this->log_list( '<li class="text-danger"><span class="label label-danger">'.TB_('ERROR').'</span> '
-						.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.',
-							'<code>'.$tag.'</code>'
-						).'</li>' );
+				$this->log_list( sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.', '<code>'.$tag.'</code>' ), 'error' );
 				if( $type == 'error_image' )
 				{	// Special warning when URL to image is used in link markdown tag:
-					$this->log_list( '<li class="text-warning"><span class="label label-warning">'.TB_('WARNING').'</span> '
-							.'The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?'
-						.'</li>' );
+					$this->log_list( 'The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?', 'warning' );
 				}
 				break;
 			case 'check':
-				$this->log_list( '<li class="text-warning"><span class="label label-warning">'.TB_('WARNING').'</span> '
-					.sprintf( 'Link %s points to "%s" which is in %s instead of %s.',
+				$this->log_list( sprintf( 'Link %s points to "%s" which is in %s instead of %s.',
 						'<code>'.$tag.'</code>',
 						$info_link,
 						'<code>'.$slug_item_locale.'</code>',
 						'<code>'.$this->current_item_locale.'</code>'
-					).'</li>' );
+					), 'warning' );
 				break;
 			case 'recommend':
-				$this->log_list( '<li class="text-warning"><span class="label label-warning">'.TB_('WARNING').'</span> '
-					.sprintf( 'We recommend "%s" (%s) as destination.',
+				$this->log_list( sprintf( 'We recommend "%s" (%s) as destination.',
 						$info_link,
 						'<code>'.$this->current_item_locale.'</code>'
-					).'</li>' );
+					), 'warning' );
 				break;
 			case 'content':
 				$this->item_content_is_updated_by_linked_file = true; // Flag to know we should update Item content
-				$this->log_list( '<li class="text-warning"><span class="label label-warning">'.TB_('WARNING').'</span> '
-						.'We will update the content accordingly.'
-					.'</li>' );
+				$this->log_list( 'We will update the content accordingly.', 'warning' );
 				break;
 		}
 	}
@@ -1929,11 +1879,11 @@ class MarkdownImport extends AbstractImport
 				// Inform about new or already assigned extra-category:
 				$cat_message = ( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) ? TB_('Extra category already assigned: %s') : TB_('Assigned new extra-category: %s') );
 				$cross_posted_message = ( $extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
-				$this->log_yaml_field( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$specified_yaml_message.$cross_posted_message ), 'info' );
+				$this->log_list( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$specified_yaml_message.$cross_posted_message ), 'info' );
 			}
 			else
 			{	// Display error on not existing category:
-				$this->log_yaml_field( sprintf( TB_('Skipping extra-category %s because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>'.$specified_yaml_message ) );
+				$this->log_list( sprintf( TB_('Skipping extra-category %s because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>'.$specified_yaml_message ), 'error' );
 			}
 		}
 
@@ -1954,7 +1904,7 @@ class MarkdownImport extends AbstractImport
 				{	// Main category cannot be un-assigned, however it must be stored together with extra-categories in DB table:
 					$extra_cat_IDs[] = $only_db_extra_Chapter->ID;
 					unset( $only_db_extra_cat_IDs[ $o ] );
-					$this->log_yaml_field( sprintf( 'Keeping MAIN category in DB: %s although it is NOT in YAML.', $only_db_extra_cat_link ), 'warning' );
+					$this->log_list( sprintf( 'Keeping MAIN category in DB: %s although it is NOT in YAML.', $only_db_extra_cat_link ), 'warning' );
 					continue;
 				}
 				$only_db_extra_cat_links[] = $only_db_extra_cat_link;
@@ -1967,7 +1917,7 @@ class MarkdownImport extends AbstractImport
 			{	// Unset wrong extra-category because it is not found in DB:
 				unset( $only_db_extra_cat_IDs[ $o ] );
 				// This cannot happens for normal DB structure but inform about such died extra-categories:
-				$this->log_yaml_field( sprintf( 'Un-assign old extra-category #%d because is not found in DB and YAML.', intval( $only_db_extra_cat_ID ) ), 'error' );
+				$this->log_list( sprintf( 'Un-assign old extra-category #%d because is not found in DB and YAML.', intval( $only_db_extra_cat_ID ) ), 'error' );
 			}
 		}
 
@@ -1977,13 +1927,13 @@ class MarkdownImport extends AbstractImport
 			{
 				case 'keep_db':
 					// Display WARNING and do not resolve:
-					$this->log_yaml_field( sprintf( 'Keeping existing extra-category in DB: %s although it is NOT in YAML.', implode( ', ', $only_db_extra_cat_links ) ), 'warning' );
+					$this->log_list( sprintf( 'Keeping existing extra-category in DB: %s although it is NOT in YAML.', implode( ', ', $only_db_extra_cat_links ) ), 'warning' );
 					// Keep old extra-category from DB for the importing Item:
 					$extra_cat_IDs = array_merge( $extra_cat_IDs, $only_db_extra_cat_IDs );
 					break;
 				case 'add_yaml':
 					// Resolve by adding extra-categories to YAML in .md file on disk:
-					$this->log_yaml_field( sprintf( 'Writing <code>extra-cats:</code> to YAML: %s', implode( ', ', $only_db_extra_cat_links ) ), 'warning' );
+					$this->log_list( sprintf( 'Writing <code>extra-cats:</code> to YAML: %s', implode( ', ', $only_db_extra_cat_links ) ), 'warning' );
 					// Keep old extra-categories from DB for the importing Item:
 					$extra_cat_IDs = array_merge( $extra_cat_IDs, $only_db_extra_cat_IDs );
 					// Add extra-categories from DB into YAML block:
@@ -1991,7 +1941,7 @@ class MarkdownImport extends AbstractImport
 					break;
 				case 'unassign':
 					// Resolve by deleting from DB:
-					$this->log_yaml_field( sprintf( 'Un-assigning old extra-category: %s because it is NOT in YAML.', implode( ', ', $only_db_extra_cat_links ) ), 'info' );
+					$this->log_list( sprintf( 'Un-assigning old extra-category: %s because it is NOT in YAML.', implode( ', ', $only_db_extra_cat_links ) ), 'info' );
 					// Set flag to know Item must be updated in order to un-assign old extra-categories:
 					$this->item_yaml_is_updated = true;
 					// Don't append old extra-categories to categories from YAML block so on item update they will be un-assigned.
@@ -2013,13 +1963,13 @@ class MarkdownImport extends AbstractImport
 	{
 		if( ! preg_match( '#^-?[0-9]*(\.[0-9]+)?$#', $value ) )
 		{	// Order value must be a decimal number:
-			$this->log_yaml_field( sprintf( 'Wrong value %s in yaml field %s.', '<code>'.$value.'</code>', '<code>order</code>' ) );
+			$this->log_list( sprintf( 'Wrong value %s in yaml field %s.', '<code>'.$value.'</code>', '<code>order</code>' ), 'error' );
 			return;
 		}
 
 		// Set same order per each category of the Item:
 		$Item->set( 'order', $value );
-		$this->log_yaml_field( sprintf( 'Use order %s from yaml field %s for all categories of the Item.', '<code>'.$value.'</code>', '<code>order</code>' ), 'info' );
+		$this->log_list( sprintf( 'Use order %s from yaml field %s for all categories of the Item.', '<code>'.$value.'</code>', '<code>order</code>' ), 'info' );
 	}
 
 
@@ -2033,26 +1983,26 @@ class MarkdownImport extends AbstractImport
 	{
 		if( $value === '' )
 		{	// Skip empty Item Type name
-			$this->log_yaml_field( sprintf( 'Skip empty yaml field %s.', '<code>item-type</code>' ), 'warning' );
+			$this->log_list( sprintf( 'Skip empty yaml field %s.', '<code>item-type</code>' ), 'warning' );
 			return;
 		}
 
 		$ItemTypeCache = & get_ItemTypeCache();
 		if( ! ( $ItemType = & $ItemTypeCache->get_by_name( $value, false, false ) ) )
 		{	// Skip unknown Item Type:
-			$this->log_yaml_field( sprintf( 'Not found Item Type %s for yaml field %s.', '"'.$value.'"', '<code>item-type</code>' ) );
+			$this->log_list( sprintf( 'Not found Item Type %s for yaml field %s.', '"'.$value.'"', '<code>item-type</code>' ), 'error' );
 			return;
 		}
 
 		if( ! $ItemType->is_enabled( $Item->get_blog_ID() ) )
 		{	// Skip not enabled Item Type:
-			$this->log_yaml_field( sprintf( 'Cannot use Item Type %s from yaml field %s because it is not enabled for the collection.', '"'.$value.'"', '<code>item-type</code>' ) );
+			$this->log_list( sprintf( 'Cannot use Item Type %s from yaml field %s because it is not enabled for the collection.', '"'.$value.'"', '<code>item-type</code>' ), 'error' );
 			return;
 		}
 
 		// Set Item Type:
 		$Item->set( 'ityp_ID', $ItemType->ID );
-		$this->log_yaml_field( sprintf( 'Use Item Type %s from yaml field %s.', '"'.$value.'"', '<code>item-type</code>' ), 'info' );
+		$this->log_list( sprintf( 'Use Item Type %s from yaml field %s.', '"'.$value.'"', '<code>item-type</code>' ), 'info' );
 	}
 
 
@@ -2072,7 +2022,7 @@ class MarkdownImport extends AbstractImport
 			if( ( $allow_string_format && $field_value === '' ) ||
 					( $field_value === array() ) )
 			{	// Skip empty yaml field:
-				$this->log_yaml_field( sprintf( TB_('Skipping YAML field %s, because it is empty.'), '<code>'.$field_name.'</code>' ), 'warning' );
+				$this->log_list( sprintf( TB_('Skipping YAML field %s, because it is empty.'), '<code>'.$field_name.'</code>' ), 'warning' );
 				return false;
 			}
 		}
@@ -2084,7 +2034,7 @@ class MarkdownImport extends AbstractImport
 
 		if( ! is_array( $field_value ) )
 		{	// Wrong not array data:
-			$this->log_yaml_field( sprintf( TB_('Skipping YAML field %s, because it is not an array.'), '<code>'.$field_name.'</code>' ) );
+			$this->log_list( sprintf( TB_('Skipping YAML field %s, because it is not an array.'), '<code>'.$field_name.'</code>' ), 'error' );
 			return false;
 		}
 
@@ -2092,7 +2042,7 @@ class MarkdownImport extends AbstractImport
 		{
 			if( is_array( $string ) )
 			{	// Skip wrong indented data:
-				$this->log_yaml_field( sprintf( TB_('Skipping YAML field %s, because it is wrongly indented.'), '<code>'.$field_name.'</code>' ) );
+				$this->log_list( sprintf( TB_('Skipping YAML field %s, because it is wrongly indented.'), '<code>'.$field_name.'</code>' ), 'error' );
 				return false;
 			}
 		}

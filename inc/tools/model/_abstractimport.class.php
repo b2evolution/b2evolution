@@ -157,17 +157,25 @@ class AbstractImport
 				break;
 
 			case 'error':
-				$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label ? '<span class="label label-danger">ERROR</span>' : '' ).' ';
+			case 'text-error':
+				$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label  && $type == 'error'? '<span class="label label-danger">ERROR</span>' : '' ).' ';
 				$after = '</'.$type_html_tag.'>';
 				break;
 
 			case 'warning':
-				$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
+			case 'text-warning':
+				$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label && $type == 'warning' ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
 				$after = '</'.$type_html_tag.'>';
 				break;
 
 			case 'info':
-				$before = '<'.$type_html_tag.' class="text-info">'.( $display_label ? '<span class="label label-info">INFO</span>' : '' ).' ';
+			case 'text-info':
+				$before = '<'.$type_html_tag.' class="text-info">'.( $display_label && $type == 'info' ? '<span class="label label-info">INFO</span>' : '' ).' ';
+				$after = '</'.$type_html_tag.'>';
+				break;
+
+			case 'text':
+				$before = '<'.$type_html_tag.'>';
 				$after = '</'.$type_html_tag.'>';
 				break;
 
@@ -186,10 +194,10 @@ class AbstractImport
 	 * Helper for quick log in list
 	 *
 	 * @param string Message
-	 * @param string Type: 'success', 'error', 'warning'
+	 * @param string Type: 'success', 'error', 'warning', 'text', NULL - to don't use wrapper around message
 	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
 	 */
-	function log_list( $message, $type = NULL, $type_html_tag = 'p' )
+	function log_list( $message, $type = 'text', $type_html_tag = 'li' )
 	{
 		$this->log_inside( 'list' );
 		$this->log( $message, $type, $type_html_tag );
