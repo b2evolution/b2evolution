@@ -74,7 +74,7 @@ class MarkdownImport extends AbstractImport
 				'type'     => 'integer',
 				'default'  => 0,
 			),
-			// Options:
+			// Checkbox options:
 			'allow_extra_cats' => array(
 				'group'   => 'options',
 				'title'   => sprintf( TB_('Allow %s to cross post into other collections'), '<code>extra-cats:</code>' ),
@@ -124,16 +124,27 @@ class MarkdownImport extends AbstractImport
 				'type'    => 'integer',
 				'default' => 0,
 			),
-			// Import mode:
+			// Radio options:
 			'slug_diff_coll' => array(
 				'group'   => 'radio',
 				'title'   => TB_('If filename/slug exists in a different collection'),
 				'options' => array(
-					'skip' => array( 'label' => sprintf( TB_('Display error and skip the %s file'), '<code>.md</code>' ) ),
+					'skip'   => array( 'label' => sprintf( TB_('Display error and skip the %s file'), '<code>.md</code>' ) ),
 					'create' => array( 'label' => TB_('Create a new slug like xyz-1') ),
 				),
 				'type'    => 'string',
 				'default' => 'skip',
+			),
+			'extra_cat_only_in_db' => array(
+				'group'   => 'radio',
+				'title'   => TB_('If extra-categories are found in DB but not in YAML'),
+				'options' => array(
+					'keep_db'  => array( 'label' => TB_('Display WARNING and do not resolve') ),
+					'add_yaml' => array( 'label' => sprintf( TB_('Resolve by adding extra-categories to YAML in %s file on disk'), '<code>.md</code>' ) ),
+					'unassign' => array( 'label' => TB_('Resolve by deleting from DB') ),
+				),
+				'type'    => 'string',
+				'default' => 'keep_db',
 			),
 		);
 
@@ -1887,7 +1898,7 @@ class MarkdownImport extends AbstractImport
 
 
 	/**
-	 * Set Item extra categories from YAML data
+	 * Set Item extra-categories from YAML data
 	 *
 	 * @param array Value
 	 * @param object Item (by reference)
@@ -1900,14 +1911,14 @@ class MarkdownImport extends AbstractImport
 			return;
 		}
 
-		// Get current extra categories:
+		// Get current extra-categories:
 		if( isset( $Item->extra_cat_IDs ) )
 		{	// Clear to be sure all etra categories are loaded from DB:
 			unset( $Item->extra_cat_IDs );
 		}
 		$old_extra_cat_IDs = $Item->get( 'extra_cat_IDs' );
 
-		// Get extra categories from YAML block:
+		// Get extra-categories from YAML block:
 		$extra_cat_IDs = array();
 		$specified_yaml_message = ' ('.TB_('specified in YAML block').')';
 		foreach( $value as $extra_cat_slug )
@@ -1915,55 +1926,78 @@ class MarkdownImport extends AbstractImport
 			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, ( strpos( $extra_cat_slug, '/' ) !== false ), $Item->get( 'ityp_ID' ) ) )
 			{	// Use only existing category:
 				$extra_cat_IDs[] = $extra_Chapter->ID;
-				// Inform about new or already assigned extra category:
+				// Inform about new or already assigned extra-category:
 				$cat_message = ( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) ? TB_('Extra category already assigned: %s') : TB_('Assigned new extra-category: %s') );
 				$cross_posted_message = ( $extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
 				$this->log_yaml_field( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$specified_yaml_message.$cross_posted_message ), 'info' );
 			}
 			else
 			{	// Display error on not existing category:
-				$this->log_yaml_field( sprintf( TB_('Skipping extra category %s because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>'.$specified_yaml_message ) );
+				$this->log_yaml_field( sprintf( TB_('Skipping extra-category %s because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>'.$specified_yaml_message ) );
 			}
 		}
 
-		// Keep old extra categories:
+		// Get old extra-categories existing in DB but not in YAML:
 		$ChapterCache = & get_ChapterCache();
-		$stored_db_message = ' ('.TB_('stored in DB').')';
-		foreach( $old_extra_cat_IDs as $old_extra_cat_ID )
+		$only_db_extra_cat_IDs = array_diff( $old_extra_cat_IDs, $extra_cat_IDs );
+		// Load all old categories in single SQL query:
+		$ChapterCache->load_list( $only_db_extra_cat_IDs );
+		$only_db_extra_cat_links = array();
+		$only_db_extra_cat_slugs = array();
+		foreach( $only_db_extra_cat_IDs as $o => $only_db_extra_cat_ID )
 		{
-			if( ! in_array( $old_extra_cat_ID, $extra_cat_IDs ) &&
-			    ( $old_extra_Chapter = & $ChapterCache->get_by_ID( $old_extra_cat_ID, false, false ) ) )
-			{	// Inform only about existing old category and that is not in YAML block:
-				$extra_cat_IDs[] = $old_extra_Chapter->ID;
-				$cross_posted_message = ( $old_extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
-				$this->log_yaml_field( sprintf( TB_('Keep old extra category: %s'), $old_extra_Chapter->get_permanent_link().$stored_db_message.$cross_posted_message ), 'info' );
+			if( $only_db_extra_Chapter = & $ChapterCache->get_by_ID( $only_db_extra_cat_ID, false, false ) )
+			{	// Get link to Category if it is found in DB:
+				$only_db_extra_cat_link = $only_db_extra_Chapter->get_permanent_link().( $only_db_extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? '(<b>'.TB_('Cross-posted').'</b>)' : '' );;
+				if( $this->get_option( 'extra_cat_only_in_db' ) == 'unassign' &&
+				    $only_db_extra_Chapter->ID == $Item->get( 'main_cat_ID' ) )
+				{	// Main category cannot be un-assigned, however it must be stored together with extra-categories in DB table:
+					$extra_cat_IDs[] = $only_db_extra_Chapter->ID;
+					unset( $only_db_extra_cat_IDs[ $o ] );
+					$this->log_yaml_field( sprintf( 'Keeping MAIN category in DB: %s although it is NOT in YAML.', $only_db_extra_cat_link ), 'warning' );
+					continue;
+				}
+				$only_db_extra_cat_links[] = $only_db_extra_cat_link;
+				if( $this->get_option( 'extra_cat_only_in_db' ) == 'add_yaml' )
+				{	// We need slugs in order to append them in YAML block:
+					$only_db_extra_cat_slugs[] = $only_db_extra_Chapter->get( 'urlname' );
+				}
+			}
+			else
+			{	// Unset wrong extra-category because it is not found in DB:
+				unset( $only_db_extra_cat_IDs[ $o ] );
+				// This cannot happens for normal DB structure but inform about such died extra-categories:
+				$this->log_yaml_field( sprintf( 'Un-assign old extra-category #%d because is not found in DB and YAML.', intval( $only_db_extra_cat_ID ) ), 'error' );
 			}
 		}
 
-		// TODO: CCC ### we don't want this by default - write back to MD source on request, but don't just unassign
-		// TODO: as discussed with FP, these should we written back to MD file
-		// see point C) C#9 from "LRT-364011-MD Importer still fails with unhandled exceptions on Glossary inserts (Duplicate entry)"
-		// disabling/commenting out for now
-		/*
-		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, array_merge( $extra_cat_IDs, array( $Item->get( 'main_cat_ID' ) ) ) );
-		$no_yaml_message = ' ('.TB_('no longer in YAML block').')';
-		if( ! empty( $del_extra_cat_IDs ) )
-		{	// Inform about unassigned extra categories:
-			$ChapterCache = & get_ChapterCache();
-			$ChapterCache->load_list( $del_extra_cat_IDs );
-			foreach( $del_extra_cat_IDs as $del_extra_cat_ID )
+		if( ! empty( $only_db_extra_cat_IDs ) )
+		{	// If extra-categories are found in DB but not in YAML:
+			switch( $this->get_option( 'extra_cat_only_in_db' ) )
 			{
-				if( $del_Chapter = & $ChapterCache->get_by_ID( $del_extra_cat_ID, false, false ) )
-				{	// If category is found in DB:
-					$cross_posted_message = ( $del_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
-					$this->log_yaml_field( sprintf( TB_('Un-assigned old extra-category: %s.'), $del_Chapter->get_permanent_link().$no_yaml_message.$cross_posted_message ), 'warning' );
-				}
-				else
-				{	// If category is NOT found in DB:
-					$this->log_yaml_field( sprintf( TB_('Un-assigned old extra-category #%s because it doesn\'t exist.'), $del_extra_cat_ID.$no_yaml_message ), 'error' );
-				}
+				case 'keep_db':
+					// Display WARNING and do not resolve:
+					$this->log_yaml_field( sprintf( 'Keeping existing extra-category in DB: %s although it is NOT in YAML.', implode( ', ', $only_db_extra_cat_links ) ), 'warning' );
+					// Keep old extra-category from DB for the importing Item:
+					$extra_cat_IDs = array_merge( $extra_cat_IDs, $only_db_extra_cat_IDs );
+					break;
+				case 'add_yaml':
+					// Resolve by adding extra-categories to YAML in .md file on disk:
+					$this->log_yaml_field( sprintf( 'Writing <code>extra-cats:</code> to YAML: %s', implode( ', ', $only_db_extra_cat_links ) ), 'warning' );
+					// Keep old extra-categories from DB for the importing Item:
+					$extra_cat_IDs = array_merge( $extra_cat_IDs, $only_db_extra_cat_IDs );
+					// Add extra-categories from DB into YAML block:
+					$this->set_item_file_yaml_field( 'extra-cats', array_merge( $value, $only_db_extra_cat_slugs ) );
+					break;
+				case 'unassign':
+					// Resolve by deleting from DB:
+					$this->log_yaml_field( sprintf( 'Un-assigning old extra-category: %s because it is NOT in YAML.', implode( ', ', $only_db_extra_cat_links ) ), 'info' );
+					// Set flag to know Item must be updated in order to un-assign old extra-categories:
+					$this->item_yaml_is_updated = true;
+					// Don't append old extra-categories to categories from YAML block so on item update they will be un-assigned.
+					break;
 			}
-		}*/
+		}
 
 		$Item->set( 'extra_cat_IDs', $extra_cat_IDs );
 	}
@@ -2079,6 +2113,8 @@ class MarkdownImport extends AbstractImport
 
 	/**
 	 * Set new content for item *.md file
+	 *
+	 * @param string New content
 	 */
 	function set_item_file_content( $new_content )
 	{
@@ -2088,6 +2124,24 @@ class MarkdownImport extends AbstractImport
 			// Set flag to know the item content was updated:
 			$this->item_file_is_updated = true;
 		}
+	}
+
+
+	/**
+	 * Set value for YAML field in content of item *.md file
+	 *
+	 * @param string YAML field name
+	 * @param array New field values
+	 */
+	function set_item_file_yaml_field( $field_name, $new_field_value )
+	{
+		$this->set_item_file_content( preg_replace(
+				'#^(---.+?'.preg_quote( $field_name, '#' ).':)(\s+.+?\n)([a-z\-]+:.+?)?---#is',
+				'$1'."\n  - ".implode( "\n  - ", array_unique( $new_field_value ) )."\n".'$3---',
+				$this->item_file_content
+			) );
+		// Set flag in order to know YAML block is updated in .md file:
+		$this->item_yaml_is_updated = true;
 	}
 
 
