@@ -1257,6 +1257,56 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	return $lib_url;
 }
 
+
+/**
+ * Check if the requested file is bundled in another
+ *
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string 'js' or 'css' or 'build'
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
+ * @return integer Index of first file that was dequeued because it is bundled inside current requested file
+ */
+function check_bundled_file( $file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
+{
+	global $required_js, $required_css, $bundled_files;
+
+	// Store here index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = NULL;
+
+	if( isset( $bundled_files[ $file ] ) )
+	{	// If currently required file contains other JS files which must not be required twice:
+		foreach( $bundled_files[ $file ] as $bundled_file )
+		{	// Include all bundled files in the global array in order to don't call them twice:
+			$bundled_url = strtolower( get_require_url( $bundled_file, $relative_to, $subfolder, $version ) );
+			if( $subfolder == 'js' )
+			{	// JS file:
+				if( empty( $required_js ) || ! in_array( $bundled_url, $required_js ) )
+				{	// Include bundled file into this global array in order to don't require this if it will be required further:
+					$required_js[] = $bundled_url;
+				}
+			}
+			else // 'css' or 'build'
+			{	// CSS file:
+				if( empty( $required_css ) || ! in_array( $bundled_url, $required_css ) )
+				{	// Include bundled file into this global array in order to don't require this if it will be required further:
+					$required_css[] = $bundled_url;
+				}
+			}
+			// Dequeue the file if it was required before:
+			$dequeued_file_index = dequeue( $bundled_file, $relative_to );
+			if( $first_dequeued_file_index === NULL )
+			{	// We need to know first dequeued file in order to insert currently
+				// required file in that place instead of insert it as last ordered:
+				$first_dequeued_file_index = $dequeued_file_index;
+			}
+		}
+	}
+
+	return $first_dequeued_file_index;
+}
+
+
 /**
  * Memorize that a specific javascript file will be required by the current page.
  * All requested files will be included in the page head only once (when headlines is called)
@@ -1276,8 +1326,8 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  */
 function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#', $position = 'headlines' )
 {
-	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
-	global $use_defer, $bundled_js_files;
+	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form(), check_bundled_file())
+	global $use_defer;
 
 	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
 	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
@@ -1289,27 +1339,8 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 		return;
 	}
 
-	// Store here index of first file that was dequeued because it is bundled inside current requested file:
-	$first_dequeued_file_index = NULL;
-
-	if( isset( $bundled_js_files[ $js_file ] ) )
-	{	// If currently required file contains other JS files which must not be required twice:
-		foreach( $bundled_js_files[ $js_file ] as $bundled_js_file )
-		{	// Include all bundled files in the global array in order to don't call them twice:
-			$bundled_js_url = strtolower( get_require_url( $bundled_js_file, $relative_to, 'js', $version ) );
-			if( empty( $required_js ) || ! in_array( $bundled_js_url, $required_js ) )
-			{	// Include bundled file into this global array in order to don't require this if it will be required further:
-				$required_js[] = $bundled_js_url;
-			}
-			// Dequeue the file if it was required before:
-			$dequeued_file_index = dequeue( $bundled_js_file, $relative_to );
-			if( $first_dequeued_file_index === NULL )
-			{	// We need to know first dequeued file in order to insert currently
-				// required file in that place instead of insert it as last ordered:
-				$first_dequeued_file_index = $dequeued_file_index;
-			}
-		}
-	}
+	// Get index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = check_bundled_file( $js_file, $relative_to, 'js', $version );
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{	// Dependency : ensure jQuery is loaded
@@ -1413,7 +1444,7 @@ function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, 
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines', $async = false )
 {
-	static $required_css;
+	global $required_css; // Use this var as global and NOT static, because it is used in other functions(e.g. check_bundled_file())
 
 	// Which subfolder do we want to use in case of absolute paths? (doesn't appy to 'relative')
 	$subfolder = 'css';
@@ -1424,6 +1455,14 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 			$subfolder = 'build';
 		}
 	}
+
+	if( is_dequeued( $css_file, $relative_to ) )
+	{	// Don't require if the file was already dequeued once:
+		return;
+	}
+
+	// Get index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = check_bundled_file( $css_file, $relative_to, $subfolder, $version );
 
 	// Get library url of CSS file by alias name
 	$css_url = get_require_url( $css_file, $relative_to, $subfolder, $version );
@@ -1462,11 +1501,11 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 		{	// Add stylesheet tag to <head>
 			if($position == 'headlines' )
 			{
-				add_headline( $stylesheet_tag, $css_file, $relative_to );
+				add_headline( $stylesheet_tag, $css_file, $relative_to, $first_dequeued_file_index );
 			}
 			elseif( $position == 'footerlines' )
 			{
-				add_footerline( $stylesheet_tag, $css_file, $relative_to );
+				add_footerline( $stylesheet_tag, $css_file, $relative_to, $first_dequeued_file_index );
 			}
 		}
 	}
@@ -3772,16 +3811,19 @@ function get_prevent_key_enter_js( $jquery_selection )
  *               - 'fontawesome' - Use only font-awesome icons
  *               - 'fontawesome-glyphicons' - Use font-awesome icons as a priority over the glyphicons
  * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE - to require css file, FALSE - is used when css file is already loaded inside superbundle file
  */
-function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url' )
+function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url', $require_files = true )
 {
 	global $b2evo_icons_type;
 
 	// Use font-awesome icons, @see get_icon()
 	$b2evo_icons_type = $icons_type;
 
-	// Load main CSS file of font-awesome icons
-	require_css( '#fontawesome#', $relative_to );
+	if( $require_files )
+	{	// Load main CSS file of font-awesome icons
+		require_css( '#fontawesome#', $relative_to );
+	}
 }
 
 

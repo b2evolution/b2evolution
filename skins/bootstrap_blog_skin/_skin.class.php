@@ -455,9 +455,6 @@ class bootstrap_blog_Skin extends Skin
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
 				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)

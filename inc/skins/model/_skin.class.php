@@ -1355,6 +1355,25 @@ class Skin extends DataObject
 				case 'superbundle':
 					// Include jQuery + Bootstrap + General front-office scripts:
 					require_js_defer( 'build/bootstrap-evo_frontoffice-superbundle.bmin.js', 'blog' );
+					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog', false /* Don't load CSS file because it is bundled */ );
+					// Include the bootstrap-b2evo_base CSS (NEW / v6 style) - Use this when you use Bootstrap:
+					if( $debug )
+					{	// Use readable CSS:
+						// rsc/css/font-awesome.css
+						// rsc/css/bootstrap/bootstrap.css
+						// rsc/build/bootstrap-b2evo_base.bundle.css:
+						//  - rsc/less/bootstrap-basic_styles.less
+						//  - rsc/less/bootstrap-basic.less
+						//  - rsc/less/bootstrap-blog_base.less
+						//  - rsc/less/bootstrap-item_base.less
+						//  - rsc/less/bootstrap-evoskins.less
+						require_css( 'bootstrap-b2evo_base-superbundle.bundle.css', 'blog' ); // CSS concatenation of the above
+					}
+					else
+					{	// Use minified CSS:
+						require_css( 'bootstrap-b2evo_base-superbundle.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+					}
 					break;
 
 				case 'jquery':
@@ -1375,8 +1394,8 @@ class Skin extends DataObject
 					if( ! in_array( 'superbundle', $features ) )
 					{	// Don't include when it is already bundled:
 						require_js_defer( '#bootstrap#', 'blog' );
+						require_css( '#bootstrap_css#', 'blog' );
 					}
-					require_css( '#bootstrap_css#', 'blog' );
 					break;
 
 				case 'bootstrap_theme_css':
@@ -1385,6 +1404,10 @@ class Skin extends DataObject
 					break;
 
 				case 'bootstrap_evo_css':
+					if( in_array( 'superbundle', $features ) )
+					{	// Don't include when it is already bundled:
+						break;
+					}
 					// Include the bootstrap-b2evo_base CSS (NEW / v6 style) - Use this when you use Bootstrap:
 					if( $debug )
 					{	// Use readable CSS:

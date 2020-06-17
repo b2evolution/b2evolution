@@ -43,6 +43,13 @@ module.exports = function(grunt) {
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
 
+					// Superbundle Font-Awesome + Bootstrap + Front-office styles:
+					'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css': [
+							'rsc/css/font-awesome.css',
+							'rsc/css/bootstrap/bootstrap.css',
+							'rsc/build/bootstrap-b2evo_base.bundle.css',
+						],
+
 					// Bootstrap back-office styles:
 					'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
@@ -156,6 +163,11 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: 'rsc/build/bootstrap-b2evo_base.bundle.css',
 				dest: 'rsc/build/bootstrap-b2evo_base.bmin.css',
+			},
+			bootstrap_b2evo_base_superbundle: {
+				nonull: true, // Display missing files
+				src: 'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css',
+				dest: 'rsc/build/bootstrap-b2evo_base-superbundle.bmin.css',
 			},
 			bootstrap_backoffice_b2evo_base: {
 				nonull: true, // Display missing files

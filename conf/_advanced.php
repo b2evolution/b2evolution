@@ -953,15 +953,25 @@ $library_local_urls = array(
 	);
 
 /**
- * JS files which contain other JS files in order to don't required them twice when main file is required on current page
+ * JS/CSS files which contain other JS/CSS files in order to don't required them twice when main file is required on current page
  *
- * Key - Alias or relative path of main JS file, Value - array of bundled files inside the main JS file
+ * Key - Alias or relative path of main JS/CSS file, Value - array of bundled files inside the main JS/CSS file
  */
-$bundled_js_files = array(
+$bundled_files = array(
 	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
 		'#jquery#',
 		'#jquery_migrate#',
 		'#bootstrap#',
+	),
+	'bootstrap-b2evo_base-superbundle.bundle.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bundle.css',
+	),
+	'bootstrap-b2evo_base-superbundle.bmin.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bmin.css',
 	),
 );
 
