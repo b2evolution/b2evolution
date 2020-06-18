@@ -12916,9 +12916,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16100, 'Creating table for checklist items...' ) )
+	if( upg_task_start( 16100, 'Creating table for checklist lines...' ) )
 	{	// part of 7.2
-		db_create_table( 'T_checklist_items', '
+		db_create_table( 'T_items__checklist_lines', '
 			check_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			check_item_ID INT(10) UNSIGNED NOT NULL,
 			check_checked TINYINT(1) NOT NULL DEFAULT 0,

@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the ItemTag class.
+ * This file implements the ChecklistItem class.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -50,7 +50,7 @@ class ChecklistItem extends DataObject
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( 'T_checklist_items', 'check_', 'check_ID' );
+		parent::__construct( 'T_items__checklist_lines', 'check_', 'check_ID' );
 
 		if( $db_row != NULL )
 		{

@@ -676,9 +676,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			primary key (lvot_link_ID, lvot_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
-	'T_checklist_items' => array(
+	'T_items__checklist_lines' => array(
 		'Creating table for checklists',
-		"CREATE TABLE T_checklist_items (
+		"CREATE TABLE T_items__checklist_lines (
 			check_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			check_item_ID INT(10) UNSIGNED NOT NULL,
 			check_checked TINYINT(1) NOT NULL DEFAULT 0,

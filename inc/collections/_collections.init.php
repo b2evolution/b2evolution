@@ -73,7 +73,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_widget__container'        => $tableprefix.'widget__container',
 		'T_widget__widget'           => $tableprefix.'widget__widget',
 		'T_temporary_ID'             => $tableprefix.'temporary_ID',
-		'T_checklist_items'          => $tableprefix.'checklist_items',
+		'T_items__checklist_lines'   => $tableprefix.'item__checklist_lines',
 	) );
 
 /**
@@ -307,7 +307,7 @@ function & get_ChecklistItemCache()
 	if( ! isset( $ChecklistItemCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'items/model/_checklistitem.class.php', 'ChecklistItem' );
-		$ChecklistItemCache = new DataObjectCache( 'ChecklistItem', false, 'T_checklist_items', 'check_', 'check_ID', 'check_label' );
+		$ChecklistItemCache = new DataObjectCache( 'ChecklistItem', false, 'T_items__checklist_lines', 'check_', 'check_ID', 'check_label' );
 	}
 
 	return $ChecklistItemCache;
