@@ -174,8 +174,8 @@ class item_checklist_items_Widget extends ComponentWidget
 		$can_update = $Item->can_meta_comment() && $this->get_param( 'allow_edit' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_checklist_before'             => '<div class="item_checklist">',
-				'widget_item_checklist_after'              => '</div>',
+				'widget_item_checklist_before' => '<div class="item_checklist">',
+				'widget_item_checklist_after'  => '</div>',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
@@ -216,7 +216,7 @@ class item_checklist_items_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['widget_item_checklist_before'];
-		echo '<div class="checklist_items form-group">';
+		echo '<div class="checklist_items">';
 
 		$checklist_items = $Item->get_checklist_items();
 
@@ -226,14 +226,13 @@ class item_checklist_items_Widget extends ComponentWidget
 			echo '<label>';
 			echo '<input id="checklist_item_'.$item->check_ID.'" type="checkbox" value="'.$item->check_ID.'"'
 					.( $item->check_checked ? ' checked="checked"' : '' ).( $can_update ? '' : ' disabled="disabled"' ).'>';
-			echo '<span class="checklist_item_label">'.$item->check_label.'</span>';
+			echo '<span class="checklist_item_label">'.format_to_output( $item->check_label ).'</span>';
 			echo '</label>';
 			if( $can_update )
 			{
 				echo action_icon( T_('Delete'), 'delete', '#', NULL, NULL, NULL, array( 'class' => 'checklist_item_delete', 'style' => 'visibility:hidden;' ) );
 			}
 			echo '</div>';
-		
 		}
 
 		echo '</div>';
@@ -241,16 +240,20 @@ class item_checklist_items_Widget extends ComponentWidget
 
 		if( $can_update )
 		{
+			$Form->switch_template_parts( array(
+				'fieldstart' => '',
+				'fieldend'   => '',
+			));
 			$Form->textarea_input( 'checklist_input_'.$this->ID, NULL, 1, '', array(
 					'class'       => 'add_checklist_item_input checklist_item_input',
 					'placeholder' => T_('Add an item'),
 					'hide_label'  => true,
 					'maxlength'   => 10000,
-					'style'       => 'display: none',
+					'style'       => 'display:none',
 				) );
 			
-			echo '<button type="button" class="btn btn-default checklist_add_btn">'.T_('Add an item').'</button>';
-			echo '<button type="button" class="btn btn-link checklist_close_btn" style="display:none;">'.get_icon( 'close' ).'</button>';
+			echo '<button type="button" class="btn btn-default btn-xs checklist_add_btn">'.T_('Add an item').'</button>';
+			echo '<button type="button" class="btn btn-link btn-xs checklist_close_btn" style="display:none;">'.get_icon( 'close' ).'</button>';
 		}
 
 		$Form->end_form();

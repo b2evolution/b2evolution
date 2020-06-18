@@ -422,6 +422,9 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .widget_core_item_workflow .evo_widget_item_workflow_form .controls {
   display: inline-block;
 }
+.checklist_items {
+  margin-bottom: 0.5rem;
+}
 .checklist_items .checklist_item {
   display: -ms-flexbox;
   display: flex;
@@ -475,6 +478,9 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .checklist_item_input {
   overflow-y: hidden;
+}
+.checklist_item_input.add_checklist_item_input {
+  margin-bottom: 0.5rem;
 }
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
