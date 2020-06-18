@@ -220,6 +220,9 @@ class item_checklist_items_Widget extends ComponentWidget
 
 		$checklist_items = $Item->get_checklist_items();
 
+		// Extra drop area for checklist items to first position:
+		echo '<div class="checklist_droparea"></div>';
+
 		foreach( $checklist_items as $item )
 		{
 			echo '<div class="checkbox checklist_item">';

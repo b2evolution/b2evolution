@@ -3208,19 +3208,11 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .checklist_items .checklist_item:hover .checklist_item_delete {
   visibility: visible !important;
 }
+.checklist_items .checklist_item:hover.ui-draggable-dragging .checklist_item_delete {
+  visibility: hidden !important;
+}
 .checklist_items .checklist_item input[type="checkbox"]:checked + .checklist_item_label {
   text-decoration: line-through;
-}
-.checklist_items .droppable-hover > label:first-child::before {
-  content: "";
-  position: absolute;
-  width: 0;
-  height: 0;
-  border: 6px solid transparent;
-  border-left-color: #f00;
-  border-right: none;
-  left: -5px;
-  bottom: -7px;
 }
 .checklist_items .droppable-hover > label:after {
   content: "";
@@ -3230,6 +3222,12 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   background: #F00;
   left: 0;
   bottom: -2px;
+}
+.checklist_items .checklist_droparea {
+  height: 2px;
+}
+.checklist_items .checklist_droparea.droppable-hover {
+  background: #F00;
 }
 .checklist_item_input {
   overflow-y: hidden;

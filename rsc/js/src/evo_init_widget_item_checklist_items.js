@@ -196,6 +196,11 @@ jQuery( document ).ready( function()
 					opacity: .8, // opacity whilst dragging
 					cursor: "move", // change the cursor whilst dragging
 					cancel: 'input,textarea,button,select,option,a,span.fa,span.widget_checkbox', // prevents dragging from starting on specified elements
+					stop: function()
+						{
+							// Remove style so dragged item "snaps" back to the list
+							jQuery( this ).removeAttr( 'style' );
+						}
 				} ).addClass( "draggable_checklist_item" ); // add our css class
 
 			// Make checklist item droppable:
@@ -211,9 +216,6 @@ jQuery( document ).ready( function()
 
 							// Move the dragged item:
 							jQuery( this ).after( ui.draggable );
-
-							// Remove style so dragged item "snaps" back to the list
-							jQuery( ui.draggable ).removeAttr( 'style' );
 
 							// Send the order to the server for persistence:
 							window.reorder_checklist_items( checklist );
@@ -249,7 +251,6 @@ jQuery( document ).ready( function()
 			var checklist_item = label.closest( '.checklist_item' );
 			var checkbox = jQuery( 'input[type="checkbox"]', checklist_item );
 			var form = checklist_item.closest( 'form' );
-			
 			event.preventDefault();
 
 			if( label.has( 'textarea.checklist_item_input' ).length === 0 )
@@ -282,7 +283,10 @@ jQuery( document ).ready( function()
 			var input_field = jQuery( this );
 			var content = input_field.data( 'content' );
 			var label = input_field.closest( '.checklist_item_label' );
-			label.html( content );  
+			setTimeout( function() {
+					// Placed inside a setTimeout to prevent jQuery error:
+					label.html( content );
+				}, 10 );
 		} );
 
 	// Add/Update checklist item on Enter keypress:
@@ -327,5 +331,5 @@ jQuery( document ).ready( function()
 		} );
 
 	// Make checklist items draggable and droppable:
-	window.dragndrop_checklist_items( '.checklist_items .checklist_item' );
+	window.dragndrop_checklist_items( '.checklist_items .checklist_item, .checklist_droparea' );
 } );

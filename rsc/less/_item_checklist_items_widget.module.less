@@ -33,24 +33,16 @@
             .checklist_item_delete {
                 visibility: visible !important;
             }
+
+            &.ui-draggable-dragging .checklist_item_delete {
+                visibility: hidden !important;
+            }
         }
 
         // Strikeout checked items:
         input[type="checkbox"]:checked + .checklist_item_label {
             text-decoration: line-through;
         }
-    }
-
-    .droppable-hover > label:first-child::before {
-        content: "";
-        position: absolute;
-        width: 0;
-        height: 0;
-        border: 6px solid transparent;
-        border-left-color: #f00;
-        border-right: none;
-        left: -5px;
-        bottom: -7px;
     }
 
     .droppable-hover > label:after {
@@ -61,6 +53,13 @@
         background: #F00;
         left: 0;
         bottom: -2px;
+    }
+
+    .checklist_droparea {
+        height: 2px;
+        &.droppable-hover {
+            background: #F00;
+        }
     }
 }
 
