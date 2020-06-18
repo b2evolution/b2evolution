@@ -160,6 +160,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 	/* Sidebar Single */
 	$default_widgets['sidebar_single'] = array(
 		array(  1, 15000, 'item_workflow', 'coll_type' => 'forum,group,manual' ),
+		array(  3, 16100, 'item_checklist_items', 'coll_type' => 'group' ),
 		array(  5, 15000, 'coll_related_post_list', 'coll_type' => 'forum' ),
 		array( 10, 15000, 'item_vote', 'coll_type' => 'manual' ),
 		array( 20, 15000, 'item_tags', 'coll_type' => 'manual' ),
