@@ -12923,6 +12923,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			check_item_ID INT(10) UNSIGNED NOT NULL,
 			check_checked TINYINT(1) NOT NULL DEFAULT 0,
 			check_label   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			check_order   INT(11) NOT NULL DEFAULT 1,
 			PRIMARY KEY (check_ID),
 			KEY check_item_ID (check_item_ID)' );
 		upg_task_end();

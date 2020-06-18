@@ -65,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__version_link'      => $tableprefix.'items__version_link',
 		'T_items__votes'             => $tableprefix.'items__votes',
 		'T_items__status_type'       => $tableprefix.'items__status_type',
+		'T_items__checklist_lines'   => $tableprefix.'items__checklist_lines',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -73,7 +74,6 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_widget__container'        => $tableprefix.'widget__container',
 		'T_widget__widget'           => $tableprefix.'widget__widget',
 		'T_temporary_ID'             => $tableprefix.'temporary_ID',
-		'T_items__checklist_lines'   => $tableprefix.'item__checklist_lines',
 	) );
 
 /**
@@ -1755,6 +1755,18 @@ class collections_Module extends Module
 						);
 
 					$checklistItem->dbdelete();
+				}
+				elseif( $item_action == 'reorder' )
+				{
+					$checklist_order = param( 'item_order', 'array', true );
+					$update_query = 'UPDATE T_items__checklist_lines SET check_order = FIELD(check_ID, '
+							.$DB->quote( $checklist_order ).') WHERE check_ID IN ('.$DB->quote( $checklist_order ).')';
+					$DB->query( $update_query );
+
+					$response = array(
+							'status' => 'reorder',
+							'order'  => $checklist_order,
+						);
 				}
 
 				exit( evo_json_encode( $response ) );

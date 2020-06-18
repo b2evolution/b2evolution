@@ -41,6 +41,7 @@ class ChecklistItem extends DataObject
     
     var $checked;
 	var $label;
+	var $order;
 
 	/**
 	 * Constructor
@@ -58,6 +59,7 @@ class ChecklistItem extends DataObject
 			$this->item_ID = $db_row->check_item_ID;
 			$this->checked = $db_row->check_checked;
 			$this->label = $db_row->check_label;
+			$this->order = $db_row->check_order;
 		}
 	}
 
@@ -87,6 +89,36 @@ class ChecklistItem extends DataObject
 	{
 		$this->Item = & $Item;
 		parent::set_param( 'item_ID', 'number', $Item->ID );
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * Note: DataObject does not require a matching *Cache object.
+	 * Therefore it will not try to update the Cache.
+	 * If something like that was needed, sth like *Cache->add() should be called.
+	 * ATTENTION: Any dbinsert should typically be followed by a 303 redirect. Updating the Cache before redirect is generally not needed.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		if( empty( $this->order ) )
+		{
+			$SQL = new SQL('Get max');
+			$SQL->SELECT( 'MAX(check_order)' );
+			$SQL->FROM( 'T_items__checklist_lines' );
+			$SQL->WHERE( 'check_item_ID ='.$DB->quote( $this->item_ID ) );
+			$max_order = intval( $DB->get_var( $SQL ) ) + 1;
+			$this->set( 'order', $max_order );
+		}
+		
+		$r = parent::dbinsert();
+
+		return $r;
 	}
 }
 

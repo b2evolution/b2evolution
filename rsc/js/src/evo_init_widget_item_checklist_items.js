@@ -69,7 +69,9 @@ jQuery( document ).ready( function()
 							new_checklist_item = new_checklist_item.replace( '$checklist_item_value$', result.check_ID );
 							new_checklist_item = new_checklist_item.replace( '$checklist_item_label$', result.check_label );
 
+							new_checklist_item = jQuery( new_checklist_item );
 							checklist.append( new_checklist_item );
+							window.dragndrop_checklist_items( new_checklist_item );
 
 							// Clear input field:
 							if( input_field.hasClass( 'add_checklist_item_input' ) )
@@ -151,6 +153,72 @@ jQuery( document ).ready( function()
 						console.error( 'Delete checklist item request error.' );
 					}
 			} );
+		};
+
+	window.reorder_checklist_items = function ( checklist )
+		{
+			var checklist_item_order = [];
+			jQuery( '.checklist_item', checklist ).each( function( index, el ) {
+					checklist_item_order.push( jQuery( 'input', el ).val() );
+				} );
+
+			jQuery.ajax( {
+				type: 'POST',
+				url: htsrv_url + 'action.php',
+				data: {
+					'mname': 'collections',
+					'action': 'checklist_item',
+					'item_action': 'reorder',
+					'item_ID': config.item_ID,
+					'item_order': checklist_item_order,
+					'crumb_collections_checklist_item': config.crumb_checklist_item,
+				},
+				dataType: 'json',
+				success: function( result )
+					{
+						// Do nothing for now
+					},
+				error: function()
+					{
+						console.error( 'Delete checklist item request error.' );
+					}
+			} );
+		};
+
+	window.dragndrop_checklist_items = function ( selector )
+		{
+			// Make checklist item draggable:
+			jQuery( selector ).draggable( {
+					helper: "original",
+					scroll: true, // scroll the window during dragging
+					scrollSensitivity: 100, // distance from edge before scoll occurs
+					zIndex: 999, // z-index whilst dragging
+					opacity: .8, // opacity whilst dragging
+					cursor: "move", // change the cursor whilst dragging
+					cancel: 'input,textarea,button,select,option,a,span.fa,span.widget_checkbox', // prevents dragging from starting on specified elements
+				} ).addClass( "draggable_checklist_item" ); // add our css class
+
+			// Make checklist item droppable:
+			jQuery( selector ).droppable( {
+					accept: ".draggable_checklist_item", // classname of objects that can be dropped
+					hoverClass: "droppable-hover", // classname when object is over this one
+					greedy: true, // stops propogation if over more than one
+					tolerance : "pointer", // droppable active when cursor over
+					delay: 1000,
+					drop: function( event, ui )
+						{	// function called when object dropped
+							var checklist = jQuery( this ).closest( '.checklist_items' );
+
+							// Move the dragged item:
+							jQuery( this ).after( ui.draggable );
+
+							// Remove style so dragged item "snaps" back to the list
+							jQuery( ui.draggable ).removeAttr( 'style' );
+
+							// Send the order to the server for persistence:
+							window.reorder_checklist_items( checklist );
+						}
+				} );
 		};
 
 	// Show new checklist item input on Add Item button click:
@@ -257,4 +325,7 @@ jQuery( document ).ready( function()
 			this.style.height = 'auto';
 			this.style.height = ( this.scrollHeight ) + 'px';
 		} );
+
+	// Make checklist items draggable and droppable:
+	window.dragndrop_checklist_items( '.checklist_items .checklist_item' );
 } );

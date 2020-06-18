@@ -1923,7 +1923,7 @@ class ItemLight extends DataObject
 			$checklist_SQL->SELECT( 'check_ID, check_item_ID, check_checked, check_label' );
 			$checklist_SQL->FROM( 'T_items__checklist_lines' );
 			$checklist_SQL->WHERE( 'check_item_ID = '.$DB->quote( $this->ID ) );
-			$checklist_SQL->ORDER_BY( 'check_ID' );
+			$checklist_SQL->ORDER_BY( 'check_order ASC, check_ID ASC' );
 			$this->checklist_items = $DB->get_results( $checklist_SQL );
 		}
 

@@ -411,11 +411,11 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   display: flex;
   -ms-flex-direction: row;
       flex-direction: row;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
 }
 .checklist_items .checklist_item label {
   min-width: 0;
-  -ms-flex-positive: 1;
-      flex-grow: 1;
   display: -ms-flexbox;
   display: flex;
 }
@@ -424,8 +424,6 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
       flex-shrink: 0;
 }
 .checklist_items .checklist_item label .checklist_item_label {
-  -ms-flex-positive: 1;
-      flex-grow: 1;
   word-break: break-word;
 }
 .checklist_items .checklist_item .checklist_item_delete {
@@ -438,6 +436,26 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .checklist_items .checklist_item input[type="checkbox"]:checked + .checklist_item_label {
   text-decoration: line-through;
+}
+.checklist_items .droppable-hover > label:first-child::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-left-color: #f00;
+  border-right: none;
+  left: -5px;
+  bottom: -7px;
+}
+.checklist_items .droppable-hover > label:after {
+  content: "";
+  position: absolute;
+  width: 102%;
+  height: 2px;
+  background: #F00;
+  left: 0;
+  bottom: -2px;
 }
 .checklist_item_input {
   overflow-y: hidden;
