@@ -1581,11 +1581,11 @@ class MarkdownImport extends AbstractImport
 				//       after we call Item->dbinsert()/Item->dbupdate()
 				$this->log( '<br/>&nbsp; &nbsp; Details: '
 					.'<i>slug=</i>'
-					.'<a href="'.$Item->get_permanent_url().'" class="evo_log__slug" target="_blank"><code>'
+					.'<a href="'.$Item->get_permanent_url().'" target="_blank"><code>'
 						.$item_slug
 					.'</code></a> '
 					.'<i>post_ID=</i>'
-					.'<a href="'.$edit_item_url.'" class="evo_log__title" target="_blank"><b>'
+					.'<a href="'.$edit_item_url.'" title="'.format_to_output( TB_('Edit this item...'), 'htmlattr' ).'" target="_blank"><b>'
 						.$post_ID
 					.'</b></a>' );
 
@@ -1594,10 +1594,11 @@ class MarkdownImport extends AbstractImport
 				{	// Skip Item with same slug in another Collection:
 					$BlogCahe = get_BlogCache();
 					$another_Blog = & $BlogCahe->get_by_ID( $post_coll_ID, false, false );
-					$this->log_list( sprintf( 'Skip this %s file because Item(%s) already exists with same slug in collection %s!',
+					$this->log_list( sprintf( 'Skip this %s file because Item %s already exists with same slug in collection %s!',
 							'<code>.md</code>',
 							// Link to another Item with same slug:
-							( $Item ? '<a href="'.$edit_item_url.'" target="_blank">'.$Item->get( 'title' ).'</a>' : '#'.$post_ID ),
+							'<a href="'.$Item->get_permanent_url().'" target="_blank">'.$Item->get( 'title' ).'</a> '
+								.'(<a href="'.$edit_item_url.'" title="'.format_to_output( TB_('Edit this item...'), 'htmlattr' ).'" target="_blank">'.$Item->ID.'</a>)',
 							// Link to another Collection where Item is found by same slug:
 							( $another_Blog ? '<a href="'.$another_Blog->get( 'url' ).'" target="_blank">'.$another_Blog->get( 'name' ).'</a>' : '#'.$post_coll_ID )
 						), 'error' );

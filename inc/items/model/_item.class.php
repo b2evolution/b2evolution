@@ -7007,11 +7007,6 @@ class Item extends ItemLight
 	{
 		global $admin_url;
 
-		if( ! $this->can_be_edited() )
-		{	// Don't allow to edit this Item if it cannot be edited by curren User:
-			return false;
-		}
-
 		// default params
 		$params += array(
 				'save_context'             => true,
@@ -7020,6 +7015,11 @@ class Item extends ItemLight
 				'force_backoffice_editing' => false,
 				'check_perm'               => true, // FALSE - if this link must be displayed even if current has no permission to view item history page
 			);
+
+		if( empty( $this->ID ) || ( $params['check_perm'] && ! $this->can_be_edited() ) )
+		{	// Don't allow to edit this Item if it is not created yet or if this Item cannot be edited by current User:
+			return false;
+		}
 
 		$this->load_Blog();
 		$url = false;
