@@ -1969,9 +1969,10 @@ class ItemLight extends DataObject
 				'after'     => '',
 				'link_text' => '$icon$', // Use a mask $icon$ or some other text
 				'class'     => '',
+				'check_perm' => true, // FALSE - if this link must be displayed even if current has no permission to view item history page
 			), $params );
 
-		if( ( $history_url = $this->get_history_url() ) === false )
+		if( ( $history_url = $this->get_history_url( '&amp;', $params['check_perm'] ) ) === false )
 		{ // No url available for current user, Don't display a link
 			return;
 		}
@@ -1991,11 +1992,11 @@ class ItemLight extends DataObject
 	 * @param string Glue between url params
 	 * @return string|boolean URL to history OR False when user cannot see a history
 	 */
-	function get_history_url( $glue = '&amp;' )
+	function get_history_url( $glue = '&amp;', $check_perm = true )
 	{
 		global $admin_url;
 
-		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( $check_perm && ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{ // Current user cannot see a history
 			return false;
 		}

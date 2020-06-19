@@ -43,6 +43,13 @@ module.exports = function(grunt) {
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
 
+					// Superbundle Font-Awesome + Bootstrap + Front-office styles:
+					'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css': [
+							'rsc/css/font-awesome.css',
+							'rsc/css/bootstrap/bootstrap.css',
+							'rsc/build/bootstrap-b2evo_base.bundle.css',
+						],
+
 					// Bootstrap back-office styles:
 					'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
@@ -156,6 +163,11 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: 'rsc/build/bootstrap-b2evo_base.bundle.css',
 				dest: 'rsc/build/bootstrap-b2evo_base.bmin.css',
+			},
+			bootstrap_b2evo_base_superbundle: {
+				nonull: true, // Display missing files
+				src: 'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css',
+				dest: 'rsc/build/bootstrap-b2evo_base-superbundle.bmin.css',
 			},
 			bootstrap_backoffice_b2evo_base: {
 				nonull: true, // Display missing files
@@ -356,6 +368,20 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_forms.js',
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
+			},
+			// JS files(bundled with jQuery and Bootstrap) that are used on front-office bootstrap skins:
+			evo_frontoffice_bootstrap_superbundle: {
+				options: {
+					banner: '/* Includes files for bootstrap front-office skins */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/jquery.min.js',
+					'rsc/js/jquery/jquery-migrate.min.js',
+					'rsc/js/bootstrap/bootstrap.min.js',
+					'rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
+				],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice-superbundle.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {

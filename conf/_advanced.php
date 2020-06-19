@@ -952,6 +952,28 @@ $library_local_urls = array(
 		'#hotkeys#' => array( 'hotkeys/hotkeys.min.js' ),
 	);
 
+/**
+ * JS/CSS files which contain other JS/CSS files in order to don't required them twice when main file is required on current page
+ *
+ * Key - Alias or relative path of main JS/CSS file, Value - array of bundled files inside the main JS/CSS file
+ */
+$bundled_files = array(
+	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
+		'#jquery#',
+		'#jquery_migrate#',
+		'#bootstrap#',
+	),
+	'bootstrap-b2evo_base-superbundle.bundle.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bundle.css',
+	),
+	'bootstrap-b2evo_base-superbundle.bmin.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bmin.css',
+	),
+);
 
 /**
  * Allow to send outbound pings on localhost

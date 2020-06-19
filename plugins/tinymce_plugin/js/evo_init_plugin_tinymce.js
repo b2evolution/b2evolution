@@ -268,8 +268,8 @@ jQuery( document ).ready( function()
 					window.tinymce_plugin_toggleEditor( config.content_id );
 				}
 	
-				// If the JS is enabled set the editor code to the currently used value:
-				jQuery( '[name="editor_code"]' ).attr( 'value', config.plugin_code );
+				// Set editor code to current plugin code if JS is enabled and tinymce is used currently:
+				jQuery( '[name="editor_code"]' ).attr( 'value', config.editor.use_tinymce == 1 ? config.plugin_code : 'html' );
 			}
 		};
 

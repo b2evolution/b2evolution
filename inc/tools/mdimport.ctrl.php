@@ -101,15 +101,17 @@ switch( $action )
 	case 'file':
 	default:
 		// Step 1:
-		// Initialize markdown import object:
-		if( $app_pro )
-		{	// Use PRO markdown import:
-			load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
-			$MarkdownImport = new MarkdownImportPro();
-		}
-		else
-		{	// Use default markdown import:
-			$MarkdownImport = new MarkdownImport();
+		if( ! isset( $MarkdownImport ) )
+		{	// Initialize markdown import object:
+			if( $app_pro )
+			{	// Use PRO markdown import:
+				load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
+				$MarkdownImport = new MarkdownImportPro();
+			}
+			else
+			{	// Use default markdown import:
+				$MarkdownImport = new MarkdownImport();
+			}
 		}
 		$AdminUI->disp_view( 'tools/views/_md_file.form.php' );
 		break;

@@ -647,7 +647,7 @@ function display_link_position( & $row, $show_actions = true, $fieldset_prefix =
 			{
 				$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\', 0, \'\', '.$fieldset_prefix.'b2evoCanvas )',
+							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\', 0, false, '.$fieldset_prefix.'b2evoCanvas )',
 							'style'   => 'cursor:pointer;'
 						) );
 
@@ -656,7 +656,7 @@ function display_link_position( & $row, $show_actions = true, $fieldset_prefix =
 			{
 				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
-							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\', 0, \'\', '.$fieldset_prefix.'b2evoCanvas )',
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\', 0, false, '.$fieldset_prefix.'b2evoCanvas )',
 							'style'   => 'cursor:default;'
 						) );
 			}

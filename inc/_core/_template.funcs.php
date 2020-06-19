@@ -1257,6 +1257,56 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	return $lib_url;
 }
 
+
+/**
+ * Check if the requested file is bundled in another
+ *
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string 'js' or 'css' or 'build'
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
+ * @return integer Index of first file that was dequeued because it is bundled inside current requested file
+ */
+function check_bundled_file( $file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
+{
+	global $required_js, $required_css, $bundled_files;
+
+	// Store here index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = NULL;
+
+	if( isset( $bundled_files[ $file ] ) )
+	{	// If currently required file contains other JS files which must not be required twice:
+		foreach( $bundled_files[ $file ] as $bundled_file )
+		{	// Include all bundled files in the global array in order to don't call them twice:
+			$bundled_url = strtolower( get_require_url( $bundled_file, $relative_to, $subfolder, $version ) );
+			if( $subfolder == 'js' )
+			{	// JS file:
+				if( empty( $required_js ) || ! in_array( $bundled_url, $required_js ) )
+				{	// Include bundled file into this global array in order to don't require this if it will be required further:
+					$required_js[] = $bundled_url;
+				}
+			}
+			else // 'css' or 'build'
+			{	// CSS file:
+				if( empty( $required_css ) || ! in_array( $bundled_url, $required_css ) )
+				{	// Include bundled file into this global array in order to don't require this if it will be required further:
+					$required_css[] = $bundled_url;
+				}
+			}
+			// Dequeue the file if it was required before:
+			$dequeued_file_index = dequeue( $bundled_file, $relative_to );
+			if( $first_dequeued_file_index === NULL )
+			{	// We need to know first dequeued file in order to insert currently
+				// required file in that place instead of insert it as last ordered:
+				$first_dequeued_file_index = $dequeued_file_index;
+			}
+		}
+	}
+
+	return $first_dequeued_file_index;
+}
+
+
 /**
  * Memorize that a specific javascript file will be required by the current page.
  * All requested files will be included in the page head only once (when headlines is called)
@@ -1276,13 +1326,21 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  */
 function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#', $position = 'headlines' )
 {
-	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
+	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form(), check_bundled_file())
 	global $use_defer;
 
 	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
 	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
 		return;
 	}
+
+	if( is_dequeued( $js_file, $relative_to ) )
+	{	// Don't require if the file was already dequeued once:
+		return;
+	}
+
+	// Get index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = check_bundled_file( $js_file, $relative_to, 'js', $version );
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{	// Dependency : ensure jQuery is loaded
@@ -1320,11 +1378,11 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 		{ // Add script tag to <head>
 			if( $position == 'headlines' )
 			{
-				add_headline( $script_tag, $js_file, $relative_to );
+				add_headline( $script_tag, $js_file, $relative_to, $first_dequeued_file_index );
 			}
 			elseif( $position == 'footerlines' )
 			{
-				add_footerline( $script_tag, $js_file, $relative_to );
+				add_footerline( $script_tag, $js_file, $relative_to, $first_dequeued_file_index );
 			}
 		}
 	}
@@ -1386,7 +1444,7 @@ function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, 
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines', $async = false )
 {
-	static $required_css;
+	global $required_css; // Use this var as global and NOT static, because it is used in other functions(e.g. check_bundled_file())
 
 	// Which subfolder do we want to use in case of absolute paths? (doesn't appy to 'relative')
 	$subfolder = 'css';
@@ -1397,6 +1455,14 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 			$subfolder = 'build';
 		}
 	}
+
+	if( is_dequeued( $css_file, $relative_to ) )
+	{	// Don't require if the file was already dequeued once:
+		return;
+	}
+
+	// Get index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = check_bundled_file( $css_file, $relative_to, $subfolder, $version );
 
 	// Get library url of CSS file by alias name
 	$css_url = get_require_url( $css_file, $relative_to, $subfolder, $version );
@@ -1435,11 +1501,11 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 		{	// Add stylesheet tag to <head>
 			if($position == 'headlines' )
 			{
-				add_headline( $stylesheet_tag, $css_file, $relative_to );
+				add_headline( $stylesheet_tag, $css_file, $relative_to, $first_dequeued_file_index );
 			}
 			elseif( $position == 'footerlines' )
 			{
-				add_footerline( $stylesheet_tag, $css_file, $relative_to );
+				add_footerline( $stylesheet_tag, $css_file, $relative_to, $first_dequeued_file_index );
 			}
 		}
 	}
@@ -1464,15 +1530,127 @@ function require_css_async( $css_file, $relative_to = 'rsc_url', $title = NULL, 
 
 
 /**
- * Dequeue a file from $headlines array by file name or alias
- *
- * @deprecated We don't need this after implement proper ordering for headlines and footerlines
+ * Dequeue a file from $headlines and $footerlines array by file name or alias
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
- * @param boolean|string What group of headlines touch to dequeue
+ * @param boolean|string What group of headlines/footerlines touch to dequeue
+ * @return integer|NULL Index/order of the file in global array on required files, NULL - if the file was not found
  */
 function dequeue( $file_name, $group_relative_to = '#anygroup#' )
 {
+	global $headline_include_file, $headline_file_index, $dequeued_headlines;
+
+	if( is_dequeued( $file_name, $group_relative_to ) )
+	{	// Don't dequeue twice:
+		pre_dump( 'is_dequeued' );
+		return NULL;
+	}
+
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
+
+	if( ! is_array( $dequeued_headlines ) )
+	{	// Initialize array first time:
+		$dequeued_headlines = array();
+	}
+
+	// Store each dequeued file in order to don't require this next time:
+	$dequeued_headlines[ $group_relative_to ][ $file_name ] = true;
+
+	// Find and store here index/order of first file:
+	$dequeued_file_index = NULL;
+
+	// Try to find and dequeue headline file:
+	if( ! empty( $headline_file_index ) )
+	{
+		$headline_file_indexes = ( $group_relative_to == '#anygroup#' ? $headline_file_index : array() );
+		if( $group_relative_to == '#anygroup#' )
+		{	// Dequeue the file from any group:
+			$headline_file_indexes = $headline_file_index;
+		}
+		elseif( isset( $headline_file_index[ $group_relative_to ] ) )
+		{	// Dequeue the file only from the requested group:
+			$headline_file_indexes = array( $group_relative_to => $headline_file_index[ $group_relative_to ] );
+		}
+		if( ! empty( $headline_file_indexes ) )
+		{	// If relative_to group is found:
+			foreach( $headline_file_indexes as $group_key => $group_headlines )
+			{
+				if( isset( $group_headlines[ $file_name ] ) )
+				{	// Dequeue html/include tag with src/href of the file:
+					$dequeued_file_index = $headline_file_index[ $group_key ][ $file_name ];
+					unset( $headline_include_file[ $group_headlines[ $file_name ] ] );
+					// Dequeue index/order of the file:
+					unset( $headline_file_index[ $group_key ][ $file_name ] );
+					// Don't find the file in next groups because it must be unique:
+					return $dequeued_file_index;
+				}
+			}
+		}
+	}
+
+	// Footerlines if the files is not found in Headlines above:
+	global $footerline_include_file, $footerline_file_index, $dequeued_footerlines;
+
+	if( ! is_array( $dequeued_footerlines ) )
+	{	// Initialize array first time:
+		$dequeued_footerlines = array();
+	}
+
+	// Store each dequeued file in order to don't require this next time:
+	$dequeued_footerlines[ $group_relative_to ][ $file_name ] = true;
+
+	// Find and store here index/order of first file:
+	$dequeued_file_index = NULL;
+
+	// Try to find and dequeue footerline file:
+	if( ! empty( $footerline_file_index ) )
+	{	// Try to dequeue footerline file:
+		$footerline_file_indexes = ( $group_relative_to == '#anygroup#' ? $footerline_file_index : array() );
+		if( $group_relative_to == '#anygroup#' )
+		{	// Dequeue the file from any group:
+			$footerline_file_indexes = $footerline_file_index;
+		}
+		elseif( isset( $footerline_file_index[ $group_relative_to ] ) )
+		{	// Dequeue the file only from the requested group:
+			$footerline_file_indexes = array( $group_relative_to => $footerline_file_index[ $group_relative_to ] );
+		}
+		if( ! empty( $footerline_file_indexes ) )
+		{	// If relative_to group is found:
+			foreach( $footerline_file_indexes as $group_key => $group_footerlines )
+			{
+				if( isset( $group_footerlines[ $file_name ] ) )
+				{	// Dequeue html/include tag with src/href of the file:
+					$dequeued_file_index = $footerline_file_index[ $group_key ][ $file_name ];
+					unset( $footerline_include_file[ $group_footerlines[ $file_name ] ] );
+					// Dequeue index/order of the file:
+					unset( $footerline_file_index[ $group_key ][ $file_name ] );
+					// Don't find the file in next groups because it must be unique:
+					return $dequeued_file_index;
+				}
+			}
+		}
+	}
+
+	return $dequeued_file_index;
+}
+
+
+/**
+ * Check if file was dequeued from required list
+ *
+ * @param string Alias, url or relative file path of JS/CSS file
+ * @param boolean|string Group of file
+ */
+function is_dequeued( $file_name, $group_relative_to )
+{
+	global $dequeued_headlines, $dequeued_footerlines;
+
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
+
+	return isset( $dequeued_headlines[ $group_relative_to ][ $file_name ] ) ||
+		isset( $dequeued_footerlines[ $group_relative_to ][ $file_name ] );
 }
 
 
@@ -1646,8 +1824,9 @@ function add_js_translation( $string, $translation )
  * @param string HTML tag like <script></script> or <link />
  * @param string File name (used to index)
  * @param boolean|string Group headlines by this group in order to allow use files with same names from several places
+ * @param integer Insert new headline in the given index, Useful to insert superbundled file instead of first bundled file
  */
-function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogroup#' )
+function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogroup#', $file_index = NULL )
 {
 	if( $file_name === NULL )
 	{	// Add inline code:
@@ -1663,9 +1842,18 @@ function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogr
 		{	// Skip already included file from the same group:
 			return;
 		}
-		$headline_include_file[] = $headline;
-		// Flag to don't include same file from same group twice:
-		$headline_file_index[ $group_relative_to ][ $file_name ] = true;
+		if( $file_index === NULL || isset( $headline_include_file[ $file_index ] ) )
+		{	// Use auto order/index:
+			$headline_include_file[] = $headline;
+			$file_index = max( array_keys( $headline_include_file ) );
+		}
+		else
+		{	// Use specific order/index when it is requested and the index is free:
+			$headline_include_file[ $file_index ] = $headline;
+		}
+		// Flag to don't include same file from same group twice,
+		// Also store value as index/order in order to dequeue it quickly:
+		$headline_file_index[ $group_relative_to ][ $file_name ] = $file_index;
 	}
 }
 
@@ -1680,8 +1868,9 @@ function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogr
  * @param string HTML tag like <script></script> or <link />
  * @param string File name (used to index)
  * @param boolean|string Group footerlines by this group in order to allow use files with same names from several places
+ * @param integer Insert new headline in the given index, Useful to insert superbundled file instead of first bundled file
  */
-function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#nogroup#' )
+function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#nogroup#', $file_index = NULL )
 {
 	if( $file_name === NULL )
 	{	// Add inline code:
@@ -1697,9 +1886,19 @@ function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#
 		{	// Skip already included file from the same group:
 			return;
 		}
+		if( $file_index === NULL || isset( $footerline_include_file[ $file_index ] ) )
+		{	// Use auto order/index:
+			$footerline_include_file[] = $footerline;
+			$file_index = max( array_keys( $footerline_include_file ) );
+		}
+		else
+		{	// Use specific order/index when it is requested and the index is free:
+			$footerline_include_file[ $file_index ] = $footerline;
+		}
 		$footerline_include_file[] = $footerline;
-		// Flag to don't include same file from same group twice:
-		$footerline_file_index[ $group_relative_to ][ $file_name ] = true;
+		// Flag to don't include same file from same group twice,
+		// Also store value as index/order in order to dequeue it quickly:
+		$footerline_file_index[ $group_relative_to ][ $file_name ] = $file_index;
 	}
 }
 
@@ -2272,6 +2471,8 @@ function include_headlines()
 	$all_headlines = array();
 	if( is_array( $headline_include_file ) )
 	{	// Include files:
+		// Sort because after dequeued bundled files we need to move main superbundled file on proper order:
+		ksort( $headline_include_file );
 		$all_headlines = $headline_include_file;
 		unset( $headline_include_file, $headline_file_index );
 	}
@@ -2323,6 +2524,8 @@ function include_footerlines()
 	if( is_array( $footerline_include_file ) )
 	{	// Include files:
 		$all_footerlines = $footerline_include_file;
+		// Sort because after dequeued bundled files we need to move main superbundled file on proper order:
+		ksort( $footerline_include_file );
 		unset( $footerline_include_file, $footerline_file_index );
 	}
 	if( is_array( $footerline_inline_code ) )
@@ -3608,16 +3811,19 @@ function get_prevent_key_enter_js( $jquery_selection )
  *               - 'fontawesome' - Use only font-awesome icons
  *               - 'fontawesome-glyphicons' - Use font-awesome icons as a priority over the glyphicons
  * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE - to require css file, FALSE - is used when css file is already loaded inside superbundle file
  */
-function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url' )
+function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url', $require_files = true )
 {
 	global $b2evo_icons_type;
 
 	// Use font-awesome icons, @see get_icon()
 	$b2evo_icons_type = $icons_type;
 
-	// Load main CSS file of font-awesome icons
-	require_css( '#fontawesome#', $relative_to );
+	if( $require_files )
+	{	// Load main CSS file of font-awesome icons
+		require_css( '#fontawesome#', $relative_to );
+	}
 }
 
 

@@ -7007,18 +7007,19 @@ class Item extends ItemLight
 	{
 		global $admin_url;
 
-		if( ! $this->can_be_edited() )
-		{	// Don't allow to edit this Item if it cannot be edited by curren User:
-			return false;
-		}
-
 		// default params
 		$params += array(
 				'save_context'             => true,
 				'glue'                     => '&amp;',
 				'force_in_skin_editing'    => false,
 				'force_backoffice_editing' => false,
+				'check_perm'               => true, // FALSE - if this link must be displayed even if current has no permission to view item history page
 			);
+
+		if( empty( $this->ID ) || ( $params['check_perm'] && ! $this->can_be_edited() ) )
+		{	// Don't allow to edit this Item if it is not created yet or if this Item cannot be edited by current User:
+			return false;
+		}
 
 		$this->load_Blog();
 		$url = false;
@@ -7026,12 +7027,12 @@ class Item extends ItemLight
 		    ( ! $params['force_backoffice_editing'] || ! check_user_perm( 'admin', 'restricted' ) ) &&
 		    ( ! is_admin_page() || $params['force_in_skin_editing'] ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
-			if( check_item_perm_edit( $this->ID, false ) )
+			if( ! $params['check_perm'] || check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
 				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
 			}
 		}
-		else if( check_user_perm( 'admin', 'restricted' ) )
+		else if( ! $params['check_perm'] || check_user_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
 			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
@@ -8446,6 +8447,7 @@ class Item extends ItemLight
 
 		if( $post_comment_status == 'closed' || $post_comment_status == 'disabled' )
 		{	// Check if item type allows these options:
+			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
 			if( $post_comment_status == 'closed' && ! $ItemType->get( 'allow_closing_comments' ) )
 			{
@@ -8460,6 +8462,14 @@ class Item extends ItemLight
 		if( empty( $item_typ_ID ) )
 		{	// Use first item type by default for wrong request:
 			$item_typ_ID = 1;
+		}
+
+		// Set Item Type here in order to get item type settings below:
+		$this->set( 'ityp_ID', $item_typ_ID );
+
+		if( ! $this->get_type_setting( 'allow_html' ) )
+		{	// Strip HTML tags from content if HTML is not allowed for Item Type of this Item:
+			$post_content = utf8_strip_tags( $post_content );
 		}
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -8497,7 +8507,6 @@ class Item extends ItemLight
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
-		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $postcat_order );
 
