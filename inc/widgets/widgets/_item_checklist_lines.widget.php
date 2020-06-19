@@ -153,10 +153,16 @@ class item_checklist_lines_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
-
 		$this->init_display( $params );
-		
+
+		if( ! empty( $params['Item'] ) )
+		{	// Used Item provided by params:
+			$Item = $params['Item'];
+		}
+		else
+		{	// use global Item:
+			global $Item;
+		}
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object
