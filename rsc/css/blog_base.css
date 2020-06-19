@@ -406,10 +406,10 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .widget_core_item_workflow .evo_widget_item_workflow_form .controls {
   display: inline-block;
 }
-.checklist_items {
+.checklist_lines {
   margin-bottom: 0.5rem;
 }
-.checklist_items .checklist_item {
+.checklist_lines .checklist_line {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: row;
@@ -417,33 +417,33 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   -ms-flex-pack: justify;
       justify-content: space-between;
 }
-.checklist_items .checklist_item label {
+.checklist_lines .checklist_line label {
   min-width: 0;
   display: -ms-flexbox;
   display: flex;
 }
-.checklist_items .checklist_item label input[type="checkbox"] {
+.checklist_lines .checklist_line label input[type="checkbox"] {
   -ms-flex-negative: 0;
       flex-shrink: 0;
 }
-.checklist_items .checklist_item label .checklist_item_label {
+.checklist_lines .checklist_line label .checklist_line_label {
   word-break: break-word;
 }
-.checklist_items .checklist_item .checklist_item_delete {
+.checklist_lines .checklist_line .checklist_line_delete {
   -ms-flex-negative: 0;
       flex-shrink: 0;
   margin-left: 3px;
 }
-.checklist_items .checklist_item:hover .checklist_item_delete {
+.checklist_lines .checklist_line:hover .checklist_line_delete {
   visibility: visible !important;
 }
-.checklist_items .checklist_item:hover.ui-draggable-dragging .checklist_item_delete {
+.checklist_lines .checklist_line:hover.ui-draggable-dragging .checklist_line_delete {
   visibility: hidden !important;
 }
-.checklist_items .checklist_item input[type="checkbox"]:checked + .checklist_item_label {
+.checklist_lines .checklist_line input[type="checkbox"]:checked + .checklist_line_label {
   text-decoration: line-through;
 }
-.checklist_items .droppable-hover > label:after {
+.checklist_lines .droppable-hover > label:after {
   content: "";
   position: absolute;
   width: 102%;
@@ -452,16 +452,16 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   left: 0;
   bottom: -2px;
 }
-.checklist_items .checklist_droparea {
+.checklist_lines .checklist_droparea {
   height: 2px;
 }
-.checklist_items .checklist_droparea.droppable-hover {
+.checklist_lines .checklist_droparea.droppable-hover {
   background: #F00;
 }
-.checklist_item_input {
+.checklist_line_input {
   overflow-y: hidden;
 }
-.checklist_item_input.add_checklist_item_input {
+.checklist_line_input.add_checklist_line_input {
   margin-bottom: 0.5rem;
 }
 .videojs_block .vjs-default-skin .vjs-big-play-button {

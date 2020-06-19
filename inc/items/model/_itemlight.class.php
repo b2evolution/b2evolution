@@ -121,13 +121,13 @@ class ItemLight extends DataObject
 	var $tags = NULL;
 
 	/**
-	 * Array of checklist items
+	 * Array of checklist lines
 	 * 
 	 * Lazy loaded.
-	 * @see ItemLight::get_checklist_items()
+	 * @see ItemLight::get_checklist_lines()
 	 * @var array
 	 */
-	var $checklist_items = NULL;
+	var $checklist_lines = NULL;
 
 	/**
 	 * Array of dbchanges flag to be able to check modifications, and execute update queries only when required
@@ -1908,26 +1908,26 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Get array of checklist items.
+	 * Get array of checklist lines.
 	 *
 	 * @return array
 	 */
-	function get_checklist_items()
+	function get_checklist_lines()
 	{
 		global $DB;
 
-		if( ! isset( $this->checklist_items ) )
+		if( ! isset( $this->checklist_lines ) )
 		{
-			// Build query to get the checklist items:
-			$checklist_SQL = new SQL( 'Get checklist items for Item #'.$this->ID );
-			$checklist_SQL->SELECT( 'check_ID, check_item_ID, check_checked, check_label' );
+			// Build query to get the checklist lines:
+			$checklist_SQL = new SQL( 'Get checklist lines for Item #'.$this->ID );
+			$checklist_SQL->SELECT( 'check_ID, check_item_ID, check_checked, check_label, check_order' );
 			$checklist_SQL->FROM( 'T_items__checklist_lines' );
 			$checklist_SQL->WHERE( 'check_item_ID = '.$DB->quote( $this->ID ) );
 			$checklist_SQL->ORDER_BY( 'check_order ASC, check_ID ASC' );
-			$this->checklist_items = $DB->get_results( $checklist_SQL );
+			$this->checklist_lines = $DB->get_results( $checklist_SQL );
 		}
 
-		return $this->checklist_items;
+		return $this->checklist_lines;
 	}
 
 

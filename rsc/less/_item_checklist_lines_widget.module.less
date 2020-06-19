@@ -1,10 +1,10 @@
-// Checklist Items widget
+// Checklist Lines widget
 
-.checklist_items {
+.checklist_lines {
 
     margin-bottom: 0.5rem;
 
-    .checklist_item {
+    .checklist_line {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -18,29 +18,30 @@
                 flex-shrink: 0;
             }
 
-            .checklist_item_label {
+            .checklist_line_label {
                 word-break: break-word;
             }
         }
 
-        .checklist_item_delete {
+        .checklist_line_delete {
             flex-shrink: 0;
             margin-left: 3px;
         }
 
         // Show delete action icon on hover:
         &:hover {
-            .checklist_item_delete {
+            .checklist_line_delete {
                 visibility: visible !important;
             }
 
-            &.ui-draggable-dragging .checklist_item_delete {
+            // Hide delete actino icon when dragged:
+            &.ui-draggable-dragging .checklist_line_delete {
                 visibility: hidden !important;
             }
         }
 
-        // Strikeout checked items:
-        input[type="checkbox"]:checked + .checklist_item_label {
+        // Strikeout checked lines:
+        input[type="checkbox"]:checked + .checklist_line_label {
             text-decoration: line-through;
         }
     }
@@ -63,10 +64,10 @@
     }
 }
 
-.checklist_item_input {
+.checklist_line_input {
     overflow-y: hidden;
 
-    &.add_checklist_item_input {
+    &.add_checklist_line_input {
         margin-bottom: 0.5rem;
     }
 }

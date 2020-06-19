@@ -296,21 +296,21 @@ function & get_ItemTagCache()
 }
 
 /**
- * Get the ChecklistItemCache
+ * Get the ChecklistLineCache
  * 
- * @return ChecklistItemCache
+ * @return ChecklistLineCache
  */
-function & get_ChecklistItemCache()
+function & get_ChecklistLineCache()
 {
-	global $ChecklistItemCache;
+	global $ChecklistLineCache;
 
-	if( ! isset( $ChecklistItemCache ) )
+	if( ! isset( $ChecklistLineCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'items/model/_checklistitem.class.php', 'ChecklistItem' );
-		$ChecklistItemCache = new DataObjectCache( 'ChecklistItem', false, 'T_items__checklist_lines', 'check_', 'check_ID', 'check_label' );
+		load_class( 'items/model/_checklistline.class.php', 'ChecklistLine' );
+		$ChecklistLineCache = new DataObjectCache( 'ChecklistLine', false, 'T_items__checklist_lines', 'check_', 'check_ID', 'check_label' );
 	}
 
-	return $ChecklistItemCache;
+	return $ChecklistLineCache;
 }
 
 /**
@@ -1679,12 +1679,12 @@ class collections_Module extends Module
 					exit(0);
 				}
 
-			case 'checklist_item':
+			case 'checklist_line':
 				global $DB;
 
-				load_class('items/model/_checklistitem.class.php', 'ChecklistItem' );
+				load_class('items/model/_checklistline.class.php', 'ChecklistLine' );
 
-				// Add/Update checklist item:
+				// Add/Update checklist line:
 				$item_action     = param( 'item_action', 'string', 'add' );
 				$item_ID         = param( 'item_ID', 'integer', true );
 				$checklist_ID    = param( 'check_ID', 'integer', NULL );
@@ -1701,60 +1701,60 @@ class collections_Module extends Module
 
 					if( empty( $checklist_ID ) )
 					{
-						$checklistItem = new ChecklistItem();
-						$checklistItem->set_Item( $edited_Item );
-						$checklistItem->set( 'label', $checklist_label );
-						$checklistItem->dbsave();
+						$checklistLine = new ChecklistLine();
+						$checklistLine->set_Item( $edited_Item );
+						$checklistLine->set( 'label', $checklist_label );
+						$checklistLine->dbsave();
 						$status = 'add';
 					}
 					else
 					{
-						$ChecklistItemCache = & get_ChecklistItemCache();
-						$checklistItem = & $ChecklistItemCache->get_by_ID( $checklist_ID );
-						if( $checklist_label != $checklistItem->label )
+						$ChecklistLineCache = & get_ChecklistLineCache();
+						$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+						if( $checklist_label != $checklistLine->label )
 						{
-							$checklistItem->set( 'label', $checklist_label );
+							$checklistLine->set( 'label', $checklist_label );
 						}
-						$checklistItem->dbsave();
+						$checklistLine->dbsave();
 						$status = 'update';
 					}
 
 					$response = array(
 							'status'      => $status,
-							'check_ID'    => $checklistItem->ID,
-							'check_label' => $checklistItem->label,
+							'check_ID'    => $checklistLine->ID,
+							'check_label' => $checklistLine->label,
 						);
 				}
 				elseif( $item_action == 'toggle_check' )
 				{
 					$checklist_checked = param( 'check_checked', 'boolean', NULL );
 
-					$ChecklistItemCache = & get_ChecklistItemCache();
-					$checklistItem = & $ChecklistItemCache->get_by_ID( $checklist_ID );
+					$ChecklistLineCache = & get_ChecklistLineCache();
+					$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
 					if( isset( $checklist_checked ) )
 					{
-						$checklistItem->set( 'checked', $checklist_checked ? 1 : 0 );
+						$checklistLine->set( 'checked', $checklist_checked ? 1 : 0 );
 					}
-					$checklistItem->dbsave();
+					$checklistLine->dbsave();
 					$status = 'toggle_check';
 
 					$response = array(
 							'status'        => $status,
-							'check_ID'      => $checklistItem->ID,
-							'check_checked' => $checklistItem->checked,
+							'check_ID'      => $checklistLine->ID,
+							'check_checked' => $checklistLine->checked,
 						);
 				}
 				elseif( $item_action == 'delete' )
 				{
-					$ChecklistItemCache = & get_ChecklistItemCache();
-					$checklistItem = & $ChecklistItemCache->get_by_ID( $checklist_ID );
+					$ChecklistLineCache = & get_ChecklistLineCache();
+					$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
 
 					$response = array(
 							'status'   => 'delete',
 							'check_ID' => $checklist_ID,
 						);
 
-					$checklistItem->dbdelete();
+					$checklistLine->dbdelete();
 				}
 				elseif( $item_action == 'reorder' )
 				{

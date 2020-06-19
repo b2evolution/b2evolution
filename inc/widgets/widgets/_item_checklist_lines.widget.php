@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Item Checklist Items Widget class.
+ * This file implements the Item Checklist Lines Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  *
  * @package evocore
  */
-class item_checklist_items_Widget extends ComponentWidget
+class item_checklist_lines_Widget extends ComponentWidget
 {
 	var $icon = 'check';
 
@@ -44,7 +44,7 @@ class item_checklist_items_Widget extends ComponentWidget
 	function __construct( $db_row = NULL )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'item_checklist_items' );
+		parent::__construct( $db_row, 'core', 'item_checklist_lines' );
 	}
 
 
@@ -55,7 +55,7 @@ class item_checklist_items_Widget extends ComponentWidget
 	 */
 	function get_help_url()
 	{
-		return get_manual_url( 'item-checklist-items-widget' );
+		return get_manual_url( 'item-checklist-lines-widget' );
 	}
 
 
@@ -64,7 +64,7 @@ class item_checklist_items_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Checklist Items');
+		return T_('Checklist Lines');
 	}
 
 
@@ -73,7 +73,7 @@ class item_checklist_items_Widget extends ComponentWidget
 	 */
 	function get_short_desc()
 	{
-		return format_to_output( T_('Checklist items') );
+		return format_to_output( T_('Checklist lines') );
 	}
 
 
@@ -82,7 +82,7 @@ class item_checklist_items_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display checklist items.');
+		return T_('Display an Item\'s checklist lines.');
 	}
 
 
@@ -104,7 +104,7 @@ class item_checklist_items_Widget extends ComponentWidget
 				'allow_edit' => array(
 					'label' => T_( 'Allow editing' ),
 					'type' => 'checkbox',
-					'note' => T_( 'Check to enable AJAX editing of checklist items if current user has permission.' ),
+					'note' => T_( 'Check to enable AJAX editing of checklist lines if current user has permission.' ),
 					'defaultvalue' => 1,
 				),
 			), parent::get_param_definitions( $params ) );
@@ -121,8 +121,9 @@ class item_checklist_items_Widget extends ComponentWidget
 		global $Item;
 
 		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && $Item->can_meta_comment() )
-		{	// Load JS to edit checklist items if it is enabled by widget setting and current User has a permission to edit them:
+		{	// Load JS to edit checklist lines if it is enabled by widget setting and current User has a permission to edit them:
 			require_js_defer( '#jquery#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 	}
 
@@ -164,19 +165,14 @@ class item_checklist_items_Widget extends ComponentWidget
 		}
 
 		if( ! ( $this->get_param( 'allow_edit' ) && $Item->can_meta_comment() ) &&
-			! count( $Item->get_checklist_items() ) )
-		{	// Nothing to display because current User cannot edit the Item and the Item has no checklist items:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no checklist items and you cannot add new for the Item.' );
+			! count( $Item->get_checklist_lines() ) )
+		{	// Nothing to display because current User cannot edit the Item and the Item has no checklist lines:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no checklist lines and you cannot add new for the Item.' );
 			return false;
 		}
 
 		// Check permission:
 		$can_update = $Item->can_meta_comment() && $this->get_param( 'allow_edit' );
-
-		$this->disp_params = array_merge( array(
-				'widget_item_checklist_before' => '<div class="item_checklist">',
-				'widget_item_checklist_after'  => '</div>',
-			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
@@ -192,54 +188,52 @@ class item_checklist_items_Widget extends ComponentWidget
 
 			$js_config = array(
 				'item_ID'                  => $Item->ID,
-				'checklist_item_template'  => '<div class="checkbox checklist_item">
+				'checklist_line_template'  => '<div class="checkbox checklist_line">
 												<label>
-													<input id="$checklist_item_ID$" type="checkbox" value="$checklist_item_value$">
-													<span class="checklist_item_label">$checklist_item_label$</span>
+													<input id="checklist_line_$checklist_line_ID$" type="checkbox" value="$checklist_line_ID$">
+													<span class="checklist_line_label">$checklist_line_label$</span>
 												</label>'.
-												action_icon( T_('Delete'), 'delete', '#', NULL, NULL, NULL, array( 'class' => 'checklist_item_delete', 'style' => 'visibility:hidden;' ) ).
+												action_icon( T_('Delete'), 'delete', '#', NULL, NULL, NULL, array( 'class' => 'checklist_line_delete', 'style' => 'visibility:hidden;' ) ).
 											'</div>',
-				'checklist_item_input_template' => $Form->textarea_input( '$checklist_item_ID$', '$checklist_item_label$', 1, '', array(
-						'class'       => 'checklist_item_input',
+				'checklist_line_input_template' => $Form->textarea_input( '$checklist_line_ID$', '$checklist_line_label$', 1, '', array(
+						'class'       => 'checklist_line_input',
 						'placeholder' => T_('Add an item'),
 						'hide_label'  => true,
 						'maxlength'   => 10000
 					) ),
-				'crumb_checklist_item' => get_crumb( 'collections_checklist_item' ),
+				'crumb_checklist_line' => get_crumb( 'collections_checklist_line' ),
 				'button_label_add' => T_('Add'),
 				'button_label_add_an_item' => T_('Add an item'),
 			);
 
-			expose_var_to_js( 'evo_init_checklist_items_config', evo_json_encode( $js_config ) );
+			expose_var_to_js( 'evo_init_checklist_lines_config', evo_json_encode( $js_config ) );
 
 			$Form->output = true;
 		}
 
-		echo $this->disp_params['widget_item_checklist_before'];
-		echo '<div class="checklist_items">';
+		echo '<div class="checklist_lines">';
 
-		$checklist_items = $Item->get_checklist_items();
+		$checklist_lines = $Item->get_checklist_lines();
 
-		// Extra drop area for checklist items to first position:
+		// Extra drop area for checklist lines to first position:
 		echo '<div class="checklist_droparea"></div>';
 
-		foreach( $checklist_items as $item )
+		foreach( $checklist_lines as $line )
 		{
-			echo '<div class="checkbox checklist_item">';
+			echo '<div class="checkbox checklist_line">';
 			echo '<label>';
-			echo '<input id="checklist_item_'.$item->check_ID.'" type="checkbox" value="'.$item->check_ID.'"'
-					.( $item->check_checked ? ' checked="checked"' : '' ).( $can_update ? '' : ' disabled="disabled"' ).'>';
-			echo '<span class="checklist_item_label">'.format_to_output( $item->check_label ).'</span>';
+			echo '<input id="checklist_line_'.$line->check_ID.'" type="checkbox" value="'.$line->check_ID.'"'
+					.( $line->check_checked ? ' checked="checked"' : '' ).( $can_update ? '' : ' disabled="disabled"' ).'>';
+			echo '<span class="checklist_line_label">'.format_to_output( $line->check_label ).'</span>';
 			echo '</label>';
 			if( $can_update )
 			{
-				echo action_icon( T_('Delete'), 'delete', '#', NULL, NULL, NULL, array( 'class' => 'checklist_item_delete', 'style' => 'visibility:hidden;' ) );
+				echo action_icon( T_('Delete'), 'delete', '#', NULL, NULL, NULL, array( 'class' => 'checklist_line_delete', 'style' => 'visibility:hidden;' ) );
 			}
 			echo '</div>';
 		}
 
 		echo '</div>';
-		echo $this->disp_params['widget_item_checklist_after'];
 
 		if( $can_update )
 		{
@@ -248,7 +242,7 @@ class item_checklist_items_Widget extends ComponentWidget
 				'fieldend'   => '',
 			));
 			$Form->textarea_input( 'checklist_input_'.$this->ID, NULL, 1, '', array(
-					'class'       => 'add_checklist_item_input checklist_item_input',
+					'class'       => 'add_checklist_line_input checklist_line_input',
 					'placeholder' => T_('Add an item'),
 					'hide_label'  => true,
 					'maxlength'   => 10000,

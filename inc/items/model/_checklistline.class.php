@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the ChecklistItem class.
+ * This file implements the ChecklistLine class.
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -23,16 +23,17 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  *
  * @package evocore
  */
-class ChecklistItem extends DataObject
+class ChecklistLine extends DataObject
 {
     /**
 	 * The item (parent) of this Comment (lazy-filled).
-	 * @see ChecklistItem::get_Item()
-	 * @see ChecklistItem::set_Item()
+	 * @see ChecklistLine::get_Item()
+	 * @see ChecklistLine::set_Item()
 	 * @access protected
 	 * @var Item
 	 */
 	var $Item;
+
 	/**
 	 * The ID of the comment's Item.
 	 * @var integer
@@ -121,5 +122,4 @@ class ChecklistItem extends DataObject
 		return $r;
 	}
 }
-
 ?>
