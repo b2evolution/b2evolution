@@ -21,7 +21,7 @@ global $AdminUI;
 $AdminUI->set_path( 'email', 'newletters' );
 
 // Check permission:
-$current_User->check_perm( 'emails', 'view', true );
+check_user_perm( 'emails', 'view', true );
 
 load_class( 'email_campaigns/model/_newsletter.class.php', 'Newsletter' );
 load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
@@ -32,7 +32,7 @@ $tab = param( 'tab', 'string', 'general', true );
 
 if( $tab == 'automations' )
 {	// Check other permission for automations:
-	$current_User->check_perm( 'options', 'view', true );
+	check_user_perm( 'options', 'view', true );
 }
 
 if( param( 'enlt_ID', 'integer', '', true ) )
@@ -43,7 +43,7 @@ if( param( 'enlt_ID', 'integer', '', true ) )
 		unset( $edited_Newsletter );
 		forget_param( 'enlt_ID' );
 		$action = '';
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('List') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('List') ), 'error' );
 	}
 }
 
@@ -53,7 +53,7 @@ switch( $action )
 		// New Newsletter:
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$edited_Newsletter = new Newsletter();
 		break;
@@ -66,7 +66,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Load data from request:
 		if( $edited_Newsletter->load_from_Request() )
@@ -74,7 +74,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Newsletter->dbinsert();
-			$Messages->add( T_('List has been created.'), 'success' );
+			$Messages->add( TB_('List has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -91,7 +91,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -102,7 +102,7 @@ switch( $action )
 
 			// Update in DB:
 			$edited_Newsletter->dbupdate();
-			$Messages->add( T_('List has been updated.'), 'success' );
+			$Messages->add( TB_('List has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -119,14 +119,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('List "%s" has been deleted.'), $edited_Newsletter->dget( 'name' ) );
+			$msg = sprintf( TB_('List "%s" has been deleted.'), $edited_Newsletter->dget( 'name' ) );
 			$edited_Newsletter->dbdelete();
 			unset( $edited_Newsletter );
 			forget_param( 'enlt_ID' );
@@ -137,7 +137,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Newsletter->check_delete( sprintf( T_('Cannot delete list "%s"'), $edited_Newsletter->dget( 'name' ) ) ) )
+			if( ! $edited_Newsletter->check_delete( sprintf( TB_('Cannot delete list "%s"'), $edited_Newsletter->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -152,7 +152,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -161,8 +161,8 @@ switch( $action )
 		$edited_Newsletter->dbupdate();
 
 		$Messages->add( ( $action == 'activate' ?
-			T_('List has been activated.') :
-			T_('List has been disactivated.') ), 'success' );
+			TB_('List has been activated.') :
+			TB_('List has been disactivated.') ), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=newsletters', 303 ); // Will EXIT
@@ -177,7 +177,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'newsletter' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an enlt_ID:
 		param( 'enlt_ID', 'integer', true );
@@ -203,8 +203,8 @@ switch( $action )
 			$Settings->dbupdate();
 
 			$Messages->add( sprintf( ( $action == 'enable' ?
-				T_('New users will be automatically subscribed to list: %s') :
-				T_('New users will no longer be automatically subscribed to list: %s') ),
+				TB_('New users will be automatically subscribed to list: %s') :
+				TB_('New users will no longer be automatically subscribed to list: %s') ),
 				'"'.$edited_Newsletter->get( 'name' ).'"' ), 'success' );
 		}
 
@@ -216,14 +216,14 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=newsletters' );
-$AdminUI->breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
+$AdminUI->breadcrumbpath_add( TB_('Emails'), $admin_url.'?ctrl=newsletters' );
+$AdminUI->breadcrumbpath_add( TB_('Lists'), $admin_url.'?ctrl=newsletters' );
 
 $AdminUI->display_breadcrumbpath_init( false );
 
 if( ! empty( $edited_Newsletter ) )
 {
-	$AdminUI->display_breadcrumbpath_add( T_('Lists'), $admin_url.'?ctrl=newsletters' );
+	$AdminUI->display_breadcrumbpath_add( TB_('Lists'), $admin_url.'?ctrl=newsletters' );
 	if( $edited_Newsletter->ID > 0 )
 	{	// Edit newsletter
 		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$edited_Newsletter->ID );
@@ -232,12 +232,12 @@ if( ! empty( $edited_Newsletter ) )
 	else
 	{	// New newsletter
 		$AdminUI->breadcrumbpath_add( $edited_Newsletter->dget( 'name' ), '?ctrl=newsletters&amp;action=new' );
-		$AdminUI->display_breadcrumbpath_add( T_('New list') );
+		$AdminUI->display_breadcrumbpath_add( TB_('New list') );
 	}
 }
 else
 {
-	$AdminUI->display_breadcrumbpath_add( T_('Lists') );
+	$AdminUI->display_breadcrumbpath_add( TB_('Lists') );
 }
 
 // Set an url for manual page:
@@ -249,20 +249,20 @@ switch( $action )
 		{ // Add menu level 3 entries:
 			$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
 					'general' => array(
-						'text' => T_('General'),
+						'text' => TB_('General'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=general&amp;enlt_ID='.$edited_Newsletter->ID ),
 					'campaigns' => array(
-						'text' => T_('Campaigns'),
+						'text' => TB_('Campaigns'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$edited_Newsletter->ID ),
 					'subscribers' => array(
-						'text' => T_('Subscribers'),
+						'text' => TB_('Subscribers'),
 						'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$edited_Newsletter->ID )
 				) );
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{	// If current user has a permissions to view options:
 				$AdminUI->add_menu_entries( array( 'email', 'newsletters' ), array(
 						'automations' => array(
-							'text' => T_('Automations'),
+							'text' => TB_('Automations'),
 							'href' => $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=automations&amp;enlt_ID='.$edited_Newsletter->ID ),
 					), 'campaigns' );
 			}
@@ -322,7 +322,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Newsletter->confirm_delete(
-				sprintf( T_('Delete list "%s"?'), $edited_Newsletter->dget( 'name' ) ),
+				sprintf( TB_('Delete list "%s"?'), $edited_Newsletter->dget( 'name' ) ),
 				'newsletter', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -340,7 +340,7 @@ switch( $action )
 				// Display automations tied to this Newsletter:
 				automation_results_block( array(
 						'enlt_ID'               => $edited_Newsletter->ID,
-						'results_title'         => T_('Automations').get_manual_link( 'automations-for-a-list' ),
+						'results_title'         => TB_('Automations').get_manual_link( 'automations-for-a-list' ),
 						'results_prefix'        => 'enltautm_',
 					) );
 				break;

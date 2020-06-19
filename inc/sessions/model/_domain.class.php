@@ -33,7 +33,7 @@ class Domain extends DataObject
 
 	var $comment;
 
-	var $source;
+	var $source_tag;
 
 	/**
 	 * Constructor

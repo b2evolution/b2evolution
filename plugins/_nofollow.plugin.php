@@ -21,7 +21,7 @@ class nofollow_plugin extends Plugin
 	var $code = 'evo_nofollow';
 	var $name = 'Tag external links';
 	var $priority = 99;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -177,7 +177,7 @@ class nofollow_plugin extends Plugin
 
 		if( ! empty( $this->setting_rel_options ) || ! empty( $this->setting_target_options ) )
 		{	// Try to find links only of at least one rel option should be added:
-			$content = replace_content_outcode( '#<a([^>]+href="https?://[^"]+"[^>]*)>(.+?)</a>#i', array( $this, 'callback_render_content' ), $content, 'replace_content_callback' );
+			$content = replace_outside_code_tags( '#<a([^>]+href="https?://[^"]+"[^>]*)>(.+?)</a>#i', array( $this, 'callback_render_content' ), $content, 'replace_content_callback' );
 		}
 
 		return false;

@@ -30,7 +30,7 @@ $Form->begin_fieldset( TB_('Report of the import') );
 	echo '<p>';
 
 	// XML file:
-	echo '<b>'.T_('Source XML').':</b> <code>'.$it_file.'</code><br />';
+	echo '<b>'.TB_('Source XML').':</b> <code>'.$it_file.'</code><br />';
 
 	$it_collections = array();
 	if( is_array( $it_blog_IDs ) && ! empty( $it_blog_IDs ) )

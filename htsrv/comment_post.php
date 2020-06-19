@@ -627,7 +627,7 @@ if( $Comment->ID )
 			$success_message = T_('Your comment is now visible by the members of this section (this collection).');
 			break;
 		case 'review':
-			if( is_logged_in() && $current_User->check_perm( 'blog_comment!review', 'create', false, $blog ) )
+			if( check_user_perm( 'blog_comment!review', 'create', false, $blog ) )
 			{
 				$success_message = T_('Your comment is now visible by moderators only (+You).');
 				break;

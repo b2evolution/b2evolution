@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $DB, $current_User, $Settings;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'options', 'edit', true );
 
 // Selected tab:
 $tab = param( 'tab', 'string', 'general' );
@@ -113,7 +113,7 @@ switch ( $action )
 				break;
 		}
 
-		$Messages->add( T_( 'Settings were updated.' ), 'success' );
+		$Messages->add( TB_( 'Settings were updated.' ), 'success' );
 		break;
 }
 
@@ -123,20 +123,20 @@ if( $tab == 'templates' )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=msgsettings' );
+$AdminUI->breadcrumbpath_add( TB_('Messages'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=msgsettings' );
 switch( $tab )
 {
 	case 'templates':
 		// Templates settings:
-		$AdminUI->breadcrumbpath_add( T_('Templates'), '?ctrl=msgsettings&amp;tab=templates' );
+		$AdminUI->breadcrumbpath_add( TB_('Templates'), '?ctrl=msgsettings&amp;tab=templates' );
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'messages-welcome-after-account-activation' );
 		break;
 
 	case 'renderers':
 		// Renderers settings:
-		$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=msgsettings&amp;tab=renderers' );
+		$AdminUI->breadcrumbpath_add( TB_('Renderers'), '?ctrl=msgsettings&amp;tab=renderers' );
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'messaging-plugin-settings' );
 		// Initialize JS for color picker field on the edit plugin settings form:
@@ -145,7 +145,7 @@ switch( $tab )
 
 	default:
 		// General settings:
-		$AdminUI->breadcrumbpath_add( T_('General'), '?ctrl=msgsettings' );
+		$AdminUI->breadcrumbpath_add( TB_('General'), '?ctrl=msgsettings' );
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'messages-settings' );
 		break;

@@ -84,15 +84,15 @@ class UserList extends DataObjectList2
 
 		if( !empty( $filterset_name ) )
 		{	// Set the filterset_name with the filterset_name param
-			$this->filterset_name = 'UserList_filters_'.$filterset_name;
+			$this->filterset_name = 'UserList_filters_'.preg_replace( '#[^a-z0-9\-_]#i', '', $filterset_name );
 		}
 		else
 		{	// Set a generic filterset_name
 			$this->filterset_name = 'UserList_filters';
 		}
 
-		$this->order_param = 'results_'.$param_prefix.'order';
-		$this->page_param = $param_prefix.'paged';
+		$this->order_param = 'results_'.$this->param_prefix.'order';
+		$this->page_param = $this->param_prefix.'paged';
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(

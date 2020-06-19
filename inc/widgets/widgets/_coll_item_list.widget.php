@@ -44,7 +44,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'content_list_master';
@@ -82,9 +82,9 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $template_options,
 					'defaultvalue' => NULL,
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 					'class' => 'evo_template_select',
 				),
@@ -650,7 +650,7 @@ class coll_item_list_Widget extends ComponentWidget
 			return true;
 		}
 
-		if( empty( $this->disp_params['template'] ) )
+		if( ! empty( $this->disp_params['template'] ) )
 		{	// For template mode we cannot know what will be displayed so no extra classes:
 			echo $this->disp_params['block_start'];
 		}

@@ -101,13 +101,12 @@ class templates_Module extends Module
 		 * @var Menu
 		 */
 		global $topleft_Menu;
-		global $current_User;
 		global $admin_url;
 		global $Collection, $Blog;
 
 		//pre_dump( $topleft_Menu->get_menu_entries( 'site') ); 
 
-		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'admin', 'restricted' ) )
 		{
 
 			// FM enabled and permission to view files:
@@ -128,14 +127,14 @@ class templates_Module extends Module
 	 */
 	function build_menu_2()
 	{
-        global $admin_url, $current_User, $AdminUI;
+		global $admin_url, $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{	// User must has an access to back-office:
 			return;
 		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{	// User has an access to view system settings:
 			$AdminUI->add_menu_entries( array( 'site' ), array(
 				'templates' => array(

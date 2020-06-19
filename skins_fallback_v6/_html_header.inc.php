@@ -19,7 +19,8 @@ $params = array_merge( array(
 	'html_tag' => '<!DOCTYPE html>'."\r\n"
 	             .'<html lang="'.locale_lang( false ).'">',
 	'viewport_tag' => '#responsive#',
-	'auto_pilot'    => 'seo_title',
+	'auto_pilot'   => 'seo_title',
+	'use_base_tag' => false
 ), $params );
 
 // Fallback to API v5:

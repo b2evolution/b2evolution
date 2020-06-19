@@ -13,74 +13,6 @@ jQuery( document ).on( 'change', '.btn-file :file', function()
 
 
 /**
- * Open or close a clickopen area (by use of CSS style).
- *
- * You have to define a div with id clickdiv_<ID> and a img with clickimg_<ID>,
- * where <ID> is the first param to the function.
- *
- * Used to expand/collapse in BACK-office:
- *  - _file.funcs.php: to toggle the subfolders in directory list
- *
- * @param string html id of the element to toggle
- * @param string CSS display property to use when visible ('inline', 'block')
- * @return false
- */
-function toggle_clickopen( id, hide, displayVisible )
-{
-	if( !( clickdiv = document.getElementById( 'clickdiv_'+id ) )
-			|| !( clickimg = document.getElementById( 'clickimg_'+id ) ) )
-	{
-		alert( 'ID '+id+' not found!' );
-		return false;
-	}
-
-	if( typeof(hide) == 'undefined' )
-	{
-		hide = clickdiv.style.display != 'none';
-	}
-
-	if( typeof(displayVisible) == 'undefined' )
-	{
-		displayVisible = ''; // setting it to "empty" is the default for an element's display CSS attribute
-	}
-
-	clickimg = jQuery( clickimg );
-	if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
-	{ // Fontawesome icon | Glyph bootstrap icon
-		if( clickimg.data( 'toggle' ) != '' )
-		{ // This icon has a class name to toggle
-			var icon_prefix = ( clickimg.hasClass( 'fa' ) ? 'fa' : 'glyphicon' );
-			if( clickimg.data( 'toggle-orig-class' ) == undefined )
-			{ // Store original class name in data
-				clickimg.data( 'toggle-orig-class', clickimg.attr( 'class' ).replace( new RegExp( '^'+icon_prefix+' (.+)$', 'g' ), '$1' ) );
-			}
-			if( clickimg.hasClass( clickimg.data( 'toggle-orig-class' ) ) )
-			{ // Replace original class name with exnpanded
-				clickimg.removeClass( clickimg.data( 'toggle-orig-class' ) )
-					.addClass( icon_prefix + '-' + clickimg.data( 'toggle' ) );
-			}
-			else
-			{ // Revert back original class
-				clickimg.removeClass( icon_prefix + '-' + clickimg.data( 'toggle' ) )
-					.addClass( clickimg.data( 'toggle-orig-class' ) );
-			}
-		}
-	}
-	else
-	{ // Sprite icon
-		var xy = clickimg.css( 'background-position' ).match( /-*\d+/g );
-		// Shift background position to the right/left to the one icon in the sprite
-		clickimg.css( 'background-position', ( parseInt( xy[0] ) + ( hide ? 16 : - 16 ) ) + 'px ' + parseInt( xy[1] ) + 'px' );
-	}
-
-	// Hide/Show content block
-	clickdiv.style.display = hide ? 'none' : displayVisible;
-
-	return false;
-}
-
-
-/**
  * Fades the relevant object to provide feedback, in case of success.
  *
  * Used only on BACK-office in the following files:
@@ -402,16 +334,26 @@ function b2template_list_highlight( obj )
 		link_url += '&highlight=' + selected_template;
 	}
 
-	if( window.self !== window.top )
+	var new_target = link.attr('target');
+	
+	if ( new_target === undefined ) 
 	{
-		window.top.location = link_url;
+		if( window.self !== window.top )
+		{
+			window.top.location = link_url;
+		}
+		else
+		{
+			window.location = link_url;
+		}
 	}
 	else
 	{
-		window.location = link_url;
+		window.open( link_url, new_target );
 	}
+
 	return false;
-} 
+}
 
 
 /**

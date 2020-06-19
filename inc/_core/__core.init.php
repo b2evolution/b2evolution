@@ -133,7 +133,6 @@ $ctrl_mappings = array(
 		'groups'           => 'users/groups.ctrl.php',
 		'organizations'    => 'users/organizations.ctrl.php',
 		'accountclose'     => 'users/account_close.ctrl.php',
-		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
 		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
@@ -141,6 +140,7 @@ $ctrl_mappings = array(
 		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 		'customize'        => 'customize/customize.ctrl.php',
+		'pro_only'         => 'pro_only/pro_only.ctrl.php',
 	);
 
 
@@ -1134,13 +1134,13 @@ class _core_Module extends Module
 
 		global $Settings;
 
-		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
-		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
-		$perm_users_view = $current_User->check_perm( 'users', 'view' );
-		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
-		$perm_emails = $current_User->check_perm( 'emails', 'view' );
-		$perm_maintenance = $current_User->check_perm( 'maintenance', 'upgrade' );
+		$perm_admin_normal = check_user_perm( 'admin', 'normal' );
+		$perm_admin_restricted = check_user_perm( 'admin', 'restricted' );
+		$perm_users_view = check_user_perm( 'users', 'view' );
+		$perm_options = check_user_perm( 'options', 'view' );
+		$perm_spam = check_user_perm( 'spamblacklist', 'view' );
+		$perm_emails = check_user_perm( 'emails', 'view' );
+		$perm_maintenance = check_user_perm( 'maintenance', 'upgrade' );
 		$entries = NULL;
 
 		$working_blog = get_working_blog();
@@ -1183,7 +1183,7 @@ class _core_Module extends Module
 				)
 			);
 
-			if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
+			if( $perm_admin_normal && check_user_perm( 'options', 'view' ) )
 			{	// If current User has an access to backoffice and can view settings:
 				$entries['site']['entries'][] = array( 'separator' => true );
 				$entries['site']['entries']['settings'] = array(
@@ -1398,8 +1398,8 @@ class _core_Module extends Module
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
-			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
+			    check_user_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
 				if( ( $disp == 'edit' || $disp == 'proposechange' || $ctrl == 'items' ) &&
@@ -1433,7 +1433,7 @@ class _core_Module extends Module
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
 					{	// Display menu entries to edit and view the post in back-office:
 						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
-						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
+						if( $perm_admin_restricted && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
 						{	// Menu item to edit post in back-office:
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
@@ -1452,7 +1452,7 @@ class _core_Module extends Module
 								);
 							}
 						}
-						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						if( $perm_admin_restricted && check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 						{	// Menu item to view post in back-office:
 							$entries['page']['entries']['view_back'] = array(
 									'text' => T_('View in Back-Office').'&hellip;',
@@ -1499,7 +1499,7 @@ class _core_Module extends Module
 					}
 					if( $featured_intro_Item->ID > 0 )
 					{	// Display menu entries to edit and view the post in back-office:
-						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $featured_intro_Item ) )
+						if( $perm_admin_restricted && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $featured_intro_Item ) )
 						{	// Menu item to edit post in back-office:
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
@@ -1508,7 +1508,7 @@ class _core_Module extends Module
 									'shortcut-top' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
 						}
-						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						if( $perm_admin_restricted && check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 						{	// Menu item to view post in back-office:
 							$entries['page']['entries']['view_back'] = array(
 									'text' => T_('View in Back-Office').'&hellip;',
@@ -1554,7 +1554,7 @@ class _core_Module extends Module
 				);
 
 				$display_separator = false;
-				if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 				{ // Check if current user has an access to post lists
 					$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
 
@@ -1574,7 +1574,7 @@ class _core_Module extends Module
 
 					$contents_submenu = array();
 
-					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					if( $Blog->get_setting( 'use_workflow' ) && check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 					{ // Workflow view
 						$contents_submenu['workflow'] = array(
 								'text' => T_('Workflow view').'&hellip;',
@@ -1633,8 +1633,8 @@ class _core_Module extends Module
 					$display_separator = true;
 				}
 
-				$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID );
-				if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+				$perm_comments = check_user_perm( 'blog_comments', 'view', false, $Blog->ID );
+				if( $perm_comments || check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 				{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
@@ -1646,7 +1646,7 @@ class _core_Module extends Module
 				}
 
 				// Chapters / Categories:
-				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 				{ // Either permission for a specific blog or the global permission:
 					$entries['blog']['entries']['chapters'] = array(
 							'text' => T_('Categories').'&hellip;',
@@ -1664,7 +1664,7 @@ class _core_Module extends Module
 				$entries['blog']['entries']['files'] = NULL;
 
 				// BLOG SETTINGS:
-				if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 				{ // We have permission to edit blog properties:
 					$blog_param = '&amp;blog='.$Blog->ID;
 
@@ -1691,6 +1691,10 @@ class _core_Module extends Module
 									'userdir' => array(
 											'text' => T_('User directory').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir'.$blog_param,
+										),
+									'search' => array(
+											'text' => T_('Search').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=search'.$blog_param,
 										),
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
@@ -1762,7 +1766,7 @@ class _core_Module extends Module
 								)
 						);
 
-					if( $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
+					if( check_user_perm( 'options', 'view', false, $Blog->ID ) )
 					{ // Post Types & Statuses
 						$entries['blog']['entries']['general']['entries']['item_types'] = array(
 								'text' => T_('Item Types').'&hellip;',
@@ -1791,7 +1795,7 @@ class _core_Module extends Module
 						);
 					}
 
-					if( $current_User->check_perm( 'options', 'view' ) )
+					if( check_user_perm( 'options', 'view' ) )
 					{ // Check if current user has a permission to view the common settings of the blogs
 						$entries['blog']['entries']['general']['entries']['common_settings'] = array(
 								'text' => T_('Common Settings').'&hellip;',
@@ -1806,8 +1810,8 @@ class _core_Module extends Module
 		{	// Only front-office collection pages:
 
 			if( $perm_admin_restricted &&
-			    ( ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) ||
-			      $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			    ( ( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) ) ||
+			      check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			  )
 			{	// If current user has an access to back-office and to edit site or collection properties:
 				global $Session;
@@ -1822,7 +1826,7 @@ class _core_Module extends Module
 				);
 			}
 
-			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( $perm_admin_restricted && check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
 				// Display menu item "Features" with depending on $disp:
 				global $disp, $disp_detail;
@@ -1927,6 +1931,11 @@ class _core_Module extends Module
 
 				$dev_entries['noindex'] = array(
 						'text' => $debug_text,
+						'disabled' => true,
+					);
+
+				$dev_entries['defer'] = array(
+						'text' => use_defer() ? 'Using Deferred loading' : 'Using Normal loading',
 						'disabled' => true,
 					);
 			}
@@ -2126,7 +2135,7 @@ class _core_Module extends Module
 				'entry_class' => 'rwdhide'
 			);
 
-		if( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'admin', 'normal' ) && check_user_perm( 'options', 'view' ) )
 		{ // Make time as link to Timezone settings if permission
 			$entries['time']['disabled'] = false;
 			$entries['time']['href'] = $admin_url.'?ctrl=time';
@@ -2185,9 +2194,9 @@ class _core_Module extends Module
 		 */
 		global $AdminUI;
 
-		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
-		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_users = $current_User->check_perm( 'users', 'view' );
+		$perm_admin_normal = check_user_perm( 'admin', 'normal' );
+		$perm_options = check_user_perm( 'options', 'view' );
+		$perm_users = check_user_perm( 'users', 'view' );
 
 		/**** Users | My profile ****/
 		if( $perm_admin_normal && $perm_users )
@@ -2254,7 +2263,7 @@ class _core_Module extends Module
 
 		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
 
-		if( $current_User->check_perm( 'orgs', 'create' ) )
+		if( check_user_perm( 'orgs', 'create' ) )
 		{	// Display a menu item for organizations if user has a perm at least to create own organization:
 			$AdminUI->add_menu_entries( array( 'users' ), array(
 					'organizations' => array(
@@ -2264,7 +2273,7 @@ class _core_Module extends Module
 		}
 
 		/**** Emails ****/
-		$perm_emails = $current_User->check_perm( 'emails', 'view' );
+		$perm_emails = check_user_perm( 'emails', 'view' );
 		if( $perm_admin_normal && $perm_options && $perm_emails )
 		{ // Permission to view email management:
 			$AdminUI->add_menu_entries( NULL, array( 'email' => array(
@@ -2330,7 +2339,7 @@ class _core_Module extends Module
 					), 'campaigns' );
 			}
 
-			if( $current_User->check_perm( 'emails', 'edit' ) )
+			if( check_user_perm( 'emails', 'edit' ) )
 			{	// Allow to test a returned email and smtp sending only if user has a permission to edit email settings:
 				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
 						'test' => array(
@@ -2354,7 +2363,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=system'
 				) ) );
 
-			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
+			$perm_spam = check_user_perm( 'spamblacklist', 'view' );
 
 			if( $perm_admin_normal && ( $perm_options || $perm_spam ) )
 			{ // Permission to view tools or antispam.
@@ -2408,7 +2417,7 @@ class _core_Module extends Module
 								'text' => T_('Countries'),
 								'href' => '?ctrl=antispam&amp;tab3=countries' ) ) );
 
-						if( $current_User->check_perm( 'stats', 'list' ) )
+						if( check_user_perm( 'stats', 'list' ) )
 						{
 							$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 								'domains' => array(
@@ -2421,7 +2430,7 @@ class _core_Module extends Module
 								'text' => T_('Settings'),
 								'href' => '?ctrl=antispam&amp;tab3=settings' ) ) );
 
-						if( $current_User->check_perm( 'options', 'edit' ) )
+						if( check_user_perm( 'options', 'edit' ) )
 						{
 							$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 								'tools' => array(
@@ -2487,7 +2496,7 @@ class _core_Module extends Module
 					) ),
 			) );
 
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
 				$AdminUI->add_menu_entries( 'options', array(
 						'syslog' => array(

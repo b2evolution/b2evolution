@@ -318,6 +318,8 @@ if( $resolve_extra_path )
 		{
 			// TAG? Does the pathinfo end with a / or a ; ?
 			$last_len  = strlen( $last_part );
+			$user_page_prefix = $Blog->get_setting( 'user_prefix' ).':';
+			$user_page_prefix_length = strlen( $user_page_prefix );
 			if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) )   // In very old b2evo version we had ITEM slugs truncated at 40 and possibly ending with `-`
 				|| $last_char == ':'
 				|| $last_char == ';' )
@@ -333,6 +335,24 @@ if( $resolve_extra_path )
 					$posts = $Blog->get_setting( 'posts_per_page' );
 				}
 				$disp = 'posts';
+			}
+			elseif( $user_page_prefix_length > 1 &&
+			        strlen( $path_elements[0] ) > $user_page_prefix_length &&
+			        substr( $path_elements[0], 0, $user_page_prefix_length ) == $user_page_prefix )
+			{	// Alias for disp=user:
+				$user_ID = -1; // Set -1 for case when user is not detected by login and ID
+				$user_request = substr( $path_elements[0], $user_page_prefix_length );
+
+				$UserCache = & get_UserCache();
+				if( $User = & $UserCache->get_by_login( $user_request ) ||
+						( is_number( $user_request ) && $User = & $UserCache->get_by_ID( $user_request, false, false ) ) )
+				{	// If user is detected in DB by login or ID:
+					$user_ID = $User->ID;
+				}
+
+				// Set disp to user with ID of user which was detected from request URL:
+				$disp = 'user';
+				set_param( 'user_ID', $user_ID );
 			}
 			elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
 			{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
@@ -710,10 +730,11 @@ elseif( $disp == '-' && !empty($Item) )
 		$disp = 'single';
 	}
 }
-elseif( $disp == '-' )
-{ // No specific request of any kind...
-	// We consider this to be the home page:
-	$disp = $Blog->get_setting('front_disp');
+elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'front_disp' ) ) )
+{	// No specific request of any kind OR
+	$requested_disp = $disp;
+	// We consider this is home front page:
+	$disp = $Blog->get_setting( 'front_disp' );
 	// Note: the above is where we MIGHT in fact set $disp = 'front';
 
 	$is_front = true; // we have detected that we are displaying the front page
@@ -724,9 +745,13 @@ elseif( $disp == '-' )
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+		// Consider URL with possible params like disp=front or coll_locale=en-US as front canonical URL of the current Collection:
+		$current_url = preg_replace( '#[\?&]((coll_locale=[^&]+|disp='.preg_quote( $disp ).')(&|$))+#', '', $ReqURL );
+		if( ! is_same_url( $current_url, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonical blog url:
-			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+			if( $Blog->get_setting( 'canonical_homepage' ) &&
+			    $redir == 'yes' &&
+			    $requested_disp != 'front' ) // Do NOT redirect when current requested URL is like ?disp=front
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}

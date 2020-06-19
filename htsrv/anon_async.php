@@ -203,7 +203,7 @@ switch( $action )
 		if( strpos( $_SERVER["HTTP_REFERER"], $admin_url ) !== false )
 		{	// If ajax is requested from admin page we should to set a variable $is_admin_page = true if user has permissions
 			// Check global permission:
-			if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
+			if( ! check_user_perm( 'admin', 'restricted' ) )
 			{	// No permission to access admin...
 				require $adminskins_path.'_access_denied.main.php';
 			}
@@ -226,10 +226,9 @@ switch( $action )
 
 			ajax_log_add( 'User: #'.$user_ID.' '.$User->login );
 
-			if( is_logged_in() &&
+			if( check_user_perm( 'admin', 'restricted' ) &&
 			    ( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
-			    $current_User->check_status( 'can_access_admin' ) &&
-			    $current_User->check_perm( 'admin', 'restricted' ) )
+			    check_user_status( 'can_access_admin' ) )
 			{	// Display the moderation buttons only if current user has a permission:
 				$moderation_buttons = '<p class="bubbletip_user__buttons">';
 				if( ! is_admin_page() )
@@ -237,7 +236,7 @@ switch( $action )
 					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
 							.T_('Edit in Back-Office').'</a>';
 				}
-				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+				if( $current_User->ID != $User->ID && check_user_perm( 'users', 'edit' ) )
 				{	// Display a button to delete a spammer only for other users and if current user can edit them:
 					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID )
 								.'" class="btn btn-sm btn-block btn-danger">'
@@ -286,7 +285,7 @@ switch( $action )
 			echo get_avatar_imgtag( $User->login, 'login', true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_class, true, '' );
 			echo '</div>';
 
-			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( is_logged_in() && $current_User->check_perm( 'user', 'view', false, $User ) ) ) )
+			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( check_user_perm( 'user', 'view', false, $User ) ) ) )
 			{ // User is not logged in and anonymous users may NOT view user profiles, or if current User has no permission to view additional information about the User
 				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
@@ -434,7 +433,7 @@ switch( $action )
 		}
 
 		// Check permission for spam voting
-		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $blog_ID );
+		check_user_perm( 'blog_vote_spam_comments', 'edit', true, $blog_ID );
 
 		$type = param( 'type', 'string' );
 		$commentid = param( 'commentid', 'integer' );
@@ -1045,7 +1044,7 @@ switch( $action )
 			if( $edited_Comment !== false )
 			{ // The comment still exists
 				// Check permission:
-				$current_User->check_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
+				check_user_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
 
 				$redirect_to = param( 'redirect_to', 'url', NULL );
 
@@ -1178,7 +1177,7 @@ switch( $action )
 		}
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'edit', true, $user_Organization );
+		check_user_perm( 'orgs', 'edit', true, $user_Organization );
 
 		// Use the glyph or font-awesome icons if it is defined by skin
 		param( 'b2evo_icons_type', 'string', '' );
@@ -1324,7 +1323,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'user' );
 		$user_ID = param( 'user_ID', 'integer', true );
 
-		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user', $user_ID ) )
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! check_user_status( 'can_report_user', $user_ID ) )
 		{ // Only if current user can reports
 			break;
 		}
@@ -1363,8 +1362,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'user' );
 
 		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) ||
-		    ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
-				! $current_User->check_status( 'can_edit_contacts' ) )
+		    ! check_user_perm( 'perm_messaging', 'reply' ) ||
+				! check_user_status( 'can_edit_contacts' ) )
 		{ // Only if current user can reports
 			break;
 		}
@@ -1430,7 +1429,11 @@ switch( $action )
 
 			case 'Comment':
 				$CommentCache = & get_CommentCache();
-				$edited_Comment = $CommentCache->get_by_ID( $target_ID );
+				$edited_Comment = $CommentCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Comment )
+				{
+					$edited_Comment = new Comment();
+				}
 				$rendered_tags = render_inline_tags( $edited_Comment, $tags, $params );
 				break;
 
@@ -1677,14 +1680,15 @@ switch( $action )
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 
-			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
-			{ // Position "Cover" can be used only by one link
-			  // Replace previous position with "Inline"
+			if( $LinkOwner->type == 'item' &&
+			    ( $link_position == 'cover' || $link_position == 'background' ) )
+			{	// Position "Cover" or "Background" can be used only by one link
+				// Replace previous position with "After more":
 				$DB->query( 'UPDATE T_links
 						SET link_position = "aftermore"
 					WHERE link_ID != '.$DB->quote( $link_ID ).'
 						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
-						AND link_position = "cover"' );
+						AND link_position = '.$DB->quote( $link_position ) );
 			}
 		}
 		else
@@ -1839,7 +1843,7 @@ switch( $action )
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		// Container code:
 		param( 'container', 'string' );
@@ -1953,7 +1957,7 @@ switch( $action )
 		$Blog = $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		param( 'wi_ID', 'integer' );
 
@@ -1987,53 +1991,42 @@ switch( $action )
 		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
 		break;
 
-	case 'get_item_parent_info':
+	case 'get_item_selector_info':
+		// Get Item's info after selector from Modal/AJAX window by $Form->item_selector():
+
 		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'item' );
+		$Session->assert_received_crumb( 'item_selector' );
 
 		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
-		param( 'parent_ID', 'integer', true );
+		param( 'item_ID', 'integer', true );
 
 		$ItemCache = & get_ItemCache();
-		$parent_Item = & $ItemCache->get_by_ID( $parent_ID, false, false );
 
-		$r = array();
-		if( $parent_Item )
+		$item_selector_info = array();
+		if( $selected_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
 		{
 			if( is_logged_in() )
 			{	// Remember what last collection was used for linking in order to display it by default on next linking:
 				global $UserSettings;
-
-				$UserSettings->set( 'last_select_parent_coll_ID', $parent_Item->get_blog_ID() );
+				$UserSettings->set( 'last_selected_item_coll_ID', $selected_Item->get_blog_ID() );
 				$UserSettings->dbupdate();
 			}
 
-			$parent_info = '';
-			$status_icons = get_visibility_statuses( 'icons' );
-			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
-			{	// Status colored icon:
-				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
-			}
-			// Title with link to permament url:
-			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
-			// Icon to edit:
-			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
-
-			$r['parent_ID'] = $parent_Item->ID;
-			$r['parent_info'] = $parent_info;
-			$r['parent_coll_ID'] = $parent_Item->get_blog_ID();
+			$item_selector_info['item_ID'] = $selected_Item->ID;
+			$item_selector_info['item_info'] = $selected_Item->get_form_selector_info();
+			$item_selector_info['coll_ID'] = $selected_Item->get_blog_ID();
 		}
 
-		echo json_encode( $r );
+		echo json_encode( $item_selector_info );
 		break;
 
 	case 'get_user_default_filters_form':
 		// Get form to change default users list filters:
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Load the AdminUI class for the skin:
 		global $current_User, $UserSettings, $is_admin_page;

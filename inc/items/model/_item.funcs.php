@@ -411,10 +411,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( $load_featured === false && // Don't try to load featured posts twice,
-		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
-		    $restrict_disp != 'front' && // Exclude front page,
-		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
+		if( ( ! $load_intro && $load_featured === true ) || // If load of featured posts is requested
+		    // If load of featured posts is NOT requested by we need to load because of collection setting "Featured post above list":
+		    ( $load_featured === false && // Don't try to load featured posts twice,
+		      $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
+		      $restrict_disp != 'front' && // Exclude front page,
+		      $Blog->get_setting( 'disp_featured_above_list' ) ) ) // If the collection setting "Featured post above list" is enabled.
 		{	// No Intro page was found, try to find a featured post instead:
 
 			$FeaturedList->reset();
@@ -519,7 +521,7 @@ function get_urltitle( $title, $locale = NULL )
 	// Leave only first 5 words in order to get a shorter URL
 	// (which is generally accepted as a better practice)
 	// User can manually enter a very long URL if he wants
-	$slug_changed = param( 'slug_changed' );
+	$slug_changed = param( 'slug_changed', 'integer' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;
@@ -819,7 +821,6 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 	// init allowed statuses array
 	$allowed_statuses = array();
 
-	$is_logged_in = is_logged_in( false );
 	$creator_coll_name = ( $dbprefix == 'post_' ) ? $dbprefix.'creator_user_ID' : $dbprefix.'author_user_ID';
 	// Iterate through all statuses and set allowed to true only if the corresponding status is allowed in case of any post/comments
 	// If the status is not allowed to show, but exists further conditions which may allow it, then set the condition.
@@ -832,54 +833,54 @@ function get_allowed_statuses_condition( $statuses, $dbprefix, $req_blog, $perm_
 				break;
 
 			case 'community': // It is always allowed for logged in users
-				$allowed = $is_logged_in;
+				$allowed = is_logged_in( false );
 				break;
 
 			case 'protected': // It is always allowed for members
-				$allowed = ( $is_logged_in && ( $current_User->check_perm( 'blog_ismember', 1, false, $req_blog ) ) );
+				$allowed = check_user_perm( 'blog_ismember', 1, false, $req_blog, false );
 				break;
 
 			case 'private': // It is allowed for users who has global 'editall' permission
-				$allowed = ( $is_logged_in && $current_User->check_perm( 'blogs', 'editall' ) );
+				$allowed = check_user_perm( 'blogs', 'editall', false, NULL, false );
 				if( ! $allowed && $dbprefix == 'comment_' )
 				{	// Allow the private comments for collection owner:
-					$allowed = ( $is_logged_in && $current_User->check_perm_blogowner( $req_blog ) );
+					$allowed = ( is_logged_in( false ) && $current_User->check_perm_blogowner( $req_blog ) );
 				}
-				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'private', 'create', false, $req_blog ) )
+				if( !$allowed && check_user_perm( $perm_prefix.'private', 'create', false, $req_blog, false ) )
 				{ // Own private posts/comments are allowed if user can create private posts/comments
 					$where[] = ' ( '.$dbprefix."status = 'private' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
 				}
 				break;
 
 			case 'review': // It is allowed for users who have permission to create comments with 'review' status and have at least 'lt' posts/comments edit perm
-				$allowed = ( $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'moderate', false, $req_blog ) );
-				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'review', 'create', false, $req_blog ) )
+				$allowed = check_user_perm( $perm_prefix.'review', 'moderate', false, $req_blog, false );
+				if( ! $allowed && check_user_perm( $perm_prefix.'review', 'create', false, $req_blog, false ) )
 				{ // Own posts/comments with 'review' status are allowed if user can create posts/comments with 'review' status
 					$where[] = ' ( '.$dbprefix."status = 'review' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
 				}
 				break;
 
 			case 'draft': // In back-office it is always allowed for users who may create posts/commetns with 'draft' status
-				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
-				if( !$allowed && $is_logged_in && $current_User->check_perm( $perm_prefix.'draft', 'create', false, $req_blog ) )
+				$allowed = ( is_admin_page() && check_user_perm( $perm_prefix.'draft', 'create', false, $req_blog ) );
+				if( ! $allowed && check_user_perm( $perm_prefix.'draft', 'create', false, $req_blog, false ) )
 				{ // In front-office only authors may see their own draft posts/comments, but only if the have permission to create draft posts/comments
 					$where[] = ' ( '.$dbprefix."status = 'draft' AND ".$creator_coll_name.' = '.$current_User->ID.' ) ';
 				}
 				break;
 
 			case 'deprecated': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
-				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
+				$allowed = ( is_admin_page() && check_user_perm( $perm_prefix.'deprecated', 'create', false, $req_blog ) );
 				// In front-office it is never allowed
 				break;
 
 			case 'redirected': // In back-office it is always allowed for users who may create posts/comments with 'deprecated' status
-				$allowed = ( is_admin_page() && $current_User->check_perm( $perm_prefix.'redirected', 'create', false, $req_blog ) );
+				$allowed = ( is_admin_page() && check_user_perm( $perm_prefix.'redirected', 'create', false, $req_blog ) );
 				// In front-office it is never allowed
 				break;
 
 			case 'trash':
 				// Currently only users with global editall permissions are allowed to view/delete recycled comments
-				$allowed = ( ( $dbprefix == 'comment_' ) && is_admin_page() && $current_User->check_perm( 'blogs', 'editall' ) );
+				$allowed = ( ( $dbprefix == 'comment_' ) && is_admin_page() && check_user_perm( 'blogs', 'editall' ) );
 				// In front-office it is never allowed
 				break;
 
@@ -956,7 +957,7 @@ function statuses_where_clause( $show_statuses = NULL, $dbprefix = 'post_', $req
 
 	if( is_logged_in( false ) && $filter_by_perm )
 	{ // User is logged in and the account was activated
-		if( $current_User->check_perm( 'blogs', 'editall', false ) )
+		if( check_user_perm( 'blogs', 'editall', false ) )
 		{ // User has permission to all blogs posts and comments, we don't have to check blog specific permissions.
 			$allowed_statuses_cond = get_allowed_statuses_condition( $show_statuses, $dbprefix, NULL, $perm_prefix );
 			if( ! empty( $allowed_statuses_cond ) )
@@ -1226,7 +1227,7 @@ function recreate_autogenerated_excerpts( $continue_url, $remove_all = true, $de
  */
 function cat_select( $Form, $form_fields = true, $show_title_links = true, $params = array() )
 {
-	global $blog, $Blog, $current_blog_ID, $current_User, $edited_Item, $cat_select_form_fields;
+	global $blog, $Blog, $current_blog_ID, $edited_Item, $cat_select_form_fields;
 	global $admin_url, $rsc_url;
 
 	if( get_post_cat_setting( $blog ) < 1 )
@@ -1283,7 +1284,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	// Init cat display param
 	$cat_display_params = array_merge( $params, array( 'total_count' => 0 ) );
 
-	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
+	if( check_user_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
 	  ( isset( $blog) && get_post_cat_setting( $blog ) > 1 && get_allow_cross_posting() == 1 ) ) )
 	{	// If collection cross posting is enabled, go through collections where current Item Type is enabled or current Item already uses categories of those collections:
@@ -1303,8 +1304,8 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 
 		foreach( $BlogCache->cache as $l_Blog )
 		{	// Run recursively through the categories of the detected collections:
-			if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
-			    ! $current_User->check_perm( 'blog_admin', '', false, $l_Blog->ID ) )
+			if( ! check_user_perm( 'blog_post_statuses', 'edit', false, $l_Blog->ID ) ||
+			    ! check_user_perm( 'blog_admin', '', false, $l_Blog->ID ) )
 			{	// Skip collection if current user has no appropriate permissions:
 				continue;
 			}
@@ -1535,7 +1536,7 @@ function cat_select_before_first( $parent_cat_ID, $level )
  */
 function cat_select_before_each( $cat_ID, $level, $total_count, $params = array() )
 { // callback to display sublist element
-	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item, $current_User;
+	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item;
 	global $creating, $cat_select_level, $cat_select_form_fields;
 
 	$params = array_merge( array(
@@ -1548,7 +1549,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count, $params = array(
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
 
-	if( $thisChapter->lock && !$current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
+	if( $thisChapter->lock && ! check_user_perm( 'blog_cats', '', false, $current_blog_ID ) )
 	{	// This chapter is locked and current user has no permission to edit the categories of this blog
 		return;
 	}
@@ -1675,14 +1676,14 @@ function cat_select_after_last( $parent_cat_ID, $level )
  */
 function cat_select_new( & $cat_display_params )
 {
-	global $blog, $Blog, $current_User;
+	global $blog, $Blog;
 
 	if( ! $cat_display_params['display_new'] )
 	{	// Don't display an input to create new category:
 		return '';
 	}
 
-	if( ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
+	if( ! check_user_perm( 'blog_cats', '', false, $blog ) )
 	{	// Current user cannot add/edit a categories for this blog
 		return '';
 	}
@@ -1755,7 +1756,7 @@ function cat_select_new( & $cat_display_params )
  */
 function attach_browse_tabs( $display_tabs3 = true )
 {
-	global $AdminUI, $Collection, $Blog, $current_User, $admin_url, $ItemTypeCache;
+	global $AdminUI, $Collection, $Blog, $admin_url, $ItemTypeCache;
 
 	if( empty( $Blog ) )
 	{ // No blog
@@ -1764,7 +1765,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 
 	$menu_entries = array();
 
-	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+	if( $Blog->get_setting( 'use_workflow' ) && check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{ // We want to use workflow properties for this blog:
 		$menu_entries['tracker'] = array(
 			'text' => T_('Workflow view'),
@@ -1830,7 +1831,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 
 	if( $display_tabs3 )
 	{
-		if( $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_comments', 'view', false, $Blog->ID ) )
 		{	// User has permission to edit published, draft or deprecated comments (at least one kind)
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'fullview' => array(
@@ -1842,7 +1843,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 				) );
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		if( check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 		{	// Initialize menu entry for Internal comments if current user has a permission:
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'meta' => array(
@@ -2078,7 +2079,7 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 {
 	$labels = array_merge( get_visibility_statuses('notes-array'), $labels );
 
-	global $current_User, $Collection, $Blog;
+	global $Collection, $Blog;
 
 	$mass_create_statuses = array( 'redirected' );
 
@@ -2086,7 +2087,7 @@ function visibility_select( & $Form, $post_status, $mass_create = false, $labels
 
 	foreach( $labels as $status => $label )
 	{
-		if( $current_User->check_perm( 'blog_post!'.$status, 'create', false, $Blog->ID ) &&
+		if( check_user_perm( 'blog_post!'.$status, 'create', false, $Blog->ID ) &&
 		    ( !in_array( $status, $mass_create_statuses ) || !$mass_create ) )
 		{
 			$sharing_options[] = array( $status, $label[0].' <span class="notes">'.$label[1].'</span>' );
@@ -2178,7 +2179,7 @@ function load_publish_status( $creating = false )
  */
 function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, $display_preview = false )
 {
-	global $Collection, $Blog, $current_User, $UserSettings;
+	global $Collection, $Blog, $UserSettings;
 	global $next_action, $highest_publish_status; // needs to be passed out for echo_publishnowbutton_js( $action )
 
 	list( $highest_publish_status, $publish_text ) = get_highest_publish_status( 'post', $Blog->ID, true, '', $edited_Item );
@@ -2197,7 +2198,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer" data-shortcut="ctrl+f9"><span class="fa fa-square-o orange"></span> <span>'.TB_('Preview blocks').'</span></a></li>
+					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer" data-shortcut="ctrl+f9">'.TB_('Preview & visualize content blocks').'</span></a></li>
 				</ul>
 			</div>';
 	}
@@ -2252,7 +2253,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	// ---------- SAVE ----------
 	$save_hotkeys = array( 'ctrl+enter', 'command+enter' );
 	$next_action = ($creating ? 'create' : 'update');
-	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! $inskin && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
 		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'),
 				'SaveEditButton btn-status-'.$edited_Item->get( 'status' ), 'data-shortcut' => 'ctrl+s,command+s' ) );
@@ -2430,16 +2431,10 @@ function echo_item_type_change_buttons( $edited_Item, $params = array() )
 	// JavaScript to set proper Item Type on press button:
 	// Note: We remove all attributes "required" at the press moment in order to avoid HTML5
 	//       restrictions on submit form and allow to change Item Type even with empty fields
-	echo '<script>
-jQuery( "button[data-item-type]" ).on( "click", function()
-{
-	jQuery( "[required]" ).removeAttr( "required" );
-	jQuery( "input[name=item_typ_ID]" ).val( jQuery( this ).data( "item-type" ) );
-	jQuery( this ).closest( "form" )
-		.append( "<input type=\"hidden\" name=\"action\" value=\"'.( empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type' ).'\">" )
-		.submit();
-} );
-</script>';
+	$js_config = array(
+			'action' =>  empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type',
+		);
+	expose_var_to_js( 'evo_item_type_change_buttons_config', evo_json_encode( $js_config ) );
 }
 
 
@@ -2579,55 +2574,15 @@ function echo_status_dropdown_button_js( $type = 'post' )
 	$tooltip_titles_js_array = array();
 	foreach( $tooltip_titles as $status => $tooltip_title )
 	{
-		$tooltip_titles_js_array[] = $status.': \''.TS_( $tooltip_title ).'\'';
+		$tooltip_titles_js_array[$status] = TS_( $tooltip_title );
 	}
-	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 
-	?>
-	<script>
-	jQuery( document ).ready( function()
-	{
-		jQuery( '.<?php echo $type; ?>_status_dropdown li a' ).click( function()
-		{
-			var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
-			var item = jQuery( this ).parent();
-			var status = item.attr( 'rel' );
-			var btn_group = item.parent().parent();
-			var btn_wrapper = btn_group.parent().parent();
-			var dropdown_buttons = btn_group.find( 'button' );
-			var first_button = dropdown_buttons.parent().find( 'button:first' );
-			var save_buttons = btn_wrapper.find( 'input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+	$js_config = array(
+			'type' => $type,
+			'tooltip_titles_js_array' => $tooltip_titles_js_array,
+		);
 
-			if( status == 'published' )
-			{ // Hide button "Publish!" if current status is already the "published":
-				btn_wrapper.find( '.quick-publish' ).hide();
-			}
-			else
-			{ // Show button "Publish!" only when another status is selected:
-				btn_wrapper.find( '.quick-publish' ).show();
-			}
-
-			save_buttons.each( function()
-			{ // Change status class name to new changed for all buttons
-				jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
-			} );
-			first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
-			jQuery( 'input[type=hidden][name=<?php echo $type; ?>_status]' ).val( status ); // update hidden field to new status value
-			btn_group.removeClass( 'open' ); // hide dropdown menu
-
-			if( first_button.attr( 'type' ) == 'submit' )
-			{ // Submit form if current dropdown button is used to submit form
-				first_button.click();
-			}
-
-			// Change tooltip based on selected status
-			btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
-
-			return false;
-		} );
-	} );
-	</script>
-	<?php
+	expose_var_to_js( 'evo_status_dropdown_button_'.$type, $js_config, 'evo_status_dropdown_button_config' );
 }
 
 
@@ -3305,78 +3260,6 @@ jQuery( document ).on( 'click', '#evo_link_version_btn', function()
 
 
 /**
- * JS Behaviour: Output JavaScript code to select parent of Item
- */
-function echo_item_select_parent_js()
-{
-	global $Blog, $UserSettings, $admin_url, $evo_item_select_parent_js_initialized;
-	global $b2evo_icons_type;
-
-	if( ! empty( $evo_item_select_parent_js_initialized ) )
-	{	// Don't initialize this JS code twice on same page:
-		return;
-	}
-
-	// Set flag to know this is initialized:
-	$evo_item_select_parent_js_initialized = true;
-
-	// Initialize JavaScript to build and open window:
-	echo_modalwindow_js();
-
-	// Initialize JavaScript for item selector window:
-	echo_item_selector_js();
-
-	// Get default collection:
-	if( ! ( $default_coll_ID = $UserSettings->get( 'last_select_parent_coll_ID' ) ) )
-	{
-		$default_coll_ID = empty( $Blog ) ? 0 : $Blog->ID;
-	}
-?>
-<script>
-var evo_select_parent_load_window_default_coll = <?php echo $default_coll_ID;?>;
-
-function evo_select_parent_load_window( item_ID )
-{
-	return evo_item_selector_load_window( item_ID,
-		[ '<?php echo TS_('Select the parent'); ?>', '<?php echo TS_('Select this Post as parent:'); ?>' ],
-		false,
-		[ { 'text': '<?php echo TS_('Select'); ?>', 'id': 'evo_select_parent_btn', 'class': 'btn btn-primary' } ],
-		evo_select_parent_load_window_default_coll,
-		'collections'
-	);
-}
-
-// Submit form to merge/append a post:
-jQuery( document ).on( 'click', '#evo_select_parent_btn', function()
-{
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: htsrv_url + "anon_async.php",
-		data: {
-			'action': 'get_item_parent_info',
-			'post_ID': jQuery( '#evo_item_selector_post_ID' ).val(),
-			'parent_ID': jQuery( '#evo_item_selector_dest_post_ID' ).val(),
-			'b2evo_icons_type': '<?php echo isset( $b2evo_icons_type ) ? $b2evo_icons_type : ''; ?>',
-			'crumb_item': '<?php echo get_crumb( 'item' ); ?>'
-		},
-		success: function( data )
-		{
-			data = JSON.parse( ajax_debug_clear( data ) );
-			jQuery( '#post_parent_ID' ).removeClass( 'field_error' ).val( data.parent_ID );
-			jQuery( '#parent_item_info' ).html( data.parent_info );
-
-			evo_select_parent_load_window_default_coll = data.parent_coll_ID;
-			closeModalWindow();
-		}
-	} );
-} );
-</script>
-<?php
-}
-
-
-/**
  * JS Behaviour: Output JavaScript code to mass change category of Items
  */
 function echo_item_mass_change_cat_js()
@@ -3537,134 +3420,38 @@ function echo_autocomplete_tags( $params = array() )
 			'update_by_ajax' => false,
 			'use_quick_tags' => false,
 		), $params );
-?>
-	<script>
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags && tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t].trim(), name: tags[t].trim() } );
-			}
-		}
 
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'tags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			minInputWidth: 0,
-			jsonContainer: 'tags',
-			<?php if( $params['update_by_ajax'] ) { ?>
-			onAdd: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'add' ) },
-			onDelete: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'delete' ) },
-			<?php } ?>
-		} );
-	}
+	// Initialize only once:
+	$autocomplete_params = array(
+			'cookie_domain' => get_cookie_domain(),
+			'cookie_path'   => get_cookie_path(),
+			'crumb_collections_update_tags' => get_crumb( 'collections_update_tags' ),
+		);
+	expose_var_to_js( 'evo_autocomplete_tags_config', evo_json_encode( $autocomplete_params ) );
 
-	<?php if( $params['update_by_ajax'] ) { ?>
-	function evo_update_item_tags_by_ajax( item_ID, tags_selector, tag_object, operation )
-	{
-		<?php if( $params['use_quick_tags'] ) { ?>
-		// Update quick tags:
-		if( operation == 'add' )
-		{
-			var item_tag = tag_object.name.trim();
-			var quick_item_tags = jQuery.cookie( 'quick_item_tags' );
-			if( quick_item_tags == null || quick_item_tags.length == 0 )
-			{
-				quick_item_tags = [];
-			}
-			else
-			{
-				quick_item_tags = quick_item_tags.split( ',' );
-			}
-			var tag_index = quick_item_tags.indexOf( item_tag );
+	// Initialize per instance/call:
+	$autocomplete_input_params = array(
+			'input_ID'          => $params['input_ID'],
+			'item_ID'           => $params['item_ID'],
+			'update_by_ajax'    => $params['update_by_ajax'],
+			'use_quick_tags'    => $params['use_quick_tags'],
 
-			if( tag_index === -1 )
-			{
-				quick_item_tags.push( item_tag );
-			}
-			else
-			{
-				quick_item_tags.splice( tag_index, 1 );
-				quick_item_tags.push( item_tag );
-			}
-
-			quick_item_tags = quick_item_tags.splice( -5 );
-			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), {
-					domain: '<?php echo format_to_js( get_cookie_domain() );?>',
-					path: '<?php echo format_to_js( get_cookie_path() );?>'
-				} );
-		}
-
-		<?php } ?>
-		// Mark input background with yellow color during AJAX updating:
-		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
-		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
-		jQuery.ajax(
-		{
-			type: 'POST',
-			url: '<?php echo get_htsrv_url(); ?>action.php',
-			data:
-			{
-				'mname': 'collections',
-				'action': 'update_tags',
-				'item_ID': item_ID,
-				'item_tags': jQuery( tags_selector ).val(),
-				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
-			},
-			success: function()
-			{	// Remove yellow background from input after success AJAX updating:
-				token_input.removeClass( 'token-input-list-process' );
-			},
-			error: function()
-			{	// Mark input background with red color after fail AJAX updating:
-				token_input.removeClass( 'token-input-list-process' ).addClass( 'token-input-list-error' );
-			}
-		} );
-	}
-	<?php } ?>
-
-	jQuery( document ).ready( function()
-	{
-		var input_ID = '<?php echo format_to_js( '#'.$params['input_ID'] );?>';
-
-		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
-		{
-			init_autocomplete_tags( input_ID );
-		}
-
-		jQuery( '#suggest_item_tags' ).click( function()
-		{
-			if( jQuery( this ).is( ':checked' ) )
-			{ // Use plugin to suggest tags
-				jQuery( input_ID ).hide();
-				init_autocomplete_tags( input_ID );
-			}
-			else
-			{ // Remove autocomplete tags plugin
-				jQuery( input_ID ).show();
-				jQuery( input_ID ).parent().find( 'ul.token-input-list-facebook' ).remove();
-			}
-		} );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-item_tags' );
-		?>
-	} );
-	</script>
-<?php
+			// Default token_input parameters:
+			'token_input_params' => array(
+					'theme'             => 'facebook',
+					'queryParam'        => 's',
+					'propertyToSearch'  => 'name',
+					'tokenValue'        => 'name',
+					'preventDuplicates' => true,
+					'prePopulate'       => NULL,
+					'hintText'          => T_('Type in a tag'),
+					'noResultsText'     => T_('No results'),
+					'searchingText'     => T_('Searching...'),
+					'minInputWidth'     => 0,
+					'jsonContainer'     => 'tags',
+				),
+		);
+	expose_var_to_js( $params['input_ID'], $autocomplete_input_params, 'evo_autocomplete_input_tags_config' );
 }
 
 
@@ -3680,7 +3467,7 @@ function echo_autocomplete_tags( $params = array() )
  */
 function check_perm_posttype( $item_typ_ID, $post_extracats, $assert_post_type = true, $assert_permission = true )
 {
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	$ItemTypeCache = & get_ItemTypeCache();
 	$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
@@ -3695,7 +3482,7 @@ function check_perm_posttype( $item_typ_ID, $post_extracats, $assert_post_type =
 	}
 
 	// Check permission:
-	return $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', $assert_permission, $post_extracats );
+	return check_user_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', $assert_permission, $post_extracats );
 }
 
 
@@ -3775,7 +3562,7 @@ function & create_multiple_posts( & $Item, $linebreak = false )
  */
 function check_cross_posting( & $post_category, & $post_extracats, $prev_main_cat = NULL )
 {
-	global $Messages, $blog, $current_User;
+	global $Messages, $blog;
 	$result = true;
 
 	$post_category = param( 'post_category', 'integer', -1 );
@@ -3802,7 +3589,7 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 			continue;
 		}
 		$cat_blog = get_catblog( $cat );
-		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) ) )
+		if( ( $cat_blog != $post_cat_blog ) && ! ( $allow_cross_posting % 2 == 1 && check_user_perm( 'blog_admin', '', false, $cat_blog ) ) )
 		{ // this cat is not from the main category
 			$Messages->add( T_('You are not allowed to cross post to several collections.') );
 			$result = false;
@@ -3815,7 +3602,7 @@ function check_cross_posting( & $post_category, & $post_extracats, $prev_main_ca
 
 	// Check if post_category belongs to a collection different from the previous main cat collection
 	if( $prev_main_cat && ( $prev_cat_blog != $post_cat_blog ) &&
-			! ( $allow_cross_posting >= 2 && $current_User->check_perm( 'blog_admin', '', false, $prev_cat_blog ) && $current_User->check_perm( 'blog_admin', '', false, $post_cat_blog ) ) )
+			! ( $allow_cross_posting >= 2 && check_user_perm( 'blog_admin', '', false, $prev_cat_blog ) && check_user_perm( 'blog_admin', '', false, $post_cat_blog ) ) )
 	{
 		$Messages->add( T_('You are not allowed to move post between collections.') );
 		$result = false;
@@ -3898,8 +3685,7 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 
 	if( ! $post_category || in_array( 0, $post_extracats ) )	// if category key is 0 => means it is a new category
 	{
-		global $current_User;
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $Blog->ID ) )
+		if( ! check_user_perm( 'blog_cats', '', false, $Blog->ID ) )
 		{	// Current user cannot add a categories for this blog
 			check_categories_nosave( $post_category, $post_extracats, $Item, $from ); // set up the category parameters
 			$Messages->add( T_('You are not allowed to create a new category.'), 'error' );
@@ -3976,8 +3762,8 @@ function check_categories( & $post_category, & $post_extracats, $Item = NULL, $f
 		$ingnored_length = strlen( $ignored_cats );
 		if( $ingnored_length > 2 )
 		{ // ingnore list is not empty
-			global $current_User, $admin_url;
-			if( $current_User->check_perm( 'options', 'view', false ) )
+			global $admin_url;
+			if( check_user_perm( 'options', 'view', false ) )
 			{
 				$cross_posting_text = '<a href="'.$admin_url.'?ctrl=collections&amp;tab=blog_settings">'.T_('cross-posting is disabled').'</a>';
 			}
@@ -4049,19 +3835,7 @@ function check_categories_nosave( & $post_category, & $post_extracats, $Item = N
  */
 function echo_onchange_newcat()
 {
-?>
-	<script>
-		jQuery( '#new_category_name' ).keypress( function()
-		{
-			var newcategory_radio = jQuery( '#sel_maincat_new' );
-			if( ! newcategory_radio.attr('checked') )
-			{
-				newcategory_radio.attr('checked', true);
-				jQuery( '#sel_extracat_new' ).attr('checked', true);
-			}
-		} );
-	</script>
-<?php
+	expose_var_to_js( 'evo_init_onchange_newcat', true );
 }
 
 /**
@@ -4197,10 +3971,9 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	{	// Set filters to display only comments of the given Item:
 		if( $comment_type == 'meta' )
 		{	// Check if current user can sees internal comments of this item:
-			global $current_User;
 			$ItemCache = & get_ItemCache();
 			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $blog_ID ) )
+			if( ! $Item || ! check_user_perm( 'meta_comment', 'view', false, $blog_ID ) )
 			{ // Current user has no permissions to view internal comments
 				$comment_type = 'feedback';
 			}
@@ -4299,7 +4072,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  */
 function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
-	global $current_User, $localtimenow, $item_id;
+	global $localtimenow, $item_id;
 
 	$Item = & $Comment->get_Item();
 	$Collection = $Blog = & $Item->get_Blog();
@@ -4331,8 +4104,8 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 	}
 	echo '"'.$reply_level_style.'>';
 
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
-	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
+	    ( $Comment->is_meta() && check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
 	{	// User can moderate this comment OR Comment is meta and current user can view internal comments of the collection:
 		echo '<div class="panel-heading small">';
 		echo '<div>';
@@ -4426,12 +4199,12 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		echo '<div class="bCommentText">';
 		$Comment->rating();
 		$Comment->avatar( 'crop-top-80x80' );
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		if( check_user_perm( 'meta_comment', 'edit', false, $Comment ) )
 		{ // Put the comment content into this container to edit by ajax
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', 'true' );
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		if( check_user_perm( 'meta_comment', 'edit', false, $Comment ) )
 		{ // End of the container that is used to edit internal comment by ajax
 			echo '</div>';
 		}
@@ -4679,7 +4452,7 @@ function echo_comment_pages( $item_ID, $currentpage, $comments_number, $params =
 function check_item_perm_edit( $post_ID, $do_redirect = true )
 {
 	global $Messages;
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	$user_can_edit = false;
 
@@ -4687,7 +4460,7 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	{ // Check permissions for editing of the current item:
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
-		$user_can_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
+		$user_can_edit = check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item );
 		$permission_message = T_('You don\'t have permission to edit this post');
 
 		if( $user_can_edit )
@@ -4711,7 +4484,7 @@ function check_item_perm_edit( $post_ID, $do_redirect = true )
 	else
 	{ // Check permissions for creating of a new item:
 		$perm_target = empty( $Blog ) ? NULL : $Blog->ID;
-		$user_can_edit = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $perm_target );
+		$user_can_edit = check_user_perm( 'blog_post_statuses', 'edit', false, $perm_target );
 		$permission_message = T_('You don\'t have permission to post into this blog');
 	}
 
@@ -4767,8 +4540,7 @@ function check_item_perm_create( $check_Blog = NULL )
 	}
 	else
 	{	// Check permissions for current user
-		global $current_User;
-		return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $check_Blog->ID );
+		return check_user_perm( 'blog_post_statuses', 'edit', false, $check_Blog->ID );
 	}
 
 	return true;
@@ -5137,6 +4909,9 @@ function render_custom_field( $value, $params = array() )
 	$evo_render_custom_field_note_template = $params['field_value_note'];
 	$value = preg_replace_callback( '/\{([^}]+)\}(\[\.([a-z0-9\-_\.]+)\])?/i', 'render_custom_field_note_callback', $value );
 
+	// Render styled text:
+	$value = preg_replace_callback( '/(.+?)(\[\.([a-z0-9\-_\.]+)\])/i', 'render_custom_field_style_callback', $value );
+
 	// Render stars:
 	if( preg_match_all( '/(#stars(:\d+.?\d+?)?(\/\d+)?)#/', $value, $star_matches ) )
 	{	// If at least one star template is found:
@@ -5175,8 +4950,22 @@ function render_custom_field_note_callback( $m )
 	$note_class = ( isset( $m[3] ) ? ' '.str_replace( '.', ' ', $m[3] ) : '' );
 
 	return str_replace( array( '$note_class$', '$note_text$' ),
-		array( $note_class, $m[1] ),
+		array( format_to_output( $note_class, 'htmlattr' ), $m[1] ),
 		$evo_render_custom_field_note_template );
+}
+
+
+/**
+* Callback function to render "value text[.class1.class2.classX]" in custom field value
+ *
+ * @param array Matches
+ * @return string
+ */
+function render_custom_field_style_callback( $m )
+{
+	$text_class = str_replace( '.', ' ', $m[3] );
+
+	return '<span class="'.format_to_output( $text_class, 'htmlattr' ).'">'.$m[1].'</span>';
 }
 
 
@@ -5474,7 +5263,7 @@ function items_manual_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User, $blog, $Collection, $Blog, $admin_url, $Session;
+	global $blog, $Collection, $Blog, $admin_url, $Session;
 
 	$result_fadeout = $Session->get( 'fadeout_array' );
 
@@ -5523,7 +5312,7 @@ function items_manual_results_block( $params = array() )
 						$ChapterCache = & get_ChapterCache();
 						if( $updated_Chapter = & $ChapterCache->get_by_ID( $order_obj_ID, false ) )
 						{
-							if( $current_User->check_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
+							if( check_user_perm( 'blog_cats', '', false, $updated_Chapter->blog_ID ) )
 							{ // Check permission to edit this Chapter
 								$updated_Chapter->set( 'order', intval( $new_value ) );
 								$updated_Chapter->dbupdate();
@@ -5537,7 +5326,7 @@ function items_manual_results_block( $params = array() )
 						$ItemCache = & get_ItemCache();
 						if( $updated_Item = & $ItemCache->get_by_ID( $order_obj_ID, false ) )
 						{
-							if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
+							if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $updated_Item ) )
 							{ // Check permission to edit this Item
 								$updated_Item->update_order( $new_value, $cat_ID );
 							}
@@ -5639,13 +5428,7 @@ function items_created_results_block( $params = array() )
 			'action'               => '',
 		), $params );
 
-	if( !is_logged_in() )
-	{	// Only logged in users can access to this function
-		return;
-	}
-
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -5733,13 +5516,7 @@ function items_edited_results_block( $params = array() )
 			'results_no_text'      => T_('User has not edited any posts'),
 		), $params );
 
-	if( !is_logged_in() )
-	{	// Only logged in users can access to this function
-		return;
-	}
-
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -6005,7 +5782,7 @@ function get_item_version_title( $Version )
  */
 function items_results( & $items_Results, $params = array() )
 {
-	global $Collection, $Blog, $current_User;
+	global $Collection, $Blog;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -6029,7 +5806,7 @@ function items_results( & $items_Results, $params = array() )
 		), $params );
 
 	if( $params['display_selector'] &&
-	    is_logged_in() && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	    check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 	{	// Display item selector only if current User has a permission to edit:
 		$items_Results->cols[] = array(
 				'th' => '',
@@ -6056,7 +5833,7 @@ function items_results( & $items_Results, $params = array() )
 					'text' => get_mass_change_renderer_buttons( 'btn-xs' ),
 				),
 			);
-		if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		if( is_pro() && check_user_perm( 'options', 'edit' ) )
 		{	// Export Items only for PRO version:
 			$items_Results->list_mass_actions['mass_export'] = array(
 					'type'  => 'submit',
@@ -6205,9 +5982,9 @@ function items_results( & $items_Results, $params = array() )
  */
 function item_type_global_icons( $object_Widget )
 {
-	global $current_User, $admin_url, $DB, $Collection, $Blog, $Session;
+	global $admin_url, $DB, $Collection, $Blog, $Session;
 
-	if( is_logged_in() && ! empty( $Blog ) && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	if( ! empty( $Blog ) && check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 	{ // We have permission to add a post with at least one status:
 		$tab_type = ( get_param( 'tab' ) == 'type' ) ? get_param( 'tab_type' ) : '';
 
@@ -6237,8 +6014,8 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
-			if( $current_User->check_perm( 'admin', 'normal' ) &&
-			    $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'admin', 'normal' ) &&
+			    check_user_perm( 'options', 'edit' ) )
 			{	// Icon buttons for import:
 				$import_buttons = array(
 					'xml' => array(
@@ -6303,7 +6080,7 @@ function item_type_global_icons( $object_Widget )
 
 			foreach( $item_types as $item_type )
 			{
-				if( $current_User->check_perm( 'blog_item_type_'.$item_type->perm_level, 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_item_type_'.$item_type->perm_level, 'edit', false, $Blog->ID ) )
 				{ // We have the permission to create posts with this post type:
 					$object_Widget->global_icon( T_('Create multiple posts...'), 'new',
 						$admin_url.'?ctrl=items&amp;action=new_mass&amp;blog='.$Blog->ID.'&amp;item_typ_ID='.$item_type->ID,
@@ -6541,7 +6318,7 @@ function display_mass_items_confirmation_panel()
  */
 function task_title_link( $Item, $display_flag = true, $display_status = false )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$col = '';
 	if( $display_status && is_logged_in() )
@@ -6595,7 +6372,7 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 		$col .= '</a> ';
 	}
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item->get_blog_ID() ) )
+	if( check_user_perm( 'meta_comment', 'view', false, $Item->get_blog_ID() ) )
 	{	// Display icon of internal comments Only if current user can views internal comments:
 		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 		if( $metas_count > 0 )
@@ -6659,7 +6436,7 @@ function item_row_slug( $item_slug )
  */
 function item_row_status( $Item, $index, $cat_ID = NULL )
 {
-	global $current_User, $AdminUI, $Collection, $admin_url;
+	global $AdminUI, $Collection, $admin_url;
 
 	$Item->load_Blog();
 	$blog_ID = $Item->Blog->ID;
@@ -6669,7 +6446,7 @@ function item_row_status( $Item, $index, $cat_ID = NULL )
 	// Get allowed visibility statuses
 	$status_options = get_visibility_statuses( '', $exclude_statuses );
 
-	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
+	if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) &&
 	    isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' && !empty( $status_options ) )
 	{ // Use dropdown for bootstrap skin and if current user can edit this post
 		$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
@@ -6707,7 +6484,7 @@ function item_row_status( $Item, $index, $cat_ID = NULL )
  */
 function item_row_order( $Item )
 {
-	global $current_User, $ItemList, $Blog;
+	global $ItemList, $Blog;
 
 	if( isset( $ItemList, $ItemList->filters['cat_single'] ) &&
 	    ! empty( $ItemList->filters['cat_single'] ) )
@@ -6730,11 +6507,12 @@ function item_row_order( $Item )
 	$item_order = $Item->get_order( $order_cat_ID );
 
 	if( ( ! isset( $ItemList, $ItemList->filters['cat_array'] ) || count( $ItemList->filters['cat_array'] ) != 1 ) &&
-	    $Blog->ID != $Item->get_blog_ID() )
+	    $Blog->ID != $Item->get_blog_ID() &&
+	    count( $Item->get_orders_by_coll_ID( $Blog->ID ) ) > 1 )
 	{	// Don't allow to edit order because in such case we display a sum of orders from all extra categories of the Item:
 		return '<span data-toggle="tooltip" title="'.format_to_output( sprintf( T_('Several order numbers were found: %s. This will sort as %s.'), implode( '+', $Item->get_orders_by_coll_ID( $Blog->ID, true ) ), $item_order ), 'htmlattr' ).'">'.$item_order.'</span>';
 	}
-	elseif( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	elseif( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
 		return '<a href="#" rel="'.$Item->ID.'"'.$order_cat_attr.'>'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 	}
@@ -6753,9 +6531,7 @@ function item_row_order( $Item )
  */
 function item_row_checkbox( $Item )
 {
-	global $current_User;
-
-	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// Allow to select Item only if current User can edit it:
 		return '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" />';
 	}
@@ -6769,7 +6545,7 @@ function item_row_checkbox( $Item )
  */
 function item_edit_actions( $Item )
 {
-	global $admin_url, $blog, $current_User;
+	global $admin_url, $blog;
 
 	$r = '';
 
@@ -6789,7 +6565,7 @@ function item_edit_actions( $Item )
 		'title' => '#',
 		'class' => '' ) );
 
-	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Item only for PRO version:
 		$r .= action_icon( T_('Export this Item...'), 'download',
 			$admin_url.'?ctrl=exportxml&amp;action=export_item&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID.'&amp;'.url_crumb( 'item' ) );
@@ -6854,7 +6630,7 @@ function manual_display_chapters( $params = array() )
  */
 function manual_display_chapter_row( $Chapter, $level, $params = array() )
 {
-	global $line_class, $current_User, $Settings;
+	global $line_class, $Settings;
 	global $admin_url;
 	global $Session;
 
@@ -6866,8 +6642,8 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
-	$perm_edit = $current_User->check_perm( 'blog_cats', '', false, $Chapter->blog_ID );
-	$perm_create_item = $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Chapter->blog_ID );
+	$perm_edit = check_user_perm( 'blog_cats', '', false, $Chapter->blog_ID );
+	$perm_create_item = check_user_perm( 'blog_post_statuses', 'edit', false, $Chapter->blog_ID );
 
 	// Redirect to manual pages after adding/editing chapter
 	$redirect_page = '&amp;redirect_page=manual';
@@ -6970,7 +6746,7 @@ function manual_display_chapter_row( $Chapter, $level, $params = array() )
  */
 function manual_display_post_row( $Item, $level, $params = array() )
 {
-	global $line_class, $current_User, $Settings;
+	global $line_class, $Settings;
 	global $admin_url;
 	global $Session;
 
@@ -7032,7 +6808,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 			'post_navigation' => 'same_category', // set a navigating through category
 			'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
 		) ) );
-	if( $current_User->check_perm( 'slugs', 'view', false ) )
+	if( check_user_perm( 'slugs', 'view', false ) )
 	{ // Display icon to view all slugs of this item if current user has permission
 		$r .= ' '.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID );
 	}
@@ -7046,7 +6822,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	$order_value = T_('Alphabetic');
 	if( isset( $params['cat_order'] ) && $params['cat_order'] == 'manual' )
 	{
-		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Add availability to edit an order if current user can edit this item
 			$order_attrs .= ' id="order-item-'.$Item->ID.'" data-cat="'.$params['chapter_ID'].'" title="'.format_to_output( T_('Click to change an order'), 'htmlattr' ).'"';
 		}
@@ -7073,8 +6849,6 @@ function manual_display_post_row( $Item, $level, $params = array() )
  */
 function item_td_task_cell( $type, $Item, $editable = true )
 {
-	global $current_User;
-
 	switch( $type )
 	{
 		case 'priority':
@@ -7110,7 +6884,7 @@ function item_td_task_cell( $type, $Item, $editable = true )
 			$title = '';
 	}
 
-	if( $current_User && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) && $editable )
+	if( $editable && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item
 		return '<a href="#" rel="'.$value.'">'.$title.'</a>';
 	}
@@ -7131,13 +6905,11 @@ function item_td_task_cell( $type, $Item, $editable = true )
  */
 function item_td_task_class( $post_ID, $post_pst_ID, $editable_class )
 {
-	global $current_User;
-
 	$ItemCache = & get_ItemCache();
 	$Item = & $ItemCache->get_by_ID( $post_ID );
 
 	$class = 'shrinkwrap tskst_'.$post_pst_ID;
-	if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{ // Current user can edit this item, Add a class to edit a priority by click from view list
 		$class .= ' '.$editable_class;
 	}

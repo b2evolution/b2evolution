@@ -40,6 +40,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ment_menu_ID        INT(10) UNSIGNED NOT NULL,
 			ment_parent_ID      INT(10) UNSIGNED NULL,
 			ment_order          INT(11) NULL,
+			ment_user_pic_size  VARCHAR(32) COLLATE ascii_general_ci NULL,
 			ment_text           VARCHAR(128) COLLATE utf8mb4_unicode_ci NULL,
 			ment_type           VARCHAR(32) COLLATE ascii_general_ci NULL,
 			ment_coll_logo_size VARCHAR(32) COLLATE ascii_general_ci NULL,
@@ -49,7 +50,10 @@ $schema_queries = array_merge( $schema_queries, array(
 			ment_item_slug      VARCHAR(255) COLLATE ascii_general_ci NULL,
 			ment_url            VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			ment_visibility     ENUM( 'always', 'access' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'always',
+			ment_access         ENUM( 'any', 'loggedin', 'perms' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'perms',
+			ment_show_badge     TINYINT(1) NOT NULL DEFAULT 1,
 			ment_highlight      TINYINT(1) NOT NULL DEFAULT 1,
+			ment_hide_empty     TINYINT(1) NOT NULL DEFAULT 0,
 			PRIMARY KEY          (ment_ID),
 			INDEX ment_menu_ID   (ment_menu_ID),
 			INDEX ment_parent_ID (ment_parent_ID)

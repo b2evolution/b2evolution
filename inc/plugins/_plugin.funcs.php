@@ -326,6 +326,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			$original_form_fieldstart_checkbox = $Form->fieldstart_checkbox;
 			$Form->fieldstart_checkbox = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_checkbox );
 		}
+		if( isset( $Form->fieldstart_radio ) )
+		{
+			$original_form_fieldstart_radio = $Form->fieldstart_radio;
+			$Form->fieldstart_radio = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_radio );
+		}
 	}
 
 	switch( $parmeta['type'] )
@@ -574,7 +579,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 
 			// This div is used to insert new set of setting:
-			echo '<div id="block_add_new_setting_'.$parname.'" data-param-num="'.$k_nb.'"></div>';
+			echo '<div id="block_add_new_setting_'.$parname.'_'.$Obj->ID.'" data-param-num="'.$k_nb.'"></div>';
 
 			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
 			if( ! is_ajax_request() )
@@ -601,13 +606,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								set_type: \''.$set_type.'\',
 								param_name: \''.$parname.'\',
 								//param_num: jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length
-								param_num: jQuery( \'#block_add_new_setting_'.$parname.'\' ).data( \'param-num\' )
+								param_num: jQuery( \'#block_add_new_setting_'.$parname.'_'.$Obj->ID.'\' ).data( \'param-num\' )
 								'.( isset( $Blog ) ? ',blog: '.$Blog->ID : '' ).'
 								'.( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' ).'
 							},
 							function( r, status )
 							{
-								jQuery( \'#block_add_new_setting_'.$parname.'\' ).replaceWith( ajax_debug_clear( r ) );
+								jQuery( \'#block_add_new_setting_'.$parname.'_'.$Obj->ID.'\' ).replaceWith( ajax_debug_clear( r ) );
 								'.( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' ).'
 								'.( isset( $parmeta['max_number'] ) ? '
 								if( jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length >= '.intval( $parmeta['max_number'] ).' )
@@ -732,6 +737,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			break;
 
+		case 'item_selector':
+			$Form->item_selector( $input_name, $set_value, $set_label, $parmeta );
+			break;
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
@@ -744,6 +752,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $original_form_fieldstart_checkbox ) )
 	{	// Revert original field start html code:
 		$Form->fieldstart_checkbox = $original_form_fieldstart_checkbox;
+	}
+	if( isset( $original_form_fieldstart_radio ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart_radio = $original_form_fieldstart_radio;
 	}
 
 	if( $outer_most && $has_array_type )
@@ -1671,7 +1683,7 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 	global $inc_path, $install_db_deltas, $DB, $Messages;
 
 	// Prepare vars for DB layout changes
-	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
+	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5', 'string' );
 
 	$db_layout = $Plugin->GetDbLayout();
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)

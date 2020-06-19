@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -131,6 +131,8 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		// Load for function get_available_thumb_sizes():
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -153,7 +155,7 @@ class bootstrap_forums_Skin extends Skin
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
 						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
-						'defaultvalue' => 'no_sidebar',
+						'defaultvalue' => isset( $Blog ) && $Blog->type == 'group' ? 'right_sidebar' : 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),
@@ -412,14 +414,10 @@ class bootstrap_forums_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
@@ -437,12 +435,12 @@ class bootstrap_forums_Skin extends Skin
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
 		{	// Init JS to autcomplete the user logins:
-			require_js( '#bootstrap_typeahead#', 'blog' );
+			require_js_defer( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
@@ -753,6 +751,7 @@ class bootstrap_forums_Skin extends Skin
 						'display_summary'        => 'no',
 						'display_noopinion'      => false,
 						'display_score'          => true,
+						'display_noactive'       => true,
 						'score_class'            => ( in_array( $disp, array( 'posts', 'flagged' ) ) ? 'vote_score__status_'.$Item->get_read_status() : '' ),
 						'icon_like_active'       => 'thumb_arrow_up',
 						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
@@ -799,6 +798,7 @@ class bootstrap_forums_Skin extends Skin
 						'class'                  => 'evo_voting_panel__left_score',
 						'display_noopinion'      => false,
 						'display_score'          => true,
+						'display_noactive'       => true,
 						'title_text'             => '',
 						'title_empty'            => '',
 						'icon_like_active'       => 'thumb_arrow_up',
@@ -818,7 +818,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function display_posts_list_header( $title, $params = array() )
 	{
-		global $Blog, $current_User;
+		global $Blog;
 
 		$params = array_merge( array(
 				'actions' => '',
@@ -836,20 +836,18 @@ class bootstrap_forums_Skin extends Skin
 				'after_workflow_header'   => '<div class="clearfix"></header>',
 				'before_workflow_title'   => '<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">',
 				'after_workflow_title'    => '</div>',
-				'before_workflow_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'before_workflow_status'  => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">',
 				'after_workflow_status'   => '</div>',
-				'before_workflow_actions' => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 text-right">',
+				'before_workflow_actions' => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 text-right">',
 				'after_workflow_actions'  => '</div>',
 			), $params );
 
 		// Check if current User can view workflow properties:
 		$can_view_workflow =
-			// User must be logged in:
-			is_logged_in() &&
 			// Workflow must be enabled for current Collection:
 			$Blog->get_setting( 'use_workflow' ) &&
 			// Current User must has a permission to be assigned for tasks of the current Collection:
-			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
+			check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
 
 		// Get template depending on permission of current User:
 		$template = ( $can_view_workflow ? 'workflow' : 'normal' );
@@ -878,19 +876,7 @@ class bootstrap_forums_Skin extends Skin
 					.'<option value="-"'.( $status == '-' ? ' selected="selected"' : '' ).'>'.T_('No status').'</option>'
 					.$ItemStatusCache->get_option_list( $status )
 				.'</select>';
-				// JavaScript to reload page with new selected task status:
-				echo '<script>
-				jQuery( "#evo_workflow_status_filter" ).change( function()
-				{
-					var url = location.href.replace( /([\?&])((status|redir)=[^&]*(&|$))+/, "$1" );
-					var status_ID = jQuery( this ).val();
-					if( status_ID !== "" )
-					{
-						url += ( url.indexOf( "?" ) == -1 ? "?" : "&" ) + "status=" + status_ID + "&redir=no";
-					}
-					location.href = url.replace( "?&", "?" ).replace( /\?$/, "" );
-				} );
-				</script>';
+			expose_var_to_js( 'evo_skin_bootstrap_forums__post_list_header', true );
 			echo $params['after_workflow_status'];
 		}
 

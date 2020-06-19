@@ -21,7 +21,7 @@ load_class( 'users/model/_usertag.class.php', 'UserTag' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'users', 'usertags' );
 
@@ -37,7 +37,7 @@ if( param( 'utag_ID', 'integer', '', true) )
 	{ // We could not find the goal to edit:
 		unset( $edited_UserTag );
 		forget_param( 'utag_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), /* TRANS: noun */ T_('User Tag') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), /* TRANS: noun */ TB_('User Tag') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -49,14 +49,14 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edited_UserTag = new UserTag();
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 		break;
 
 	case 'create':
@@ -67,14 +67,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to create tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_UserTag->load_from_Request() )
 		{ // We could load data from form without errors:
 			// Insert in DB:
 			$edited_UserTag->dbinsert();
-			$Messages->add( T_('New tag has been created.'), 'success' );
+			$Messages->add( TB_('New tag has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=usertags', 303 ); // Will EXIT
@@ -90,7 +90,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an tag_ID:
 		param( 'utag_ID', 'integer', true );
@@ -100,7 +100,7 @@ switch( $action )
 		{ // We could load data from form without errors:
 			// Update user tag in DB:
 			$edited_UserTag->dbupdate();
-			$Messages->add( T_('Tag has been updated.'), 'success' );
+			$Messages->add( TB_('Tag has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=usertags', 303 ); // Will EXIT
@@ -116,14 +116,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an tag_ID:
 		param( 'utag_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Tag "%s" has been deleted.'), '<b>'.$edited_UserTag->dget( 'name' ).'</b>' );
+			$msg = sprintf( TB_('Tag "%s" has been deleted.'), '<b>'.$edited_UserTag->dget( 'name' ).'</b>' );
 			$edited_UserTag->dbdelete();
 			unset( $edited_UserTag );
 			forget_param( 'utag_ID' );
@@ -134,7 +134,7 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_UserTag->check_delete( sprintf( T_('Cannot delete tag "%s"'), '<b>'.$edited_UserTag->dget( 'name' ).'</b>' ), array(), true ) )
+			if( ! $edited_UserTag->check_delete( sprintf( TB_('Cannot delete tag "%s"'), '<b>'.$edited_UserTag->dget( 'name' ).'</b>' ), array(), true ) )
 			{ // There are restrictions:
 				$action = 'list';
 			}
@@ -148,7 +148,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$user_ID = param( 'user_ID', 'integer', 0, true );
 
@@ -164,7 +164,7 @@ switch( $action )
 
 		if( $result )
 		{
-			$Messages->add( sprintf( T_('Tag "%s" has been unlinked from user "%s".'),
+			$Messages->add( sprintf( TB_('Tag "%s" has been unlinked from user "%s".'),
 				'<b>'.$edited_UserTag->dget( 'name' ).'</b>',
 				'<b>'.$edited_User->dget( 'login' ).'</b>' ), 'success' );
 		}
@@ -182,7 +182,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$old_tag_ID = param( 'old_tag_ID', 'integer', 0, true );
 
@@ -222,7 +222,7 @@ switch( $action )
 		$DB->query( 'DELETE FROM T_users__tag
 			WHERE utag_ID = '.$DB->quote( $old_UserTag->ID ) );
 
-		$Messages->add( sprintf( T_('The previously named "%s" tag has been merged with the existing "%s" tag.'),
+		$Messages->add( sprintf( TB_('The previously named "%s" tag has been merged with the existing "%s" tag.'),
 				'<b>'.$old_UserTag->dget( 'name' ).'</b>',
 				'<b>'.$edited_UserTag->dget( 'name' ).'</b>' ), 'success' );
 
@@ -238,17 +238,17 @@ switch( $action )
 		$Session->assert_received_crumb( 'usertag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$DB->query( 'DELETE T_users__usertag FROM T_users__usertag
 				LEFT JOIN T_users ON uutg_user_ID = user_ID
 			 WHERE user_ID IS NULL' );
-		$Messages->add_to_group( sprintf( T_('Removed %d associations with non-existing users.'), $DB->rows_affected ), 'success', T_('Deleting orphan tags:') );
+		$Messages->add_to_group( sprintf( TB_('Removed %d associations with non-existing users.'), $DB->rows_affected ), 'success', TB_('Deleting orphan tags:') );
 
 		$DB->query( 'DELETE T_users__tag FROM T_users__tag
 				LEFT JOIN T_users__usertag ON utag_ID = uutg_emtag_ID
 			 WHERE uutg_user_ID IS NULL' );
-		$Messages->add_to_group( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success', T_('Deleting orphan tags:') );
+		$Messages->add_to_group( sprintf( TB_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success', TB_('Deleting orphan tags:') );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=usertags', 303 ); // Will EXIT
@@ -258,8 +258,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Users'), $admin_url.'?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('User Tags'), $admin_url.'?ctrl=usertags' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), $admin_url.'?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('User Tags'), $admin_url.'?ctrl=usertags' );
 
 if( $action == 'new' || $action == 'edit' )
 {
@@ -296,7 +296,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_UserTag->confirm_delete(
-				sprintf( T_('Delete tag "%s"?'), '<b>'.$edited_UserTag->dget( 'name' ).'</b>' ),
+				sprintf( TB_('Delete tag "%s"?'), '<b>'.$edited_UserTag->dget( 'name' ).'</b>' ),
 				'usertag', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'list':

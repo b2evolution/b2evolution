@@ -124,13 +124,13 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function request_required_files()
 	{
-		global $Item, $current_User;
+		global $Item;
 
-		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			init_tokeninput_js( 'blog' );
-			require_js( '#jquery#', 'blog' );
-			require_js( 'jquery/jquery.cookie.min.js', 'blog' );
+			require_js_defer( '#jquery#', 'blog' );
+			require_js_defer( 'jquery/jquery.cookie.min.js', 'blog' );
 		}
 	}
 
@@ -160,7 +160,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $current_User;
+		global $Item;
 
 		$this->init_display( $params );
 
@@ -216,7 +216,7 @@ class item_tags_Widget extends ComponentWidget
 			$quick_tag_buttons = $this->disp_params['widget_item_tags_before_quicklist'];
 			foreach( $quick_item_tags as $item_tag )
 			{
-				$quick_tag_buttons .= '<button type="button" class="btn btn-default btn-xs" onclick="add_quick_tag_'.$this->ID.'( this )">'.format_to_output( $item_tag ).'</button>';
+				$quick_tag_buttons .= '<button type="button" class="btn btn-default btn-xs" onclick="add_quick_tag('.format_to_js( $this->ID ).', this )">'.format_to_output( $item_tag ).'</button>';
 			}
 			$quick_tag_buttons .= $this->disp_params['widget_item_tags_after_quicklist'];;
 
@@ -250,29 +250,19 @@ class item_tags_Widget extends ComponentWidget
 			$this->disp_params['widget_item_tags_after'] .= ' '.action_icon( T_('Edit tags'), 'edit',
 					$Item->get_edit_url( array( 'force_backoffice_editing' => true ) ).'#itemform_adv_props',
 					NULL, NULL, NULL, array( 'id' => 'evo_widget_item_tags_edit_icon_'.$this->ID ) )
-				.'</span>'
-				// JS to activate an edit tags form:
-				.'<script>
-				function add_quick_tag_'.$this->ID.'( obj )
-				{
-					var item_tag = jQuery( obj ).text();
-					jQuery( "#item_tags_'.$this->ID.'" ).tokenInput( "add", { id: item_tag, name: item_tag } );
-				}
-
-				jQuery( "#evo_widget_item_tags_edit_icon_'.$this->ID.'" ).click( function()
-				{
-					jQuery( "#evo_widget_item_tags_edit_form_'.$this->ID.'" ).show();
-					jQuery( "#evo_widget_item_tags_edit_form_'.$this->ID.' input" ).focus();
-					jQuery( "#evo_widget_item_tags_list_'.$this->ID.'" ).hide();
-					return false;
-				} );
-				</script>';
+				.'</span>';
+			
+			// JS to activate an edit tags form:	
+			$js_config = array(
+					'input_ID'  => 'item_tags_'.$this->ID,
+					'widget_ID' => $this->ID
+				);
+			expose_var_to_js( 'item_tags_widget_'.$this->ID, $js_config, 'evo_item_tags_widget_config' );
 		}
 
 		if( $this->get_param( 'allow_edit' ) &&
-		    is_logged_in() &&
-		    $current_User->check_perm( 'admin', 'restricted' ) &&
-		    $current_User->check_perm( 'options', 'edit' ) )
+		    check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'options', 'edit' ) )
 		{	// Use different style for edit mode, make tag icon as link to edit item tag in back-office:
 			global $admin_url, $ReqURL;
 			$tags_params['before_tag'] = '<span>'.action_icon( T_('Edit tag'), 'tag', $admin_url.'?ctrl=itemtags&amp;action=edit&amp;tag_ID=$tag_ID$&amp;return_to='.rawurlencode( $ReqURL ) );
@@ -308,7 +298,7 @@ class item_tags_Widget extends ComponentWidget
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 			);
 	}

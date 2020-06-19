@@ -29,7 +29,7 @@ $Results->Cache = & get_SkinCache();
 
 $Results->title = T_('Installed skins').get_manual_link('installed-skins');
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -100,7 +100,7 @@ $Results->cols[] = array(
 						'td' => '$skin_folder$',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	global $Settings;
 	$site_skin_IDs = array(

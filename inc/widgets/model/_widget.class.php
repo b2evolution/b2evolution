@@ -886,7 +886,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session, $current_User;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session;
 
 		$this->init_display( $params );
 
@@ -903,8 +903,14 @@ class ComponentWidget extends DataObject
 					'data-type'      => $this->get_name(),
 					'data-container' => $this->get_container_param( 'code' ),
 				);
+			if( $this->get( 'code' ) == 'subcontainer' &&
+			    ( $sub_WidgetContainer = & $this->get_sub_WidgetContainer() ) )
+			{	// For Sub-Container widget we should know what sub-container is used in order to list and add widgets on customizer mode:
+				$designer_mode_data['data-subcontainer-name'] = $sub_WidgetContainer->get( 'name' );
+				$designer_mode_data['data-subcontainer-code'] = $this->get_param( 'container' );
+			}
 			// Set data to know current user has a permission to edit this widget:
-			$designer_mode_data['data-can-edit'] = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;
+			$designer_mode_data['data-can-edit'] = check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;
 			// Don't load a widget content from cache when designer mode is enabled:
 			$force_nocaching = true;
 			// Set designer mode:
@@ -924,7 +930,7 @@ class ComponentWidget extends DataObject
 				$is_subcontainer = ( $this->get( 'code' ) == 'subcontainer' || $this->get( 'code' ) == 'subcontainer_row' );
 				echo '<div class="dev-blocks '.( $is_subcontainer ? 'dev-blocks--subcontainer' : 'dev-blocks--widget' ).'"><div class="dev-blocks-name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">';
-				if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 				{	// Display a link to edit this widget only if current user has a permission:
 					echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 				}
@@ -1016,7 +1022,7 @@ class ComponentWidget extends DataObject
 				if( $display_containers )
 				{ // DEBUG:
 					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
-					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 					{	// Display a link to edit this widget only if current user has a permission:
 						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 					}
@@ -1037,7 +1043,7 @@ class ComponentWidget extends DataObject
 				if( $display_containers )
 				{ // DEBUG:
 					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
-					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 					{	// Display a link to edit this widget only if current user has a permission:
 						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 					}
@@ -1146,7 +1152,10 @@ class ComponentWidget extends DataObject
 		if( $this->disp_params['block_display_title'] && !empty( $title ) )
 		{
 			$r = $this->disp_params['block_title_start'];
-			$r .= format_to_output( $title );
+			if( ! isset( $this->disp_params['hide_header_title'] ) )
+			{
+				$r .= format_to_output( $title );
+			}
 			$r .= $this->disp_params['block_title_end'];
 
 			if( $display ) echo $r;
@@ -1277,12 +1286,15 @@ class ComponentWidget extends DataObject
 
 		$DB->begin();
 
-		$order_max = $DB->get_var(
-			'SELECT MAX(wi_order)
-				 FROM T_widget__widget
-				WHERE wi_wico_ID = '.$this->wico_ID, 0, 0, 'Get current max order' );
+		if( ! isset( $this->order ) )
+		{
+			$order_max = $DB->get_var(
+				'SELECT MAX(wi_order)
+					FROM T_widget__widget
+					WHERE wi_wico_ID = '.$this->wico_ID, 0, 0, 'Get current max order' );
 
-		$this->set( 'order', $order_max+1 );
+			$this->set( 'order', $order_max+1 );
+		}
 
 		$res = parent::dbinsert();
 
@@ -1609,6 +1621,13 @@ class ComponentWidget extends DataObject
 	 */
 	function display_error_message( $message = NULL )
 	{
+		global $Blog;
+
+		if( isset( $this->BlockCache ) )
+		{	// Do NOT cache because this widget has an error which is dispalyed only for collection admin:
+			$this->BlockCache->abort_collect();
+		}
+
 		if( $message === NULL )
 		{
 			$message = 'Unable to display widget '.$this->get_name();
@@ -1617,7 +1636,10 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-		echo '<span class="evo_param_error">'.$message.'</span>';
+		if( check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		{	// Display error only for collection admin:
+			echo '<span class="evo_param_error">'.$message.'</span>';
+		}
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 	}

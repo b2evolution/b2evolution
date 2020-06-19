@@ -17,14 +17,10 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var instance of User class
- */
-global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'maintenance', 'backup', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'maintenance', 'backup', true );
 
 // Load Backup class (PHP4):
 load_class( 'maintenance/model/_backup.class.php', 'Backup' );

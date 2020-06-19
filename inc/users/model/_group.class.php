@@ -640,12 +640,12 @@ class Group extends DataObject
 			return false;
 		}
 
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{	// Allow to assing any group if current user has full access to edit users:
 			return true;
 		}
 
-		if( ! $current_User->check_perm( 'users', 'moderate' ) )
+		if( ! check_user_perm( 'users', 'moderate' ) )
 		{	// User must has a permission at least to modearate the users:
 			return false;
 		}

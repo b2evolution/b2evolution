@@ -23,7 +23,7 @@ global $Comment;
  */
 global $CommentList;
 
-global $AdminUI, $UserSettings, $current_User;
+global $AdminUI, $UserSettings;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -121,11 +121,11 @@ while( $Comment = & $CommentList->get_next() )
 			) );
 	}
 
-	if( ! $comments_can_be_recycled && $Comment->get( 'status' ) != 'trash' && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
+	if( ! $comments_can_be_recycled && $Comment->get( 'status' ) != 'trash' && check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
 	{	// Set flag to know at least one comment from the current list can be recycled:
 		$comments_can_be_recycled = true;
 	}
-	if( ! $comments_can_be_deleted && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
+	if( ! $comments_can_be_deleted && check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
 	{	// Set flag to know at least one comment from the current list can be deleted:
 		$comments_can_be_deleted = true;
 	}
@@ -149,7 +149,7 @@ if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 	echo_comment_status_buttons( $Form, NULL, $item_status, 'comments_visibility' );
 	echo_status_dropdown_button_js( 'comment' );
 
-	if( $item_id > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) )
+	if( $item_id > 0 && check_user_perm( 'blog_post_statuses', 'edit', false, $blog ) )
 	{	// Display a button to create a post from selected comments:
 		echo ' '.T_('or').' ';
 		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );

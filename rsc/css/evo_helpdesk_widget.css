@@ -230,7 +230,7 @@ svg {
   position: relative;
   min-height: 64px;
 }
-.evo_helpdesk_widget_loading:before {
+.evo_helpdesk_widget_loading::before {
   content: "";
   position: absolute;
   background: #fafafa;

@@ -266,7 +266,7 @@ span.icon.voted {
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
 }
-a.rollover_sprite:hover span.icon:before {
+a.rollover_sprite:hover span.icon::before {
   visibility: visible !important;
   background: inherit;
   float: left;
@@ -331,26 +331,26 @@ a:hover .fa-x-rollover-grey {
 a:hover .fa-flag.fa-x--hover {
   color: #F00 !important;
 }
-a:hover .fa-flag.fa-x--hover:before {
+a:hover .fa-flag.fa-x--hover::before {
   content: "\f11d";
 }
 a:hover .fa-flag-o.fa-x--hover {
   color: #F00 !important;
 }
-a:hover .fa-flag-o.fa-x--hover:before {
+a:hover .fa-flag-o.fa-x--hover::before {
   content: "\f024";
 }
-.fa-x-external-link--nudge:before {
+.fa-x-external-link--nudge::before {
   position: relative;
   top: 0.05em;
   left: 0.11em;
 }
-.fa-x-linkedin--nudge:before {
+.fa-x-linkedin--nudge::before {
   position: relative;
   top: -0.05em;
   left: 0.04em;
 }
-.fa-x-google-plus--nudge:before {
+.fa-x-google-plus--nudge::before {
   position: relative;
   left: 0.1em;
 }
@@ -379,7 +379,7 @@ input.loader_img {
   min-width: 64px;
   min-height: 64px;
 }
-.evo_rest_api_loading:before {
+.evo_rest_api_loading::before {
   content: "";
   position: absolute;
   background: #FFF;
@@ -822,6 +822,9 @@ input.loader_img {
 .filter_item div.icon {
   height: 22px;
 }
+a {
+  word-break: break-all;
+}
 .visible-xs,
 .visible-sm,
 .visible-md,
@@ -1073,8 +1076,8 @@ span.roundbutton_red:hover {
   border-left: none;
   border-right: 1px solid #787878;
 }
-.roundbutton_group .roundbutton:before,
-.roundbutton_group .roundbutton_text:before {
+.roundbutton_group .roundbutton::before,
+.roundbutton_group .roundbutton_text::before {
   border-left: 1px solid #b1b1b1;
   content: "";
   position: absolute;
@@ -1082,9 +1085,9 @@ span.roundbutton_red:hover {
   bottom: 0;
   left: -1px;
 }
-.roundbutton_group .roundbutton:first-child:before,
-.roundbutton_group .roundbutton_text:first-child:before,
-.roundbutton_group .roundbutton_text.first-child:before {
+.roundbutton_group .roundbutton:first-child::before,
+.roundbutton_group .roundbutton_text:first-child::before,
+.roundbutton_group .roundbutton_text.first-child::before {
   border: none;
 }
 .roundbutton_group .roundbutton:first-child,
@@ -1148,8 +1151,8 @@ a.roundbutton_text_noicon span {
   background-image: -o-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
   background-image: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
 }
-.roundbutton.rbtn_black:before,
-.roundbutton_group .roundbutton.rbtn_black:before {
+.roundbutton.rbtn_black::before,
+.roundbutton_group .roundbutton.rbtn_black::before {
   border-color: #1a1a1a;
 }
 .roundbutton.rbtn_black:hover,

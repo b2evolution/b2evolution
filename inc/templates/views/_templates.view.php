@@ -138,7 +138,7 @@ function td_template_actions( & $row )
 
 	return $action_icons;
 }
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	$Results->cols[] = array(
 		'th' => T_('Actions'),

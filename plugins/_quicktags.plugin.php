@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -93,10 +93,8 @@ class quicktags_plugin extends Plugin
 			return false;
 		}
 
-		global $current_User;
-
 		// Allow html tags like <pre>, <img> and <a> only when current user has a permission for this:
-		$params['allow_restricted_html'] = ( is_logged_in() && $current_User->check_perm( 'blog_comments', 'edit', false, $item_Blog->ID ) );
+		$params['allow_restricted_html'] = ( check_user_perm( 'blog_comments', 'edit', false, $item_Blog->ID ) );
 
 		return $this->DisplayCodeToolbar( $params );
 	}
@@ -125,7 +123,7 @@ class quicktags_plugin extends Plugin
 		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 		//<![CDATA[
@@ -381,7 +379,11 @@ class quicktags_plugin extends Plugin
 				+ '<input type="button" id="b2evo_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" />'
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
-			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
+			var toolbar = document.querySelector( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' );
+			if( toolbar )
+			{
+				toolbar.innerHTML = r;
+			};
 		}
 
 		/**

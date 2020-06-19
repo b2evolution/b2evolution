@@ -35,8 +35,9 @@ $pp = $ItemList->param_prefix;
 
 global $tab;
 global ${$pp.'flagged'}, ${$pp.'mustread'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'},
-		${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'}, ${$pp.'assgn'},
-		${$pp.'assgn_login'}, ${$pp.'status'}, ${$pp.'types'};
+		${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'},
+		${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'involves'}, ${$pp.'involves_login'},
+		${$pp.'status'}, ${$pp.'statuses'}, ${$pp.'types'}, ${$pp.'renderers'};
 
 $flagged = ${$pp.'flagged'};
 $mustread = ${$pp.'mustread'};
@@ -50,8 +51,12 @@ $author = ${$pp.'author'};
 $author_login = ${$pp.'author_login'};
 $assgn = ${$pp.'assgn'};
 $assgn_login = ${$pp.'assgn_login'};
+$involves = ${$pp.'involves'};
+$involves_login = ${$pp.'involves_login'};
 $status = ${$pp.'status'};
+$statuses = ${$pp.'statuses'};
 $types = ${$pp.'types'};
+$renderers = ${$pp.'renderers'};
 
 
 load_funcs( 'skins/_skin.funcs.php' );
@@ -161,7 +166,7 @@ if( $Blog->get_setting( 'use_workflow' ) )
 			{
 				echo '<li><input type="radio" name="'.$pp.'assgn" value="'.$loop_User->ID.'" class="radio"';
 				if( $loop_User->ID == $assgn ) echo ' checked="checked"';
-				echo ' /> <a href="'.regenerate_url( $pp.'assgn', $pp.'assgn='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">';
+				echo ' /> <a href="'.regenerate_url( $pp.'assgn', $pp.'assgn='.$loop_User->ID ).'">';
 				echo $loop_User->get_colored_login( array( 'login_text' => 'name' ) );
 				echo '</a></li>';
 			}
@@ -189,21 +194,35 @@ $ItemStatusCache = & get_ItemStatusCache();
 $ItemStatusCache->load_all(); // TODO: load for current blog only
 if( count( $ItemStatusCache->cache ) )
 {	// Display only if at least one status exists in DB:
-	$fold_status = ( $ItemList->default_filters['statuses'] == $ItemList->filters['statuses'] );
-	$Form->begin_fieldset( T_('Status'), array( 'id' => 'items_filter_status', 'fold' =>true, 'default_fold' => empty( $status ) ) );
+	$Form->begin_fieldset( T_('Status'), array( 'id' => 'items_filter_status', 'fold' =>true, 'default_fold' => empty( $status ) && empty( $statuses ) ) );
 	echo '<ul>';
 
-	echo '<li><input type="radio" name="'.$pp.'status" value="-" class="radio"'.( $status == '-' ? ' checked="checked"' : '' ).' />';
-	echo ' <a href="'.regenerate_url( $pp.'status', $pp.'status=-' ).'">'.T_('Without status').'</a></li>';
+	echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="-" class="radio"'.( $status == '-' || ( is_array( $statuses ) && in_array( '-', $statuses ) ) ? ' checked="checked"' : '' ).' />';
+	echo ' <a href="'.regenerate_url( $pp.'status,'.$pp.'statuses', $pp.'status=-' ).'">'.T_('Without status').'</a></li>';
+	if( ! empty( $status ) )
+	{
+		if( substr( $status, 0, 1 ) == '-' )
+		{
+			$status = substr( $status, 1 );
+		}
+		if( ! empty( $status ) )
+		{
+			$statuses = explode( ',', $status );
+		}
+	}
 
 	foreach( $ItemStatusCache->cache as $loop_Obj )
 	{
-		echo '<li><input type="radio" name="'.$pp.'status" value="'.$loop_Obj->ID.'" class="radio"'.( $status == $loop_Obj->ID ? ' checked="checked"' : '' ).' />';
-		echo ' <a href="'.regenerate_url( $pp.'status', $pp.'status='.$loop_Obj->ID ).'">';
+		echo '<li><input type="checkbox" name="'.$pp.'statuses[]" value="'.$loop_Obj->ID.'" class="radio"'.( is_array( $statuses ) && in_array( $loop_Obj->ID, $statuses ) ? ' checked="checked"' : '' ).' />';
+		echo ' <a href="'.regenerate_url( $pp.'status,'.$pp.'statuses', $pp.'status='.$loop_Obj->ID ).'">';
 		$loop_Obj->disp('name');
 		echo '</a></li>';
 	}
 	echo '</ul>';
+
+	// Buttons to check/uncheck/reverse all status filters:
+	$Form->checkbox_controls( $pp.'statuses' );
+
 	$Form->end_fieldset();
 }
 
@@ -303,7 +322,41 @@ if( $user_count )
 		{
 			echo '<li>'
 				.'<input type="radio" name="'.$pp.'author" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $author ? ' checked="checked"' : '' ).' /> '
-				.'<a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'" rel="bubbletip_user_'.$loop_User->ID.'">'
+				.'<a href="'.regenerate_url( $pp.'author', $pp.'author='.$loop_User->ID ).'">'
+					.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
+				.'</a>'
+			.'</li>';
+		}
+		echo '</ul>';
+	}
+}
+$Form->end_fieldset();
+
+// INVOLVES:
+// TODO: allow multiple selection
+// Load only first 21 users to know when we should display an input box instead of full users list
+$UserCache->load_blogmembers( $Blog->ID, 21 );
+$user_count = count( $UserCache->cache );
+$fold_involves = ( $ItemList->default_filters['involves'] == ( empty( $ItemList->filters['involves'] ) ? NULL : $ItemList->filters['involves'] ) );
+$Form->begin_fieldset( T_('Involves'), array( 'id' => 'items_filter_involves', 'fold' => true, 'default_fold' => $fold_involves ) );
+if( $user_count )
+{
+	if( $user_count > 20 )
+	{	// Display an input box to enter user login:
+		echo '<label for="'.$pp.'involves_login">'.T_('User').':</label> <input type="text" class="form-control middle autocomplete_login" value="'.format_to_output( $involves_login, 'formvalue' ).'" name="'.$pp.'involves_login" id="'.$pp.'involves_login" />';
+	}
+	else
+	{	// Display a list of users:
+		echo '<ul>'
+			.'<li>'
+				.'<input type="radio" name="'.$pp.'involves" value="0" class="radio"'.( empty( $involves ) ? ' checked="checked"' : '' ).' /> '
+				.'<a href="'.regenerate_url( $pp.'involves', $pp.'involves=0' ).'">'.T_('Any').'</a>'
+			.'</li>';
+		foreach( $UserCache->cache as $loop_User )
+		{
+			echo '<li>'
+				.'<input type="radio" name="'.$pp.'involves" value="'.$loop_User->ID.'" class="radio"'.( $loop_User->ID == $involves ? ' checked="checked"' : '' ).' /> '
+				.'<a href="'.regenerate_url( $pp.'involves', $pp.'involves='.$loop_User->ID ).'">'
 					.$loop_User->get_colored_login( array( 'login_text' => 'name' ) )
 				.'</a>'
 			.'</li>';
@@ -353,6 +406,32 @@ $Plugins->call_by_code( 'evo_Arch', array( // Parameters follow:
 	'itemlist_prefix' => $pp,       // Prefix of the ItemList object
 ) );
 $Form->end_fieldset();
+
+// RENDERER PLUGINS:
+global $Plugins;
+$renderer_plugins = $Plugins->get_renderer_options( NULL, array(
+	'setting_name' => 'coll_apply_rendering',
+	'Blog'         => $Blog,
+) );
+if( count( $renderer_plugins ) )
+{	// Display only if at least one renderer plugin is allowed to be selected/unselected per Item of the current Collection:
+	$Form->begin_fieldset( T_('Uses Renderer'), array( 'id' => 'items_filter_renderer', 'fold' => true, 'default_fold' => empty( $renderers ) ) );
+	echo '<ul>';
+
+	foreach( $renderer_plugins as $renderer_plugin )
+	{
+		echo '<li><input type="checkbox" name="'.$pp.'renderers[]" value="'.format_to_output( $renderer_plugin['code'], 'formvalue' ).'" class="checkbox"'.( is_array( $renderers ) && in_array( $renderer_plugin['code'], $renderers ) ? ' checked="checked"' : '' ).' />';
+		echo ' <a href="'.regenerate_url( $pp.'renderers', $pp.'renderers[]='.$renderer_plugin['code'] ).'">';
+		echo $renderer_plugin['name'];
+		echo '</a></li>';
+	}
+	echo '</ul>';
+
+	// Buttons to check/uncheck/reverse all renderer plugin filters:
+	$Form->checkbox_controls( $pp.'renderers' );
+
+	$Form->end_fieldset();
+}
 
 $Form->end_form();
 

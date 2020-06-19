@@ -29,6 +29,8 @@
 // Item Workflow widget:
 @import "_item_workflow_widget.module.less";
 
+// Checklist Items widget:
+@import "_item_checklist_lines_widget.module.less";
 
 // ----- PLUGINS -----
 
@@ -46,6 +48,11 @@
 
 // Tiles style 2
 @import "_evo_tile_2.module.less";
+
+// -----
+
+// Thumblist style
+@import "_evo_thumblist.module.less";
 
 // -----
 
@@ -78,7 +85,7 @@ div.children-widgets-inline > div.evo_widget {
 
 // MILOS > Intro posts style padding alignment
 main .well {
-	padding: 15px 15px 25px 15px;
+	padding: 15px 15px 5px 15px;
 	header .small.text-muted {
 		margin: 4px 0px 10px 0px;
 		a {
@@ -101,7 +108,7 @@ main .well {
 			background: #ddd;
 		}
 	}
-	> a:before {
+	> a::before {
 		font-family: FontAwesome;
 		content: '\f02b \00a0 ';
 		color: #aaa;
@@ -194,7 +201,7 @@ td#next {
 
 
 div.powered_by {
-	margin: 16px 0;
+	margin: 16px 0 0 0;
 	text-align: center;
 }
 div.error_404,
@@ -310,7 +317,7 @@ div.widget_core_user_profile_pics {
 }
 
 // Profile menu link widget alignment issue fix
-.widget_core_profile_menu_link ul li a img {
+.evo_widget_basic_menu_link_myprofile ul li a img {
 	vertical-align: middle;
 	.border-radius;
 }
@@ -689,8 +696,16 @@ div.results {
 	font-size: 125%;
 	color: #666;
 }
-.search_title a {
-	text-decoration: underline;
+.search_title {
+	a {
+		text-decoration: underline;
+	}
+	.label a {
+		color: #FFF;
+		&:hover {
+			color: #abc6e0;
+		}
+	}
 }
 .search_result {
 	padding: 15px 15px 5px;
@@ -1171,7 +1186,7 @@ div.evo_fileuploader_form {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
-		&:after {
+		&::after {
 			content: "...";
 			font-size: 10px;
 			top: -7px;

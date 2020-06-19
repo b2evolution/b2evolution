@@ -37,7 +37,7 @@ $Form->begin_form();
 			'ignored_apply_rendering' => array( 'always', 'stealth', 'never' )
 		) );
 
-	$Form->buttons( array( array( 'submit', 'actionArray[mass_change_renderer]', T_('Change renderer'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'actionArray[mass_change_renderer]', TB_('Change renderer'), 'SaveButton' ) ) );
 
 $Form->end_form();
 ?>

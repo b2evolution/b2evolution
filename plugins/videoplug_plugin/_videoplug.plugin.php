@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $number_of_installs = 1;
 
 
@@ -128,7 +128,7 @@ class videoplug_plugin extends Plugin
 		      ( $this->get_coll_setting( 'replace_url_post', $setting_Blog ) && ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
 		  ) )
 		{	// Render full video URLs in post or comment content:
-			$content = replace_content_outcode_shorttags( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
+			$content = replace_outside_code_and_short_tags( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
 				array( $this, 'parse_video_url_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
 
@@ -136,7 +136,7 @@ class videoplug_plugin extends Plugin
 		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook|wistia):?[^\[\]]*\]/i' );
 
 		// Replace video tags with html code:
-		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|wistia|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?:?([^:\[\]\\\/]*)\]#',
+		$content = replace_outside_code_tags( '#\[video:(youtube|dailymotion|vimeo|facebook|wistia|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?:?([^:\[\]\\\/]*)\]#',
 			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
@@ -443,7 +443,7 @@ class videoplug_plugin extends Plugin
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 			//<![CDATA[

@@ -23,7 +23,7 @@ class auto_anchors_plugin extends Plugin
 	var $code = 'auto_anchors';
 	var $name = 'Auto Anchors';
 	var $priority = 33;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -140,35 +140,13 @@ class auto_anchors_plugin extends Plugin
 			return;
 		}
 
-		$this->require_css( 'auto_anchors.css' );
-		if( $disp == 'single' || $disp == 'page' )
-		{	// Initialize JS for better scrolling only on Item's page:
-			add_js_headline( 'jQuery( document ).ready( function()
-			{
-				jQuery( "h1, h2, h3, h4, h5, h6" ).each( function()
-				{	// Append anchor link to header:
-					if( jQuery( this ).attr( "id") && jQuery( this ).hasClass( "evo_auto_anchor_header" ) )
-					{	// Only if it has id attribute and it was genereated by this plugin
-						var current_url = location.href.replace( /#.+$/, "" ) + "#" + jQuery( this ).attr( "id" );
-						jQuery( this ).append( " <a href=\"" + current_url + "\" class=\"evo_auto_anchor_link\"><span class=\"fa fa-link\"></span></a>" );
-					}
-				} );
-				var evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
-				jQuery( ".evo_auto_anchor_link" ).on( "click", function()
-				{
-					var link_href = jQuery( this ).attr( "href" );
-					jQuery( "html,body" ).animate(
-					{	// Scroll to anchor:
-						scrollTop: jQuery( this ).offset().top - evo_toolbar_height - '.intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ).'
-					},
-					function()
-					{	// Update URL with proper anchor in browser address bar:
-						window.history.pushState( "", "", link_href );
-					} );
-					return false;
-				} );
-			} );' );
-		}
+		$this->require_css_async( 'auto_anchors.css', false, 'footerlines' );
+
+		// JS for initialize anchor icons and for better scrolling:
+		// NOTE: we need this on each page because content bloc items may be included as widget even on front page!
+		expose_var_to_js( 'evo_plugin_auto_anchors_settings', '{
+				offset_scroll: '.format_to_js( intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ) ).'
+			}' );
 	}
 
 
@@ -195,7 +173,7 @@ class auto_anchors_plugin extends Plugin
 		load_funcs( 'locales/_charset.funcs.php' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks:
-		$content = replace_content_outcode( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
 
 		return true;
 	}

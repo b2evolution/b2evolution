@@ -21,7 +21,7 @@ class mermaid_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $number_of_installs = 1;
 
 
@@ -225,8 +225,8 @@ class mermaid_plugin extends Plugin
 			return;
 		}
 
-		$this->require_js( 'js/mermaid.min.js' );
-		add_js_headline( 'mermaid.initialize({startOnLoad:true});' );
+		$this->require_js_defer( 'js/mermaid.min.js' );	// Loaded in defer mode because this can take a while and init script below may already fire
+		$this->require_js_defer( 'js/evo_init_mermaid.js' );
 	}
 
 
@@ -242,8 +242,8 @@ class mermaid_plugin extends Plugin
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			$this->require_js( 'js/mermaid.min.js' );
-			add_js_headline( 'mermaid.initialize({startOnLoad:true});' );
+			$this->require_js_defer( 'js/mermaid.min.js' ); // Loaded in defer mode because this can take a while and init script below may already fire
+			$this->require_js_defer( 'js/evo_init_mermaid.js' );
 		}
 	}
 
@@ -374,7 +374,7 @@ class mermaid_plugin extends Plugin
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 			//<![CDATA[

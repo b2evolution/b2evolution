@@ -27,7 +27,7 @@ global $Collection, $Blog;
  */
 global $CommentList;
 
-global $current_User, $admin_url, $tab3;
+global $admin_url, $tab3;
 
 /*
  * Display comments:
@@ -45,7 +45,7 @@ if( check_comment_mass_delete( $CommentList ) )
 	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
-if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
+if( $tab3 != 'meta' && check_user_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{

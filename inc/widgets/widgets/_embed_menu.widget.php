@@ -95,7 +95,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$SiteMenuCache = & get_SiteMenuCache();
 		$SiteMenuCache->load_where( 'menu_translates_menu_ID IS NULL' );
@@ -109,7 +109,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 				),
 				'menu_ID' => array(
 					'label' => T_('Menu to display'),
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
 					'type' => 'select_object',
 					'object' => $SiteMenuCache,
 					'defaultvalue' => '',
@@ -177,13 +177,17 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		foreach( $menu_entries as $MenuEntry )
+		echo $this->get_layout_menu_wrapper( 'start' );
+
+		foreach( $menu_entries as $SiteMenuEntry )
 		{
-			if( $url = $MenuEntry->get_url() )
+			if( $url = $SiteMenuEntry->get_url() )
 			{	// Display a layout with menu link only if it is not restricted by some permission for current User:
-				echo $this->get_layout_menu_link( $url, $MenuEntry->get_text(), $MenuEntry->is_active() );
+				echo $this->get_layout_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active() );
 			}
 		}
+
+		echo $this->get_layout_menu_wrapper( 'end' );
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

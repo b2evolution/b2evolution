@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 
 param( 'action', 'string' );
@@ -35,7 +35,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'submit', 'array:string', array() );
 		if( isset($submit['restore_defaults']) )
@@ -60,11 +60,11 @@ switch( $action )
 					'fm_resize_quality' ) );
 			if( $Settings->dbupdate() )
 			{
-				$Messages->add( T_('Restored default values.'), 'success' );
+				$Messages->add( TB_('Restored default values.'), 'success' );
 			}
 			else
 			{
-				$Messages->add( T_('Settings have not changed.'), 'note' );
+				$Messages->add( TB_('Settings have not changed.'), 'note' );
 			}
 		}
 		else
@@ -91,7 +91,7 @@ switch( $action )
 			// Default dir CHMOD:
 			if( param( 'fm_default_chmod_dir', 'string', NULL ) !== NULL )
 			{
-				param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+				param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', TB_('Invalid CHMOD value. Use 3 digits.') );
 				$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
 			}
 
@@ -101,7 +101,7 @@ switch( $action )
 			// Default files CHMOD:
 			if( param( 'fm_default_chmod_file', 'string', NULL ) !== NULL )
 			{
-				param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+				param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', TB_('Invalid CHMOD value. Use 3 digits.') );
 				$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
 			}
 
@@ -114,12 +114,12 @@ switch( $action )
 
 			// Advanced settings
 			param( 'regexp_filename', 'string', '' );
-			if( param_check_isregexp( 'regexp_filename', T_('Valid filename pattern is not a regular expression!') ) )
+			if( param_check_isregexp( 'regexp_filename', TB_('Valid filename pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_filename', $regexp_filename );
 			}
 			param( 'regexp_dirname', 'string', '' );
-			if( param_check_isregexp( 'regexp_dirname', T_('Valid dirname pattern is not a regular expression!') ) )
+			if( param_check_isregexp( 'regexp_dirname', TB_('Valid dirname pattern is not a regular expression!') ) )
 			{
 				$Settings->set( 'regexp_dirname', $regexp_dirname );
 			}
@@ -129,11 +129,11 @@ switch( $action )
 			{ // ?evocache folder name has changed
 				if( rename_cachefolders( $old_foldername, $evocache_foldername ) )
 				{
-					$Messages->add( sprintf( T_( 'All %s folders have been renamed to %s' ), $old_foldername, $evocache_foldername ), 'success' );
+					$Messages->add( sprintf( TB_( 'All %s folders have been renamed to %s' ), $old_foldername, $evocache_foldername ), 'success' );
 				}
 				else
 				{
-					$Messages->add( sprintf( T_( 'Some %s folders could not be renamed to %s' ), $old_foldername, $evocache_foldername ), 'warning' );
+					$Messages->add( sprintf( TB_( 'Some %s folders could not be renamed to %s' ), $old_foldername, $evocache_foldername ), 'warning' );
 				}
 				$Settings->set( 'evocache_foldername', $evocache_foldername );
 			}
@@ -147,18 +147,18 @@ switch( $action )
 			$Settings->set( 'fm_resize_width', $fm_resize_width );
 			param( 'fm_resize_height', 'integer', 0 );
 			$Settings->set( 'fm_resize_height', $fm_resize_height );
-			param_integer_range( 'fm_resize_quality', 0, 100, T_('The compression value must be between %d and %d.') );
+			param_integer_range( 'fm_resize_quality', 0, 100, TB_('The compression value must be between %d and %d.') );
 			$Settings->set( 'fm_resize_quality', $fm_resize_quality );
 
 			if( ! $Messages->has_errors() )
 			{
 				if( $Settings->dbupdate() )
 				{
-					$Messages->add( T_('File settings updated.'), 'success' );
+					$Messages->add( TB_('File settings updated.'), 'success' );
 				}
 				else
 				{
-					$Messages->add( T_('Settings have not changed.'), 'note' );
+					$Messages->add( TB_('Settings have not changed.'), 'note' );
 				}
 			}
 		}
@@ -181,8 +181,8 @@ $AdminUI->set_path( 'files', 'settings', 'settings' );
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
+$AdminUI->breadcrumbpath_add( TB_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=fileset' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'file-settings' );

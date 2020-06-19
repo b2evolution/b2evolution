@@ -406,14 +406,31 @@ if( $params['comment_type'] == 'meta' )
 		// Set canvas object for plugins:
 		echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
+		if( $Item->can_attach( false, $Comment->type ) )
+		{	// If current user has permission to attach files for the item:
+			load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+			// Create $LinkComment to generate temporary link owner ID for the $Comment:
+			$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+
+			if( empty( $Comment->temp_link_owner_ID ) )
+			{	// Set Comment temp_link_owner_ID:
+				$Comment->temp_link_owner_ID = $LinkOwner->get_ID();
+			}
+		}
+
 		// CALL PLUGINS NOW:
 		ob_start();
-		$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-			'target_type'   => 'Comment',
-			'target_object' => $Comment,
-			'content_id'    => $content_id,
-			'edit_layout'   => 'inskin',
-		) );
+		$admin_editor_params = array(
+				'target_type'   => 'Comment',
+				'target_object' => $Comment,
+				'content_id'    => $content_id,
+				'edit_layout'   => 'inskin',
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 		$admin_display_editor_button = ob_get_clean();
 
 		$comment_options = array();
@@ -450,7 +467,7 @@ if( $params['comment_type'] == 'meta' )
 					<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
 				</div>';
 				// JS code to don't hide popup on click to checkbox:
-				$text_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+				expose_var_to_js( 'evo_commentform_renderers__click', true );
 		}
 
 		if( $Blog->get_setting( 'allow_html_comment' ) )
@@ -563,7 +580,7 @@ if( $params['comment_type'] == 'meta' )
 
 		if( $Item->can_attach() )
 		{	// Don't display "/Add file" on the preview button if JS is enabled:
-			echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+			echo '<script>document.querySelector( "input[type=submit].preview.btn-info" ).value = "'.TS_('Preview').'";</script>';
 		}
 
 			$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );

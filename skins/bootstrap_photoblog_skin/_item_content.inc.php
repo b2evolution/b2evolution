@@ -124,7 +124,7 @@ $content_mode = resolve_auto_content_mode( $content_mode );
 
 if( $params['include_cover_images'] )
 { // Include the cover images on teaser place
-	$teaser_image_positions = 'cover,teaser,teaserperm,teaserlink';
+	$teaser_image_positions = 'cover,background,teaser,teaserperm,teaserlink';
 }
 else
 { // Don't include the cover images

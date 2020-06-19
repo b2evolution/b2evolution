@@ -111,6 +111,15 @@ class ItemList2 extends ItemListLight
 		// Set Item params from request:
 		$Item->load_from_Request();
 
+		// Use only first slug on PREVIEW mode in order to initialize correct permanent URL:
+		$urltitles = $Item->get( 'urltitle' );
+		if( $urltitles === '' )
+		{	// If slugs are empty on preview form, try to get previous of from title:
+			$urltitles = ( empty( $this->previous_urltitle ) ? $Item->get( 'title' ) : $this->previous_urltitle );
+		}
+		$urltitles = explode( ',', $urltitles );
+		$Item->set( 'urltitle', get_urltitle( $urltitles[0] ) );
+
 		if( isset( $Item->previous_status ) )
 		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)
@@ -631,8 +640,11 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_assignees( $this->filters['assignees'] );
 		$next_Query->where_assignees_logins( $this->filters['assignees_login'] );
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
+		$next_Query->where_involves( $this->filters['involves'] );
+		$next_Query->where_involves_logins( $this->filters['involves_login'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
+		$next_Query->where_statuses_array( $this->filters['statuses_array'] );
 		// itemtype_usage param is kept only for the case when some custom types should be displayed
 		$next_Query->where_itemtype_usage( ! empty( $itemtype_usage ) ? $itemtype_usage : $this->filters['itemtype_usage'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -646,6 +658,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_flagged( $this->filters['flagged'] );
 		$next_Query->where_locale_visibility();
 		$next_Query->where_mustread( $this->filters['mustread'] );
+		$next_Query->where_renderers( $this->filters['renderers'] );
 
 		/*
 		 * ORDER BY stuff:

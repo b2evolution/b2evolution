@@ -261,6 +261,11 @@ th, td, caption {
 			color: #FFF !important;
 		}
 	}
+	&.btn-danger-hover:hover {
+		color: #fff;
+		background-color: #c9302c;
+		border-color: #ac2925;
+	}
 }
 .evo_widget{
 	.btn { // we need this to give space to buttons on successive widget lines
@@ -761,7 +766,7 @@ div.results {
 
 	tr.placeholder {
 		position: relative;
-		&:before {
+		&::before {
 			content: "";
 			position: absolute;
 			width: 0;
@@ -772,7 +777,7 @@ div.results {
 			margin-top: -5px;
 			left: 0;
 		}
-		&:after {
+		&::after {
 			content: "";
 			position: absolute;
 			width: 100%;
@@ -897,7 +902,7 @@ div.messages{
 a:hover .glyphicon {
 	color: #2A6496;
 }
-.glyphicon:before {
+.glyphicon::before {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -1190,8 +1195,8 @@ div.edit_toolbars, div.message_toolbars {
 // Fix colorbox sizes
 #colorbox,
 #colorbox *,
-#colorbox *:before,
-#colorbox *:after {
+#colorbox *::before,
+#colorbox *::after {
 	-webkit-box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	box-sizing: content-box;
@@ -1369,9 +1374,6 @@ div.edit_toolbars, div.message_toolbars {
 // Widgets containers "Sidebar" and "Sidebar 2":
 .evo_container__sidebar, .evo_container__sidebar_2 {
 	// .widget_core_menu_link
-	// .widget_core_msg_menu_link
-	// .widget_core_profile_menu_link
-	// .widget_core_flag_menu_link
 	.evo_widget[class$=_menu_link] a.btn {
 		width: 100%;
 	}
@@ -1389,15 +1391,15 @@ div.edit_toolbars, div.message_toolbars {
 // Grouped form fieldsets with bootstrap js accordion toggle behavior:
 .accordion-caret {
 	.accordion-toggler {
-		&:before {
+		&::before {
 			font-size: 14px;
 			font-family: FontAwesome;
 		}
-		&:not(.collapsed):before {
+		&:not(.collapsed)::before {
 			padding-right: 3px;
 			content: '\f0d7';
 		}
-		&.collapsed:before {
+		&.collapsed::before {
 			padding-right: 6px;
 			content: '\f0da';
 		}
@@ -1416,7 +1418,7 @@ div.edit_toolbars, div.message_toolbars {
 				padding: 0;
 			}
 			.panel-body, .evo_post__full_text.clearfix {
-				&:before, &:after {
+				&::before, &::after {
 					// Change this from default bootstrap value "table", in order to
 					// avoid double space of 10px margin between <p> and login form:
 					display: block;

@@ -363,12 +363,12 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
 	{
-		$perm = $current_User->check_perm( 'stats', 'view' );
+		$perm = check_user_perm( 'stats', 'view' );
 	}
 
 	if( $perm == true )
@@ -595,14 +595,14 @@ function hit_iprange_status( $IP_address )
  */
 function hit_iprange_status_title( $IP_address )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	// Get status code of IP range by IP address
 	$ip_range_status = hit_iprange_status( $IP_address );
 
 	if( $ip_range_status === '' )
 	{ // No IP range for this IP address
-		if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		if( check_user_perm( 'spamblacklist', 'edit' ) )
 		{ // Display a link to create new one if user has an access
 			return '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$IP_address.'">'.T_('Create').'</a>';
 		}
@@ -612,7 +612,7 @@ function hit_iprange_status_title( $IP_address )
 		}
 	}
 
-	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+	if( check_user_perm( 'spamblacklist', 'view' ) )
 	{ // Current user has access to view IP ranges
 		global $blog;
 		$blog_param = empty( $blog ) ? '' : '&amp;blog=1';

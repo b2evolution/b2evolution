@@ -76,6 +76,7 @@ class ItemType extends DataObject
 	var $front_order_excerpt     = NULL;
 	var $front_order_url         = NULL;
 	var $front_order_location    = NULL;
+	var $front_order_workflow    = 50;
 
 	/**
 	 * Custom fields
@@ -159,6 +160,7 @@ class ItemType extends DataObject
 			$this->front_order_short_title = isset( $db_row->ityp_front_order_short_title ) ? $db_row->ityp_front_order_short_title : NULL;
 			$this->front_order_instruction = isset( $db_row->ityp_front_order_instruction ) ? $db_row->ityp_front_order_instruction : NULL;
 			$this->front_order_attachments = isset( $db_row->ityp_front_order_attachments ) ? $db_row->ityp_front_order_attachments : NULL;
+			$this->front_order_workflow = isset( $db_row->ityp_front_order_workflow ) ? $db_row->ityp_front_order_workflow : NULL;
 			$this->front_order_text = isset( $db_row->ityp_front_order_text ) ? $db_row->ityp_front_order_text : NULL;
 			$this->front_order_tags = isset( $db_row->ityp_front_order_tags ) ? $db_row->ityp_front_order_tags : NULL;
 			$this->front_order_excerpt = isset( $db_row->ityp_front_order_excerpt ) ? $db_row->ityp_front_order_excerpt : NULL;
@@ -335,6 +337,10 @@ class ItemType extends DataObject
 		// Front-Office Order (Attachments)
 		param( 'ityp_front_order_attachments', 'integer', NULL );
 		$this->set_from_Request( 'front_order_attachments' );
+
+		// Front-Office Order (Workflow)
+		param( 'ityp_front_order_workflow', 'integer', NULL );
+		$this->set_from_Request( 'front_order_workflow' );
 
 		// Use excerpt
 		param( 'ityp_use_excerpt', 'string' );
@@ -649,7 +655,17 @@ class ItemType extends DataObject
 				}
 			}
 
-			if( ! $formula_has_wrong_field && $custom_field['formula'] !== '' )
+			if( $formula_uses_function = preg_match( '#[a-z0-9_]+\s*\(.*?\)#i', $custom_field['formula'] ) )
+			{	// Don't allow to use functions in formula:
+				$Messages->add( sprintf( T_('Forbidden to use functions in formula, please fix %s of the field "%s".'),
+						'<code>'.$custom_field['formula'].'</code>',
+						$custom_field['label']
+					), 'warning' );
+			}
+
+			if( ! $formula_has_wrong_field &&
+			    ! $formula_uses_function &&
+			    $custom_field['formula'] !== '' )
 			{	// Check for correct formula:
 				$test_formula = preg_replace( '#\$(.+?)\$#', '1', $custom_field['formula'] );
 				try

@@ -15,6 +15,12 @@ if( $inactive_account_threshold === 0 )
 	return 1;
 }
 
+if( empty( $UserSettings ) )
+{	// initialize UserSettings, because in CLI mode is not initialized yet:
+	load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+	$UserSettings = new UserSettings();
+}
+
 // Only users with "activated", "manualactivated" OR "autoactivated" statuses may receive inactive account reminders
 $status_condition = '( user_status = "activated" OR user_status = "manualactivated" OR user_status = "autoactivated" )';
 

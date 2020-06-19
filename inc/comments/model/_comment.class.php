@@ -728,7 +728,7 @@ class Comment extends DataObject
 	 */
 	function get_vote_spam_disabled()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		$result = array(
 				'is_voted' => false,
@@ -774,7 +774,7 @@ class Comment extends DataObject
 	 */
 	function get_vote_helpful_disabled()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		$result = array(
 				'is_voted' => false,
@@ -1463,10 +1463,9 @@ class Comment extends DataObject
 	 */
 	function author_url_with_actions( $redirect_to = NULL, $ajax_button = false, $check_perms = true, $save_context = true )
 	{
-		global $current_User;
 		if( $this->author_url( '', ' &bull; Url: <span id="commenturl_'.$this->ID.'" class="bUrl">', '' ) )
 		{ // There is an URL
-			if( ! $this->get_author_User() && $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+			if( ! $this->get_author_User() && check_user_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
 			{ // Author is anonymous user and we have permission to edit this comment...
 				if( $redirect_to == NULL )
 				{
@@ -1515,14 +1514,10 @@ class Comment extends DataObject
 	 */
 	function can_be_edited()
 	{
-		global $current_User;
-
 		// Comment must be stored in DB:
 		return ! empty( $this->ID ) &&
-			// User must be logged in and activated:
-			is_logged_in( false ) &&
-			// User must has a permission to edit this Comment:
-			$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
+			// User must be logged in and activated and has a permission to edit this Comment:
+			check_user_perm( 'comment!CURSTATUS', 'edit', false, $this, false );
 	}
 
 
@@ -1595,11 +1590,11 @@ class Comment extends DataObject
 	 */
 	function deleteurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
-		if( $check_perm && ! $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
+		if( $check_perm && ! check_user_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
 		{ // If current user has no permission to edit this comment
 			return false;
 		}
@@ -1641,13 +1636,13 @@ class Comment extends DataObject
 	 */
 	function banurl_link( $redirect_to, $ajax_button = false, $check_perm = true, $glue = '&amp;', $save_context = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
 		//$Item = & $this->get_Item();
 
-		if( $check_perm && ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		if( $check_perm && ! check_user_perm( 'spamblacklist', 'edit' ) )
 		{ // if current user has no permission to edit spams
 			return false;
 		}
@@ -1697,7 +1692,7 @@ class Comment extends DataObject
 	 */
 	function delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $glue = '&amp;', $save_context = true, $ajax_button = false, $confirm_text = '#', $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
@@ -1708,7 +1703,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( ! $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
+		if( ! check_user_perm( 'comment!CURSTATUS', 'delete', false, $this ) )
 		{ // If User has no permission to delete a comments:
 			return false;
 		}
@@ -1805,7 +1800,7 @@ class Comment extends DataObject
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) )
 		{
@@ -1813,7 +1808,7 @@ class Comment extends DataObject
 		}
 
 		if( ( $this->status == 'deprecated' ) // Already deprecated!
-		    || !$current_User->check_perm( 'comment!deprecated', 'moderate', false, $this ) )
+		    || ! check_user_perm( 'comment!deprecated', 'moderate', false, $this ) )
 		{ // User has no right to deprecated this comment:
 			return false;
 		}
@@ -1876,7 +1871,7 @@ class Comment extends DataObject
 				'title_no_voted'      => T_('You sent a "not helpful" vote.'),
 			), $params );
 
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$this->get_Item();
 
@@ -2011,7 +2006,7 @@ class Comment extends DataObject
 
 		$this->get_Item();
 
-		if( !is_logged_in( false ) || !$current_User->check_perm( 'blog_vote_spam_comments', 'edit', false, $this->Item->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_vote_spam_comments', 'edit', false, $this->Item->get_blog_ID(), false ) )
 		{ // If User has no permission to vote spam
 			return false;
 		}
@@ -2081,10 +2076,21 @@ class Comment extends DataObject
 				'title_no'              => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'        => T_('You sent a "not helpful" vote.'),
 				'title_empty'           => T_('No user votes yet.'),
+				'title_own'             => T_('You cannot vote on own Item.'),
 				'class'                 => 'nowrap',
 				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
 				'display_noopinion'     => true,
 				'display_score'         => false,
+				'icon_like_active'        => 'thumb_up',
+				'icon_like_noactive'      => 'thumb_up_disabled',
+				'icon_noopinion_active'   => 'ban',
+				'icon_noopinion_noactive' => 'ban_disabled',
+				'icon_dontlike_active'    => 'thumb_down',
+				'icon_dontlike_noactive'  => 'thumb_down_disabled',
+				'display_noactive'        => false, // Display not active icons, when current User is owner of this Item
+				'display_like'            => true,
+				'display_noopinion'       => true,
+				'display_dontlike'        => true,
 				'icon_like_active'        => 'thumb_up',
 				'icon_like_noactive'      => 'thumb_up_disabled',
 				'icon_noopinion_active'   => 'ban',
@@ -2119,6 +2125,16 @@ class Comment extends DataObject
 
 		if( $current_User->ID == $this->author_user_ID )
 		{	// Display only vote summary/score for users on their own comments:
+			if( $params['display_noactive'] && $params['display_like'])
+			{	// Display disabled 'Like' icon:
+				echo get_icon( $params['icon_like_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
+
+			if( $params['display_noactive'] && $params['display_noopinion'] )
+			{	// Display disabled 'No opinion' icon:
+				echo get_icon( $params['icon_noopinion_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
+
 			if( $params['display_score'] )
 			{	// Display score:
 				echo '<span class="vote_score">'.$this->get( 'helpful_addvotes' ).'</span>';
@@ -2129,6 +2145,11 @@ class Comment extends DataObject
 				$params['after_result'] = '.';
 				$result_summary = $this->get_vote_summary( 'helpful', $params );
 				echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+			}
+
+			if( $params['display_noactive'] && $params['display_dontlike'] )
+			{	// Display disabled 'Don't like' icon:
+				echo get_icon( $params['icon_dontlike_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
 			}
 		}
 		else
@@ -2199,7 +2220,7 @@ class Comment extends DataObject
 			return false;
 		}
 
-		global $current_User, $blog;
+		global $blog;
 
 		if( is_null( $current_status ) )
 		{ // Use status of comment if param is NULL
@@ -2230,7 +2251,7 @@ class Comment extends DataObject
 			}
 			else
 			{	// Check if current user can moderate this comment to the next/prev status:
-				$has_perm = $current_User->check_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
+				$has_perm = check_user_perm( 'comment!'.$status_order[$curr_index][0], 'moderate', false, $this );
 			}
 		}
 		if( $has_perm )
@@ -2257,7 +2278,7 @@ class Comment extends DataObject
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
@@ -2363,11 +2384,7 @@ class Comment extends DataObject
 	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $ajax_button = false, $redirect_to = NULL )
 	{
-		global $current_User;
-
-		if( ! is_logged_in( false ) ) return false;
-
-		if( !$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'comment!CURSTATUS', 'edit', false, $this, false ) )
 		{ // User has no permission to edit this comment
 			return false;
 		}
@@ -2425,8 +2442,6 @@ class Comment extends DataObject
 	 */
 	function next_status_link( $params, $raise, $current_status = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in( false ) ) return false;
 
 		$next_status_in_row = $this->get_next_status( $raise, $current_status );
@@ -2786,14 +2801,14 @@ class Comment extends DataObject
 
 		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') );
 		if( $use_cache )
-		{ // the format/comment can be cached:
+		{	// the format/comment can be cached:
 			if( empty( $CommentList ) )
-			{ // set comments Blog from comment Item
+			{	// set comments Blog from comment Item
 				$this->get_Item();
 				$comments_Blog = & $this->Item->get_Blog();
 			}
 			else
-			{ // set comments Blog from CommentList
+			{	// set comments Blog from CommentList
 				$comments_Blog = & $CommentList->Blog;
 			}
 			$comment_renderers = $this->get_renderers_validated();
@@ -2807,15 +2822,15 @@ class Comment extends DataObject
 			$CommentPrerenderingCache = & get_CommentPrerenderingCache();
 
 			if( isset($CommentPrerenderingCache[$format][$this->ID][$cache_key]) )
-			{ // already in PHP cache.
+			{	// already in PHP cache.
 				$r = $CommentPrerenderingCache[$format][$this->ID][$cache_key];
 				// Save memory, typically only accessed once.
 				unset($CommentPrerenderingCache[$format][$this->ID][$cache_key]);
 			}
 			else
-			{ // try loading into Cache
+			{	// try loading into Cache
 				if( ! isset($CommentPrerenderingCache[$format]) )
-				{ // only do the prefetch loading once.
+				{	// only do the prefetch loading once.
 					$CommentPrerenderingCache[$format] = array();
 
 					$SQL = new SQL( 'Preload prerendered comments content ('.$format.')' );
@@ -2841,7 +2856,7 @@ class Comment extends DataObject
 						$row_cache_key = $row->cmpr_format.'/'.$row->cmpr_renderers;
 
 						if( ! isset($CommentPrerenderingCache[$format][$row->cmpr_cmt_ID]) )
-						{ // init list
+						{	// init list
 							$CommentPrerenderingCache[$format][$row->cmpr_cmt_ID] = array();
 						}
 
@@ -2866,7 +2881,7 @@ class Comment extends DataObject
 			$r = format_to_output( $data, $format );
 
 			if( $use_cache )
-			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
+			{	// save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
 				global $servertimenow;
 				$DB->query( 'REPLACE INTO T_comments__prerendering ( cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered, cmpr_datemodified )
 					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $comment_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered comment content' );
@@ -2929,6 +2944,32 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get excerpt, derived from {@link Comment::$content}.
+	 *
+	 * @param int Maximum length
+	 * @param string Tail to use, when string gets cropped. Its length gets
+	 *               substracted from the total length (with HTML entities
+	 *               being decoded). Default is "&hellip;" (HTML entity)
+	 * @return string
+	 */
+	function get_excerpt( $params = array() )
+	{
+		$params = array_merge( array(
+				'format' => 'htmlbody',
+				'maxlen' => 254,
+				'tail'   => '&hellip;',
+			), $params );
+
+		$content = $this->get_prerendered_content( $params['format'] );
+
+		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
+		$content = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $content );
+
+		return excerpt( $content, $params['maxlen'], $params['tail'] );
+	}
+
+
+	/**
 	 * Template function: display content of comment
 	 *
 	 * @param string Output format, see {@link format_to_output()}
@@ -2938,7 +2979,6 @@ class Comment extends DataObject
 	 */
 	function content( $format = 'htmlbody', $ban_urls = false, $show_attachments = true, $params = array() )
 	{
-		global $current_User;
 		global $Plugins;
 
 		// Make sure we are not missing any param:
@@ -3110,7 +3150,7 @@ class Comment extends DataObject
 
 		if( $ban_urls )
 		{ // add ban icons if user has edit permission for this comment
-			$ban_urls = $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
+			$ban_urls = check_user_perm( 'comment!CURSTATUS', 'edit', false, $this );
 		}
 
 		$output = $this->get_content( $format, $params );
@@ -3347,6 +3387,20 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get creation time of Comment. This should replace Comment::date() and Comment::time()
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_creation_time( $format = '', $useGM = false )
+	{
+		$format = locale_resolve_datetime_fmt( $format );
+
+		return mysql2date( $format, $this->date, $useGM );
+	}
+
+
+	/**
 	 * Template tag:  display rating
 	 */
 	function rating( $params = array() )
@@ -3369,7 +3423,7 @@ class Comment extends DataObject
 		echo $params['after'];
 	}
 
-  /**
+	/**
 	 * Rating input
 	 */
 	function rating_input( $params = array() )
@@ -3377,16 +3431,16 @@ class Comment extends DataObject
 		global $rsc_uri;
 
 		$params = array_merge( array(
-									'before'     => '',
-									'after'      => '',
-									'label_low'  => T_('Bad'),
-									'label_2'    => T_('Poor'),
-									'label_3'    => T_('Average'),
-									'label_4'    => T_('Good'),
-									'label_high' => T_('Excellent'),
-									'reset'      => false,
-									'item_ID'    => 0, // Set only for new comments without defined item ID
-								), $params );
+				'before'     => '',
+				'after'      => '',
+				'label_low'  => T_('Bad'),
+				'label_2'    => T_('Poor'),
+				'label_3'    => T_('Average'),
+				'label_4'    => T_('Good'),
+				'label_high' => T_('Excellent'),
+				'reset'      => false,
+				'item_ID'    => 0, // Set only for new comments without defined item ID
+			), $params );
 
 		echo $params['before'];
 
@@ -3394,6 +3448,7 @@ class Comment extends DataObject
 		{	// Set item ID for form with new comment
 			$this->item_ID = $params['item_ID'];
 		}
+
 		if( $comment_Item = & $this->get_Item() )
 		{
 			if( $item_Blog = & $comment_Item->get_Blog() )
@@ -3408,7 +3463,6 @@ class Comment extends DataObject
 		}
 
 		echo '<div id="comment_rating">';
-
 		echo $params['label_low'];
 
 		for( $i=1; $i<=5; $i++ )
@@ -3423,28 +3477,42 @@ class Comment extends DataObject
 
 		echo $params['label_high'];
 
-		$jquery_raty_param = '';
 		if( $params['reset'] )
-		{ // Init "reset" button
-			$jquery_raty_param = 'cancel: true';
+		{	// Init "reset" button
+			$raty_params['cancel'] = true;
 			$this->rating_none_input( array( 'before' => '<p>', 'after' => '</p>' ) );
 		}
 
 		echo '</div>';
-
-		echo '<script>
-		/* <![CDATA[ */
-		jQuery("#comment_rating").html("").raty({
-			scoreName: "comment_rating",
-			start: '.(int)$this->rating.',
-			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"],
-			width: 110,
-			'.$jquery_raty_param.'
-		});
-		/* ]]> */
-		</script>';
-
 		echo $params['after'];
+
+		$raty_params = array(
+			'scoreName' => "comment_rating",
+			'start' => (int) $this->rating,
+			'hintList' => array(
+					$params['label_low'],
+					$params['label_2'],
+					$params['label_3'],
+					$params['label_4'],
+					$params['label_high'],
+				),
+			'width' => 110,
+		);
+
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+					evo_render_star_rating( <?php echo evo_json_encode( $raty_params ); ?> );
+				} );
+			</script>
+			<?php
+		}	
+		else
+		{
+			expose_var_to_js( 'evo_comment_rating_config', evo_json_encode( $raty_params ) );
+		}
 	}
 
 
@@ -4354,7 +4422,7 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get( 'email' );
+			$reply_to = NULL; // Don't allow to reply to registered User:
 			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
@@ -4507,16 +4575,22 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
+			$email_headers = array();
+			if( ! empty( $user_reply_to ) )
+			{	// Allow to reply only to anonymous user and when it is allowed depending on notify user type:
+				$email_headers['Reply-To'] = $user_reply_to;
+			}
+
 			if( $notify_User )
 			{	// Send the email to registered User:
 				// Note: Note activated users won't get notification email
-				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, $email_headers );
 			}
 			else
 			{	// Send the email to anonymous user:
 				$email_template_params['comment_ID'] = $anon_Comment->ID;
 				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
-				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, $email_headers );
 			}
 
 			if( $send_mail_result )
@@ -4558,7 +4632,7 @@ class Comment extends DataObject
 	 */
 	function send_assignment_notification( $executed_by_userid = NULL )
 	{
-		global $current_User, $Messages, $UserSettings;
+		global $Messages, $UserSettings;
 
 		$notified_user_IDs = array();
 
@@ -4606,7 +4680,7 @@ class Comment extends DataObject
 					$commented_Item->get( 'title' ) );
 
 				// Send the email:
-				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
 					$commented_Item->display_notification_message( T_('Sending email notification to assigned user.') );
@@ -5204,7 +5278,7 @@ class Comment extends DataObject
 	 */
 	function update_last_touched_date( $update_item_last_touched_ts = true, $update_item_contents_last_updated_ts = false )
 	{
-		global $localtimenow, $current_User;
+		global $localtimenow;
 
 		if( $this->is_meta() )
 		{ // Don't touch Item when this Comment is meta
@@ -5378,8 +5452,6 @@ class Comment extends DataObject
 	 */
 	function restrict_status( $update_status = false )
 	{
-		global $current_User;
-
 		// Store current status to display a warning:
 		$current_status = $this->get( 'status' );
 
@@ -5387,7 +5459,7 @@ class Comment extends DataObject
 
 		if( $this->is_meta() )
 		{	// Internal comment:
-			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
+			if( ! is_logged_in() || ( $commented_Item && ! check_user_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
 			{	// Change internal comment status to 'protected' if user has no perm to view them:
 				$comment_allowed_status = 'protected';
 			}

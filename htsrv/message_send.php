@@ -541,16 +541,22 @@ if( $success_message )
 				'Comment'           => $Comment,
 			);
 
+		$email_headers = array();
+		if( ! is_logged_in() )
+		{	// Allow to reply only to anonymous user:
+			$email_headers['Reply-To'] = $sender_address;
+		}
+
 		if( empty( $recipient_User ) )
 		{	// Send email to visitor/anonymous:
 			// Get a message text from template file
 			$email_template_params['anonymous_recipient_name'] = $recipient_name;
 			$message = mail_template( 'contact_message_new', 'text', $email_template_params );
-			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, $email_headers );
 		}
 		else
 		{	// Send mail to registered user:
-			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, $email_headers );
 		}
 	}
 

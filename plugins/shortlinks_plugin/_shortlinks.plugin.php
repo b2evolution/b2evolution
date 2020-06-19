@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -144,7 +144,7 @@ class shortlinks_plugin extends Plugin
 		$content = & $params['data'];
 
 		// Replace the create post links with simple text if current user has no perm to create a post:
-		$content = replace_content_outcode( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#<a[^>]+href="([^"]+)"[^>]+data-function="create_post" data-coll="(\d+)"[^>]*>(.+?)</a>#i', array( $this, 'callback_replace_post_links' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -230,9 +230,9 @@ class shortlinks_plugin extends Plugin
 				( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
 				( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
-				( \]\] | \)\) )                    # Lookahead for )) or ]]
+				( \]{2,} | \){2,} )                # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
-			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+			$content = replace_outside_code_and_short_tags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 		// -------- RELATIVE BRACKETED URLS -------- :
@@ -244,9 +244,9 @@ class shortlinks_plugin extends Plugin
 				( \s \.[a-z0-9_\-\.]+ )?           # Style classes started and separated with dot (Optional)
 				( \s _[a-z0-9_\-]+ )?              # Link target started with _ (Optional)
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
-				( \]\] | \)\) )                    # Lookahead for )) or ]]
+				( \]{2,} | \){2,} )                # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
-			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+			$content = replace_outside_code_and_short_tags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 /* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
@@ -334,7 +334,7 @@ class shortlinks_plugin extends Plugin
 			}
 
 			// Replace all found standalone words with links:
-			$content = replace_content_outcode_shorttags( $search_wikiwords, $replace_links, $content );
+			$content = replace_outside_code_and_short_tags( $search_wikiwords, $replace_links, $content );
 		}
 
 		// -------- BRACKETED WIKIWORDS -------- :
@@ -351,7 +351,7 @@ class shortlinks_plugin extends Plugin
 					'.$search_anchor_slug_itemid.'
 					(?=
 						( \s .*? )?                 # Custom link text instead of post or chapter title with optional style classes
-						( \)\) | \]\] )             # Lookahead for )) or ]]
+						( \){2,} | \]{2,} )             # Lookahead for )) or ]]
 					)
 				/x'.$regexp_modifier; // x = extended (spaces + comments allowed)
 			if( preg_match_all( $search, $content, $matches, PREG_SET_ORDER ) )
@@ -398,7 +398,7 @@ class shortlinks_plugin extends Plugin
 					$this->current_wiki_word = $wiki_word;
 
 					// Fix for regexp:
-					$WikiWord = str_replace( '#', '\#', preg_quote( $WikiWord ) );
+					$WikiWord = preg_quote( $WikiWord, '#' );
 
 					// [[WikiWord]]
 					// [[WikiWord text]]
@@ -412,10 +412,10 @@ class shortlinks_plugin extends Plugin
 						( \s \.[a-z0-9_\-\.]+ )? # Style classes started and separated with dot (Optional)
 						( \s _[a-z0-9_\-]+ )?    # Link target started with _ (Optional)
 						( \s .+? )?              # Custom link text instead of post/chapter title (Optional)
-						( \]\] | \)\) )          # Lookahead for )) or ]]
+						( \]{2,} | \){2,} )      # Lookahead for )) or ]]
 						*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
 
-					$content = replace_content_outcode_shorttags( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
+					$content = replace_outside_code_and_short_tags( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 				}
 			}
 		}
@@ -425,17 +425,22 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for replace_content_outcode to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
+	 * Callback function for replace_outside_code_tags to render links like [[http://site.com/page.html .style.classes text]] or ((http://site.com/page.html .style.classes text))
 	 *
 	 * @param array Matches of regexp
 	 * @return string A processed link to the requested URL
 	 */
 	function callback_replace_bracketed_urls( $m )
 	{
-		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[7] == '))' ) )
+		if( ! ( $m[1] == '[[' && substr( $m[7], 0, 2 ) == ']]' ) &&
+		    ! ( $m[1] == '((' && substr( $m[7], 0, 2 ) == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
+		}
+
+		if( strlen( $m[7] ) > 2 )
+		{	// Fix Custom link text with appending chars ] or ) if it is ended with chars ] or ):
+			$m[6] .= substr( $m[7], 0, -2 );
 		}
 
 		// Clear custom link text:
@@ -466,7 +471,7 @@ class shortlinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for replace_content_outcode to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
+	 * Callback function for replace_outside_code_tags to render links like [[wiki-word .style.classes text]] or ((wiki-word .style.classes text))
 	 *
 	 * @param array Matches of regexp
 	 * @return string A processed link to post/chapter URL OR a suggestion text to create new post from unfound post urltitle
@@ -475,10 +480,15 @@ class shortlinks_plugin extends Plugin
 	{
 		global $blog, $evo_charset, $admin_url;
 
-		if( ! ( $m[1] == '[[' && $m[5] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[5] == '))' ) )
+		if( ! ( $m[1] == '[[' && substr( $m[5], 0, 2 ) == ']]' ) &&
+		    ! ( $m[1] == '((' && substr( $m[5], 0, 2 ) == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
+		}
+
+		if( strlen( $m[5] ) > 2 )
+		{	// Fix Custom link text with appending chars ] or ) if it is ended with chars ] or ):
+			$m[4] .= substr( $m[5], 0, -2 );
 		}
 
 		$ItemCache = & get_ItemCache();
@@ -786,10 +796,10 @@ class shortlinks_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea:
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		// Load js and css for modal window:
-		$this->require_js( 'shortlinks.js', true );
+		$this->require_js_defer( 'shortlinks.js', true );
 		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:
@@ -798,27 +808,38 @@ class shortlinks_plugin extends Plugin
 		// Initialize Javascript to build shortlinks modal window;
 		$this->init_js_lang_vars();
 
-		?><script>
-		//<![CDATA[
-		function shortlinks_toolbar( title, prefix )
+		$js_config = array(
+				'js_prefix'            => $params['js_prefix'],
+				'plugin_code'          => $this->code,
+
+				'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
+				'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
+				'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
+				'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
+				'toolbar_title'        => T_('Short Links:'),
+
+				'button_title'         => T_('Link to a Post'),
+				'button_value'         => T_('Link to a Post'),
+				'button_class'         => $this->get_template( 'toolbar_button_class' ),
+			);
+
+		if( is_ajax_request() )
 		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
-
-				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
-
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-
-				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_shortlinks_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
 		}
-		//]]>
-		</script><?php
+		else
+		{
+			expose_var_to_js( 'shortlinks_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_shortlinks_toolbar_config' );
+		}
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script>shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}
@@ -829,6 +850,7 @@ class shortlinks_plugin extends Plugin
 	 */
 	function init_js_lang_vars( $relative_to = 'rsc_url' )
 	{
+		// TODO: Include in rsc/js/src/evo_init_plugin_shortlinks.js
 		global $Blog;
 
 		// Initialize variables for the file "shortlinks.js":
@@ -1016,22 +1038,22 @@ class shortlinks_plugin extends Plugin
 	{
 		if( ! empty( $this->link_types['abs_url_optimize'] ) )
 		{	// Optimize absolute URLs:
-			$content = replace_content_outcode_shorttags( '*
+			$content = replace_outside_code_and_short_tags( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( (https?://|//).+/ ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
-					( \]\] | \)\) ) # Lookahead for )) or ]]
+					( \]{2,} | \){2,} ) # Lookahead for )) or ]]
 					*ix', // x = extended (spaces + comments allowed)
 				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 		if( ! empty( $this->link_types['rel_url_optimize'] ) )
 		{	// Optimize relative URLs:
-			$content = replace_content_outcode_shorttags( '*
+			$content = replace_outside_code_and_short_tags( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( /(.+/)? ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
-					( \]\] | \)\) ) # Lookahead for )) or ]]
+					( \]{2,} | \){2,} ) # Lookahead for )) or ]]
 					*ix', // x = extended (spaces + comments allowed)
 				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
@@ -1048,8 +1070,8 @@ class shortlinks_plugin extends Plugin
 	 */
 	function optimize_urls_callback( $m )
 	{
-		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
-		    ! ( $m[1] == '((' && $m[7] == '))' ) )
+		if( ! ( $m[1] == '[[' && substr( $m[7], 0, 2 ) == ']]' ) &&
+		    ! ( $m[1] == '((' && substr( $m[7], 0, 2 ) == '))' ) )
 		{	// Wrong pattern, Return original text:
 			return $m[0];
 		}
@@ -1061,8 +1083,19 @@ class shortlinks_plugin extends Plugin
 			return $m[0];
 		}
 
+		if( strlen( $m[7] ) > 2 )
+		{	// Fix Custom link text with appending chars ] or ) if it is ended with chars ] or ):
+			$m[6] .= substr( $m[7], 0, -2 );
+		}
+
+		$slug = $m[5];
+		$anchor_position = strpos( $slug, '#' );
+		if( $anchor_position !== false )
+		{	// Remove anchor from slug:
+			$slug = substr( $slug, 0, $anchor_position );
+		}
 		$SlugCache = & get_SlugCache();
-		if( ! $SlugCache->get_by_name( $m[5], false, false ) )
+		if( ! $SlugCache->get_by_name( $slug, false, false ) )
 		{	// The Slug is not found in system, Keep it as is without optimization:
 			return $m[0];
 		}

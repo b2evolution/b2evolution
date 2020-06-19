@@ -230,8 +230,6 @@ class Menu extends Widget
 	 */
 	function get_html_menu( $path = NULL, $template = 'main', $level = 0, $force_empty = false )
 	{
-		global $current_User;
-
 		$r = '';
 
 		if( is_null($path) )

@@ -17,9 +17,9 @@ global $retrict_tag;
 global $link_ID, $tag_type, $Plugins;
 
 $tag_types = array(
-	'image'     => T_('Image'),
-	'thumbnail' => T_('Thumbnail'),
-	'inline'    => T_('Basic inline'),
+	'image'     => TB_('Image'),
+	'thumbnail' => TB_('Thumbnail'),
+	'inline'    => TB_('Basic inline'),
 );
 
 // Get additional tabs from active Plugins:
@@ -50,7 +50,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 			$Form = new Form( NULL, 'form' );
 			$Form->begin_form( 'fform' );
 			$Form->hidden( 'link_ID', $link_ID );
-			$Form->begin_fieldset( T_('Parameters') );
+			$Form->begin_fieldset( TB_('Parameters') );
 			echo '<div class="tab-content">';
 			foreach( $tag_types as $tag_type_key => $tag_type_title )
 			{
@@ -63,15 +63,15 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 						{	// Disable input of Caption on initialize this edit form:
 							$image_caption_params['disabled'] = 'disabled';
 						}
-						$Form->text_input( 'image_caption', get_param( 'image_caption' ), 40, T_('Caption'), '<br>
+						$Form->text_input( 'image_caption', get_param( 'image_caption' ), 40, TB_('Caption'), '<br>
 							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
 								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'image_disable_caption' ) ? ' checked="checked"' : '' ).'>
-								<span>'.T_('Disable caption').'</span></span>', $image_caption_params );
+								<span>'.TB_('Disable caption').'</span></span>', $image_caption_params );
 						// TODO: Alt text:
-						$Form->text( 'image_href', get_param( 'image_href' ), 40, T_('HRef') );
+						$Form->text( 'image_href', get_param( 'image_href' ), 40, TB_('HRef') );
 						// TODO: Size:
 						$image_class = get_param( 'image_class' );
-						$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$Form->text( 'image_class', $image_class, 40, TB_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
 							<button class="btn btn-default btn-xs">noborder</button>
 							<button class="btn btn-default btn-xs">rounded</button>
@@ -80,18 +80,18 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 					case 'thumbnail':
 						// TODO: Alt text:
-						$Form->text( 'thumbnail_href', get_param( 'thumbnail_href' ), 40, T_('HRef') );
+						$Form->text( 'thumbnail_href', get_param( 'thumbnail_href' ), 40, TB_('HRef') );
 						$Form->radio( 'thumbnail_size', get_param( 'thumbnail_size' ), array(
 								array( 'small', 'small' ),
 								array( 'medium', 'medium' ),
 								array( 'large', 'large' )
-							), T_( 'Size') );
+							), TB_( 'Size') );
 						$Form->radio( 'thumbnail_alignment', get_param( 'thumbnail_alignment' ), array(
 								array( 'left', 'left' ),
 								array( 'right', 'right' )
-							), T_( 'Alignment') );
+							), TB_( 'Alignment') );
 						$thumbnail_class = get_param( 'thumbnail_class' );
-						$Form->text( 'thumbnail_class', get_param( 'thumbnail_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$Form->text( 'thumbnail_class', get_param( 'thumbnail_class' ), 40, TB_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
 							<button class="btn btn-default btn-xs">noborder</button>
 							<button class="btn btn-default btn-xs">rounded</button>
@@ -100,7 +100,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 					case 'inline':
 						$inline_class = get_param( 'inline_class' );
-						$Form->text( 'inline_class', get_param( 'inline_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$Form->text( 'inline_class', get_param( 'inline_class' ), 40, TB_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 								<button class="btn btn-default btn-xs">border</button>
 								<button class="btn btn-default btn-xs">noborder</button>
 								<button class="btn btn-default btn-xs">rounded</button>

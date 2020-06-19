@@ -54,13 +54,13 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	init_results_js(); // Add functions to work with Results tables
 	init_affix_messages_js();
 
-	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
+	require_js_defer( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
 
 
 	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') )
 	{	// Activate bozo validator
-		require_js( 'bozo_validator.js' );
+		require_js_defer( 'bozo_validator.js' );
 	}
 
 	if( $UserSettings->get('focus_on_first_input') )

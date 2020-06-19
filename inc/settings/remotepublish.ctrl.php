@@ -14,8 +14,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 // Store/retrieve preferred tab from UserSettings:
 $UserSettings->param_Request( 'tab', 'pref_remotepublish_tab', 'string', 'eblog', true /* memorize */, true /* force */ );
@@ -35,7 +35,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'globalsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		switch( $tab )
 		{
@@ -128,7 +128,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'globalsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		load_funcs( 'cron/model/_post_by_mail.funcs.php');
 		load_class( 'items/model/_itemlist.class.php', 'ItemList' );

@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 $AdminUI->set_path( 'users', 'usersettings', 'display' );
 
@@ -26,7 +26,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'display' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// UPDATE display settings:
 		param( 'use_gravatar', 'integer', 0 );
@@ -38,7 +38,7 @@ switch ( $action )
 		param( 'bubbletip_size_front', 'string', '' );
 		param( 'bubbletip_anonymous', 'integer', 0 );
 		param( 'bubbletip_size_anonymous', 'string', '' );
-		param( 'bubbletip_overlay' );
+		param( 'bubbletip_overlay', 'text' );
 		param( 'allow_anonymous_user_list', 'integer', 0 );
 		param( 'allow_anonymous_user_profiles', 'integer', 0 );
 		param( 'user_url_loggedin', 'string', '' );
@@ -64,14 +64,14 @@ switch ( $action )
 		{ // Update the user groups levels only if at least one users page is available for anonymous users
 			param( 'allow_anonymous_user_level_min', 'integer', 0 );
 			param( 'allow_anonymous_user_level_max', 'integer', 0 );
-			param_check_interval( 'allow_anonymous_user_level_min', 'allow_anonymous_user_level_max', T_('User group level must be a number.'), T_('The minimum user group level must be lower than (or equal to) the maximum.') );
+			param_check_interval( 'allow_anonymous_user_level_min', 'allow_anonymous_user_level_max', TB_('User group level must be a number.'), TB_('The minimum user group level must be lower than (or equal to) the maximum.') );
 			if( ! param_has_error( 'allow_anonymous_user_level_min' ) && $allow_anonymous_user_level_min < 0 )
 			{ // Limit by min user group level
-				param_error( 'allow_anonymous_user_level_min', T_('Minimum user group level cannot be lower than 0.') );
+				param_error( 'allow_anonymous_user_level_min', TB_('Minimum user group level cannot be lower than 0.') );
 			}
 			if( ! param_has_error( 'allow_anonymous_user_level_max' ) && $allow_anonymous_user_level_max > 10 )
 			{ // Limit by max user group level
-				param_error( 'allow_anonymous_user_level_max', T_('Maximum user group level cannot be higher than 10.') );
+				param_error( 'allow_anonymous_user_level_max', TB_('Maximum user group level cannot be higher than 10.') );
 			}
 
 			$updated_settings[] = array( 'allow_anonymous_user_level_min', $allow_anonymous_user_level_min );
@@ -87,7 +87,7 @@ switch ( $action )
 				// invalidate all PageCaches
 				invalidate_pagecaches();
 
-				$Messages->add( T_('Display settings updated.'), 'success' );
+				$Messages->add( TB_('Display settings updated.'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=display', 303 ); // Will EXIT
 				// We have EXITed already at this point!!
@@ -99,9 +99,9 @@ switch ( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Display'), '?ctrl=display' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Display'), '?ctrl=display' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'user-settings-display-tab' );

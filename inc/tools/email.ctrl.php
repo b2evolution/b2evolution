@@ -13,16 +13,11 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var User
- */
-global $current_User;
-
 global $DB;
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'emails', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'emails', 'view', true );
 
 load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
 load_funcs('tools/model/_email.funcs.php');
@@ -43,7 +38,7 @@ if( $tab == 'addresses' )
 		{	// We could not find the goal to edit:
 			unset( $edited_EmailAddress );
 			forget_param( 'emadr_ID' );
-			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Address') ), 'error' );
+			$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Email Address') ), 'error' );
 		}
 	}
 }
@@ -56,7 +51,7 @@ elseif( $tab == 'sent' && empty( $tab3 ) )
 		{
 			unset( $edited_EmailLog );
 			forget_param( 'emlog_ID' );
-			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Log') ), 'error' );
+			$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Email Log') ), 'error' );
 		}
 	}
 }
@@ -68,7 +63,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		switch( $tab3 )
 		{
@@ -146,7 +141,7 @@ switch( $action )
 				param( 'repath_errtype', 'text', true );
 				if( strlen( $repath_errtype ) > 5000 )
 				{	// Crop the value by max available size
-					$Messages->add( T_('Maximum length of the field "Error message decoding configuration" is 5000 symbols, the big value will be cropped.'), 'note' );
+					$Messages->add( TB_('Maximum length of the field "Error message decoding configuration" is 5000 symbols, the big value will be cropped.'), 'note' );
 					$repath_errtype = substr( $repath_errtype, 0, 5000 );
 				}
 				$Settings->set( 'repath_errtype', $repath_errtype );
@@ -201,12 +196,12 @@ switch( $action )
 				// Save info about SMTP enabling/disabling
 				if( ! $old_smtp_enabled && $Settings->get( 'smtp_enabled' ) )
 				{ // Enabled
-					$syslog_message = T_( 'SMTP enabled.' );
+					$syslog_message = TB_( 'SMTP enabled.' );
 				}
 				elseif( $old_smtp_enabled && ! $Settings->get( 'smtp_enabled' ) )
 				{ // Disabled
-					$syslog_message = T_( 'SMTP disabled.' )
-						.( ! empty( $smtp_error ) && is_string( $smtp_error ) ? ' '.sprintf( T_( 'Reason: %s' ), $smtp_error ) : '' );
+					$syslog_message = TB_( 'SMTP disabled.' )
+						.( ! empty( $smtp_error ) && is_string( $smtp_error ) ? ' '.sprintf( TB_( 'Reason: %s' ), $smtp_error ) : '' );
 				}
 				break;
 
@@ -242,7 +237,7 @@ switch( $action )
 				{ // Log system info into DB
 					syslog_insert( $syslog_message, 'info', NULL );
 				}
-				$Messages->add( T_('Settings updated.'), 'success' );
+				$Messages->add( TB_('Settings updated.'), 'success' );
 
 				if( $tab3 == 'smtp' && $Settings->get( 'smtp_enabled' ) )
 				{ // Check if connection is available
@@ -253,11 +248,11 @@ switch( $action )
 					$test_mail_output = is_array( $test_mail_messages ) ? implode( "<br />\n", $test_mail_messages ) : '';
 					if( $smtp_connection_result )
 					{ // Success
-						$Messages->add( T_('The connection with this SMTP server has been tested successfully.'), 'success' );
+						$Messages->add( TB_('The connection with this SMTP server has been tested successfully.'), 'success' );
 					}
 					else
 					{ // Error
-						$Messages->add( T_('The connection with this SMTP server has failed.'), 'error' );
+						$Messages->add( TB_('The connection with this SMTP server has failed.'), 'error' );
 					}
 					// Don't redirect here in order to display a result($test_mail_output) of SMTP connection above settings form
 				}
@@ -279,7 +274,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		load_funcs( 'cron/model/_decode_returned_emails.funcs.php');
 		load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
@@ -315,7 +310,7 @@ switch( $action )
 					}
 					else
 					{
-						dre_msg( T_('There are no messages in the mailbox') );
+						dre_msg( TB_('There are no messages in the mailbox') );
 					}
 					imap_close( $mbox );
 				}
@@ -346,7 +341,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Test SMTP connection
 		$test_mail_messages = smtp_connection_test();
@@ -363,7 +358,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emailsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Test email sending:
 		if( $action == 'test_email_smtp' )
@@ -383,7 +378,7 @@ switch( $action )
 		// Form to create new Email Address:
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Init Email Address to show on the form
 		$edited_EmailAddress = new EmailAddress();
@@ -396,7 +391,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email_blocked' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$action = 'blocked_edit';
 		if( !isset( $edited_EmailAddress ) )
@@ -410,7 +405,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Save Email Address in DB:
 			$edited_EmailAddress->dbsave();
-			$Messages->add( T_('The email address was updated.'), 'success' );
+			$Messages->add( TB_('The email address was updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=email', 303 ); // Will EXIT
@@ -425,14 +420,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'email_blocked' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an emadr_ID:
 		param( 'emadr_ID', 'integer', true );
 
 		if( $edited_EmailAddress->dbdelete() )
 		{
-			$Messages->add( T_('The email address was deleted.'), 'success' );
+			$Messages->add( TB_('The email address was deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=email', 303 ); // Will EXIT
@@ -447,7 +442,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		// Make sure we got an emlog_ID:
 		param( 'emlog_ID', 'integer', 0, true );
@@ -461,14 +456,14 @@ switch( $action )
 			{ // We could not find the email log to delete:
 				unset( $edited_EmailLog );
 				forget_param( 'emlog_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Log') ), 'error' );
+				$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Email Log') ), 'error' );
 			}
 			else
 			{
 				// Delete from DB:
 				if( $edited_EmailLog->dbdelete() )
 				{
-					$Messages->add( sprintf( T_('Email log #%d has been deleted.'), $emlog_ID ), 'success' );
+					$Messages->add( sprintf( TB_('Email log #%d has been deleted.'), $emlog_ID ), 'success' );
 				}
 			}
 
@@ -485,7 +480,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'email' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		param( 'emret_ID', 'integer', 0 );
 		param( 'redirect_to', 'url', $admin_url.'?ctrl=email&tab=return' );
@@ -495,7 +490,7 @@ switch( $action )
 			WHERE emret_ID = '.$emret_ID );
 		if( $result )
 		{
-			$Messages->add( sprintf( T_('Returned email log #%d has been deleted.'), $emret_ID ), 'success' );
+			$Messages->add( sprintf( TB_('Returned email log #%d has been deleted.'), $emret_ID ), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -505,17 +500,17 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=campaigns' );
+$AdminUI->breadcrumbpath_add( TB_('Emails'), '?ctrl=campaigns' );
 
 switch( $tab )
 {
 	case 'sent':
-		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Sent'), '?ctrl=email&amp;tab='.$tab );
 
 		switch( $tab3 )
 		{
 			case 'stats':
-				$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=email&amp;tab=sent&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Stats'), '?ctrl=email&amp;tab=sent&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-statistics-summary' );
@@ -525,26 +520,26 @@ switch( $tab )
 				break;
 
 			case 'envelope':
-				$AdminUI->breadcrumbpath_add( T_('Envelope'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Envelope'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-notification-settings' );
 				break;
 
 			case 'smtp':
-				$AdminUI->breadcrumbpath_add( T_('SMTP gateway'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('SMTP gateway'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
 
 				if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'smtp_enabled' ) )
 				{	// Display this error when primary email service is SMTP but it is not enabled:
-					$Messages->add( T_('Your external SMTP Server is not enabled.'), 'error' );
+					$Messages->add( TB_('Your external SMTP Server is not enabled.'), 'error' );
 				}
 				break;
 
 			case 'throttling':
-				$AdminUI->breadcrumbpath_add( T_('Throttling'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Throttling'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-throttling-settings' );
@@ -552,9 +547,9 @@ switch( $tab )
 
 			case 'test':
 				// Check permission:
-				$current_User->check_perm( 'emails', 'edit', true );
+				check_user_perm( 'emails', 'edit', true );
 
-				$AdminUI->breadcrumbpath_add( T_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-test-smtp-settings' );
@@ -578,11 +573,11 @@ switch( $tab )
 		break;
 
 	case 'addresses':
-		$AdminUI->breadcrumbpath_add( T_('Addresses'), '?ctrl=email&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Addresses'), '?ctrl=email&amp;tab='.$tab );
 		if( !isset( $edited_EmailAddress ) )
 		{ // List page with email addresses
 			// Init js to edit status field
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
 
 		// Set an url for manual page:
@@ -590,7 +585,7 @@ switch( $tab )
 		break;
 
 	case 'return':
-		$AdminUI->breadcrumbpath_add( T_('Returned'), '?ctrl=email&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Returned'), '?ctrl=email&amp;tab='.$tab );
 		if( empty( $emret_ID ) )
 		{ // Initialize date picker on list page
 			init_datepicker_js();
@@ -604,14 +599,14 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'log':
-				$AdminUI->breadcrumbpath_add( T_('Return Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Return Log'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'email-returned' );
 				break;
 
 			case 'settings':
-				$AdminUI->breadcrumbpath_add( T_('POP/IMAP Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('POP/IMAP Settings'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				if( $Settings->get( 'repath_enabled' ) )
 				{ // If the decoding the returned emails is enabled
@@ -622,10 +617,10 @@ switch( $tab )
 					$repath_cron = $DB->get_var( $repath_cron_SQL->get() );
 					if( empty( $repath_cron ) )
 					{ // Display a warning if cron job "Process the return path inbox" doesn't exist:
-						$repath_warning = T_('There is no scheduled job configured to process your Return Path inbox.');
-						if( $current_User->check_perm( 'options', 'edit' ) )
+						$repath_warning = TB_('There is no scheduled job configured to process your Return Path inbox.');
+						if( check_user_perm( 'options', 'edit' ) )
 						{ // Suggest a link to create a job if current user has a permission:
-							$repath_warning .= ' '.sprintf( T_('<a %s>Click here</a> to create such a job.'), ' href="'.$admin_url.'?ctrl=crontab&amp;action=new&amp;cjob_type=process-return-path-inbox"' );
+							$repath_warning .= ' '.sprintf( TB_('<a %s>Click here</a> to create such a job.'), ' href="'.$admin_url.'?ctrl=crontab&amp;action=new&amp;cjob_type=process-return-path-inbox"' );
 						}
 						$Messages->add( $repath_warning, 'warning' );
 					}
@@ -637,9 +632,9 @@ switch( $tab )
 
 			case 'test':
 				// Check permission:
-				$current_User->check_perm( 'emails', 'edit', true );
+				check_user_perm( 'emails', 'edit', true );
 
-				$AdminUI->breadcrumbpath_add( T_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'test-saved-settings' );
@@ -702,7 +697,7 @@ switch( $tab )
 				if( ! empty( $edited_EmailLog ) && $action == 'delete' )
 				{
 					$edited_EmailLog->confirm_delete(
-						sprintf( T_('Delete email log #%d?'), $edited_EmailLog->ID ),
+						sprintf( TB_('Delete email log #%d?'), $edited_EmailLog->ID ),
 						'email', $action, get_memorized( 'action' ) );
 				}
 

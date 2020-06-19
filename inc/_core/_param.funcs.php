@@ -97,6 +97,21 @@ function param_format( $value, $type = 'raw' )
 
 		case 'float':
 		case 'double':
+			// Remove all thousand separators:
+			$value = str_replace( array( ' ', '\'' ), '', $value );
+			if( preg_match( '/([\.,])\d+$/', $value, $dec_point ) )
+			{	// If value contains decimal point:
+				if( substr_count( $value, $dec_point[1] ) > 1 )
+				{	// If decimal point is used more than 1 time then consider this as thousand separator and remove them all:
+					$value = str_replace( $dec_point[1], '', $value );
+				}
+				else
+				{	// Remove decimal points what used as thousand separators:
+					$value = str_replace( array( ',', '.' ), '', $value );
+					$dec_point_pos = strlen( $value ) - strlen( $dec_point[0] ) + 1;
+					$value = substr( $value, 0, $dec_point_pos ).'.'.substr( $value, $dec_point_pos );
+				}
+			}
 			return floatval( $value );
 
 		default:
@@ -148,7 +163,7 @@ function param_format( $value, $type = 'raw' )
  *              'allow_empty' will refuse illegal values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
-function param( $var, $type = 'raw', $default = '', $memorize = false,
+function param( $var, $type, $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
 	global $Debuglog, $debug, $evo_charset, $io_charset, $is_cli;
@@ -483,7 +498,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 							case 'float':
 							case 'double':
-								$regexp = '/^(\+|-)?[0-9]+(.[0-9]+)?$/';
+								$regexp = '/^(\+|-)?[0-9 \'.,]+([.,][0-9]+)?$/';
 								break;
 
 							default:
@@ -506,6 +521,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							}
 						}
 					}
+
+					// Format param:
+					$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 					// Change the variable type:
 					settype( $GLOBALS[$var], $type );
@@ -947,7 +965,7 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 			$params = $temp_params;
 		}
 
-		$error_message .= ' '.sprintf( T_('If you don’t know it or have forgotten your password, you can <a %s>reset it here</a>.'), 'href="'.$lostpassword_url.'"' );
+		$error_message .= ' '.sprintf( T_('If you don\'t know it or have forgotten your password, you can <a %s>reset it here</a>.'), 'href="'.$lostpassword_url.'"' );
 
 		param_error( $var, $error_message );
 
@@ -2355,7 +2373,6 @@ function param_check_gender( $var, $required = false )
 {
 	if( empty( $GLOBALS[$var] ) )
 	{	// empty is OK if not required:
-		global $current_User;
 		if( $required )
 		{
 			param_error( $var, T_( 'Please select a gender.' ) );
@@ -2821,7 +2838,7 @@ function param_check_serialized_array( $param_name )
 	}
 
 	// Search all string items in the serialized array:
-	preg_match_all( '/[{;]s:(\d+):"/', $param_value, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/[{;]s:(\d+):"/i', $param_value, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $m => $match )
 	{	// And replace its values with spaces in order to don't decide below the following string values as object structures:
 		//    a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}
@@ -2831,7 +2848,7 @@ function param_check_serialized_array( $param_name )
 	if(
 		// Allow to unserialize only arrays, main reason is an excluding of object structure like:
 		//     - O:7:"Results":1:{s:3:"sql";s:21:"SELECT * FROM T_users";}
-		( substr( $param_value, 0, 2 ) == 'a:' ) &&
+		( stripos( $param_value, 'a:' ) === 0 ) &&
 		// + Check there is no Object in the array (We NEVER want to unserialize an object):
 		//     a:1:{s:3:"key";O:8:"stdClass":1:{s:1:"x";i:1;}}
 		//     a:1:{i:123;O:8:"stdClass":1:{s:1:"x";i:1;}}
@@ -2839,7 +2856,7 @@ function param_check_serialized_array( $param_name )
 		//     a:1:{s:3:"key";a:1:{i:456;O:8:"stdClass":1:{s:1:"x";i:1;}}}
 		//   This checking exclude real string with object structure value like ';O:8:':
 		//     a:1:{s:3:"key";s:5:";O:8:";}
-		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/', $param_value ) )
+		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/i', $param_value ) )
 	)
 	{	// Correct data:
 		return true;

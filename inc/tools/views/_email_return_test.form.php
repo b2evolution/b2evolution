@@ -28,18 +28,18 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'test-saved-settings' ) );
+$Form->begin_fieldset( TB_('Test saved settings').get_manual_link( 'test-saved-settings' ) );
 
 	$url = '?ctrl=email&amp;tab=return&amp;tab3=test&amp;'.url_crumb('emailsettings').'&amp;action=';
-	$Form->info_field( T_('Perform tests'),
-				'<a href="'.$url.'test_1">['.T_('connect to server and list folders').']</a>&nbsp;&nbsp;'.
-				'<a href="'.$url.'test_2">['.T_('get one returned email').']</a>&nbsp;&nbsp;'.
-				'<a href="'.$url.'test_3">['.T_('Paste an error message/returned email').']</a>' );
+	$Form->info_field( TB_('Perform tests'),
+				'<a href="'.$url.'test_1">['.TB_('connect to server and list folders').']</a>&nbsp;&nbsp;'.
+				'<a href="'.$url.'test_2">['.TB_('get one returned email').']</a>&nbsp;&nbsp;'.
+				'<a href="'.$url.'test_3">['.TB_('Paste an error message/returned email').']</a>' );
 
 	if( $action == 'test_3' )
 	{ // Display a textarea to fill a sample error message
-		$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, T_('Test error message'), T_('Use this to paste an email returned with an error message to check if b2evolution can decode it.'), 50 );
-		$Form->buttons( array( array( 'submit', 'actionArray[test_3]', T_('Process the contents as if it were a returned email'), 'SaveButton' ) ) );
+		$Form->textarea( 'test_error_message', param( 'test_error_message', 'raw', '' ), 15, TB_('Test error message'), TB_('Use this to paste an email returned with an error message to check if b2evolution can decode it.'), 50 );
+		$Form->buttons( array( array( 'submit', 'actionArray[test_3]', TB_('Process the contents as if it were a returned email'), 'SaveButton' ) ) );
 	}
 
 	if( !empty( $repath_test_output ) )

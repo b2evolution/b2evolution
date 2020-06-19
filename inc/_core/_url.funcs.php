@@ -605,8 +605,10 @@ function url_same_protocol( $url, $other_url = NULL )
  * @param string existing url
  * @param string|array Params to add (string as-is) or array, which gets urlencoded.
  * @param string delimiter to use for more params
+ * @param boolean true by default for extra security checking
+ * @return string URL with added param
  */
-function url_add_param( $url, $param, $glue = '&amp;' )
+function url_add_param( $url, $param, $glue = '&amp;', $prevent_quotes = true )
 {
 	if( empty( $param ) )
 	{
@@ -632,6 +634,12 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 			$param_list[] = get_param_urlencoded( $k, $v, $glue );
 		}
 		$param = implode( $glue, $param_list );
+	}
+
+	if( $prevent_quotes &&
+	    ( strpos( $param, '"' ) !== false || strpos( $param, '\'' ) !== false ) )
+	{	// Don't allow chars " and ' in new set params:
+		debug_die( 'Invalid chars in params <b>'.format_to_output( $param, 'htmlbody' ).'</b> for <code>url_add_param()</code> !' );
 	}
 
 	if( strpos( $url, '?' ) !== false )
@@ -975,8 +983,7 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 
 	if( is_admin_page() || empty( $Blog ) )
 	{ // Backoffice part
-		global $current_User;
-		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) )
+		if( check_user_perm( 'admin', 'restricted' ) && check_user_status( 'can_access_admin' ) )
 		{ // User must has an access to backoffice
 			global $admin_url;
 			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
@@ -1084,6 +1091,65 @@ function url_check_same_domain( $main_url, $check_url )
 
 
 /**
+ * Check redirect URL if it is a part of redirect URLs in email log content
+ *
+ * Used to check redirect_to URLs from email message
+ *
+ * @param string Redirect URL
+ * @param string Email log content, NULL - if we need to get email log message from DB by email log ID and key
+ * @param string Email log ID
+ * @param string Email log key
+ * @return boolean TRUE if the requested URL can be used as redirect URL for the email log
+ */
+function check_redirect_url_by_email_log( $redirect_to, $email_log_message = NULL, $email_log_ID = NULL, $email_log_key = NULL )
+{
+	global $baseurl;
+
+	if( empty( $redirect_to ) )
+	{	// No URL to check:
+		return false;
+	}
+
+	if( stripos( $redirect_to, $baseurl ) === 0 )
+	{	// Allow redirect url if it is started with same domain as base url:
+		return true;
+	}
+
+	if( $email_log_message === NULL &&
+	    ! empty( $email_log_ID ) &&
+	    ! empty( $email_log_key ) )
+	{	// Try to get email log message from DB if it is not provided yet:
+		global $DB;
+		$SQL = new SQL( 'Get message of email log #'.$email_log_ID.' to check redirect url' );
+		$SQL->SELECT( 'emlog_message' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $email_log_ID ) );
+		$SQL->WHERE_and( 'emlog_key = '.$DB->quote( $email_log_key ) );
+		$email_log_message = $DB->get_var( $SQL );
+	}
+
+	if( empty( $email_log_message ) )
+	{	// Email log message is not provided and not found in DB:
+		return false;
+	}
+
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( $redirect_to ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// Additional check for case when URLs are encoded to html entities:
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( str_replace( '&', '&amp;', $redirect_to ) ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// The redirect URL is not allowed:
+	return false;
+}
+
+
+/**
  * Get current URL
  *
  * @param string Exclude params separated by comma
@@ -1158,5 +1224,46 @@ function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = a
 
 	// Append allowed params from current URL to the given URL:
 	return url_add_param( $url, $allowed_params, $glue );
+}
+
+
+/**
+ * Get URL with same domain as current URL
+ *
+ * @param string Original URL to check and use with current domain
+ * @return string Fixed URL with domain of current URL
+ */
+function get_same_domain_url( $url )
+{
+	global $ReqHost;
+
+	if( ! isset( $ReqHost ) || strpos( $url, $ReqHost ) === 0 )
+	{	// If domain of original URL is same as current URL domain:
+		return $url;
+	}
+	else
+	{	// Use current domain if domains are different, e.g. when collection URL uses subdomain or different absolute URL:
+		return preg_replace( '#^https?://[^/]+#i', $ReqHost, $url );
+	}
+}
+
+
+/**
+ * Get admin URL
+ *
+ * @param string URL params
+ * @param string Delimiter to use for more params
+ * @return string Admin URL
+ */
+function get_admin_url( $url_params = '', $glue = '&amp;' )
+{
+	global $admin_url, $current_admin_url;
+
+	if( ! isset( $current_admin_url ) )
+	{	// Initialize current admin URL once:
+		$current_admin_url = get_same_domain_url( $admin_url );
+	}
+
+	return url_add_param( $current_admin_url, $url_params, $glue );
 }
 ?>

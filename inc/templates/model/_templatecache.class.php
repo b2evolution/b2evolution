@@ -165,6 +165,45 @@ class TemplateCache extends DataObjectCache
 
 
 	/**
+	 * Get localized Template by given code
+	 *
+	 * @param string Code of Template
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
+	 * @param string Locale, NULL - for current locale
+	 * @return object|NULL|boolean Reference on cached Template, NULL - if request with empty code, FALSE - if requested Template does not exist
+	 */
+	function & get_localized_by_code( $code, $halt_on_error = true, $halt_on_empty = true, $locale = NULL )
+	{
+		if( ! ( $locale_Template = & $this->get_by_code( $code, $halt_on_error, $halt_on_empty ) ) )
+		{	// No template found by code:
+			$r = false;
+			return $r;
+		}
+
+		if( $locale === NULL )
+		{	// Use current locale:
+			global $current_locale;
+			$locale = $current_locale;
+		}
+
+		// Check if the template has a child matching the current locale:
+		$localized_templates = $locale_Template->get_localized_templates( $locale );
+		if( ! empty( $localized_templates ) )
+		{	// Use localized template:
+			$locale_Template = & $localized_templates[0];
+		}
+
+		if( $halt_on_error && ! $locale_Template )
+		{	// Halt if no template with locale:
+			debug_die( 'No Template found in '.$this->dbtablename.' for locale '.$locale.' by code '.$code.'!' );
+		}
+
+		return $locale_Template;
+	}
+
+
+	/**
 	 * Load templates for a given context
 	 * 
 	 * @param string Comma-separated list of contexts to load

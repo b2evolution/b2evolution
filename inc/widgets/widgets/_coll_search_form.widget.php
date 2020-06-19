@@ -85,7 +85,7 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 		// Get available templates:
 		$context = 'search_form';
 		$TemplateCache = & get_TemplateCache();
@@ -103,9 +103,9 @@ class coll_search_form_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $TemplateCache->get_code_option_array(),
 					'defaultvalue' => 'search_form_simple',
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 					'class' => 'evo_template_select',
 				),
@@ -191,6 +191,16 @@ class coll_search_form_Widget extends ComponentWidget
 			$widget_Blog = & $Blog;
 		}
 
+		if( ! $widget_Blog->get_setting( 'search_enable' ) )
+		{	// This page is disabled:
+			$coll_name = $widget_Blog->get( 'name' );
+			if( check_user_perm( 'blog_properties', 'edit', false, $widget_Blog->ID ) )
+			{	// Make collection name to edit properties:
+				$coll_name = '<a href="'.get_admin_url( 'ctrl=coll_settings&tab=search&blog='.$widget_Blog->ID ).'">'.$coll_name.'</a>';
+			}
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because a search form is disabled for Collection "'.$coll_name.'".' );
+			return false;
+		}
 
 		$TemplateCache = & get_TemplateCache();
 		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
@@ -248,77 +258,67 @@ class coll_search_form_Widget extends ComponentWidget
 						$selected_author[$key][$field] = $value;
 					}
 				}
-				?>
-				<script>
-				jQuery( document ).ready( function()
-				{
-					jQuery( '[data-search-id="<?php echo format_to_js( $this->widget_instance_ID );?>"] #search_author' ).tokenInput(
-						'<?php echo format_to_js( get_restapi_url().'users/authors' ); ?>',
+			
+				expose_var_to_js( 'evo_widget_coll_search_form', '{
+						selector: "[data-search-id] #search_author",
+						url: "'.format_to_js( get_restapi_url().'users/authors' ).'",
+						config:
 						{
-							theme: 'facebook',
-							queryParam: 'q',
-							propertyToSearch: 'login',
+							theme: "facebook",
+							queryParam: "q",
+							propertyToSearch: "login",
 							preventDuplicates: true,
-							prePopulate: <?php echo evo_json_encode( $selected_author ) ?>,
-							hintText: '<?php echo TS_('Type in a username') ?>',
-							noResultsText: '<?php echo TS_('No results') ?>',
-							searchingText: '<?php echo TS_('Searching...') ?>',
-							jsonContainer: 'users',
+							prePopulate: '.evo_json_encode( $selected_author ).',
+							hintText: "'.TS_('Type in a username').'",
+							noResultsText: "'.TS_('No results').'",
+							searchingText: "'.TS_('Searching...').'",
+							jsonContainer: "users",
 							tokenFormatter: function( user )
 							{
-								return '<li>' +
-										<?php echo $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login';?> +
-										'<input type="hidden" name="search_author_array[id][]" value="' + user.id + '" />' +
-										'<input type="hidden" name="search_author_array[login][]" value="' + user.login + '" />' +
-									'</li>';
+								return "<li>" +
+										'.( $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login' ).' +
+										\'<input type="hidden" name="search_author_array[id][]" value="\' + user.id + \'" />\' +
+										\'<input type="hidden" name="search_author_array[login][]" value="\' + user.login + \'" />\' +
+									"</li>";
 							},
 							resultsFormatter: function( user )
 							{
 								var title = user.login;
 								if( user.fullname != null && user.fullname !== undefined )
 								{
-									title += '<br />' + user.fullname;
+									title += "<br />" + user.fullname;
 								}
-								return '<li>' +
+								return "<li>" +
 										user.avatar +
-										'<div>' +
+										"<div>" +
 											title +
-										'</div><span></span>' +
-									'</li>';
+										"</div><span></span>" +
+									"</li>";
 							},
 							onAdd: function()
 							{
-								if( this.tokenInput( 'get' ).length > 0 )
+								if( this.tokenInput( "get" ).length > 0 )
 								{
-									jQuery( '#token-input-search_author' ).attr( 'placeholder', '' );
+									jQuery( "#token-input-search_author" ).attr( "placeholder", "" );
 								}
 							},
 							onDelete: function()
 							{
-								if( this.tokenInput( 'get' ).length === 0 )
+								if( this.tokenInput( "get" ).length === 0 )
 								{
-									jQuery( '#token-input-search_author' ).attr( 'placeholder', '<?php echo T_('Any author' ); ?>' ).css( 'width', '100%' );
+									jQuery( "#token-input-search_author" ).attr( "placeholder", "'.TS_('Any author' ).'" ).css( "width", "100%" );
 								}
-							},
-							<?php
-							if( param_has_error( 'search_author' ) )
-							{	// Mark this field as error
-							?>
-							onReady: function()
+							},'.
+							( param_has_error( 'search_author' ) ?
+							// Mark this field as error
+							'onReady: function()
 							{
-								jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
-							}
-							<?php } ?>
-						} );
-					<?php
-					if( empty( $selected_author ) )
-					{
-						echo 'jQuery( "#token-input-search_author" ).attr( "placeholder", "'.format_to_output( T_('Any author' ), 'htmlattr' ).'" ).css( "width", "100%" );';
-					}
-					?>
-				} );
-				</script>
-				<?php
+								jQuery( ".token-input-list-facebook" ).addClass( "token-input-list-error" );
+							}' : '' ).'
+						},'.
+					( empty( $selected_author ) ? '
+						placeholder: "'.TS_('Any author' ).'",' : '' ).'
+					}' );
 			}
 
 			echo $this->disp_params['block_body_end'];

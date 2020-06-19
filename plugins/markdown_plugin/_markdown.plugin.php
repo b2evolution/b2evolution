@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -336,6 +336,13 @@ class markdown_plugin extends Plugin
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+
 		if( ! empty( $params['Comment'] ) )
 		{ // Comment is set, get Blog from comment
 			$Comment = & $params['Comment'];
@@ -374,6 +381,13 @@ class markdown_plugin extends Plugin
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{ // Print toolbar on screen
@@ -391,6 +405,13 @@ class markdown_plugin extends Plugin
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+		
 		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{	// Print toolbar on screen:
@@ -445,305 +466,68 @@ class markdown_plugin extends Plugin
 		}
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
-		?><script>
-		//<![CDATA[
-		var <?php echo $params['js_prefix']; ?>markdown_btns = new Array();
-		var <?php echo $params['js_prefix']; ?>markdown_open_tags = new Array();
+		$js_config = array(
+				'js_prefix' => $params['js_prefix'],
+				'enable_text_styles' => (int) $text_styles_enabled,
+				'enable_links'       => (int) $links_enabled,
+				'enable_images'      => (int) $images_enabled,
 
-		function markdown_btn( id, text, title, tag_start, tag_end, style, open, grp_pos )
+				'btn_title_bold'   => T_('Bold'),
+				'btn_title_italic' => T_('Italic'),
+				'btn_title_link'   => T_('Link'),
+				'btn_title_image'  => T_('Image'),
+				'btn_title_h1'     => T_('Header 1'),
+				'btn_title_h2'     => T_('Header 2'),
+				'btn_title_h3'     => T_('Header 3'),
+				'btn_title_h4'     => T_('Header 4'),
+				'btn_title_h5'     => T_('Header 5'),
+				'btn_title_h6'     => T_('Header 6'),
+				'btn_title_li'     => T_('Unordered list item'),
+				'btn_title_ol'     => T_('Ordered list item'),
+				'btn_title_blockquote' => T_('Blockquote'),
+				'btn_title_codespan'   => T_('Codespan'),
+				'btn_title_preblock'   => T_('Preformatted code block'),
+				'btn_title_codeblock'  => T_('Highlighted code block'),
+				'btn_title_hr' => T_('Horizontal Rule'),
+				'btn_title_br' => T_('Line Break'),
+				'btn_title_close_all_tags' => T_('Close all tags'),
+
+				'toolbar_before'       => $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) ),
+				'toolbar_after'        => $this->get_template( 'toolbar_after' ),
+				'toolbar_button_class' => $this->get_template( 'toolbar_button_class' ),
+				'toolbar_title_before' => $this->get_template( 'toolbar_title_before' ),
+				'toolbar_title_after'  => $this->get_template( 'toolbar_title_after' ),
+				'toolbar_group_before' => $this->get_template( 'toolbar_group_before' ),
+				'toolbar_group_after'  => $this->get_template( 'toolbar_group_after' ),
+				'toolbar_title'        => T_('Markdown'),
+
+				'prompt_url' => T_('URL'),
+				'prompt_text' => T_('Text'),
+				'prompt_title' => T_('Title'),
+
+				'plugin_code' => $this->code,
+
+			);
+
+		if( is_ajax_request() )
 		{
-			this.id = id;               // used to name the toolbar button
-			this.text = text;           // label on button
-			this.title = title;         // title
-			this.tag_start = tag_start; // open tag
-			this.tag_end = tag_end;     // close tag
-			this.style = style;         // style on button
-			this.open = open;           // set to -1 if tag does not need to be closed
-			this.grp_pos = grp_pos;     // position in the group, e.g. 'last'
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_markdown_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
 		}
-
-<?php
-	if( $text_styles_enabled )
-	{ // Show thess buttons only when plugin setting "Italic & Bold styles" is enabled ?>
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_bold','bold', '<?php echo TS_('Bold') ?>',
-				'**','**',
-				'font-weight:bold'
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_italic','italic', '<?php echo TS_('Italic') ?>',
-				'*','*',
-				'font-style:italic', -1, 'last'
-			);
-<?php
-	}
-
-	if( $links_enabled )
-	{ // Show this button only when plugin setting "Links" is enabled ?>
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_link', 'link','<?php echo TS_('Link') ?>',
-				'','',
-				'text-decoration:underline', -1<?php echo ! $images_enabled ? ', \'last\'' : '' ?>
-			);
-<?php
-	}
-
-	if( $images_enabled )
-	{ // Show this button only when plugin setting "Images" is enabled ?>
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_img', 'img','<?php echo TS_('Image') ?>',
-				'','',
-				'', -1, 'last'
-			);
-<?php
-	} ?>
-
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H1', '<?php echo TS_('Header 1') ?>',
-				'\n# ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H2', '<?php echo TS_('Header 2') ?>',
-				'\n## ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H3', '<?php echo TS_('Header 3') ?>',
-				'\n### ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H4', '<?php echo TS_('Header 4') ?>',
-				'\n#### ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H5', '<?php echo TS_('Header 5') ?>',
-				'\n##### ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_h1','H6', '<?php echo TS_('Header 6') ?>',
-				'\n###### ','',
-				'', -1, 'last'
-			);
-
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_li','li', '<?php echo TS_('Unordered list item') ?>',
-				'\n* ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_ol','ol', '<?php echo TS_('Ordered list item') ?>',
-				'\n1. ','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_li','blockquote', '<?php echo TS_('Blockquote') ?>',
-				'\n> ','',
-				'', -1, 'last'
-			);
-
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_codespan','codespan', '<?php echo TS_('Codespan') ?>',
-				'`','`',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_preblock','preblock', '<?php echo TS_('Preformatted code block') ?>',
-				'\n\t','',
-				'', -1, 'last'
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_codeblock','codeblock', '<?php echo TS_('Highlighted code block') ?>',
-				'\n```\n','\n```\n',
-				'', -1, 'last'
-			);
-
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_hr','hr', '<?php echo TS_('Horizontal Rule') ?>',
-				'\n---\n','',
-				'', -1
-			);
-		<?php echo $params['js_prefix']; ?>markdown_btns[<?php echo $params['js_prefix']; ?>markdown_btns.length] = new markdown_btn(
-				'<?php echo $params['js_prefix']; ?>mrkdwn_br','<br>', '<?php echo TS_('Line Break') ?>',
-				'  \n','',
-				'', -1
-			);
-
-		function <?php echo $params['js_prefix']; ?>markdown_get_btn( button, i )
+		else
 		{
-			var r = '';
-			if( button.id == '<?php echo $params['js_prefix']; ?>mrkdwn_img' )
-			{ // Image
-				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_insert_lnkimg|<?php echo $params['js_prefix']; ?>b2evoCanvas|img" value="' + button.text + '" />';
-			}
-			else if( button.id == '<?php echo $params['js_prefix']; ?>mrkdwn_link' )
-			{ // Link
-				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_insert_lnkimg|<?php echo $params['js_prefix']; ?>b2evoCanvas" value="' + button.text + '" />';
-			}
-			else
-			{ // Normal buttons:
-				r += '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.title
-					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_insert_tag|<?php echo $params['js_prefix']; ?>b2evoCanvas|'+i+'" value="' + button.text + '" />';
-			}
-
-			return r;
+			expose_var_to_js( 'mardown_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_markdown_toolbar_config' );
 		}
-
-		// Memorize a new open tag
-		function <?php echo $params['js_prefix']; ?>markdown_add_tag( button )
-		{
-			if( <?php echo $params['js_prefix']; ?>markdown_btns[button].tag_end != '' )
-			{
-				<?php echo $params['js_prefix']; ?>markdown_open_tags[<?php echo $params['js_prefix']; ?>markdown_open_tags.length] = button;
-				document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value = '/' + document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value;
-			}
-		}
-
-		// Forget about an open tag
-		function <?php echo $params['js_prefix']; ?>markdown_remove_tag( button )
-		{
-			for( i = 0; i < <?php echo $params['js_prefix']; ?>markdown_open_tags.length; i++ )
-			{
-				if( <?php echo $params['js_prefix']; ?>markdown_open_tags[i] == button )
-				{
-					<?php echo $params['js_prefix']; ?>markdown_open_tags.splice( i, 1 );
-					document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value = document.getElementById( <?php echo $params['js_prefix']; ?>markdown_btns[button].id ).value.replace( '/', '' );
-				}
-			}
-		}
-
-		function <?php echo $params['js_prefix']; ?>markdown_check_open_tags( button )
-		{
-			var tag = 0;
-			for( i = 0; i < <?php echo $params['js_prefix']; ?>markdown_open_tags.length; i++ )
-			{
-				if( <?php echo $params['js_prefix']; ?>markdown_open_tags[i] == button )
-				{
-					tag++;
-				}
-			}
-
-			if( tag > 0 )
-			{
-				return true; // tag found
-			}
-			else
-			{
-				return false; // tag not found
-			}
-		}
-
-		function <?php echo $params['js_prefix']; ?>markdown_close_all_tags()
-		{
-			var count = <?php echo $params['js_prefix']; ?>markdown_open_tags.length;
-			for( o = 0; o < count; o++ )
-			{
-				<?php echo $params['js_prefix']; ?>markdown_insert_tag( <?php echo $params['js_prefix']; ?>b2evoCanvas, <?php echo $params['js_prefix']; ?>markdown_open_tags[<?php echo $params['js_prefix']; ?>markdown_open_tags.length - 1] );
-			}
-		}
-
-		function <?php echo $params['js_prefix']; ?>markdown_toolbar( title )
-		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
-			for( var i = 0; i < <?php echo $params['js_prefix']; ?>markdown_btns.length; i++ )
-			{
-				r += <?php echo $params['js_prefix']; ?>markdown_get_btn( <?php echo $params['js_prefix']; ?>markdown_btns[i], i );
-				if( <?php echo $params['js_prefix']; ?>markdown_btns[i].grp_pos == 'last' && i > 0 && i < <?php echo $params['js_prefix']; ?>markdown_btns.length - 1 )
-				{ // Separator between groups
-					r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
-				}
-			}
-			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>'
-				+ '<input type="button" id="<?php echo $params['js_prefix']; ?>mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-
-			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
-		}
-
-		function <?php echo $params['js_prefix']; ?>markdown_insert_tag( field, i )
-		{
-			// we need to know if something is selected.
-			// First, ask plugins, then try IE and Mozilla.
-			var sel_text = b2evo_Callbacks.trigger_callback( "get_selected_text_for_" + field.id );
-			var focus_when_finished = false; // used for IE
-
-			if( sel_text == null )
-			{ // detect selection:
-				//IE support
-				if( document.selection )
-				{
-					field.focus();
-					var sel = document.selection.createRange();
-					sel_text = sel.text;
-					focus_when_finished = true;
-				}
-				//MOZILLA/NETSCAPE support
-				else if( field.selectionStart || field.selectionStart == '0' )
-				{
-					var startPos = field.selectionStart;
-					var endPos = field.selectionEnd;
-					sel_text = ( startPos != endPos );
-				}
-			}
-
-			if( sel_text )
-			{ // some text selected
-				textarea_wrap_selection( field, <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_start, <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_end, 0 );
-			}
-			else
-			{
-				if( !<?php echo $params['js_prefix']; ?>markdown_check_open_tags(i) || <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_end == '' )
-				{
-					textarea_wrap_selection( field, <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_start, '', 0 );
-					<?php echo $params['js_prefix']; ?>markdown_add_tag(i);
-				}
-				else
-				{
-					textarea_wrap_selection( field, '', <?php echo $params['js_prefix']; ?>markdown_btns[i].tag_end, 0 );
-					<?php echo $params['js_prefix']; ?>markdown_remove_tag(i);
-				}
-			}
-			if( focus_when_finished )
-			{
-				field.focus();
-			}
-		}
-
-
-		function <?php echo $params['js_prefix']; ?>markdown_insert_lnkimg( field, type )
-		{
-			var url = prompt( '<?php echo TS_('URL') ?>:', 'http://' );
-			if( url )
-			{
-				url = '[' + prompt('<?php echo TS_('Text') ?>:', '') + ']'
-					+ '(' + url;
-				var title = prompt( '<?php echo TS_('Title') ?>:', '' );
-				if( title != '' )
-				{
-					url += ' "' + title + '"';
-				}
-				url += ')';
-				if( typeof( type ) != 'undefined' && type == 'img' )
-				{ // for <img> tag
-					url = '!' + url;
-				}
-				textarea_wrap_selection( field, url, '', 1 );
-			}
-		}
-		//]]>
-		</script><?php
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script><?php echo $params['js_prefix']; ?>markdown_toolbar( '<?php echo TS_('Markdown').': '; ?>' );</script><?php
 
 		return true;
 	}

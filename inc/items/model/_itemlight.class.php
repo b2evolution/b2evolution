@@ -121,6 +121,15 @@ class ItemLight extends DataObject
 	var $tags = NULL;
 
 	/**
+	 * Array of checklist lines
+	 * 
+	 * Lazy loaded.
+	 * @see ItemLight::get_checklist_lines()
+	 * @var array
+	 */
+	var $checklist_lines = NULL;
+
+	/**
 	 * Array of dbchanges flag to be able to check modifications, and execute update queries only when required
 	 * Note: Only those updates needs to be tracked in this var which are saved in a relational table ( e.g. tags, extracats )
 	 * @access protected
@@ -146,7 +155,7 @@ class ItemLight extends DataObject
 	               $datecreated_field = '', $datemodified_field = 'datemodified',
 	               $creator_field = '', $lasteditor_field = '' )
 	{
-		global $localtimenow, $default_locale, $current_User;
+		global $localtimenow, $default_locale;
 
 		// Call parent constructor:
 		parent::__construct( $dbtable, $dbprefix, $dbIDname, $datecreated_field, $datemodified_field,
@@ -214,6 +223,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
 				array( 'table'=>'T_items__user_data', 'fk'=>'itud_item_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
+				array( 'table'=>'T_items__checklist_lines', 'fk'=>'check_item_ID', 'msg'=>T_('%d checklist items') ),
 			);
 	}
 
@@ -529,6 +539,16 @@ class ItemLight extends DataObject
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
 				return $this->Blog->gen_blogurl();
 
+			case 'tag':
+				// Link to permanent url of first tag:
+				$item_tags = $this->get_tags();
+				if( ! empty( $item_tags ) )
+				{	// If Item has at least one tag:
+					$item_Blog = & $this->get_Blog();
+					return $item_Blog->gen_tag_url( array_shift( $item_tags ), 1, $glue );
+				}
+				// else fallback to category permanent url:
+
 			case 'cat':
 				// Link to permanent url of main chapter:
 				$this->get_main_Chapter();
@@ -544,7 +564,7 @@ class ItemLight extends DataObject
 	/**
 	 * Get permalink type
 	 *
-	 * @return string Permalink type: front, none, cat, single, archive, subchap
+	 * @return string Permalink type: front, none, cat, tag, single, archive, subchap
 	 */
 	function get_permalink_type( $default_permalink_type = '' )
 	{
@@ -578,9 +598,13 @@ class ItemLight extends DataObject
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
-			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) ) )
+			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-sub', 'intro-all' ) ) )
 			{	// This post has a permanent URL as url to main chapter:
 				$permalink_type = 'cat';
+			}
+			elseif( $item_type_usage == 'intro-tag' )
+			{	// This post has a permanent URL as url to tag page:
+				$permalink_type = 'tag';
 			}
 			else
 			{	// Allowed to have a permalink:
@@ -932,8 +956,8 @@ class ItemLight extends DataObject
 				}
 				else
 				{	// Main chapter is defined, we can show the page
-					global $Messages, $current_User;
-					if( is_logged_in() && $current_User->check_perm( 'blogs', 'editall' ) )
+					global $Messages;
+					if( check_user_perm( 'blogs', 'editall' ) )
 					{ // User has permission to all blogs posts and comments, display a message as note in order to allow update it
 						$message_type = 'note';
 					}
@@ -1555,7 +1579,7 @@ class ItemLight extends DataObject
 			{	// This is an intro, do not link title by default:
 				$params['link_type'] = 'none';
 			}
-			elseif( is_same_url( $this->get_permanent_url( '', $blogurl, '&' ), $ReqURL ) )
+			elseif( is_single_page() )
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
@@ -1592,7 +1616,8 @@ class ItemLight extends DataObject
 
 			case 'admin_view':
 				// View in admin
-				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+				global $admin_url;
+				$url = $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
 				break;
 
 			case 'edit_view_url':
@@ -1883,6 +1908,30 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Get array of checklist lines.
+	 *
+	 * @return array
+	 */
+	function get_checklist_lines()
+	{
+		global $DB;
+
+		if( ! isset( $this->checklist_lines ) )
+		{
+			// Build query to get the checklist lines:
+			$checklist_SQL = new SQL( 'Get checklist lines for Item #'.$this->ID );
+			$checklist_SQL->SELECT( 'check_ID, check_item_ID, check_checked, check_label, check_order' );
+			$checklist_SQL->FROM( 'T_items__checklist_lines' );
+			$checklist_SQL->WHERE( 'check_item_ID = '.$DB->quote( $this->ID ) );
+			$checklist_SQL->ORDER_BY( 'check_order ASC, check_ID ASC' );
+			$this->checklist_lines = $DB->get_results( $checklist_SQL );
+		}
+
+		return $this->checklist_lines;
+	}
+
+
+	/**
 	 * Get a list of item IDs from $MainList and $ItemList, if they are loaded.
 	 * This is used for prefetching item related data for the whole list(s).
 	 * This will at least return the item's ID itself.
@@ -1920,9 +1969,10 @@ class ItemLight extends DataObject
 				'after'     => '',
 				'link_text' => '$icon$', // Use a mask $icon$ or some other text
 				'class'     => '',
+				'check_perm' => true, // FALSE - if this link must be displayed even if current has no permission to view item history page
 			), $params );
 
-		if( ( $history_url = $this->get_history_url() ) === false )
+		if( ( $history_url = $this->get_history_url( '&amp;', $params['check_perm'] ) ) === false )
 		{ // No url available for current user, Don't display a link
 			return;
 		}
@@ -1942,11 +1992,11 @@ class ItemLight extends DataObject
 	 * @param string Glue between url params
 	 * @return string|boolean URL to history OR False when user cannot see a history
 	 */
-	function get_history_url( $glue = '&amp;' )
+	function get_history_url( $glue = '&amp;', $check_perm = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( $check_perm && ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{ // Current user cannot see a history
 			return false;
 		}

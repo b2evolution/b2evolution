@@ -42,8 +42,8 @@ $Form->begin_form( 'evo_comment' );
 	$Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->hidden( 'redirect_to', $edited_Comment->get_permanent_url() );
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) &&
-	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'admin', 'restricted' ) &&
+	    check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->hidden( 'comment_issue_date', mysql2localedate( $edited_Comment->get( 'date' ) ) );
 		$Form->hidden( 'comment_issue_time', substr( $edited_Comment->get( 'date' ), 11 ) );

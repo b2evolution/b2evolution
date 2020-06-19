@@ -391,76 +391,80 @@ if( $disp == 'front' )
 }
 ?>
 
-<footer class="row">
+<footer class="container-fluid">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12">
+	<div class="row">
+   
+		<div class="col-md-12">
+
+				<?php
+				// Display container and contents:
+				widget_container( 'footer', array(
+						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
+					) );
+				?>
+
+			<p class="center">
+				<?php
+					// Display footer text (text can be edited in Blog Settings):
+					$Blog->footer_text( array(
+							'before' => '',
+							'after'  => ' &bull; ',
+						) );
+
+				// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+				?>
+
+				<?php
+					// Display a link to contact the owner of this blog (if owner accepts messages):
+					$Blog->contact_link( array(
+							'before' => '',
+							'after'  => ' &bull; ',
+							'text'   => T_('Contact'),
+							'title'  => T_('Send a message to the owner of this blog...'),
+						) );
+					// Display a link to help page:
+					$Blog->help_link( array(
+							'before'      => ' ',
+							'after'       => ' ',
+							'text'        => T_('Help'),
+						) );
+				?>
+
+				<?php
+					// Display additional credits:
+					// If you can add your own credits without removing the defaults, you'll be very cool :))
+					// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+					credits( array(
+							'list_start'  => '&bull;',
+							'list_end'    => ' ',
+							'separator'   => '&bull;',
+							'item_start'  => ' ',
+							'item_end'    => ' ',
+						) );
+				?>
+			</p>
 
 			<?php
-			// Display container and contents:
-			widget_container( 'footer', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
-					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
-					'container_end'   => '</div>',
-					'block_start'     => '<div class="evo_widget $wi_class$">',
-					'block_end'       => '</div>',
-				) );
-			?>
-
-		<p class="center">
-			<?php
-				// Display footer text (text can be edited in Blog Settings):
-				$Blog->footer_text( array(
-						'before' => '',
-						'after'  => ' &bull; ',
-					) );
-
-			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
-			?>
-
-			<?php
-				// Display a link to contact the owner of this blog (if owner accepts messages):
-				$Blog->contact_link( array(
-						'before' => '',
-						'after'  => ' &bull; ',
-						'text'   => T_('Contact'),
-						'title'  => T_('Send a message to the owner of this blog...'),
-					) );
-				// Display a link to help page:
-				$Blog->help_link( array(
-						'before'      => ' ',
-						'after'       => ' ',
-						'text'        => T_('Help'),
+				// Please help us promote b2evolution and leave this logo on your blog:
+				powered_by( array(
+						'block_start' => '<div class="powered_by">',
+						'block_end'   => '</div>',
+						// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+						'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+						'img_width'   => 120,
+						'img_height'  => 32,
 					) );
 			?>
-
-			<?php
-				// Display additional credits:
-				// If you can add your own credits without removing the defaults, you'll be very cool :))
-				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-				credits( array(
-						'list_start'  => '&bull;',
-						'list_end'    => ' ',
-						'separator'   => '&bull;',
-						'item_start'  => ' ',
-						'item_end'    => ' ',
-					) );
-			?>
-		</p>
-
-		<?php
-			// Please help us promote b2evolution and leave this logo on your blog:
-			powered_by( array(
-					'block_start' => '<div class="powered_by">',
-					'block_end'   => '</div>',
-					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-					'img_width'   => 120,
-					'img_height'  => 32,
-				) );
-		?>
-	</div><!-- .col -->
+		</div><!-- .col -->
+		
+	</div>
 
 </footer><!-- .row -->
 
@@ -480,122 +484,8 @@ skin_include( '_html_footer.inc.php' );
 // ------------------------------- END OF FOOTER --------------------------------
 
 if( $Skin->is_visible_sidebar( true, 'single' ) && $Skin->get_setting( 'sidebar_single_affix' ) )
-{	// Sidebar enabled, add script that will affix the sidebar:
-	$sidebar_offset = $Skin->get_setting( 'message_affix_offset' ) == '' ? 20 : $Skin->get_setting( 'message_affix_offset' );
-	?>
-	<script>
-		jQuery( document ).ready( function()
-		{
-			var affix_obj = jQuery( ".evo_container", ".evo_sidebar_col" ),
-			    evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
-
-			if( !affix_obj.length )
-			{	// Nothing to affix:
-				return;
-			}
-
-			var affix_obj_top = affix_obj.offset().top;
-
-			// Wrap sidebar containers:
-			affix_obj.wrapAll( '<div class="sidebar_wrapper"></div>' );
-			var wrapper = affix_obj.parent(),
-			    wrapper_width = wrapper.outerWidth();
-
-			wrapper.affix( {
-				offset: {
-					top: function() {
-						return affix_obj_top - get_affix_offset() - parseInt( wrapper.css( "margin-top" ) );
-					}
-				}
-			} );
-
-			// This is needed when we refresh the page that was already scrolled and the sidebar is already affixed.
-			// The affix.bs.affix event does not get trigger in this case!
-			if( wrapper.hasClass( 'affix' ) && ! wrapper.attr( 'style' ) && ! jQuery( 'div.sidebar_placeholder' ).length )
-			{
-				affix_sidebar();
-				check_sidebar_overflow();
-			}
-
-			wrapper.on( "affix.bs.affix", function() {
-				affix_sidebar();
-				check_sidebar_overflow();
-			} );
-
-			wrapper.on( "affixed-top.bs.affix", function() {
-				// Remove the placeholder:
-				if( jQuery( 'div.sidebar_placeholder' ).length )
-				{
-					wrapper.unwrap();
-				}
-
-				// Reset wrapper style:
-				wrapper.css( { "width": "", "top": "", "z-index": "" } );
-			} );
-
-			function get_affix_offset()
-			{
-				var affix_offset = evo_toolbar_height + <?php echo $sidebar_offset;?>,
-					  sitewide_header_affix_offset = 0;
-
-				// This is specific to b2evolution.net forum site.
-				// Sites with a custom sitewide header that contains fixed elements should declare the JS function below
-				// or compensate with the "Messages affix offset" skin setting:
-				if( window.get_sitewide_header_affix_offset && typeof window.get_sitewide_header_affix_offset === 'function' )
-				{
-					sitewide_header_affix_offset = window.get_sitewide_header_affix_offset();
-				}
-
-				return affix_offset + sitewide_header_affix_offset;
-			}
-
-			function affix_sidebar()
-			{
-				// Create a placeholder for the affix obj berfore we fix it into position:
-				wrapper.wrap( '<div class="sidebar_placeholder"></div>' );
-				var placeholder = wrapper.parent();
-				placeholder.css( 'width', '100%' );
-
-				// Fix wrapper into position:
-				wrapper.css( { "width": wrapper_width, "top": get_affix_offset(), "z-index": 1050 } );
-			}
-
-			function check_sidebar_overflow()
-			{
-				var content_col = jQuery( '.evo_content_col' ),
-				    exceed_viewport = window.innerHeight < ( wrapper.height() + get_affix_offset() ),
-				    exceed_content = wrapper.height() > content_col.height();
-
-				if( exceed_viewport || exceed_content )
-				{
-					wrapper.addClass( 'affix-forced-top' );
-				}
-				else
-				{
-					wrapper.removeClass( 'affix-forced-top' );
-				}
-			}
-
-			jQuery( window ).on( "resize", function()
-				{
-					var placeholder = jQuery( '.sidebar_placeholder' );
-
-					if( placeholder.length )
-					{	// Adapt same width as placeholder:
-						wrapper.css( { 'width': placeholder.outerWidth() } );
-						wrapper_width = placeholder.outerWidth();
-					}
-					else
-					{
-						// Reset wrapper style:
-						wrapper.css( { "width": "", "top": "", "z-index": "" } );
-					}
-					affix_sidebar();
-					check_sidebar_overflow();
-				} );
-
-		} );
-	</script>
-	<?php
+{
+	// Init JS to scroll down to content:
+	$Skin->require_js_defer( 'affix_sidebar.js', true );
 }
 ?>

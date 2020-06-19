@@ -21,7 +21,7 @@ class bootstrap_blocks_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -504,14 +504,10 @@ class bootstrap_blocks_blog_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
@@ -526,7 +522,7 @@ class bootstrap_blocks_blog_Skin extends Skin
 */
 		// Default font - Family:
 		$this->dynamic_style_rule( 'font_family', '#skin_wrapper { font-family: $setting_value$ }', array(
-			'options' => $this->get_font_definitions()
+			'options' => $this->get_font_definitions( 'style' )
 		) );
 		// Default font - Size:
 		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(

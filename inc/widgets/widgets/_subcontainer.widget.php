@@ -247,6 +247,31 @@ class subcontainer_Widget extends ComponentWidget
 
 		return true;
 	}
+
+
+	/**
+	 * Get Sub-Container
+	 *
+	 * @return object|false
+	 */
+	function & get_sub_WidgetContainer()
+	{
+		// Get container type "coll"/"shared" and real container code from stored value:
+		$code_data = explode( ':', $this->get_param( 'container' ), 2 );
+		if( count( $code_data ) != 2 || ! in_array( $code_data[0], array( 'coll', 'shared' ) ) )
+		{	// Invalid container code:
+			$r = false;
+			return $r;
+		}
+
+		$subcontainer_coll_ID = ( $code_data[0] == 'coll' ? $this->get_coll_ID() : NULL );
+		$subcontainer_code = $code_data[1];
+
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $subcontainer_coll_ID, $this->get_container_param( 'skin_type' ), $subcontainer_code );
+
+		return $WidgetContainer;
+	}
 }
 
 ?>

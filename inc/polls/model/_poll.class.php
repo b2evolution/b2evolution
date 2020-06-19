@@ -94,7 +94,7 @@ class Poll extends DataObject
 		global $current_User;
 
 		// Owner:
-		if( $current_User->check_perm( 'polls', 'edit' ) )
+		if( check_user_perm( 'polls', 'edit' ) )
 		{	// Update the owner if current user has a permission to edit all polls:
 			$pqst_owner_login = param( 'pqst_owner_login', 'string', NULL );
 			param_check_not_empty( 'pqst_owner_login', T_('Please enter the owner\'s login.') );

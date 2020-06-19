@@ -625,6 +625,15 @@ $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change thi
 
 
 /**
+ * Change to true if you want to be able to install arbitrary ZIP files on the server.
+ * ATTENTION: this poses a security risk if the admin password is compromised.
+ *
+ * @global boolean $auto_upgrade_from_any_url
+ */
+$auto_upgrade_from_any_url = false;
+
+
+/**
  * Location of the logs folder.
  *
  * Note: This folder does SHOULD NOT be accessible through HTTP.
@@ -824,6 +833,7 @@ $noredir_params = array(
 	'page',          // For showing a different page in a multipage post
 	'quote_post',    // For quoting a post in the forums
 	'quote_comment', // For quoting a comment in the forums
+	'get_redirected_debuginfo_from_sess_ID', // For display debug info of redirected page from different domain
 );
 
 
@@ -942,6 +952,28 @@ $library_local_urls = array(
 		'#hotkeys#' => array( 'hotkeys/hotkeys.min.js' ),
 	);
 
+/**
+ * JS/CSS files which contain other JS/CSS files in order to don't required them twice when main file is required on current page
+ *
+ * Key - Alias or relative path of main JS/CSS file, Value - array of bundled files inside the main JS/CSS file
+ */
+$bundled_files = array(
+	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
+		'#jquery#',
+		'#jquery_migrate#',
+		'#bootstrap#',
+	),
+	'bootstrap-b2evo_base-superbundle.bundle.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bundle.css',
+	),
+	'bootstrap-b2evo_base-superbundle.bmin.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bmin.css',
+	),
+);
 
 /**
  * Allow to send outbound pings on localhost
@@ -980,6 +1012,40 @@ $max_skin_api_version = 7;
  * Used to enable using of evo helpdesk widget from other sites
  */
 $access_control_allow_origin = false; // set to '*' or to specific URL to enable CORS requests
+
+
+/**
+ * Allow to use a "defer" way for loading of JavaScript files
+ * 
+ * TODO: Implement new value 'front' in order to allow this only on front-office
+ */
+$use_defer = true;
+
+$use_defer_for_backoffice = false;
+$use_defer_for_loggedin_users = true;
+$use_defer_for_anonymous_users = true;
+
+$use_defer_for_default_register_form = true;
+
+$use_defer_for_anonymous_disp_register = true;
+$use_defer_for_anonymous_disp_register_finish = true;
+$use_defer_for_anonymous_disp_users = true;
+$use_defer_for_anonymous_disp_anonpost = true;
+
+$use_defer_for_loggedin_disp_single_page = true;
+$use_defer_for_loggedin_disp_front = true;
+$use_defer_for_loggedin_disp_messages = true;
+$use_defer_for_loggedin_disp_threads = true;
+$use_defer_for_loggedin_disp_profile = true;
+$use_defer_for_loggedin_disp_pwdchange = true;
+$use_defer_for_loggedin_disp_edit = true;
+$use_defer_for_loggedin_disp_proposechange = true;
+$use_defer_for_loggedin_disp_edit_comment = true;
+$use_defer_for_loggedin_disp_comments = true;
+$use_defer_for_loggedin_disp_visits = true;
+$use_defer_for_loggedin_disp_contacts = true;
+
+$disable_tinymce_for_frontoffice_comment_form = false; // Disables TinyMCE plugin in the front-office for comment forms
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

@@ -22,7 +22,7 @@ global $Skin;
 // Do inits depending on current $disp:
 skin_init( $disp );
 // TODO: move to Skin::display_init
-require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
+require_js_defer( 'functions.js', 'blog' );	// for opening popup window (comments)
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
 		'arcdir_text'     => T_('Index'),

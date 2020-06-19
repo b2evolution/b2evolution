@@ -43,6 +43,13 @@ module.exports = function(grunt) {
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
 						],
 
+					// Superbundle Font-Awesome + Bootstrap + Front-office styles:
+					'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css': [
+							'rsc/css/font-awesome.css',
+							'rsc/css/bootstrap/bootstrap.css',
+							'rsc/build/bootstrap-b2evo_base.bundle.css',
+						],
+
 					// Bootstrap back-office styles:
 					'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css': [
 							// Basic styles for all bootstrap skins
@@ -83,6 +90,9 @@ module.exports = function(grunt) {
 
 					// evo helpdesk widget
 					'rsc/css/evo_helpdesk_widget.css': 'rsc/less/evo_helpdesk_widget.less',
+
+					// info dots plugin
+					'plugins/infodots_plugin/infodots.css': 'plugins/infodots_plugin/infodots.less',
 				}
 			},
 
@@ -154,6 +164,11 @@ module.exports = function(grunt) {
 				src: 'rsc/build/bootstrap-b2evo_base.bundle.css',
 				dest: 'rsc/build/bootstrap-b2evo_base.bmin.css',
 			},
+			bootstrap_b2evo_base_superbundle: {
+				nonull: true, // Display missing files
+				src: 'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css',
+				dest: 'rsc/build/bootstrap-b2evo_base-superbundle.bmin.css',
+			},
 			bootstrap_backoffice_b2evo_base: {
 				nonull: true, // Display missing files
 				src: 'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
@@ -202,6 +217,10 @@ module.exports = function(grunt) {
 				src: 'rsc/build/b2evo_helper_screens.css',
 				dest: 'rsc/build/b2evo_helper_screens.min.css',
 			},
+			jqplot: {
+				src: [ 'rsc/css/jquery/jquery.jqplot.css', 'rsc/css/jquery/jquery.jqplot.b2evo.css' ],
+				dest: 'rsc/build/b2evo_jqplot.bmin.css',
+			}
 		},
 
 		// Configuration for the uglify minifying tasks:
@@ -270,13 +289,56 @@ module.exports = function(grunt) {
 				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
 			},
+			// JS files that are used marketing popup container:
+			ddexitpop: {
+				options: { banner: '/* This includes ddexitpop files to initialize marketing popup container */\n' },
+				nonull: true, // Display missing files
+				src: ['rsc/js/src/ddexitpop.js', 'rsc/js/src/evo_init_ddexitpop.js'],
+				dest: 'rsc/js/build/ddexitpop.bmin.js'
+			},
+			// JS files that may be used on ANY page of front-office and back-office
+			evo_generic: {
+				options: {
+					banner: '/* This file includes ALL generic files that may be used on any page of front-office and back-office */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/src/evo_generic_functions.js',
+					'rsc/js/src/evo_init_generic_jquery_ready_functions.js',
+					'rsc/js/src/evo_init_password_indicator.js',
+					'rsc/js/src/evo_init_password_edit.js',
+					'rsc/js/src/evo_init_login_validator.js',
+					'rsc/js/src/evo_init_skin_bootstrap_forums.js',
+					'rsc/js/src/evo_init_widget_coll_search_form.js',
+					'rsc/js/src/evo_init_autocomplete_login.js',
+					'rsc/js/src/evo_init_widget_poll.js',
+					'rsc/js/src/evo_init_widget_item_checklist_lines.js',
+					'rsc/js/src/evo_init_plugin_auto_anchors.js',
+					'rsc/js/src/evo_init_plugin_custom_tags.js',
+					'rsc/js/src/evo_init_plugin_table_contents.js',
+					'rsc/js/src/evo_init_plugin_shortlinks.js',
+					'rsc/js/src/evo_init_plugin_inlines.js',
+					'rsc/js/src/evo_init_plugin_markdown.js',
+					'rsc/js/src/evo_init_plugin_polls.js',
+					'rsc/js/src/evo_init_plugin_shortcodes.js',
+					'rsc/js/src/evo_init_plugin_widescroll.js',
+					'rsc/js/src/evo_init_editable_column.js',
+					'rsc/js/src/evo_init_regional.js',
+					'rsc/js/src/evo_init_bootstrap_tooltips.js',
+					'rsc/js/src/evo_comment_funcs.js',
+					'rsc/js/src/evo_user_funcs.js',
+					'rsc/js/build/colorbox.bmin.js',
+				],
+				dest: 'rsc/js/build/evo_generic.bmin.js'
+			},
 			// JS files that are used on front-office standard skins:
 			evo_frontoffice: {
 				options: {
-					banner: '/* This includes 10 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js */\n'
+					banner: '/* This includes 11 files: build/evo_generic.bmin.js, src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/evo_modal_window.js',
+				src: ['rsc/js/build/evo_generic.bmin.js',
+							'rsc/js/src/evo_modal_window.js',
 							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',
@@ -288,23 +350,14 @@ module.exports = function(grunt) {
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/evo_frontoffice.bmin.js'
 			},
-			// JS files that are used on front-office standard skins with ddexitpop:
-			evo_frontoffice_with_ddexitpop: {
-				options: {
-					banner: '/* This includes 11 files: src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js, src/ddexitpop.js */\n'
-				},
-				nonull: true, // Display missing files
-				src: ['rsc/js/build/evo_frontoffice.bmin.js',
-							'rsc/js/src/ddexitpop.js'],
-				dest: 'rsc/js/build/evo_frontoffice-with-ddexitpop.bmin.js'
-			},
 			// JS files that are used on front-office bootstrap skins:
 			evo_frontoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 10 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js */\n'
+					banner: '/* This includes 11 files: build/evo_generic.bmin.js, src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/src/bootstrap-evo_modal_window.js',
+				src: ['rsc/js/build/evo_generic.bmin.js',
+							'rsc/js/src/bootstrap-evo_modal_window.js',
 							'rsc/js/src/evo_images.js',
 							'rsc/js/src/evo_user_crop.js',
 							'rsc/js/src/evo_user_report.js',
@@ -316,25 +369,30 @@ module.exports = function(grunt) {
 							'rsc/js/ajax.js'],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice.bmin.js'
 			},
-			// JS files that are used on front-office bootstrap skins with ddexitpop:
-			evo_frontoffice_bootstrap_with_ddexitpop: {
+			// JS files(bundled with jQuery and Bootstrap) that are used on front-office bootstrap skins:
+			evo_frontoffice_bootstrap_superbundle: {
 				options: {
-					banner: '/* This includes 11 files: src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_contact_groups.js, src/evo_rest_api.js, src/evo_item_flag.js, src/evo_links.js, src/evo_forms.js, ajax.js, src/ddexitpop.js */\n'
+					banner: '/* Includes files for bootstrap front-office skins */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
-							'rsc/js/src/ddexitpop.js'],
-				dest: 'rsc/js/build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js'
+				src: [
+					'rsc/js/jquery.min.js',
+					'rsc/js/jquery/jquery-migrate.min.js',
+					'rsc/js/bootstrap/bootstrap.min.js',
+					'rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
+				],
+				dest: 'rsc/js/build/bootstrap-evo_frontoffice-superbundle.bmin.js'
 			},
 			// JS files that are used on back-office standard skins:
 			evo_backoffice: {
 				options: {
-					banner: '/* This includes 22 files: functions.js, ajax.js, communication.js, form_extensions.js, extracats.js, dynamic_select.js, backoffice.js, blog_widgets.js,'+
+					banner: '/* This includes 23 files: build/evo_generic.bmin.js, functions.js, ajax.js, communication.js, form_extensions.js, extracats.js, dynamic_select.js, backoffice.js, blog_widgets.js,'+
 						'src/evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
 						'src/evo_user_org.js, src/evo_automation.js, src/evo_user_tags.js, src/evo_user_status.js, src/evo_user_groups.js, src/evo_rest_api.js, src/evo_links.js, src/evo_forms.js, src/evo_input_counter.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/functions.js',
+				src: ['rsc/js/build/evo_generic.bmin.js',
+							'rsc/js/functions.js',
 							'rsc/js/ajax.js',
 							'rsc/js/communication.js',
 							'rsc/js/form_extensions.js',
@@ -354,6 +412,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_groups.js',
 							'rsc/js/src/evo_user_filters.js',
 							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_files.js',
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_forms.js',
 							'rsc/js/src/evo_input_counter.js'],
@@ -362,12 +421,13 @@ module.exports = function(grunt) {
 			// JS files that are used on back-office bootstrap skins:
 			evo_backoffice_bootstrap: {
 				options: {
-					banner: '/* This includes 22 files: functions.js, ajax.js, communication.js, form_extensions.js, extracats.js, dynamic_select.js, backoffice.js, '+
+					banner: '/* This includes 23 files: build/evo_generic.bmin.js, functions.js, ajax.js, communication.js, form_extensions.js, extracats.js, dynamic_select.js, backoffice.js, '+
 						'blog_widgets.js, src/bootstrap-evo_modal_window.js, src/evo_images.js, src/evo_user_crop.js, src/evo_user_report.js, src/evo_user_deldata.js, '+
 						'src/evo_user_org.js, src/evo_automation.js, src/evo_user_tags.js, src/evo_user_status.js, src/evo_user_groups.js, src/evo_rest_api.js, src/evo_links.js, src/evo_forms.js, src/evo_input_counter.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/functions.js',
+				src: ['rsc/js/build/evo_generic.bmin.js',
+							'rsc/js/functions.js',
 							'rsc/js/ajax.js',
 							'rsc/js/communication.js',
 							'rsc/js/form_extensions.js',
@@ -387,6 +447,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_groups.js',
 							'rsc/js/src/evo_user_filters.js',
 							'rsc/js/src/evo_rest_api.js',
+							'rsc/js/src/evo_files.js',
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_forms.js',
 							'rsc/js/src/evo_input_counter.js'],
@@ -396,6 +457,48 @@ module.exports = function(grunt) {
 				src: 'rsc/js/evo_helpdesk_widget.js',
 				dest: 'rsc/js/evo_helpdesk_widget.min.js',
 			},
+			evo_fileuploader: {
+				options: {
+					banner: '/* This file includes ALL files that are used for quick file uploader */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/multiupload/fine-uploader.js',
+					'rsc/js/src/evo_init_dragdrop_button.js',
+					'rsc/js/src/evo_init_attachment_fieldset.js',
+				],
+				dest: 'rsc/js/build/evo_fileuploader.bmin.js'
+			},
+			evo_fileuploader_sortable: {
+				options: {
+					banner: '/* This file includes ALL files that are used for quick file uploader with sortable feature for attachments */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/build/evo_fileuploader.bmin.js',
+					'rsc/js/jquery/jquery.sortable.min.js',
+					'rsc/js/src/evo_init_link_sortable.js',
+				],
+				dest: 'rsc/js/build/evo_fileuploader_sortable.bmin.js'
+			},
+			evo_jqplot: {
+				options: {
+					banner: '/* This file includes ALL files that are used for drawing charts using jqplot */\n'
+				},
+				nonull: true, // Display missing files
+				src: [
+					'rsc/js/jquery/jqplot/jquery.jqplot.min.js',
+					'rsc/js/jquery/jqplot/jqplot.barRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.canvasTextRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.canvasOverlay.min.js',
+					'rsc/js/jquery/jqplot/jqplot.categoryAxisRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.donutRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.enhancedLegendRenderer.min.js',
+					'rsc/js/jquery/jqplot/jqplot.highlighter.min.js',	
+				],
+				dest: 'rsc/js/build/evo_jqplot.bmin.js'
+			}
 		},
 
 		// Markdown to HTML

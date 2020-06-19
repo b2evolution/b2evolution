@@ -435,6 +435,11 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'usage'           => 'post',
 			'use_short_title' => 'optional',
 		);
+	$post_types[] = array(
+			'name'                 => 'Task',
+			'allow_html'           => 0,
+			'front_order_workflow' => 20,
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -467,6 +472,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'use_coordinates'          => 'never',
 			'front_order_title'        => 10,
 			'front_order_attachments'  => 30,
+			'front_order_workflow'     => NULL,
 			'front_order_text'         => 80,
 			'front_order_location'     => 90,
 		);
@@ -525,7 +531,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'type'            => 'double',
 			'order'           => 180,
 			'note'            => T_('Enter a number'),
-			'format'          => '$ 0 0.00',
+			'format'          => '$ 0 0.00[.green];$ 0 0.00[.red]',
 			'cell_class'      => 'right',
 			'green_highlight' => 'lowest',
 		),
@@ -847,9 +853,9 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 
 
 	task_begin( 'Creating default Post Statuses... ' );
-	$post_status = array( 'New', 'In Progress', 'Duplicate', 'Not A Bug', 'In Review', 'Fixed', 'Closed', 'OK' );
-
-	$DB->query( "INSERT INTO T_items__status ( pst_name )	VALUES ( '".implode( "' ),( '", $post_status )." ')" );
+	$post_status_with_order = array(" ( 'New', 10 ) ", " ( 'In Progress', 20 ) ", " ( 'Duplicate', 30 ) ", " ( 'Not A Bug', 40 ) ", " ( 'In Review', 50 ) ", " ( 'Fixed', 60 ) ", " ( 'Closed', 70 ) ", " ( 'OK', 80 ) ", );
+	
+	$DB->query( "INSERT INTO T_items__status ( pst_name, pst_order )	VALUES ". implode( ",", $post_status_with_order ) );
 	task_end();
 
 
@@ -1584,8 +1590,8 @@ function create_demo_users()
 		{	// Impossible to rename the admin folder to another name
 
 			// Display the errors:
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
 
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
@@ -1705,6 +1711,43 @@ function create_default_templates( $is_task = true )
 			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
 
+		// Item attachments:
+		'item_details_files_list' => array(
+			'name'     => 'Item Details: Attachments: List',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=<div class="item_attachments"><ul class="bFiles">|
+				before_attach=<li>|
+				before_attach_size=<span class="file_size">(|
+				after_attach_size=)</span>|
+				after_attach=</li>|
+				after=</ul></div>|
+				file_link_format=$file_name$|
+				display_download_icon=1|
+				file_link_text=title|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
+		'item_details_files_buttons' => array(
+			'name'     => 'Item Details: Attachments: Buttons',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=|
+				before_attach=|
+				before_attach_size=(|
+				after_attach_size=)|
+				after_attach=|
+				after=|
+				attach_format=$file_link$|
+				file_link_format=$icon$ <b>Download Now!</b><br />$file_name$ $file_size$ $file_desc$|
+				display_download_icon=1|
+				file_link_text=title|
+				file_link_class=btn btn-success|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
 
 		// Content List widget:
 		'content_list' => array(
@@ -2167,7 +2210,7 @@ function create_default_templates( $is_task = true )
 			'context'  => 'registration',
 			'template' => '[Form:login]
 [Form:password]
-[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+[Form:email]
 <div class="evo_register_buttons">
 	[Form:submit|
 		name=register|
@@ -2198,7 +2241,7 @@ function create_default_templates( $is_task = true )
 			'context'  => 'registration',
 			'template' => '[Form:firstname]
 [Form:lastname]
-[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+[Form:email]
 [Form:password]
 <div class="evo_register_buttons">
 	[Form:submit|
@@ -2229,7 +2272,7 @@ function create_default_templates( $is_task = true )
 		'registration_email_social' => array(
 			'name'     => 'Registration: email & social buttons',
 			'context'  => 'registration',
-			'template' => '[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+			'template' => '[Form:email]
 <div class="evo_register_buttons">
 	[Form:submit|
 		name=register|
@@ -2272,13 +2315,13 @@ function create_default_templates( $is_task = true )
 	</div>
 </div>
 <div class="row row-gutter-sm">
-	<div class="col-sm-12 col-md-12 col-lg-5 margin-y-xs">
+	<div class="col-sm-12 col-md-4 col-lg-5 margin-y-xs">
 		[Form:search_author]
 	</div>
-	<div class="col-sm-12 col-md-12 col-lg-4 margin-y-xs">
+	<div class="col-sm-12 col-md-4 col-lg-4 margin-y-xs">
 		[Form:search_content_age]
 	</div>
-	<div class="col-sm-12 col-md-12 col-lg-3 margin-y-xs">
+	<div class="col-sm-12 col-md-4 col-lg-3 margin-y-xs">
 		[Form:search_content_type]
 	</div>
 </div>',
@@ -2299,7 +2342,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Item:permalink] (Post)</div>
+		<div class="search_title">[Item:permalink] <span class="label label-primary">[Item:type]</span></div>
 		<div class="result_content">[Item:excerpt|excerpt_more_text=]</div>
 		<div class="search_info dimmed">[Item:categories|before=In ]</div>
 		<div class="search_info dimmed">Published by [Item:author|
@@ -2316,8 +2359,25 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Comment:permalink] (Comment)</div>
-		<div class="result_content">[Comment:content|format=raw_text]</div>
+		<div class="search_title">[Comment:permalink] <span class="label label-primary">Comment</span></div>
+		<div class="result_content">[Comment:excerpt]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_meta' => array(
+			'name'     => 'Search Result: Internal comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] <span class="label label-info">Internal comment</span></div>
+		<div class="result_content">[Comment:excerpt]</div>
 		<div class="search_info dimmed">Published by [Comment:author|
 			link_text=avatar_name|
 			thumb_size=crop-top-15x15|
@@ -2333,7 +2393,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[File:file_link|link_text=title] (File: [File:file_link|link_text=icon] [File:type])</div>
+		<div class="search_title">[File:file_link|link_text=title] <span class="label label-primary">File: [File:file_link|link_text=icon] [File:type]</span></div>
 		<div class="result_content">
 			[File:url]
 			[File:description|before=<div>|after=</div>]
@@ -2349,7 +2409,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Cat:permalink] (Category)</div>
+		<div class="search_title">[Cat:permalink] <span class="label label-primary">Category</span></div>
 		<div class="result_content">[Cat:description]</div>
 	</div>
 </div>',
@@ -2361,10 +2421,47 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Tag:permalink] (Tag)</div>
+		<div class="search_title">[Tag:permalink] <span class="label label-primary">Tag</span></div>
 		<div class="result_content">[echo:tag_post_count] posts are tagged with "[Tag:name]"</div>
 	</div>
 </div>',
+		),
+
+		'content_list_with_thumbnail' => array(
+			'name'     => 'Content List with Thumbnail',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<ul class="evo_thumblist">]
+[set:after_list=</ul>]
+[set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
+[set:evo_thumblist_image__modifiers=|                    // Modifier classes for each thumbnail image]
+[set:evo_thumblist_image__size=crop-80x80|              // Image size for displaying image]',
+		),
+
+		'content_list_with_thumbnail_item' => array(
+			'name'     => 'Content List with Thumbnail: Item',
+			'context'  => 'content_list_item',
+			'template' => '<li>
+		<div class="evo_thumblist_image [echo:evo_thumblist_image__modifiers]">
+			[Item:images|
+				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
+				limit=1|	                                      // Max 1 images
+				image_size=$evo_thumblist_image__size$|                
+				image_link_to=single|	                                  // Link to item details
+				placeholder=#file_thumbnail_text_icon|	                  // If no image available, display text file icon
+			]
+		</div>
+		<div class="evo_thumblist_title">
+			[Item:permalink|text=#title|class=default]
+		</div>
+		<div class="evo_thumblist_body">
+			<p>[Item:excerpt|
+							excerpt_no_more_link=| // No "more" link
+							max_words=20| // how many words we will display
+			]
+			</p> 
+			[Item:permalink|text=...|class=btn btn-default  evo_thumblist_button evo_thumblist_button__transparent|title=]
+		</div>
+</li>',
 		)
 
 	);

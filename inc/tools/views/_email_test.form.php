@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $current_User, $admin_url;
+global $admin_url;
 global $test_mail_output, $email_send_allow_php_mail;
 
 
@@ -29,13 +29,13 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Test SMTP settings').get_manual_link( 'email-test-smtp-settings' ) );
+$Form->begin_fieldset( TB_('Test SMTP settings').get_manual_link( 'email-test-smtp-settings' ) );
 
 	$url = $admin_url.'?ctrl=email&amp;tab='.get_param( 'tab' ).'&amp;tab3='.get_param( 'tab3' ).'&amp;'.url_crumb('emailsettings').'&amp;action=';
-	$Form->info_field( T_('Perform tests'),
-				'<a href="'.$url.'test_smtp" class="btn btn-default">'.T_('SMTP server connection').'</a>&nbsp;&nbsp;'.
-				'<a href="'.$url.'test_email_smtp" class="btn btn-default">'.T_('Send test email via SMTP').'</a>&nbsp;&nbsp;'.
-				( $email_send_allow_php_mail ? '<a href="'.$url.'test_email_php" class="btn btn-default">'.T_('Send test email via PHP').'</a>' : '' ),
+	$Form->info_field( TB_('Perform tests'),
+				'<a href="'.$url.'test_smtp" class="btn btn-default">'.TB_('SMTP server connection').'</a>&nbsp;&nbsp;'.
+				'<a href="'.$url.'test_email_smtp" class="btn btn-default">'.TB_('Send test email via SMTP').'</a>&nbsp;&nbsp;'.
+				( $email_send_allow_php_mail ? '<a href="'.$url.'test_email_php" class="btn btn-default">'.TB_('Send test email via PHP').'</a>' : '' ),
 				array( 'class' => 'info_full_height' ) );
 
 	if( !empty( $test_mail_output ) )

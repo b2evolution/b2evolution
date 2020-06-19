@@ -66,7 +66,7 @@ $Form->begin_form( '', '', $params );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( sprintf( T_('Propose change for Item %s'),
+	$Form->begin_fieldset( sprintf( TB_('Propose change for Item %s'),
 			' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>' )
 		.get_manual_link( 'post-contents-panel' ), array( 'id' => 'itemform_content' ) );
 
@@ -75,7 +75,7 @@ $Form->begin_form( '', '', $params );
 	$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 	if( $edited_Item->get_type_setting( 'use_title' ) != 'never' )
 	{	// Display a post title field:
-		$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array( 'maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
+		$Form->text_input( 'post_title', $item_title, 20, TB_('Title'), '', array( 'maxlength' => 255, 'required' => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ) ) );
 	}
 	else
 	{	// Hide a post title field:
@@ -134,11 +134,11 @@ $Form->begin_form( '', '', $params );
 		echo '<span class="html_status">';
 		if( $edited_Item->get_type_setting( 'allow_html' ) )
 		{
-			echo T_('HTML is allowed');
+			echo TB_('HTML is allowed');
 		}
 		else
 		{
-			echo T_('HTML is not allowed');
+			echo TB_('HTML is not allowed');
 		}
 		// Display manual link for more info:
 		echo get_manual_link( 'post-allow-html' );
@@ -147,7 +147,7 @@ $Form->begin_form( '', '', $params );
 	echo '</div>';
 
 	echo '<div class="pull-right">';
-	$Form->submit( array( 'actionArray[save_propose]', T_('Propose change'), 'btn-primary evo_propose_change_btn' ) );
+	$Form->submit( array( 'actionArray[save_propose]', TB_('Propose change'), 'btn-primary evo_propose_change_btn' ) );
 	echo '</div>';
 
 	echo '<div class="clearfix"></div>';
@@ -160,13 +160,13 @@ $Form->begin_form( '', '', $params );
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
 	{	// Display fieldset with custom fields only if at least one exists:
-		$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		$custom_fields_title = TB_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+		if( check_user_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
 			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
-					.action_icon( T_('Edit fields...'), 'edit',
+					.action_icon( TB_('Edit fields...'), 'edit',
 						$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ).'#fieldset_wrapper_custom_fields',
-						T_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
+						TB_('Edit fields...'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm' ) )
 				.'</span>';
 		}
 

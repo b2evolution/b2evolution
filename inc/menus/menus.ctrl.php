@@ -18,7 +18,7 @@ load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
 load_class( 'menus/model/_sitemenuentrycache.class.php', 'SiteMenuEntryCache' );
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'site', 'menus' );
 
@@ -31,7 +31,7 @@ if( param( 'menu_ID', 'integer', '', true ) )
 	{	// We could not find the goal to edit:
 		unset( $edited_SiteMenu );
 		forget_param( 'menu_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Menu') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Menu') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -43,7 +43,7 @@ if( param( 'ment_ID', 'integer', '', true ) )
 	{	// We could not find the goal to edit:
 		unset( $edited_SiteMenuEntry );
 		forget_param( 'menu_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Menu Entry') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Menu Entry') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -72,7 +72,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( $edited_SiteMenu && $edited_SiteMenu->duplicate() )
 		{
@@ -90,14 +90,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request:
 		if( $edited_SiteMenu->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_SiteMenu->dbinsert();
-			$Messages->add( T_('New menu created.'), 'success' );
+			$Messages->add( TB_('New menu created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenu->ID ); // Will EXIT
@@ -113,7 +113,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to edit menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
@@ -123,7 +123,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update Menu in DB:
 			$edited_SiteMenu->dbupdate();
-			$Messages->add( T_('Menu updated.'), 'success' );
+			$Messages->add( TB_('Menu updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=menus' ); // Will EXIT
@@ -139,14 +139,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'menu' );
 
 		// Check that current user has permission to delete menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Menu &laquo;%s&raquo; deleted.'), $edited_SiteMenu->dget( 'name' ) );
+			$msg = sprintf( TB_('Menu &laquo;%s&raquo; deleted.'), $edited_SiteMenu->dget( 'name' ) );
 			$edited_SiteMenu->dbdelete();
 			unset( $edited_SiteMenu );
 			forget_param( 'menu_ID' );
@@ -157,7 +157,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_SiteMenu->check_delete( sprintf( T_('Cannot delete menu &laquo;%s&raquo;'), $edited_SiteMenu->dget( 'name' ) ), array(), true ) )
+			if( ! $edited_SiteMenu->check_delete( sprintf( TB_('Cannot delete menu &laquo;%s&raquo;'), $edited_SiteMenu->dget( 'name' ) ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'list';
 			}
@@ -187,14 +187,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'menuentry' );
 
 		// Check that current user has permission to create menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request:
 		if( $edited_SiteMenuEntry->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_SiteMenuEntry->dbinsert();
-			$Messages->add( T_('New menu entry created.'), 'success' );
+			$Messages->add( TB_('New menu entry created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenuEntry->get( 'menu_ID' ) ); // Will EXIT
@@ -210,7 +210,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'menuentry' );
 
 		// Check that current user has permission to edit menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
@@ -220,7 +220,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update Menu in DB:
 			$edited_SiteMenuEntry->dbupdate();
-			$Messages->add( T_('Menu entry updated.'), 'success' );
+			$Messages->add( TB_('Menu entry updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenuEntry->get( 'menu_ID' ) ); // Will EXIT
@@ -236,14 +236,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'menuentry' );
 
 		// Check that current user has permission to delete menus:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an menu_ID:
 		param( 'menu_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Menu entry &laquo;%s&raquo; deleted.'), $edited_SiteMenuEntry->dget( 'text' ) );
+			$msg = sprintf( TB_('Menu entry &laquo;%s&raquo; deleted.'), $edited_SiteMenuEntry->dget( 'text' ) );
 			$edited_SiteMenuEntry->dbdelete();
 			unset( $edited_SiteMenuEntry );
 			forget_param( 'ment_ID' );
@@ -254,7 +254,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_SiteMenuEntry->check_delete( sprintf( T_('Cannot delete menu &laquo;%s&raquo;'), $edited_SiteMenuEntry->dget( 'text' ) ), array(), true ) )
+			if( ! $edited_SiteMenuEntry->check_delete( sprintf( TB_('Cannot delete menu &laquo;%s&raquo;'), $edited_SiteMenuEntry->dget( 'text' ) ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'list';
 			}
@@ -264,8 +264,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Menus'), $admin_url.'?ctrl=menus' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Menus'), $admin_url.'?ctrl=menus' );
 
 // Set an url for manual page:
 if( $action == 'new' || $action == 'edit' )
@@ -297,7 +297,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_SiteMenu->confirm_delete(
-				sprintf( T_('Delete menu &laquo;%s&raquo;?'), $edited_SiteMenu->dget( 'name' ) ),
+				sprintf( TB_('Delete menu &laquo;%s&raquo;?'), $edited_SiteMenu->dget( 'name' ) ),
 				'menu', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'new':
@@ -310,7 +310,7 @@ switch( $action )
 	case 'delete_entry':
 		// We need to ask for confirmation:
 		$edited_SiteMenuEntry->confirm_delete(
-				sprintf( T_('Delete menu entry &laquo;%s&raquo;?'), $edited_SiteMenuEntry->dget( 'text' ) ),
+				sprintf( TB_('Delete menu entry &laquo;%s&raquo;?'), $edited_SiteMenuEntry->dget( 'text' ) ),
 				 'menuentry', $action, array_merge( get_memorized( 'action,locale,blog,mode' ), array( 'action' => 'edit' ) ) );
 		// NO BREAK
 	case 'new_entry':

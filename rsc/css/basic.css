@@ -77,6 +77,9 @@ div.dev-blocks--content-block > .dev-blocks-name {
   color: #F60;
   background-color: #ffeac1;
 }
+div.dev-blocks--content-block > .dev-blocks-name a {
+  color: #F60;
+}
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
 }
@@ -999,15 +1002,15 @@ div.avatartag.main .avatar_actions {
   display: inline-block;
   font-size: 10px;
 }
-.evobar-menu [class^=evobar-icon-]:before {
+.evobar-menu [class^=evobar-icon-]::before {
   width: 10px;
   height: 10px;
   content: "\25BC";
 }
-.evobar-menu .evobar-icon-right:before {
+.evobar-menu .evobar-icon-right::before {
   content: "\25B6";
 }
-.evobar-menu .evobar-icon-left:before {
+.evobar-menu .evobar-icon-left::before {
   content: "\25C0";
 }
 form {
@@ -1067,11 +1070,7 @@ span.checkbox_error input.checkbox {
 span.checkbox_surround {
   background: #fbf2ee;
   border: 1px solid #F825F1;
-}
-span.checkbox_surround input.checkbox {
-  background: #fbf2ee;
-}
-span.checkbox_surround_init {
+  border-radius: 2px;
   padding: 1px;
 }
 input.large,
@@ -1250,7 +1249,7 @@ div.bText div.log_container li {
   padding: 0;
   background: none;
 }
-div.bText div.log_container ul li:before {
+div.bText div.log_container ul li::before {
   content: none;
 }
 div.skin_error {

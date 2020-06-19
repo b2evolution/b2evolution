@@ -21,12 +21,12 @@
   border-top: 1px solid;
   padding-top: 9px;
 }
-#evo_site_header .navbar .navbar-collapse .nav .login {
+#evo_site_header .navbar .navbar-collapse .nav .evo_widget_basic_menu_link_myprofile {
   padding-top: 4px;
   padding-bottom: 4px;
   line-height: 32px;
 }
-#evo_site_header .navbar .navbar-collapse .nav .login img {
+#evo_site_header .navbar .navbar-collapse .nav .evo_widget_basic_menu_link_myprofile img {
   margin-right: 5px;
   border-radius: 4px;
 }
@@ -47,7 +47,7 @@
   #evo_site_header .navbar .navbar-collapse .nav.navbar-right li.evo_widget > a {
     display: inline-block;
   }
-  #evo_site_header .navbar .navbar-collapse .nav.navbar-right .login {
+  #evo_site_header .navbar .navbar-collapse .nav.navbar-right .evo_widget_basic_menu_link_myprofile {
     padding-top: 8px;
     padding-bottom: 9px;
   }

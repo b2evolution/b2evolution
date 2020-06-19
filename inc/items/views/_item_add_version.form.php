@@ -24,22 +24,22 @@ $Form->begin_form();
 	$Form->hidden( 'blog', $edited_Item->get_blog_ID() );
 	$Form->hidden( 'p', $edited_Item->ID );
 
-	$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options( 'all' ), T_('Language'), '', array( 'style' => 'width:auto' ) );
+	$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options( 'all' ), TB_('Language'), '', array( 'style' => 'width:auto' ) );
 
-	$Form->info( T_('Collection'), '<span id="evo_item_new_version_coll"></span>' );
+	$Form->info( TB_('Collection'), '<span id="evo_item_new_version_coll"></span>' );
 	$Form->hidden( 'post_coll_ID', '' );
 
-	$Form->checkbox( 'post_same_images', 1, T_('Same images'), T_('Link all attachments of current Item to new version.') );
+	$Form->checkbox( 'post_same_images', 1, TB_('Same images'), TB_('Link all attachments of current Item to new version.') );
 
 	$ItemTypeCache = & get_ItemTypeCache();
-	$Form->select_input_object( 'item_typ_ID', $edited_Item->get( 'ityp_ID' ), $ItemTypeCache, T_('Item Type') );
+	$Form->select_input_object( 'item_typ_ID', $edited_Item->get( 'ityp_ID' ), $ItemTypeCache, TB_('Item Type') );
 
 	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 	{	// If parent is allowed for the Item Type:
-		$Form->checkbox( 'post_create_child', 1, T_('Create as child'), T_('Version will be a child and current Item will be parent.') );
+		$Form->checkbox( 'post_create_child', 1, TB_('Create as child'), TB_('Version will be a child and current Item will be parent.') );
 	}
 
-	$Form->buttons( array( array( 'submit', 'actionArray[new_version]', T_('Add version'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'actionArray[new_version]', TB_('Add version'), 'SaveButton' ) ) );
 
 $Form->end_form();
 ?>

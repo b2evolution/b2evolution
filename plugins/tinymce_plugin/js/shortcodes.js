@@ -1,4 +1,4 @@
-var evo = evo || {};
+var evo = window.evo || {};
 
 evo.shortcode = {
 	types: {

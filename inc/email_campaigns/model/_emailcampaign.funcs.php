@@ -40,7 +40,7 @@ function get_filterset_user_IDs( $filterset_name = 'admin' )
  */
 function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
 	$EmailCampaignCache = & get_EmailCampaignCache();
 	$EmailCampaign = & $EmailCampaignCache->get_by_ID( $campaign_ID );
@@ -54,7 +54,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Campaign info'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['info']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'info'} );";
 	}
@@ -64,7 +64,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Compose'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['compose']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'compose'} );";
 	}
@@ -75,7 +75,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'href'  => $url,
 		'class' => 'ecmp_plaintext_tab'.( $EmailCampaign->get( 'sync_plaintext' ) ? ' hidden' : '' ),
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['plaintext']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'plaintext'} );";
 	}
@@ -85,7 +85,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Review and send'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['send']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'send'} );";
 	}
@@ -95,7 +95,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Recipient list'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['recipient']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'recipient'} );";
 	}
@@ -105,7 +105,7 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Plugins'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
 		$modes['plugins']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'plugins'} );";
 	}
@@ -338,7 +338,7 @@ function filter_campaign_results_block( & $Form )
  */
 function campaign_results_block( $params = array() )
 {
-	global $admin_url, $UserSettings, $current_User, $DB;
+	global $admin_url, $UserSettings, $DB;
 
 	$params = array_merge( array(
 		'enlt_ID'               => NULL,
@@ -387,7 +387,7 @@ function campaign_results_block( $params = array() )
 	$Results->Cache = & get_EmailCampaignCache();
 	$Results->title = $params['results_title'];
 
-	if( $current_User->check_perm( 'emails', 'edit' ) && $params['display_create_button'] )
+	if( check_user_perm( 'emails', 'edit' ) && $params['display_create_button'] )
 	{ // User must has a permission to edit emails
 		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
@@ -558,7 +558,7 @@ function campaign_results_block( $params = array() )
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
-				.( $current_User->check_perm( 'emails', 'edit' ) ?
+				.( check_user_perm( 'emails', 'edit' ) ?
 				// Display an action icon to delete newsletter if current User has a perm:
 				action_icon( T_('Duplicate this email campaign...'), 'copy', $admin_url.'?ctrl=campaigns&amp;action=copy&amp;ecmp_ID=$ecmp_ID$' )
 				.action_icon( T_('Delete this email campaign!'), 'delete', $admin_url.'?ctrl=campaigns&amp;action=delete&amp;ecmp_ID=$ecmp_ID$&amp;'.url_crumb( 'campaign' ) ) : '' )
@@ -579,8 +579,6 @@ function campaign_results_block( $params = array() )
  */
 function campaign_td_welcome( $ecmp_ID, $ecmp_welcome, $ecmp_activate )
 {
-	global $current_User;
-
 	if( $ecmp_welcome )
 	{	// If email campaign is used as welcome message:
 		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
@@ -600,7 +598,7 @@ function campaign_td_welcome( $ecmp_ID, $ecmp_welcome, $ecmp_activate )
 		$activate_icon = '';
 	}
 
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{	// Make icon(s) toggle welcome/activate statuses if current User has a perm to edit this:
 		global $admin_url, $ctrl;
 		$icon_url = $admin_url.'?ctrl=campaigns'

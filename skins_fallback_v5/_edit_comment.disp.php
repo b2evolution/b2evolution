@@ -80,7 +80,7 @@ $Form->begin_form( 'bComment' );
 	// set b2evoCanvas for plugins
 	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->begin_fieldset( '', array( 'id' => 'comment_date_field' ) );
 		echo $Form->begin_field( NULL, T_('Comment date') );
@@ -127,7 +127,7 @@ $Form->begin_form( 'bComment' );
 	$LinkOwner = new LinkComment( $edited_Comment );
 	if( $LinkOwner->count_links() )
 	{ // there are attachments to display
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'files', 'view' ) && check_user_perm( 'admin', 'restricted' ) )
 		{
 			$Form->begin_fieldset( T_('Attachments') );
 			display_attachments( $LinkOwner );

@@ -19,9 +19,9 @@ global $MarkdownImport;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
-$Form->begin_form( 'fform', T_('Markdown Importer') );
+$Form->begin_form( 'fform', TB_('Markdown Importer') );
 
-$Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) );
+$Form->begin_fieldset( TB_('Import log').get_manual_link( 'markdown-importer' ) );
 
 // Display process of importing:
 $MarkdownImport->display_import();
@@ -29,7 +29,7 @@ $MarkdownImport->display_import();
 $Form->end_fieldset();
 
 $Form->buttons( array(
-		array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$MarkdownImport->get_Blog()->get( 'url' ).'\'' ),
+		array( 'button', 'button', TB_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$MarkdownImport->get_Blog()->get( 'url' ).'\'' ),
 	) );
 
 $Form->end_form();

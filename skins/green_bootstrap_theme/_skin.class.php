@@ -23,7 +23,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.3';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -1289,14 +1289,10 @@ class green_bootstrap_theme_Skin extends Skin
 	{
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 	}
@@ -1437,7 +1433,7 @@ class green_bootstrap_theme_Skin extends Skin
 		) );
 		// Default font - Family:
 		$this->dynamic_style_rule( 'font_family', '#skin_wrapper { font-family: $setting_value$ }', array(
-			'options' => $this->get_font_definitions()
+			'options' => $this->get_font_definitions( 'style' )
 		) );
 		// Default font - Size:
 		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(
@@ -1668,12 +1664,12 @@ class green_bootstrap_theme_Skin extends Skin
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
 		{	// Init JS to autcomplete the user logins
-			require_js( '#bootstrap_typeahead#', 'blog' );
+			require_js_defer( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
@@ -1742,9 +1738,6 @@ class green_bootstrap_theme_Skin extends Skin
 			case 'front':
 				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
-
-				// Used to quick upload several files:
-				init_fileuploader_js( 'blog' );
 				break;
 
 			case 'posts':
@@ -1762,15 +1755,12 @@ class green_bootstrap_theme_Skin extends Skin
 						$bootstrap_manual_posts_text = $Chapter->get( 'name' );
 					}
 				}
-
-				// Used to quick upload several files for comment of intro post:
-				init_fileuploader_js( 'blog' );
 				break;
 		}
 
 		if( $this->is_side_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			$this->require_js( 'manual/affix_sidebars.js' );
+			$this->require_js_defer( 'left_navigation.js' );
 		}
 
 		// Init JS to affix Messages:
@@ -2167,6 +2157,7 @@ class green_bootstrap_theme_Skin extends Skin
 						'display_summary'        => 'no',
 						'display_noopinion'      => false,
 						'display_score'          => true,
+						'display_noactive'       => true,
 						'score_class'            => ( in_array( $disp, array( 'posts', 'flagged' ) ) ? 'vote_score__status_'.$Item->get_read_status() : '' ),
 						'icon_like_active'       => 'thumb_arrow_up',
 						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
@@ -2213,6 +2204,7 @@ class green_bootstrap_theme_Skin extends Skin
 						'class'                  => 'evo_voting_panel__left_score',
 						'display_noopinion'      => false,
 						'display_score'          => true,
+						'display_noactive'       => true,
 						'title_text'             => '',
 						'title_empty'            => '',
 						'icon_like_active'       => 'thumb_arrow_up',
@@ -2319,7 +2311,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function display_posts_list_header( $title, $params = array() )
 	{
-		global $Blog, $current_User;
+		global $Blog;
 
 		$params = array_merge( array(
 				'actions' => '',
@@ -2337,20 +2329,18 @@ class green_bootstrap_theme_Skin extends Skin
 				'after_workflow_header'   => '<div class="clearfix"></header>',
 				'before_workflow_title'   => '<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">',
 				'after_workflow_title'    => '</div>',
-				'before_workflow_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'before_workflow_status'  => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">',
 				'after_workflow_status'   => '</div>',
-				'before_workflow_actions' => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 text-right">',
+				'before_workflow_actions' => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 text-right">',
 				'after_workflow_actions'  => '</div>',
 			), $params );
 
 		// Check if current User can view workflow properties:
 		$can_view_workflow =
-			// User must be logged in:
-			is_logged_in() &&
 			// Workflow must be enabled for current Collection:
 			$Blog->get_setting( 'use_workflow' ) &&
 			// Current User must has a permission to be assigned for tasks of the current Collection:
-			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
+			check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
 
 		// Get template depending on permission of current User:
 		$template = ( $can_view_workflow ? 'workflow' : 'normal' );

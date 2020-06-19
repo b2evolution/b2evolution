@@ -1498,9 +1498,11 @@ class Results extends Table
 						$r .= '<option value="'.format_to_output( $selector, 'formvalue' ).'">'.$label.'</option>';
 					}
 					$r .= '</select> ';
+					$r .= '<span class="btn-group">';
 					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
 							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
 							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '</span>';
 				}
 				else
 				{
@@ -1512,9 +1514,11 @@ class Results extends Table
 					{
 						$selector = $this->checkbox_toggle_selectors;
 					}
+					$r .= '<span class="btn-group">';
 					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
 							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
 							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '</span>';
 				}
 
 				if( ! empty( $this->list_mass_actions ) )

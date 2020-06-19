@@ -53,10 +53,10 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-if( ! ( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'spamblacklist', 'view' ) ) &&
-		! ( $current_User->check_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
+if( ! ( check_user_perm( 'admin', 'normal' ) && check_user_perm( 'spamblacklist', 'view' ) ) &&
+		! ( check_user_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
 {
-	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ) );
+	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ TB_('Group/user permission denied by %s!'), $app_name ) );
 }
 
 
@@ -68,7 +68,7 @@ if( param( 'iprange_ID', 'integer', '', true) )
 	{	// We could not find the goal to edit:
 		unset( $edited_IPRange );
 		forget_param( 'iprange_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('IP Range') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('IP Range') ), 'error' );
 	}
 }
 
@@ -79,7 +79,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
+		check_user_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
 
 		$keyword = utf8_substr( $keyword, 0, 80 );
 		param( 'delhits', 'integer', 0 );
@@ -100,7 +100,7 @@ switch( $action )
 		// it has to be a minimum of 5 characters to avoid being too generic
 		if( utf8_strlen( $keyword ) < 5 )
 		{
-			$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars( $keyword ) ), 'error' );
+			$Messages->add( sprintf( TB_('The keyword &laquo;%s&raquo; is too short, it has to be a minimum of 5 characters!'), htmlspecialchars( $keyword ) ), 'error' );
 			break;
 		}
 
@@ -115,7 +115,7 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote( '%'.$keyword.'%' ),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add_to_group( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
+			$Messages->add_to_group( sprintf( TB_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', TB_('Banning keyword:') );
 		}
 
 		if( $delcomments )
@@ -135,18 +135,18 @@ switch( $action )
 			// Delete all comments data from DB
 			Comment::db_delete_where( $keyword_cond.$del_condition );
 
-			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
+			$Messages->add_to_group( sprintf( TB_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', TB_('Banning keyword:') );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{ // Success
-				$Messages->add_to_group( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
+				$Messages->add_to_group( sprintf( TB_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success', TB_('Banning keyword:') );
 			}
 			else
 			{ // Failed
-				$Messages->add( sprintf( T_('Failed to add the keyword %s to black list locally.'), '<b>'.htmlspecialchars( $keyword ).'</b>' ), 'error' );
+				$Messages->add( sprintf( TB_('Failed to add the keyword %s to black list locally.'), '<b>'.htmlspecialchars( $keyword ).'</b>' ), 'error' );
 			}
 		}
 
@@ -157,7 +157,7 @@ switch( $action )
 
 		if( ! $blacklist_locally && ! $report && ! $delhits && ! $delcomments )
 		{ // If no action has been selected
-			$Messages->add( T_('Please select at least one action to ban the keyword.' ), 'error' );
+			$Messages->add( TB_('Please select at least one action to ban the keyword.' ), 'error' );
 		}
 
 		if( $display_mode != 'js' && ! $Messages->has_errors() )
@@ -188,10 +188,10 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		param( 'hit_ID', 'integer', true );	// Required!
-		$Messages->add( sprintf( T_('Removing entry #%d from the ban list...'), $hit_ID), 'note' );
+		$Messages->add( sprintf( TB_('Removing entry #%d from the ban list...'), $hit_ID), 'note' );
 		antispam_delete( $hit_ID );
 		break;
 
@@ -203,7 +203,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		// Report this keyword as abuse:
 		antispam_report_abuse( $keyword );
@@ -217,7 +217,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		ob_start();
 		antispam_poll_abuse();
@@ -230,14 +230,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// fp> Restore defaults has been removed because it's extra maintenance work and no real benefit to the user.
 
-		param_integer_range( 'antispam_threshold_publish', -100, 100, T_('The threshold must be between -100 and 100.') );
+		param_integer_range( 'antispam_threshold_publish', -100, 100, TB_('The threshold must be between -100 and 100.') );
 		$Settings->set( 'antispam_threshold_publish', $antispam_threshold_publish );
 
-		param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
+		param_integer_range( 'antispam_threshold_delete', -100, 100, TB_('The threshold must be between -100 and 100.') );
 		$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
 
 		param( 'antispam_block_contact_form', 'integer', 0 );
@@ -259,7 +259,7 @@ switch( $action )
 			}
 			if( $l_weight < 0 || $l_weight > 100 )
 			{
-				param_error( 'antispam_plugin_spam_weight['.$l_plugin_ID.']', T_('Spam weight has to be in the range of 0-100.') );
+				param_error( 'antispam_plugin_spam_weight['.$l_plugin_ID.']', TB_('Spam weight has to be in the range of 0-100.') );
 				continue;
 			}
 			if( $DB->query( '
@@ -287,7 +287,7 @@ switch( $action )
 		{
 			$Settings->dbupdate();
 
-			$Messages->add( T_('Settings updated.'), 'success' );
+			$Messages->add( TB_('Settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=antispam&tab3=settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -298,7 +298,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
@@ -325,7 +325,7 @@ switch( $action )
 
 			$rows_affected = $rows_affected + $DB->rows_affected;
 		}
-		$Messages->add( sprintf( T_('Deleted %d comments'), $rows_affected ), 'success' );
+		$Messages->add( sprintf( TB_('Deleted %d comments'), $rows_affected ), 'success' );
 		break;
 
 	case 'find_spam_referers':
@@ -333,7 +333,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
@@ -357,7 +357,7 @@ switch( $action )
 
 			$rows_affected = $rows_affected + $DB->rows_affected;
 		}
-		$Messages->add( sprintf( T_('Deleted %d logged hits'), $rows_affected ), 'success' );
+		$Messages->add( sprintf( TB_('Deleted %d logged hits'), $rows_affected ), 'success' );
 		break;
 
 	case 'iprange_create':
@@ -367,7 +367,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		$edited_IPRange = new IPRange();
 
@@ -376,7 +376,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_IPRange->dbinsert();
-			$Messages->add( T_('New IP Range created.'), 'success' );
+			$Messages->add( TB_('New IP Range created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=antispam&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit&filter=new', 303 ); // Will EXIT
@@ -392,7 +392,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		// Make sure we got an iprange_ID:
 		param( 'iprange_ID', 'integer', true );
@@ -402,7 +402,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update IP Range in DB:
 			$edited_IPRange->dbupdate();
-			$Messages->add( T_('IP Range updated.'), 'success' );
+			$Messages->add( TB_('IP Range updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit', 303 ); // Will EXIT
@@ -418,14 +418,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		// Make sure we got an iprange_ID:
 		param( 'iprange_ID', 'integer', true );
 
 		if( $edited_IPRange->dbdelete() )
 		{
-			$Messages->add( T_('IP Range deleted.'), 'success' );
+			$Messages->add( TB_('IP Range deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
@@ -440,13 +440,13 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array:integer', array() );
 
 		if( empty( $bankruptcy_blogs ) )
 		{
-			$Messages->add( T_('Please select at least one blog.'), 'error' );
+			$Messages->add( TB_('Please select at least one blog.'), 'error' );
 		}
 
 		if( !param_errors_detected() )
@@ -466,7 +466,7 @@ switch( $action )
 		$query = param( 'query', 'string', NULL );
 		if( empty( $query ) )
 		{
-			param_error( 'query', T_('You must specify an IP address or domain to query') );
+			param_error( 'query', TB_('You must specify an IP address or domain to query') );
 		}
 		else
 		{
@@ -484,9 +484,9 @@ if( $display_mode != 'js' )
 
 		if( isset( $collections_Module ) )
 		{ // Display list of blogs:
-			if( $current_User->check_perm( 'stats', 'view' ) )
+			if( check_user_perm( 'stats', 'view' ) )
 			{
-				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ), TB_('All'),
 								$admin_url.'?ctrl=antispam&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0', NULL, false, true );
 			}
 			else
@@ -495,16 +495,16 @@ if( $display_mode != 'js' )
 						'', NULL, false, true );
 			}
 		}
-		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
-		$AdminUI->breadcrumbpath_add( T_('IPs'), $admin_url.'?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		$AdminUI->breadcrumbpath_add( T_('IP Ranges'), $admin_url.'?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_add( TB_('IPs'), $admin_url.'?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('IP Ranges'), $admin_url.'?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 		$AdminUI->set_path( 'stats', 'ips', 'ranges' );
 	}
 	else
 	{
 		$AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-		$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-		$AdminUI->breadcrumbpath_add( T_('Antispam'), $admin_url.'?ctrl=antispam' );
+		$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+		$AdminUI->breadcrumbpath_add( TB_('Antispam'), $admin_url.'?ctrl=antispam' );
 	}
 
 	if( empty( $tab3 ) )
@@ -514,7 +514,7 @@ if( $display_mode != 'js' )
 	switch( $tab3 )
 	{
 		case 'settings':
-			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			init_hotkeys_js();
 
 			// Set an url for manual page:
@@ -522,14 +522,14 @@ if( $display_mode != 'js' )
 			break;
 
 		case 'tools':
-			$AdminUI->breadcrumbpath_add( T_('Tools'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			$AdminUI->breadcrumbpath_add( TB_('Tools'), '?ctrl=antispam&amp;tab3='.$tab3 );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'antispam-tools' );
 			break;
 
 		case 'blacklist':
-			$AdminUI->breadcrumbpath_add( T_('Blacklist'), '?ctrl=antispam' );
+			$AdminUI->breadcrumbpath_add( TB_('Blacklist'), '?ctrl=antispam' );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'antispam-tab' );
@@ -538,14 +538,14 @@ if( $display_mode != 'js' )
 		case 'ipranges':
 			if( empty( $action ) )
 			{	// View a list of IP ranges
-				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+				require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			}
-			elseif( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+			elseif( ! check_user_perm( 'spamblacklist', 'edit' ) )
 			{	// Check permission to create/edit IP range
-				$Messages->add( T_('You have no permission to edit this IP range!'), 'error' );
+				$Messages->add( TB_('You have no permission to edit this IP range!'), 'error' );
 				$action = '';
 			}
-			$AdminUI->breadcrumbpath_add( T_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			$AdminUI->breadcrumbpath_add( TB_('IP Ranges'), '?ctrl=antispam&amp;tab3='.$tab3 );
 
 			// Set an url for manual page:
 			if( $action == 'iprange_new' || $action == 'iprange_edit' )
@@ -560,26 +560,26 @@ if( $display_mode != 'js' )
 			break;
 
 		case 'countries':
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
-				require_js( 'jquery/jquery.jeditable.js' );
+				require_js_defer( 'jquery/jquery.jeditable.js' );
 			}
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'countries-list' );
 
-			$AdminUI->breadcrumbpath_add( T_('Countries'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			$AdminUI->breadcrumbpath_add( TB_('Countries'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			break;
 
 		case 'domains':
 			load_funcs('sessions/model/_hitlog.funcs.php');
-			$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=antispam&amp;tab3='.$tab3 );
-			if( $current_User->check_perm( 'stats', 'edit' ) )
+			$AdminUI->breadcrumbpath_add( TB_('Referring domains'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			if( check_user_perm( 'stats', 'edit' ) )
 			{
-				require_js( 'jquery/jquery.jeditable.js' );
+				require_js_defer( 'jquery/jquery.jeditable.js' );
 			}
 			// Load jquery UI to highlight cell on change domain type
-			require_js( '#jqueryUI#' );
+			require_js_defer( '#jqueryUI#' );
 			// Used for edit form
 			$tab_from = 'antispam';
 			$blog = 0; // Don't restrict domains by blog ID on this controller
@@ -623,7 +623,7 @@ switch( $tab3 )
 		// Check permission:
 		if( $tool != 'whois' )
 		{
-			$current_User->check_perm( 'options', 'edit', true );
+			check_user_perm( 'options', 'edit', true );
 		}
 
 		switch( $tool )

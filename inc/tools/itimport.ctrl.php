@@ -13,8 +13,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 load_funcs( 'tools/model/_wp.funcs.php' );
 load_funcs( 'tools/model/_itemtypeimport.funcs.php' );
@@ -60,7 +60,7 @@ switch( $action )
 		if( param( 'import_type', 'string', 'skip' ) == 'update' &&
 		    param( 'import_type_update_confirm', 'string' ) !== 'DELETE' )
 		{	// If deleting/replacing is not confirmed:
-			param_error( 'import_type_update_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
+			param_error( 'import_type_update_confirm', sprintf( TB_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
 		}
 
 		if( param_errors_detected() )

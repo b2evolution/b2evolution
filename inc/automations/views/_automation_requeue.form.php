@@ -33,17 +33,17 @@ $Form->hidden( 'source_step_ID', param( 'source_step_ID', 'integer', NULL ) );
 // To requeue only a specific user:
 $Form->hidden( 'source_user_ID', param( 'source_user_ID', 'integer', NULL ) );
 
-$Form->begin_fieldset( T_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ), array( 'style' => 'width:420px' ) );
+$Form->begin_fieldset( TB_('Requeue automation for finished steps').get_manual_link( 'requeue-automation-for-finished-steps' ), array( 'style' => 'width:420px' ) );
 
 	// Get automations where user is NOT added yet:
 	$AutomationStepCache = & get_AutomationStepCache();
 	$automation_cache_SQL = $AutomationStepCache->get_SQL_object();
 	$automation_cache_SQL->WHERE_and( 'step_autm_ID = '.$edited_Automation->ID );
 	$AutomationStepCache->load_by_sql( $automation_cache_SQL );
-	$Form->select_input_object( 'target_step_ID', '', $AutomationStepCache, T_('Step'), array( 'required' => true ) );
+	$Form->select_input_object( 'target_step_ID', '', $AutomationStepCache, TB_('Step'), array( 'required' => true ) );
 
 	echo '<p class="center">';
-	$Form->button( array( '', 'actionArray[requeue]', T_('Requeue'), 'SaveButton' ) );
+	$Form->button( array( '', 'actionArray[requeue]', TB_('Requeue'), 'SaveButton' ) );
 	echo '</p>';
 
 $Form->end_fieldset();

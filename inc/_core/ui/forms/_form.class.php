@@ -75,11 +75,6 @@ class Form extends Widget
 	var $hiddens = array();
 
 	/**
-	 * Do we need to add javascript for check/uncheck all functionality
-	 */
-	var $check_all = false;
-
-	/**
 	 * Additional Javascript to append to the form, in {@link Form::end_form()}.
 	 *
 	 * @access protected
@@ -2149,25 +2144,42 @@ class Form extends Widget
 
 	/**
 	 * Return links to check and uncheck all check boxes of the form
+	 * 
+	 * @deprecated use Form::checkbox_controls() instead
 	 */
 	function check_all()
 	{
-		// Need to add event click on links at the form end.
-		$this->check_all = true;
+		return $this->checkbox_controls( '$all$', array( 'button_class' => 'btn btn-default' ) );
+	}
 
-		$r = '<span class="btn-group">';
 
-		// fp> This is "name=" and I mean it!!! The JS is looking for all elements with this name!
-		$r .= '<a name="check_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
-				//.T_('Check all').' '
-				.get_icon( 'check_all', 'imgtag', NULL, true )
-				.'</a> <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
-				//.T_('Uncheck all').' '
-				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
+	/**
+	 * Control icon/buttons to check/uncheck/reverse all checkboxes by input name
+	 *
+	 * @param string Field name of the checkbox, '$all$' - to control all checkboxes of this Form
+	 * @param array Additional parameters
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function checkbox_controls( $field_name = '$all$', $params = array() )
+	{
+		$params = array_merge( array(
+				'before_buttons' => '<div class="btn-group">',
+				'after_buttons'  => '</div>',
+				'button_class'   => 'btn btn-default btn-xs',
+				'icon_class'     => 'middle',
+			), $params );
 
-		$r .= '</span>';
+		$r = $params['before_buttons'];
 
-		return $r;
+		$button_tag_start = '<button type="button" class="'.format_to_output( $params['button_class'], 'htmlattr' ).'" data-checkbox-control="'.format_to_output( $field_name, 'htmlattr' ).'" data-checkbox-control-type';
+
+		$r .= $button_tag_start.'="check">'.get_icon( 'check_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button> ';
+		$r .= $button_tag_start.'="uncheck">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
+		$r .= $button_tag_start.'="reverse">'.T_('Invert').'</button>';
+
+		$r .= $params['after_buttons'];
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -2396,12 +2408,6 @@ class Form extends Widget
 					if( typeof init_dynamicSelect == "function" )
 					{
 						jQuery( document ).bind( "ready", init_dynamicSelect );
-						';
-						if( $this->check_all )
-						{ // Init check_all event on check_all links
-							$r .= 'jQuery( document ).bind( "ready", init_check_all );';
-						}
-						$r .= '
 					}
 					';
 
@@ -2441,11 +2447,11 @@ class Form extends Widget
 	 * @param string name
 	 * @param string label
 	 * @param boolean true to surround checkboxes if they are required
-	 * @param boolean true add a surround_check span, used by check_all mouseover
+	 * @param boolean true add a surround_check span, used by check_all mouseover @deprecated
 	 * @param array Params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false, $field_params = array() )
+	function checklist( $options, $field_name, $field_label, $required = false, $dummy = NULL, $field_params = array() )
 	{
 		$field_params = array_merge( array(
 				'wide' => false,
@@ -2492,16 +2498,6 @@ class Form extends Widget
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
 			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'"'.$extra_attribs.'>';
 
-			if( $add_highlight_spans )
-			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
-				$r .= '<span name="surround_check" class="checkbox_surround_init">';
-				$after_field_highlight = '</span>';
-			}
-			else
-			{
-				$after_field_highlight = '';
-			}
-
 			$after_field = '';
 			if( param_has_error( $field_name ) )
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
@@ -2532,8 +2528,6 @@ class Form extends Widget
 			$r .= ' class="'.$this->inputclass_checkbox.'" />';
 
 			$r .= $after_field;
-
-			$r .= $after_field_highlight;
 
 			$r .= ' '.$option[2];
 
@@ -2701,7 +2695,12 @@ class Form extends Widget
 	{
 		global $edited_User;
 
-		if( isset($field_params['allow_none']) )
+		if( isset($field_params['required']) )
+		{	// 'allow_none' param value should depend on 'required' param value:
+			$allow_none = !$field_params['required'];
+			unset( $field_params['allow_none'] );
+		}
+		elseif( isset($field_params['allow_none']) )
 		{
 			$allow_none = $field_params['allow_none'];
 			unset( $field_params['allow_none'] );
@@ -3752,13 +3751,11 @@ class Form extends Widget
 			$field_params['note_format'] = '<div>'.$field_params['note_format'].'</div>';
 		}
 
-		$field_params['id'] = false; // No ID attribute for the label
 		if( isset( $field_params['required'] ) )
 		{
 			$field_required = $field_params['required'];
 		}
 		$this->handle_common_params( $field_params, $field_name, $field_label );
-		unset($field_params['id']);  // unset, so it gets handled correctly as default below
 
 		$r = $this->begin_field( NULL, NULL, false, 'radio' );
 
@@ -5012,7 +5009,6 @@ class Form extends Widget
 	 */
 	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
 	{
-		global $current_User;
 		global $attachment_tab;
 
 		// Get object type to initialize link owner
@@ -5215,6 +5211,174 @@ class Form extends Widget
 		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Builds Item selector field
+	 *
+	 * @param string Name/ID of the input field
+	 * @param string Initial value
+	 * @param string Field label
+	 * @param array Extended attributes/parameters
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function item_selector( $field_name, $selected_item_ID, $field_label, $field_params = array() )
+	{
+		global $thumbnail_sizes, $file_select_js_initialized;
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$field_params = array_merge( array(
+				'btn_select_title'   => NT_('Select'),
+				'btn_selected_title' => NT_('Select another'),
+				'btn_select_icon'    => 'magnifier',
+				'btn_select_class'   => 'btn btn-sm btn-info',
+				'btn_deselect_title' => NT_('Deselect Item'),
+				'btn_deselect_icon'  => 'remove',
+				'window_title_page1' => NT_('Select the Item'),
+				'window_title_page2' => NT_('Select the Item').':',
+			), $field_params );
+
+			$r = $this->begin_field();
+
+			// Hidden field for a selected Item ID:
+			$r .= '<input'.get_field_attribs_as_string( array(
+					'type'  => 'hidden',
+					'id'    => $field_name,
+					'name'  => $field_name,
+					'value' => $selected_item_ID,
+				) ).' />';
+
+			// Try to get Item by initial ID:
+			$ItemCache = & get_ItemCache();
+			$selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false );
+
+			// Display info of the selected Item:
+			$r .= '<span id="'.format_to_output( 'evo_item_selector_info_'.$field_name, 'htmlattr' ).'">';
+			if( $selected_Item )
+			{
+				$r .= $selected_Item->get_form_selector_info();
+			}
+			$r .= '</span>';
+
+			// Button to select Item:
+			$btn_select_title = ( empty( $field_params['btn_select_icon'] ) ? '' : get_icon( $field_params['btn_select_icon'] ).' ' )
+				.'<span class="evo_item_selector_btn_title">'.( $selected_Item ? T_( $field_params['btn_selected_title'] ) : T_( $field_params['btn_select_title'] ) ).'</span>';
+			$r .= '<button type="button"'
+				.'id="evo_item_selector_form_btn_'.$field_name.'" '
+				.'class="'.$field_params['btn_select_class'].' evo_item_selector_form_btn" '
+				.'onclick="return evo_form_item_selector_load_window( \''.$field_name.'\' )" >'
+					.format_to_output( trim( $btn_select_title ), 'htmlbody' )
+				.'</button>';
+
+			// Icon to deselect the Item:
+			$deselector_params = array(
+					'id'      => 'evo_item_deselector_btn_'.$field_name,
+					'title'   => T_( $field_params['btn_deselect_title'] ),
+					'class'   => 'evo_item_deselector_btn pointer',
+				);
+			if( ! $selected_Item )
+			{	// Hide the deselector icon if no selected Item yet:
+				$deselector_params['style'] = 'display:none';
+			}
+			$r .= ' '.get_icon( $field_params['btn_deselect_icon'], 'imgtag', $deselector_params );
+
+			// Initialize different config per each field:
+			$r .= '<script>
+			if( typeof( evo_form_item_selector ) == "undefined" )
+			{
+				var evo_form_item_selector = {};
+			}
+			evo_form_item_selector.'.$field_name.' = {
+				window_title_page1: "'.TS_( $field_params['window_title_page1'] ).'",
+				window_title_page2: "'.TS_( $field_params['window_title_page2'] ).'",
+				btn_select_title:   "'.TS_( $field_params['btn_select_title'] ).'",
+				btn_selected_title: "'.TS_( $field_params['btn_selected_title'] ).'",
+			};
+			</script>';
+
+			if( empty( $this->item_selector_js_initialized ) )
+			{	// Initialize JS code for Item selector once:
+				global $UserSettings, $b2evo_icons_type;
+
+				// Initialize JavaScript to build and open window:
+				echo_modalwindow_js();
+
+				// Initialize JavaScript for item selector window:
+				echo_item_selector_js();
+
+				// Get last selected collection:
+				if( ! ( $last_selected_item_coll_ID = $UserSettings->get( 'last_selected_item_coll_ID' ) ) )
+				{
+					global $Blog;
+					$last_selected_item_coll_ID = empty( $Blog ) ? 0 : $Blog->ID;
+				}
+
+				$r .= '<script>
+				var evo_last_selected_item_coll_ID = '.$last_selected_item_coll_ID.';
+
+				function evo_form_item_selector_load_window( field_name )
+				{
+					return evo_item_selector_load_window( null,
+						[ evo_form_item_selector[ field_name ].window_title_page1, evo_form_item_selector[ field_name ].window_title_page2 ],
+						false,
+						[ { "text": evo_form_item_selector[ field_name ].btn_select_title, "id": "evo_item_selector_window_btn_" + field_name, "class": "btn btn-primary evo_item_selector_window_btn" } ],
+						evo_last_selected_item_coll_ID,
+						"collections"
+					);
+				}
+
+				// Submit form to use the selected Item for the form field:
+				jQuery( document ).on( "click", ".evo_item_selector_window_btn", function()
+				{
+					var field_name = jQuery( this ).attr( "id" ).replace( /^evo_item_selector_window_btn_/, "" );
+					jQuery.ajax(
+					{
+						type: "POST",
+						url: htsrv_url + "anon_async.php",
+						data: {
+							"action": "get_item_selector_info",
+							"item_ID": jQuery( "#evo_item_selector_dest_post_ID" ).val(),
+							"b2evo_icons_type": "'.( isset( $b2evo_icons_type ) ? $b2evo_icons_type : '' ).'",
+							"crumb_item_selector": "'.get_crumb( 'item_selector' ).'"
+						},
+						success: function( data )
+						{
+							data = JSON.parse( ajax_debug_clear( data ) );
+							if( typeof( data.item_ID ) == "undefined" )
+							{	// Unexpected error, do NOT translate!
+								alert( "Wrong Item, try again." );
+							}
+							else
+							{	// Update Item data in the form:
+								jQuery( "#" + field_name ).val( data.item_ID );
+								jQuery( "#evo_item_selector_info_" + field_name ).html( data.item_info );
+								jQuery( "#evo_item_selector_form_btn_" + field_name ).find( ".evo_item_selector_btn_title" ).html( evo_form_item_selector[ field_name ].btn_selected_title );
+								jQuery( "#evo_item_deselector_btn_" + field_name ).show();
+								evo_last_selected_item_coll_ID = data.coll_ID;
+							}
+							closeModalWindow();
+						}
+					} );
+				} );
+
+				// Deselect the Item:
+				jQuery( document ).on( "click", ".evo_item_deselector_btn", function()
+				{
+					var field_name = jQuery( this ).attr( "id" ).replace( /^evo_item_deselector_btn_/, "" );
+					jQuery( "#" + field_name ).val( "" );
+					jQuery( "#evo_item_selector_info_" + field_name ).html( "" );
+					jQuery( "#evo_item_selector_form_btn_" + field_name ).find( ".evo_item_selector_btn_title" ).html( evo_form_item_selector[ field_name ].btn_select_title );
+					jQuery( this ).hide();
+				} );
+				</script>';
+				$this->item_selector_js_initialized = true;
+			}
+
+			$r .= $this->end_field();
+
+			return $this->display_or_return( $r );
 	}
 }
 

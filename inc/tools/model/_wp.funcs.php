@@ -489,7 +489,12 @@ function wpxml_parser( $file )
 			$post['attachment_url'] = (string) $wp->attachment_url;
 		}
 
-		foreach ( $item->category as $c )
+		if( isset( $evo->post_extra_urltitle ) )
+		{	// Extra slugs:
+			$post['extra_slugs'] = (array)$evo->post_extra_urltitle;
+		}
+
+		foreach( $item->category as $c )
 		{
 			$att = $c->attributes();
 			if( isset( $att['nicename'] ) )
@@ -551,6 +556,7 @@ function wpxml_parser( $file )
 				'comment_type'         => (string) $comment->comment_type,
 				'comment_parent'       => (string) $comment->comment_parent,
 				'comment_user_id'      => (int) $comment->comment_user_id,
+				'comment_user_login'   => (string) $evo_comment->comment_user_login,
 				'comment_status'             => (string) $evo_comment->comment_status,
 				'comment_IP_country'         => (string) $evo_comment->comment_IP_country,
 				'comment_rating'             => (int) $evo_comment->comment_rating,

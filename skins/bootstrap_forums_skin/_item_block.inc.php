@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $preview, $dummy_fields, $cat, $current_User, $app_version;
+global $Item, $preview, $dummy_fields, $cat, $app_version;
 
 /**
  * @var array Save all statuses that used on this page in order to show them in the footer legend
@@ -127,7 +127,6 @@ skin_widget( array(
 					'link_type' => 'permalink',
 				),
 			// Item Next Previous widget
-			'widget_item_next_previous_display' => ! $Item->is_featured(), // Do not show Item Next Previous widget if featured item
 			'widget_item_next_previous_params' => array(
 					'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
 					'post_navigation' => 'same_category', // force to stay in the same category in this skin
@@ -465,24 +464,7 @@ skin_widget( array(
 
 </div><!-- ../forums_list single_topic -->
 
-	<?php
-		locale_restore_previous();	// Restore previous locale (Blog locale)
-	?>
-<script>
-jQuery( document ).ready( function()
-{
-	jQuery( '.quote_button' ).click( function()
-	{ // Submit a form to save the already entered content
-		console.log( jQuery( this ).attr( 'href' ) );
-		var form = jQuery( 'form[id^=evo_omment_form_id_]' );
-		if( form.length == 0 )
-		{ // No form found, Use an url of this link
-			return true;
-		}
-		// Set an action as url of this link and submit a form
-		form.attr( 'action', jQuery( this ).attr( 'href' ) );
-		form.submit();
-		return false;
-	} );
-} );
-</script>
+<?php
+	locale_restore_previous();	// Restore previous locale (Blog locale)
+	expose_var_to_js( 'evo_skin_bootstrap_forum__quote_button_click', true );
+?>

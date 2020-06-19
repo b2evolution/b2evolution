@@ -132,7 +132,7 @@ switch( $action )
 
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 		// Check permission based on DB status:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
@@ -170,7 +170,7 @@ switch( $action )
 		check_categories( $post_category, $post_extracats, NULL, 'frontoffice' );
 
 		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
+		check_user_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
@@ -263,7 +263,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Check if new category was started to create.  If yes check if it is valid:
 		$isset_category = check_categories( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
@@ -403,8 +403,8 @@ switch( $action )
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
 			$Messages->add( T_('New proposed change has been recorded.'), 'success' );
-			if( $current_User->check_perm( 'admin', 'restricted' ) &&
-			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			if( check_user_perm( 'admin', 'restricted' ) &&
+			    check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Redirect to item history page with new poroposed change if current User has a permisson:
 				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 			}

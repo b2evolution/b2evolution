@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $sec_ID, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
+global $blog, $sec_ID, $admin_url, $rsc_url, $UserSettings, $tab3;
 
 global $dname, $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_email, $dtyp_unknown;
 
@@ -111,7 +111,7 @@ $count_SQL->WHERE( $SQL->get_where( '' ) );
 
 $Results = new Results( $SQL->get(), 'refdom_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 { // Current user has a permission to create new domain
 	global $tab_from;
 	$tab_from_param = empty( $tab_from ) ? '' : '&amp;tab_from='.$tab_from;
@@ -183,7 +183,7 @@ $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'dom_type',
 		'td_class' => 'jeditable_cell dom_type_edit',
-		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_type$">%stats_dom_type_title( #dom_type# )%</a>' :
 			/* No edit */'%stats_dom_type_title( #dom_type# )%',
 	);
@@ -199,7 +199,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'dom_status',
 		'td_class' => 'jeditable_cell dom_status_edit',
-		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_status$">%stats_dom_status_title( #dom_status# )%</a>' :
 			/* No edit */'%stats_dom_status_title( #dom_status# )%',
 		'extra' => array( 'style' => 'background-color: %stats_dom_status_color( "#dom_status#" )%;', 'format_to_output' => false )
@@ -226,7 +226,7 @@ if( $tab3 == 'top' )
 					);
 }
 
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -250,7 +250,7 @@ function dom_row_actions( $dom_ID )
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 { // Check permission to edit Domains:
 	// Print JS to edit a domain type
 	echo_editable_column_js( array(

@@ -138,7 +138,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'image_class'                => 'img-responsive',
 					'image_size'                 => 'fit-1920x1080',
 					'limit'                      => 1,
-					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+					'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink',
 				) );
 			}
 		?>

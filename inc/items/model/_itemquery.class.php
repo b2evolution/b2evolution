@@ -33,6 +33,8 @@ class ItemQuery extends SQL
 	var $author_login;
 	var $assignees;
 	var $assignees_login;
+	var $involved_user_IDs;
+	var $involved_user_logins;
 	var $statuses;
 	var $types;
 	var $itemtype_usage;
@@ -565,6 +567,67 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict items that have any comment OR internal/meta comment by the specific users
+	 *
+	 * @param string List of user IDs to restrict to (must have been previously validated)
+	 */
+	function where_involves( $involved_user_IDs )
+	{
+		$this->involved_user_IDs = clear_ids_list( $involved_user_IDs );
+
+		if( empty( $this->involved_user_IDs ) )
+		{
+			return;
+		}
+
+		if( substr( $involved_user_IDs, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+		}
+
+		$this->FROM_add( 'INNER JOIN T_comments AS involved_id ON involved_id.comment_item_ID = post_ID' );
+		$this->WHERE_and( 'involved_id.comment_author_user_ID '.$eq.' ( '.$this->involved_user_IDs.' )' );
+	}
+
+
+	/**
+	 * Restrict items that have any comment OR internal/meta comment by the specific users
+	 *
+	 * @param string List of involved user logins to restrict to (must have been previously validated)
+	 */
+	function where_involves_logins( $involved_user_logins )
+	{
+		$this->involved_user_logins = $involved_user_logins;
+
+		if( empty( $this->involved_user_logins ) )
+		{
+			return;
+		}
+
+		if( substr( $involved_user_logins, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+			$involved_user_IDs = get_users_IDs_by_logins( substr( $this->involved_user_logins, 1 ) );
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+			$involved_user_IDs = get_users_IDs_by_logins( $this->involved_user_logins );
+		}
+
+		if( ! empty( $involved_user_IDs ) )
+		{	// Filter only if correct users are found by logins:
+			$this->FROM_add( 'INNER JOIN T_comments AS involved_login ON involved_login.comment_item_ID = post_ID' );
+			$this->WHERE_and( 'involved_login.comment_author_user_ID '.$eq.' ( '.$involved_user_IDs.' )' );
+		}
+	}
+
+
+	/**
 	 * Restrict to specific locale
 	 *
 	 * @param string locale to restrict to ('all' if you don't want to restrict)
@@ -585,7 +648,7 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific (extended) statuses
 	 *
-	 * @param string List of assignees to restrict to (must have been previously validated)
+	 * @param string List of statuses to restrict to (must have been previously validated)
 	 */
 	function where_statuses( $statuses )
 	{
@@ -614,6 +677,57 @@ class ItemQuery extends SQL
 		else
 		{
 			$this->WHERE_and( $this->dbprefix.'pst_ID IN ('.$this->statuses.')' );
+		}
+	}
+
+
+	/**
+	 * Restrict to specific (extended) statuses
+	 *
+	 * @param array Array of statuses to restrict to (must have been previously validated)
+	 */
+	function where_statuses_array( $statuses )
+	{
+		if( ! is_array( $statuses ) )
+		{	// Wrong data:
+			return;
+		}
+
+		$filter_without_status = false;
+		foreach( $statuses as $s => $status_ID )
+		{
+			if( $status_ID == '-' )
+			{	// Filter by "No status":
+				$filter_without_status = true;
+				unset( $statuses[ $s ] );
+				continue;
+			}
+
+			$status_ID = intval( $status_ID );
+
+			if( empty( $status_ID ) )
+			{	// Remove a not number value from list:
+				unset( $statuses[ $s ] );
+				continue;
+			}
+
+			// Update value to integer format:
+			$statuses[ $s ] = $status_ID;
+		}
+
+		$where_statuses = array();
+		if( $filter_without_status )
+		{	// Filter by "No status":
+			$where_statuses[] = $this->dbprefix.'pst_ID IS NULL';
+		}
+		if( ! empty( $statuses ) )
+		{	// Filter by specific statuses:
+			$where_statuses[] = $this->dbprefix.'pst_ID IN ( '.implode( ',', $statuses ).' )';
+		}
+
+		if( ! empty( $where_statuses ) )
+		{	// Apply filter by statuses:
+			$this->WHERE_and( implode( ' OR ', $where_statuses ) );
 		}
 	}
 
@@ -1112,6 +1226,53 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific renderer plugins
+	 *
+	 * @param array Renderer plugin codes
+	 */
+	function where_renderers( $renderers )
+	{
+		global $DB, $Plugins;
+
+		if( empty( $renderers ) )
+		{	// No filters:
+			return;
+		}
+
+		foreach( $renderers as $r => $renderer )
+		{	// Escape chars:
+			$renderers[ $r ] = $DB->escape( $renderer );
+		}
+
+		$sql_conditions = array();
+
+		if( isset( $Plugins, $this->Blog ) )
+		{	// Get default renderer plugins for current Collection:
+			$default_renderers = $Plugins->validate_renderer_list( array( 'default' ), array(
+				'setting_name' => 'coll_apply_rendering',
+				'Blog'         => $this->Blog,
+			) );
+			if( ! empty( $default_renderers ) )
+			{
+				foreach( $renderers as $renderer )
+				{
+					if( in_array( $renderer, $default_renderers ) )
+					{	// If at least one default renderer plugin is used to filter then get items which still use default renderers:
+						$sql_conditions[] = $this->dbprefix.'renderers = "default"';
+						break;
+					}
+				}
+			}
+		}
+
+		// Filter by selected renderers:
+		$sql_conditions[] = $this->dbprefix.'renderers REGEXP "(^|\.)('.implode( '|', $renderers ).')(\.|$)"';
+
+		$this->WHERE_and( implode( ' OR ', $sql_conditions ) );
+	}
+
+
+	/**
 	 * Generate order by clause
 	 *
 	 * @param $order_by
@@ -1173,8 +1334,8 @@ class ItemQuery extends SQL
 		{
 			$table_alias = $key.'_table';
 			$field_value = $table_alias.'.icfv_value';
-			if( strpos( $key, 'custom_double' ) === 0 )
-			{ // Double values should be compared as numbers and not like strings
+			if( strpos( $key, 'custom_double' ) === 0 || strpos( $key, 'custom_computed' ) === 0 )
+			{	// Double and computed values should be compared as numbers and not like strings
 				$field_value .= '+0';
 			}
 			if( in_array( $key, $orderby_array ) )

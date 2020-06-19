@@ -96,6 +96,24 @@ class PluginSettings extends AbstractSettings
 		return parent::delete( $this->plugin_ID, $setting );
 	}
 
+
+	/**
+	 * Commit changed plugin settings to DB.
+	 *
+	 * @return boolean true, if settings have been updated; false otherwise
+	 */
+	function dbupdate()
+	{
+		$result = parent::dbupdate();
+
+		if( $result )
+		{	// BLOCK CACHE INVALIDATION:
+			BlockCache::invalidate_key( 'plugin_ID', $this->plugin_ID ); // Plugin has changed
+		}
+
+		return $result;
+	}
+
 }
 
 ?>

@@ -24,22 +24,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function render_template_code( $code, & $params, $objects = array(), & $used_template_tags = NULL )
 {
-	global $current_locale;
-
 	$TemplateCache = & get_TemplateCache();
-	if( ! ( $Template = & $TemplateCache->get_by_code( $code, false, false ) ) )
-	{
-		return false;
-	}
-
-	// Check if the template has a child matching the current locale:
-	$localized_templates = $Template->get_localized_templates( $current_locale );
-	if( ! empty( $localized_templates ) )
-	{	// Use localized template:
-		$Template = & $localized_templates[0];
-	}
-
-	if( $Template )
+	if( $Template = & $TemplateCache->get_localized_by_code( $code, false, false ) )
 	{	// Render variables in available Template:
 		return render_template( $Template->template_code, $params, $objects, $used_template_tags );
 	}
@@ -367,7 +353,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Comment:creation_time':
-			echo mysql2date( $params['date_format'], $rendered_Comment->date );
+			$temp_params = array_merge( array(
+					'format' => '#short_date_time',
+					'useGM'  => false,
+				), $params );
+			echo $rendered_Comment->get_creation_time( $temp_params['format'], $temp_params['useGM'] );
 			break;
 
 		case 'Comment:content':
@@ -377,6 +367,10 @@ function render_template_callback( $var, $params, $objects = array() )
 					'show_attachments' => false,
 				), $params );
 			echo $rendered_Comment->content( $temp_params['format'], $temp_params['ban_urls'], $temp_params['show_attachments'], $temp_params );
+			break;
+
+		case 'Comment:excerpt':
+			echo $rendered_Comment->get_excerpt( $params );
 			break;
 
 		case 'Comment:permalink':
@@ -417,15 +411,17 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			$country = param( 'country', 'integer', 0 );
 			$temp_params = array(
-					'name'       => 'country',
-					'value'      => $country,
-					'label'      => T_('Country'),
-					'allow_none' => true,
-					'required'   => isset( $params['reg1_required'] ) ? in_array( 'country', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
-					'class'      => '',
-					'hide_label' => false,
-					'style'      => '',
+					'name'        => 'country',
+					'value'       => $country,
+					'label'       => T_('Country'),
+					'hide_label'  => false,
+					'note'        => '',
+					'bottom_note' => '',
+					'class'       => '',
+					'style'       => '',
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'country', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 				);
+
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
 
@@ -444,15 +440,16 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(
 					'name'        => $dummy_fields['email'],
 					'value'       => $email,
-					'size'        => 50,
 					'label'       => T_('Email'),
-					'placeholder' => $params['register_use_placeholders'] ? T_('Email address') : '',
+					'hide_label'  => false,
+					'note'        => '',
 					'bottom_note' => T_('We respect your privacy. Your email will remain strictly confidential.'),
+					'placeholder' => $params['register_use_placeholders'] ? T_('Email address') : '',
+					'size'        => 50,
 					'maxlength'   => 255,
 					'class'       => 'input_text wide_input',
-					'required'    => isset( $params['reg1_required'] ) ? in_array( 'email', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
-					'hide_label'  => false,
 					'style'       => '',
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'email', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 			);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -467,15 +464,16 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(
 					'name'        => 'firstname',
 					'value'       => $firstname,
-					'size'        => 18,
 					'label'       => T_('First name'),
+					'hide_label'  => false,
 					'note'        => T_('Your real first name'),
+					'bottom_note' => '',
 					'placeholder' => '',
+					'size'        => 18,
 					'maxlength'   => 50,
 					'class'       => 'input_text',
-					'required'    => isset( $params['reg1_required'] ) ? in_array( 'firstname', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
-					'hide_label'  => false,
 					'style'       => '',
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'firstname', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -488,13 +486,15 @@ function render_template_callback( $var, $params, $objects = array() )
 		
 			$gender = param( 'gender', 'string', false );
 			$temp_params = array(
-					'name'       => 'gender',
-					'value'      => $gender,
-					'label'      => T_('I am'),
-					'required'   => isset( $params['reg1_required'] ) ? in_array( 'gender', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
-					'class'      => '',
-					'hide_label' => false,
-					'style'      => '',
+					'name'        => 'gender',
+					'value'       => $gender,
+					'label'       => T_('I am'),
+					'hide_label'  => false,
+					'note'        => '',
+					'bottom_note' => '',
+					'class'       => '',
+					'style'       => '',
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'gender', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -513,15 +513,16 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(
 					'name'        => 'lastname',
 					'value'       => $lastname,
-					'size'        => 18,
 					'label'       => T_('Last name'),
+					'hide_label'  => false,
 					'note'        => T_('Your real last name'),
+					'bottom_note' => '',
 					'placeholder' => '',
+					'size'        => 18,
 					'maxlength'   => 50,
 					'class'       => 'input_text',
-					'required'    => isset( $params['reg1_required'] ) ? in_array( 'lastname', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
-					'hide_label'  => false,
 					'style'       => '',
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'lastname', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -533,15 +534,15 @@ function render_template_callback( $var, $params, $objects = array() )
 			global $Settings, $current_locale;
 
 			$temp_params = array(
-					'name'       => 'locale',
-					'value'      => $current_locale,
-					'label'      => T_('Locale'),
-					'class'      => '',
-					'note'       => T_('Preferred language'),
-					'class'      => '',
-					'required'   => isset( $params['reg1_required'] ) ? in_array( 'locale', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
-					'hide_label' => false,
-					'style'      => '',
+					'name'        => 'locale',
+					'value'       => $current_locale,
+					'label'       => T_('Locale'),
+					'hide_label'  => false,
+					'note'        => T_('Preferred language'),
+					'bottom_note' => '',
+					'class'       => '',
+					'style'       => '',
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'locale', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -560,16 +561,17 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(  // Here, we make sure not to modify $params
 					'name'         => $dummy_fields['login'],
 					'value'        => $login,
-					'size'         => 22,
 					'label'        => /* TRANS: noun */ T_('Login'),
+					'hide_label'   => false,
 					'note'         => $params['register_use_placeholders'] ? '' : T_('Choose a username').'.',
+					'bottom_note'  => '',
 					'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a username') : '',
+					'size'         => 22,
 					'maxlength'    => 20,
 					'class'        => 'input_text',
+					'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
 					'required'     => isset( $params['reg1_required'] ) ? in_array( 'login', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'input_suffix' => ' <span id="login_status"></span><span class="help-inline"><div id="login_status_msg" class="red"></div></span>',
-					'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
-					'hide_label'   => false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -583,16 +585,17 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(
 					'name'         => $dummy_fields['pass1'],
 					'value'        => '',
-					'size'         => 18,
 					'label'        => T_('Password'),
+					'hide_label'   => false,
 					'note'         => $params['register_use_placeholders'] ? '' : T_('Choose a password').'.',
 					'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a password') : '',
+					'bottom_note'  => '',
+					'size'         => 18,
 					'maxlength'    => 70,
 					'class'        => 'input_text',
-					'required'     => isset( $params['reg1_required'] ) ? in_array( 'password', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'style'        => 'width:'.$params['register_field_width'].'px',
+					'required'     => isset( $params['reg1_required'] ) ? in_array( 'password', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'autocomplete' => 'off',
-					'hide_label'   => false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -602,17 +605,17 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(
 					'name_confirm'         => $dummy_fields['pass2'],
 					'value_confirm'        => '',
-					'size_confirm'         => 18,
 					'label_confirm'        => '',
+					'hide_label_confirm'   => false,
 					'note_confirm'         => ( $params['register_use_placeholders'] ? '' : T_('Please type your password again').'.' ).'<div id="pass2_status" class="red"></div>',
+					'bottom_note_confirm'  => '',
 					'placeholder_confirm'  => $params['register_use_placeholders'] ? T_('Please type your password again') : '',
+					'size_confirm'         => 18,
 					'maxlength_confirm'    => 70,
 					'class_confirm'        => 'input_text',
-					'required_confirm'     => isset( $params['reg1_required'] ) ? in_array( 'password', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'style_confirm'        => 'width:'.$params['register_field_width'].'px',
+					'required_confirm'     => isset( $params['reg1_required'] ) ? in_array( 'password', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'autocomplete_confirm' => 'off',
-					'class_confirm'        => '',
-					'hide_label_confirm'   => false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -635,16 +638,17 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(  // Here, we make sure not to modify $params
 					'name'         => 'search_author',
 					'value'        => $search_author,
-					'size'         => '',
 					'label'        => '',
+					'hide_label'   => true,
 					'note'         => '',
+					'bottom_note'  => '',
 					'placeholder'  => T_('Any author'),
+					'size'         => '',
 					'maxlength'    => '',
 					'class'        => 'input_text'.is_logged_in() ? '' : ' autocomplete_login',
+					'style'        => '',
 					'required'     => false,
 					'input_suffix' => '',
-					'style'        => '',
-					'hide_label'   => true,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -665,14 +669,15 @@ function render_template_callback( $var, $params, $objects = array() )
 				);
 
 			$temp_params = array(
-					'name'       => 'search_content_age',
-					'value'      => $search_content_age,
-					'label'      => T_('Content age'),
-					'class'      => '',
-					'note'       => '',
-					'required'   => false,
-					'hide_label' => true,
-					'style'      => '',
+					'name'        => 'search_content_age',
+					'value'       => $search_content_age,
+					'label'       => T_('Content age'),
+					'hide_label'  => true,
+					'note'        => '',
+					'bottom_note' => '',
+					'class'       => '',
+					'style'       => '',
+					'required'    => false,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -682,7 +687,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Form:search_content_type':
 			global $Blog;
-			
+
 			if( ! $Blog )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Blog is not defined at this moment.</span>';
@@ -697,6 +702,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			if( $Blog->get_setting( 'search_include_cmnts' ) )
 			{
 				$content_type_options['comment'] = T_('Comments');
+			}
+			if( $Blog->get_setting( 'search_include_metas' ) &&
+			    check_user_perm( 'meta_comment', 'view', false, $Blog->ID )  )
+			{
+				$content_type_options['meta'] = T_('Internal comments');
 			}
 			if( $Blog->get_setting( 'search_include_files' ) )
 			{
@@ -715,14 +725,15 @@ function render_template_callback( $var, $params, $objects = array() )
 			{
 				$content_type_options = array( '' => T_('All') ) + $content_type_options;
 				$temp_params = array(
-						'name'       => 'search_type',
-						'value'      => $search_type,
-						'label'      => T_('Content type'),
-						'class'      => '',
-						'note'       => '',
-						'required'   => false,
-						'hide_label' => true,
-						'style'      => '',
+						'name'        => 'search_type',
+						'value'       => $search_type,
+						'label'       => T_('Content type'),
+						'hide_label'  => true,
+						'note'        => '',
+						'bottom_note' => '',
+						'class'       => '',
+						'style'       => '',
+						'required'    => false,
 					);
 				// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 				$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -740,16 +751,16 @@ function render_template_callback( $var, $params, $objects = array() )
 			$temp_params = array(  // Here, we make sure not to modify $params
 					'name'         => 's',
 					'value'        => $search_term,
-					'size'         => 25,
 					'label'        => '',
+					'hide_label'   => true,
 					'note'         => '',
 					'placeholder'  => '',
-					'maxlength'    => '',
+					'size'         => 25,
+					'maxlength'    => 100,
 					'class'        => 'input_text',
+					'style'        => '',
 					'required'     => false,
 					'input_suffix' => '',
-					'style'        => '',
-					'hide_label'   => true,
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
@@ -762,7 +773,6 @@ function render_template_callback( $var, $params, $objects = array() )
 					'name'       => 'submit',
 					'value'      => T_('Submit'),
 					'class'      => 'btn btn-primary',
-					'hide_label' => false,
 					'style'      => '',
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
@@ -845,7 +855,13 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:feedback_link':
-			echo $rendered_Item->get_feedback_link( $params );
+			echo $rendered_Item->get_feedback_link( array_merge( array(
+					'show_in_single_mode' => true,
+				), $params ) );
+			break;
+
+		case 'Item:files':
+			echo $rendered_Item->get_files( $params );
 			break;
 
 		case 'Item:flag_icon':
@@ -875,9 +891,9 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item:images':
 			echo $rendered_Item->get_images( array_merge( array(
-					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+																// '#cover_and_teaser_all' => 'cover,background,teaser,teaserperm,teaserlink'
 					'limit'                      => 1000, // Max # of images displayed
 					'before'                     => '<div>',
 					'before_image'               => '<figure class="evo_image_block">',
@@ -899,7 +915,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 				), $params ) );
 			break;
-			
+
 		case 'Item:issue_date':
 			$rendered_Item->issue_date( $params );
 			break;
@@ -995,6 +1011,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->dget( 'title' );
 			break;
 
+		case 'Item:type':
+			echo $rendered_Item->get_type_setting( 'name' );
+			break;
+
 		case 'Item:visibility_status':
 			if( $rendered_Item->status != 'published' )
 			{
@@ -1068,9 +1088,6 @@ function render_template_callback( $var, $params, $objects = array() )
 		// Tag
 		case 'Tag:name':
 			echo $tag;
-			break;
-
-		case 'Tag:item_count':
 			break;
 
 		case 'Tag:permalink':

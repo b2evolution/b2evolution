@@ -20,7 +20,7 @@ global $WordpressImport, $action;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
-$Form->begin_form( 'fform', T_('WordPress XML Importer') );
+$Form->begin_form( 'fform', TB_('WordPress XML Importer') );
 $Form->add_crumb( 'wpxml' );
 $Form->hidden_ctrl();
 $Form->hiddens_by_key( get_memorized( 'blog' ) );
@@ -35,12 +35,12 @@ $Form->begin_fieldset( TB_('Confirm import') );
 	if( $WordpressImport->info_data['errors'] === false )
 	{	// Display found Item Types as selector:
 		wpxml_item_types_selector( $WordpressImport->info_data['XML_file_path'], $WordpressImport->info_data['ZIP_folder_path'] );
-		$form_buttons[] = array( 'submit', 'actionArray[import]', T_('Confirm import'), 'SaveButton' );
+		$form_buttons[] = array( 'submit', 'actionArray[import]', TB_('Confirm import'), 'SaveButton' );
 	}
 	elseif( $WordpressImport->info_data['error_type'] == 'folder_exists' )
 	{	// Display buttons to delete or use already existing folder:
-		$form_buttons[] = array( 'submit', 'actionArray[delete_extract]', T_('Delete and extract again'), 'DefaultButton' );
-		$form_buttons[] = array( 'submit', 'actionArray[use_existing_folder]', T_('Continue with existing folder'), 'SaveButton' );
+		$form_buttons[] = array( 'submit', 'actionArray[delete_extract]', TB_('Delete and extract again'), 'DefaultButton' );
+		$form_buttons[] = array( 'submit', 'actionArray[use_existing_folder]', TB_('Continue with existing folder'), 'SaveButton' );
 	}
 
 $Form->end_fieldset();

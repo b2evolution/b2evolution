@@ -621,6 +621,7 @@ class WordpressImport extends AbstractImport
 						continue;
 					}
 					$user_ID = $User->ID;
+					$existing_users[ $author_login ] = $user_ID;
 					if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )
 					{
 						$UserSettings->set( 'created_fromIPv4', ip2int( $author['author_created_fromIPv4'] ), $user_ID );
@@ -1163,6 +1164,23 @@ class WordpressImport extends AbstractImport
 					$post_urltitle = $post_link_match[1];
 				}
 
+				if( ! empty( $post['extra_slugs'] ) )
+				{	// Extra slugs:
+					foreach( $post['extra_slugs'] as $extra_slug )
+					{
+						if( ( $checke_extra_slug = $this->check_slug( $extra_slug ) ) !== false )
+						{	// Import only not duplicated extra slug:
+							$post_urltitle .= ','.$checke_extra_slug;
+							// Store new slug in cache:
+							$this->cache_slugs[] = $checke_extra_slug;
+						}
+						else
+						{	// Display warning for duplicated slug:
+							$this->log_warning( sprintf( 'Extra slug %s could not be imported because it is already used.', '<code>'.$extra_slug.'</code>' ) );
+						}
+					}
+				}
+
 				$Item->set( 'main_cat_ID', $post_main_cat_ID );
 				$Item->set( 'creator_user_ID', $author_ID );
 				$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
@@ -1358,7 +1376,7 @@ class WordpressImport extends AbstractImport
 								'<code>'.$File->_adfp_full_path.'</code>',
 								'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
 							// Replace this caption tag from content with b2evolution format:
-							$updated_post_content = replace_content_outcode( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$updated_post_content = replace_outside_code_tags( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
 							$link_order++;
 						}
 						else
@@ -1379,7 +1397,7 @@ class WordpressImport extends AbstractImport
 						{	// Try to link File:
 							if( $link_ID = $this->link_by_URL( $img_url, 'inline', $link_order, $LinkOwner ) )
 							{	// Replace this img tag from content with b2evolution format:
-								$updated_post_content = replace_content_outcode( $img_matches[0][$i], '[image:'.$link_ID.']', $updated_post_content, 'replace_content', 'str' );
+								$updated_post_content = replace_outside_code_tags( $img_matches[0][$i], '[image:'.$link_ID.']', $updated_post_content, 'replace_content', 'str' );
 							}
 						}
 					}
@@ -1490,7 +1508,7 @@ class WordpressImport extends AbstractImport
 							$evo_short_link = '[['.$link_Item->get( 'urltitle' ).' '.$link_matches[3][ $l ].']]';
 
 							// Replace a link tag with evo short link:
-							$item_content = replace_content_outcode( $link_matches[0][ $l ], $evo_short_link, $item_content, 'replace_content', 'str' );
+							$item_content = replace_outside_code_tags( $link_matches[0][ $l ], $evo_short_link, $item_content, 'replace_content', 'str' );
 
 							// For log:
 							$converted_links[] = '<code>'.format_to_output( $link_matches[0][ $l ], 'htmlspecialchars' ).'</code> => <code>'.$evo_short_link.'</code>';
@@ -1538,8 +1556,12 @@ class WordpressImport extends AbstractImport
 				foreach( $comments as $comment )
 				{
 					$comment_author_user_ID = 0;
-					if( !empty( $comment['comment_user_id'] ) && isset( $authors_IDs[ (string) $comment['comment_user_id'] ] ) )
-					{	// Author ID
+					if( ! empty( $comment['comment_user_login'] ) && isset( $existing_users[ $comment['comment_user_login'] ] ) )
+					{	// Get Author ID by login:
+						$comment_author_user_ID = $existing_users[ $comment['comment_user_login'] ];
+					}
+					elseif( ! empty( $comment['comment_user_id'] ) && isset( $authors_IDs[ (string) $comment['comment_user_id'] ] ) )
+					{	// Use Author ID from xml data:
 						$comment_author_user_ID = $authors_IDs[ (string) $comment['comment_user_id'] ];
 					}
 
@@ -1930,6 +1952,36 @@ class WordpressImport extends AbstractImport
 		$login = $this->fix_author_login( $login );
 
 		return ( isset( $this->users[ $login ] ) ? $this->users[ $login ] : $default_user_ID );
+	}
+
+
+	/**
+	 * Check if current slug can be used for new Item
+	 *
+	 * @param string Slug
+	 * @return string|boolean Cleaned slug or FALSE if the checked slug is already used
+	 */
+	function check_slug( $slug )
+	{
+		if( ! isset( $this->cache_slugs ) )
+		{	// Load slugs from DB once:
+			global $DB;
+			$slugs_SQL = new SQL( 'Load all slugs before wordpress import to avoid duplicated slugs' );
+			$slugs_SQL->SELECT( 'slug_title' );
+			$slugs_SQL->FROM( 'T_slug' );
+			$this->cache_slugs = $DB->get_col( $slugs_SQL );
+		}
+
+		// Clean up slug:
+		$slug = get_urltitle( $slug );
+
+		if( in_array( $slug, $this->cache_slugs ) )
+		{	// The slug is already used:
+			return false;
+		}
+
+		// Return cleaned slug:
+		return $slug;
 	}
 }
 ?>

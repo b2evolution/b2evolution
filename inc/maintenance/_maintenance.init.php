@@ -161,14 +161,14 @@ class maintenance_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $AdminUI, $current_User;
+		global $AdminUI, $auto_upgrade_from_any_url;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! check_user_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'maintenance', 'backup' ) )
+		if( check_user_perm( 'maintenance', 'backup' ) )
 		{
 			// Display Backup tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
@@ -178,7 +178,7 @@ class maintenance_Module extends Module
 							) );
 		}
 
-		if( $current_User->check_perm( 'maintenance', 'upgrade' ) )
+		if( check_user_perm( 'maintenance', 'upgrade' ) )
 		{
 			// Display Updates tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
@@ -186,11 +186,14 @@ class maintenance_Module extends Module
 									'text' => TB_('Auto Upgrade'),
 									'href' => '?ctrl=upgrade' ),
 							) );
-			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
+			if( $auto_upgrade_from_any_url )
+			{	// Deny upgrade from Git because upgrade from any URL is denied by config:
+				$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'upgradegit' => array(
 									'text' => TB_('Upgrade from Git'),
 									'href' => '?ctrl=upgrade&amp;tab=git' ),
 							) );
+			}
 		}
 	}
 

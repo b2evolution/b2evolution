@@ -15,14 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load Currency class (PHP4):
 load_class( 'regional/model/_currency.class.php', 'Currency' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
@@ -41,7 +36,7 @@ if( param( 'curr_ID', 'integer', '', true) )
 	if( ($edited_Currency = & $CurrencyCache->get_by_ID( $curr_ID, false )) === false )
 	{	unset( $edited_Currency );
 		forget_param( 'curr_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Currency') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Currency') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -54,7 +49,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Disable a currency only if it is enabled, and user has edit access.
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure the currency information was loaded. If not, just exit with error.
 		if( empty($edited_Currency) )
@@ -66,12 +61,12 @@ switch( $action )
 		if ( $action == 'disable_currency' )
 		{	// Disable this currency by setting flag to false.
 			$edited_Currency->set( 'enabled', 0 );
-			$Messages->add( sprintf( T_('Disabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Disabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_currency' )
 		{	// Enable currency by setting flag to true.
 			$edited_Currency->set( 'enabled', 1 );
-			$Messages->add( sprintf( T_('Enabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Enabled currency (%s, #%d).'), $edited_Currency->name, $edited_Currency->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -87,7 +82,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset($edited_Currency) )
 		{	// We don't have a model to use, start with blank object:
@@ -102,7 +97,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an curr_ID:
 		param( 'curr_ID', 'integer', true );
@@ -118,7 +113,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request
 		if( $edited_Currency->load_from_Request() )
@@ -126,7 +121,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Currency->dbinsert();
-			$Messages->add( T_('New currency created.'), 'success' );
+			$Messages->add( TB_('New currency created.'), 'success' );
 
 			// What next?
 			switch( $action )
@@ -157,7 +152,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an curr_ID:
 		param( 'curr_ID', 'integer', true );
@@ -168,7 +163,7 @@ switch( $action )
 
 			// Update in DB:
 			$edited_Currency->dbupdate();
-			$Messages->add( T_('Currency updated.'), 'success' );
+			$Messages->add( TB_('Currency updated.'), 'success' );
 
 			// If no error, Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=currencies', 303 ); // Will EXIT
@@ -183,14 +178,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an curr_ID:
 		param( 'curr_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Currency &laquo;%s&raquo; deleted.'), $edited_Currency->dget('name') );
+			$msg = sprintf( TB_('Currency &laquo;%s&raquo; deleted.'), $edited_Currency->dget('name') );
 			$edited_Currency->dbdelete();
 			unset( $edited_Currency );
 			forget_param( 'curr_ID' );
@@ -201,7 +196,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Currency->check_delete( sprintf( T_('Cannot delete currency &laquo;%s&raquo;'), $edited_Currency->dget('name') ), array(), true ) )
+			if( ! $edited_Currency->check_delete( sprintf( TB_('Cannot delete currency &laquo;%s&raquo;'), $edited_Currency->dget('name') ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -212,10 +207,10 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Currencies'), $admin_url.'?ctrl=currencies' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('Regional'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( TB_('Currencies'), $admin_url.'?ctrl=currencies' );
 
 // Set an url for manual page:
 switch( $action )
@@ -255,7 +250,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Currency->confirm_delete(
-				sprintf( T_('Delete currency &laquo;%s&raquo;?'), $edited_Currency->dget('name') ),
+				sprintf( TB_('Delete currency &laquo;%s&raquo;?'), $edited_Currency->dget('name') ),
 				'currency', $action, get_memorized( 'action' ) );
 	case 'new':
 	case 'create':
