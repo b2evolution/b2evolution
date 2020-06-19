@@ -340,6 +340,9 @@ $Form->begin_form( '', '', $params );
 		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
 	}
 
+	$tab_panes[] = '#checklist';
+	echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $edited_Item->get_checklist_lines() ? ' <span id="checklist_counter" class="badge badge-important">'.count( $edited_Item->get_checklist_lines() ).'</span>' : '' ).'</a></li>';
+
 	echo '</ul>';
 
 	echo '<div class="tab-content  evo_tab_pane_itemform_content">';
@@ -615,6 +618,24 @@ $Form->begin_form( '', '', $params );
 
 		$Form->close_tab_pane();
 	}
+
+	// ####################### CHECKLIST #########################
+	$Form->open_tab_pane( array( 'id' => 'checklist', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'item-checklist-panel' ) ) );
+	if( $creating )
+	{	// Display button to save new creating item:
+		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ TB_('Save post to start adding Checklist lines'), 'btn-primary' ) );
+	}
+	else
+	{
+		skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'item_checklist_lines',
+			// Optional display params
+			'Item'  => $edited_Item,
+			'title' => NULL,
+		) );
+	}
+	$Form->close_tab_pane();
 
 	echo '</div>';
 
@@ -1177,7 +1198,68 @@ tab_href_value = jQuery( '.content-form-with-tab #itemform_tab_pane' ).val();
 if( js_tab_panes_array.indexOf( tab_href_value ) == -1 )
 {
 	tab_href_value = '#attachment';
-}		    
+}
+
+// Watch for new checklist items and update badge accordingly:
+var checklist = document.querySelector( '.checklist_lines' );
+var observer_config = { attributes: true, childList: true, characterData: true };
+var observer = new MutationObserver( function( mutations ) {
+		mutations.forEach( function( mutation )
+			{
+				if( ( mutation.addedNodes && mutation.addedNodes.length > 0 ) || ( mutation.removedNodes && mutation.removedNodes.length > 0 ) )
+				{
+					var nodes_to_check = [];
+					// element added to DOM
+					if( mutation.addedNodes.length > 0 )
+					{
+						nodes_to_check = mutation.addedNodes;
+					}
+					else if( mutation.removedNodes.length > 0 )
+					{
+						nodes_to_check = mutation.removedNodes;
+					}
+					var hasClass = [].some.call( nodes_to_check, function( el )
+						{	// Check if added/removed node has class '.checklist_line':
+							if( el.classList )
+							{
+								return el.classList.contains( 'checklist_line' );
+							}
+							else
+							{
+								return false;
+							}
+						} );
+
+					if( hasClass )
+					{	// element has class `.checklist_line`, update counter:
+						var checklist_badge = document.getElementById( 'checklist_counter' );
+						var checklist_line_count = document.querySelectorAll( '.checklist_lines .checklist_line' ).length
+						if( checklist_badge )
+						{
+							if( checklist_line_count > 0 )
+							{	// Update checklist counter badge:
+								checklist_badge.innerHTML = checklist_line_count;
+							}
+							else
+							{	// Remove checklist counter badge:
+								checklist_badge.remove();
+							}
+						}
+						else if( checklist_line_count > 0 )
+						{	// Create checklist counter badge:
+							var checklist_tab = document.querySelector( 'a[href="#checklist"]' );
+							checklist_badge = document.createElement( 'span' );
+							checklist_badge.classList.add( 'badge', 'badge-important' );
+							checklist_badge.innerHTML = checklist_line_count;
+							checklist_badge.setAttribute( 'id', 'checklist_counter' );
+							checklist_tab.appendChild( document.createTextNode( ' ' ) );
+							checklist_tab.appendChild( checklist_badge );
+						}
+					}
+				}
+			} );
+	} );
+observer.observe( checklist, observer_config );
 
 jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
 jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
