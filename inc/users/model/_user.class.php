@@ -2966,8 +2966,12 @@ class User extends DataObject
 	{
 		$params = array_merge( array(
 				'target' => '_blank',
-				'rel'    => 'nofollow'
+				'rel'    => 'nofollow',
+				'class'  => '',
 			), $params );
+
+		// Add style class to break long urls:
+		$params['class'] = trim( $params['class'].' linebreak' );
 
 		$link = '<a href="'.$this->get_field_url().'"'.get_field_attribs_as_string( $params, false ).'>'.$this->get_field_url().'</a>';
 

@@ -1640,9 +1640,11 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
 	{
 		$additional_attrs = ' '.trim( $additional_attrs );
 	}
-	//return $text;
-	/*preg_match( '/<code>([.\r\n]+?)<\/code>/i', $text, $matches );
-	pre_dump( $text, $matches );*/
+
+	// Add style class to break long urls:
+	$additional_attrs = stripos( $additional_attrs, ' class="' ) === false
+		? $additional_attrs.' class="linebreak"'
+		: preg_replace( '/ class="([^"]*)"/i', ' class="$1 linebreak"', $additional_attrs );
 
 	$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
