@@ -889,6 +889,12 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_general_affix' => array(
+						'label' => T_('Fixed position for General Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 0,
+					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
 						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
@@ -900,18 +906,18 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Fixed position for Single Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
+					),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
 						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
-					),
-					'sidebar_single_affix' => array(
-						'label' => T_('Sidebar Single'),
-						'note'  => T_('Use affix to keep visible when scrolling down.'),
-						'type'  => 'checkbox',
-						'defaultvalue' => 1,
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
@@ -1708,6 +1714,12 @@ class green_bootstrap_theme_Skin extends Skin
 		</style>';
 		add_headline( $custom_css );
 		}
+
+		if( ( $this->get_setting( 'sidebar_general_affix' ) && $this->is_visible_sidebar_forums( true, 'general' ) ) ||
+		    ( $this->get_setting( 'sidebar_single_affix' ) && $this->is_visible_sidebar_forums( true, 'single' ) ) )
+		{	// Init JS to fix sidebars on scroll down:
+			require_js_defer( 'src/evo_affix_sidebars.js', 'blog', false, '#', 'footerlines' );
+		}
 	}
 
 
@@ -2370,7 +2382,7 @@ class green_bootstrap_theme_Skin extends Skin
 					.$ItemStatusCache->get_option_list( $status )
 				.'</select>';
 				// JavaScript to reload page with new selected task status:
-				echo '<script>
+				/*echo '<script>
 				jQuery( "#evo_workflow_status_filter" ).change( function()
 				{
 					var url = location.href.replace( /([\?&])((status|redir)=[^&]*(&|$))+/, "$1" );
@@ -2381,7 +2393,7 @@ class green_bootstrap_theme_Skin extends Skin
 					}
 					location.href = url.replace( "?&", "?" ).replace( /\?$/, "" );
 				} );
-				</script>';
+				</script>';*/
 			echo $params['after_workflow_status'];
 		}
 

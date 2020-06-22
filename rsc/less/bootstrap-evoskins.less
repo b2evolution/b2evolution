@@ -1569,3 +1569,22 @@ span[id^=title_folding_] {
 		}
 	}
 }
+
+// Affix sidebars:
+#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
+	&.evo_affixed {
+		position: fixed;
+		z-index: 100;
+	}
+}
+// Don't fix a position of ALL sidebars when window height <= 800px OR width <= 992px:
+@media (max-height:800px),(max-width:992px) {
+	#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
+		&.evo_affixed {
+			position: static;
+		}
+	}
+	.evo_affixed_spacer {
+		display: none;
+	}
+}

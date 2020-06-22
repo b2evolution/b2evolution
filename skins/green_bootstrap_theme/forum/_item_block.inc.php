@@ -141,7 +141,7 @@ skin_widget( array(
 	<?php } ?>
 
 	<div class="row">
-		<div class="evo_content_col <?php echo $Skin->get_column_class( 'single' ); ?>">
+		<div class="evo_content_col <?php echo $Skin->get_column_class_forums( 'single' ); ?>">
 
 	<section class="table evo_content_block<?php echo ' evo_voting_layout__'.$Skin->get_setting( 'voting_place' ); ?>">
 	<div class="panel panel-default">
@@ -402,15 +402,19 @@ skin_widget( array(
 		</div><!-- .col -->
 
 		<?php
-		if( $Skin->is_visible_sidebar( false, 'single' ) )
+		if( $Skin->is_visible_sidebar_forums( false, 'single' ) )
 		{	// Display sidebar:
+			?>
+			<aside class="evo_sidebar_col col-md-3<?php echo $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ?>">
+				<div id="evo_container__sidebar_single">
+			<?php
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
 				// Display container contents:
 				widget_container( 'sidebar_single', array(
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						'container_display_if_empty' => false, // If no widget, don't display container at all
-						'container_start' => '<aside class="evo_sidebar_col col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ).'"><div class="evo_container $wico_class$">',
-						'container_end'   => '</div></aside>',
+						'container_start' => '<div class="evo_container $wico_class$">',
+						'container_end'   => '</div>',
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 						'block_end' => '</div>',
@@ -459,29 +463,16 @@ skin_widget( array(
 						'custom_fields_separator_row_header_field' => '<div class="col-xs-12" colspan="$cols_count$"><b>$field_title$$field_description_icon$</b></div>',
 					) );
 				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
+			?>
+				</div>
+			</aside>
+			<?php
 		} ?>
 	</div><!-- .row -->
 
 </div><!-- ../forums_list single_topic -->
 
-	<?php
-		locale_restore_previous();	// Restore previous locale (Blog locale)
-	?>
-<script>
-jQuery( document ).ready( function()
-{
-	jQuery( '.quote_button' ).click( function()
-	{ // Submit a form to save the already entered content
-		console.log( jQuery( this ).attr( 'href' ) );
-		var form = jQuery( 'form[id^=evo_omment_form_id_]' );
-		if( form.length == 0 )
-		{ // No form found, Use an url of this link
-			return true;
-		}
-		// Set an action as url of this link and submit a form
-		form.attr( 'action', jQuery( this ).attr( 'href' ) );
-		form.submit();
-		return false;
-	} );
-} );
-</script>
+<?php
+	locale_restore_previous();	// Restore previous locale (Blog locale)
+	expose_var_to_js( 'evo_skin_bootstrap_forum__quote_button_click', true );
+?>

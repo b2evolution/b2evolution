@@ -66,23 +66,23 @@ jQuery( document ).ready( function()
 			// Set width of current sidebar to what wrapper has:
 			$sidebar.css( 'width', $sidebar.parent().width() );
 
-			if( ! $sidebar.hasClass( 'fixed' ) &&
+			if( ! $sidebar.hasClass( 'evo_affixed' ) &&
 					$sidebar.data( 'column-height' ) < jQuery( window ).height() &&
 					jQuery( window ).scrollTop() > $sidebar.offset().top - $sidebar.data( 'top-start' ) )
 			{	// Fill the space with fake block with same size where we had real sidebar
 				// AND Make sidebar as fixed if we scroll down:
 				$sidebar.before( $sidebarSpacer );
-				$sidebar.addClass( 'fixed' );
+				$sidebar.addClass( 'evo_affixed' );
 			}
-			else if( $sidebar.hasClass( 'fixed' ) &&
+			else if( $sidebar.hasClass( 'evo_affixed' ) &&
 					jQuery( window ).scrollTop() < $sidebarSpacer.offset().top - $sidebar.data( 'top-start' ) )
-			{	// Remove 'fixed' class from sidebar if we scroll to the top of page:
-				$sidebar.removeClass( 'fixed' ).css( 'top', '' );
+			{	// Remove 'evo_affixed' class from sidebar if we scroll to the top of page:
+				$sidebar.removeClass( 'evo_affixed' ).css( 'top', '' );
 				// Remove fake block after reverting real sidebar at the original place:
 				$sidebarSpacer.remove();
 			}
 
-			if( $sidebar.hasClass( 'fixed' ) )
+			if( $sidebar.hasClass( 'evo_affixed' ) )
 			{	// Check and fix an overlapping of footer with sidebar:
 				$sidebar.css( 'top', $sidebar.data( 'top-start' ) + 'px' );
 				var diff = $sidebar.offset().top + $sidebar.data( 'column-height' ) - $sidebar.data( 'top-shift' ) - jQuery( '#evo_site_footer' ).offset().top;
@@ -149,7 +149,7 @@ jQuery( document ).ready( function()
 			// Create fake empty block instead of real sidebar in order to fill the space what was used by real sidebar before we made sidebar to "position:fixed",
 			// if we don't create such block at the same position and size as sidebar then layout will be broken, because some elements will be shifted to the place where sidebar was before fixed position.
 			var $sidebarSpacer = jQuery( '<div />', {
-					"class" : "evo_container__sidebar fixed_spacer",
+					"class" : "evo_container__sidebar evo_affixed_spacer",
 					"height": $sidebar.parent().outerHeight( true )
 				} );
 			jQuery( window ).bind( 'scroll resize', function ()

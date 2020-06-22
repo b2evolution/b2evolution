@@ -17,25 +17,6 @@
 	padding-top: 30px;
 }
 
-// -------------------------- Sidebars --------------------------
-#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
-	background: #FFF;
-	&.fixed {
-		position: fixed;
-	}
-}
-// Don't fix a position of ALL sidebars when window height <= 800px OR width <= 992px:
-@media (max-height:800px),(max-width:992px) {
-	#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
-		&.fixed {
-			position: static;
-		}
-	}
-	.fixed_spacer {
-		display: none;
-	}
-}
-
 // Powered-by logo.
 div.powered_by p {
 	// border: 1px solid red;
