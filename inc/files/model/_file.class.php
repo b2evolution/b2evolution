@@ -2693,6 +2693,16 @@ class File extends DataObject
 				}
 			}
 		}
+		elseif( substr( $this->_adfp_full_path, -4 ) == '.svg' )
+		{	// Special case for SVG file because we cannot generate thumbnail for this file type:
+			$img_attribs['src'] = $this->get_url();
+			global $thumbnail_sizes;
+			if( isset( $thumbnail_sizes[ $size_name ] ) )
+			{	// Set attributes for SVG file from config of thumbnail sizes:
+				$img_attribs['width'] = $thumbnail_sizes[ $size_name ][1];
+				$img_attribs['height'] = $thumbnail_sizes[ $size_name ][2];
+			}
+		}
 		else
 		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
@@ -3398,7 +3408,7 @@ class File extends DataObject
 
 		// IMAGE:
 		// File type is still not defined, Try to detect image
-		if( $this->get_image_size() !== false )
+		if( is_image_file( $this->_adfp_full_path ) || $this->get_image_size() !== false )
 		{ // This is image file
 			$this->update_file_type( 'image' );
 			return;
