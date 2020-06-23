@@ -5707,8 +5707,9 @@ class Item extends ItemLight
 			}
 			if( $File->exists() )
 			{	// Get file link to download if file exists:
+				$file_download_url = $this->get_coll_setting( 'download_enable' ) ? $Link->get_download_url() : NULL;
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $file_download_url ) : '';
 			}
 			else
 			{	// File doesn't exist, We cannot display a link, Display only file name and warning:

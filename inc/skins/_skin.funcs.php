@@ -336,6 +336,19 @@ function skin_init( $disp )
 				debug_die( 'Invalid page URL!' );
 			}
 
+			$seo_page_type = 'Download page';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{ // We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			if( ! $Blog->get_setting( 'download_enable' ) )
+			{	// If download is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-download-disabled';
+				break;
+			}
+
 			$download_link_ID = param( 'download', 'integer', 0 );
 
 			// Check if we can allow to download the selected file
@@ -362,13 +375,6 @@ function skin_init( $disp )
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );
-
-			$seo_page_type = 'Download page';
-
-			if( $Blog->get_setting( $disp.'_noindex' ) )
-			{ // We prefer robots not to index these pages:
-				$robots_index = false;
-			}
 			break;
 
 		case 'posts':
