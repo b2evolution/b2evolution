@@ -1332,10 +1332,15 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_convert_content_to_wysiwyg( $params )
 	{
-		global $Plugins, $Session;
+		global $Plugins, $Session, $debug, $debug_jslog;
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'tinymce' );
+
+		// Do not append debug logs to response because
+		// here we expect only converted content in WYISWYG edit form:
+		$debug = false;
+		$debug_jslog = false;
 
 		$content = param( 'content', 'raw' );
 
