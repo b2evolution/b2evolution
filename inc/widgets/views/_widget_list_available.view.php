@@ -112,6 +112,7 @@ $core_componentwidget_defs = array(
 			'coll_category_list',           // Category list
 			'content_hierarchy',            // Content Hierarchy
 			'coll_tag_cloud',               // Tag cloud
+			'coll_item_list_sort_order',    // Sort order
 			// Plugin: Calendar
 			// Plugin: Date Archives
 		),
