@@ -3642,6 +3642,16 @@ div.message_toolbars {
 .modal-footer .btn + .btn {
   margin-bottom: 3px;
 }
+#modal_window.evo_modal_window__percent_height .modal-content {
+  height: 100%;
+  overflow: hidden;
+}
+#modal_window.evo_modal_window__percent_height .modal-body {
+  height: 100%;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 70px;
+}
 .tt-dropdown-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
