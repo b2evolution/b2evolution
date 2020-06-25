@@ -462,7 +462,9 @@ function skin_init( $disp )
 
 					global $cat, $catsel;
 
-					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
+					if( ( empty( $catsel ) || // 'catsel' filter is not defined
+					      ( is_array( $catsel ) && count( $catsel ) == 1 ) // 'catsel' filter is used for single cat, e.g. when skin config 'cat_array_mode' = 'parent'
+					    ) && preg_match( '~^[0-9]+$~', $cat ) ) // 'cat' filter is ID of category and NOT modifier for 'catsel' multicats
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children
