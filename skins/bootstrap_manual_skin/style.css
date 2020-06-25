@@ -13,26 +13,6 @@
 .evo_container__footer {
   padding-top: 30px;
 }
-#evo_container__sidebar,
-#evo_container__sidebar_2,
-#evo_container__sidebar_single {
-  background: #FFF;
-}
-#evo_container__sidebar.fixed,
-#evo_container__sidebar_2.fixed,
-#evo_container__sidebar_single.fixed {
-  position: fixed;
-}
-@media (max-height: 800px), (max-width: 992px) {
-  #evo_container__sidebar.fixed,
-  #evo_container__sidebar_2.fixed,
-  #evo_container__sidebar_single.fixed {
-    position: static;
-  }
-  .fixed_spacer {
-    display: none;
-  }
-}
 div.powered_by p {
   margin: 4px auto;
 }

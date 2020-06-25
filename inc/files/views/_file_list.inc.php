@@ -611,7 +611,7 @@ $Form->begin_form();
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'            => $fm_FileRoot->ID,
-					'path'                   => $path,
+					'path'                   => empty( $path ) ? './' : $path,
 					'listElement'            => 'jQuery( ".filelist_tbody" ).get(0)',
 					'list_element'           => '.filelist_tbody',
 					'list_style'             => 'table',

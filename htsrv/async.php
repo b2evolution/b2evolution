@@ -872,7 +872,7 @@ switch( $action )
 		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
 		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
 
-		echo '<div style="background:#FFF;height:90%">'
+		echo '<div style="background:#FFF;height:100%">'
 				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'&amp;prefix='.$prefix.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
@@ -1180,6 +1180,114 @@ switch( $action )
 		{
 			echo '<li>'.get_directory_tree( $dir_FileRoot, $subdir_File->get_full_path(), $dir_File->get_full_path(), false, $subdir_File->get_rdfs_rel_path(), true ).'</li>';
 		}
+		break;
+
+	case 'browse_existing_attachments':
+
+		global $DB;
+
+		$mode = 'upload';
+
+		// Get fileroot:
+		$FileRootCache = & get_FileRootCache();
+
+		load_class( 'files/model/_filelist.class.php', 'FileList' );
+
+		// Get all Item comments:
+		$link_type = param( 'link_type', 'string', true );
+		$link_object_ID = param( 'link_object_ID', 'integer', true );
+
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
+		$LinkCache = & get_LinkCache();
+
+		$links = array();
+		$link_owner_class = get_class( $LinkOwner->link_Object );
+
+		switch( $link_owner_class )
+		{
+			case 'Item':
+			case 'Comment':
+				if( $link_owner_class == 'Comment' )
+				{
+					$edited_Item = $LinkOwner->get_Item();
+					$item_ID = $edited_Item->ID;
+				}
+				else
+				{
+					$item_ID = $LinkOwner->link_Object->ID;
+				}
+
+				$comments_SQL = new SQL( 'Get all the comments of an Item' );
+				$comments_SQL->SELECT( 'comment_ID' );
+				$comments_SQL->FROM( 'T_comments' );
+				$comments_SQL->WHERE( 'comment_item_ID = '.$DB->quote( $item_ID ) );
+				$comment_IDs = $DB->get_col( $comments_SQL );
+
+				load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
+
+				$LinkCache = & get_LinkCache();
+
+				$ea_Linklist = new DataObjectList2( $LinkCache ); // IN FUNC
+
+				$links_SQL = new SQL( 'Get all the links belonging to comments of an Item' );
+				$links_SQL->SELECT( 'l.*' );
+				$links_SQL->FROM( 'T_links AS l' );
+				$links_SQL->FROM_add( 'LEFT JOIN T_files AS f ON f.file_ID = l.link_file_ID' );
+				if( $comment_IDs )
+				{
+					$links_SQL->WHERE( 'link_cmt_ID IN ('.$DB->quote( $comment_IDs ).')' );
+				}
+				$links_SQL->WHERE_or( 'link_itm_ID = '.$DB->quote( $item_ID ) );
+				$links_SQL->ORDER_BY( 'link_datemodified DESC' );
+
+				$ea_Linklist->sql = $links_SQL->get();
+				$ea_Linklist->run_query( false, false, false, 'get_attachment_LinkList' );
+
+				// Get FileRoot and dummy FileList:
+				if( $ea_Linklist->get_total_rows() )
+				{
+					$Link = & $ea_Linklist->get_by_idx( 0 );
+					$File = & $Link->get_File();
+					$fm_FileRoot = & $File->get_FileRoot();
+				}
+				else
+				{
+					global $Blog;
+					
+					if( empty( $Blog ) )
+					{
+						$ItemCache = & get_ItemCache();
+						$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+						$Blog = $edited_Item->get_Blog();
+					}
+
+					$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $Blog->ID );
+				}
+				$fm_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
+				$selected_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
+				break;
+
+			case 'Message':
+				// Get all links from all messages in the same thread
+				break;
+
+			case 'EmailCampaign':
+				break;
+		}
+		
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+
+		$AdminUI = new AdminUI();
+		$Widget = new Widget( 'file_browser' );
+		$Widget->title = T_('Existing attachments').get_manual_link('existing-attachments');
+		$Widget->disp_template_replaced( 'block_start' );
+		
+		require $inc_path.'links/views/_link_file_list.inc.php';
+
+		$Widget->disp_template_raw( 'block_end' );
 		break;
 
 	default:
