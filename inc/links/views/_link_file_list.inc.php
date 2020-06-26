@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the UI for file browsing.
+ * This file implements the UI for browsing attached files.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -8,18 +8,20 @@
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
- * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
+ * @var Linklist
+ */
+global $ea_Linklist;
+/**
  * @var Filelist
  */
 global $fm_Filelist;
 /**
- * fp> Temporary. I need this for NuSphere debugging.
  * @var File
  */
 global $lFile;
@@ -56,19 +58,6 @@ global $linkctrl, $linkdata;
 // Name of the iframe we want some actions to come back to:
 global $iframe_name, $field_name, $file_type;
 
-$Form = new Form( NULL, 'FilesForm', 'post', 'none' );
-$Form->begin_form();
-	$Form->hidden_ctrl();
-
-	$Form->hidden( 'confirmed', '0' );
-	$Form->hidden( 'md5_filelist', $fm_Filelist->md5_checksum() );
-	$Form->hidden( 'md5_cwd', md5($fm_Filelist->get_ads_list_path()) );
-	$Form->hiddens_by_key( get_memorized('fm_selected') ); // 'fm_selected' gets provided by the form itself
-
-	if( get_param( 'fm_sources_root' ) == '' )
-	{	// Set the root only when it is not defined, otherwise it is gone from memorized param
-		$Form->hidden( 'fm_sources_root', $fm_Filelist->_FileRoot->ID );
-	}
 ?>
 <table class="filelist table table-bordered table-hover table-condensed">
 	<?php
@@ -114,7 +103,7 @@ $Form->begin_form();
 			echo '<th class="nowrap">'./* TRANS: download count */ T_('Downloads').'</th>';
 		}
 
-		echo '<th class="nowrap">'./* TRANS: file size */ T_('Link date').'</th>';
+		echo '<th class="nowrap">'./* TRANS: creation date of source Item or Comment */ T_('Date created').'</th>';
 
 		echo '<th class="nowrap">'./* TRANS: file size */ T_('Size').'</th>';
 
@@ -150,12 +139,7 @@ $Form->begin_form();
 	?>
 	<tbody class="filelist_tbody">
 	<?php
-	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
-
-	// Set FileList perms
-	$all_perm = check_user_perm( 'files', 'all', false );
-	$edit_allowed_perm = check_user_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
 
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
@@ -173,17 +157,13 @@ $Form->begin_form();
 		$lLinkOwner = & $lLink->get_LinkOwner();
 		$row_class = array();
 		if( ( get_class( $lLinkOwner->link_Object ) == 'Comment' ) && $lLinkOwner->link_Object->is_meta() )
-		{
+		{	// Show different background color for internal comments:
 			$row_class[] = 'bg-info';
-		}
-		else
-		{
-			$row_class[] = $countFiles % 2 ? 'odd' : 'even';
 		}
 		echo '<tr class="'.implode( ' ', $row_class ).'"';
 
 		if( isset($fm_highlight) && $lFile->get_name() == $fm_highlight )
-		{ // We want a specific file to be highlighted (user clicked on "locate"/target icon
+		{	// We want a specific file to be highlighted (user clicked on "locate"/target icon
 			echo ' id="fm_highlighted"'; // could be a class, too..
 		}
 		echo '>';
@@ -238,16 +218,10 @@ $Form->begin_form();
 					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
-			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
-			{	// TODO: Warning icon with hint
-				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_dirname ), 'data-toggle' => 'tooltip' ) ).'&nbsp;';
-				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
-			}
 
 			/***************  Link ("chain") icon:  **************/
 
 			// Only provide link/"chain" icons for files.
-			// TODO: dh> provide support for direcories (display included files).
 
 			// fp> here might not be the best place to put the perm check
 			if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
@@ -268,42 +242,6 @@ $Form->begin_form();
 				echo ' ';
 			}
 
-			if( isset($edited_User) ) // fp> Perm already checked in controller
-			{	// Offer option to link the file to an Item (or anything else):
-				if( $lFile->is_image() )
-				{
-					echo action_icon( T_('Use this as my profile picture!'), 'link',
-								regenerate_url( 'fm_selected', 'action=link_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-								NULL, NULL, NULL, array() );
-					echo action_icon( T_('Duplicate and use as profile picture'), 'user',
-								regenerate_url( 'fm_selected', 'action=duplicate_user&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-								NULL, NULL, NULL, array() );
-					echo ' ';
-				}
-			}
-			elseif( !$lFile->is_dir() && ! empty( $linkctrl ) && ! empty( $linkdata ) )
-			{
-				echo action_icon( T_('Link this file!'), 'link',
-							regenerate_url( 'fm_selected', 'action=link_data&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
-							NULL, NULL, NULL, array() );
-
-				echo ' ';
-			}
-
-			if( $fm_mode == 'file_select' && !empty( $field_name ) && !$lFile->is_dir() && $lFile->get( 'type' ) == $file_type )
-			{
-				$sfile_root = FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() );
-				$sfile_path = $lFile->get_rdfp_rel_path();
-				$link_attribs = array();
-				$link_action = 'set_field';
-
-				$link_attribs['class'] = 'evo_select_file btn btn-primary btn-xs';
-				$link_attribs['onclick'] = 'return '.( get_param( 'iframe_name' ) == '' ? 'window.parent' : 'parent.frames[\''.format_to_js( get_param( 'iframe_name' ) ).'\']' ).'.file_select_add( \''.$field_name.'\', \''.$sfile_root.'\', \''.$sfile_path.'\' );';
-				$link_attribs['type'] = 'button';
-				$link_attribs['title'] = T_('Select file');
-				echo '<button'.get_field_attribs_as_string( $link_attribs, false ).'>'.get_icon( 'link' ).' './* TRANS: verb */ T_('Select').'</button> ';
-			}
-
 			/******************** File name + meta data ********************/
 			echo file_td_name( $lFile );
 
@@ -312,7 +250,7 @@ $Form->begin_form();
 
 		/*******************  File type  ******************/
 
-		if( $UserSettings->get('fm_showtypes') )
+		if( $UserSettings->get( 'fm_showtypes' ) )
 		{	// Show file types
 			echo '<td class="type">'.$lFile->get_type().'</td>';
 			evo_flush();
@@ -320,7 +258,7 @@ $Form->begin_form();
 
 		/*******************  Added by  *******************/
 
-		if( $UserSettings->get('fm_showcreator') )
+		if( $UserSettings->get( 'fm_showcreator' ) )
 		{
 			if( $creator = $lFile->get_creator() )
 			{
@@ -335,7 +273,7 @@ $Form->begin_form();
 
 		/****************  Download Count  ****************/
 
-		if( $UserSettings->get('fm_showdownload') )
+		if( $UserSettings->get( 'fm_showdownload' ) )
 		{	// Show download count
 			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
@@ -360,7 +298,7 @@ $Form->begin_form();
 
 		/****************  File time stamp  ***************/
 
-		if( $UserSettings->get('fm_showdate') != 'no' )
+		if( $UserSettings->get( 'fm_showdate' ) != 'no' )
 		{	// Show last modified datetime (always full in title attribute)
 			$lastmod_date = $lFile->get_lastmod_formatted( 'date' );
 			$lastmod_time = $lFile->get_lastmod_formatted( 'time' );
@@ -372,28 +310,18 @@ $Form->begin_form();
 
 		/****************  File pemissions  ***************/
 
-		if( $UserSettings->get('fm_showfsperms') )
+		if( $UserSettings->get( 'fm_showfsperms' ) )
 		{	// Show file perms
 			echo '<td class="perms">';
 			$fm_permlikelsl = $UserSettings->param_Request( 'fm_permlikelsl', 'fm_permlikelsl', 'integer', 0 );
-
-			if( $edit_allowed_perm )
-			{	// User can edit:
-				echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='
-							.rawurlencode($lFile->get_rdfp_rel_path()) ).'&amp;'.url_crumb( 'file' ).'">'
-							.$lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' ).'</a>';
-			}
-			else
-			{
-				echo $lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' );
-			}
+			echo $lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' );
 			echo '</td>';
 			evo_flush();
 		}
 
 		/****************  File owner  ********************/
 
-		if( $UserSettings->get('fm_showfsowner') )
+		if( $UserSettings->get( 'fm_showfsowner' ) )
 		{	// Show file owner
 			echo '<td class="fsowner">';
 			echo $lFile->get_fsowner_name();
@@ -403,7 +331,7 @@ $Form->begin_form();
 
 		/****************  File group *********************/
 
-		if( $UserSettings->get('fm_showfsgroup') )
+		if( $UserSettings->get( 'fm_showfsgroup' ) )
 		{	// Show file owner
 			echo '<td class="fsgroup">';
 			echo $lFile->get_fsgroup_name();
@@ -418,18 +346,18 @@ $Form->begin_form();
 
 
 	/**
-	 * @global integer Number of cols for the files table, 6 is minimum.
+	 * @global integer Number of cols for the files table, 4 is minimum.
 	 */
-	$filetable_cols = 5
-		+ (int)$fm_flatmode
-		+ (int)$UserSettings->get('fm_showcreator')
-		+ (int)$UserSettings->get('fm_showtypes')
-		+ (int)($UserSettings->get('fm_showdate') != 'no')
-		+ (int)$UserSettings->get('fm_showfsperms')
-		+ (int)$UserSettings->get('fm_showfsowner')
-		+ (int)$UserSettings->get('fm_showfsgroup')
-		+ (int)$UserSettings->get('fm_showdownloads')
-		+ (int)$UserSettings->get('fm_imglistpreview');
+	$filetable_cols = 4
+		+ ( int ) $fm_flatmode
+		+ ( int ) $UserSettings->get( 'fm_showcreator' )
+		+ ( int ) $UserSettings->get( 'fm_showtypes' )
+		+ ( int ) ( $UserSettings->get( 'fm_showdate' ) != 'no' )
+		+ ( int ) $UserSettings->get( 'fm_showfsperms' )
+		+ ( int ) $UserSettings->get( 'fm_showfsowner' )
+		+ ( int ) $UserSettings->get( 'fm_showfsgroup' )
+		+ ( int ) $UserSettings->get( 'fm_showdownloads' )
+		+ ( int ) $UserSettings->get( 'fm_imglistpreview' );
 
 	$noresults = '';
 	if( $countFiles == 0 )
@@ -447,7 +375,4 @@ $Form->begin_form();
 	echo '</tbody>';
 	?>
 </table>
-<?php
-	$Form->end_form();
-?>
 <!-- End of detailed file list -->

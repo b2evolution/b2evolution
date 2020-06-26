@@ -1185,13 +1185,9 @@ switch( $action )
 	case 'browse_existing_attachments':
 
 		global $DB;
-
 		$mode = 'upload';
 
-		// Get fileroot:
 		$FileRootCache = & get_FileRootCache();
-
-		load_class( 'files/model/_filelist.class.php', 'FileList' );
 
 		// Get all Item comments:
 		$link_type = param( 'link_type', 'string', true );
@@ -1217,6 +1213,7 @@ switch( $action )
 					$item_ID = $LinkOwner->link_Object->ID;
 				}
 
+				// Get list of comment IDs under Item or related to Comment:
 				$comments_SQL = new SQL( 'Get all the comments of an Item' );
 				$comments_SQL->SELECT( 'comment_ID' );
 				$comments_SQL->FROM( 'T_comments' );
@@ -1224,28 +1221,26 @@ switch( $action )
 				$comment_IDs = $DB->get_col( $comments_SQL );
 
 				load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
-
 				$LinkCache = & get_LinkCache();
-
-				$ea_Linklist = new DataObjectList2( $LinkCache ); // IN FUNC
+				$ea_Linklist = new DataObjectList2( $LinkCache );
 
 				$links_SQL = new SQL( 'Get all the links belonging to comments of an Item' );
 				$links_SQL->SELECT( 'l.*' );
 				$links_SQL->FROM( 'T_links AS l' );
-				$links_SQL->FROM_add( 'LEFT JOIN T_files AS f ON f.file_ID = l.link_file_ID' );
+				$links_SQL->FROM_add( 'LEFT JOIN T_comments AS c ON c.comment_ID = l.link_cmt_ID' );
 				if( $comment_IDs )
 				{
 					$links_SQL->WHERE( 'link_cmt_ID IN ('.$DB->quote( $comment_IDs ).')' );
 				}
 				$links_SQL->WHERE_or( 'link_itm_ID = '.$DB->quote( $item_ID ) );
-				$links_SQL->ORDER_BY( 'link_datemodified DESC' );
+				$links_SQL->ORDER_BY( 'c.comment_date DESC' );
 
 				$ea_Linklist->sql = $links_SQL->get();
 				$ea_Linklist->run_query( false, false, false, 'get_attachment_LinkList' );
 
 				// Get FileRoot and dummy FileList:
 				if( $ea_Linklist->get_total_rows() )
-				{
+				{	// Use first attachment to get the FileRoot:
 					$Link = & $ea_Linklist->get_by_idx( 0 );
 					$File = & $Link->get_File();
 					$fm_FileRoot = & $File->get_FileRoot();
@@ -1263,16 +1258,13 @@ switch( $action )
 
 					$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $Blog->ID );
 				}
+				load_class( 'files/model/_filelist.class.php', 'FileList' );
 				$fm_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
 				$selected_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
 				break;
 
-			case 'Message':
-				// Get all links from all messages in the same thread
-				break;
-
-			case 'EmailCampaign':
-				break;
+			default:
+				debug_die( 'Existing attachments list not available to '.$link_owner_class );
 		}
 		
 		global $current_User, $UserSettings, $is_admin_page, $adminskins_path;

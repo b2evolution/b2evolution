@@ -1842,8 +1842,8 @@ if( $mode != 'modal' )
 	// -------------------
 	// Browsing interface:
 	// -------------------
-	if( $mode == 'upload' )
-	{
+	if( ( $mode == 'upload' ) && in_array( get_class( $LinkOwner->link_Object ), array( 'Comment', 'Item' ) ) )
+	{	// Display existing attachments tab:
 		$attach_files_url = get_htsrv_url().'async.php?action=browse_existing_attachments&amp;root='.$root
 				.'&amp;path='.$path
 				.'&amp;prefix='.$prefix
@@ -1861,21 +1861,22 @@ if( $mode != 'modal' )
 			</li>
 		</ul>
 		<div class="tab-content">
-		<div class="tab-pane active" id="file_browser">
+			<div class="tab-pane active" id="file_browser">
+				<?php
+				// Display VIEW:
+				$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
+				?>
+			</div>
+			<div class="tab-pane" id="existing_attachments"></div>
+		</div>
 		<?php
 		expose_var_to_js( 'evo_tabs_ajax_load__click', true );
 	}
-	// Display VIEW:
-	$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
-	if( $mode == 'upload' )
+	else
 	{
-		?>
-		</div>
-		<div class="tab-pane" id="existing_attachments"></div>
-		</div>
-		<?php
+		// Display VIEW:
+		$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
 	}
-
 
 	// End payload block:
 	$AdminUI->disp_payload_end();
