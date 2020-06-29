@@ -477,7 +477,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Tags',
 		"CREATE TABLE T_items__tag (
 			tag_ID   INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-			tag_name VARCHAR(50) COLLATE utf8_bin NOT NULL,
+			tag_name VARCHAR(50) COLLATE utf8mb4_bin NOT NULL,
 			PRIMARY KEY (tag_ID),
 			UNIQUE tag_name( tag_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

@@ -21,7 +21,7 @@ $app_version = '7.1.5-stable';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2020-06-24';
+$app_date = '2020-06-29';
 
 /**
  * Is this b2evolution PRO?
@@ -44,7 +44,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 16012;
+$new_db_version = 16013;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
