@@ -12634,6 +12634,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16013, 'Upgrading columns to utf8mb4_bin...' ) )
+	{	// part of 7.1.5-stable
+		db_add_index( 'T_track__keyphrase', 'keyp_phrase', 'keyp_phrase(32)', 'UNIQUE' );
+		db_modify_col( 'T_track__keyphrase', 'keyp_phrase', 'VARCHAR( 255 ) COLLATE utf8mb4_bin NOT NULL' );
+		db_modify_col( 'T_hitlog', 'hit_keyphrase', 'VARCHAR(255) COLLATE utf8mb4_bin DEFAULT NULL' );
+		db_modify_col( 'T_items__tag', 'tag_name', 'VARCHAR(50) COLLATE utf8mb4_bin NOT NULL' );
+		db_modify_col( 'T_files', 'file_path', 'varchar(767) COLLATE utf8mb4_bin not null default ""' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 16083, 'Upgrading table for Menu entries and Converting menu widgets "Messaging", "Flagged Items" and "My Profile" into "Basic Menu link" widget...' ) )
 	{	// part of 7.2
 		db_upgrade_cols( 'T_menus__entry', array(
