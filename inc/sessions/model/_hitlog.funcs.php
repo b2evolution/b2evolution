@@ -1607,4 +1607,46 @@ function get_hit_full_url( $hit_uri, $hit_coll_ID )
 
 	return $hit_host.$hit_uri;
 }
+
+
+/**
+ * Get the search engine parameter definitions.
+ * 
+ * Based on search engine detections YAML list maintained and used by Matomo - {@link https://github.com/matomo-org/searchengine-and-social-list}
+ * 
+ * @return array of search engine definitions
+ */
+function get_search_engine_params()
+{
+	global $search_engine_params, $inc_path;
+
+	if( empty( $search_engine_params ) )
+	{
+		$search_engine_params = array();
+
+		$search_engine_definitions = json_decode( file_get_contents( $inc_path.'sessions/model/_search_engines.json' ) );
+
+		foreach( $search_engine_definitions as $name => $info )
+		{
+			if( empty( $info ) || !is_array( $info ) )
+			{
+				continue;
+			}
+
+			foreach( $info as $url_definitions )
+			{
+				$url_definitions = (array) $url_definitions;
+				foreach( $url_definitions['urls'] as $url )
+				{
+					$search_engine_data = $url_definitions;
+					unset( $search_engine_data['urls'] );
+					$search_engine_data['name'] = $name;
+					$search_engine_params[$url] = $search_engine_data;
+				}
+			}
+		}
+	}
+
+	return $search_engine_params;
+}
 ?>
