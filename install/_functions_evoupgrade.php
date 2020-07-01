@@ -12634,7 +12634,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16014, 'Upgrading columns to utf8mb4_bin...' ) )
+	if( upg_task_start( 16013, 'Upgrading columns to utf8mb4_bin...' ) )
 	{	// part of 7.1.5-stable
 		// Remove keyphrases with length > 250 chars before reducing column size in order to avoid duplicate entry errors:
 		$DB->query( 'DELETE FROM T_track__keyphrase
