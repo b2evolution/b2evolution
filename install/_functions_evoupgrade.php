@@ -12636,11 +12636,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16013, 'Upgrading columns to utf8mb4_bin...' ) )
+	if( upg_task_start( 16014, 'Upgrading columns to utf8mb4_bin...' ) )
 	{	// part of 7.1.5-stable
-		db_add_index( 'T_track__keyphrase', 'keyp_phrase', 'keyp_phrase(32)', 'UNIQUE' );
-		db_modify_col( 'T_track__keyphrase', 'keyp_phrase', 'VARCHAR( 255 ) COLLATE utf8mb4_bin NOT NULL' );
-		db_modify_col( 'T_hitlog', 'hit_keyphrase', 'VARCHAR(255) COLLATE utf8mb4_bin DEFAULT NULL' );
+		// Remove keyphrases with length > 250 chars before reducing column size in order to avoid duplicate entry errors:
+		$DB->query( 'DELETE FROM T_track__keyphrase
+			WHERE LENGTH( keyp_phrase ) > 250' );
+		$DB->query( 'UPDATE T_hitlog
+			  SET hit_keyphrase = NULL
+			WHERE LENGTH( hit_keyphrase ) > 250' );
+		// Drop unique key before changing column to utf8mb4(4bytes) from utf8(3bytes),
+		// because max size for unique key is 1000 bytes(4bytes * 250chars):
+		db_drop_index( 'T_track__keyphrase', 'keyp_phrase' );
+		db_modify_col( 'T_track__keyphrase', 'keyp_phrase', 'VARCHAR( 250 ) COLLATE utf8mb4_bin NOT NULL' );
+		db_add_index( 'T_track__keyphrase', 'keyp_phrase', 'keyp_phrase', 'UNIQUE' );
+		db_modify_col( 'T_hitlog', 'hit_keyphrase', 'VARCHAR(250) COLLATE utf8mb4_bin DEFAULT NULL' );
+		// Modify these columns in order to avoid errors when 4bytes char is in search string:
 		db_modify_col( 'T_items__tag', 'tag_name', 'VARCHAR(50) COLLATE utf8mb4_bin NOT NULL' );
 		db_modify_col( 'T_files', 'file_path', 'varchar(767) COLLATE utf8mb4_bin not null default ""' );
 		upg_task_end();
