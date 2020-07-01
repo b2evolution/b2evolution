@@ -217,7 +217,7 @@ $section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 $today = date( 'Y-m-d', $localtimenow );
 $Results->filter_area = array(
 	'callback' => 'filter_keyphrases',
-	'url_ignore' => 'goal_ID,datestartinput,datestart,datestopinput,datestop,goal_name,split_engines',
+	'url_ignore' => 'goal_ID,datestartinput,datestart,datestopinput,datestop,keyword,goal_name,split_engines',
 	);
 
 $Results->register_filter_preset( 'all', T_('All'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params );
