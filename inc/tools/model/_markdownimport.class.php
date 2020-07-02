@@ -1074,11 +1074,11 @@ class MarkdownImport extends AbstractImport
 						);
 					foreach( $image_matches[3] as $i => $image_relative_path )
 					{
-						$file_params['file_alt'] = trim( $image_matches[2][$i] );
-						if( strtolower( $file_params['file_alt'] ) == 'img' ||
-								strtolower( $file_params['file_alt'] ) == 'image' )
+						$image_alt = trim( $image_matches[2][$i] );
+						if( strtolower( $image_alt ) == 'img' ||
+								strtolower( $image_alt ) == 'image' )
 						{	// Don't use this default text for alt image text:
-							$file_params['file_alt'] = '';
+							$image_alt = '';
 						}
 						$file_params['file_title'] = trim( $image_matches[5][$i], ' "' );
 						// Detect link position:
@@ -1100,11 +1100,23 @@ class MarkdownImport extends AbstractImport
 							{	// Generate image inline tag:
 								$image_inline_caption = preg_replace( '#^[\r\n\s"\*]+(.+?)[\r\n\s"\*]+$#', '$1', $image_matches[7][$i] ); // note: trim() doesn't remove char * on the right side as expected
 								$image_inline_class = trim( str_replace( '}{', '', $image_matches[6][$i].$image_matches[11][$i] ), ' {}' );
-								$image_inline_tag = '[image:'.$link_data['ID']
-									.( $image_inline_class === '' && $image_inline_caption === '' ? '' : ':'.$image_inline_caption )
-									.( $image_matches[1][$i] == '[' && $image_matches[10][$i] !== '' ? ( $image_inline_class === '' && $image_inline_caption === '' ? ':-' : '' ).':'.$image_matches[10][$i] : '' )
-									.( $image_inline_class === '' ? '' : ':'.$image_inline_class )
-									.']';
+								$image_options = array();
+								// Caption has always a place if at least one option is defined below:
+								$image_options[] = $image_inline_caption;
+								if( $image_alt !== '' )
+								{	// Alt:
+									$image_options[] = $image_alt;
+								}
+								if( $image_matches[1][$i] == '[' && $image_matches[10][$i] !== '' )
+								{	// HRef:
+									$image_options[] = $image_matches[10][$i];
+								}
+								if( $image_inline_class !== '' )
+								{	// Class:
+									$image_options[] = $image_inline_class;
+								}
+								$image_options = ( count( $image_options ) > 2 || $image_options[0] !== '' ? ':'.implode( ':', $image_options ) : '' );
+								$image_inline_tag = '[image:'.$link_data['ID'].$image_options.']';
 							}
 							else // 'teaser'
 							{	// Don't provide inline tag for teaser image:
@@ -1254,7 +1266,6 @@ class MarkdownImport extends AbstractImport
 				'file_root_type' => 'collection',
 				'file_root_ID'   => '',
 				'file_title'     => '',
-				'file_alt'       => '',
 				'folder_path'    => '',
 				'link_position'  => 'inline',
 			), $params );
@@ -1366,7 +1377,6 @@ class MarkdownImport extends AbstractImport
 			if( empty( $replaced_File->ID ) )
 			{	// Create new File in DB with additional params:
 				$replaced_File->set( 'title', $params['file_title'] );
-				$replaced_File->set( 'alt', $params['file_alt'] );
 				if( ! $replaced_File->dbinsert() )
 				{	// Don't translate
 					$this->log_list( sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ), 'error' );
@@ -1421,7 +1431,6 @@ class MarkdownImport extends AbstractImport
 
 		// Set additional params and create new File:
 		$File->set( 'title', $params['file_title'] );
-		$File->set( 'alt', $params['file_alt'] );
 		$File->dbsave();
 
 		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
