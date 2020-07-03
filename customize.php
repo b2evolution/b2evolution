@@ -108,12 +108,10 @@ init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 
 add_js_headline( 'var customizer_url = "'.get_customizer_url().'";'
 	.'var evo_js_lang_not_controlled_page = \''.TS_('This page is not controlled by b2evolution.').'\'' );
-require_css( 'bootstrap-b2evo_base.bmin.css' );
-require_js_defer( '#jquery#' );
-require_js_defer( 'src/evo_customizer.js' );
-require_js_defer( '#bootstrap#' );
-require_css( '#bootstrap_css#' );
-require_js_defer( 'build/bootstrap-evo_frontoffice.bmin.js' );
+require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' );
+require_js_defer( 'build/bootstrap-evo_frontoffice-superbundle.bmin.js', 'blog' );
+require_js_defer( 'src/evo_customizer.js', 'blog' );
+require_css( '#bootstrap_css#', 'blog' );
 
 // Initialize shortcut keys:
 init_hotkeys_js( 'blog' );

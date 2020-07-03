@@ -1360,7 +1360,7 @@ class File extends DataObject
 	 * @param string rel= attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lightbox
 	 * @param string image class=
 	 * @param string image align=
-	 * @param string image alt=
+	 * @param string image alt=, Use '-' in order to don't display any alt text
 	 * @param string image caption/description to be displayed under the image
 	 * @param integer Link ID
 	 * @param integer Size multiplier, can be 1, 2 and etc. (Used for b2evonet slider for example)
@@ -1439,8 +1439,15 @@ class File extends DataObject
 					$img_attribs['align'] = $image_align;
 				}
 
-				if( $img_attribs['alt'] == '' )
-				{ // Image alt
+				if( $image_alt == '-' )
+				{	// Don't display any alt text:
+					if( isset( $img_attribs['alt'] ) )
+					{
+						unset( $img_attribs['alt'] );
+					}
+				}
+				elseif( $image_alt != '' )
+				{	// Overrride original image alt store in DB per this File:
 					$img_attribs['alt'] = $image_alt;
 				}
 

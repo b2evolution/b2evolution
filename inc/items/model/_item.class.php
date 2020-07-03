@@ -5162,12 +5162,16 @@ class Item extends ItemLight
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 		}
 
+		if( empty( $params['image_alt'] ) )
+		{	// Override image alt text by current Item title only when it is not passed e.g. from inline/short tag `[image:123::Custom Alt Text]`:
+			$params['image_alt'] = $this->get( 'title' );
+		}
+
 		// Generate the IMG tag with all the alt, title and desc if available
 		return $Link->get_tag( array_merge( $params, array(
 					'image_link_to'    => $link_to,   // can be URL, can be empty
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
-					'image_alt'        => $this->get( 'title' ),
 				) ) );
 	}
 
@@ -5707,8 +5711,9 @@ class Item extends ItemLight
 			}
 			if( $File->exists() )
 			{	// Get file link to download if file exists:
+				$file_download_url = $this->get_coll_setting( 'download_enable' ) ? $Link->get_download_url() : NULL;
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $file_download_url ) : '';
 			}
 			else
 			{	// File doesn't exist, We cannot display a link, Display only file name and warning:

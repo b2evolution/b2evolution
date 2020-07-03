@@ -122,14 +122,13 @@ class image_Widget extends ComponentWidget
 				'size_begin_line' => array(
 					'type' => 'begin_line',
 					'label' => T_('Image size'),
+					'note' => T_('Leave blank for auto.'),
 				),
 					'width' => array(
-						'label' => T_('Image width'),
 						'note' => '',
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
-						'hide_label' => true,
 						'valid_pattern' => array(
 								'pattern' => '~^(\d+(px|%)?)?$~i',
 								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
@@ -139,19 +138,45 @@ class image_Widget extends ComponentWidget
 						'type' => 'string',
 					),
 					'height' => array(
-						'label' => T_('Image height'),
-						'note' => '',
+						'note' => T_('Leave blank for auto.'),
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
-						'hide_label' => true,
 						'valid_pattern' => array(
 								'pattern' => '~^(\d+(px|%)?)?$~i',
 								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
-					'label' => T_('Leave blank for auto.'),
+				),
+				'max_size_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('Max size'),
+				),
+					'max_width' => array(
+						'note' => '',
+						'defaultvalue' => '',
+						'allow_empty' => true,
+						'size' => 4,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid max size, it must be specified in px or %%.') ) ),
+					),
+					'max_size_separator' => array(
+						'label' => ' x ',
+						'type' => 'string',
+					),
+					'max_height' => array(
+						'note' => T_('Leave blank for auto.'),
+						'defaultvalue' => '',
+						'allow_empty' => true,
+						'size' => 4,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid max size, it must be specified in px or %%.') ) ),
+					),
+				'max_size_end_line' => array(
+					'type' => 'end_line',
 				),
 				'alt' => array(
 					'label' => T_('Image Alt text'),
@@ -243,9 +268,18 @@ class image_Widget extends ComponentWidget
 		);
 
 		// Initialize image attributes:
+		// Image width:
 		$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
 		// Image height:
 		$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';
+		if( ! empty( $this->disp_params['max_width'] ) )
+		{	// Max width:
+			$image_attrs['style'] .= 'max-width:'.format_to_output( $this->disp_params['max_width'], 'htmlattr' ).';';
+		}
+		if( ! empty( $this->disp_params['max_height'] ) )
+		{	// Max height:
+			$image_attrs['style'] .= 'max-height:'.format_to_output( $this->disp_params['max_height'], 'htmlattr' ).';';
+		}
 		// If no unit is specified in a size, consider the unit to be px:
 		$image_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $image_attrs['style'] );
 

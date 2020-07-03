@@ -336,6 +336,19 @@ function skin_init( $disp )
 				debug_die( 'Invalid page URL!' );
 			}
 
+			$seo_page_type = 'Download page';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{ // We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			if( ! $Blog->get_setting( 'download_enable' ) )
+			{	// If download is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-download-disabled';
+				break;
+			}
+
 			$download_link_ID = param( 'download', 'integer', 0 );
 
 			// Check if we can allow to download the selected file
@@ -362,13 +375,6 @@ function skin_init( $disp )
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );
-
-			$seo_page_type = 'Download page';
-
-			if( $Blog->get_setting( $disp.'_noindex' ) )
-			{ // We prefer robots not to index these pages:
-				$robots_index = false;
-			}
 			break;
 
 		case 'posts':
@@ -456,7 +462,9 @@ function skin_init( $disp )
 
 					global $cat, $catsel;
 
-					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
+					if( ( empty( $catsel ) || // 'catsel' filter is not defined
+					      ( is_array( $catsel ) && count( $catsel ) == 1 ) // 'catsel' filter is used for single cat, e.g. when skin config 'cat_array_mode' = 'parent'
+					    ) && preg_match( '~^[0-9]+$~', $cat ) ) // 'cat' filter is ID of category and NOT modifier for 'catsel' multicats
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children

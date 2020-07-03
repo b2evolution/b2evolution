@@ -642,14 +642,17 @@ switch( $action )
 		$new_Item = new Item();
 		$new_Item->set( 'status', 'draft' );
 		$new_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
-		$new_Item->set( 'title', TB_( 'Elevated from comment' ) );
+		// Generate Item title from Comment content excerpt by first X words allowed for slug length:
+		$item_title = explode( ' ', $edited_Comment->get_excerpt() );
+		$item_title = array_slice( $item_title, 0, $Blog->get_setting( 'slug_limit' ) );
+		$new_Item->set( 'title', implode( ' ', $item_title ) );
 
 		if( $type == 'quote' )
 		{ // Set a post data for a quote mode:
 			$item_content = $edited_Comment->get_author_name().' '.TB_( 'wrote' ).':';
 			if( $new_Item->get_type_setting( 'allow_html' ) )
 			{ // Use html quote format if HTML is allowed for new creating post:
-				$item_content .= ' <blockquote>'.$edited_Comment->get_content( 'raw_text' ).'</blockquote>';
+				$item_content .= ' <blockquote>'.$edited_Comment->get( 'content' ).'</blockquote>';
 			}
 			else
 			{ // Use markdown quote format if HTML is NOT allowed for new creating post:
@@ -661,7 +664,7 @@ switch( $action )
 		else // $type == 'original'
 		{ // Set a post data for an original mode:
 			// Use an original comment content for new creating post:
-			$item_content = $edited_Comment->get_content( 'raw_text' );
+			$item_content = $edited_Comment->get( 'content' );
 
 			// Set a post creator:
 			$author_User = & $edited_Comment->get_author_User();
@@ -674,12 +677,50 @@ switch( $action )
 				$new_Item->set_creator_by_login( $author_User->login );
 			}
 		}
-		$new_Item->set( 'content', $item_content );
+
+		// Get all attached files to the elevated Comment:
+		$comment_LinkOwner = new LinkComment( $edited_Comment );
+		$comment_Links = & $comment_LinkOwner->get_Links();
+		$comment_has_links = ! empty( $comment_Links );
+		if( ! $comment_has_links )
+		{	// If comment has at least one attached file then set content only after
+			// we will convert all inline tags to new link IDs after insert new Item:
+			// (otherwise note "Invalid inline file placeholders won't be displayed." appears)
+			$new_Item->set( 'content', $item_content );
+		}
 
 		if( ! $new_Item->dbinsert() )
 		{
 			$Messages->add( TB_( 'Unable to create the new post!' ), 'error' );
 			break;
+		}
+
+		if( $comment_has_links )
+		{	// Link all attached files from the elevated Comment to new create Item:
+			$item_LinkOwner = new LinkItem( $new_Item );
+			$inline_link_IDs = array();
+			foreach( $comment_Links as $comment_Link )
+			{
+				if( $item_link_ID = $item_LinkOwner->add_link( $comment_Link->get( 'file_ID' ), $comment_Link->get( 'position' ), $comment_Link->get( 'order' ), false ) )
+				{	// If file was linked successfully:
+					if( $comment_Link->get( 'position' ) == 'inline' )
+					{	// Store what inline link IDs should updated in Item's content:
+						$inline_link_IDs[ $comment_Link->ID ] = $item_link_ID;
+					}
+				}
+			}
+
+			if( ! empty( $inline_link_IDs ) )
+			{	// Replace comment inline link IDs with new item link IDs:
+				foreach( $inline_link_IDs as $comment_link_ID => $item_link_ID )
+				{
+					$item_content = replace_outside_code_tags( '/\[([a-z]+):'.$comment_link_ID.'/i', '[$1:'.$item_link_ID, $item_content );
+				}
+			}
+
+			// Set content with updated link IDs:
+			$new_Item->set( 'content', $item_content );
+			$new_Item->dbupdate();
 		}
 
 		// Deprecate the comment after elevating

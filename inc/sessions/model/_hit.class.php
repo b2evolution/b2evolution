@@ -414,7 +414,7 @@ class Hit
 			$pos = strpos( $this->referer, $self_referer );
 			// If not starting within in the first 12 chars it's probably an url param as in &url=http://this_blog.com
 			if( $pos !== false && $pos <= 12 &&
-			    ! ( $debug && strpos( $this->referer, '/search.html' ) ) ) // search simulation
+				! ( $debug && strpos( $this->referer, '/search.html' ) ) ) // search simulation
 			{
 				// This type may be superseeded by admin page
 				if( ! $this->detect_admin_page() )
@@ -697,7 +697,7 @@ class Hit
 		}
 
 		if( ! $match && ( $browscap = $this->get_browser_caps() ) &&
-		    isset( $browscap->crawler ) && $browscap->crawler )
+			isset( $browscap->crawler ) && $browscap->crawler )
 		{
 			$Debuglog->add( 'Hit:detect_useragent(): robot (through browscap)', 'request' );
 			$this->agent_type = 'robot';
@@ -876,7 +876,7 @@ class Hit
 
 		if( $keyphrase !== NULL )
 		{	// Limit keyphrase but do NOT convert NULL to empty string:
-			$keyphrase = substr( $keyphrase, 0, 255 );
+			$keyphrase = substr( $keyphrase, 0, 250 );
 		}
 
 		// Extract the serprank from search referers:
@@ -936,7 +936,7 @@ class Hit
 				'hit_referer'           => $DB->quote( substr( $this->referer, 0, 250 ) ), // VARCHAR(250) and likely to be longer
 				'hit_referer_dom_ID'    => $DB->quote( $this->get_referer_domain_ID() ),
 				'hit_keyphrase_keyp_ID' => $DB->quote( NULL ),
-				'hit_keyphrase'         => $DB->quote( $keyphrase ), // VARCHAR(255) and likely to be longer
+				'hit_keyphrase'         => $DB->quote( $keyphrase ), // VARCHAR(250) and likely to be longer
 				'hit_serprank'          => $DB->quote( $serprank ),
 				'hit_coll_ID'           => $DB->quote( $blog_ID ),
 				'hit_remote_addr'       => $DB->quote( $this->IP ),
@@ -1306,11 +1306,14 @@ class Hit
 		if( is_null( $this->search_engine_names ) )
 		{
 			$this->search_engine_names = array();
+
+			$search_engine_params = get_search_engine_params();
+
 			foreach( $search_engine_params as $url => $info )
 			{
-				if( ! isset( $this->search_engine_names[$info[0]] ) )
+				if( ! isset( $this->search_engine_names[$info['name']] ) )
 				{	// Do not overwrite existing keys
-					$this->search_engine_names[$info[0]] = $url;
+					$this->search_engine_names[$info['name']] = $url;
 				}
 			}
 		}
@@ -1451,7 +1454,8 @@ class Hit
 		global $search_engine_params;
 
 		// Load search engine definitions
-		require_once dirname(__FILE__).'/_search_engines.php';
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$search_engine_params = get_search_engine_params();
 
 		// Parse referer:
 		$pu = @parse_url( $referer );
@@ -1531,6 +1535,10 @@ class Hit
 	{
 		global $Debuglog, $search_engine_params, $evo_charset, $current_charset;
 
+		// Load search engine definitions
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$search_engine_params = get_search_engine_params();
+
 		// Make sure we don't try params extraction twice
 		$this->_search_params_tried = true;
 
@@ -1541,19 +1549,19 @@ class Hit
 			return false;
 		}
 
-		$search_engine_name = $search_engine_params[$ref_host][0];
+		$search_engine_name = $search_engine_params[$ref_host]['name'];
 
 		$keyword_param = NULL;
-		if( ! empty( $search_engine_params[$ref_host][1] ) )
+		if( ! empty( $search_engine_params[$ref_host]['params'] ) )
 		{
-			$keyword_param = $search_engine_params[$ref_host][1];
+			$keyword_param = $search_engine_params[$ref_host]['params'];
 		}
 		if( is_null( $keyword_param ) )
 		{	// Get settings from first item in group
 			$search_engine_names = $this->get_search_engine_names();
 
 			$url = $search_engine_names[$search_engine_name];
-			$keyword_param = $search_engine_params[$url][1];
+			$keyword_param = $search_engine_params[$url]['params'];
 		}
 		if( ! is_array( $keyword_param ) )
 		{
@@ -1568,7 +1576,7 @@ class Hit
 			$query = str_replace( '&', '&amp;', strstr( $query, '?' ) );
 		}
 		elseif( $search_engine_name == 'Google' && ( strpos( $query, '&as_' ) !== false || strpos( $query, 'as_' ) === 0 ) )
-		{ // Google with "as_" param
+		{	// Google with "as_" param
 			$keys = array();
 
 			if( $key = $this->get_param_from_string( $query, 'as_q' ) )
@@ -1630,10 +1638,42 @@ class Hit
 			}
 		}
 
+		// Use 'hiddenkeyword' param from search engine definitions to check
+		// if the search engine refers from paths that may not contain/provide a keyword:
+		if( ! $key_param_in_query && ! empty( $search_engine_params[$ref_host]['hiddenkeyword'] ) )
+		{
+			$path_with_query_and_fragment = $ref_path;
+			if( !empty( $query ) )
+			{
+				$path_with_query_and_fragment .= '?'.$query;
+			}
+			if( !empty( $fragment ) )
+			{
+				$path_with_query_and_fragment .= '#'.$fragment;
+			}
+
+			foreach( $search_engine_params[$ref_host]['hiddenkeyword'] as $path )
+			{
+				if( strlen( $path ) > 1 && substr( $path, 0, 1 ) == '/' && substr( $path, -1,1 ) == '/' )
+				{
+					if( preg_match( $path, $path_with_query_and_fragment ) )
+					{
+						$key_param_in_query = true;
+						break;
+					}
+				}
+				elseif( $path == $path_with_query_and_fragment )
+				{
+					$key_param_in_query = true;
+					break;
+				}
+			}
+		}
+
 		if( empty( $key ) && ! $key_param_in_query )
-		{ // Not a search referer
+		{	// Not a search referer
 			if( $this->referer_type == 'search' )
-			{ // If the referer was detected as 'search' we need to change it to 'special'
+			{	// If the referer was detected as 'search' we need to change it to 'special'
 				// to keep search stats clean.
 				$this->referer_type = 'special';
 				$Debuglog->add( 'Hit: extract_params_from_referer() overrides referer type set by detect_referer(): "search" -> "special"', 'request' );
@@ -1644,13 +1684,13 @@ class Hit
 
 
 		// Convert encoding:
-		if( ! empty( $search_engine_params[$ref_host][3] ) )
+		if( ! empty( $search_engine_params[$ref_host]['charsets'] ) )
 		{
-			$ie = $search_engine_params[$ref_host][3];
+			$ie = $search_engine_params[$ref_host]['charsets'];
 		}
-		elseif( isset( $url ) && ! empty( $search_engine_params[$url][3] ) )
+		elseif( isset( $url ) && ! empty( $search_engine_params[$url]['charsets'] ) )
 		{
-			$ie = $search_engine_params[$url][3];
+			$ie = $search_engine_params[$url]['charsets'];
 		}
 		else
 		{	// Fallback to default encoding:
@@ -1685,6 +1725,10 @@ class Hit
 
 		// Extract the "serp rank"
 		// Typically http://google.com?s=keyphraz&start=18 returns 18
+
+		// There is no longer a 'serp rank' param in the latest search engine definitions,
+		// we will have to resort to the fallback param values:
+		/*
 		if( ! empty( $search_engine_params[$ref_host][4] ) )
 		{
 			$serp_param = $search_engine_params[$ref_host][4];
@@ -1697,6 +1741,9 @@ class Hit
 		{	// Fallback to default params
 			$serp_param = array( 'offset', 'page', 'start' );
 		}
+		*/
+		// Fallback to default params
+		$serp_param = array( 'offset', 'page', 'start' );
 
 		if( ! is_array( $serp_param ) )
 		{
