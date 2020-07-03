@@ -127,6 +127,7 @@ global $iframe_name, $field_name, $file_type;
 			echo '<th class="nowrap">'./* TRANS: file group */ T_('Group').'</th>';
 		}
 
+		echo '<th class="lastcol nowrap">'. /* TRANS: file actions; edit, rename, copy, .. */ T_('Actions').'</th>';
 		echo '</tr>';
 	?>
 	</thead>
@@ -287,6 +288,7 @@ global $iframe_name, $field_name, $file_type;
 		{
 			case 'Comment':
 			case 'Item':
+			case 'EmailCampaign':
 				$owner_date = $lLinkOwner->link_Object->get_creation_time();
 				break;
 		}
@@ -339,6 +341,16 @@ global $iframe_name, $field_name, $file_type;
 			evo_flush();
 		}
 
+		/*****************  Action icons  ****************/
+
+		echo '<td class="actions lastcol text-nowrap">';
+		echo file_td_actions( $lFile, array( 'move', 'copy', 'delete' ) );
+		echo '</td>';
+		evo_flush();
+
+		echo '</tr>';
+		evo_flush();
+
 
 		$countFiles++;
 	}
@@ -346,9 +358,9 @@ global $iframe_name, $field_name, $file_type;
 
 
 	/**
-	 * @global integer Number of cols for the files table, 4 is minimum.
+	 * @global integer Number of cols for the files table, 5 is minimum.
 	 */
-	$filetable_cols = 4
+	$filetable_cols = 5
 		+ ( int ) $fm_flatmode
 		+ ( int ) $UserSettings->get( 'fm_showcreator' )
 		+ ( int ) $UserSettings->get( 'fm_showtypes' )

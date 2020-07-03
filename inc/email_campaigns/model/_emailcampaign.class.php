@@ -1733,6 +1733,20 @@ class EmailCampaign extends DataObject
 
 		return empty( $added_users_num ) ? false : $added_users_num;
 	}
+
+
+	/**
+	 * Get creation time of Email Campaign
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_creation_time( $format = '', $useGM = false )
+	{
+		$format = locale_resolve_datetime_fmt( $format );
+
+		return mysql2date( $format, $this->date_ts, $useGM );
+	}
 }
 
 ?>

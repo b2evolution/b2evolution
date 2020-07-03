@@ -1842,7 +1842,8 @@ if( $mode != 'modal' )
 	// -------------------
 	// Browsing interface:
 	// -------------------
-	if( ( $mode == 'upload' ) && in_array( get_class( $LinkOwner->link_Object ), array( 'Comment', 'Item' ) ) )
+	$show_existing_attachments_tab = ( $mode == 'upload' ) && isset( $LinkOwner ) && in_array( get_class( $LinkOwner->link_Object ), array( 'Comment', 'Item', 'EmailCampaign' ) );
+	if( $show_existing_attachments_tab )
 	{	// Display existing attachments tab:
 		$attach_files_url = get_htsrv_url().'async.php?action=browse_existing_attachments&amp;root='.$root
 				.'&amp;path='.$path
@@ -1850,16 +1851,18 @@ if( $mode != 'modal' )
 				.'&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type )
 				.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		?>
-		<ul class="nav nav-tabs">
-			<li class="active">
-				<a href="#file_browser" data-toggle="tab"><?php echo T_('File browser'); ?></a>
-			</li>
-			<li>
-				<a href="<?php echo $attach_files_url;?>" data-toggle="tabajax" data-target="#existing_attachments">
-					<?php echo T_('Existing attachments'); ?>
-				</a>
-			</li>
-		</ul>
+		<div class="margin-bottom-md">
+			<ul class="nav nav-tabs">
+				<li class="active">
+					<a href="#file_browser" data-toggle="tab"><?php echo T_('File browser'); ?></a>
+				</li>
+				<li>
+					<a href="<?php echo $attach_files_url;?>" data-toggle="tabajax" data-target="#existing_attachments">
+						<?php echo T_('Existing attachments'); ?>
+					</a>
+				</li>
+			</ul>
+		</div>
 		<div class="tab-content">
 			<div class="tab-pane active" id="file_browser">
 				<?php
