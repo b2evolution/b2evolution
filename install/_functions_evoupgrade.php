@@ -12948,6 +12948,31 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Drop unique key before changing column to utf8mb4(4bytes) from utf8(3bytes),
 		// because max size for unique key is 1000 bytes(4bytes * 250chars):
 		db_drop_index( 'T_track__keyphrase', 'keyp_phrase' );
+		// Remove all duplicated key phrases which may were inserted by miskate when INDEX KEY for keyp_phrase was not UNIQUE:
+		$dupl_keyphrases_SQL = new SQL( 'Find all duplicated key phrases' );
+		$dupl_keyphrases_SQL->SELECT( 'keyp_phrase, GROUP_CONCAT( keyp_ID ) AS IDs,
+			SUM( keyp_count_refered_searches ) AS sum_keyp_count_refered_searches,
+			SUM( keyp_count_internal_searches ) AS sum_keyp_count_internal_searches' );
+		$dupl_keyphrases_SQL->FROM( 'T_track__keyphrase' );
+		$dupl_keyphrases_SQL->GROUP_BY( 'keyp_phrase' );
+		$dupl_keyphrases_SQL->HAVING( 'COUNT( keyp_phrase ) > 1' );
+		$dupl_keyphrases = $DB->get_results( $dupl_keyphrases_SQL );
+		foreach( $dupl_keyphrases as $dupl_keyphrase )
+		{
+			// Find first/min record because only this is correct and only this can be kept in DB:
+			// (All next duplicates must be removed from DB)
+			$first_keyp_ID = min( explode( ',', $dupl_keyphrase->IDs ) );
+			// Fix counters by moving all what counted in duplicated records by mistake:
+			$DB->query( 'UPDATE T_track__keyphrase
+				  SET keyp_count_refered_searches = '.$dupl_keyphrase->sum_keyp_count_refered_searches.',
+				      keyp_count_internal_searches = '.$dupl_keyphrase->sum_keyp_count_internal_searches.'
+				WHERE keyp_ID = '.$first_keyp_ID );
+			// Delete all duplicated/wrong records except of only first/correct:
+			$DB->query( 'DELETE FROM T_track__keyphrase
+				WHERE keyp_ID IN ( '.$dupl_keyphrase->IDs.' )
+				  AND keyp_ID != '.$first_keyp_ID );
+		}
+		// Upgrade key phrase columns:
 		db_modify_col( 'T_track__keyphrase', 'keyp_phrase', 'VARCHAR( 250 ) COLLATE utf8mb4_bin NOT NULL' );
 		db_add_index( 'T_track__keyphrase', 'keyp_phrase', 'keyp_phrase', 'UNIQUE' );
 		db_modify_col( 'T_hitlog', 'hit_keyphrase', 'VARCHAR(250) COLLATE utf8mb4_bin DEFAULT NULL' );
