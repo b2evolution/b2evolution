@@ -377,6 +377,7 @@ module.exports = function(grunt) {
 				src: [
 					'rsc/js/jquery.min.js',
 					'rsc/js/jquery/jquery-migrate.min.js',
+					'rsc/js/jquery/jquery.ui.b2evo.min.js',
 					'rsc/js/bootstrap/bootstrap.min.js',
 					'rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
 				],
