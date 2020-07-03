@@ -235,16 +235,39 @@ class Hitlist
 		$Plugins->trigger_event( 'BeforeSessionsDelete', $temp_array = array( 'cutoff_timestamp' => $oldest_date ) );
 
 		// PRUNE SESSIONS:
-		$hitlist_Timer->start( 'sessions' );
-		$sessions_rows_affected = $DB->query( 'DELETE FROM T_sessions
-			WHERE
-				( sess_user_ID IS NOT NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $oldest_date ) ).' )
-				OR
-				( sess_user_ID IS NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $time_prune_before ) ).' )',
-			'Autoprune sessions' );
-		$hitlist_Timer->stop( 'sessions' );
-		$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
-		$return_message .= Hitlist::log_pruning( sprintf( '%s rows from %s, Execution time: %s seconds', $sessions_rows_affected, 'T_sessions', $hitlist_Timer->get_duration( 'sessions' ) ), $output_message, true );
+		$sessions_rows_affected_total = 0;
+		$sessions_rows_affected_i = 1;
+		$sessions_i = 0;
+		$hitlist_Timer->start( 'sessions_total' );
+		while( $sessions_rows_affected_i )
+		{
+			$hitlist_Timer->start( 'sessions_i' );
+			$sessions_rows_affected_i = $DB->query( 'DELETE FROM T_sessions
+				WHERE
+					( sess_user_ID IS NOT NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $oldest_date ) ).' )
+					OR
+					( sess_user_ID IS NULL AND sess_lastseen_ts < '.$DB->quote( date( 'Y-m-d H:i:s', $time_prune_before ) ).' )
+				LIMIT 1000',
+				'Autoprune sessions' );
+			$hitlist_Timer->stop( 'sessions_i' );
+			if( $sessions_i == 0 || $sessions_rows_affected_i > 0 )
+			{
+				$Debuglog->add( 'Hitlist::dbprune(): autopruned '.$sessions_rows_affected_i.' rows from T_sessions.', 'request' );
+				$return_message .= Hitlist::log_pruning( sprintf( '%s rows from %s, Execution time: %s seconds', $sessions_rows_affected_i, 'T_sessions', $hitlist_Timer->get_duration( 'sessions_i' ) ), $output_message, true );
+				$sessions_rows_affected_total += $sessions_rows_affected_i;
+			}
+			$sessions_i++;
+			if( $sessions_rows_affected_i < 1000 )
+			{	// Don't try next query if current already is less 1000 records:
+				break;
+			}
+		}
+		$hitlist_Timer->stop( 'sessions_total' );
+		if( $sessions_i > 1 )
+		{	// Display total pruned sessions only if it was executed more 1 time per 1000 limited records:
+			$Debuglog->add( 'Hitlist::dbprune(): Total autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
+			$return_message .= Hitlist::log_pruning( sprintf( 'Total %s rows from %s, Execution time: %s seconds', $sessions_rows_affected_total, 'T_sessions', $hitlist_Timer->get_duration( 'sessions_total' ) ), $output_message, true );
+		}
 
 
 		// PRUNE BASEDOMAINS:
