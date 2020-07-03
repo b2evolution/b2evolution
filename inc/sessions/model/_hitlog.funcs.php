@@ -1624,7 +1624,11 @@ function get_search_engine_params()
 	{
 		$search_engine_params = array();
 
-		$search_engine_definitions = json_decode( file_get_contents( $inc_path.'sessions/model/_search_engines.json' ) );
+		// Load Spyc library to parse YAML data:
+		load_funcs( '_ext/spyc/Spyc.php' );
+
+		// Load search engine definitions from external library:
+		$search_engine_definitions = spyc_load_file( $inc_path.'_ext/matomo/SearchEngines.yml' );
 
 		foreach( $search_engine_definitions as $name => $info )
 		{
@@ -1635,7 +1639,6 @@ function get_search_engine_params()
 
 			foreach( $info as $url_definitions )
 			{
-				$url_definitions = (array) $url_definitions;
 				foreach( $url_definitions['urls'] as $url )
 				{
 					$search_engine_data = $url_definitions;
