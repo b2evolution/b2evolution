@@ -12936,7 +12936,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16101, 'Upgrading columns to utf8mb4_bin...' ) )
+	if( upg_task_start( 16102, 'Upgrading columns to utf8mb4_bin...' ) )
 	{	// part of 7.2
 		// NOTE: This is a duplicate block of 16014 because auto-upgrade tool cannot detect differences in COLLATE:
 		// Remove keyphrases with length > 250 chars before reducing column size in order to avoid duplicate entry errors:
