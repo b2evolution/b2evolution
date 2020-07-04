@@ -704,7 +704,7 @@ class bootstrap_forums_Skin extends Skin
 		{
 			case 'cat_array_mode':
 				// What category level use to display the items on disp=posts:
-				//   - 'children' - Get items from current category and from all its sub-categories recursively
+				//   - 'children' - Get items from current category and from all its sub-categories recirsively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'parent';
 
