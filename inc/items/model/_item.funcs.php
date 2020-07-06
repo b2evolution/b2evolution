@@ -327,7 +327,10 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 	// Convert to boolean because settings may have '0' and '1' values instead:
 	$load_featured = (boolean)$load_featured;
 
-	if( $featured_list_type !== $load_featured || $featured_disp_detail !== $disp_detail )
+	// Check clear disp details without suffix -intro and -nointro:
+	$check_clear_disp_detail = preg_replace( '#(-intro|-nointro)$#', '', $disp_detail );
+
+	if( $featured_list_type !== $load_featured || $featured_disp_detail !== $check_clear_disp_detail )
 	{	// Reset a featured list if previous request was to load another type:
 		$FeaturedList = NULL;
 	}
@@ -335,7 +338,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 	// Save current list type in global var:
 	$featured_list_type = $load_featured;
 	// Save current disp detail in global var, but decide 'posts-topcat-intro' and 'posts-topcat-nointro' same as 'posts-topcat' and etc. for other disp details like 'posts-subcat':
-	$featured_disp_detail = preg_replace( '#(-intro|-nointro)$#', '', $disp_detail );
+	$featured_disp_detail = $check_clear_disp_detail;
 
 	if( !isset( $FeaturedList ) )
 	{	// Don't repeat if we've done this already -- Initialize the featured list only first time this function is called in a skin:
