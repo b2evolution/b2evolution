@@ -16,15 +16,15 @@ jQuery( document ).ready( function()
 	}
 
 	var config = evo_init_checklist_lines_config;
-	window.toggle_add_checklist_line_input = function( form, show_input )
+	window.toggle_add_checklist_line_input = function( wrapper, show_input )
 		{
-			var new_checklist_line_input  = jQuery( '.add_checklist_line_input', form );
+			var new_checklist_line_input  = jQuery( '.add_checklist_line_input', wrapper );
 			var new_checklist_line_button = jQuery( '.checklist_add_btn' );
 			var new_checklist_line_close  = jQuery( '.checklist_close_btn' );
 
 			if( show_input == undefined )
 			{
-				show_input = jQuery( '.add_checklist_line_input', form ).is( ':visible' ).length === 0;
+				show_input = jQuery( '.add_checklist_line_input', wrapper ).is( ':visible' ).length === 0;
 			}
 
 			if( show_input == true )
@@ -61,8 +61,8 @@ jQuery( document ).ready( function()
 					{
 						if( result.status == 'add' )
 						{	// Add checklist line:
-							var form = input_field.closest( 'form' );
-							var checklist = jQuery( '.checklist_lines', form );
+							var wrapper = input_field.closest( 'div.checklist_wrapper' );
+							var checklist = jQuery( '.checklist_lines', wrapper );
 							var new_checklist_line = config.checklist_line_template;
 
 							new_checklist_line = new_checklist_line.replace( /\$checklist_line_ID\$/g, result.check_ID );
@@ -225,22 +225,22 @@ jQuery( document ).ready( function()
 
 	// Show new checklist line input on Add Item button click:
 	jQuery( '.checklist_add_btn' ).on( 'click', function() {
-			var form = jQuery( this ).closest( 'form' );
-			var input_field = jQuery( 'textarea.add_checklist_line_input', form );
+			var wrapper = jQuery( this ).closest( 'div.checklist_wrapper' );
+			var input_field = jQuery( 'textarea.add_checklist_line_input', wrapper );
 			if( input_field.is( ':visible' ) )
 			{	// Add checklist line input is visible, send request:
 				window.update_checklist_line( input_field );
 			}
 			else
 			{	// Show the add checklist line input:
-				window.toggle_add_checklist_line_input( form, true );
+				window.toggle_add_checklist_line_input( wrapper, true );
 			}
 		} );
 
 	// Hide new checklist line input on Close button click:
 	jQuery( '.checklist_close_btn' ).on( 'click', function() {
-			var form = jQuery( this ).closest( 'form' );
-			window.toggle_add_checklist_line_input( form, false );
+			var wrapper = jQuery( this ).closest( 'div.checklist_wrapper' );
+			window.toggle_add_checklist_line_input( wrapper, false );
 		} );
 
 
@@ -250,14 +250,14 @@ jQuery( document ).ready( function()
 			var content = label.html();
 			var checklist_line = label.closest( '.checklist_line' );
 			var checkbox = jQuery( 'input[type="checkbox"]', checklist_line );
-			var form = checklist_line.closest( 'form' );
+			var wrapper = checklist_line.closest( 'div.checklist_wrapper' );
 
 			event.preventDefault();
 
 			if( label.has( 'textarea.checklist_line_input' ).length === 0 )
 			{
 				// Close new checklist line input:
-				window.toggle_add_checklist_line_input( form, false );
+				window.toggle_add_checklist_line_input( wrapper, false );
 
 				// Show textarea input for checklist line label:
 				var input_template = jQuery( config.checklist_line_input_template );
@@ -314,10 +314,10 @@ jQuery( document ).ready( function()
 			var delete_link = jQuery( this );	
 			var checklist_line = delete_link.closest( '.checklist_line' );
 			var checkbox = jQuery( 'input[type="checkbox"]', checklist_line );
-			var form = checklist_line.closest( 'form' );
+			var wrapper = checklist_line.closest( 'div.checklist_wrapper' );
 
 			// Close new checklist line input:
-			window.toggle_add_checklist_line_input( form, false );
+			window.toggle_add_checklist_line_input( wrapper, false );
 
 			// Delete the checklist line:
 			window.delete_checklist_line( delete_link, checkbox.val() );

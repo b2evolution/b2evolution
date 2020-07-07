@@ -184,8 +184,8 @@ class item_checklist_lines_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 		
+		echo '<div class="checklist_wrapper">';
 		$Form = new Form();
-		$Form->begin_form();
 		$Form->switch_layout( 'linespan' );
 
 		if( $can_update )
@@ -259,7 +259,7 @@ class item_checklist_lines_Widget extends ComponentWidget
 			echo '<button type="button" class="btn btn-link btn-xs checklist_close_btn" style="display:none;">'.get_icon( 'close' ).'</button>';
 		}
 
-		$Form->end_form();
+		echo '</div>';
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
