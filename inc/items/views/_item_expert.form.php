@@ -628,6 +628,7 @@ $Form->begin_form( '', '', $params );
 	}
 	else
 	{
+		// Make sure the widget does not insert a form here!
 		skin_widget( array(
 			// CODE for the widget:
 			'widget' => 'item_checklist_lines',
