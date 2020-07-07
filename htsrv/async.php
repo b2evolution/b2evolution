@@ -872,12 +872,10 @@ switch( $action )
 		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
 		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
 
-		echo '<div style="background:#FFF;height:90%">'
-				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+		echo '<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'&amp;prefix='.$prefix.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
-					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
-			.'</div>';
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>';
 
 		break;
 
@@ -903,12 +901,10 @@ switch( $action )
 		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
 		//$additional_params .= empty( $field_name ) ? '' : '&amp;field_name='.$field_name;
 
-		echo '<div style="background:#FFF;height:90%">'
-				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+		echo '<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;field_name='.$field_name.'&amp;file_type='.$file_type.'&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=file_select'.$additional_params.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
-					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
-			.'</div>';
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>';
 
 		break;
 
@@ -924,12 +920,10 @@ switch( $action )
 		// Check permission:
 		check_user_perm( 'files', 'view', true, $FileRoot );
 
-		echo '<div style="background:#FFF;height:80%">'
-				.'<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+		echo '<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0&amp;path='.param( 'path', 'string' ).'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
-					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
-			.'</div>';
+					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>';
 
 		break;
 

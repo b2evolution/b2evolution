@@ -290,6 +290,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 	<aside class="evo_sidebar_col col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
+		<div id="evo_container__sidebar">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
@@ -363,6 +364,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
+		</div>
 	</aside><!-- .col -->
 	<?php } ?>
 
@@ -482,10 +484,4 @@ siteskin_include( '_site_body_footer.inc.php' );
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
 // ------------------------------- END OF FOOTER --------------------------------
-
-if( $Skin->is_visible_sidebar( true, 'single' ) && $Skin->get_setting( 'sidebar_single_affix' ) )
-{
-	// Init JS to scroll down to content:
-	$Skin->require_js_defer( 'affix_sidebar.js', true );
-}
 ?>

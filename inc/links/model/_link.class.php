@@ -305,10 +305,15 @@ class Link extends DataObject
 
 		if( $LinkOwner->type == 'item' && $LinkOwner->Item )
 		{ // Use specific url for Item to download
+			if( ! $LinkOwner->Item->get_coll_setting( 'download_enable' ) )
+			{	// If ?disp=download is disabled then use simple original URL to the File:
+				return $File->get_url();
+			}
+
 			switch( $params['type'] )
 			{
 				case 'action':
-					// Get URL to froce download a file
+					// Get URL to force download a file
 					if( $File->get_ext() == 'zip' )
 					{ // Provide direct url to ZIP files
 					  // NOTE: The same hardcoded place is in the file "htsrv/download.php", lines 56-60

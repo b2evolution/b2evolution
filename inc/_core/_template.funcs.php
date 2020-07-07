@@ -1895,7 +1895,6 @@ function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#
 		{	// Use specific order/index when it is requested and the index is free:
 			$footerline_include_file[ $file_index ] = $footerline;
 		}
-		$footerline_include_file[] = $footerline;
 		// Flag to don't include same file from same group twice,
 		// Also store value as index/order in order to dequeue it quickly:
 		$footerline_file_index[ $group_relative_to ][ $file_name ] = $file_index;

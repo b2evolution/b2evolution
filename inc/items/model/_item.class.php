@@ -3163,7 +3163,9 @@ class Item extends ItemLight
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
 			{
 				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
-				$link_class_attr = empty( $custom_field['link_class'] ) ? '' : ' class="'.format_to_output( $custom_field['link_class'], 'htmlattr' ).'"';
+				// Add style class to break long urls:
+				$link_class = trim( $custom_field['link_class'].' linebreak' );
+				$link_class_attr = ' class="'.format_to_output( $link_class, 'htmlattr' ).'"';
 				$nofollow_attr = $custom_field['link_nofollow'] ? ' rel="nofollow"' : '';
 				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
 				{
@@ -3187,7 +3189,7 @@ class Item extends ItemLight
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
-								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'], '', '', NULL, array(), array( 'nofollow' => $custom_field['link_nofollow'] ) );
+								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $link_class, '', '', NULL, array(), array( 'nofollow' => $custom_field['link_nofollow'] ) );
 								break 2;
 							}
 							// else fallback to other points:
@@ -4094,7 +4096,12 @@ class Item extends ItemLight
 				}
 				else
 				{	// Display URL field as html link:
-					$link_class = empty( $link_data[1] ) ? '' : ' class="'.trim( str_replace( '.', ' ', $link_data[1] ) ).'"';
+					$link_class = empty( $link_data[1] ) ? '' : str_replace( '.', ' ', $link_data[1] );
+					if( empty( $tags[4][ $t ] ) )
+					{	// Add style class to break long urls:
+						$link_class .= ' linebreak';
+					}
+					$link_class = ' class="'.trim( $link_class ).'"';
 					$link_text = empty( $tags[4][ $t ] ) ? $field_value : $tags[4][ $t ];
 					$link_html = '<a href="'.$field_value.'"'.$link_class.'>'.$link_text.'</a>';
 				}
@@ -5155,12 +5162,16 @@ class Item extends ItemLight
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 		}
 
+		if( empty( $params['image_alt'] ) )
+		{	// Override image alt text by current Item title only when it is not passed e.g. from inline/short tag `[image:123::Custom Alt Text]`:
+			$params['image_alt'] = $this->get( 'title' );
+		}
+
 		// Generate the IMG tag with all the alt, title and desc if available
 		return $Link->get_tag( array_merge( $params, array(
 					'image_link_to'    => $link_to,   // can be URL, can be empty
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
-					'image_alt'        => $this->get( 'title' ),
 				) ) );
 	}
 
@@ -5700,8 +5711,9 @@ class Item extends ItemLight
 			}
 			if( $File->exists() )
 			{	// Get file link to download if file exists:
+				$file_download_url = $this->get_coll_setting( 'download_enable' ) ? $Link->get_download_url() : NULL;
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $file_download_url ) : '';
 			}
 			else
 			{	// File doesn't exist, We cannot display a link, Display only file name and warning:

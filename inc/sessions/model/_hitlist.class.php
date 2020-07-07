@@ -188,10 +188,19 @@ class Hitlist
 		$return_message .= Hitlist::log_pruning( sprintf( 'Aggregate the rows from %s to %s, Execution time: %s seconds', 'T_track__goalhit', 'T_track__goalhit_aggregate', $hitlist_Timer->get_duration( 'aggregate_goal_hits' ) ), $output_message, true );
 
 		// Aggregate the counts of unique sessions:
-		$hitlist_Timer->start( 'aggregate_sessions' );
-		Hitlist::aggregate_sessions();
-		$hitlist_Timer->stop( 'aggregate_sessions' );
-		$return_message .= Hitlist::log_pruning( sprintf( 'Aggregate the rows from %s to %s, Execution time: %s seconds', 'T_hitlog', 'T_hits__aggregate_sessions', $hitlist_Timer->get_duration( 'aggregate_sessions' ) ), $output_message, true );
+		$session_types = array(
+			'coll_browser' => 'ONLY collection browser sessions',
+			'coll_api'     => 'ONLY collection API sessions',
+			'all_browser'  => 'ALL browser sessions',
+			'all_api'      => 'ALL API sessions',
+		);
+		foreach( $session_types as $session_type => $session_type_desc )
+		{
+			$hitlist_Timer->start( 'aggregate_sessions_'.$session_type );
+			Hitlist::aggregate_sessions( $session_type );
+			$hitlist_Timer->stop( 'aggregate_sessions_'.$session_type );
+			$return_message .= Hitlist::log_pruning( sprintf( 'Aggregate '.$session_type_desc.' from %s to %s, Execution time: %s seconds', 'T_hitlog', 'T_hits__aggregate_sessions', $hitlist_Timer->get_duration( 'aggregate_sessions_'.$session_type ) ), $output_message, true );
+		}
 
 		// PRUNE:
 		$return_message .= Hitlist::log_pruning( "\n".'PRUNING:', $output_message );
@@ -319,50 +328,65 @@ class Hitlist
 
 	/**
 	 * Aggregate the counts of unique sessions
+	 *
+	 * @param string What to aggregate?
+	 *               - all: ALL sessions
+	 *               - coll_browser: ONLY collection browser sessions
+	 *               - coll_api: ONLY collection API sessions
+	 *               - all_browser: ALL browser sessions
+	 *               - all_api: ALL API sessions
 	 */
-	static function aggregate_sessions()
+	static function aggregate_sessions( $type = 'all' )
 	{
 		global $DB;
 
 		// NOTE: Do NOT aggregate current day because it is not ended yet
 		$max_aggregate_date = date( 'Y-m-d H:i:s', mktime( 0, 0, 0 ) );
 
-		// ONLY collection browser sessions:
-		$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser )
-			SELECT DATE( hit_datetime ) AS hit_date, hit_coll_ID, COUNT( DISTINCT hit_sess_ID )
-			  FROM T_hitlog
-			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
-			   AND hit_agent_type = "browser"
-			   AND hit_coll_ID > 0
-			 GROUP BY hit_date, hit_coll_ID',
-			'Aggregate ONLY collection sessions from hit log (hit_agent_type = "browser")' );
-		// ONLY collection API sessions:
-		$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
-			SELECT DATE( hit_datetime ) AS hit_date, hit_coll_ID, COUNT( DISTINCT hit_sess_ID )
-			  FROM T_hitlog
-			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
-			   AND hit_type = "api"
-			   AND hit_coll_ID > 0
-			 GROUP BY hit_date, hit_coll_ID
-			ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )',
-			'Aggregate ONLY collection sessions from hit log (hit_type = "api")' );
-		// ALL browser sessions:
-		$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser )
-			SELECT DATE( hit_datetime ) AS hit_date, 0, COUNT( DISTINCT hit_sess_ID )
-			  FROM T_hitlog
-			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
-			   AND hit_agent_type = "browser"
-			 GROUP BY hit_date',
-			'Aggregate ALL sessions from hit log (hit_agent_type = "browser")' );
-		// ALL API sessions:
-		$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
-			SELECT DATE( hit_datetime ) AS hit_date, 0, COUNT( DISTINCT hit_sess_ID )
-			  FROM T_hitlog
-			 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
-			   AND hit_type = "api"
-			 GROUP BY hit_date
-			ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )',
-			'Aggregate ALL sessions from hit log (hit_type = "api")' );
+		if( $type == 'all' || $type == 'coll_browser' )
+		{	// ONLY collection browser sessions:
+			$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser )
+				SELECT DATE( hit_datetime ) AS hit_date, hit_coll_ID, COUNT( DISTINCT hit_sess_ID )
+				  FROM T_hitlog
+				 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+				   AND hit_agent_type = "browser"
+				   AND hit_coll_ID > 0
+				 GROUP BY hit_date, hit_coll_ID',
+				'Aggregate ONLY collection sessions from hit log (hit_agent_type = "browser")' );
+		}
+		if( $type == 'all' || $type == 'coll_api' )
+		{	// ONLY collection API sessions:
+			$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
+				SELECT DATE( hit_datetime ) AS hit_date, hit_coll_ID, COUNT( DISTINCT hit_sess_ID )
+				  FROM T_hitlog
+				 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+				   AND hit_type = "api"
+				   AND hit_coll_ID > 0
+				 GROUP BY hit_date, hit_coll_ID
+				ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )',
+				'Aggregate ONLY collection sessions from hit log (hit_type = "api")' );
+		}
+		if( $type == 'all' || $type == 'all_browser' )
+		{	// ALL browser sessions:
+			$DB->query( 'REPLACE INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_browser )
+				SELECT DATE( hit_datetime ) AS hit_date, 0, COUNT( DISTINCT hit_sess_ID )
+				  FROM T_hitlog
+				 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+				   AND hit_agent_type = "browser"
+				 GROUP BY hit_date',
+				'Aggregate ALL sessions from hit log (hit_agent_type = "browser")' );
+		}
+		if( $type == 'all' || $type == 'all_api' )
+		{	// ALL API sessions:
+			$DB->query( 'INSERT INTO T_hits__aggregate_sessions ( hags_date, hags_coll_ID, hags_count_api )
+				SELECT DATE( hit_datetime ) AS hit_date, 0, COUNT( DISTINCT hit_sess_ID )
+				  FROM T_hitlog
+				 WHERE hit_datetime < '.$DB->quote( $max_aggregate_date ).'
+				   AND hit_type = "api"
+				 GROUP BY hit_date
+				ON DUPLICATE KEY UPDATE hags_count_api = VALUES( hags_count_api )',
+				'Aggregate ALL sessions from hit log (hit_type = "api")' );
+		}
 	}
 
 

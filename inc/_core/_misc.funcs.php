@@ -1640,9 +1640,11 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
 	{
 		$additional_attrs = ' '.trim( $additional_attrs );
 	}
-	//return $text;
-	/*preg_match( '/<code>([.\r\n]+?)<\/code>/i', $text, $matches );
-	pre_dump( $text, $matches );*/
+
+	// Add style class to break long urls:
+	$additional_attrs = stripos( $additional_attrs, ' class="' ) === false
+		? $additional_attrs.' class="linebreak"'
+		: preg_replace( '/ class="([^"]*)"/i', ' class="$1 linebreak"', $additional_attrs );
 
 	$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
@@ -9058,14 +9060,36 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
 							$current_file_params['title'] = $inline_params[0];
 						}
-						$opt_index++;
+						if( $inline_type == 'image' )
+						{	// Caption has always a reserved placefor image short tag:
+							$opt_index++;
+						}
 
-						// TODO: Alt text:
+						// RegExp to detect HRef option:
+						$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+
+						// Alt text:
+						$current_image_params['image_alt'] = '';
+						if( isset( $inline_params[ $opt_index ] ) &&
+						    substr( $inline_params[ $opt_index ], 0, 1 ) != '.' &&
+						    ! preg_match( $href_regexp, $inline_params[ $opt_index ] ) &&
+						    ( $inline_type == 'image' || ! in_array( $inline_params[ $opt_index ], array( 'small', 'medium', 'large', 'original' ) ) ) )
+						{	// Override the image File's alt text with provided in current inline tag:
+							if( $inline_params[ $opt_index ] == '-' )
+							{	// Alt text display is disabled:
+								$current_image_params['image_alt'] = '-';
+							}
+							else
+							{	// New image alt text was set:
+								$current_image_params['image_alt'] = strip_tags( $inline_params[ $opt_index ] );
+							}
+							$opt_index++;
+						}
 
 						// HRef:
 						if( $inline_type != 'inline' &&
 						    ! empty( $inline_params[ $opt_index ] ) &&
-						    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $inline_params[ $opt_index ], $href_match ) )
+						    preg_match( $href_regexp, $inline_params[ $opt_index ], $href_match ) )
 						{
 							if( stripos( $href_match[0], 'http' ) === 0 )
 							{	// Absolute URL:
@@ -9185,12 +9209,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									unset( $current_file_params['class'] );
 								}
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										'', '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
+										'', '', $current_image_params['image_alt'], '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
 								break;
 
 							default:
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', $current_image_params['image_alt'], '' );
 						}
 					}
 				}
@@ -9205,6 +9229,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				{
 					global $thumbnail_sizes;
 
+					$thumbnail_alt = '';
 					$thumbnail_href = false;
 					$thumbnail_rel = NULL;
 					$thumbnail_additional_class = false;
@@ -9219,11 +9244,29 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$inline_params = explode( ':', $inline[4] );
 						$opt_index = 0;
 
-						// TODO: Alt text:
+						// RegExp to detect HRef option:
+						$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+
+						// Alt text:
+						if( isset( $inline_params[ $opt_index ] ) &&
+						    substr( $inline_params[ $opt_index ], 0, 1 ) != '.' &&
+						    ! preg_match( $href_regexp, $inline_params[ $opt_index ] ) &&
+						    ! in_array( $inline_params[ $opt_index ], array( 'small', 'medium', 'large', 'left', 'right' ) ) )
+						{	// Override the image File's alt text with provided in current inline tag:
+							if( $inline_params[ $opt_index ] == '-' )
+							{	// Alt text display is disabled:
+								$thumbnail_alt = '-';
+							}
+							else
+							{	// New image alt text was set:
+								$thumbnail_alt = strip_tags( $inline_params[ $opt_index ] );
+							}
+							$opt_index++;
+						}
 
 						// HRef:
 						if( ! empty( $inline_params[ $opt_index ] ) &&
-						    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $inline_params[ $opt_index ], $href_match ) )
+						    preg_match( $href_regexp, $inline_params[ $opt_index ], $href_match ) )
 						{
 							if( stripos( $href_match[0], 'http' ) === 0 )
 							{	// Absolute URL:
@@ -9313,6 +9356,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						'image_link_title'    => '',	// can be text or #title# or #desc#
 						'image_link_rel'      => $thumbnail_rel,
 						'image_class'         => implode( ' ', $thumbnail_classes ),
+						'image_alt'           => $thumbnail_alt,
 					);
 
 					switch( $object_class )

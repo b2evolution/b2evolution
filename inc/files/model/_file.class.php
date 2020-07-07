@@ -1360,7 +1360,7 @@ class File extends DataObject
 	 * @param string rel= attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lightbox
 	 * @param string image class=
 	 * @param string image align=
-	 * @param string image alt=
+	 * @param string image alt=, Use '-' in order to don't display any alt text
 	 * @param string image caption/description to be displayed under the image
 	 * @param integer Link ID
 	 * @param integer Size multiplier, can be 1, 2 and etc. (Used for b2evonet slider for example)
@@ -1439,8 +1439,15 @@ class File extends DataObject
 					$img_attribs['align'] = $image_align;
 				}
 
-				if( $img_attribs['alt'] == '' )
-				{ // Image alt
+				if( $image_alt == '-' )
+				{	// Don't display any alt text:
+					if( isset( $img_attribs['alt'] ) )
+					{
+						unset( $img_attribs['alt'] );
+					}
+				}
+				elseif( $image_alt != '' )
+				{	// Overrride original image alt store in DB per this File:
 					$img_attribs['alt'] = $image_alt;
 				}
 
@@ -2693,6 +2700,16 @@ class File extends DataObject
 				}
 			}
 		}
+		elseif( substr( $this->_adfp_full_path, -4 ) == '.svg' )
+		{	// Special case for SVG file because we cannot generate thumbnail for this file type:
+			$img_attribs['src'] = $this->get_url();
+			global $thumbnail_sizes;
+			if( isset( $thumbnail_sizes[ $size_name ] ) )
+			{	// Set attributes for SVG file from config of thumbnail sizes:
+				$img_attribs['width'] = $thumbnail_sizes[ $size_name ][1];
+				$img_attribs['height'] = $thumbnail_sizes[ $size_name ][2];
+			}
+		}
 		else
 		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
@@ -3398,7 +3415,7 @@ class File extends DataObject
 
 		// IMAGE:
 		// File type is still not defined, Try to detect image
-		if( $this->get_image_size() !== false )
+		if( is_image_file( $this->_adfp_full_path ) || $this->get_image_size() !== false )
 		{ // This is image file
 			$this->update_file_type( 'image' );
 			return;

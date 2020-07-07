@@ -371,10 +371,15 @@ function is_image_file( $file_path )
 		return false;
 	}
 
+	if( substr( $file_path, -4 ) == '.svg' )
+	{	// Consider all SVG file is image, because not SVG files has a mime type as 'image/svg':
+		return true;
+	}
+
 	$file_info = finfo_open( FILEINFO_MIME_TYPE );
 	$file_type = finfo_file( $file_info, $file_path );
 
-	return in_array( $file_type, array( 'image/png', 'image/jpeg', 'image/gif' ) );
+	return in_array( $file_type, array( 'image/png', 'image/jpeg', 'image/gif', 'image/svg', 'image/svg+xml' ) );
 }
 
 /**

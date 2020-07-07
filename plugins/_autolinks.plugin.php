@@ -568,6 +568,11 @@ class autolinks_plugin extends Plugin
 			$additional_attrs = ' '.trim( $additional_attrs );
 		}
 
+		// Add style class to break long urls:
+		$additional_attrs = stripos( $additional_attrs, ' class="' ) === false
+			? $additional_attrs.' class="linebreak"'
+			: preg_replace( '/ class="([^"]*)"/i', ' class="$1 linebreak"', $additional_attrs );
+
 		$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
 		$text = preg_replace(
 			/* Tblue> I removed the double quotes from the first RegExp because

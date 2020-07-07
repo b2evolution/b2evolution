@@ -6,8 +6,11 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 {	// Initialize and Show container designer block:
 	var container = jQuery( this );
 
-	// To be sure all previous designer blocks are hidden before show new one:
-	jQuery( '.evo_designer__container' ).hide();
+	if( jQuery( '.evo_designer.evo_designer__widget[data-widget-block-clicked=1]' ).length == 0 )
+	{	// Unmark currently selected sub-container only when this is not event of clicking on child widget of the subcontainer:
+		// To be sure all previous designer blocks are hidden before show new one:
+		jQuery( '.evo_designer__container' ).hide();
+	}
 
 	// Initialize designer block for widget container:
 	evo_widget_initialize_designer_container_block( container );
@@ -44,7 +47,7 @@ function evo_widget_initialize_designer_container_block( container )
 	evo_widget_update_container_position( container );
 }
 
-jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
+jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function( e )
 {	// Initialize and Show widget designer block:
 	var widget = jQuery( this );
 
@@ -54,10 +57,17 @@ jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 		return;
 	}
 
-	// To be sure all previous designer blocks are hidden before show new one:
-	jQuery( '.evo_designer' ).removeClass( 'evo_designer__subcontainer_active evo_designer__subcontainer_inactive' ).hide();
-	// Unmark active subcontainer widget:
-	jQuery( '.evo_widget.evo_widget__subcontainer_active' ).removeClass( 'evo_widget__subcontainer_active' );
+	jQuery( '.evo_designer.evo_designer__subcontainer_active, .evo_designer.evo_designer__subcontainer_inactive' ).each( function()
+	{
+		if( ! ( e.pageX >= jQuery( this ).offset().left - 3 && e.pageY >= jQuery( this ).offset().top - 3 && // top-left point
+		        e.pageX <= jQuery( this ).offset().left + jQuery( this ).width() + 3 && e.pageY <= jQuery( this ).offset().top + jQuery( this ).height() + 3 ) ) // bottom-right point
+		{	// If mouse cursor is outside of current active sub-container,
+			// Hide current desinger block:
+			jQuery( this ).hide();
+			// Unmark active subcontainer widget:
+			jQuery( '.evo_widget.evo_widget__subcontainer_active[data-id=' + jQuery( this ).data( 'id' )+ ']' ).removeClass( 'evo_widget__subcontainer_active' );
+		}
+	} );
 
 	// Initialize designer block for widget:
 	evo_widget_initialize_designer_block( widget );
@@ -212,6 +222,10 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 		return;
 	}
 
+	// Mark currently clicking widget in order to don't hide/inactive parent subcontainer:
+	var widget_block = jQuery( this );
+	widget_block.attr( 'data-widget-block-clicked', 1 );
+
 	var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 
 	if( typeof( b2evo_widget_edit_url ) != 'undefined' )
@@ -247,6 +261,8 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			.animate( { opacity: 0 }, 10, function()
 			{
 				jQuery( this ).hide();
+				// Remove flag after clict event was ended here:
+				widget_block.removeAttr( 'data-widget-block-clicked' );
 			} );
 
 			jQuery( '.evo_widget[data-z-index]' ).each( function()

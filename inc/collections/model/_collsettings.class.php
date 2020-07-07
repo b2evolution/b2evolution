@@ -333,6 +333,7 @@ class CollectionSettings extends AbstractSettings
 			'last_invalidation_timestamp' => 0,
 
 		// Download settings:
+			'download_enable' => 1,
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
