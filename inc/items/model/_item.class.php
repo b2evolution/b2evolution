@@ -5991,8 +5991,8 @@ class Item extends ItemLight
 				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
-		if( $params['show_in_single_mode'] == false && is_single_page() )
-		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we don't want to display this link
+		if( $params['show_in_single_mode'] == false && is_single_page( $this->ID ) )
+		{	// We are viewing the single page for this Item, which (typically) contains comments, so we don't want to display this link
 			return;
 		}
 
