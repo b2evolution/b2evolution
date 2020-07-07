@@ -2636,21 +2636,21 @@ This is an extra line.' ),
 		'category'  => 'background',
 		'type'      => 'Child Post',
 		'parent_ID' => '#get_item#another_custom_fields_example#ID#',
-		'content'   => '<p>'.sprintf( TD_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
-<p>'.TD_('This also allows us to access the custom fields of the parent post:').'</p>
-<p>[parent:fields]</p>
-[teaserbreak]
-<p>'.TD_('It is also possible to selectively display only a couple of these fields:').'</p>
-<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>
-<p>'.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>
-<p>'.sprintf( TD_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' ).'</p>
-<p>'.sprintf( TD_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
-<h3>'.TD_('Replicated fields').'</h3>
-<p>'.TD_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>
-<p>'.TD_('This child post has the following fields which automatically replicate from its parent:').'</p>
-<p>[fields]</p>
-<p>'.sprintf( TD_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>
-<p>[compare:$this$,$parent$]</p>',
+		'content'   => sprintf( TD_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' )."\n\n"
+.TD_('This also allows us to access the custom fields of the parent post:')."\n\n"
+.'[parent:fields]'."\n\n"
+.'[teaserbreak]'."\n\n"
+.TD_('It is also possible to selectively display only a couple of these fields:')."\n\n"
+.'[parent:fields:first_numeric_field,first_string_field,second_numeric_field]'."\n\n"
+.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' )."\n\n"
+.sprintf( TD_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' )."\n\n"
+.sprintf( TD_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' )."\n\n"
+.'###'.TD_('Replicated fields')."\n\n"
+.TD_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).')."\n\n"
+.TD_('This child post has the following fields which automatically replicate from its parent:')."\n\n"
+.'[fields]'."\n\n"
+.sprintf( TD_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' )."\n\n"
+.'[compare:$this$,$parent$]',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123' ),
 			array( 'first_string_field', 'abc' ),
@@ -2659,6 +2659,9 @@ This is an extra line.' ),
 		),
 		'files' => array(
 			array( 'monument-valley/monument-valley-road.jpg', 'attachment', 'custom_field' => 'image_1' ),
+		),
+		'settings' => array(
+			'editor_code' => 'html', // use markup(don't use tinymce) edtior by default for this demo item
 		),
 	);
 
