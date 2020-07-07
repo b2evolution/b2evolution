@@ -1416,10 +1416,7 @@ class Comment extends DataObject
 			{
 				$r .= 'rel="'.implode( ' ', $rel_values ).'" ';
 			}
-			if( ! empty( $link_class ) )
-			{
-				$r .= 'class="'.$link_class.'" ';
-			}
+			$r .= 'class="'.trim( $link_class.' linebreak' ).'" ';
 			$r .= 'href="'.$url.'">';
 		}
 		$r .= ( empty($linktext) ? $url : $linktext );

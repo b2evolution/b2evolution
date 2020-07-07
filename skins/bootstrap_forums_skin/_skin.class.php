@@ -152,6 +152,12 @@ class bootstrap_forums_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_general_affix' => array(
+						'label' => T_('Fixed position for General Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 0,
+					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
 						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
@@ -163,18 +169,18 @@ class bootstrap_forums_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Fixed position for Single Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
+					),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
 						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
-					),
-					'sidebar_single_affix' => array(
-						'label' => T_('Sidebar Single'),
-						'note'  => T_('Use affix to keep visible when scrolling down.'),
-						'type'  => 'checkbox',
-						'defaultvalue' => 1,
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
@@ -463,6 +469,12 @@ class bootstrap_forums_Skin extends Skin
 
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
+
+		if( ( $this->get_setting( 'sidebar_general_affix' ) && $this->is_visible_sidebar( true, 'general' ) ) ||
+		    ( $this->get_setting( 'sidebar_single_affix' ) && $this->is_visible_sidebar( true, 'single' ) ) )
+		{	// Init JS to fix sidebars on scroll down:
+			require_js_defer( 'src/evo_affix_sidebars.js', 'blog', false, '#', 'footerlines' );
+		}
 	}
 
 
@@ -694,7 +706,7 @@ class bootstrap_forums_Skin extends Skin
 		{
 			case 'cat_array_mode':
 				// What category level use to display the items on disp=posts:
-				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'children' - Get items from current category and from all its sub-categories recursively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'parent';
 

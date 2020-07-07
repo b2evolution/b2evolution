@@ -165,6 +165,9 @@ class shortlinks_plugin extends Plugin
 		// Get collection from given params:
 		$setting_Blog = $this->get_Blog_from_params( $params );
 
+		// Get currently rendering Item:
+		$this->current_Item = $this->get_Item_from_params( $params );
+
 		$this->link_types = $this->get_coll_setting( 'link_types', $setting_Blog );
 
 		return $this->render_content( $content );
@@ -535,11 +538,16 @@ class shortlinks_plugin extends Plugin
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
 		}
-		elseif( ! empty( $this->link_types['anchor'] ) && isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false, false ) ) )
-		{	// Item is found
-			$permalink = $Item->get_permanent_url();
+		elseif( ! empty( $this->link_types['anchor'] ) && isset( $anchor ) && ! empty( $this->current_Item ) )
+		{	// Use Item's URL with anchor:
+			if( $this->current_Item->get_permalink_type() != 'none' )
+			{	// Use full permanent URL like 'http://site.com/item-slug#anchor' only for normal Item that have separate single of intro page,
+				// For Item without permanent URL like "Content Blcok" or "Special" we should use only relative URL like '#anchor' in order
+				// to link always to currently opened URL, because they are included inside of another Item. NOTE: for proper work skin must not use html tag `<base href="/skin_folder" />`.
+				$permalink = $this->current_Item->get_permanent_url();
+			}
 			$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
-			$existing_link_text = $Item->get( 'title' );
+			$existing_link_text = $this->current_Item->get( 'title' );
 			unset($anchor);
 		}
 

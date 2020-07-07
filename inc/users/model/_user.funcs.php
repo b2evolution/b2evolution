@@ -4056,7 +4056,7 @@ function userfield_prepare( & $userfield )
 			{
 				$url = 'http://'.$url;
 			}
-			$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow">'.$userfield->uf_varchar.'</a>';
+			$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow" class="linebreak">'.$userfield->uf_varchar.'</a>';
 			break;
 
 		case 'text':

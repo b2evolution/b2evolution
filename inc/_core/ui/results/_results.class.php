@@ -1127,7 +1127,8 @@ class Results extends Table
 						else debug_die( 'Invalid Results-group_by-type: '.var_export( $type, true ) );
 
 
-						if( isset( $this->current_group_ID[$group_depth] ) &&  $this->current_group_ID[$group_depth] != $value )
+						if( ! isset( $this->current_group_ID[$group_depth] ) || // Condition to start first group
+						    $this->current_group_ID[$group_depth] != $value ) // Condition to start all next groups
 						{ // Group changed here:
 							$this->current_group_ID[$group_depth] = $value;
 

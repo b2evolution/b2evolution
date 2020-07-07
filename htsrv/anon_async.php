@@ -1498,9 +1498,11 @@ switch( $action )
 
 		// Default values:
 		$image_caption = NULL;
+		$image_disable_caption = false;
+		$image_alt = NULL;
+		$image_disable_alt = false;
 		$image_href = NULL;
 		$image_class = NULL;
-		$image_disable_caption = false;
 		$thumbnail_href = NULL;
 		$thumbnail_size = 'medium';
 		$thumbnail_alignment = 'left';
@@ -1541,10 +1543,22 @@ switch( $action )
 						}
 						$opt_index++;
 					}
-					// TODO: Alt text:
+					$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+					// Alt text:
+					$image_disable_alt = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) &&
+					    substr( $parts[ $opt_index ], 0, 1 ) != '.' &&
+					    ! preg_match( $href_regexp, $parts[ $opt_index ] ) )
+					{
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_alt = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
 					// HRef:
 					if( ! empty( $parts[ $opt_index ] ) &&
-					    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $parts[ $opt_index ], $href_match ) )
+					    preg_match( $href_regexp, $parts[ $opt_index ], $href_match ) )
 					{
 						if( stripos( $href_match[0], 'http' ) === 0 )
 						{	// Absolute URL:
@@ -1566,10 +1580,23 @@ switch( $action )
 					break;
 
 				case 'thumbnail':
-					// TODO: Alt text:
+					$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+					// Alt text:
+					$image_disable_alt = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) &&
+					    substr( $parts[ $opt_index ], 0, 1 ) != '.' &&
+					    ! preg_match( $href_regexp, $parts[ $opt_index ] ) &&
+					    ! in_array( $parts[ $opt_index ], array( 'small', 'medium', 'large', 'left', 'right' ) ) )
+					{
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_alt = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
 					// HRef:
 					if( ! empty( $parts[ $opt_index ] ) &&
-					    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $parts[ $opt_index ], $href_match ) )
+					    preg_match( $href_regexp, $parts[ $opt_index ], $href_match ) )
 					{
 						if( stripos( $href_match[0], 'http' ) === 0 )
 						{	// Absolute URL:
@@ -1605,9 +1632,22 @@ switch( $action )
 					break;
 
 				case 'inline':
-					if( isset( $parts[2] ) )
+					// Alt text:
+					$image_disable_alt = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) &&
+					    substr( $parts[ $opt_index ], 0, 1 ) != '.' &&
+					    ! in_array( $parts[ $opt_index ], array( 'small', 'medium', 'large', 'original' ) ) )
 					{
-						$inline_class = $parts[2];
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_alt = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
+					// Class:
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						$inline_class = $parts[ $opt_index ];
 					}
 					break;
 

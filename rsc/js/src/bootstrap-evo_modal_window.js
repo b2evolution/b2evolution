@@ -23,8 +23,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
-	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
-	var style_body_height = height.match( /px/i ) ? ' style="min-height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
+	var modal_window_class = style_height.match( /%$/i ) ? ' evo_modal_window__percent_height' : '';
 	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons !== false );
 	var button_form = 'form';
 
@@ -50,7 +49,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 
 	if( jQuery( '#modal_window' ).length == 0 )
 	{ // Build modal window
-		var modal_html = '<div id="modal_window" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content"' + style_height_fixed + '>';
+		var modal_html = '<div id="modal_window" class="modal fade' + modal_window_class + '" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content">';
 		if( typeof title != 'undefined' && title != '' )
 		{
 			modal_html += '<div class="modal-header">' +
@@ -58,7 +57,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 					'<h4 class="modal-title">' + title + '</h4>' +
 				'</div>';
 		}
-		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html;
+		modal_html += '<div class="modal-body">' + body_html;
 
 		if( iframe_id )
 		{

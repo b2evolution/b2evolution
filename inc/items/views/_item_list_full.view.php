@@ -860,11 +860,14 @@ if( $action == 'view' )
 }
 elseif( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
-	echo '<span class="btn-group">';
-	echo '<input type="button" class="btn btn-default" value="'.T_('Check all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\' ).prop( \'checked\', true );" /> '.
-		'<input type="button" class="btn btn-default" value="'.T_('Uncheck all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).prop( \'checked\', false );" /> '.
-		'<input type="button" class="btn btn-default" value="'.T_('Reverse').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).each( function() { this.checked = !this.checked } );" />';
-	echo '</span> ';
+
+	// Buttons to check/uncheck/invert all Items:
+	$Form->checkbox_controls( 'selected_items', array(
+		'before_buttons' => '<span class="btn-group">',
+		'after_buttons'  => '</span> ',
+		'button_class'   => 'btn btn-default',
+		'icon_class'     => '',
+	) );
 
 	echo T_('With checked posts').': ';
 

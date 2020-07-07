@@ -101,6 +101,7 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( TB_('Download pages').get_manual_link( 'download-display-other' ) );
+	$Form->checkbox( 'download_enable', $edited_Blog->get_setting( 'download_enable' ), TB_('Enable Download pages'), sprintf( TB_('Check to use %s intead of default opening of attachments'), '<code>?disp=download</code>' ) );
 	$Form->text_input( 'download_delay', $edited_Blog->get_setting( 'download_delay' ), 2, TB_('Download delay') );
 $Form->end_fieldset();
 

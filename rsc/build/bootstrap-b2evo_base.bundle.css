@@ -1061,8 +1061,9 @@ div.filters .filter_item {
 div.filters .filter_item div {
   margin: 0;
 }
-a {
+.linebreak {
   word-break: break-all;
+  white-space: normal;
 }
 .widget_core_coll_category_list label {
   font-weight: normal;
@@ -5739,6 +5740,16 @@ div.message_toolbars {
 .modal-footer .btn + .btn {
   margin-bottom: 3px;
 }
+#modal_window.evo_modal_window__percent_height .modal-content {
+  height: 100%;
+  overflow: hidden;
+}
+#modal_window.evo_modal_window__percent_height .modal-body {
+  height: 100%;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 70px;
+}
 .tt-dropdown-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -6008,4 +6019,20 @@ span[id^=title_folding_] {
 }
 .comment-workflow-form .controls > * {
   margin-left: 6px;
+}
+#evo_container__sidebar.evo_affixed,
+#evo_container__sidebar_2.evo_affixed,
+#evo_container__sidebar_single.evo_affixed {
+  position: fixed;
+  z-index: 100;
+}
+@media (max-height: 800px), (max-width: 992px) {
+  #evo_container__sidebar.evo_affixed,
+  #evo_container__sidebar_2.evo_affixed,
+  #evo_container__sidebar_single.evo_affixed {
+    position: static;
+  }
+  .evo_affixed_spacer {
+    display: none;
+  }
 }

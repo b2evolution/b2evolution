@@ -443,6 +443,7 @@ class Blog extends DataObject
 				$this->set_setting( 'use_workflow', 1 );
 				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'download_enable', 0 );
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
 				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
@@ -478,6 +479,7 @@ class Blog extends DataObject
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 				$this->set_setting( 'category_ordering', 'manual' );
 				$this->set_setting( 'disp_featured_above_list', 1 );
+				$this->set_setting( 'download_enable', 0 );
 
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
@@ -979,7 +981,9 @@ class Blog extends DataObject
 		}
 
 		if( param( 'download_delay', 'integer', NULL ) !== NULL )
-		{ // Download delay
+		{	// Enable Download pages:
+			$this->set_setting( 'download_enable', param( 'download_enable', 'integer', 0 ) );
+			// Download delay
 			param_check_range( 'download_delay', 0, 10, T_('Download delay must be numeric (0-10).') );
 			$this->set_setting( 'download_delay', get_param( 'download_delay' ) );
 		}

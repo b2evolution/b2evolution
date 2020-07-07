@@ -1218,6 +1218,19 @@ div.edit_toolbars, div.message_toolbars {
 		margin-bottom: 3px;
 	}
 }
+// Modal window with percent height:
+#modal_window.evo_modal_window__percent_height {
+	.modal-content {
+		height: 100%;
+		overflow: hidden;
+	}
+	.modal-body {
+		height: 100%;
+		overflow: hidden;
+		padding-top: 0;
+		padding-bottom: 70px;
+	}
+}
 
 // Typeahead plugin FOR username autosuggest
 .tt-dropdown-menu {
@@ -1567,5 +1580,24 @@ span[id^=title_folding_] {
 		> * {
 			margin-left: 6px;
 		}
+	}
+}
+
+// Affix sidebars:
+#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
+	&.evo_affixed {
+		position: fixed;
+		z-index: 100;
+	}
+}
+// Don't fix a position of ALL sidebars when window height <= 800px OR width <= 992px:
+@media (max-height:800px),(max-width:992px) {
+	#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
+		&.evo_affixed {
+			position: static;
+		}
+	}
+	.evo_affixed_spacer {
+		display: none;
 	}
 }

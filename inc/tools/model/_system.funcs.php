@@ -1154,10 +1154,10 @@ function display_system_check( $params )
 
 		// JPG:
 		// Tblue> Note: "JPG Support" was renamed to "JPEG Support" in PHP 5.3.
-		init_system_check( 'GD JPG Support', ( ! empty($gd_info['JPG Support']) || ! empty($gd_info['JPEG Support']) ) ? T_('Read/Write') : T_('No') );
-		if( empty($gd_info['JPG Support']) && empty($gd_info['JPEG Support']) )
+		init_system_check( 'GD JPG Support', ( ! empty($gd_info['JPG Support']) || ! empty( $gd_info['JPEG Support'] ) ) ? T_('Read/Write') : T_('No') );
+		if( empty( $gd_info['JPG Support'] ) && empty( $gd_info['JPEG Support'] ) )
 		{
-			disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for JPG images.') );
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'JPG' ) );
 		}
 		else
 		{
@@ -1166,9 +1166,9 @@ function display_system_check( $params )
 
 		// PNG:
 		init_system_check( 'GD PNG Support', !empty($gd_info['PNG Support']) ? T_('Read/Write') : T_('No') );
-		if( empty($gd_info['PNG Support']) )
+		if( empty( $gd_info['PNG Support'] ) )
 		{
-			disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for PNG images.') );
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'PNG' ) );
 		}
 		else
 		{
@@ -1176,7 +1176,7 @@ function display_system_check( $params )
 		}
 
 		// GIF:
-		if( !empty($gd_info['GIF Create Support']) )
+		if( !empty( $gd_info['GIF Create Support'] ) )
 		{
 			$gif_support = T_('Read/Write');
 		}
@@ -1191,7 +1191,7 @@ function display_system_check( $params )
 		init_system_check( 'GD GIF Support', $gif_support );
 		if( $gif_support == T_('No') )
 		{
-			disp_system_check( 'warning', T_('You will not be able to automatically generate thumbnails for GIF images.') );
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'GIF' ) );
 		}
 		elseif( $gif_support == T_('Read') )
 		{
@@ -1199,6 +1199,83 @@ function display_system_check( $params )
 		}
 		else
 		{
+			disp_system_check( 'ok' );
+		}
+
+		// BMP:
+		// This is not yet considered an image by b2evolution, see is_image_file().
+		init_system_check( 'GD BMP Support', !empty( $gd_info['BMP Support'] ) ? T_('Read/Write') : T_('No') );
+		if( empty( $gd_info['BMP Support'] ) )
+		{
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'BMP' ) );
+		}
+		else
+		{
+			disp_system_check( 'ok' );
+		}
+
+		// WBMP:
+		// This is not yet considered an image by b2evolution, see is_image_file().
+		init_system_check( 'GD WBMP Support', !empty( $gd_info['WBMP Support'] ) ? T_('Read/Write') : T_('No') );
+		if( empty( $gd_info['WBMP Support'] ) )
+		{
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'WBMP' ) );
+		}
+		else
+		{
+			disp_system_check( 'ok' );
+		}
+
+		// XBM:
+		// This is not yet considered an image by b2evolution, see is_image_file().
+		init_system_check( 'GD XBM Support', !empty( $gd_info['XBM Support'] ) ? T_('Read/Write') : T_('No') );
+		if( empty( $gd_info['XBM Support'] ) )
+		{
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'XBM' ) );
+		}
+		else
+		{
+			disp_system_check( 'ok' );
+		}
+
+		// XPM:
+		// This is not yet considered an image by b2evolution, see is_image_file().
+		init_system_check( 'GD XPM Support', !empty( $gd_info['XPM Support'] ) ? T_('Read/Write') : T_('No') );
+		if( empty( $gd_info['XPM Support'] ) )
+		{
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %s images.'), 'XPM' ) );
+		}
+		else
+		{
+			disp_system_check( 'ok' );
+		}
+
+		// WebP:
+		// This is not yet considered an image by b2evolution, see is_image_file().
+		init_system_check( 'GD WebP Support', !empty( $gd_info['WebP Support'] ) ? T_('Read/Write') : T_('No') );
+		if( empty( $gd_info['WebP Support'] ) )
+		{
+			disp_system_check( 'warning', sprintf( T_('You will not be able to automatically generate thumbnails for %ss images.'), 'WebP' ) );
+		}
+		else
+		{
+			disp_system_check( 'ok' );
+		}
+
+		// TGA:
+		// This is not yet considered an image by b2evolution, see is_image_file().
+		// GD does not currently have TGA create support yet
+		if( !empty($gd_info['TGA Read Support']) )
+		{
+			$tga_support = T_('Read');
+		}
+		else
+		{
+			$tga_support = T_('No');
+		}
+		if( $tga_support == T_('Read') )
+		{	
+			init_system_check( 'GD TGA Support', $tga_support );
 			disp_system_check( 'ok' );
 		}
 
@@ -1212,6 +1289,14 @@ function display_system_check( $params )
 		{
 			disp_system_check( 'ok' );
 		}
+
+		// FreeType Linkage:
+		if( !empty( $gd_info['FreeType Support'] ) )
+		{
+			init_system_check( 'GD FreeType Linkage', $gd_info['FreeType Linkage'] );
+			disp_system_check( 'ok' );
+		}
+
 		// pre_dump( $gd_info );
 	}
 	echo $params['section_end'];
