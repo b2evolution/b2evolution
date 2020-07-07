@@ -1932,6 +1932,25 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Get number of unchecked checklist lines
+	 */
+	function get_unchecked_checklist_lines()
+	{
+		$checklist_lines = $this->get_checklist_lines();
+		$unchecked_checklist_lines = 0;
+		foreach( $checklist_lines as $checklist_line )
+		{
+			if( ! $checklist_line->check_checked )
+			{
+				$unchecked_checklist_lines++;
+			}
+		}
+
+		return $unchecked_checklist_lines;
+	}
+
+
+	/**
 	 * Get a list of item IDs from $MainList and $ItemList, if they are loaded.
 	 * This is used for prefetching item related data for the whole list(s).
 	 * This will at least return the item's ID itself.

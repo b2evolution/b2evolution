@@ -341,11 +341,12 @@ $Form->begin_form( '', '', $params );
 	}
 
 	$tab_panes[] = '#checklist';
-	echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $edited_Item->get_checklist_lines() ? ' <span id="checklist_counter" class="badge badge-important">'.count( $edited_Item->get_checklist_lines() ).'</span>' : '' ).'</a></li>';
+	$unchecked_checklist_lines = $edited_Item->get_unchecked_checklist_lines();
+	echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $unchecked_checklist_lines > 0 ? ' <span id="checklist_counter" class="badge badge-important">'.$unchecked_checklist_lines.'</span>' : '' ).'</a></li>';
 
 	echo '</ul>';
 
-	echo '<div class="tab-content  evo_tab_pane_itemform_content">';
+	echo '<div class="tab-content evo_tab_pane_itemform_content">';
 
 	$attachment_tab = true;
 	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
@@ -1180,6 +1181,8 @@ echo_item_merge_js();
 echo_item_add_version_js();
 // JS code for link to link new version:
 echo_item_link_version_js();
+// Init Item Checklist JS:
+expose_var_to_js( 'evo_item_checklist_config', true );
 
 // JS to post excerpt mode switching:
 ?>
@@ -1232,29 +1235,7 @@ var observer = new MutationObserver( function( mutations ) {
 
 					if( hasClass )
 					{	// element has class `.checklist_line`, update counter:
-						var checklist_badge = document.getElementById( 'checklist_counter' );
-						var checklist_line_count = document.querySelectorAll( '.checklist_lines .checklist_line' ).length
-						if( checklist_badge )
-						{
-							if( checklist_line_count > 0 )
-							{	// Update checklist counter badge:
-								checklist_badge.innerHTML = checklist_line_count;
-							}
-							else
-							{	// Remove checklist counter badge:
-								checklist_badge.remove();
-							}
-						}
-						else if( checklist_line_count > 0 )
-						{	// Create checklist counter badge:
-							var checklist_tab = document.querySelector( 'a[href="#checklist"]' );
-							checklist_badge = document.createElement( 'span' );
-							checklist_badge.classList.add( 'badge', 'badge-important' );
-							checklist_badge.innerHTML = checklist_line_count;
-							checklist_badge.setAttribute( 'id', 'checklist_counter' );
-							checklist_tab.appendChild( document.createTextNode( ' ' ) );
-							checklist_tab.appendChild( checklist_badge );
-						}
+						window.update_checklist_tab_badge();
 					}
 				}
 			} );
