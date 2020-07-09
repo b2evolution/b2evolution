@@ -139,6 +139,10 @@ class coll_search_form_Widget extends ComponentWidget
 		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			init_tokeninput_js( 'blog' );
 		}
+
+		// The JS file below requires jQuery tokeninput plugin and is not bundled with evo_generic.bmin.js
+		// as that file is loaded before the tokeninput JS is initialized above:
+		require_js_defer( 'src/evo_init_widget_coll_search_form.js', 'blog' );
 	}
 
 
