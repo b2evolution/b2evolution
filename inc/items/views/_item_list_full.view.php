@@ -849,10 +849,10 @@ while( $Item = & $ItemList->get_item() )
 }
 
 // Instantiate ClipboardJS:
-echo '<script>var clipboard = new ClipboardJS("a.clipboard-copy");</script>';
+expose_var_to_js( 'evo_init_item_list_clipboard_js', true );
 
 if( $action == 'view' )
-{ // Load JS functions to work with comments
+{	// Load JS functions to work with comments
 	load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 	// Handle show_comments radioboxes

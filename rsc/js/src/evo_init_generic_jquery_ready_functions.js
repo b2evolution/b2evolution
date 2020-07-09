@@ -1180,4 +1180,10 @@ jQuery( document ).ready( function()
 		// Expand all fieldsets that have the fields with error
 		jQuery( '.field_error' ).closest( '.fieldset_wrapper.folded' ).find( 'span[id^=icon_folding_]' ).click();
 	}
+
+	// Clipboard JS - Item List
+	if( typeof( evo_init_item_list_clipboard_js ) != 'undefined' )
+	{
+		window.clipboard = new ClipboardJS( 'a.clipboard-copy' );
+	}
 } );
