@@ -961,6 +961,7 @@ $bundled_files = array(
 	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
 		'#jquery#',
 		'#jquery_migrate#',
+		'#jqueryUI#',
 		'#bootstrap#',
 	),
 	'bootstrap-b2evo_base-superbundle.bundle.css' => array(

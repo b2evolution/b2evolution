@@ -2714,15 +2714,17 @@ function display_if_empty( $params = array() )
 /**
  * Check if current page is a single Item's page
  *
+ * @param integer|NULL ID of Item to be sure we currently see single page of the Item, NULL - to don't check
  * @return boolean
  */
-function is_single_page()
+function is_single_page( $check_item_ID = NULL )
 {
 	global $disp, $MainList, $Item;
 
 	return ( $disp == 'single' || $disp == 'page' ) &&
 		( isset( $MainList ) && $MainList->single_post ) &&
-		( isset( $Item ) && $Item->ID > 0 );
+		( isset( $Item ) && $Item->ID > 0 ) &&
+		( $check_item_ID === NULL || $check_item_ID == $Item->ID );
 }
 
 

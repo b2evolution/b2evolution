@@ -1453,10 +1453,6 @@ class Hit
 	{
 		global $search_engine_params;
 
-		// Load search engine definitions
-		load_funcs( 'sessions/model/_hitlog.funcs.php' );
-		$search_engine_params = get_search_engine_params();
-
 		// Parse referer:
 		$pu = @parse_url( $referer );
 
@@ -1464,6 +1460,10 @@ class Hit
 		{	// Wrong referer without host name:
 			return false;
 		}
+
+		// Load search engine definitions
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$search_engine_params = get_search_engine_params();
 
 		$ref_host = $pu['host'];
 		$ref_query = isset( $pu['query'] ) ? $pu['query'] : '';
@@ -1535,10 +1535,6 @@ class Hit
 	{
 		global $Debuglog, $search_engine_params, $evo_charset, $current_charset;
 
-		// Load search engine definitions
-		load_funcs( 'sessions/model/_hitlog.funcs.php' );
-		$search_engine_params = get_search_engine_params();
-
 		// Make sure we don't try params extraction twice
 		$this->_search_params_tried = true;
 
@@ -1548,6 +1544,10 @@ class Hit
 		{	// Not a search referer
 			return false;
 		}
+
+		// Load search engine definitions
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$search_engine_params = get_search_engine_params();
 
 		$search_engine_name = $search_engine_params[$ref_host]['name'];
 

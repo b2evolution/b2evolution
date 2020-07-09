@@ -3163,9 +3163,8 @@ class Item extends ItemLight
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
 			{
 				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
-				// Add style class to break long urls:
-				$link_class = trim( $custom_field['link_class'].' linebreak' );
-				$link_class_attr = ' class="'.format_to_output( $link_class, 'htmlattr' ).'"';
+				$link_class = trim( $custom_field['link_class'] );
+				$link_class_attr = ( $link_class === '' ? '' : ' class="'.format_to_output( $link_class, 'htmlattr' ).'"' );
 				$nofollow_attr = $custom_field['link_nofollow'] ? ' rel="nofollow"' : '';
 				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
 				{
@@ -3212,7 +3211,17 @@ class Item extends ItemLight
 							// Use value of url fields as URL to the link:
 							if( ! empty( $orig_custom_field_value ) )
 							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
-								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'.$custom_field_value.'</a>';
+								$url_link_class = $custom_field['link_class'];
+								if( $custom_field_value == $orig_custom_field_value )
+								{	// Use word-break style only when original URL is used for link text because URL may contains very long single word:
+									$url_link_class .= ' linebreak';
+								}
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'
+									.$nofollow_attr
+									.' class="'.format_to_output( trim( $url_link_class ), 'htmlattr' ).'"'
+									.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'
+										.$custom_field_value
+									.'</a>';
 							}
 							break 2;
 					}
@@ -5982,8 +5991,8 @@ class Item extends ItemLight
 				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
-		if( $params['show_in_single_mode'] == false && is_single_page() )
-		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we don't want to display this link
+		if( $params['show_in_single_mode'] == false && is_single_page( $this->ID ) )
+		{	// We are viewing the single page for this Item, which (typically) contains comments, so we don't want to display this link
 			return;
 		}
 
