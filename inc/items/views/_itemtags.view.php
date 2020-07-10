@@ -97,7 +97,7 @@ function tag_td_name( $tag_ID, $tag_name )
 }
 $Results->cols[] = array(
 		'th'       => /* TRANS: noun */ T_('Tag'),
-		'order'    => 'tag_name COLLATE utf8_bin',
+		'order'    => 'tag_name COLLATE utf8mb4_bin',
 		'td'       => '%tag_td_name( #tag_ID#, #tag_name# )%',
 	);
 
