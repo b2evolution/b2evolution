@@ -3648,7 +3648,9 @@ div.message_toolbars {
   flex-direction: column;
 }
 #modal_window.evo_modal_window__percent_height .modal-body {
-  flex-grow: 1;
+  height: 100%;
+  overflow: hidden;
+  padding-top: 0;
 }
 #modal_window.evo_modal_window__percent_height .modal-footer {
   flex-shrink: 0;
