@@ -43,6 +43,7 @@ global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
 global $redirect_to, $orig_action;
+global $attachment_tab;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -105,7 +106,7 @@ $Form->begin_form( '', '', $params );
 ?>
 <div class="row">
 
-<div class="left_col col-lg-9 col-md-8">
+<div class="left_col col-lg-9 col-md-8 content-form-with-tab">
 
 	<?php
 	// ############################ INSTRUCTIONS ##############################
@@ -295,18 +296,66 @@ $Form->begin_form( '', '', $params );
 
 	$Form->end_fieldset();
 
+	global $UserSettings;
+	
+	$active_tab_pane_value = $UserSettings->get_collection_setting( 'active_tab_pane_itemform', $Blog->ID );
+	
+	echo '<input type="hidden" name="tab_pane_active[tab_pane_itemform]" id="itemform_tab_pane" value="'.$active_tab_pane_value.'">';
 
-	// ####################### ATTACHMENTS/LINKS #########################
+	echo '<ul class="nav nav-tabs">';
+	
+	$tab_panes = array();
+
+	$tab_panes[] = '#attachment';
+	
+	echo '<li><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) )
+	{	
+		$tab_panes[] = '#custom_fields';
+		
+		echo '<li><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
+	}
+
+	$tab_panes[] = '#advance_properties';
+	
+	echo '<li><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
+
+	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
+	{
+		$tab_panes[] = '#allowtrackbacks';
+		
+		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
+	}
+
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
+
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	{
+		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
+		
+		$tab_panes[] = '#internal_comments';
+		
+		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
+	}
+
+	$tab_panes[] = '#checklist';
+	$unchecked_checklist_lines = $edited_Item->get_unchecked_checklist_lines();
+	echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $unchecked_checklist_lines > 0 ? ' <span id="checklist_counter" class="badge badge-important">'.$unchecked_checklist_lines.'</span>' : '' ).'</a></li>';
+
+	echo '</ul>';
+
+	echo '<div class="tab-content evo_tab_pane_itemform_content">';
+
+	$attachment_tab = true;
 	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
 	$Form->attachments_fieldset( $edited_Item, $fold_images_attachments_block );
 
-
-	// ############################ CUSTOM FIELDS #############################
-	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
 	{	// Display fieldset with custom fields only if at least one exists:
-		$custom_fields_title = TB_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
-		if( check_user_perm( 'options', 'edit' ) )
+		$custom_fields_title = get_manual_link( 'post-custom-fields-panel' );
+		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
 			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
 					.action_icon( TB_('Edit fields...'), 'edit',
@@ -315,26 +364,25 @@ $Form->begin_form( '', '', $params );
 				.'</span>';
 		}
 
-		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
-
+		$Form->open_tab_pane( array( 'id' => 'custom_fields', 'class' => 'tab_pane_pads', 'right_items' => $custom_fields_title ) );
+		
 		$Form->switch_layout( 'fields_table' );
-		$Form->begin_fieldset();
-
+		
 		// Display inputs to edit custom fields:
 		display_editable_custom_fields( $Form, $edited_Item );
 
-		$Form->end_fieldset();
 		$Form->switch_layout( NULL );
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
+
+	
 
 	// ############################ ADVANCED PROPERTIES #############################
 
-	$Form->begin_fieldset( TB_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
+	$Form->open_tab_pane( array( 'id' => 'advance_properties', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-advanced-properties-panel' ) ) );
 
 	$Form->switch_layout( 'fields_table' );
-	$Form->begin_fieldset();
 
 	// URL slugs:
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
@@ -491,17 +539,15 @@ $Form->begin_form( '', '', $params );
 		}
 	}
 
-	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
-	$Form->end_fieldset();
-
+	$Form->close_tab_pane();
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( TB_('Additional actions').get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
+		$Form->open_tab_pane( array( 'id' => 'allowtrackbacks', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-edit-additional-actions-panel' ) ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
@@ -512,25 +558,21 @@ $Form->begin_form( '', '', $params );
 		</div>
 		<?php
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
-
 
 	// ####################### PLUGIN FIELDSETS #########################
 
-	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
+	// $Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
-	if( check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		// ####################### INTERNAL COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
-		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( TB_('Internal comments').get_manual_link( 'meta-comments-panel' )
-						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
-					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
+		$Form->open_tab_pane( array( 'id' => 'internal_comments', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'meta-comments-panel' ) ) );
 
 		if( $creating )
 		{	// Display button to save new creating item:
@@ -575,8 +617,30 @@ $Form->begin_form( '', '', $params );
 			load_funcs( 'comments/model/_comment_js.funcs.php' );
 		}
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
+
+	// ####################### CHECKLIST #########################
+	$Form->open_tab_pane( array( 'id' => 'checklist', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'item-checklist-panel' ) ) );
+	if( $creating )
+	{	// Display button to save new creating item:
+		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ TB_('Save post to start adding Checklist lines'), 'btn-primary' ) );
+	}
+	else
+	{
+		// Make sure the widget does not insert a form here!
+		skin_widget( array(
+			// CODE for the widget:
+			'widget' => 'item_checklist_lines',
+			// Optional display params
+			'Item'  => $edited_Item,
+			'title' => NULL,
+		) );
+	}
+	$Form->close_tab_pane();
+
+	echo '</div>';
+
 	?>
 
 </div>
@@ -1118,10 +1182,82 @@ echo_item_merge_js();
 echo_item_add_version_js();
 // JS code for link to link new version:
 echo_item_link_version_js();
+// Init Item Checklist JS:
+expose_var_to_js( 'evo_item_checklist_config', true );
 
 // JS to post excerpt mode switching:
 ?>
 <script>
+
+<?php
+
+$js_tab_panes_array = json_encode($tab_panes);
+echo "var js_tab_panes_array = ". $js_tab_panes_array . ";\n";
+
+?>
+
+tab_href_value = jQuery( '.content-form-with-tab #itemform_tab_pane' ).val();
+
+// Check if database saved active tab pane value exits in the tab pane or not
+if( js_tab_panes_array.indexOf( tab_href_value ) == -1 )
+{
+	tab_href_value = '#attachment';
+}
+
+// Watch for new checklist items and update badge accordingly:
+var checklist = document.querySelector( '.checklist_lines' );
+var observer_config = { attributes: true, childList: true, characterData: true };
+var observer = new MutationObserver( function( mutations ) {
+		mutations.forEach( function( mutation )
+			{
+				if( ( mutation.addedNodes && mutation.addedNodes.length > 0 ) || ( mutation.removedNodes && mutation.removedNodes.length > 0 ) )
+				{
+					var nodes_to_check = [];
+					// element added to DOM
+					if( mutation.addedNodes.length > 0 )
+					{
+						nodes_to_check = mutation.addedNodes;
+					}
+					else if( mutation.removedNodes.length > 0 )
+					{
+						nodes_to_check = mutation.removedNodes;
+					}
+					var hasClass = [].some.call( nodes_to_check, function( el )
+						{	// Check if added/removed node has class '.checklist_line':
+							if( el.classList )
+							{
+								return el.classList.contains( 'checklist_line' );
+							}
+							else
+							{
+								return false;
+							}
+						} );
+
+					if( hasClass )
+					{	// element has class `.checklist_line`, update counter:
+						window.update_checklist_tab_badge();
+					}
+				}
+			} );
+	} );
+observer.observe( checklist, observer_config );
+
+jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
+jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
+
+// Show attachment tab result summary in single line
+jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
+jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )
+{	// Do tab wise operations
+	tab_href_value = jQuery( event.target ).attr( "href" );
+	jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
+	if( tab_href_value === '#advance_properties' )
+	{
+		jQuery( window ).resize();
+	}
+});
+
 jQuery( '#post_excerpt' ).on( 'keyup', function()
 {
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:

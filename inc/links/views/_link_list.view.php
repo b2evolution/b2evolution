@@ -209,19 +209,22 @@ display_dragdrop_upload_button( array(
 		'fieldset_prefix'        => $fieldset_prefix,
 	) );
 
-	// Initialize attachments fieldset to set proper height and handler to resize it:
-	if( is_ajax_request() )
+	if( ! isset( $attachment_tab ) )
 	{
-		?>
-		<script>
-		jQuery( document ).ready( function() {
-				evo_link_initialize_fieldset( '<?php echo $fieldset_prefix;?>' );
-			} );
-		</script>
-		<?php
-	}
-	else
-	{
-		expose_var_to_js( 'link_initialize_fieldset_'.$fieldset_prefix, array( 'fieldset_prefix' => $fieldset_prefix ), 'evo_link_initialize_fieldset_config' );
+		// Initialize attachments fieldset to set proper height and handler to resize it:
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+					evo_link_initialize_fieldset( '<?php echo $fieldset_prefix;?>' );
+				} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'link_initialize_fieldset_'.$fieldset_prefix, array( 'fieldset_prefix' => $fieldset_prefix ), 'evo_link_initialize_fieldset_config' );
+		}
 	}
 ?>

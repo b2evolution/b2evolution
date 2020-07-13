@@ -65,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__version_link'      => $tableprefix.'items__version_link',
 		'T_items__votes'             => $tableprefix.'items__votes',
 		'T_items__status_type'       => $tableprefix.'items__status_type',
+		'T_items__checklist_lines'   => $tableprefix.'items__checklist_lines',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
 		'T_postcats'                 => $tableprefix.'postcats',
@@ -292,6 +293,24 @@ function & get_ItemTagCache()
 	}
 
 	return $ItemTagCache;
+}
+
+/**
+ * Get the ChecklistLineCache
+ * 
+ * @return ChecklistLineCache
+ */
+function & get_ChecklistLineCache()
+{
+	global $ChecklistLineCache;
+
+	if( ! isset( $ChecklistLineCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_checklistline.class.php', 'ChecklistLine' );
+		$ChecklistLineCache = new DataObjectCache( 'ChecklistLine', false, 'T_items__checklist_lines', 'check_', 'check_ID', 'check_label' );
+	}
+
+	return $ChecklistLineCache;
 }
 
 /**
@@ -1659,6 +1678,98 @@ class collections_Module extends Module
 				{	// Exit here when AJAX request, so we don't need a redirect after this function:
 					exit(0);
 				}
+
+			case 'checklist_line':
+				global $DB;
+
+				load_class('items/model/_checklistline.class.php', 'ChecklistLine' );
+
+				// Add/Update checklist line:
+				$item_action     = param( 'item_action', 'string', 'add' );
+				$item_ID         = param( 'item_ID', 'integer', true );
+				$checklist_ID    = param( 'check_ID', 'integer', NULL );
+
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				// Check perms:
+				check_user_perm( 'meta_comment', 'add', true, $edited_Item->get_blog_ID() );
+
+				if( $item_action == 'add' )
+				{
+					$checklist_label = param( 'check_label', 'string', true );
+
+					if( empty( $checklist_ID ) )
+					{
+						$checklistLine = new ChecklistLine();
+						$checklistLine->set_Item( $edited_Item );
+						$checklistLine->set( 'label', $checklist_label );
+						$checklistLine->dbsave();
+						$status = 'add';
+					}
+					else
+					{
+						$ChecklistLineCache = & get_ChecklistLineCache();
+						$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+						if( $checklist_label != $checklistLine->label )
+						{
+							$checklistLine->set( 'label', $checklist_label );
+						}
+						$checklistLine->dbsave();
+						$status = 'update';
+					}
+
+					$response = array(
+							'status'      => $status,
+							'check_ID'    => $checklistLine->ID,
+							'check_label' => $checklistLine->label,
+						);
+				}
+				elseif( $item_action == 'toggle_check' )
+				{
+					$checklist_checked = param( 'check_checked', 'boolean', NULL );
+
+					$ChecklistLineCache = & get_ChecklistLineCache();
+					$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+					if( isset( $checklist_checked ) )
+					{
+						$checklistLine->set( 'checked', $checklist_checked ? 1 : 0 );
+					}
+					$checklistLine->dbsave();
+					$status = 'toggle_check';
+
+					$response = array(
+							'status'        => $status,
+							'check_ID'      => $checklistLine->ID,
+							'check_checked' => $checklistLine->checked,
+						);
+				}
+				elseif( $item_action == 'delete' )
+				{
+					$ChecklistLineCache = & get_ChecklistLineCache();
+					$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+
+					$response = array(
+							'status'   => 'delete',
+							'check_ID' => $checklist_ID,
+						);
+
+					$checklistLine->dbdelete();
+				}
+				elseif( $item_action == 'reorder' )
+				{
+					$checklist_order = param( 'item_order', 'array', true );
+					$update_query = 'UPDATE T_items__checklist_lines SET check_order = FIELD(check_ID, '
+							.$DB->quote( $checklist_order ).') WHERE check_ID IN ('.$DB->quote( $checklist_order ).')';
+					$DB->query( $update_query );
+
+					$response = array(
+							'status' => 'reorder',
+							'order'  => $checklist_order,
+						);
+				}
+
+				exit( evo_json_encode( $response ) );
 		}
 	}
 }

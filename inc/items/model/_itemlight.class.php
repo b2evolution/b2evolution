@@ -121,6 +121,15 @@ class ItemLight extends DataObject
 	var $tags = NULL;
 
 	/**
+	 * Array of checklist lines
+	 * 
+	 * Lazy loaded.
+	 * @see ItemLight::get_checklist_lines()
+	 * @var array
+	 */
+	var $checklist_lines = NULL;
+
+	/**
 	 * Array of dbchanges flag to be able to check modifications, and execute update queries only when required
 	 * Note: Only those updates needs to be tracked in this var which are saved in a relational table ( e.g. tags, extracats )
 	 * @access protected
@@ -214,6 +223,7 @@ class ItemLight extends DataObject
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_item_ID', 'msg'=>T_('%d items subscriptions') ),
 				array( 'table'=>'T_items__prerendering', 'fk'=>'itpr_itm_ID', 'msg'=>T_('%d prerendered content') ),
 				array( 'table'=>'T_items__user_data', 'fk'=>'itud_item_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
+				array( 'table'=>'T_items__checklist_lines', 'fk'=>'check_item_ID', 'msg'=>T_('%d checklist items') ),
 			);
 	}
 
@@ -1894,6 +1904,49 @@ class ItemLight extends DataObject
 		}
 
 		return $this->tags;
+	}
+
+
+	/**
+	 * Get array of checklist lines.
+	 *
+	 * @return array
+	 */
+	function get_checklist_lines()
+	{
+		global $DB;
+
+		if( ! isset( $this->checklist_lines ) )
+		{
+			// Build query to get the checklist lines:
+			$checklist_SQL = new SQL( 'Get checklist lines for Item #'.$this->ID );
+			$checklist_SQL->SELECT( 'check_ID, check_item_ID, check_checked, check_label, check_order' );
+			$checklist_SQL->FROM( 'T_items__checklist_lines' );
+			$checklist_SQL->WHERE( 'check_item_ID = '.$DB->quote( $this->ID ) );
+			$checklist_SQL->ORDER_BY( 'check_order ASC, check_ID ASC' );
+			$this->checklist_lines = $DB->get_results( $checklist_SQL );
+		}
+
+		return $this->checklist_lines;
+	}
+
+
+	/**
+	 * Get number of unchecked checklist lines
+	 */
+	function get_unchecked_checklist_lines()
+	{
+		$checklist_lines = $this->get_checklist_lines();
+		$unchecked_checklist_lines = 0;
+		foreach( $checklist_lines as $checklist_line )
+		{
+			if( ! $checklist_line->check_checked )
+			{
+				$unchecked_checklist_lines++;
+			}
+		}
+
+		return $unchecked_checklist_lines;
 	}
 
 

@@ -12982,6 +12982,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16110, 'Creating table for checklist lines...' ) )
+	{	// part of 7.2
+		db_create_table( 'T_items__checklist_lines', '
+			check_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			check_item_ID INT(10) UNSIGNED NOT NULL,
+			check_checked TINYINT(1) NOT NULL DEFAULT 0,
+			check_label   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			check_order   INT(11) NOT NULL DEFAULT 1,
+			PRIMARY KEY (check_ID),
+			KEY check_item_ID (check_item_ID)' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

@@ -1186,4 +1186,41 @@ jQuery( document ).ready( function()
 	{
 		window.clipboard = new ClipboardJS( 'a.clipboard-copy' );
 	}
+
+	// Item Checklist JS - inc/items/views/_item_expert.form.php
+	if( typeof( evo_item_checklist_config ) != 'undefined' )
+	{
+		window.update_checklist_tab_badge = function() 
+			{
+				var checklist_badge = document.getElementById( 'checklist_counter' );
+				var unchecked_line_count = document.querySelectorAll( '.checklist_lines .checklist_line input[type="checkbox"]:not(:checked)' ).length;
+				
+				if( checklist_badge )
+				{
+					if( unchecked_line_count > 0 )
+					{	// Update checklist counter badge:
+						checklist_badge.innerHTML = unchecked_line_count;
+					}
+					else
+					{	// Remove checklist counter badge:
+						checklist_badge.remove();
+					}
+				}
+				else if( unchecked_line_count > 0 )
+				{	// Create checklist counter badge:
+					var checklist_tab = document.querySelector( 'a[href="#checklist"][data-toggle="tab"]' );
+					if( checklist_tab )
+					{
+						checklist_badge = document.createElement( 'span' );
+						checklist_badge.classList.add( 'badge', 'badge-important' );
+						checklist_badge.innerHTML = unchecked_line_count;
+						checklist_badge.setAttribute( 'id', 'checklist_counter' );
+						checklist_tab.appendChild( document.createTextNode( ' ' ) );
+						checklist_tab.appendChild( checklist_badge );
+					}
+				}
+			};
+
+		jQuery( '.checklist_lines' ).on( 'click', '.checklist_line input[type="checkbox"]', window.update_checklist_tab_badge );
+	}
 } );

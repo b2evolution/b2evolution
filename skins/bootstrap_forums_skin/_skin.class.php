@@ -131,6 +131,8 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		// Load for function get_available_thumb_sizes():
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -159,7 +161,7 @@ class bootstrap_forums_Skin extends Skin
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
 						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
-						'defaultvalue' => 'no_sidebar',
+						'defaultvalue' => isset( $Blog ) && $Blog->type == 'group' ? 'right_sidebar' : 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),

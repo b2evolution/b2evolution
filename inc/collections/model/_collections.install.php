@@ -545,6 +545,18 @@ $schema_queries = array_merge( $schema_queries, array(
 			KEY itvt_user_ID (itvt_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_items__checklist_lines' => array(
+		'Creating table for checklists',
+		"CREATE TABLE T_items__checklist_lines (
+			check_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			check_item_ID INT(10) UNSIGNED NOT NULL,
+			check_checked TINYINT(1) NOT NULL DEFAULT 0,
+			check_label   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			check_order   INT(11) NOT NULL DEFAULT 1,
+			PRIMARY KEY (check_ID),
+			KEY check_item_ID (check_item_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_subscriptions' => array(
 		'Creating table for subscriptions',
 		"CREATE TABLE T_subscriptions (
