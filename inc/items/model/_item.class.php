@@ -3360,26 +3360,25 @@ class Item extends ItemLight
 		$field_name = $params['field'];
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{ // Custom field with this index doesn't exist
-			echo $params['before']
-				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>'
-				.$params['after'];
+			echo '<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>';
 			return;
 		}
-
-		echo $params['before'];
 
 		switch( $params['what'] )
 		{
 			case 'label':
-				echo $this->get_custom_field_title( $params['field'] );
+				$r = $this->get_custom_field_title( $params['field'] );
 				break;
 
 			default: // formatted_value
-				echo $this->get_custom_field_formatted( $field_name, $params );
+				$r = $this->get_custom_field_formatted( $field_name, $params );
 				break;
 		}
 
-		echo $params['after'];
+		if( is_string( $r ) && $r !== '' )
+		{	// Print if value is not empty string:
+			echo $params['before'].$r.$params['after'];
+		}
 	}
 
 
