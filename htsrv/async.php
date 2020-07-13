@@ -1204,18 +1204,22 @@ switch( $action )
 				if( $link_owner_class == 'Comment' )
 				{
 					$edited_Item = $LinkOwner->get_Item();
-					$item_ID = $edited_Item->ID;
 				}
 				else
 				{
-					$item_ID = $LinkOwner->link_Object->ID;
+					$edited_Item = $LinkOwner->Item;
 				}
+				$item_ID = $edited_Item->ID;
 
 				// Get list of comment IDs under Item or related to Comment:
 				$comments_SQL = new SQL( 'Get all the comments of an Item' );
 				$comments_SQL->SELECT( 'comment_ID' );
 				$comments_SQL->FROM( 'T_comments' );
 				$comments_SQL->WHERE( 'comment_item_ID = '.$DB->quote( $item_ID ) );
+				if( ! $edited_Item->can_meta_comment() )
+				{	// If current User doesn't have an access to meta comments:
+					$comments_SQL->WHERE( 'comment_type != "meta"' );
+				}
 				$comment_IDs = $DB->get_col( $comments_SQL );
 
 				$links_SQL = new SQL( 'Get all the links belonging to comments of an Item' );
@@ -1241,11 +1245,9 @@ switch( $action )
 				else
 				{
 					global $Blog;
-					
+
 					if( empty( $Blog ) )
 					{
-						$ItemCache = & get_ItemCache();
-						$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 						$Blog = $edited_Item->get_Blog();
 					}
 
