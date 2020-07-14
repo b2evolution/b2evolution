@@ -103,6 +103,7 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'user_text'         => '',
 					'users_text'        => '',
 					'comments_text'     => '',
+					'search_text'       => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

@@ -13006,6 +13006,32 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16140, 'Installing new widget title for search page and updating widget "Search Form"...' ) )
+	{	// part of 7.2.0-beta
+		// Add widget CSS class for all search form widgets that use full form template:
+		$search_widgets_SQL = new SQL( 'Get widgets "Search Form" before updating params' );
+		$search_widgets_SQL->SELECT( 'wi_ID, wi_params' );
+		$search_widgets_SQL->FROM( 'T_widget__widget' );
+		$search_widgets_SQL->WHERE( 'wi_code = "coll_search_form"' );
+		$search_widgets_SQL->WHERE_and( 'wi_params IS NOT NULL' );
+		$search_widgets = $DB->get_assoc( $search_widgets_SQL );
+		foreach( $search_widgets as $search_widget_ID => $search_widget_params )
+		{
+			$search_widget_params = unserialize( $search_widget_params );
+			if( isset(  $search_widget_params['template'] ) &&
+			    $search_widget_params['template'] == 'search_form_full' )
+			{	// Add class "well" only for full form:
+				$search_widget_params['widget_css_class'] = isset( $search_widget_params['widget_css_class'] ) ? trim( $search_widget_params['widget_css_class'].' well' ) : 'well';
+				$DB->query( 'UPDATE T_widget__widget
+					  SET wi_params = '.$DB->quote( serialize( $search_widget_params ) ).'
+					WHERE wi_ID = '.$search_widget_ID );
+			}
+		}
+		// Add new default widget for title on search page:
+		install_new_default_widgets( 'search_area', 'request_title' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

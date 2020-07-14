@@ -601,8 +601,10 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Search Area */
 	$default_widgets['search_area'] = array(
+		array( 5,  16140, 'request_title' ),
 		array( 10, 15960, 'coll_search_form', 'params' => array(
 				'template' => 'search_form_full',
+				'widget_css_class' => 'well',
 			) ),
 	);
 
