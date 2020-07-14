@@ -827,7 +827,8 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
- * Allow parameters in URL without redirect to Item canonical URL when collection setting "301 redirect to canonical URL when possible" is enabled
+ * Allow parameters in URL without redirect to Any(Collection, Category, Item, disp=posts, Archive, Tag, User profile) canonical URLs
+ * when collection settings "301 redirect to canonical URL when possible" is enabled
  */
 $noredir_params = array(
 	'page',          // For showing a different page in a multipage post

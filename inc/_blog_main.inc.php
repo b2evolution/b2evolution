@@ -745,6 +745,8 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
+		// Keep ONLY allowed noredir params from current URL in the canonical URL:
+		$canonical_url = url_clear_noredir_params( $canonical_url );
 		// Consider URL with possible params like disp=front or coll_locale=en-US as front canonical URL of the current Collection:
 		$current_url = preg_replace( '#[\?&]((coll_locale=[^&]+|disp='.preg_quote( $disp ).')(&|$))+#', '', $ReqURL );
 		if( ! is_same_url( $current_url, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
