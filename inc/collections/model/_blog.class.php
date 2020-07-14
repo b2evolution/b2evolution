@@ -3186,7 +3186,18 @@ class Blog extends DataObject
 				if( check_user_perm( 'blog_properties', 'edit', false, $this->ID ) ||
 				    ( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) ) )
 				{	// Return customizer URL only if current User can edit skin settings of collection or site:
-					$customizing_url = isset( $params['customizing_url'] ) ? $params['customizing_url'] : get_current_url();
+					if( ! empty( $params['customizing_url'] ) )
+					{	// Get customizing URL from passed param:
+						$customizing_url = $params['customizing_url'];
+					}
+					elseif( get_param( 'customizing_url' ) != '' )
+					{	// Get customizing URL from currently provided _GET param 'customizing_url':
+						$customizing_url = get_param( 'customizing_url' );
+					}
+					else
+					{	// Use current URL for customizing URL:
+						$customizing_url = get_current_url();
+					}
 					if( $customizing_url == '#baseurl#' )
 					{	// Use base URL of this collection:
 						$customizing_url = $this->get( 'baseurl' );
