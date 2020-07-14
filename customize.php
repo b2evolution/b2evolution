@@ -96,6 +96,10 @@ elseif( $customizer_mode == 'disable' )
 	else
 	{	// Use current customizing URL, but remove params which are used only for enabled customizer mode:
 		$redirect_to = clear_url( $customizing_url, 'customizer_mode,designer_mode,show_toolbar,redir' );
+		if( strpos( $redirect_to, 'customizing_url=' ) !== false )
+		{	// Extract customizing URL in order to avoid redirect to same customize.php if it was added in URL params twice by mistake:
+			$redirect_to = urldecode( preg_replace( '#^.+[\?&]customizing_url=#', '', $redirect_to ) );
+		}
 	}
 	// 303 Redirect to normal page:
 	header_redirect( $redirect_to );
