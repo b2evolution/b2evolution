@@ -48,7 +48,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|echo|set|param):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|User|echo|set|param):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -295,6 +295,15 @@ function render_template_callback( $var, $params, $objects = array() )
 			elseif( ! is_scalar( $params[ $param_name ] ) )
 			{	// Param is not scalar and cannot be printed on screen:
 				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not scalar.</span>';
+			}
+			break;
+
+		case 'User':
+			global $User;
+			$rendered_User = ( !isset( $objects['User'] ) ? $User : $objects['User'] );
+			if( empty( $rendered_User ) || ! ( $rendered_User instanceof User ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object User is not defined at this moment.</span>';
 			}
 			break;
 
@@ -1085,7 +1094,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Plugin->SkinTag( $params );
 			break;
 
-		// Tag
+		// Tag:
 		case 'Tag:name':
 			echo $tag;
 			break;
@@ -1110,7 +1119,96 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			echo $rendered_Blog->get_tag_link( $tag, $temp_params['text'], $temp_params );
 			break;
-		
+
+		// User:
+		case 'User:custom':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'field'       => NULL,
+					'before'      => '',
+					'before_item' => '',
+					'after_item'  => '',
+					'after'       => '',
+					'limit'       => NULL,
+				), $params );
+			$userfield_values = $rendered_User->userfield_values_by_code( $temp_params['field'], true );
+
+			if( is_array( $userfield_values ) )
+			{
+				$limit = count( $userfield_values );
+				if( is_int( $temp_params['limit'] ) && ( $temp_params['limit'] <= $limit ) )
+				{
+					$limit = (int) $temp_params['limit'];
+				}
+
+				$r = '';
+
+				$r .= $temp_params['before'];
+				for( $i = 0; $i < $limit; $i++ )
+				{
+					$r .= $temp_params['before_item'];
+					$r .= $userfield_values[$i];
+					$r .= $temp_params['after_item'];
+				}
+				$r .= $temp_params['after'];
+
+				echo format_to_output( $r );
+			}
+			break;
+
+		case 'User:email':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->email( $temp_params['format'] );
+			break;
+
+		case 'User:first_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->first_name( $temp_params['format'] );
+			break;
+
+		case 'User:fullname':
+			echo $rendered_User->get( 'fullname' );
+			break;
+
+		case 'User:last_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->last_name( $temp_params['format'] );
+			break;
+
+		case 'User:login':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			echo $rendered_User->login( $temp_params['format'] );
+			break;
+
+		case 'User:nick_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->nick_name( $temp_params['format'] );
+			break;
+
+		case 'User:picture':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'block_class' => NULL,
+					'show_login'  => false,
+				), $params );
+			echo $rendered_User->get_avatar_styled( $temp_params );
+			break;
+
+		case 'User:preferredname':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->preferred_name( $temp_params['format'] );
+			break;
+
 		// Others
 		default:
 			switch( $scope )

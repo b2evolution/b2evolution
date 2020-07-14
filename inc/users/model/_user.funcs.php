@@ -4045,6 +4045,11 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
  */
 function userfield_prepare( & $userfield )
 {
+	if( isset( $userfield->_prepared ) && $userfield->_prepared )
+	{	// Userfield is already prepared, skip:
+		return;
+	}
+
 	$userfield->uf_varchar = format_to_output( $userfield->uf_varchar, 'htmlspecialchars' );
 
 	switch( $userfield->ufdf_type )
@@ -4063,6 +4068,9 @@ function userfield_prepare( & $userfield )
 			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
 			break;
 	}
+
+	// Mark this userfield as prepared:
+	$userfield->_prepared = true;
 }
 
 

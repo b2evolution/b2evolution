@@ -1749,6 +1749,18 @@ function create_default_templates( $is_task = true )
 			]'
 		),
 
+		// About Author widget:
+		'about_author' => array(
+			'name'     => 'Item Details: About Author',
+			'context'  => 'item_details',
+			'template' => '<div class="clearfix"><div class="evo_avatar">
+	[User:picture|size=crop-top-48x48]
+</div>
+<div class="evo_author_display_field">
+	[User:custom|field=microbio]
+</div></div>',
+		),
+
 		// Content List widget:
 		'content_list' => array(
 			'name'     => 'Content List',
