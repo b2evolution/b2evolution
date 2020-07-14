@@ -146,7 +146,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Comment List */
 	$default_widgets['comment_list'] = array(
-		array( 5, 16070, 'request_title' ),
+		array( 5, 16130, 'request_title' ),
 	);
 
 	/* Comment Area */
