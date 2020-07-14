@@ -12747,6 +12747,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$DB->query( 'UPDATE T_items__status SET pst_order = 80 WHERE pst_name = "OK"' );
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 16070, 'Installing new widgets/containers...' ) )
+	{	// part of 7.1.5-stable
+		install_new_default_widgets( 'comment_list', 'request_title' );
+		upg_task_end();
+	}
 
 	if( upg_task_start( 16088, 'Converting widget "Common Navigation Links" into "Embed Menu" widget...' ) )
 	{	// part of 7.2

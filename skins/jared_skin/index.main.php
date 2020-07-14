@@ -95,6 +95,7 @@ if( $is_other_disp ) {
 					'msgform_text'      => '',
 					'user_text'         => T_( 'User settings' ),
 					'users_text'        => T_( 'Users' ),
+					'comments_text'     => '',
 					'posts_text'        => T_( 'Posts' ),
 					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
