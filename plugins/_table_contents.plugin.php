@@ -239,7 +239,7 @@ class table_contents_plugin extends Plugin
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
 				'set_coll_ID'  => isset( $Blog ) ? $Blog->ID : NULL, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => isset( $Blog ) ? $Blog->ID : NULL, // Has the content of the displayed blog changed ?
-				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 			);
 	}
 
