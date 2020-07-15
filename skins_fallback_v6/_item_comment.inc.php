@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -72,9 +72,9 @@ echo $params['comment_title_before'];
 switch( $Comment->get( 'type' ) )
 {
 	case 'comment': // Display a comment:
-	case 'meta': // Display a meta comment:
+	case 'meta': // Display an internal comment:
 		if( $Comment->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			echo '<span class="badge badge-info">'.$Comment->get_inlist_order().'</span> ';
 		}
 
@@ -184,7 +184,7 @@ echo '</span>';
 echo '<div class="action_btn_group">';
 	$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
 	echo '<span class="'.button_class( 'group' ).'">';
-		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+		$delete_button_is_displayed = check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
 			'ajax_button' => true,
 			'class'       => button_class( 'text' ),

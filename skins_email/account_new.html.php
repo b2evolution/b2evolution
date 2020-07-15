@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -125,6 +125,7 @@ echo '</table>'."\n";
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['new_user_ID'], T_('Edit User'), 'div.buttons a+a.btn-primary' )."\n";
 echo get_link_tag( $admin_url.'?ctrl=users&action=show_recent', T_('View recent registrations'), 'div.buttons a+a.btn-default' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=users&action=delete&deltype=spammer&user_ID='.$params['new_user_ID'], T_('Delete Spammer'), 'div.buttons a+a.btn-danger' )."\n";
 echo "</div>\n";
 
 // Footer vars:

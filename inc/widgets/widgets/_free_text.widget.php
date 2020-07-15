@@ -52,7 +52,7 @@ class free_text_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Free Text' );
+		$title = T_('Text');
 		return $title;
 	}
 

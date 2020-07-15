@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -50,10 +50,15 @@ class CollectionSettings extends AbstractSettings
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
 			'permalinks'      => 'single',				// single, archive, subchap
+			'postlist_enable' => 1,
 
 		// Page 2,3,4..; settings:
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
+
+		// User profile page settings:
+			'user_prefix' => 'user',
+			'user_links' => 'params',
 
 		// Single post settings:
 			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
@@ -70,6 +75,13 @@ class CollectionSettings extends AbstractSettings
 			'tags_structured_data' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
+		// Tiny URLs settings:
+			'tinyurl_type'   => 'basic',
+			'tinyurl_domain' => '',
+			'tinyurl_tag_source' => 'utm_source',
+			'tinyurl_tag_slug' => 'utm_campaign',
+			'tinyurl_tag_extra_term' => 'utm_term',
+
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
 			'voting_neutral'  => 0, // Allow Neutral vote
@@ -85,7 +97,7 @@ class CollectionSettings extends AbstractSettings
 			'require_anon_name' => 1,
 			'require_anon_email' => 1,
 			'allow_anon_url' => 0,
-			'comment_maxlen' => 1500,
+			'comment_maxlen' => 20000,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -101,7 +113,7 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
-			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
+			'meta_comments_frontoffice' => 1, // Display internal comments in front-office
 			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:
@@ -125,7 +137,7 @@ class CollectionSettings extends AbstractSettings
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
-			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
+			'chapter_noindex' => '1',       // META NOINDEX on Category pages without intro
 			'category_prefix'   => '',
 			'categories_meta_description' => 1,
 			'category_ordering' => 'alpha',             // Ordering of categories
@@ -140,6 +152,9 @@ class CollectionSettings extends AbstractSettings
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',							// fp> fp> we want this changed to prefix only for new blogs only
 			'tag_rel_attrib' => 1,						// rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
+
+		// User profile page settings:
+			'canonical_user_urls' => 1, // Redirect user profile pages to their canonical Url?
 
 		// Other filtered pages:
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
@@ -239,11 +254,14 @@ class CollectionSettings extends AbstractSettings
 
 		// User directory:
 			'userdir_enable' => 1,
-			'userdir_filter_gender' => 1,
-			'userdir_filter_level' => 1,
-			'userdir_filter_org' => 1,
-			'userdir_filter_criteria' => 1,
-			'userdir_filter_lastseen' => 1,
+			'userdir_filter_restrict_to_members' => 1,
+			'userdir_filter_name' => 1,
+			'userdir_filter_email' => 0,
+			'userdir_filter_country' => 1,
+			'userdir_filter_region' => 1,
+			'userdir_filter_subregion' => 1,
+			'userdir_filter_city' => 1,
+			'userdir_filter_age_group' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -262,11 +280,13 @@ class CollectionSettings extends AbstractSettings
 
 		// Other settings:
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
+			'search_enable'        => 1, // Enable disp=search
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'search_sort_by'       => 'score', // Sort type of results on disp=search ('score', 'date')
 			'search_include_cats'  => 1, // Include categories to results on disp=search
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
+			'search_include_metas' => 1, // Include meta/internal comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'search_include_files' => 1, // Include files to results on disp=search
 			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
@@ -297,6 +317,12 @@ class CollectionSettings extends AbstractSettings
 			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
 			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
 			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
+			'search_result_template_item'      => 'search_result_item',
+			'search_result_template_comment'   => 'search_result_comment',
+			'search_result_template_meta'      => 'search_result_meta',
+			'search_result_template_file'      => 'search_result_file',
+			'search_result_template_category'  => 'search_result_category',
+			'search_result_template_tag'       => 'search_result_tag',
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:
@@ -307,6 +333,7 @@ class CollectionSettings extends AbstractSettings
 			'last_invalidation_timestamp' => 0,
 
 		// Download settings:
+			'download_enable' => 1,
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
@@ -333,6 +360,7 @@ class CollectionSettings extends AbstractSettings
 	 *  'normal_skin_ID' => NULL,
 	 *  'mobile_skin_ID' => NULL,
 	 *  'tablet_skin_ID' => NULL,
+	 *  'alt_skin_ID' => NULL,
 	 */
 
 

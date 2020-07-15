@@ -62,7 +62,7 @@ class item_comment_feed_link_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Comment Feed Link');
+		return T_('Comment Feed Link');
 	}
 
 

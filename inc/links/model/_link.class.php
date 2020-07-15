@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -227,7 +227,7 @@ class Link extends DataObject
 				'after_image'         => '</div>',
 				'image_size'          => 'original',
 				'image_sizes'         => NULL, // simplified sizes= attribute for browser to select correct size from srcset= -- NULL = no srcset
-				'image_link_to'       => 'original',
+				'image_link_to'       => 'original',   // can be URL, can be empty
 				'image_link_title'    => '',	// can be text or #title# or #desc#
 				'image_link_rel'      => '',
 				'image_class'         => '',
@@ -305,10 +305,15 @@ class Link extends DataObject
 
 		if( $LinkOwner->type == 'item' && $LinkOwner->Item )
 		{ // Use specific url for Item to download
+			if( ! $LinkOwner->Item->get_coll_setting( 'download_enable' ) )
+			{	// If ?disp=download is disabled then use simple original URL to the File:
+				return $File->get_url();
+			}
+
 			switch( $params['type'] )
 			{
 				case 'action':
-					// Get URL to froce download a file
+					// Get URL to force download a file
 					if( $File->get_ext() == 'zip' )
 					{ // Provide direct url to ZIP files
 					  // NOTE: The same hardcoded place is in the file "htsrv/download.php", lines 56-60
@@ -339,8 +344,6 @@ class Link extends DataObject
 	 */
 	function can_be_file_deleted()
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// Not logged in user
 			return false;
@@ -354,7 +357,7 @@ class Link extends DataObject
 
 		if( ! ( $File = & $this->get_File() ) ||
 		    ! ( $FileRoot = & $File->get_FileRoot() ) ||
-		    ! $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		    ! check_user_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 		{	// Current user has no permission to edit this file
 			return false;
 		}
@@ -526,7 +529,7 @@ class Link extends DataObject
 		$DB->begin();
 
 		$LinkOwner = & $this->get_LinkOwner();
-		if( $LinkOwner && $LinkOwner->type == 'item' && isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
+		if( $LinkOwner && ( $LinkOwner->type == 'item' ) && ( isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) ) )
 		{
 			if( ! $LinkOwner->Item->check_proposed_change_restriction( 'error' ) )
 			{	// If the Link's Item cannot be updated because of proposed change:

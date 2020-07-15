@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin-skin
@@ -42,16 +42,13 @@ class AdminUI extends AdminUI_general
 	{
 		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url, $rsc_url;
 
-		require_js( '#jquery#', 'rsc_url' );
-		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+		require_js_defer( '#jquery#', 'rsc_url' );
+		require_js_defer( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
-		require_js( '#bootstrap#', 'rsc_url' );
+		require_js_defer( '#bootstrap#', 'rsc_url' );
 		require_css( '#bootstrap_css#', 'rsc_url' );
 		// require_css( '#bootstrap_theme_css#', 'rsc_url' );
-		require_js( '#bootstrap_typeahead#', 'rsc_url' );
-
-		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
-		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
+		require_js_defer( '#bootstrap_typeahead#', 'rsc_url' );
 
 		if( $debug )
 		{	// Use readable CSS:
@@ -68,15 +65,15 @@ class AdminUI extends AdminUI_general
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
-			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'absolute' );	// Relative to <base> tag (current skin folder)
 		}
 		else
 		{	// Use minified CSS:
-			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'absolute' );	// Relative to <base> tag (current skin folder)
 		}
 
 		// Load general JS file:
-		require_js( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
+		require_js_defer( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
 
 		// Set bootstrap css classes for messages
 		$Messages->set_params( array(
@@ -89,7 +86,7 @@ class AdminUI extends AdminUI_general
 			) );
 
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-		init_fontawesome_icons( 'fontawesome-glyphicons' );
+		init_fontawesome_icons( 'fontawesome-glyphicons', 'rsc_uri' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:
@@ -102,7 +99,7 @@ class AdminUI extends AdminUI_general
 
 		// evo helpdesk widget:
 		//require_css( $rsc_url.'css/evo_helpdesk_widget.min.css' );
-		//require_js( $rsc_url.'js/evo_helpdesk_widget.min.js' );
+		//require_js_defer( $rsc_url.'js/evo_helpdesk_widget.min.js' );
 	}
 
 
@@ -350,17 +347,17 @@ class AdminUI extends AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '<div class="evo_panel">',
-						'header_text' => '<div class="center"><ul class="pagination">'
+					'header_start' => '<div class="results_header clearfix">',
+						'header_text' => '<div class="evo_pager"><div class="results_summary">$nb_results$ Results $reset_filters_button$</div><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
-						'header_text_single' => '',
+						'header_text_single' => '<div class="results_summary">$nb_results$ attachments $reset_filters_button$</div>',
 					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
 					'filters_start'        => '<div class="filters panel-body">',
 					'filters_end'          => '</div>',
-					'filter_button_class'  => 'btn-sm btn-info',
+					'filter_button_class'  => 'evo_btn_apply_filters btn-sm btn-info',
 					'filter_button_before' => '<div class="form-group pull-right">',
 					'filter_button_after'  => '</div>',
 					'messages_start' => '<div class="messages form-inline">',
@@ -411,7 +408,7 @@ class AdminUI extends AdminUI_general
 							'total_col_end' => "</td>\n",
 						'total_line_end' => "</tr>\n\n",
 					'list_end' => "</table></div>\n\n",
-					'footer_start' => '<div class="evo_panel evo_panel__footer">',
+					'footer_start' => '<div class="results_footer">',
 					'footer_text' => '<div class="center"><ul class="pagination">'
 							.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 						.'</ul></div><div class="center page_size_selector">$page_size$</div>'
@@ -435,7 +432,7 @@ class AdminUI extends AdminUI_general
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
 					'no_results_start' => '<div class="panel-footer">'."\n",
-					'no_results_end'   => '$no_results$</div>'."\n\n",
+					'no_results_end'   => '$no_results$ $reset_filters_button$</div>'."\n\n",
 				'content_end' => '</div>',
 				'after' => '</div>',
 				'sort_type' => 'basic'
@@ -564,6 +561,8 @@ class AdminUI extends AdminUI_general
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+					'tab_pane_open' => '<div id="$id$" class="tab-pane fade $class$" $tab_pane_attribs$ ><div class="pull-left">$pull_left$</div><div class="pull-right">$pull_right$</div><div class="clearfix"></div>'."\n",
+					'tab_pane_close'   => '</div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
 					'labelclass'     => 'control-label col-sm-3',
@@ -582,6 +581,8 @@ class AdminUI extends AdminUI_general
 					'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 					// Additional params depending on field type:
 					// - checkbox
+					'fieldstart_checkbox'    => '<div class="form-group checkbox-group" $ID$>'."\n",
+					'fieldend_checkbox'      => "</div>\n\n",
 					'inputclass_checkbox'    => '',
 					'inputstart_checkbox'    => '<div class="controls col-sm-9"><div class="checkbox"><label>',
 					'inputend_checkbox'      => "</label></div></div>\n",
@@ -831,7 +832,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function get_bloglist_buttons( $title = '' )
 	{
-		global $blog, $current_User, $admin_url;
+		global $blog, $admin_url;
 
 		$max_buttons = 7;
 
@@ -905,7 +906,7 @@ class AdminUI extends AdminUI_general
 		if( $this->coll_list_disp_sections )
 		{	// Check if filter by section is used currently:
 			$sec_ID = param( 'sec_ID', 'integer', 0 );
-			if( ! is_logged_in() || ! ( $current_User->check_perm( 'stats', 'view' ) || $current_User->check_perm( 'section', 'view', false, $sec_ID ) ) )
+			if( ! is_logged_in() || ! ( check_user_perm( 'stats', 'view' ) || check_user_perm( 'section', 'view', false, $sec_ID ) ) )
 			{
 				$sec_ID = 0;
 				set_param( 'sec_ID', 0 );
@@ -944,7 +945,7 @@ class AdminUI extends AdminUI_general
 		}
 
 		// Button to add new collection:
-		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+		if( $this->coll_list_disp_add && check_user_perm( 'blogs', 'create' ) )
 		{	// Display a button to add new collection if it is requested and current user has a permission
 			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.format_to_output( T_('New Collection'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 		}
@@ -994,7 +995,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function display_customizer_tabs( $params = array() )
 	{
-		global $Blog, $Settings, $current_User, $admin_url;
+		global $Blog, $Settings;
 
 		$params = array_merge( array(
 				'action_links'   => '',
@@ -1017,27 +1018,27 @@ class AdminUI extends AdminUI_general
 
 		// Site:
 		if( $Settings->get( 'site_skins_enabled' ) &&
-				$current_User->check_perm( 'options', 'edit' ) )
+				check_user_perm( 'options', 'edit' ) )
 		{	// If current User can edit site skin settings:
 			$tabs['site'] = array(
 				'text' => T_('Site'),
-				'href' => $admin_url.'?ctrl=customize&amp;view=site_skin',
+				'href' => get_admin_url( 'ctrl=customize&amp;view=site_skin' ),
 			);
 		}
 		// Collection:
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
+		if( check_user_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
 		{	// If current User can edit current collection settings:
 			$tabs['coll'] = array(
 				'text' => $tab_Blog->get( 'shortname' ),
-				'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+				'href' => get_admin_url( 'ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID ),
 				'entries' => array(
 					'skin' => array(
 						'text' => T_('Skin'),
-						'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+						'href' => get_admin_url( 'ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID ),
 					),
 					'widgets' => array(
 						'text' => T_('Widgets'),
-						'href' => $admin_url.'?ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID,
+						'href' => get_admin_url( 'ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID ),
 					),
 				)
 			);
@@ -1050,7 +1051,7 @@ class AdminUI extends AdminUI_general
 		{	// If current User can edit settings of at least two collections:
 			$tabs['other'] = array(
 				'text' => T_('Other'),
-				'href' => $admin_url.'?ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID,
+				'href' => get_admin_url( 'ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID ),
 			);
 		}
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -23,7 +23,7 @@ global $Comment;
  */
 global $CommentList;
 
-global $AdminUI, $UserSettings, $current_User;
+global $AdminUI, $UserSettings;
 
 // If rediret_to was not set, create new redirect
 $redirect_to = param( 'redirect_to', 'url', regenerate_url( '', 'filter=restore', '', '&' ) );
@@ -38,11 +38,11 @@ if( empty( $item_id ) )
 $currentpage = param( 'currentpage', 'integer', 1 );
 $comments_number = param( 'comments_number', 'integer', 0 );
 
-// Check if current comments list displays meta comments:
+// Check if current comments list displays internal comments:
 $is_meta_comments_list = ( isset( $CommentList->filters['types'] ) && in_array( 'meta', $CommentList->filters['types'] ) );
 
 if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
-{	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
+{	// Allow to select ONLY normal comments(EXCLUDE internal comments) for action on item view page:
 	global $blog, $admin_url;
 
 	$Form = new Form( $admin_url );
@@ -66,7 +66,7 @@ if( $item_id > 0 )
 	$display_meta_title = false;
 }
 else
-{	// Display additional info of meta comment when no post page, e.g. on "Meta discussion" tab:
+{	// Display additional info of internal comment when no post page, e.g. on "Internal comments" tab:
 	$display_meta_title = true;
 }
 
@@ -121,11 +121,11 @@ while( $Comment = & $CommentList->get_next() )
 			) );
 	}
 
-	if( ! $comments_can_be_recycled && $Comment->get( 'status' ) != 'trash' && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
+	if( ! $comments_can_be_recycled && $Comment->get( 'status' ) != 'trash' && check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
 	{	// Set flag to know at least one comment from the current list can be recycled:
 		$comments_can_be_recycled = true;
 	}
-	if( ! $comments_can_be_deleted && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
+	if( ! $comments_can_be_deleted && check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment ) )
 	{	// Set flag to know at least one comment from the current list can be deleted:
 		$comments_can_be_deleted = true;
 	}
@@ -138,7 +138,7 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 }
 
 if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
-{	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
+{	// Allow to select ONLY normal comments(EXCLUDE internal comments) for action on item view page:
 	echo T_('With checked comments').': ';
 
 	// Display a button to change visibility of selected comments:
@@ -149,7 +149,7 @@ if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
 	echo_comment_status_buttons( $Form, NULL, $item_status, 'comments_visibility' );
 	echo_status_dropdown_button_js( 'comment' );
 
-	if( $item_id > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) )
+	if( $item_id > 0 && check_user_perm( 'blog_post_statuses', 'edit', false, $blog ) )
 	{	// Display a button to create a post from selected comments:
 		echo ' '.T_('or').' ';
 		$Form->button( array( 'submit', 'actionArray[create_comments_post]', T_('Create new Post'), 'btn-warning' ) );

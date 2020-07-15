@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -88,7 +88,7 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
-		if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+		if( check_user_perm( 'users', 'edit', false ) )
 		{ // Admins cannot close own accounts
 			$Messages->add( T_( 'Since you are an Admin with User management privileges, you cannot close your own account!' ) );
 			// Redirect to show the errors:
@@ -302,7 +302,7 @@ switch( $action )
 			$Collection = $Blog = $BlogCache->get_by_ID( $blog );
 			if( $Blog )
 			{
-				$changepwd_url = $Blog->get( 'userurl', array( 'url_suffix' => 'disp=pwdchange&reqID='.$reqID, 'glue' => '&' ) );
+				$changepwd_url = $Blog->get( 'pwdchangeurl', array( 'url_suffix' => 'reqID='.$reqID, 'glue' => '&' ) );
 			}
 		}
 

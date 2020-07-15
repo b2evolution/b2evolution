@@ -43,66 +43,66 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-		<?php
-			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			widget_container( 'page_top', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
-					'container_end'       => '</div></div>',
-					'block_start'         => '<div class="evo_widget $wi_class$">',
-					'block_end'           => '</div>',
-					'block_display_title' => false,
-					'list_start'          => '<ul>',
-					'list_end'            => '</ul>',
-					'item_start'          => '<li>',
-					'item_end'            => '</li>',
-				) );
-			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-		?>
+	<?php
+		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		widget_container( 'page_top', array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => true, // Display container anyway even if no widget
+				'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+				'container_end'       => '</div></div>',
+				'block_start'         => '<div class="evo_widget $wi_class$">',
+				'block_end'           => '</div>',
+				'block_display_title' => false,
+				'list_start'          => '<ul>',
+				'list_end'            => '</ul>',
+				'item_start'          => '<li>',
+				'item_end'            => '</li>',
+			) );
+		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+	?>
 
-		<?php
-			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			widget_container( 'header', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
-					'container_end'     => '</div></div>',
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
-					'block_title_start' => '<h1>',
-					'block_title_end'   => '</h1>',
-				) );
-			// ----------------------------- END OF "Header" CONTAINER -----------------------------
-		?>
+	<?php
+		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		widget_container( 'header', array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => true, // Display container anyway even if no widget
+				'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+				'container_end'     => '</div></div>',
+				'block_start'       => '<div class="evo_widget $wi_class$">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<h1>',
+				'block_title_end'   => '</h1>',
+			) );
+		// ----------------------------- END OF "Header" CONTAINER -----------------------------
+	?>
 
 </header><!-- .row -->
 
-		<?php
-			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			// Note: this container is designed to be a single <ul> list
-			widget_container( 'menu', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
-					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
-					'container_end'       => '</ul></div></nav>',
-					'block_start'         => '',
-					'block_end'           => '',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '<li class="evo_widget $wi_class$">',
-					'item_end'            => '</li>',
-					'item_selected_start' => '<li class="active evo_widget $wi_class$">',
-					'item_selected_end'   => '</li>',
-					'item_title_before'   => '',
-					'item_title_after'    => '',
-				) );
-			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
-		?>
+<?php
+	// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+	// Display container and contents:
+	// Note: this container is designed to be a single <ul> list
+	widget_container( 'menu', array(
+			// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+			'container_end'       => '</ul></div></nav>',
+			'block_start'         => '',
+			'block_end'           => '',
+			'block_display_title' => false,
+			'list_start'          => '',
+			'list_end'            => '',
+			'item_start'          => '<li class="evo_widget $wi_class$">',
+			'item_end'            => '</li>',
+			'item_selected_start' => '<li class="active evo_widget $wi_class$">',
+			'item_selected_end'   => '</li>',
+			'item_title_before'   => '',
+			'item_title_after'    => '',
+		) );
+	// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+?>
 
 <div class="row">
 
@@ -113,7 +113,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -122,19 +122,6 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// --------------------------------- END OF MESSAGES ---------------------------------
 		}
-		?>
-
-		<?php
-			// ------------------- PREV/NEXT POST LINKS (SINGLE POST MODE) -------------------
-			item_prevnext_links( array(
-					'block_start' => '<nav><ul class="pager">',
-						'prev_start'  => '<li class="previous">',
-						'prev_end'    => '</li>',
-						'next_start'  => '<li class="next">',
-						'next_end'    => '</li>',
-					'block_end'   => '</ul></nav>',
-				) );
-			// ------------------------- END OF PREV/NEXT POST LINKS -------------------------
 		?>
 
 		<?php
@@ -154,6 +141,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
+					'search_text'       => '',
 					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
 						'before'              => '<span class="pull-right">',
@@ -169,17 +158,9 @@ siteskin_include( '_site_body_header.inc.php' );
 		// Go Grab the featured post:
 		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
 		{	// We have a featured/intro post to display:
-			$intro_item_style = '';
-			$LinkOwner = new LinkItem( $Item );
-			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
-			if( ! empty( $LinkList ) &&
-					$Link = & $LinkList->get_next() &&
-					$File = & $Link->get_File() &&
-					$File->exists() &&
-					$File->is_image() )
-			{	// Use cover image of intro-post as background:
-				$intro_item_style = 'background-image: url("'.$File->get_url().'")';
-			}
+			// Use background position image of intro-post for background URL:
+			$background_image_url = $Item->get_cover_image_url( 'background' );
+			$intro_item_style = $background_image_url ? 'background-image: url("'.$background_image_url.'")' : '';
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
@@ -219,6 +200,7 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
+
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
 																				.'<div class="panel-heading">'
@@ -238,15 +220,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -257,8 +230,10 @@ siteskin_include( '_site_body_header.inc.php' );
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
 					'msgform_form_title' => T_('Contact'),
 				) );

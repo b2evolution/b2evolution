@@ -22,7 +22,7 @@ global $Skin;
 // Do inits depending on current $disp:
 skin_init( $disp );
 // TODO: move to Skin::display_init
-require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
+require_js_defer( 'functions.js', 'blog' );	// for opening popup window (comments)
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
 		'arcdir_text'     => T_('Index'),
@@ -142,6 +142,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			'category_text'     => T_('Gallery').': ',
 			'categories_text'   => T_('Galleries').': ',
 			'user_text'         => '',
+			'comments_text'     => '',
+			'search_text'       => '',
 			'display_edit_links'  => ( $disp == 'edit' ),
 			'edit_links_template' => array(
 				'before'              => '<span class="pull-right">',

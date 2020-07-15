@@ -99,7 +99,7 @@ function evo_customizer_update_style( setting_input )
 		.addClass( is_dynamic_style_updated ? 'btn-danger' : 'btn-primary' );
 }
 
-jQuery( document ).on( 'ready', function()
+jQuery( document ).ready( function()
 {
 	jQuery( '#evo_customizer__backoffice' ).on( 'load', function()
 	{	// If iframe with settings has been loaded

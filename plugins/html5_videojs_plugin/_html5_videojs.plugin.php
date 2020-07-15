@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  *
@@ -22,7 +22,7 @@ class html5_videojs_plugin extends Plugin
 	var $code = 'b2evH5VJSP';
 	var $name = 'HTML 5 VideoJS Player';
 	var $priority = 80;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );
@@ -51,7 +51,7 @@ class html5_videojs_plugin extends Plugin
 		global $Collection, $Blog;
 
 		require_css( '#videojs_css#', 'blog' );
-		require_js( '#videojs#', 'blog' );
+		require_js_async( '#videojs#', 'blog' );
 		$this->require_skin();
 
 		add_css_headline( '.video-js{ max-width: 100% !important; margin: auto; }

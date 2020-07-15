@@ -22,7 +22,7 @@ global $Skin;
 // Do inits depending on current $disp:
 skin_init( $disp );
 // TODO: move to Skin::display_init
-require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
+require_js_defer( 'functions.js', 'blog' );	// for opening popup window (comments)
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
 		'arcdir_text'     => T_('Index'),
@@ -48,7 +48,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_display_if_empty' => true, // Display container anyway even if no widget
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -268,6 +268,13 @@ siteskin_include( '_site_body_header.inc.php' );
 				<?php
 					// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 					skin_include( '_item_feedback.inc.php', array(
+							'disp_comments'        => true,
+							'disp_comment_form'    => true,
+							'disp_trackbacks'      => true,
+							'disp_trackback_url'   => true,
+							'disp_pingbacks'       => true,
+							'disp_webmentions'     => true,
+							'disp_meta_comments'   => false,
 							'before_section_title' => '<h4>',
 							'after_section_title'  => '</h4>',
 							'author_link_text'     => 'auto',
@@ -293,21 +300,12 @@ siteskin_include( '_site_body_header.inc.php' );
 				<?php
 				if( evo_version_compare( $app_version, '6.7' ) >= 0 )
 				{	// We are running at least b2evo 6.7, so we can include this file:
-					// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-					skin_include( '_item_workflow.inc.php' );
-					// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
-				}
-				?>
-
-				<?php
-				if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-				{	// We are running at least b2evo 6.7, so we can include this file:
-					// ------------------ META COMMENTS INCLUDED HERE ------------------
+					// ------------------ INTERNAL COMMENTS INCLUDED HERE ------------------
 					skin_include( '_item_meta_comments.inc.php', array(
 							'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 							'comment_end'           => '</article>',
 						) );
-					// ---------------------- END OF META COMMENTS ---------------------
+					// ---------------------- END OF INTERNAL COMMENTS ---------------------
 				}
 				?>
 			</div>

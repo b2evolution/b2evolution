@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -33,6 +33,8 @@ class ItemQuery extends SQL
 	var $author_login;
 	var $assignees;
 	var $assignees_login;
+	var $involved_user_IDs;
+	var $involved_user_logins;
 	var $statuses;
 	var $types;
 	var $itemtype_usage;
@@ -134,35 +136,23 @@ class ItemQuery extends SQL
 	 */
 	function where_ID_list( $pl = '' )
 	{
-		$r = false;
+		$this->pl = clear_ids_list( $pl );
 
-		$this->pl = $pl;
+		if( empty( $this->pl ) )
+		{	// Nothing to filter:
+			return;
+		}
 
-		if( empty( $pl ) ) return $r; // nothing to do
-
-		if( substr( $this->pl, 0, 1 ) == '-' )
+		if( substr( $pl, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
-			$this->pl = substr( $this->pl, 1 );
 		}
 		else
 		{
 			$eq = 'IN';
 		}
 
-		$p_ID_array = array();
-		$p_id_list = explode( ',', $this->pl );
-		foreach( $p_id_list as $p_id )
-		{
-			$p_ID_array[] = intval( $p_id );// make sure they're all numbers
-		}
-
-		$this->pl = implode( ',', $p_ID_array );
-
 		$this->WHERE_and( $this->dbIDname.' '.$eq.'( '.$this->pl.' )' );
-		$r = true;
-
-		return $r;
 	}
 
 
@@ -188,7 +178,7 @@ class ItemQuery extends SQL
 		$BlogCache = & get_BlogCache();
 		$current_Blog = $BlogCache->get_by_ID( $blog );
 
-		$this->WHERE_and( $current_Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID') );
+		$this->WHERE_and( $current_Blog->get_sql_where_aggregate_coll_IDs( 'T_categories.cat_blog_ID' ) );
 
 
 		$cat_array = NULL;
@@ -264,15 +254,15 @@ class ItemQuery extends SQL
 
 		if( ! empty( $coll_IDs ) )
 		{ // Force to aggregate the collection IDs from current param and not from blog setting
-			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID', $coll_IDs ) );
+			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'T_categories.cat_blog_ID', $coll_IDs ) );
 		}
 		elseif( $cat_focus == 'main' )
 		{ // We are requesting a narrow search
-			$this->WHERE_and( 'cat_blog_ID = '.$Blog->ID );
+			$this->WHERE_and( 'T_categories.cat_blog_ID = '.$Blog->ID );
 		}
 		else
 		{ // Aggregate the collections IDs from blog setting
-			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'T_categories.cat_blog_ID' ) );
 		}
 
 
@@ -363,7 +353,7 @@ class ItemQuery extends SQL
 		$status_restrictions = array();
 		foreach( $status_coll_clauses as $status_coll_clause => $status_coll_IDs )
 		{	// Initialize status permission restriction for each grouped condition that is formed above:
-			$status_restrictions[] = 'cat_blog_ID IN ( '.implode( ',', $status_coll_IDs ).' ) AND '.$status_coll_clause;
+			$status_restrictions[] = 'T_categories.cat_blog_ID IN ( '.implode( ',', $status_coll_IDs ).' ) AND '.$status_coll_clause;
 		}
 
 		$this->WHERE_and( '( '.implode( ' ) OR ( ', $status_restrictions ).' )' );
@@ -437,25 +427,23 @@ class ItemQuery extends SQL
 	 */
 	function where_author( $author_IDs )
 	{
-		$this->author = $author_IDs;
+		$this->author = clear_ids_list( $author_IDs );
 
 		if( empty( $this->author ) )
 		{
 			return;
 		}
 
-		if( substr( $this->author, 0, 1 ) == '-' )
+		if( substr( $author_IDs, 0, 1 ) == '-' )
 		{ // Exclude the users IF a list starts with MINUS sign:
 			$eq = 'NOT IN';
-			$users_IDs = substr( $this->author, 1 );
 		}
 		else
 		{ // Include the users:
 			$eq = 'IN';
-			$users_IDs = $this->author;
 		}
 
-		$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ( '.$users_IDs.' )' );
+		$this->WHERE_and( $this->dbprefix.'creator_user_ID '.$eq.' ( '.$this->author.' )' );
 	}
 
 
@@ -495,25 +483,30 @@ class ItemQuery extends SQL
 	 * Restrict to specific assignees by users IDs
 	 *
 	 * @param string List of assignees IDs to restrict to (must have been previously validated)
-	 * @param string List of assignees logins to restrict to (must have been previously validated)
 	 */
-	function where_assignees( $assignees, $assignees_logins = '' )
+	function where_assignees( $assignees )
 	{
-		$this->assignees = $assignees;
+		$this->assignees = clear_ids_list( $assignees );
+
+		if( empty( $assignees ) )
+		{
+			return;
+		}
+
+		if( $assignees == '-' )
+		{	// List is ONLY a MINUS sign (we want only those not assigned)
+			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IS NULL' );
+		}
 
 		if( empty( $this->assignees ) )
 		{
 			return;
 		}
 
-		if( $this->assignees == '-' )
-		{	// List is ONLY a MINUS sign (we want only those not assigned)
-			$this->WHERE_and( $this->dbprefix.'assigned_user_ID IS NULL' );
-		}
-		elseif( substr( $this->assignees, 0, 1 ) == '-' )
+		if( substr( $assignees, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$this->WHERE_and( '( '.$this->dbprefix.'assigned_user_ID IS NULL
-			                  OR '.$this->dbprefix.'assigned_user_ID NOT IN ('.substr( $this->assignees, 1 ).') )' );
+			                  OR '.$this->dbprefix.'assigned_user_ID NOT IN ('.$this->assignees.') )' );
 		}
 		else
 		{
@@ -559,6 +552,8 @@ class ItemQuery extends SQL
 	 */
 	function where_author_assignee( $author_assignee )
 	{
+		global $DB;
+
 		$this->author_assignee = $author_assignee;
 
 		if( empty( $author_assignee ) )
@@ -566,8 +561,69 @@ class ItemQuery extends SQL
 			return;
 		}
 
-		$this->WHERE_and( '( '.$this->dbprefix.'creator_user_ID = '. $author_assignee.' OR '.
-											$this->dbprefix.'assigned_user_ID = '.$author_assignee.' )' );
+		$this->WHERE_and( '( '.$this->dbprefix.'creator_user_ID = '.$DB->quote( $author_assignee ).' OR '.
+											$this->dbprefix.'assigned_user_ID = '.$DB->quote( $author_assignee ).' )' );
+	}
+
+
+	/**
+	 * Restrict items that have any comment OR internal/meta comment by the specific users
+	 *
+	 * @param string List of user IDs to restrict to (must have been previously validated)
+	 */
+	function where_involves( $involved_user_IDs )
+	{
+		$this->involved_user_IDs = clear_ids_list( $involved_user_IDs );
+
+		if( empty( $this->involved_user_IDs ) )
+		{
+			return;
+		}
+
+		if( substr( $involved_user_IDs, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+		}
+
+		$this->FROM_add( 'INNER JOIN T_comments AS involved_id ON involved_id.comment_item_ID = post_ID' );
+		$this->WHERE_and( 'involved_id.comment_author_user_ID '.$eq.' ( '.$this->involved_user_IDs.' )' );
+	}
+
+
+	/**
+	 * Restrict items that have any comment OR internal/meta comment by the specific users
+	 *
+	 * @param string List of involved user logins to restrict to (must have been previously validated)
+	 */
+	function where_involves_logins( $involved_user_logins )
+	{
+		$this->involved_user_logins = $involved_user_logins;
+
+		if( empty( $this->involved_user_logins ) )
+		{
+			return;
+		}
+
+		if( substr( $involved_user_logins, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+			$involved_user_IDs = get_users_IDs_by_logins( substr( $this->involved_user_logins, 1 ) );
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+			$involved_user_IDs = get_users_IDs_by_logins( $this->involved_user_logins );
+		}
+
+		if( ! empty( $involved_user_IDs ) )
+		{	// Filter only if correct users are found by logins:
+			$this->FROM_add( 'INNER JOIN T_comments AS involved_login ON involved_login.comment_item_ID = post_ID' );
+			$this->WHERE_and( 'involved_login.comment_author_user_ID '.$eq.' ( '.$involved_user_IDs.' )' );
+		}
 	}
 
 
@@ -590,13 +646,13 @@ class ItemQuery extends SQL
 
 
 	/**
-	 * Restrict to specific (exetnded) statuses
+	 * Restrict to specific (extended) statuses
 	 *
-	 * @param string List of assignees to restrict to (must have been previously validated)
+	 * @param string List of statuses to restrict to (must have been previously validated)
 	 */
 	function where_statuses( $statuses )
 	{
-		$this->statuses = $statuses;
+		$this->statuses = clear_ids_list( $statuses );
 
 		if( empty( $statuses ) )
 		{
@@ -607,14 +663,71 @@ class ItemQuery extends SQL
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
 			$this->WHERE_and( $this->dbprefix.'pst_ID IS NULL' );
 		}
-		elseif( substr( $statuses, 0, 1 ) == '-' )
+
+		if( empty( $this->statuses ) )
+		{
+			return;
+		}
+
+		if( substr( $statuses, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$this->WHERE_and( '( '.$this->dbprefix.'pst_ID IS NULL
-			                  OR '.$this->dbprefix.'pst_ID NOT IN ('.substr( $statuses, 1 ).') )' );
+			                  OR '.$this->dbprefix.'pst_ID NOT IN ('.$this->statuses.') )' );
 		}
 		else
 		{
-			$this->WHERE_and( $this->dbprefix.'pst_ID IN ('.$statuses.')' );
+			$this->WHERE_and( $this->dbprefix.'pst_ID IN ('.$this->statuses.')' );
+		}
+	}
+
+
+	/**
+	 * Restrict to specific (extended) statuses
+	 *
+	 * @param array Array of statuses to restrict to (must have been previously validated)
+	 */
+	function where_statuses_array( $statuses )
+	{
+		if( ! is_array( $statuses ) )
+		{	// Wrong data:
+			return;
+		}
+
+		$filter_without_status = false;
+		foreach( $statuses as $s => $status_ID )
+		{
+			if( $status_ID == '-' )
+			{	// Filter by "No status":
+				$filter_without_status = true;
+				unset( $statuses[ $s ] );
+				continue;
+			}
+
+			$status_ID = intval( $status_ID );
+
+			if( empty( $status_ID ) )
+			{	// Remove a not number value from list:
+				unset( $statuses[ $s ] );
+				continue;
+			}
+
+			// Update value to integer format:
+			$statuses[ $s ] = $status_ID;
+		}
+
+		$where_statuses = array();
+		if( $filter_without_status )
+		{	// Filter by "No status":
+			$where_statuses[] = $this->dbprefix.'pst_ID IS NULL';
+		}
+		if( ! empty( $statuses ) )
+		{	// Filter by specific statuses:
+			$where_statuses[] = $this->dbprefix.'pst_ID IN ( '.implode( ',', $statuses ).' )';
+		}
+
+		if( ! empty( $where_statuses ) )
+		{	// Apply filter by statuses:
+			$this->WHERE_and( implode( ' OR ', $where_statuses ) );
 		}
 	}
 
@@ -626,7 +739,7 @@ class ItemQuery extends SQL
 	 */
 	function where_types( $types )
 	{
-		$this->types = $types;
+		$this->types = clear_ids_list( $types );
 
 		if( empty( $types ) )
 		{
@@ -637,14 +750,20 @@ class ItemQuery extends SQL
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
 			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
 		}
-		elseif( substr( $types, 0, 1 ) == '-' )
+
+		if( empty( $this->types ) )
+		{
+			return;
+		}
+
+		if( substr( $types, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
-			                  OR '.$this->dbprefix.'ityp_ID NOT IN ('.substr( $types, 1 ).') )' );
+			                  OR '.$this->dbprefix.'ityp_ID NOT IN ('.$this->types.') )' );
 		}
 		else
 		{
-			$this->WHERE_and( $this->dbprefix.'ityp_ID IN ('.$types.')' );
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IN ('.$this->types.')' );
 		}
 	}
 
@@ -1107,6 +1226,53 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to specific renderer plugins
+	 *
+	 * @param array Renderer plugin codes
+	 */
+	function where_renderers( $renderers )
+	{
+		global $DB, $Plugins;
+
+		if( empty( $renderers ) )
+		{	// No filters:
+			return;
+		}
+
+		foreach( $renderers as $r => $renderer )
+		{	// Escape chars:
+			$renderers[ $r ] = $DB->escape( $renderer );
+		}
+
+		$sql_conditions = array();
+
+		if( isset( $Plugins, $this->Blog ) )
+		{	// Get default renderer plugins for current Collection:
+			$default_renderers = $Plugins->validate_renderer_list( array( 'default' ), array(
+				'setting_name' => 'coll_apply_rendering',
+				'Blog'         => $this->Blog,
+			) );
+			if( ! empty( $default_renderers ) )
+			{
+				foreach( $renderers as $renderer )
+				{
+					if( in_array( $renderer, $default_renderers ) )
+					{	// If at least one default renderer plugin is used to filter then get items which still use default renderers:
+						$sql_conditions[] = $this->dbprefix.'renderers = "default"';
+						break;
+					}
+				}
+			}
+		}
+
+		// Filter by selected renderers:
+		$sql_conditions[] = $this->dbprefix.'renderers REGEXP "(^|\.)('.implode( '|', $renderers ).')(\.|$)"';
+
+		$this->WHERE_and( implode( ' OR ', $sql_conditions ) );
+	}
+
+
+	/**
 	 * Generate order by clause
 	 *
 	 * @param $order_by
@@ -1168,8 +1334,8 @@ class ItemQuery extends SQL
 		{
 			$table_alias = $key.'_table';
 			$field_value = $table_alias.'.icfv_value';
-			if( strpos( $key, 'custom_double' ) === 0 )
-			{ // Double values should be compared as numbers and not like strings
+			if( strpos( $key, 'custom_double' ) === 0 || strpos( $key, 'custom_computed' ) === 0 )
+			{	// Double and computed values should be compared as numbers and not like strings
 				$field_value .= '+0';
 			}
 			if( in_array( $key, $orderby_array ) )
@@ -1208,6 +1374,8 @@ class ItemQuery extends SQL
 			// Join table of categories for field 'postcat_order':
 			$current_cat_ID = ( isset( $this->cat_array ) && count( $this->cat_array ) == 1 ? $DB->quote( $this->cat_array[0] ) : 'post_main_cat_ID' );
 			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND '.$current_cat_ID.' = postcatsorders.postcat_cat_ID' );
+			// Join table to know collection of main category when list should be ordered by SUM of all extra categories from not main(cross-posted) collection:
+			$this->FROM_add( 'INNER JOIN T_categories AS postmaincat ON post_main_cat_ID = postmaincat.cat_ID' );
 			// Replace field to real name:
 			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
 		}

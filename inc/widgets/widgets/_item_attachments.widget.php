@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -62,7 +62,7 @@ class item_attachments_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Attachments');
+		return T_('Attachments');
 	}
 
 
@@ -92,42 +92,32 @@ class item_attachments_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $admin_url;
+
+		// Get available templates:
+		$context = 'item_details';
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_by_context( $context );
+
 		$r = array_merge( array(
 			'title' => array(
-					'label' => T_( 'Title' ),
-					'size' => 40,
-					'note' => T_( 'This is the title to display' ),
-					'defaultvalue' => '',
-				),
-			'disp_download_icon' => array(
-					'type' => 'checkbox',
-					'label' => T_('Display download icon'),
-					'defaultvalue' => 1,
-					'note' => '',
-				),
-			'link_text' => array(
-					'label' => T_('Link'),
-					'note' => '',
-					'type' => 'radio',
-					'field_lines' => true,
-					'options' => array(
-							array( 'filename', T_('Always display Filename') ),
-							array( 'title', T_('Display Title if available') ) ),
-					'defaultvalue' => 'title',
-				),
-			'disp_file_size' => array(
-					'type' => 'checkbox',
-					'label' => T_('Display file size'),
-					'defaultvalue' => 1,
-					'note' => '',
-				),
-			'disp_file_desc' => array(
-					'type' => 'checkbox',
-					'label' => T_('Add descriptions'),
-					'defaultvalue' => 1,
-					'note' => T_('Display description if available.'),
-				),
-			), parent::get_param_definitions( $params ) );
+				'label' => T_('Title'),
+				'size' => 40,
+				'note' => T_('This is the title to display'),
+				'defaultvalue' => T_('Attachments').':',
+			),
+			'template' => array(
+				'label' => T_('Template'),
+				'type' => 'select',
+				'options' => $TemplateCache->get_code_option_array(),
+				'defaultvalue' => 'item_details_files_list',
+				'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
+						.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+						array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
+						array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+				'class' => 'evo_template_select',
+			),
+		), parent::get_param_definitions( $params ) );
 
 		return $r;
 	}
@@ -150,21 +140,35 @@ class item_attachments_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		$TemplateCache = & get_TemplateCache();
+		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
+		{	// No template:
+			$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+			return false;
+		}
+
 		$this->disp_params = array_merge( array(
 				'widget_item_attachments_params' => array(),
+				'image_attachment' => true,
 			), $this->disp_params );
+
+		$item_files = render_template_code( $this->disp_params['template'], $this->disp_params );
+
+		if( empty( $item_files ) )
+		{	// Don't display this widget when Item has no attachments:
+			$this->disp_params = array_merge( array(
+				'hide_header_title' => true,
+			), $this->disp_params );
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no attachments.' );
+			return false;
+		}
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
 		// Display attachments/files that are linked to the current item:
-		$Item->files( array_merge( $this->disp_params['widget_item_attachments_params'], array(
-				'display_download_icon' => $this->disp_params['disp_download_icon'],
-				'file_link_text'        => $this->disp_params['link_text'],
-				'display_file_size'     => $this->disp_params['disp_file_size'],
-				'display_file_desc'     => $this->disp_params['disp_file_desc'],
-			) ) );
+		echo $item_files;
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -185,8 +189,8 @@ class item_attachments_Widget extends ComponentWidget
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'cont_coll_ID' => $Blog->ID, // Has the content of the displayed blog changed ?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 			);
 	}
 }

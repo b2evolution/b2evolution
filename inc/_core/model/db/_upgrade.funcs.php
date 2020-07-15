@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -1416,8 +1416,12 @@ function db_delta_table_engines( $tables, $silent )
  */
 function install_make_db_schema_current( $display = true )
 {
-	global $schema_queries, $DB, $debug;
+	global $schema_queries, $DB, $debug, $db_config;
 
+	// Changing default charset of DB if its not utf8_general_ci:
+	echo get_install_format_text_and_log( T_('Changing default charset of DB...').'<br />'."\n" );
+	$DB->query( 'ALTER DATABASE `'.$db_config['name'].'` CHARACTER SET utf8 COLLATE utf8_general_ci' );
+	
 	// Go through all tables:
 	foreach( $schema_queries as $table => $query_info )
 	{
@@ -1448,7 +1452,7 @@ function install_make_db_schema_current( $display = true )
 			{
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
 				{
-					echo get_install_format_text( $itemlist[0]['note']."<br />\n", 'br' );
+					echo get_install_format_text_and_log( $itemlist[0]['note']."<br />\n", 'br' );
 					evo_flush();
 					foreach( $itemlist[0]['queries'] as $query )
 					{ // should be just one, but just in case
@@ -1461,22 +1465,22 @@ function install_make_db_schema_current( $display = true )
 				}
 				else
 				{
-					echo get_install_format_text( 'Altering table &laquo;'.$table.'&raquo;...' );
-					echo get_install_format_text( '<ul>' );
+					echo get_install_format_text_and_log( 'Altering table &laquo;'.$table.'&raquo;...' );
+					echo get_install_format_text_and_log( '<ul>' );
 					foreach( $itemlist as $item )
 					{
-						echo get_install_format_text( '<li>'.$item['note'], 'li' );
+						echo get_install_format_text_and_log( '<li>'.$item['note'], 'li' );
 						if( $debug )
 						{
 							pre_dump( $item['queries'] );
 						}
-						echo get_install_format_text( '</li>' );
+						echo get_install_format_text_and_log( '</li>' );
 						foreach( $item['queries'] as $query )
 						{
 							$DB->query( $query );
 						}
 					}
-					echo get_install_format_text( '</ul>' );
+					echo get_install_format_text_and_log( '</ul>' );
 				}
 			}
 		}

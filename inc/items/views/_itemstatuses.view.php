@@ -16,6 +16,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $admin_url;
 
+function item_status_order( $item_status_order, $item_status_id )
+{
+	if( check_user_perm( 'options', 'edit', true ) )
+	{
+		return '<a href="#" rel="'.$item_status_id.'"'.'>'.( $item_status_order === NULL ? '-' : $item_status_order ).'</a>';
+	}
+	else
+	{
+		return $item_status_order;
+	}
+
+}
+
 // Create query
 $SQL = new SQL();
 $SQL->SELECT( '*' );
@@ -42,7 +55,16 @@ $Results->cols[] = array(
 		'td' => '<strong><a href="'.$admin_url.'?ctrl=itemstatuses&amp;pst_ID=$pst_ID$&amp;action=edit">$pst_name$</a></strong>',
 	);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+$Results->cols[] = array(
+		'th' => T_('Order'),
+		'th_class' => 'shrinkwrap hidden-xs',
+		'order' => 'pst_order',
+		'td_class' => 'right jeditable_cell item_status_order_edit hidden-xs',
+		'td' => '%item_status_order( #pst_order#, #pst_ID# )%',
+		'extra' => array( 'rel' => '#pst_ID#' ),
+	);
+
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -61,3 +83,22 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 ?>
+
+<script>
+jQuery(document).ready( function()
+{	
+<?php
+
+// Print JS to edit an item status order:
+echo_editable_column_js( array(
+	'column_selector' => '.item_status_order_edit',
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_status_order_edit&'.url_crumb( 'itemstatus' ),
+	'field_type'      => 'text',
+	'new_field_name'  => 'new_item_status_order',
+	'ID_value'        => 'jQuery( this ).attr( "rel" )',
+	'ID_name'         => 'pst_ID',
+	'print_init_tags' => false
+) );
+?>
+});
+</script>

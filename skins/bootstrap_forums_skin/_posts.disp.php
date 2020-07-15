@@ -9,14 +9,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $number_of_posts_in_cat, $cat, $legend_icons;
+global $number_of_posts_in_cat, $cat, $legend_icons, $tag;
 
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
@@ -40,29 +40,33 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'suffix_text'           => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'coll_logo_size'        => 'fit-128x16',
 	) );
 
+// Display default title only for tag page without intro Item:
+request_title( array(
+		'title_before'      => '<h2 class="page_title">',
+		'title_after'       => '</h2>',
+		'format'            => 'htmlbody',
+		'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : '' ),
+	) );
 
 // Go Grab the featured post:
-if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item( 'posts', NULL, false, NULL ) )
+if( ! in_array( $disp, array( 'single', 'page' ) ) &&
+    $Item = & get_featured_Item( 'posts', NULL, false, ( isset( $tag ) || $single_cat_ID ? false : NULL ) ) )
 {	// We have a intro post to display:
-	$intro_item_style = '';
-	$LinkOwner = new LinkItem( $Item );
-	$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
-	if( ! empty( $LinkList ) &&
-			$Link = & $LinkList->get_next() &&
-			$File = & $Link->get_File() &&
-			$File->exists() &&
-			$File->is_image() )
-	{	// Use cover image of intro-post as background:
-		$intro_item_style = 'background-image: url("'.$File->get_url().'")';
-	}
+	$featured_item_ID = $Item->ID;
+	// Use background position image of intro-post for background URL:
+	$background_image_url = $Item->get_cover_image_url( 'background' );
+	$intro_item_style = $background_image_url ? 'background-image: url("'.$background_image_url.'")' : '';
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block_intro.inc.php', array(
 			'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
@@ -205,17 +209,18 @@ if( isset( $MainList ) &&
 	{	// Display category title:
 		$ChapterCache = & get_ChapterCache();
 		if( $category = & $ChapterCache->get_by_ID( $single_cat_ID ) )
-		{ // Display category title
-			echo '<div class="panel-heading">'
-					// Buttons to post/reply:
-					.$Skin->get_post_button( $single_cat_ID, NULL, array(
+		{	// Display category title:
+			$Skin->display_posts_list_header( '<h3 class="panel-title">'.$category->get( 'name' ).'</h3>', array(
+					'actions' => $Skin->get_post_button( $single_cat_ID, NULL, array(
 							'group_class'  => 'pull-right',
 							'button_class' => 'btn-sm',
-						) )
-					// Category title:
-					.'<h3 class="panel-title">'.$category->get( 'name' ).'</h3>'
-				.'</div>';
+						) ),
+				) );
 		}
+	}
+	else
+	{	// Display header for latest topics:
+		$Skin->display_posts_list_header( T_('Latest topics') );
 	}
 	?>
 
@@ -223,9 +228,13 @@ if( isset( $MainList ) &&
 <?php
 
 if( $single_cat_ID )
-{	// Go to grab the intro/featured posts only on pages with defined category:
+{	// Go to grab only featured posts only on pages with defined category:
 	while( $Item = & get_featured_Item( 'posts', NULL, false, true, false ) )
-	{	// We have the intro or featured posts to display:
+	{	// We have the featured posts to display:
+		if( isset( $featured_item_ID ) && $featured_item_ID == $Item->ID )
+		{	// Skip featured Item if it is already displayed above in intro style block:
+			continue;
+		}
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
 				'Item'       => $Item,
@@ -248,11 +257,11 @@ if( $MainList->result_num_rows > 0 )
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 }
-elseif( isset( $current_Chapter ) )
-{ // Display a message about no posts in this category
+else
+{	// Display a message about no posts:
 ?>
 <div class="ft_no_post">
-	<?php echo T_('There is no topic in this forum yet.'); ?>
+	<?php echo isset( $current_Chapter ) ? T_('There is no topic in this forum yet.') : T_('No topics.'); ?>
 </div>
 <?php
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -30,6 +30,7 @@ function evo_link_initialize_fieldset( fieldset_prefix )
 		{	// Make the attachments fieldset wrapper resizable:
 			minHeight: 80,
 			handles: 's',
+			zIndex: 0,
 			resize: function( e, ui )
 			{	// Limit max height by table of attachments:
 				jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height() );
@@ -98,7 +99,7 @@ function evo_link_change_position( selectInput, url, crumb )
 		if( r == "OK" ) {
 			evoFadeSuccess( jQuery(oThis).closest('tr') );
 			jQuery(oThis).closest('td').removeClass('error');
-			if( new_position == 'cover' )
+			if( new_position == 'cover' || new_position == 'background' )
 			{ // Position "Cover" can be used only by one link
 				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
 				{ // Replace previous position with "Inline"
@@ -124,15 +125,16 @@ function evo_link_change_position( selectInput, url, crumb )
  * @param string Caption text
  * @param boolean Replace a selected text
  * @param string Caption, when this param is filled then tag is inserted in format like [image:123]Caption[/image]
+ * @param object Current canvas where inline tag should be inserted
  */
-function evo_link_insert_inline( type, link_ID, option, replace, caption )
+function evo_link_insert_inline( type, link_ID, option, replace, caption, current_b2evoCanvas )
 {
 	if( replace == undefined )
 	{
 		replace = 0;
 	}
 
-	if( typeof( b2evoCanvas ) != 'undefined' )
+	if( typeof( current_b2evoCanvas ) != 'undefined' )
 	{	// Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
@@ -164,18 +166,18 @@ function evo_link_insert_inline( type, link_ID, option, replace, caption )
 						$position_selector.closest( 'td' ).removeClass( 'error' );
 
 						// Insert an image tag
-						textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+						textarea_wrap_selection( current_b2evoCanvas, insert_tag, '', replace, window.document );
 					}, 'POST' );
 				deferInlineReminder = false;
 			}
 			else
 			{	// Already an inline, insert image tag
-				textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+				textarea_wrap_selection( current_b2evoCanvas, insert_tag, '', replace, window.document );
 			}
 		}
 		else
 		{
-			textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+			textarea_wrap_selection( current_b2evoCanvas, insert_tag, '', replace, window.document );
 		}
 	}
 }
@@ -273,8 +275,9 @@ function evo_link_change_order( event_object, link_ID, action )
  * @param integer ID of Item or Comment
  * @param string Root (example: 'collection_1')
  * @param string Path to the file relative to root
+ * @param string Prefix, e.g. "meta_"
  */
-function evo_link_attach( type, object_ID, root, path )
+function evo_link_attach( type, object_ID, root, path, prefix )
 {
 	// Call REST API request to attach a file to Item/Comment:
 	evo_rest_api_request( 'links',
@@ -287,8 +290,11 @@ function evo_link_attach( type, object_ID, root, path )
 	},
 	function( data )
 	{
-		var table_obj = jQuery( '#attachments_fieldset_table .results table', window.parent.document );
-		var table_parent = table_obj.parent;
+		if( typeof( prefix ) == 'undefined' )
+		{
+			prefix = '';
+		}
+		var table_obj = jQuery( '#' + prefix + 'attachments_fieldset_table .results table', window.parent.document );
 		var results_obj = jQuery( data.list_content );
 		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {
 			// Delay for a few milleseconds after content is loaded to get the correct height
@@ -307,10 +313,10 @@ function evo_link_attach( type, object_ID, root, path )
  *
  * @return object Overlay indicator of ajax loading
  */
-function evo_link_ajax_loading_overlay()
+function evo_link_ajax_loading_overlay( fieldset_prefix )
 {
-	var table = jQuery( '#attachments_fieldset_table' );
-
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var table = jQuery( '#' + prefix + 'attachments_fieldset_table' );
 	var ajax_loading = false;
 
 	if( table.find( '.results_ajax_loading' ).length == 0 )
@@ -335,9 +341,14 @@ function evo_link_ajax_loading_overlay()
  * @param integer ID of Item or Comment
  * @param string Action: 'refresh', 'sort'
  */
-function evo_link_refresh_list( type, object_ID, action )
+function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 {
-	var ajax_loading = evo_link_ajax_loading_overlay();
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var ajax_loading = evo_link_ajax_loading_overlay( prefix );
+	if( typeof( action ) == 'undefined' )
+	{
+		action = 'refresh';
+	}
 
 	if( ajax_loading )
 	{	// If new request is allowed in current time:
@@ -345,20 +356,28 @@ function evo_link_refresh_list( type, object_ID, action )
 		// Call REST API request to attach a file to Item/Comment:
 		evo_rest_api_request( 'links',
 		{
-			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
+			'action':    action,
 			'type':      type.toLowerCase(),
 			'object_ID': object_ID,
+			'prefix':    prefix,
 		},
 		function( data )
 		{
 			// Refresh a content of the links list:
-			jQuery( '#attachments_fieldset_table' ).html( data.html );
+			jQuery( '#' + prefix + 'attachments_fieldset_table' ).html( data.html );
 
-			// Remove temporary content of ajax loading indicator:
-			ajax_loading.remove();
+			// Initialize init_uploader( 'fieldset_' + prefix ) to display uploader button
+			if( window.evo_init_dragdrop_button_config && window.evo_init_dragdrop_button_config['fieldset_' + prefix] )
+			{
+				init_uploader( window.evo_init_dragdrop_button_config['fieldset_' + prefix] );
+			}
 
 			// Update the attachment block height after refreshing:
-			evo_link_fix_wrapper_height();
+			evo_link_fix_wrapper_height( prefix );
+			
+
+			// Remove temporary content of ajax loading indicator:
+			ajax_loading.remove();	
 		} );
 	}
 
@@ -373,7 +392,7 @@ function evo_link_refresh_list( type, object_ID, action )
 function evo_link_sort_list( fieldset_prefix )
 {
 	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
-	var rows = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
+	var rows = jQuery( '#' + prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
 	rows.sort( function( a, b )	{
 		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
 		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
@@ -398,7 +417,7 @@ function evo_link_sort_list( fieldset_prefix )
 	$.each( rows, function( index, row ) {
 		if( index === 0 )
 		{
-			jQuery( row ).prependTo( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
+			jQuery( row ).prependTo( '#' + prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
 			previousRow = row;
 		}
 		else

@@ -7,12 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 //____________________ Callbacks functions to display categories list _____________________
+
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * @var Blog
@@ -49,7 +51,7 @@ $line_class = 'odd';
  */
 function cat_line( $Chapter, $level )
 {
-	global $line_class, $permission_to_edit, $current_User, $Settings;
+	global $line_class, $permission_to_edit, $Settings, $admin_url;
 	global $ChapterCache, $current_default_cat_ID;
 	global $number_of_posts_in_cat;
 
@@ -209,7 +211,7 @@ function cat_line( $Chapter, $level )
 	// Posts
 	if( isset($number_of_posts_in_cat[$Chapter->ID]) )
 	{
-		$r .= '<td class="center">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
+		$r .= '<td class="center"><a href="'.$admin_url.'?ctrl=items&amp;blog='.$Chapter->get( 'blog_ID' ).'&amp;catsel[]='.$Chapter->ID.'">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</a></td>';
 	}
 	else
 	{	// no posts in this category
@@ -395,7 +397,7 @@ $Form->radio_input( 'category_ordering', $Blog->get_setting('category_ordering')
 					array( 'value'=>'alpha', 'label'=>T_('Alphabetically') ),
 					array( 'value'=>'manual', 'label'=>T_('Manually') ),
 			 ), T_('Sort categories'), array( 'note'=>'('.T_('Note: can be overridden for sub-categories').')' ) );
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) )  );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ) )  );
 
 echo '</div>'; // form wrapper end
 

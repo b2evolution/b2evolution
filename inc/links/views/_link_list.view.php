@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -40,7 +40,7 @@ if( empty( $Blog ) )
 
 if( ! isset( $fieldset_prefix ) )
 {	// Define default fieldset prefix:
-	// (used to display several fieldset on same page, e.g. for normal and meta comments)
+	// (used to display several fieldset on same page, e.g. for normal and internal comments)
 	$fieldset_prefix = '';
 }
 
@@ -94,7 +94,7 @@ $Results->cols[] = array(
 					'th' => T_('Position'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ),
-					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).' )%',
+					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).', "'.$fieldset_prefix.'" )%',
 				);
 
 // Add attr "id" to handle quick uploader
@@ -127,7 +127,7 @@ else
 // Load FileRoot class to get fileroot ID of collection below:
 load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
-$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->type : $LinkOwner->type;
+$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->tmp_type : $LinkOwner->type;
 
 switch( $link_owner_type )
 {
@@ -137,6 +137,7 @@ switch( $link_owner_type )
 		break;
 
 	case 'comment':
+	case 'metacomment':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'c' ).$LinkOwner->get_ID().'/';
 		break;
@@ -156,15 +157,18 @@ $link_owner_positions = $LinkOwner->get_positions();
 
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
-		'before' => '<div class="evo_fileuploader_form">',
-		'after'  => '</div>',
-		'fileroot_ID'      => $upload_fileroot,
-		'path'             => $upload_path,
-		'listElement'      => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
-		'list_style'       => 'table',
-		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
-				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-					.'<span class="qq-upload-drop-area-text-selector"></span>'
+		'before'                 => '<div class="evo_fileuploader_form">',
+		'after'                  => '</div>',
+		'fileroot_ID'            => $upload_fileroot,
+		'path'                   => $upload_path,
+		'listElement'            => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
+		'list_element'           => '#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody',
+		'list_style'             => 'table',
+		'template'               => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'	// Main dropzone
+					// The div below is not necessary because were making the main dropzone transparent so
+					// the upload button below will not be covered when the main dropzone is "displayed" on drop ((see qq-hide-dropzone doc)):
+					//.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 					.'<div>#button_text#</div>'
@@ -193,7 +197,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" )',
+		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).add( jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).find( "textarea.link_attachment_dropzone" ) )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,
@@ -204,8 +208,23 @@ display_dragdrop_upload_button( array(
 		'fm_mode'                => $fm_mode,
 		'fieldset_prefix'        => $fieldset_prefix,
 	) );
+
+	if( ! isset( $attachment_tab ) )
+	{
+		// Initialize attachments fieldset to set proper height and handler to resize it:
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+					evo_link_initialize_fieldset( '<?php echo $fieldset_prefix;?>' );
+				} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'link_initialize_fieldset_'.$fieldset_prefix, array( 'fieldset_prefix' => $fieldset_prefix ), 'evo_link_initialize_fieldset_config' );
+		}
+	}
 ?>
-<script type="text/javascript">
-// Initialize attachments fieldset to set proper height and handler to resize it:
-evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
-</script>

@@ -7,15 +7,15 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 // Store/retrieve preferred tab from UserSettings:
 $UserSettings->param_Request( 'tab', 'pref_remotepublish_tab', 'string', 'eblog', true /* memorize */, true /* force */ );
@@ -35,7 +35,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'globalsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		switch( $tab )
 		{
@@ -114,7 +114,7 @@ switch( $action )
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('General settings updated.'), 'success' );
+			$Messages->add( TB_('General settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=remotepublish', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -128,7 +128,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'globalsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		load_funcs( 'cron/model/_post_by_mail.funcs.php');
 		load_class( 'items/model/_itemlist.class.php', 'ItemList' );
@@ -171,7 +171,7 @@ switch( $action )
 				}
 				else
 				{
-					pbm_msg( T_('There are no messages in the mailbox') );
+					pbm_msg( TB_('There are no messages in the mailbox') );
 				}
 				imap_close( $mbox );
 			}
@@ -187,21 +187,21 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Remote publishing'), $admin_url.'?ctrl=remotepublish' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('Remote publishing'), $admin_url.'?ctrl=remotepublish' );
 
 switch( $tab )
 {
 	case 'eblog':
-		$AdminUI->breadcrumbpath_add( T_('Post by Email'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Post by Email'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'post-by-email' );
 		break;
 
 	case 'xmlrpc':
-		$AdminUI->breadcrumbpath_add( T_('XML-RPC'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('XML-RPC'), $admin_url.'?ctrl=remotepublish&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'xml-rpc' );

@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -32,7 +32,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = 'b2evBAspm';
 	var $priority = 60;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -101,20 +101,12 @@ class basic_antispam_plugin extends Plugin
 					'note'=>T_('Block comments with both "[link=" and "[url=" tags.'),
 					'defaultvalue' => 1,
 				),
-				'nofollow_for_hours' => array(
-					'type' => 'integer',
-					'label' => T_('Apply rel="nofollow"'),
-					'note'=>T_('hours. For how long should rel="nofollow" be applied to comment links? (0 means never, -1 means always)'),
-					'defaultvalue' => '-1', // use "nofollow" infinitely by default so lazy admins won't promote spam
-					'size' => 5,
-				),
 				'check_url_referers' => array(
 					'type' => 'checkbox',
 					'label' => T_('Check referers for URL'),
 					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
 					'defaultvalue' => '0',
 				),
-
 			);
 	}
 
@@ -299,98 +291,6 @@ class basic_antispam_plugin extends Plugin
 				}
 			}
 		}
-	}
-
-
-	/**
-	 * If we use "makelink", handle nofollow rel attrib.
-	 *
-	 * @uses basic_antispam_plugin::apply_nofollow()
-	 */
-	function FilterCommentAuthor( & $params )
-	{
-		if( ! $params['makelink'] )
-		{
-			return false;
-		}
-
-		$this->apply_nofollow( $params['data'], $params['Comment'] );
-	}
-
-
-	/**
-	 * Handle nofollow in author URL (if it's made clickable)
-	 *
-	 * @uses basic_antispam_plugin::FilterCommentAuthor()
-	 */
-	function FilterCommentAuthorUrl( & $params )
-	{
-		$this->FilterCommentAuthor( $params );
-	}
-
-
-	/**
-	 * Handle nofollow rel attrib in comment content.
-	 *
-	 * @uses basic_antispam_plugin::FilterCommentAuthor()
-	 */
-	function FilterCommentContent( & $params )
-	{
-		$this->apply_nofollow( $params['data'], $params['Comment'] );
-	}
-
-
-	/**
-	 * Callback for preg_replace_callback ini apply_nofollow()
-	 */
-	private static function _apply_nofollow_callback( $matches )
-	{
-		if( preg_match( '~\brel=([\'"])(.*?)\1~', $matches[2], $match ) )
-		{ // there is already a rel attrib:
-			$rel_values = explode( " ", $match[2] );
-
-			if( ! in_array( 'nofollow', $rel_values ) )
-			{
-				$rel_values[] = 'nofollow';
-			}
-
-			return $matches[1]
-				.preg_replace(
-					'~\brel=([\'"]).*?\1~',
-					'rel=$1'.implode( " ", $rel_values ).'$1',
-					$matches[2] )
-				.">";
-		}
-		else
-		{
-			return $matches[1].$matches[2].' rel="nofollow">';
-		}
-	}
-
-
-	/**
-	 * Do we want to apply rel="nofollow" tag?
-	 *
-	 * @return boolean
-	 */
-	function apply_nofollow( & $data, $Comment )
-	{
-		global $localtimenow;
-
-		$hours = $this->Settings->get('nofollow_for_hours'); // 0=never, -1 always, otherwise for x hours
-
-		if( $hours == 0 )
-		{ // "never"
-			return;
-		}
-
-		if( $hours > 0 // -1 is "always"
-			&& mysql2timestamp( $Comment->date ) <= ( $localtimenow - $hours*3600 ) )
-		{
-			return;
-		}
-
-		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', array( 'basic_antispam_plugin', '_apply_nofollow_callback' ), $data );
 	}
 
 

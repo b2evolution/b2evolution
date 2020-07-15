@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -45,7 +45,7 @@ $Results->title = T_('Organizations').get_manual_link( 'organizations-tab' );
 /*
  * Table icons:
  */
-if( $current_User->check_perm( 'orgs', 'create', false ) )
+if( check_user_perm( 'orgs', 'create', false ) )
 { // create new group link
 	$Results->global_icon( T_('Create a new organization...'), 'new', '?ctrl=organizations&amp;action=new', T_('Add organization').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -62,10 +62,8 @@ function filter_organizations( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_organizations',
 	'url_ignore' => 'org_name,results_org_page',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=organizations' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=organizations' );
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
@@ -77,9 +75,7 @@ $Results->cols[] = array(
 
 function org_td_name( & $Organization )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'orgs', 'view', false, $Organization ) )
+	if( check_user_perm( 'orgs', 'view', false, $Organization ) )
 	{
 		global $admin_url;
 		return '<a href="'.$admin_url.'?ctrl=organizations&amp;action=edit&amp;org_ID='.$Organization->ID.'&amp;filter=refresh"><b>'.$Organization->get( 'name' ).'</b></a>';
@@ -124,17 +120,15 @@ $Results->cols[] = array(
 
 function org_td_actions( & $Organization )
 {
-	global $current_User;
-
 	$r = '';
-	$perm_org_edit = $current_User->check_perm( 'orgs', 'edit', false, $Organization );
+	$perm_org_edit = check_user_perm( 'orgs', 'edit', false, $Organization );
 
 	if( $perm_org_edit )
 	{
 		$r .= action_icon( T_('Edit this organization...'), 'edit',
 			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=edit&amp;filter=refresh' ) );
 	}
-	if( $current_User->check_perm( 'orgs', 'create', false ) )
+	if( check_user_perm( 'orgs', 'create', false ) )
 	{
 		$r .= action_icon( T_('Duplicate this organization...'), 'copy',
 			regenerate_url( 'ctrl,action', 'ctrl=organizations&amp;org_ID='.$Organization->ID.'&amp;action=new' ) );

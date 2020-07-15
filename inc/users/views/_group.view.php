@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -48,7 +48,7 @@ $Results->title = T_('Groups (for setting permissions)').get_manual_link( 'user-
 /*
  * Table icons:
  */
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( check_user_perm( 'users', 'edit', false ) )
 {	// create new group link
 	$Results->global_icon( T_('Create a new group...'), 'new', '?ctrl=groups&amp;action=new', T_('Add group').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -62,7 +62,7 @@ $Results->cols[] = array(
 	);
 
 // Check if user can edit users
-$has_perm_users_edit = $current_User->check_perm( 'users', 'edit', false );
+$has_perm_users_edit = check_user_perm( 'users', 'edit', false );
 
 $Results->cols[] = array(
 		'th' => T_('Name'),
@@ -149,10 +149,10 @@ $Results->cols[] = array(
 
 function grp_actions( & $row )
 {
-	global $usedgroups, $Settings, $current_User;
+	global $usedgroups, $Settings;
 
 	$r = '';
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{
 		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=edit&amp;grp_ID='.$row->grp_ID ) );
 
@@ -179,7 +179,7 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( check_user_perm( 'users', 'edit', false ) )
 { // If user can edit the users - Init js to edit group level by AJAX
 	$group_levels = array();
 	for( $l = 0; $l <= 10; $l++ )

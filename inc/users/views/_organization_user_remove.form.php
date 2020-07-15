@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -28,12 +28,12 @@ $Form->begin_form( 'fform' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 	$Form->hidden( 'user_login', $edited_User->get( 'login' ) );
 
-	echo '<p>'.sprintf( T_('This will remove %s from the organization. Would you like to continue?'), $edited_User->get( 'preferredname' ) ).'</p>';
+	echo '<p>'.sprintf( TB_('This will remove %s from the organization. Would you like to continue?'), $edited_User->get( 'preferredname' ) ).'</p>';
 
 $buttons = array();
-if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+if( check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to confirm removal of user from the organization
-	$buttons[] = array( 'submit', 'actionArray[unlink_user]', T_('Continue'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[unlink_user]', TB_('Continue'), 'SaveButton' );
 }
 $Form->end_form( $buttons );
 ?>

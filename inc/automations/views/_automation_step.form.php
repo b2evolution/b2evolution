@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -29,29 +29,29 @@ $edit_automation_url = regenerate_url( 'action,step_ID', 'action=edit&amp;autm_I
 
 if( $display_mode != 'js' )
 {
-	$Form->global_icon( T_('Cancel editing').'!', 'close', $edit_automation_url );
+	$Form->global_icon( TB_('Cancel editing').'!', 'close', $edit_automation_url );
 }
 
-$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? T_('Duplicate step') : T_('New step') ) : T_('Step') ).get_manual_link( 'automation-step-details' ) );
+$Form->begin_form( 'fform', $display_mode == 'js' ? '' : sprintf( $creating ? ( $edited_AutomationStep->ID > 0 ? TB_('Duplicate step') : TB_('New step') ) : TB_('Step') ).get_manual_link( 'automation-step-details' ) );
 
 $Form->add_crumb( 'automationstep' );
 $Form->hidden( 'action', $creating ? ( $edited_AutomationStep->ID > 0 ? 'duplicate_step' : 'create_step' ) : 'update_step' );
 $Form->hidden( 'autm_ID', $step_Automation->ID );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating && $edited_AutomationStep->ID == 0 ? ',step_ID' : '' ) ) );
 
-$Form->info( T_('Automation'), '<a href="'.$edit_automation_url.'">'.$step_Automation->get( 'name' ).'</a>' );
+$Form->info( TB_('Automation'), '<a href="'.$edit_automation_url.'">'.$step_Automation->get( 'name' ).'</a>' );
 
 if( $step_Automation->ID > 0 )
 {
-	$Form->info( T_('ID'), $step_Automation->ID );
+	$Form->info( TB_('ID'), $step_Automation->ID );
 }
 
-$Form->text_input( 'step_order', $edited_AutomationStep->get( 'order' ), 10, T_('Order'), '', array( 'maxlength' => 11, 'required' => ! $creating, 'note' => $creating ? T_('Leave empty to set an order automatically.') : '' ) );
+$Form->text_input( 'step_order', $edited_AutomationStep->get( 'order' ), 10, TB_('Order'), '', array( 'maxlength' => 11, 'required' => ! $creating, 'note' => $creating ? TB_('Leave empty to set an order automatically.') : '' ) );
 
-$Form->select_input_array( 'step_type', $edited_AutomationStep->get( 'type' ), step_get_type_titles(), T_('Type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
+$Form->select_input_array( 'step_type', $edited_AutomationStep->get( 'type' ), step_get_type_titles(), TB_('Type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
 // IF Condition:
-$Form->info_field( T_('IF Condition'), '<div id="step_if_condition"></div>', array( 'class' => 'ffield_step_if_condition' ) );
+$Form->info_field( TB_('IF Condition'), '<div id="step_if_condition"></div>', array( 'class' => 'ffield_step_if_condition' ) );
 $Form->hidden( 'step_if_condition', '' );
 
 // Email Campaign:
@@ -59,73 +59,73 @@ $EmailCampaignCache = & get_EmailCampaignCache();
 $EmailCampaignCache->load_all();
 $Form->select_input_object( 'step_email_campaign',
 	( $edited_AutomationStep->get( 'type' ) == 'send_campaign' ? $edited_AutomationStep->get( 'info' ) : '' ),
-	$EmailCampaignCache, T_('Email Campaign'), array( 'allow_none' => true, 'required' => true ) );
+	$EmailCampaignCache, TB_('Email Campaign'), array( 'allow_none' => true, 'required' => true ) );
 
 // Notification message:
 $Form->textarea_input( 'step_notification_message', (
 		$edited_AutomationStep->get( 'type' ) == 'notify_owner'
 		? $edited_AutomationStep->get( 'info' )
 		: '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)'
-	), 10, T_('Notification message') );
+	), 10, TB_('Notification message') );
 
 // Usertag:
 $Form->text_input( 'step_usertag', ( in_array( $edited_AutomationStep->get( 'type' ), array( 'add_usertag', 'remove_usertag' ) ) ? $edited_AutomationStep->get( 'info' ) : '' ),
-	80, T_('Usertag'), '', array( 'maxlength' => 200 ) );
+	80, TB_('Usertag'), '', array( 'maxlength' => 200 ) );
 
 // Newsletter:
 $NewsletterCache = & get_NewsletterCache();
 $newsletter_ID = ( in_array( $edited_AutomationStep->get( 'type' ), array( 'subscribe', 'unsubscribe' ) ) ? intval( $edited_AutomationStep->get( 'info' ) ) : 0 );
 $NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.$newsletter_ID );
-$Form->select_input_object( 'step_newsletter', $newsletter_ID, $NewsletterCache, T_('List'), array( 'required' => true, 'allow_none' => true ) );
+$Form->select_input_object( 'step_newsletter', $newsletter_ID, $NewsletterCache, TB_('List'), array( 'required' => true, 'allow_none' => true ) );
 
 // Automation:
 $AutomationCache = & get_AutomationCache();
 $AutomationCache->load_all();
 $automation_ID = ( $edited_AutomationStep->get( 'type' ) == 'start_automation' ? intval( $edited_AutomationStep->get( 'info' ) ) : 0 );
-$Form->select_input_object( 'step_automation', $automation_ID, $AutomationCache, T_('Automation'), array( 'required' => true, 'allow_none' => true ) );
+$Form->select_input_object( 'step_automation', $automation_ID, $AutomationCache, TB_('Automation'), array( 'required' => true, 'allow_none' => true ) );
 
 // Account status:
 $step_user_status = ( $edited_AutomationStep->get( 'type' ) == 'user_status' ? $edited_AutomationStep->get( 'info' ) : '' );
 $user_statuses = get_user_statuses();
 unset( $user_statuses['new'] );
-$Form->select_input_array( 'user_status', $step_user_status, $user_statuses, T_('Account status'), T_('If the user account is already in the desired status when the step is executed, the status will <b>NOT</b> be changed.'), array( 'required' => true, 'allow_none' => true ) );
+$Form->select_input_array( 'user_status', $step_user_status, $user_statuses, TB_('Account status'), TB_('If the user account is already in the desired status when the step is executed, the status will <b>NOT</b> be changed.'), array( 'required' => true, 'allow_none' => true ) );
 
 // Load all steps of the edited step's automation excluding current step:
 $AutomationStepCache = & get_AutomationStepCache();
 $AutomationStepCache->clear();
 $AutomationStepCache->load_where( 'step_autm_ID = '.$step_Automation->ID
 	.( ! $creating ? ' AND step_ID != '.$edited_AutomationStep->ID : '' ) );
-$next_step_prepend_options = array( '' => T_('Continue') );
+$next_step_prepend_options = array( '' => TB_('Continue') );
 if( ! $creating )
 {	// Display special label for option with current Step:
-	$next_step_prepend_options[ $edited_AutomationStep->ID ] = T_('Loop');
+	$next_step_prepend_options[ $edited_AutomationStep->ID ] = TB_('Loop');
 }
 else
 {	// If new step is creating we should use special key because we don't know step ID here,
 	// On inserting new Step we replace this temp key with real ID of new inserted Step:
-	$next_step_prepend_options['loop'] = T_('Loop');
+	$next_step_prepend_options['loop'] = TB_('Loop');
 }
-$next_step_prepend_options[-1] = T_('STOP');
+$next_step_prepend_options[-1] = TB_('STOP');
 
-$Form->begin_line( '<span id="step_result_label_yes">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'YES' ) ).'</span>', 'step_yes_next' );
+$Form->begin_line( '<span id="step_result_label_yes">'.TB_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'YES' ) ).'</span>', 'step_yes_next' );
 	$Form->select_input_object( 'step_yes_next_step_ID', $edited_AutomationStep->get( 'yes_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
-	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
+	$Form->duration_input( 'step_yes_next_step_delay', $edited_AutomationStep->get( 'yes_next_step_delay' ), TB_('Delay'), 'days', 'minutes', array(
 			'none_value_label' => '0',
 			'allow_none_title' => false,
 		) );
 $Form->end_line();
 
-$Form->begin_line( '<span id="step_result_label_no">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'NO' ) ).'</span>', 'step_no_next' );
+$Form->begin_line( '<span id="step_result_label_no">'.TB_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'NO' ) ).'</span>', 'step_no_next' );
 	$Form->select_input_object( 'step_no_next_step_ID', $edited_AutomationStep->get( 'no_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
-	$Form->duration_input( 'step_no_next_step_delay', $edited_AutomationStep->get( 'no_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
+	$Form->duration_input( 'step_no_next_step_delay', $edited_AutomationStep->get( 'no_next_step_delay' ), TB_('Delay'), 'days', 'minutes', array(
 			'none_value_label' => '0',
 			'allow_none_title' => false,
 		) );
 $Form->end_line();
 
-$Form->begin_line( '<span id="step_result_label_error">'.T_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'ERROR' ) ).'</span>', 'step_error_next' );
+$Form->begin_line( '<span id="step_result_label_error">'.TB_( step_get_result_label( $edited_AutomationStep->get( 'type' ), 'ERROR' ) ).'</span>', 'step_error_next' );
 	$Form->select_input_object( 'step_error_next_step_ID', $edited_AutomationStep->get( 'error_next_step_ID' ), $AutomationStepCache, '', array( 'prepend_options' => $next_step_prepend_options ) );
-	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), T_('Delay'), 'days', 'minutes', array(
+	$Form->duration_input( 'step_error_next_step_delay', $edited_AutomationStep->get( 'error_next_step_delay' ), TB_('Delay'), 'days', 'minutes', array(
 			'none_value_label' => '0',
 			'allow_none_title' => false,
 		) );
@@ -143,15 +143,15 @@ $NewsletterCache->clear();
 global $DB;
 $NewsletterCache->load_where( 'enlt_ID IN ( '.$DB->quote( $step_Automation->get_newsletter_IDs() ).' )' );
 $lastsent_list_prepend_options = array(
-		-1 => T_('Any list'),
-		'' => T_('Any list tied to step automation'),
+		-1 => TB_('Any list'),
+		'' => TB_('Any list tied to step automation'),
 	);
 $form_newsletter_selector = $Form->select_input_object( '$newsletter_selector$', '', $NewsletterCache, '', array( 'prepend_options' => $lastsent_list_prepend_options ) );
 $Form->output = true;
 $Form->switch_layout( NULL );
 
 $Form->end_form( array(
-		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
+		array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' )
 	) );
 
 if( ! $creating && $display_mode != 'js' )
@@ -169,16 +169,16 @@ if( ! $creating && $display_mode != 'js' )
 
 	$Results = new Results( $SQL->get(), 'aust_', '-A', NULL, $count_SQL->get() );
 
-	$Results->title = T_('Users queued').get_manual_link( 'automation-step-users-queued' );
+	$Results->title = TB_('Users queued').get_manual_link( 'automation-step-users-queued' );
 
 	$Results->cols[] = array(
-			'th'    => T_('User'),
+			'th'    => TB_('User'),
 			'order' => 'aust_user_ID',
 			'td'    => '%get_user_identity_link( "", #aust_user_ID# )%',
 		);
 
 	$Results->cols[] = array(
-			'th'       => T_('Next execution time'),
+			'th'       => TB_('Next execution time'),
 			'order'    => 'aust_next_exec_ts',
 			'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 			'th_class' => 'shrinkwrap',
@@ -186,7 +186,7 @@ if( ! $creating && $display_mode != 'js' )
 		);
 
 	$Results->cols[] = array(
-			'th'       => T_('Actions'),
+			'th'       => TB_('Actions'),
 			'td'       => '%autm_td_users_actions( #aust_autm_ID#, #aust_user_ID#, #user_login#, '.$edited_AutomationStep->ID.', '.$edited_AutomationStep->get( 'order' ).' )%',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
@@ -463,6 +463,21 @@ jQuery( document ).ready( function()
 			}
 		},
 		{
+			id: 'days_before_birthday',
+			label: '<?php echo TS_('Days before birthday'); ?>',
+			type: 'integer',
+			operators: operators_default,
+			input: 'select',
+			values: {
+			<?php
+				for( $i = 0; $i <= 365; $i++ )
+				{
+					echo $i.': \''.format_to_js( $i ).'\', ';
+				}
+			?>
+			}
+		},
+		{
 			id: 'listsend_last_sent_to_user',
 			label: '<?php echo TS_('Last sent list to user' ); ?>',
 			operators: operators_listsend,
@@ -594,14 +609,14 @@ jQuery( document ).on( 'click', '#btn_abort_edit, #step_confirmation_modal .clos
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" aria-hidden="true">&times;</button>
-				<h4 class="modal-title"><?php echo T_('Confirmation'); ?></h4>
+				<h4 class="modal-title"><?php echo TB_('Confirmation'); ?></h4>
 			</div>
 			<div class="modal-body">
-				<p><?php echo empty( $edited_AutomationStep->ID ) ? T_('You must pause the automation before creating new step.') : T_('You must pause the automation before changing step.'); ?></p>
+				<p><?php echo empty( $edited_AutomationStep->ID ) ? TB_('You must pause the automation before creating new step.') : TB_('You must pause the automation before changing step.'); ?></p>
 			</div>
 			<div class="modal-footer">
-				<button id="btn_pause_edit" type="button" class="btn btn-danger"><?php echo empty( $edited_AutomationStep->ID ) ? T_('Pause & create') : T_('Pause & edit'); ?></button>
-				<button id="btn_abort_edit" type="button" class="btn btn-default"><?php echo empty( $edited_AutomationStep->ID ) ? T_('Abort create') : T_('Abort edit'); ?></button>
+				<button id="btn_pause_edit" type="button" class="btn btn-danger"><?php echo empty( $edited_AutomationStep->ID ) ? TB_('Pause & create') : TB_('Pause & edit'); ?></button>
+				<button id="btn_abort_edit" type="button" class="btn btn-default"><?php echo empty( $edited_AutomationStep->ID ) ? TB_('Abort create') : TB_('Abort edit'); ?></button>
 			</div>
 		</div>
 	</div>

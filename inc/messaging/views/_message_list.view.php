@@ -193,10 +193,8 @@ function filter_messages( & $Form )
 $Results->filter_area = array(
 		'submit_title' => T_('Filter messages'),
 		'callback' => 'filter_messages',
-		'presets' => array(
-			'all' => array( T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) ),
-			)
 	);
+$Results->register_filter_preset( 'all', T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) );
 
 /**
  * Author:
@@ -228,7 +226,7 @@ $Results->cols[] = array(
 /**
  * Actions:
  */
-if( $current_User->check_perm( 'perm_messaging', 'delete' ) && ( $Results->get_total_rows() > 1 ) && ( $action != 'preview' ) )
+if( check_user_perm( 'perm_messaging', 'delete' ) && ( $Results->get_total_rows() > 1 ) && ( $action != 'preview' ) )
 {	// We have permission to modify and there are more than 1 message (otherwise it's better to delete the whole thread):
 	$Results->cols[] = array(
 							'th' => T_('Del'),
@@ -315,7 +313,7 @@ if( $is_recipient )
 					'form_use_fieldset' => false,
 				) );
 
-			if( $current_User->check_perm( 'files', 'view' ) )
+			if( check_user_perm( 'files', 'view' ) )
 			{	// If current user has a permission to view the files:
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 				// Initialize this object as global because this is used in many link functions:

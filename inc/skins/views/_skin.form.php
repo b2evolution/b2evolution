@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -23,10 +23,10 @@ global $edited_Skin;
 
 $Form = new Form( NULL, 'skin_checkchanges' );
 
-$Form->global_icon( T_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('skin') ) );
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
+$Form->global_icon( TB_('Uninstall this skin!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('skin') ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', T_('Skin properties') );
+$Form->begin_form( 'fform', TB_('Skin properties') );
 
 	$Form->add_crumb( 'skin' );
 	$Form->hidden_ctrl();
@@ -34,7 +34,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
 	$Form->hidden( 'tab', get_param( 'tab' ) );
 
-	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
+	$Form->begin_fieldset( TB_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 
 		echo '<div class="skin_settings well">';
 			$disp_params = array( 'skinshot_class' => 'coll_settings_skinshot' );
@@ -42,32 +42,32 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 			// Skin name
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin name').':</label>';
+				echo '<label>'.TB_('Skin name').':</label>';
 				echo '<span>'.$edited_Skin->name.'</span>';
 			echo '</div>';
 
 
 			// Skin version
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin version').':</label>';
+				echo '<label>'.TB_('Skin version').':</label>';
 				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
 			echo '</div>';
 
 			// Site Skin:
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Site Skin').':</label>';
-				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+				echo '<label>'.TB_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? TB_('Yes') : TB_('No') ).'</span>';
 			echo '</div>';
 
 			// Collection Skin:
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Collection Skin').':</label>';
-				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+				echo '<label>'.TB_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? TB_('Yes') : TB_('No') ).'</span>';
 			echo '</div>';
 
 			// Skin format:
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin format').':</label>';
+				echo '<label>'.TB_('Skin format').':</label>';
 				echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 			echo '</div>';
 
@@ -86,15 +86,15 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				$container_ul = '-';
 			}
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Containers').':</label>';
+				echo '<label>'.TB_('Containers').':</label>';
 				echo '<span>'.$container_ul.'</span>';
 			echo '</div>';
 
 		echo '</div>';
 		echo '<div class="skin_settings_form">';
-			$Form->begin_fieldset( T_('System Settings for this skin').get_manual_link( 'skin-system-settings' ) );
+			$Form->begin_fieldset( TB_('System Settings for this skin').get_manual_link( 'skin-system-settings' ) );
 
-			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
+			$Form->text_input( 'skin_name', $edited_Skin->name, 128, TB_('Skin name'), TB_('As seen by blog owners'), array( 'required'=>true ) );
 
 			$skin_types = get_skin_types();
 			$skin_types_options = array();
@@ -102,7 +102,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 			{
 				$skin_types_options[] = array( $skin_type_key, $skin_type_data[0], $skin_type_data[1] );
 			}
-			$Form->radio( 'skin_type', $edited_Skin->type, $skin_types_options, T_( 'Skin type' ), true );
+			$Form->radio( 'skin_type', $edited_Skin->type, $skin_types_options, TB_( 'Skin type' ), true );
 			$Form->end_fieldset();
 
 			$SQL = 'SELECT a.* FROM(
@@ -116,19 +116,27 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 					UNION ALL
 					SELECT blog_ID, blog_name, "tablet" AS skin_type, "3" AS skin_type_order
 					FROM T_blogs
-					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' ) AS a
+					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' 
+					UNION ALL
+					SELECT blog_ID, blog_name, "alt" AS skin_type, "4" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_alt_skin_ID = '.$edited_Skin->ID.' ) AS a
 					ORDER BY blog_ID ASC, skin_type_order ASC';
 
 			$count_SQL = 'SELECT SUM( IF( blog_normal_skin_ID = '.$edited_Skin->ID.', 1, 0 )
 					+ IF( blog_mobile_skin_ID = '.$edited_Skin->ID.', 1, 0 )
-					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
+					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_alt_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
 					FROM T_blogs
-					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.' OR blog_mobile_skin_ID = '.$edited_Skin->ID.' OR blog_tablet_skin_ID = '.$edited_Skin->ID;
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.'
+					   OR blog_mobile_skin_ID = '.$edited_Skin->ID.'
+					   OR blog_tablet_skin_ID = '.$edited_Skin->ID.'
+					   OR blog_alt_skin_ID = '.$edited_Skin->ID;
 
 			$Results = new Results( $SQL, '', '', 1000, $count_SQL );
-			$Results->title = T_('Used by').'...';
+			$Results->title = TB_('Used by').'...';
 			$Results->cols[] = array(
-				'th' => T_('Collection ID'),
+				'th' => TB_('Collection ID'),
 				'td_class' => 'shrinkwrap',
 				'td' => '$blog_ID$',
 			);
@@ -141,7 +149,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				}
 				$url_params = 'tab=skin&amp;blog='.$row->blog_ID;
 
-				if( in_array( $row->skin_type, array( 'mobile', 'tablet' ) ) )
+				if( in_array( $row->skin_type, array( 'mobile', 'tablet', 'alt' ) ) )
 				{
 					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->skin_type );
 				}
@@ -150,12 +158,12 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 			}
 
 			$Results->cols[] = array(
-				'th' => T_('Collection name'),
+				'th' => TB_('Collection name'),
 				'td' => '%display_skin_setting_link( {row} )%',
 			);
 
 			$Results->cols[] = array(
-				'th' => T_('Skin type'),
+				'th' => TB_('Skin type'),
 				'td' => '%get_skin_type_title( #skin_type# )%',
 				'td_class' => 'text-center'
 			);
@@ -166,6 +174,6 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 	$Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>

@@ -12,8 +12,8 @@ body {
 	float: right;
 }
 
-.evo_container__site_header,
-.evo_container__site_footer {
+#evo_site_header,
+#evo_site_footer {
 	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
 	line-height: normal;
 	color: #ccc;
@@ -22,7 +22,7 @@ body {
 }
 
 // SITE HEADER:
-.evo_container__site_header {
+#evo_site_header {
 	/* autoprefixer: off */
 	font-size: 16px;
 	font-weight: 300;
@@ -66,11 +66,13 @@ body {
 			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
 			font-weight: normal;
 		}
-		&.user {
-			color: #ccc; // Don't use a color for user names in the header site menu
+		&.evo_widget_basic_menu_link_myprofile {
 			position: relative;
 			padding-left: 49px;
-			font-weight: normal;
+			.user {
+				color: #ccc; // Don't use a color for user names in the header site menu
+				font-weight: normal;
+			}
 			img {
 				position: absolute;
 				top: 0;
@@ -105,7 +107,7 @@ body {
 	.evo_widget {
 		padding: 0;
 		display: inline-block;
-		&.widget_core_msg_menu_link .badge {
+		.evo_widget_basic_menu_link_messages .badge {
 			margin-top: -3px;
 		}
 		&.widget_core_site_logo a:hover {
@@ -199,14 +201,14 @@ input#nav-trigger {
 // Devices with max width <= 1024px (iPhone,iPad):
 // Don't fix a position of the sitewide header
 @media only screen and (max-device-width: 1024px) {
-	div#skin_wrapper .evo_container__site_header {
+	div#skin_wrapper #evo_site_header {
 		position: inherit;
 		width: 100%;
 	}
 }
 
 // SITE FOOTER:
-.evo_container__site_footer {
+#evo_site_footer {
 	font-size: 11px;
 	text-align: center;
 	border-top: 1px solid #444;

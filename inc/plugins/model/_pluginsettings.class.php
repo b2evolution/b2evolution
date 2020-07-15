@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -94,6 +94,24 @@ class PluginSettings extends AbstractSettings
 	function delete( $setting )
 	{
 		return parent::delete( $this->plugin_ID, $setting );
+	}
+
+
+	/**
+	 * Commit changed plugin settings to DB.
+	 *
+	 * @return boolean true, if settings have been updated; false otherwise
+	 */
+	function dbupdate()
+	{
+		$result = parent::dbupdate();
+
+		if( $result )
+		{	// BLOCK CACHE INVALIDATION:
+			BlockCache::invalidate_key( 'plugin_ID', $this->plugin_ID ); // Plugin has changed
+		}
+
+		return $result;
 	}
 
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package api
  */
@@ -72,8 +72,8 @@ class RestApi
 		$UserCache = & get_UserCache();
 
 		// Note: login and password cannot include ' or " or > or <
-		$entered_login = utf8_strtolower( utf8_strip_tags( remove_magic_quotes( $entered_login ) ) );
-		$entered_password = utf8_strip_tags( remove_magic_quotes( $entered_password ) );
+		$entered_login = utf8_strtolower( utf8_strip_tags( $entered_login ) );
+		$entered_password = utf8_strip_tags( $entered_password );
 
 		if( is_email( $entered_login ) )
 		{	// We have an email address instead of login name
@@ -377,9 +377,7 @@ class RestApi
 				}
 				elseif( $allow_access == 'members' )
 				{	// Check if current user is member of the collection:
-					global $current_User;
-
-					if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+					if( ! check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 					{	// Current user cannot access to the collection:
 						$this->halt( T_('You are not a member of this section, therefore you are not allowed to access it.'), 'access_denied', 403 );
 						// Exit here.
@@ -473,8 +471,8 @@ class RestApi
 		if( $api_restrict_to_available_fileroots &&
 		    (
 		      ! is_logged_in() ||
-		      ! $current_User->check_perm( 'admin', 'restricted' ) ||
-		      ! $current_User->check_perm( 'files', 'view' )
+		      ! check_user_perm( 'admin', 'restricted' ) ||
+		      ! check_user_perm( 'files', 'view' )
 		    ) )
 		{	// Anonymous user has no access to file roots AND also if current use has no access to back-office or to file manager:
 			$result_count = 0;
@@ -484,7 +482,7 @@ class RestApi
 			if( $api_restrict_to_available_fileroots )
 			{	// Restrict collections by available file roots for current user:
 
-				// SQL analog for $current_User->check_perm( 'blogs', 'view' ) || $current_User->check_perm( 'files', 'edit' ):
+				// SQL analog for check_user_perm( 'blogs', 'view' ) || check_user_perm( 'files', 'edit' ):
 				$current_User->get_Group();
 				$check_perm_blogs_view_files_edit_SQL = new SQL();
 				$check_perm_blogs_view_files_edit_SQL->SELECT( 'grp_ID' );
@@ -494,7 +492,7 @@ class RestApi
 				$check_perm_blogs_view_files_edit_SQL->WHERE_and( 'grp_perm_blogs IN ( "viewall", "editall" ) OR gset_value IS NULL OR gset_value IN ( "all", "edit" )' );
 				$restrict_available_fileroots_sql = '( '.$check_perm_blogs_view_files_edit_SQL->get().' )';
 
-				// SQL analog for $current_User->check_perm( 'blog_media_browse', 'view', false, $Blog ):
+				// SQL analog for check_user_perm( 'blog_media_browse', 'view', false, $Blog ):
 				$check_perm_blog_media_browse_user_SQL = new SQL();
 				$check_perm_blog_media_browse_user_SQL->SELECT( 'bloguser_blog_ID' );
 				$check_perm_blog_media_browse_user_SQL->FROM( 'T_coll_user_perms' );
@@ -611,8 +609,6 @@ class RestApi
 	 */
 	private function controller_coll_view()
 	{
-		global $current_User;
-
 		$coll_urlname = empty( $this->args[1] ) ? 0 : $this->args[1];
 
 		$BlogCache = & get_BlogCache();
@@ -1115,9 +1111,9 @@ class RestApi
 	 */
 	private function controller_coll_assignees()
 	{
-		global $current_User, $Collection, $Blog, $DB;
+		global $Collection, $Blog, $DB;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+		if( ! check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 		{	// Check permission: Current user must has a permission to be assignee of the collection:
 			$this->halt( 'You are not allowed to view assigness of the collection "'.$Blog->get( 'name' ).'".', 'no_access', 403 );
 			// Exit here.
@@ -1392,7 +1388,7 @@ class RestApi
 			global $current_User;
 			if( is_logged_in() )
 			{	// Check perms for logged in user:
-				if( ! ( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) ) )
+				if( ! ( check_user_perm( 'users', 'moderate' ) && check_user_perm( 'files', 'all' ) ) )
 				{	// Current user has an access only to file root of own account:
 					$user_filters = array( 'userids' => array( $current_User->ID ) );
 				}
@@ -1492,8 +1488,6 @@ class RestApi
 	 */
 	private function controller_user_view()
 	{
-		global $current_User;
-
 		// Get an user ID for request "GET <baseurl>/api/v1/users/<id>":
 		$user_ID = intval( empty( $this->args[1] ) ? 0 : $this->args[1] );
 
@@ -1522,7 +1516,7 @@ class RestApi
 		$user_data['picture'] = $user_picture;
 		// Other pictures:
 		$user_data['pictures'] = array();
-		if( is_logged_in() && $current_User->check_status( 'can_view_user', $user_ID ) )
+		if( check_user_status( 'can_view_user', $user_ID ) )
 		{ // Display other pictures, but only for logged in and activated users:
 			$user_pic_links = $User->get_avatar_Links();
 			foreach( $user_pic_links as $user_pic_Link )
@@ -1660,7 +1654,7 @@ class RestApi
 	{
 		global $current_User;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit' ) )
+		if( ! check_user_perm( 'users', 'edit' ) )
 		{	// Current user has no permission to delete the requested user:
 			$this->halt( T_('You have no permission to edit other users!'), 'no_access', 403 );
 			// Exit here.
@@ -1720,7 +1714,7 @@ class RestApi
 	{
 		global $current_User, $DB;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+		if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 		{	// Check permission: User is not allowed to view threads
 			$this->halt( 'You are not allowed to view recipients.', 'no_access', 403 );
 			// Exit here.
@@ -1857,8 +1851,6 @@ class RestApi
 	 */
 	private function controller_user_logins()
 	{
-		global $current_User;
-
 		$api_q = trim( urldecode( param( 'q', 'string', '' ) ) );
 		$api_status = param( 'status', 'string', '' );
 
@@ -1899,7 +1891,7 @@ class RestApi
 		$users = $this->func_user_search( $api_q, $func_user_search_params );
 
 		// Check if current user can see other users with ALL statuses:
-		$can_view_all_users = ( is_logged_in() && $current_User->check_perm( 'users', 'view' ) );
+		$can_view_all_users = check_user_perm( 'users', 'view' );
 
 		$user_logins = array();
 		foreach( $users as $User )
@@ -2027,8 +2019,10 @@ class RestApi
 		/* Yura: Here I added "COLLATE utf8_general_ci" because:
 		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
 		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 * 
+		 * Erwin: Changed added collation from "utf8_general_ci" to "utf8mb4_general_ci" to match default DB connection collation
 		 */
-		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8mb4_general_ci' );
 		$tags_SQL->ORDER_BY( 'tag_name' );
 		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
@@ -2086,8 +2080,10 @@ class RestApi
 		/* Yura: Here I added "COLLATE utf8_general_ci" because:
 		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
 		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 * 
+		 * Erwin: Changed added collation from "utf8_general_ci" to "utf8mb4_general_ci" to match default DB connection collation
 		 */
-		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8mb4_general_ci' );
 		$tags_SQL->ORDER_BY( 'utag_name' );
 		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
@@ -2125,7 +2121,7 @@ class RestApi
 		{
 			$polls = array();
 
-			$perm_poll_view = $current_User->check_perm( 'polls', 'view' );
+			$perm_poll_view = check_user_perm( 'polls', 'view' );
 
 			$polls_SQL = new SQL();
 			$polls_SQL->SELECT( 'pqst_ID, pqst_owner_user_ID, pqst_question_text' );
@@ -2345,7 +2341,8 @@ class RestApi
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 
-			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
+			if( $LinkOwner->type == 'item' &&
+			    ( $link_position == 'cover' || $link_position == 'background' ) )
 			{ // Position "Cover" can be used only by one link
 			  // Replace previous position with "Inline"
 				$DB->query( 'UPDATE T_links
@@ -2535,6 +2532,7 @@ class RestApi
 
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
+		$fieldset_prefix = param( 'prefix', 'string', NULL );
 
 		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
@@ -2578,7 +2576,7 @@ class RestApi
 		}
 
 		// Initialize admin skin:
-		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI, $inc_path;
 		$admin_skin = is_logged_in() ? $UserSettings->get( 'admin_skin', $current_User->ID ) : 'bootstrap';
 		$is_admin_page = true;
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
@@ -2589,7 +2587,8 @@ class RestApi
 
 		// Get the refreshed content:
 		ob_start();
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		// We do not use $AdminUI->disp_view() because we need the $fieldset_prefix above:
+		require $inc_path.'links/views/_link_list.view.php';
 		$refreshed_content = ob_get_clean();
 
 		$this->add_response( 'html', $refreshed_content );

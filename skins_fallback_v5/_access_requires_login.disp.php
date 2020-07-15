@@ -25,4 +25,9 @@ skin_container( NT_('Login Required'), array(
 		'block_body_end'    => '</div>',
 	) );
 // --------------------- END OF "Login Required" CONTAINER -----------------------
+
+// Display login form footer:
+display_login_form_footer( array(
+		'source' => 'access requires login',
+	) );
 ?>

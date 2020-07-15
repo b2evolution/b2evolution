@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -484,12 +484,20 @@ function import_cities( $country_ID, $file_path )
 	// Begin transaction
 	$DB->begin();
 
-	// Get all sub-regions of the current country
-	$subregions_data = $DB->get_results( '
-		SELECT subrg_ID, subrg_code, rgn_ID, rgn_ctry_ID
-		  FROM T_regional__subregion
-		  LEFT JOIN T_regional__region ON subrg_rgn_ID = rgn_ID
-		 WHERE rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	// Get all regions of the requested country:
+	$SQL = new SQL( 'Get regions of country #'.$country_ID.' before importing cities' );
+	$SQL->SELECT( 'rgn_code, rgn_ID' );
+	$SQL->FROM( 'T_regional__region' );
+	$SQL->WHERE( 'rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	$regions = $DB->get_assoc( $SQL );
+
+	// Get all sub-regions of the requested country:
+	$SQL = new SQL( 'Get sub-regions of country #'.$country_ID.' before importing cities' );
+	$SQL->SELECT( 'subrg_ID, subrg_code, rgn_ID' );
+	$SQL->FROM( 'T_regional__subregion' );
+	$SQL->FROM_add( 'LEFT JOIN T_regional__region ON subrg_rgn_ID = rgn_ID' );
+	$SQL->WHERE( 'rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	$subregions_data = $DB->get_results( $SQL );
 
 	$subregions = array();
 	foreach( $subregions_data as $subregion )
@@ -513,23 +521,19 @@ function import_cities( $country_ID, $file_path )
 			continue;
 		}
 
+		// Post code:
 		$postcode = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
+		// City name:
 		$name = trim( $data[1], " \xA0" );
-		$subregion_code = '';
-		if( isset( $data[2] ) )
-		{	// Optional field
-			$subregion_code = trim( $data[2], " \xA0" );
-		}
+		// Sub-region code (optional column; recommended):
+		$subregion_code = ( isset( $data[2] ) ? trim( $data[2], " \xA0" ) : '' );
+		// Region code (optional column; provide only if no sub-region):
+		$region_code = ( isset( $data[3] ) ? trim( $data[3], " \xA0" ) : '' );
 
 		if( empty( $postcode ) && empty( $name ) )
 		{	// Skip empty row
 			continue;
 		}
-
-		/*if( empty( $subregion_code ) )
-		{	// If field subregion_code is NOT defined, we get it from city postcode ( 2 first letters )
-			$subregion_code = substr( $postcode, 0, 2 );
-		}*/
 
 		$city = array(
 			'ctry_ID'  => $country_ID,
@@ -537,15 +541,20 @@ function import_cities( $country_ID, $file_path )
 			'name'     => $DB->quote( $name ),
 		);
 
-		if( empty( $subregion_code ) || ! isset( $subregions[$subregion_code] ) )
-		{	// Subregion is not defined and not found in DB
-			$city['rgn_ID'] = 'NULL';
+		if( ! empty( $subregion_code ) && isset( $subregions[ $subregion_code ] ) )
+		{	// Set region ID & subregion ID for current city:
+			$city['rgn_ID'] = $subregions[ $subregion_code ]->rgn_ID;
+			$city['subrg_ID'] = $subregions[ $subregion_code ]->subrg_ID;
+		}
+		elseif( ! empty( $region_code ) && isset( $regions[ $region_code ] ) )
+		{	// Set region ID for current city:
+			$city['rgn_ID'] = $regions[ $region_code ];
 			$city['subrg_ID'] = 'NULL';
 		}
 		else
-		{	// Set region ID & subregion ID for current city
-			$city['rgn_ID'] = $subregions[$subregion_code]->rgn_ID;
-			$city['subrg_ID'] = $subregions[$subregion_code]->subrg_ID;
+		{	// Subregion and Region are not defined and not found in DB:
+			$city['rgn_ID'] = 'NULL';
+			$city['subrg_ID'] = 'NULL';
 		}
 
 		// Get city from DB with current country, postcode & name
@@ -626,135 +635,12 @@ function echo_regional_js( $prefix, $region_visible )
 	{	// If region is NOT visible we don't need in these ajax functions
 		return;
 	}
-?>
-<script>
-jQuery( document ).ready( function()
-{
-	check_regional_required_fields();
-} );
 
-jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).change( function ()
-{	// Load option list with regions for seleted country
-	load_regions( jQuery( this ).val(), 0 );
-} );
+	$regional_config = array(
+			'prefix' => $prefix,
+		);
 
-jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).change( function ()
-{	// Change option list with sub-regions
-	load_subregions( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val(), jQuery( this ).val() );
-} );
-
-jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).change( function ()
-{	// Change option list with cities
-	load_cities( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val(), jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).val(), jQuery( this ).val() );
-} );
-
-
-jQuery( '#button_refresh_region' ).click( function ()
-{	// Button - Refresh regions
-	load_regions( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val(), 0 );
-	return false;
-} );
-
-jQuery( '#button_refresh_subregion' ).click( function ()
-{	// Button - Refresh sub-regions
-	load_subregions( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val(), jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).val() );
-	return false;
-} );
-
-jQuery( '#button_refresh_city' ).click( function ()
-{	// Button - Refresh cities
-	load_cities( jQuery( '#<?php echo $prefix; ?>_ctry_ID' ).val(), jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).val(), jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).val() );
-	return false;
-} );
-
-/**
- * Disable HTML attribute "required" if the regional selector has no locations for given parent location:
- */
-function check_regional_required_fields()
-{
-	jQuery( '#<?php echo $prefix; ?>_rgn_ID, #<?php echo $prefix; ?>_subrg_ID, #<?php echo $prefix; ?>_city_ID' ).each( function()
-	{
-		if( typeof( jQuery( this ).attr( 'required' ) ) != 'undefined' ||
-				jQuery( this ).data( 'required' ) === true )
-		{	// If this regional field should be required:
-			if( jQuery( this ).find( 'option' ).length > 1 )
-			{	// Require if parent regional location has at least one child location:
-				jQuery( this ).attr( 'required', 'required' );
-			}
-			else
-			{	// Don't require if there are no child regional locations:
-				jQuery( this ).removeAttr( 'required' );
-			}
-			// Store original state of attribute "required":
-			jQuery( this ).data( 'required', true );
-		}
-		else
-		{	// Store original state of attribute "required":
-			jQuery( this ).data( 'required', false );
-		}
-	} );
-}
-
-function load_regions( country_ID, region_ID )
-{	// Load option list with regions for seleted country
-	jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).next().find( 'button' ).hide().next().show();
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_regions_option_list&page=edit&mode=load_all&ctry_id=' + country_ID + '&rgn_id=' + region_ID,
-	success: function( result )
-		{
-			jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).next().find( 'button' ).show().next().hide();
-
-			result = ajax_debug_clear( result );
-			var options = result.split( '-##-' );
-
-			jQuery( '#<?php echo $prefix; ?>_rgn_ID' ).html( options[0] );
-			jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).html( options[1] );
-			jQuery( '#<?php echo $prefix; ?>_city_ID' ).html( options[2] );
-			check_regional_required_fields();
-		}
-	} );
-}
-
-function load_subregions( country_ID, region_ID )
-{	// Load option list with sub-regions for seleted region
-	jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).next().find( 'button' ).hide().next().show();
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_subregions_option_list&page=edit&mode=load_all&ctry_id=' + country_ID + '&rgn_id=' + region_ID,
-	success: function( result )
-		{
-			jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).next().find( 'button' ).show().next().hide();
-
-			result = ajax_debug_clear( result );
-			var options = result.split( '-##-' );
-
-			jQuery( '#<?php echo $prefix; ?>_subrg_ID' ).html( options[0] );
-			jQuery( '#<?php echo $prefix; ?>_city_ID' ).html( options[1] );
-			check_regional_required_fields();
-		}
-	} );
-}
-
-function load_cities( country_ID, region_ID, subregion_ID )
-{	// Load option list with cities for seleted region or sub-region
-	jQuery( '#<?php echo $prefix; ?>_city_ID' ).next().find( 'button' ).hide().next().show();
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_cities_option_list&page=edit&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
-	success: function( result )
-		{
-			jQuery( '#<?php echo $prefix; ?>_city_ID' ).html( ajax_debug_clear( result ) );
-			jQuery( '#<?php echo $prefix; ?>_city_ID' ).next().find( 'button' ).show().next().hide();
-			check_regional_required_fields();
-		}
-	} );
-}
-</script>
-<?php
+	expose_var_to_js( 'regional_'.$prefix, $regional_config, 'evo_regional_config' );
 }
 
 

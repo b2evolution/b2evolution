@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -33,7 +33,7 @@ class ping_pingomatic_plugin extends Plugin
 	 */
 	var $code = 'ping_pingomatic';
 	var $priority = 50;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $author = 'http://daniel.hahler.de/';
 
 	/*

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -72,6 +72,14 @@ $schema_queries = array(
 			PRIMARY KEY ( cach_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_social__network' => array(
+		'Creating table for social networks',
+		"CREATE TABLE T_social__network (
+			sn_ID int(10) UNSIGNED NOT NULL auto_increment,
+			sn_name VARCHAR(32) NOT NULL,
+			PRIMARY KEY (sn_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_users' => array(
 		'Creating table for Users',
 		"CREATE TABLE T_users (
@@ -94,6 +102,9 @@ $schema_queries = array(
 			user_gender char(1) COLLATE ascii_general_ci NULL,
 			user_age_min int unsigned NULL,
 			user_age_max int unsigned NULL,
+			user_birthday_year smallint unsigned NULL,
+			user_birthday_month tinyint unsigned NULL,
+			user_birthday_day tinyint unsigned NULL,
 			user_reg_ctry_ID int(10) unsigned NULL,
 			user_ctry_ID int(10) unsigned NULL,
 			user_rgn_ID int(10) unsigned NULL,
@@ -119,12 +130,14 @@ $schema_queries = array(
 			ufdf_name       varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			ufdf_options    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ufdf_required   enum('hidden','optional','recommended','require') COLLATE ascii_general_ci NOT NULL default 'optional',
+			ufdf_visibility enum('unrestricted','private','admin') COLLATE ascii_general_ci NOT NULL default 'unrestricted',
 			ufdf_duplicated enum('forbidden','allowed','list') COLLATE ascii_general_ci NOT NULL default 'allowed',
 			ufdf_order      int(11) NOT NULL,
 			ufdf_suggest    tinyint(1) NOT NULL DEFAULT 0,
 			ufdf_bubbletip  varchar(2000) COLLATE utf8mb4_unicode_ci NULL,
 			ufdf_icon_name  varchar(100) COLLATE ascii_general_ci NULL,
 			ufdf_code       varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT 'Code MUST be lowercase ASCII only',
+			ufdf_grp_ID     int(10) UNSIGNED NULL,
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -241,6 +254,18 @@ $schema_queries = array(
 			uutg_emtag_ID INT(10)  UNSIGNED NOT NULL,
 			PRIMARY KEY (uutg_user_ID, uutg_emtag_ID),
 			UNIQUE taguser(uutg_emtag_ID, uutg_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__social_network' => array(
+		'Creating table for user social network',
+		"CREATE TABLE T_users__social_network (
+			usn_user_ID INT(10) UNSIGNED NOT NULL,
+			usn_sn_ID INT(10) UNSIGNED NOT NULL,
+			usn_network_ID VARCHAR(256) COLLATE ascii_general_ci NOT NULL,
+			usn_token VARCHAR(1000) NOT NULL,
+			usn_token_expiration_ts TIMESTAMP NULL DEFAULT NULL,
+			PRIMARY KEY (usn_user_ID, usn_sn_ID ),
+			INDEX usn_network_ID (usn_network_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
@@ -577,7 +602,7 @@ $schema_queries = array(
 			ecmp_sync_plaintext       TINYINT(1) NOT NULL DEFAULT 1,
 			ecmp_sent_ts              TIMESTAMP NULL,
 			ecmp_auto_sent_ts         TIMESTAMP NULL,
-			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_renderers            VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ecmp_use_wysiwyg          TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID         INT(10) UNSIGNED NULL DEFAULT NULL,
 			ecmp_welcome              TINYINT(1) NOT NULL DEFAULT 0,
@@ -665,11 +690,11 @@ $schema_queries = array(
 			step_label                 VARCHAR(500) COLLATE utf8mb4_unicode_ci NULL,
 			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe', 'start_automation', 'user_status') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
 			step_info                  TEXT COLLATE utf8mb4_unicode_ci NULL,
-			step_yes_next_step_ID      INT(10) UNSIGNED NULL,
+			step_yes_next_step_ID      INT NULL COMMENT 'Must be unsigned for special values like -1 = STOP',
 			step_yes_next_step_delay   INT UNSIGNED NULL,
-			step_no_next_step_ID       INT(10) UNSIGNED NULL,
+			step_no_next_step_ID       INT NULL COMMENT 'Must be unsigned for special values like -1 = STOP',
 			step_no_next_step_delay    INT UNSIGNED NULL,
-			step_error_next_step_ID    INT(10) UNSIGNED NULL,
+			step_error_next_step_ID    INT NULL COMMENT 'Must be unsigned for special values like -1 = STOP',
 			step_error_next_step_delay INT UNSIGNED NULL,
 			step_diagram               VARCHAR(64) NULL,
 			PRIMARY KEY                (step_ID),

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -55,7 +55,7 @@ $Results->display( array(
 		'page_url' => regenerate_url( 'blog,ctrl,action,results_'.$Results->param_prefix.'page', 'action='.param_action().'&amp;'.url_crumb( 'tools' ) )
 	) );
 
-if( ( $current_User->check_perm('options', 'edit', true) ) && ( $Results->get_num_rows() ) )
+if( ( check_user_perm('options', 'edit', false) ) && ( $Results->get_num_rows() ) )
 { // display Delete link
 	global $DB;
 	$slug_IDs = $DB->get_col( $SQL->get() );

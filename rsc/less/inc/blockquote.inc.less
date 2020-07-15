@@ -1,0 +1,101 @@
+// Classes to blockquotes styling of text
+// May be used in quick Templates
+
+@base-font-size: 2em;
+@base-line-height: 1.5em;
+
+.brooks {
+	position: relative;
+	z-index: 0;
+	padding: 0;
+	margin-bottom: 3em;
+	border-left: none;
+	font-family: "Sanchez", "Helvetica Neue", Helvetica, Arial, serif;
+	font-size: @base-font-size;
+	line-height: @base-line-height;
+	font-style: italic;
+	color: #3d748f;
+	&::before {
+		content: '\201C';
+		position: absolute;
+		top: 0.12em;
+		left: -0.15em;
+		color: #e7e6e4;
+		font-size: 5em;
+		z-index: -1;
+	}
+	footer {
+		font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, serif;
+		font-size: 0.6em;
+		font-weight: 700;
+		color: #d3d3cf;
+		text-align: right;
+	}
+	q::before, q::after {
+		// Disable default content for quote html tag:
+		content: '';
+	}
+}
+
+.ludwig {
+	padding: 0 0 0 1em;
+	margin-bottom: 3em;
+	border-left: 0.2em solid #4d91b3;
+	font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, serif;
+	font-size: @base-font-size;
+	line-height: @base-line-height;
+	font-weight: 100;
+	color: #3d748f;
+	q::before, q::after {
+		content: '\201C';
+		font-family: "Sanchez", "Helvetica Neue", Helvetica, Arial, serif;
+		font-weight: bold;
+		color: #4d91b3;
+	}
+	q::after {
+		content: '\201D';
+	}
+	footer {
+		font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, serif;
+		font-size: 0.6em;
+		font-weight: 700;
+		color: #d3d3cf;
+		text-align: right;
+	}
+}
+
+.groucho {
+	position: relative;
+	z-index: 0;
+	padding: 0;
+	margin-bottom: 3em;
+	border-left: none;
+	font-family: "Sanchez", "Helvetica Neue", Helvetica, Arial, serif;
+	font-size: @base-font-size;
+	line-height: @base-line-height;
+	color: #3d748f;
+	footer {
+		font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, serif;
+		font-size: 0.6em;
+		font-weight: 700;
+		color: #d3d3cf;
+		text-align: right;
+		&::before {
+			content: '\2015';  
+		}
+	}
+	&::after {
+		content: '\201D';
+		position: absolute;
+		top: 25px;
+		right: 0;
+		font-size: 5em;
+		font-style: italic;
+		color: #e7e6e4;
+		z-index: -1;
+	}
+	q::before, q::after {
+		// Disable default content for quote html tag:
+		content: '';
+	}
+}

@@ -84,7 +84,7 @@ elseif( $confirmed )
 								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
+								&& $edited_User->check_perm( 'blog_ismember', 'view', false, $coll_ID ) )
 						{ // opt-out collection
 							if( $subscription_name == 'sub_items' )
 							{
@@ -143,7 +143,7 @@ elseif( $confirmed )
 							if( $Blog->get( 'advanced_perms' )
 									&& $Blog->get_setting( 'allow_item_subscriptions' )
 									&& $Blog->get_setting( 'opt_out_item_subscription' )
-									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
 							{
 								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 										VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
@@ -352,7 +352,7 @@ elseif( $confirmed )
 					break;
 
 				case 'meta_comment':
-					// unsubscribe from meta comment notifications
+					// unsubscribe from internal comment notifications
 					$UserSettings->set( 'notify_meta_comments', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
@@ -360,6 +360,12 @@ elseif( $confirmed )
 				case 'comment_mentioned':
 					// unsubscribe from new comment notifications when user is mentioned:
 					$UserSettings->set( 'notify_comment_mentioned', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'meta_comment_mentioned':
+					// unsubscribe from new internal comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_meta_comment_mentioned', '0', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -424,7 +430,7 @@ elseif( $confirmed )
 								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
+								&& $edited_User->check_perm( 'blog_ismember', 'view', false, $coll_ID ) )
 						{ // opt-out collection
 							if( $subscription_name == 'sub_items' )
 							{
@@ -483,7 +489,7 @@ elseif( $confirmed )
 							if( $Blog->get( 'advanced_perms' )
 									&& $Blog->get_setting( 'allow_item_subscriptions' )
 									&& $Blog->get_setting( 'opt_out_item_subscription' )
-									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
 							{
 								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 										VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );
@@ -668,7 +674,7 @@ elseif( $confirmed )
 					break;
 
 				case 'meta_comment':
-					// resubscribe from meta comment notifications
+					// resubscribe from internal comment notifications
 					$UserSettings->set( 'notify_meta_comments', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
@@ -676,6 +682,12 @@ elseif( $confirmed )
 				case 'comment_mentioned':
 					// resubscribe to new comment notifications when user is mentioned:
 					$UserSettings->set( 'notify_comment_mentioned', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
+				case 'meta_comment_mentioned':
+					// resubscribe to new internal comment notifications when user is mentioned:
+					$UserSettings->set( 'notify_meta_comment_mentioned', '1', $edited_User->ID );
 					$UserSettings->dbupdate();
 					break;
 
@@ -882,13 +894,18 @@ switch( $type )
 		break;
 
 	case 'meta_comment':
-		// unsubscribe from meta comment notifications
-		$type_str = $notification_prefix.': '.T_('a meta comment is posted.');
+		// unsubscribe from internal comment notifications
+		$type_str = $notification_prefix.': '.T_('an internal comment is posted.');
 		break;
 
 	case 'comment_mentioned':
 		// unsubscribe from new comment notifications when user is mentioned:
 		$type_str = $notification_prefix.': '.T_('I have been mentioned on a comment.');
+		break;
+
+	case 'meta_comment_mentioned':
+		// unsubscribe from new internal comment notifications when user is mentioned:
+		$type_str = $notification_prefix.': '.T_('I have been mentioned on an internal comment.');
 		break;
 
 	case 'post_mentioned':

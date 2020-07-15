@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -198,11 +198,11 @@ class files_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User, $admin_url, $Settings;
+		global $admin_url, $Settings;
 
 		$filetypes_allowed_icon = get_icon( 'file_allowed' );
 		$filetypes_not_allowed_icon = get_icon( 'file_not_allowed' );
-		if( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{ // Set the links to icons if current user has a permission to edit the file types:
 			$filetypes_allowed_icon = '<a href="'.$admin_url.'?ctrl=filetypes" title="'.format_to_output( T_('Edit unlocked file types...'), 'htmlattr' ).'">'.$filetypes_allowed_icon.'</a>';
 			$filetypes_not_allowed_icon = '<a href="'.$admin_url.'?ctrl=filetypes" title="'.format_to_output( T_('Edit locked file types...'), 'htmlattr' ).'">'.$filetypes_not_allowed_icon.'</a>';
@@ -374,28 +374,28 @@ class files_Module extends Module
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'shared_root', $permlevel );
+					return check_user_perm( 'shared_root', $permlevel );
 				case 'import':
 					if( $permlevel == 'edit_allowed' )
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'import_root', $permlevel );
+					return check_user_perm( 'import_root', $permlevel );
 				case 'skins':
 				case 'siteskins':
 					if( $permlevel == 'edit_allowed' )
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'skins_root', $permlevel );
+					return check_user_perm( 'skins_root', $permlevel );
 				case 'plugins':
 					if( $permlevel == 'edit_allowed' )
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'plugins_root', $permlevel );
+					return check_user_perm( 'plugins_root', $permlevel );
 				case 'user':
-					if( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+					if( check_user_perm( 'users', 'moderate' ) && check_user_perm( 'files', 'all' ) )
 					{ // Current user can edits all files of other users
 						return true;
 					}
@@ -411,7 +411,7 @@ class files_Module extends Module
 							$perm = true;
 							return $perm;
 						}
-						if( $current_User->check_perm( 'blogs', $permlevel ) )
+						if( check_user_perm( 'blogs', $permlevel ) )
 						{	// If current user has access to view or edit all collections:
 							$perm = true;
 							return $perm;
@@ -598,13 +598,12 @@ class files_Module extends Module
 		 * @var Menu
 		 */
 		global $topleft_Menu;
-		global $current_User;
 		global $admin_url;
 		global $Collection, $Blog;
 
-		if( $current_User->check_perm( 'admin', 'standard' ) )
+		if( check_user_perm( 'admin', 'standard' ) )
 		{
-			if( !empty($Blog) && $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
+			if( !empty($Blog) && check_user_perm( 'files', 'view', false, $Blog->ID ) )
 			{	// Manage blog files:
 
 				// TODO: this is hackish and would require a proper function call
@@ -620,9 +619,9 @@ class files_Module extends Module
 			}
 		}
 
-		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'admin', 'restricted' ) )
 		{
-			if( $current_User->check_perm( 'files', 'view', false, NULL ) )
+			if( check_user_perm( 'files', 'view', false, NULL ) )
 			{	// Manage files generally:
 
 				// FM enabled and permission to view files:
@@ -643,10 +642,6 @@ class files_Module extends Module
 	function build_menu_1()
 	{
 		global $blog, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		global $Settings;
 		/**
@@ -654,12 +649,12 @@ class files_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
+		if( check_user_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
 		{	// FM enabled and permission to view files:
 			$AdminUI->add_menu_entries( NULL, array(
 						'files' => array(

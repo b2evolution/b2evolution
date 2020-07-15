@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -42,8 +42,8 @@ $Form->begin_form( 'evo_comment' );
 	$Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->hidden( 'redirect_to', $edited_Comment->get_permanent_url() );
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) &&
-	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'admin', 'restricted' ) &&
+	    check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->hidden( 'comment_issue_date', mysql2localedate( $edited_Comment->get( 'date' ) ) );
 		$Form->hidden( 'comment_issue_time', substr( $edited_Comment->get( 'date' ), 11 ) );
@@ -115,7 +115,7 @@ $Form->begin_form( 'evo_comment' );
 	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
 			'cols' => 38,
 			'rows' => 11,
-			'class' => 'evo_comment_field autocomplete_usernames',
+			'class' => 'evo_comment_field'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : ''),
 			'id' => $dummy_fields[ 'content' ],
 			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );

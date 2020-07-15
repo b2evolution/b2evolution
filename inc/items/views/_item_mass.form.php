@@ -17,10 +17,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var Item
  */
 global $edited_Item;
@@ -50,7 +46,7 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'item_checkchanges', 'post' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), 4, 2 );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ), 4, 2 );
 
 $Form->labelstart = '<strong>';
 $Form->labelend = "</strong>\n";
@@ -107,6 +103,8 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
 	$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+	$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
+	$Form->hidden( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ) );
 	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 	$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
 	// CUSTOM FIELDS
@@ -121,8 +119,8 @@ $Form->begin_form( '', '', $params );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	$Form->begin_fieldset( T_('Mass post contents').get_manual_link( 'mass-new-screen' ) );
-	//$Form->begin_fieldset( T_('Mass post contents').get_manual_link('post_contents_fieldset') );
+	$Form->begin_fieldset( TB_('Mass post contents').get_manual_link( 'mass-new-screen' ) );
+	//$Form->begin_fieldset( TB_('Mass post contents').get_manual_link('post_contents_fieldset') );
 
 	$Form->hidden( 'post_title', 'None' );
 	$Form->hidden( 'mass_create', '1' );
@@ -132,7 +130,7 @@ $Form->begin_form( '', '', $params );
 	// ---------------------------- TEXTAREA -------------------------------------
 	$Form->textarea_input( 'content', $item_content, 16, '', array(
 			'style' => 'width:100%',
-			'note'  => T_('Separate posts with a blank line. The first line of each post becomes a title.'),
+			'note'  => TB_('Separate posts with a blank line. The first line of each post becomes a title.'),
 			'cols'  => 40 ,
 			'rows'  => 33,
 			'id'    => 'itemform_post_content',
@@ -141,7 +139,7 @@ $Form->begin_form( '', '', $params );
 	echo '<br />';
 
 	// ------------------------------- SETTINGS ---------------------------------
-	$Form->checkbox( 'paragraphs_linebreak', false, '', T_( 'Create paragraphs at each line break' ) );
+	$Form->checkbox( 'paragraphs_linebreak', false, '', TB_( 'Create paragraphs at each line break' ) );
 
 	$Form->switch_layout( NULL );
 
@@ -150,7 +148,7 @@ $Form->begin_form( '', '', $params );
 	echo '<div class="edit_actions">';
 
 	$next_action = ($creating ? 'create' : 'update');
-	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ T_('Create posts'), 'SaveButton' ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', /* TRANS: This is the value of an input submit button */ TB_('Create posts'), 'SaveButton' ) );
 
 	echo '</div>';
 
@@ -170,7 +168,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### VISIBILITY / SHARING ###################
 
-	$Form->begin_fieldset( T_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
+	$Form->begin_fieldset( TB_('Visibility / Sharing'), array( 'id' => 'itemform_visibility' ) );
 
 	$Form->switch_layout( 'linespan' );
 	visibility_select( $Form, $edited_Item->status, true );
@@ -180,7 +178,7 @@ $Form->begin_form( '', '', $params );
 
 	// ################### TEXT RENDERERS ###################
 
-	$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
+	$Form->begin_fieldset( TB_('Text Renderers'), array( 'id' => 'itemform_renderers' ) );
 
 	// fp> TODO: there should be no param call here (shld be in controller)
 	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
@@ -192,25 +190,25 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->allow_comment_statuses() )
 	{
-		$Form->begin_fieldset( T_('Comments'), array( 'id' => 'itemform_comments' ) );
+		$Form->begin_fieldset( TB_('Comments'), array( 'id' => 'itemform_comments' ) );
 
 		?>
-			<label title="<?php echo T_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
-			<?php echo T_('Open') ?></label><br />
+			<label title="<?php echo TB_('Visitors can leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="open" class="checkbox" <?php if( $post_comment_status == 'open' ) echo 'checked="checked"'; ?> />
+			<?php echo TB_('Open') ?></label><br />
 		<?php
 		if( $edited_Item->get_type_setting( 'allow_closing_comments' ) )
 		{ // Allow closing comments
 		?>
-			<label title="<?php echo T_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="closed" class="checkbox" <?php if( $post_comment_status == 'closed' ) echo 'checked="checked"'; ?> />
-			<?php echo T_('Closed') ?></label><br />
+			<label title="<?php echo TB_('Visitors can NOT leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="closed" class="checkbox" <?php if( $post_comment_status == 'closed' ) echo 'checked="checked"'; ?> />
+			<?php echo TB_('Closed') ?></label><br />
 		<?php
 		}
 
 		if( $edited_Item->get_type_setting( 'allow_disabling_comments' ) )
 		{ // Allow disabling comments
 		?>
-			<label title="<?php echo T_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
-			<?php echo T_('Disabled') ?></label><br />
+			<label title="<?php echo TB_('Visitors cannot see nor leave comments on this post.') ?>"><input type="radio" name="post_comment_status" value="disabled" class="checkbox" <?php if( $post_comment_status == 'disabled' ) echo 'checked="checked"'; ?> />
+			<?php echo TB_('Disabled') ?></label><br />
 		<?php
 		}
 

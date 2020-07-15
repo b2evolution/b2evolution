@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -382,6 +382,10 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_end'   => "</div>\n",
 	);
 
+require_js( '#jquery#' );
+require_js( '#bootstrap#' );
+require_css( '#bootstrap_css#' );
+require_css( 'b2evo_helper_screens.min.css' );
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
@@ -400,12 +404,7 @@ if( $display != 'cli' )
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script src="../rsc/js/jquery.min.js"></script>
-		<!-- Bootstrap -->
-		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
-		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
-		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
-		<link href="../rsc/css/font-awesome.min.css" rel="stylesheet">
+		<?php include_headlines() /* Add javascript and css files included above */ ?>
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">
@@ -665,12 +664,12 @@ switch( $action )
 					{
 						if( ! is_null( $old_db_version ) && $old_db_version < $new_db_version )
 						{ // DB is not updagraded to new version yet, We should not suggest to normalize DB to avoid errors
-							display_install_messages( sprintf( T_('WARNING: Some of your tables have a different charset than the expected %s. You should normalize your database after upgrade.'), utf8_strtoupper( $evo_charset ) ), 'warning' );
+							display_install_messages( sprintf( T_('WARNING: Your database and/or some of your tables have a different charset than the expected %s. You should normalize your database after upgrade.'), utf8_strtoupper( $evo_charset ) ), 'warning' );
 						}
 						else
 						{ // DB is already upgraded to last version, Siggest to normalize DB
 							$require_charset_update = true;
-							display_install_messages( sprintf( T_('WARNING: Some of your tables have a different charset than the expected %s. It is strongly recommended to normalize your database charset by running the preselected task below:'), utf8_strtoupper( $evo_charset ) ) );
+							display_install_messages( sprintf( T_('WARNING: Your database and/or some of your tables have a different charset than the expected %s. It is strongly recommended to normalize your database charset by running the preselected task below:'), utf8_strtoupper( $evo_charset ) ) );
 						}
 					}
 				}
@@ -751,7 +750,7 @@ switch( $action )
 			</form>
 		<?php
 
-		display_base_config_recap();
+		display_base_config_recap( true );
 		echo_install_button_js();
 		break;
 
@@ -948,14 +947,16 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Installation in progress'), get_install_steps_count() );
 
-		echo get_install_format_text( '<h2>'.T_('Installing b2evolution...').'</h2>', 'h2' );
+		start_install_log( 'install-log' );
+
+		echo get_install_format_text_and_log( '<h2>'.T_('Installing b2evolution...').'</h2>', 'h2' );
 
 		// Try to obtain some serious time to do some serious processing (5 minutes)
 		// NOte: this must NOT be in upgrade_b2evo_tables(), otherwise it will mess with the longer setting used by the auto upgrade feature.
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
 			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
-			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
+			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the process to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
 		// Try to display the messages here because they can be created during checking params of quick installation:
@@ -973,7 +974,7 @@ switch( $action )
 			{ // A quick deletion is requested before new installation
 				require_once( dirname(__FILE__). '/_functions_delete.php' );
 
-				echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
+				echo get_install_format_text_and_log( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 				evo_flush();
 
 				// Uninstall b2evolution: Delete DB & Cache files
@@ -986,11 +987,11 @@ switch( $action )
 
 		if( $old_db_version = get_db_version() )
 		{
-			echo get_install_format_text( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
+			echo get_install_format_text_and_log( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
 
 			if( $old_db_version < $new_db_version )
 			{
-				echo get_install_format_text( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
+				echo get_install_format_text_and_log( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
 			}
 
 			// Stop the animation of the progress bar
@@ -1001,7 +1002,7 @@ switch( $action )
 
 		if( $htaccess != 'skip' )
 		{
-			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			echo get_install_format_text_and_log( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
 			evo_flush();
 			// Check for .htaccess:
 			if( ! install_htaccess( false, ($htaccess == 'force') ) )
@@ -1015,6 +1016,8 @@ switch( $action )
 
 		// Here's the meat!
 		install_newdb();
+
+		end_install_log();
 
 		// Stop the animation of the progress bar
 		stop_install_progress_bar();
@@ -1035,7 +1038,9 @@ switch( $action )
 		// Progress bar
 		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
-		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
+		start_install_log( 'upgrade-log' );
+
+		echo get_install_format_text_and_log( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
 
 		display_install_messages( sprintf( '<p>%s<ol><li>%s</li><li>%s</li><li>%s</li></ol></p>',
 				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
@@ -1045,7 +1050,7 @@ switch( $action )
 
 		if( $htaccess != 'skip' )
 		{
-			echo get_install_format_text( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
+			echo get_install_format_text_and_log( '<h2>'.T_('Checking files...').'</h2>', 'h2' );
 			evo_flush();
 			// Check for .htaccess:
 			if( ! install_htaccess( true, ($htaccess == 'force') ) )
@@ -1062,10 +1067,10 @@ switch( $action )
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
 			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
-			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
+			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the process to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
-		echo get_install_format_text( '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>', 'h2' );
 		evo_flush();
 
 		$is_automated_upgrade = ( $action !== 'evoupgrade' );
@@ -1100,19 +1105,21 @@ switch( $action )
 			$upgrade_result_title = T_('Upgrade completed successfully!');
 			$upgrade_result_body = sprintf( T_('Now you can <a %s>log in</a> with your usual b2evolution username and password.'), 'href="'.$admin_url.'"' );
 
-			echo get_install_format_text( '<p class="alert alert-success"><evo:success>'.$upgrade_result_title.'</evo:success></p>', 'p' );
-			echo get_install_format_text( '<p>'.$upgrade_result_body.'</p>', 'p' );
+			echo get_install_format_text_and_log( '<p class="alert alert-success"><evo:success>'.$upgrade_result_title.'</evo:success></p>', 'p' );
+			echo get_install_format_text_and_log( '<p>'.$upgrade_result_body.'</p>', 'p' );
 
 			// Display modal window with upgrade data and instructions
 			display_install_result_window( $upgrade_result_title, $upgrade_result_body );
 		}
 		else
 		{	// There has been an error during upgrade... (or upgrade was not performed)
-			echo get_install_format_text( '<p class="alert alert-danger" style="margin-top: 40px;"><evo:error>'.T_('Upgrade failed!').'</evo:error></p>', 'p' );
+			echo get_install_format_text_and_log( '<p class="alert alert-danger" style="margin-top: 40px;"><evo:error>'.T_('Upgrade failed!').'</evo:error></p>', 'p' );
 
 			// A link back to install menu
 			display_install_back_link();
 		}
+
+		end_install_log();
 
 		// Stop the animation of the progress bar
 		stop_install_progress_bar();
@@ -1135,14 +1142,14 @@ switch( $action )
 			start_install_progress_bar( T_('Deletion in progress') );
 		}
 
-		echo get_install_format_text( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.T_('Deleting b2evolution tables from the database...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $allow_evodb_reset < 1 )
 		{
 			echo T_('If you have installed b2evolution tables before and wish to start anew, you must delete the b2evolution tables before you can start a new installation. b2evolution can delete its own tables for you, but for obvious security reasons, this feature is disabled by default.');
-			echo get_install_format_text( '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>', 'p' );
-			echo get_install_format_text( '<p>'.T_('Then reload this page and a reset option will appear.').'</p>', 'p' );
+			echo get_install_format_text_and_log( '<p>'.sprintf( T_('To enable it, please go to the %s file and change: %s to %s'), '/conf/_basic_config.php', '<pre>$allow_evodb_reset = 0;</pre>', '<pre>$allow_evodb_reset = 1;</pre>' ).'</p>', 'p' );
+			echo get_install_format_text_and_log( '<p>'.T_('Then reload this page and a reset option will appear.').'</p>', 'p' );
 			// A link to back to install menu
 			display_install_back_link();
 
@@ -1298,6 +1305,7 @@ if( $display != 'cli' )
 ?>
 <!-- b2evo-install-action:<?php echo $action ?> -->
 <!-- b2evo-install-end -->
+	<?php include_footerlines(); /* Add JavaScript and CSS files included by plugins and skin */ ?>
 	</body>
 </html>
 <?php

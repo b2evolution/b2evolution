@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -23,7 +23,7 @@ global $Collection, $Blog;
  */
 global $edited_Item;
 
-global $admin_url, $current_User;
+global $admin_url;
 
 if( $lastedit_User = & $edited_Item->get_lastedit_User() )
 {	// Get login of last edit user
@@ -45,12 +45,12 @@ $proposed_changes_SQL->WHERE_and( 'iver_type = "proposed"' );
 
 // SQL to get current version:
 $current_sql = 'SELECT "current" AS iver_ID, "c" AS param_ID,
-		"'.$edited_Item->last_touched_ts.'" AS iver_edit_last_touched_ts,
-		"'.$edited_Item->lastedit_user_ID.'" AS iver_edit_user_ID,
+		'.$DB->quote( $edited_Item->last_touched_ts ).' AS iver_edit_last_touched_ts,
+		'.$DB->quote( $edited_Item->lastedit_user_ID ).' AS iver_edit_user_ID,
 		"current" AS iver_type,
-		"'.$edited_Item->status.'" AS iver_status,
-		"'.$edited_Item->title.'" AS iver_title,
-		"'.str_replace( '"', '\"', $lastedit_user_login ).'" AS user_login,
+		'.$DB->quote( $edited_Item->status ).' AS iver_status,
+		'.$DB->quote( $edited_Item->title ).' AS iver_title,
+		'.$DB->quote( $lastedit_user_login ).' AS user_login,
 		0 AS version_order';
 
 // SQL to get old versions:
@@ -204,7 +204,7 @@ $Results->cols[] = array(
  */
 function iver_td_actions( $iver_ID, $iver_type )
 {
-	global $edited_Item, $current_User;
+	global $edited_Item;
 	$r = '';
 
 	// Button to view the version:

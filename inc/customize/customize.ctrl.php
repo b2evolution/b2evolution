@@ -28,6 +28,9 @@ param( 'view', 'string', '' );
 $UserSettings->set( 'customizer_view_'.$blog, $view );
 $UserSettings->dbupdate();
 
+// Initialize shortcut keys
+init_hotkeys_js( 'blog' );
+
 switch( $view )
 {
 	case 'site_skin':

@@ -62,7 +62,7 @@ class item_comment_form_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Comment Form');
+		return T_('Comment Form');
 	}
 
 
@@ -194,7 +194,6 @@ class item_comment_form_Widget extends ComponentWidget
 								'block_after'     => '',
 								'block_separator' => '<br /><br />' ) ) )
 					) ),
-				'comment_mode'         => '', // Can be 'quote' from GET request
 				'comment_type'         => 'comment',
 				'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
 				'comment_title_after'   => '</h4></div><div class="panel-body">',
@@ -216,7 +215,9 @@ class item_comment_form_Widget extends ComponentWidget
 		$section_title = $widget_params['form_title_start'].$widget_params['form_title_text'].$widget_params['form_title_end'];
 		if( $widget_params['disp_comment_form'] && ( $widget_params['comment_type'] == 'meta' && $Item->can_meta_comment() ||
 				$Item->can_comment( $widget_params['before_comment_error'], $widget_params['after_comment_error'], '#', $widget_params['comment_closed_text'], $section_title, $widget_params ) ) )
-		{ // We want to display the comments form and the item can be commented on:
+		{	// We want to display the comments form and the item can be commented on:
+
+			echo '<a name="'.( $widget_params['comment_type'] == 'meta' ? 'meta-comment-form' : 'comment-form' ).'"></a>';
 
 			echo $widget_params['before_comment_form'];
 
@@ -224,7 +225,7 @@ class item_comment_form_Widget extends ComponentWidget
 			if( $Comment = get_comment_from_session( 'preview', $widget_params['comment_type'] ) )
 			{	// We have a comment to preview
 				if( $Comment->item_ID == $Item->ID )
-				{ // display PREVIEW:
+				{	// display PREVIEW:
 
 					// We do not want the current rendered page to be cached!!
 					if( !empty( $PageCache ) )
@@ -238,7 +239,7 @@ class item_comment_form_Widget extends ComponentWidget
 					}
 
 					if( empty( $Comment->in_reply_to_cmt_ID ) )
-					{ // Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
+					{	// Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
 						// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 						skin_include( $widget_params['comment_template'], array(
 								'Comment'               => & $Comment,
@@ -284,9 +285,9 @@ class item_comment_form_Widget extends ComponentWidget
 				}
 			}
 			else
-			{ // New comment:
+			{	// New comment:
 				if( ( $Comment = get_comment_from_session( 'unsaved', $widget_params['comment_type'] ) ) == NULL )
-				{ // there is no saved Comment in Session
+				{	// there is no saved Comment in Session
 					$Comment = new Comment();
 					$Comment->set( 'type', $widget_params['comment_type'] );
 					$Comment->set( 'item_ID', $Item->ID );
@@ -298,7 +299,7 @@ class item_comment_form_Widget extends ComponentWidget
 						$comment_author_url = '';
 					}
 					else
-					{ // Get params from $_COOKIE
+					{	// Get params from $_COOKIE
 						$comment_author = param_cookie( $cookie_name, 'string', '' );
 						$comment_author_email = utf8_strtolower( param_cookie( $cookie_email, 'string', '' ) );
 						$comment_author_url = param_cookie( $cookie_url, 'string', '' );
@@ -311,7 +312,7 @@ class item_comment_form_Widget extends ComponentWidget
 					$comment_content =  $widget_params['default_text'];
 				}
 				else
-				{ // set saved Comment attributes from Session
+				{	// set saved Comment attributes from Session
 					$comment_content = $Comment->content;
 					$comment_author = $Comment->author;
 					$comment_author_email = $Comment->author_email;
@@ -325,20 +326,11 @@ class item_comment_form_Widget extends ComponentWidget
 					$checked_attachments = $Comment->checked_attachments;
 				}
 
-				if( $widget_params['comment_mode'] == 'quote' )
-				{	// These params go from ajax form loading, Used to reply with quote
-					set_param( 'mode', $widget_params['comment_mode'] );
-					set_param( 'qc', $widget_params['comment_qc'] );
-					set_param( 'qp', $widget_params['comment_qp'] );
-					set_param( $dummy_fields[ 'content' ], $widget_params[ $dummy_fields[ 'content' ] ] );
-				}
-
-				$mode = param( 'mode', 'string' );
-				if( $mode == 'quote' )
-				{ // Quote for comment/post
+				$quoted_comment_ID = param( 'quote_comment', 'integer', 0 );
+				$quoted_post_ID = param( 'quote_post', 'integer', 0 );
+				if( $quoted_comment_ID || $quoted_post_ID )
+				{	// Quote for comment/post
 					$comment_content = param( $dummy_fields[ 'content' ], 'html' );
-					$quoted_comment_ID = param( 'qc', 'integer', 0 );
-					$quoted_post_ID = param( 'qp', 'integer', 0 );
 					if( ! empty( $quoted_comment_ID ) &&
 							( $CommentCache = & get_CommentCache() ) &&
 							( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
@@ -346,11 +338,11 @@ class item_comment_form_Widget extends ComponentWidget
 					{	// Allow comment quoting only for the same comment type form:
 						$quoted_Item = $quoted_Comment->get_Item();
 						if( $quoted_User = $quoted_Comment->get_author_User() )
-						{ // User is registered
+						{	// User is registered
 							$quoted_login = $quoted_User->login;
 						}
 						else
-						{ // Anonymous user
+						{	// Anonymous user
 							$quoted_login = $quoted_Comment->get_author_name();
 						}
 						$quoted_content = $quoted_Comment->get( 'content' );
@@ -389,7 +381,7 @@ class item_comment_form_Widget extends ComponentWidget
 				param( 'comment_allow_msgform', 'integer', NULL ); // checkbox
 
 				if( is_null($comment_cookies) )
-				{ // "Remember me" checked, if remembered before:
+				{	// "Remember me" checked, if remembered before:
 					$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
 				}
 			}
@@ -430,6 +422,7 @@ class item_comment_form_Widget extends ComponentWidget
 			$Form->hidden( 'comment_type', $widget_params['comment_type'] );
 			$Form->hidden( 'comment_item_ID', $Item->ID );
 
+			$comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 			$comment_type = param( 'comment_type', 'string', 'comment' );
 			if( ! empty( $comment_reply_ID ) && $comment_type == $widget_params['comment_type'] )
 			{
@@ -471,7 +464,7 @@ class item_comment_form_Widget extends ComponentWidget
 			}
 
 			if( ! $Comment->is_meta() && $Item->can_rate() )
-			{ // Comment rating:
+			{	// Comment rating:
 				ob_start();
 				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
 				$comment_rating = ob_get_clean();
@@ -484,19 +477,12 @@ class item_comment_form_Widget extends ComponentWidget
 			}
 
 			// Workflow properties:
-			if( $Comment->is_meta() &&
-			    $Item->can_edit_workflow() )
+			if( $Comment->is_meta() )
 			{	// Display workflow properties if current user can edit at least one workflow property:
-				$Item->display_workflow_field( 'status', $Form );
-
-				$Item->display_workflow_field( 'user', $Form );
-
-				$Item->display_workflow_field( 'priority', $Form );
-
-				$Item->display_workflow_field( 'deadline', $Form );
-
-				// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
-				$widget_params['form_submit_text'] = T_('Update Status').' / '.$widget_params['form_submit_text'];
+				skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+					'Form'    => & $Form,
+					'Comment' => & $Comment,
+				) ) );
 			}
 
 			// Set prefix for js code in plugins:
@@ -529,24 +515,41 @@ class item_comment_form_Widget extends ComponentWidget
 			$Form->textarea_input( $dummy_fields['content'], $comment_content, $widget_params['textarea_lines'], $widget_params['form_comment_text'], array(
 					'note'  => $note,
 					'cols'  => 38,
-					'class' => 'autocomplete_usernames',
+					'class' => ( check_autocomplete_usernames( $Comment ) ? 'autocomplete_usernames ' : '' ).'link_attachment_dropzone',
 					'id'    => $content_id,
-					'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+					'maxlength' => ( $Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 				) );
 			$Form->inputstart = $form_inputstart;
 
 			// Set canvas object for plugins:
 			echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
+			if( $Item->can_attach( false, $Comment->type ) )
+			{	// If current user has permission to attach files for the item:
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				// Create $LinkComment to generate temporary link owner ID for the $Comment:
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+
+				if( empty( $Comment->temp_link_owner_ID ) )
+				{	// Set Comment temp_link_owner_ID:
+					$Comment->temp_link_owner_ID = $LinkOwner->get_ID();
+				}
+			}
+
 			// CALL PLUGINS NOW:
 			ob_start();
-			$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-				'target_type'   => 'Comment',
-				'target_object' => $Comment,
-				'content_id'    => $content_id,
-				'edit_layout'   => 'inskin',
-			) );
-			$quick_setting_switch = ob_get_flush();
+			$admin_editor_params = array(
+					'target_type'   => 'Comment',
+					'target_object' => $Comment,
+					'content_id'    => $content_id,
+					'edit_layout'   => 'inskin',
+				);
+			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			{
+				$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+			}
+			$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
+			$admin_display_editor_button = ob_get_clean();
 
 			// Additional options:
 			$comment_options = array();
@@ -565,10 +568,6 @@ class item_comment_form_Widget extends ComponentWidget
 			{	// For registered user and normal(not meta) comment and if item subscriptions are allowed for current collection:
 				$comment_options[] = array( 'comment_user_notify', 1, T_('Notify me of replies'), ( isset( $comment_user_notify ) ? $comment_user_notify : 1 ) );
 			}
-			if( count( $comment_options ) > 0 )
-			{	// Display additional options:
-				$Form->checklist( $comment_options, 'comment_options', T_('Options') );
-			}
 
 			// Display renderers
 			$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
@@ -576,9 +575,67 @@ class item_comment_form_Widget extends ComponentWidget
 					'setting_name' => 'coll_apply_comment_rendering',
 					'js_prefix'    => $plugin_js_prefix,
 				) );
+
+			$text_renderers = '';
 			if( !empty( $comment_renderer_checkboxes ) )
 			{
-				$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
+				//$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
+				$text_renderers .= '<div id="commentform_renderers" class="btn-group dropup pull-right">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> '.T_('Text Renderers').'</button>
+						<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
+					</div>';
+					// JS code to don't hide popup on click to checkbox:
+					expose_var_to_js( 'evo_commentform_renderers__click', true );
+			}
+
+			if( $Blog->get_setting( 'allow_html_comment' ) )
+			{
+				$form_fieldstart = $Form->fieldstart;
+				$Form->fieldstart = add_tag_class( $Form->fieldstart, 'comment_text_renderers' );
+				$Form->begin_line();
+				echo '<div class="text_editor_controls">';
+					echo '<div>';
+					echo $admin_display_editor_button;
+					echo '</div>';
+
+					if( ! empty( $text_renderers ) )
+					{
+						echo $text_renderers;
+					}
+				echo '</div>';
+				$Form->end_line();
+				$Form->fieldstart = $form_fieldstart;
+
+				if( count( $comment_options ) > 0 )
+				{
+					$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+				}
+			}
+			else
+			{
+				if( count( $comment_options ) > 0 )
+				{
+					$form_inputstart = $Form->inputstart;
+					$form_inputend   = $Form->inputend;
+
+					$Form->inputstart = add_tag_class( $Form->inputstart, 'text_editor_controls' );
+					$Form->inputstart .='<div>';
+					$Form->inputend = '</div><div class="comment_text_renderers">'.$text_renderers.'</div>'.$Form->inputend;
+
+					$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+
+					$Form->inputstart = $form_inputstart;
+					$Form->inputend   = $form_inputend;
+				}
+				elseif( ! empty( $text_renderers ) )
+				{
+					$form_fieldstart = $Form->fieldstart;
+					$Form->fieldstart = add_tag_class( $Form->fieldstart, 'comment_text_renderers' );
+					$Form->begin_line();
+					echo $text_renderers;
+					$Form->end_line();
+					$Form->fieldstart = $form_fieldstart;
+				}
 			}
 
 			// Attach files:
@@ -616,6 +673,19 @@ class item_comment_form_Widget extends ComponentWidget
 			// Display attachments fieldset:
 			$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
 
+			if( ! $Comment->is_meta() )
+			{	// Display workflow properties for normal comment form here:
+				skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+						'Form'    => & $Form,
+						'Comment' => & $Comment,
+					) ) );
+			}
+
+			if( $Item->can_edit_workflow() )
+			{	// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
+				$widget_params['form_submit_text'] = T_('Update Status').' / '.$widget_params['form_submit_text'];
+			}
+
 			$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 			// Display plugin captcha for comment form before submit button:
@@ -634,23 +704,14 @@ class item_comment_form_Widget extends ComponentWidget
 
 				if( $Item->can_attach() )
 				{	// Don't display "/Add file" on the preview button if JS is enabled:
-					echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+					expose_var_to_js( 'evo_comment_form_preview_button_config', evo_json_encode( array( 'button_value' => T_('Preview') ) ) );
 				}
 
 				$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 				echo $Form->buttonsend;
 			$Form->end_fieldset();
-			?>
-			<script type="text/javascript">
-			jQuery( document ).ready( function() {
-				// Align TinyMCE toggle buttons:
-				jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
-			} );
-			</script>
-			<div class="clear"></div>
 
-			<?php
 			$Form->end_form();
 
 			echo $widget_params['after_comment_form'];

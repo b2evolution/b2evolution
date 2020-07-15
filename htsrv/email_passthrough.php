@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -206,16 +206,9 @@ switch( $type )
 			}
 		}
 
-		// Redirect
-		if( empty( $redirect_to ) )
-		{	// If a redirect param was not defined on submitted form then redirect to site url:
-			$redirect_to = $baseurl;
-		}
-
-		// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
-		// header_redirect( $redirect_to, 303 ); // Will EXIT
-		header( 'Location: '.$redirect_to, true, 303 ); // explictly setting the status is required for (fast)cgi
-		exit(0);
+		// Use message of already loaded email log above, otherwise set empty string in order to don't execute SQL query twice:
+		$email_log_message = ( isset( $email_log['emlog_message'] ) ? $email_log['emlog_message'] : '' );
+		header_redirect_from_email( $redirect_to, 303, $email_log_message );
 		// We have EXITed already at this point!!
 		break;
 
@@ -224,12 +217,8 @@ switch( $type )
 		update_mail_log_time( 'open', $email_ID, $email_key );
 
 		if( ! empty( $redirect_to ) )
-		{
-			// Redirect
-			// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
-			//header_redirect( $redirect_to, 302 ); // Will EXIT
-			header( 'Location: '.$redirect_to, true, 302 ); // explictly setting the status is required for (fast)cgi
-			exit(0);
+		{	// Do redirect only when URL is provided:
+			header_redirect_from_email( $redirect_to, 302, NULL, $email_ID, $email_key );
 			// We have EXITed already at this point!!
 		}
 		break;

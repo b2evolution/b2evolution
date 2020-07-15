@@ -360,9 +360,11 @@ class polls_Module extends Module
 				}
 
 				if( ! empty( $redirect_to ) )
-				{ // header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
-					header( 'Location: '.$redirect_to, true, 303 ); // explictly setting the status is required for (fast)cgi
-					exit( 0 );
+				{	// Redirect to provided URL after voting:
+					// Use message of already loaded email log above, otherwise set empty string in order to don't execute SQL query twice:
+					$email_log_message = ( isset( $email_log['emlog_message'] ) ? $email_log['emlog_message'] : '' );
+					header_redirect_from_email( $redirect_to, 303, $email_log_message );
+					// We have EXITed already at this point!!
 				}
 				break;
 		}
@@ -376,14 +378,14 @@ class polls_Module extends Module
 	 */
 	function build_menu_2()
 	{
-		global $admin_url, $current_User, $AdminUI;
+		global $admin_url, $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{	// User must has an access to back-office:
 			return;
 		}
 
-		if( $current_User->check_perm( 'polls', 'create' ) )
+		if( check_user_perm( 'polls', 'create' ) )
 		{	// User has an access at least to view and edit own polls:
 			$AdminUI->add_menu_entries( array( 'site' ), array(
 				'polls' => array(

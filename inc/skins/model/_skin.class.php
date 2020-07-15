@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -106,10 +106,11 @@ class Skin extends DataObject
 				array( 'table'=>'T_blogs', 'fk'=>'blog_normal_skin_ID', 'fk_short'=>'normal_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_blogs', 'fk'=>'blog_mobile_skin_ID', 'fk_short'=>'mobile_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_blogs', 'fk'=>'blog_tablet_skin_ID', 'fk_short'=>'tablet_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_alt_skin_ID', 'fk_short'=>'alt_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
-						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
+						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" OR set_name = "def_alt_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
-						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
+						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" OR set_name = "alt_skin_ID" )' ),
 			);
 	}
 
@@ -143,7 +144,7 @@ class Skin extends DataObject
 	/**
 	 * Get default type/format for the skin.
 	 *
-	 * Possible values are normal, tablet, phone, feed, sitemap.
+	 * Possible values are normal, tablet, phone, feed, sitemap, alt.
 	 */
 	function get_default_type()
 	{
@@ -152,7 +153,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Does this skin providesnormal (collection) skin functionality?
+	 * Does this skin provide normal (collection) skin functionality?
 	 */
 	function provides_collection_skin()
 	{
@@ -187,6 +188,34 @@ class Skin extends DataObject
 	function get_api_version()
 	{
 		return 5;
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// This function MUST be overriden by custom skin and return proper Array like sample below.
+		// It is declared here only to avoid errors during upgrade in case of older/badly written Skins.
+
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		/* Sample:
+		return array(
+				'sidebar_single'       => array( NT_('Sidebar Single'), 95 ),
+				'front_page_main_area' => NULL,
+			);
+		*/
+
+		return array();
 	}
 
 
@@ -245,6 +274,61 @@ class Skin extends DataObject
 	function get_css_framework()
 	{
 		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
+	}
+
+
+	/**
+	 * Set param value
+	 *
+	 * By default, all values will be considered strings
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'name':
+				// Restrict long skin names to avoid die error:
+				$parvalue = utf8_substr( $parvalue, 0, 128 );
+				break;
+		}
+
+		return parent::set( $parname, $parvalue, $make_null );
+	}
+
+
+	/**
+	 * Get the declarations of the widgets that the skin recommends by default.
+	 *
+	 * The skin class defines a default set of widgets to used. Skins should override this.
+	 *
+	 * @param string Collection type: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param string Skin type: 'normal' - Standard, 'mobile' - Phone, 'tablet' - Tablet
+	 * @param array Additional params. Example value 'init_as_blog_b' => true
+	 * @return array Array of default widgets:
+	 *          - Key - Container code,
+	 *          - Value - array of widget arrays OR SPECIAL VALUES:
+	 *             - 'coll_type': Include this container only for collection kinds separated by comma, first char "-" means to exclude,
+	 *             - 'type': Container type, empty - main container, other values: 'sub', 'page', 'shared', 'shared-sub',
+	 *             - 'name': Container name,
+	 *             - 'order': Container order,
+	 *             - widget data array():
+	 *                - 0: Widget order (*mandatory field*),
+	 *                - 1: Widget code (*mandatory field*),
+	 *                - 'params' - Widget params(array or serialized string),
+	 *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
+	 *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
+	 *                - 'coll_type': Include this widget only for collection types separated by comma, first char "-" means to exclude,
+	 *                - 'skin_type': Include this widget only for skin types separated by comma, first char "-" means to exclude,
+	 *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
+	 */
+	function get_default_widgets( $coll_type, $skin_type = 'normal', $context = array() )
+	{
+		return array( '*' => true ); // For all containers, use b2evo defaults.
 	}
 
 
@@ -315,7 +399,7 @@ class Skin extends DataObject
 		 */
 		global $Collection, $Blog;
 		global $admin_url, $rsc_url;
-		global $Timer, $Session, $debug, $current_User;
+		global $Timer, $Session, $debug;
 
 		$params = array_merge( array(
 				'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
@@ -364,7 +448,7 @@ class Skin extends DataObject
 		if( $display_debug_containers )
 		{ // Wrap container in visible container:
 			echo '<div class="dev-blocks dev-blocks--container"><div class="dev-blocks-name">';
-			if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Display a link to edit this widget only if current user has a permission:
 				echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'">Edit</a></span>';
 			}
@@ -627,14 +711,24 @@ class Skin extends DataObject
 	{
 		if( is_null( $this->container_list ) )
 		{
-			if( method_exists( $this, 'get_declared_containers' ) )
+			$skin_declared_containers = $this->get_declared_containers();
+			if( $this->get_api_version() > 5 || ! empty( $skin_declared_containers ) )
 			{	// Get default containers and containers what declared by this skin:
-				$this->container_list = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
+				// All v6+ skins must use either declared containers or default containers,
+				$this->container_list = array_merge( get_skin_default_containers(), $skin_declared_containers );
 
 				foreach( $this->container_list as $wico_code => $wico_data )
 				{
 					if( $wico_data === NULL )
 					{	// Exclude containers which are not used in the current Skin:
+						unset( $this->container_list[ $wico_code ] );
+					}
+
+					if( ! is_array( $wico_data ) || // Must be array
+					    ! isset( $wico_data[0] ) || // 1st for container title
+					    ! isset( $wico_data[1] ) || // 2nd for container order
+					    ! is_number( $wico_data[1] ) ) // Order must be a number
+					{	// Skip wrong container data:
 						unset( $this->container_list[ $wico_code ] );
 					}
 				}
@@ -644,6 +738,7 @@ class Skin extends DataObject
 			}
 			else
 			{	// Get containers from skin files:
+				// Only v5 skins may use containers searched in skin files if they don't declare at least one container:
 				$this->discover_containers( false );
 			}
 		}
@@ -689,20 +784,24 @@ class Skin extends DataObject
 				'highlighted'     => false,
 			), $disp_params );
 
-		if( isset( $disp_params[ 'select_url' ] ) )
-		{
-			$skin_url = $disp_params[ 'select_url' ];
-			$select_a_begin = '<a href="'.$disp_params[ 'select_url' ].'" title="'.T_('Select this skin!').'">';
+		if( isset( $disp_params['select_url'] ) )
+		{	// Initialize params for link to SELECT new skin for collection:
+			$skin_url = $disp_params['select_url'];
+			$select_a_begin = '<a href="'.format_to_output( $disp_params['select_url'], 'htmlattr' ).'"'
+					.( isset( $disp_params['onclick'] ) ? ' onclick="'.format_to_output( $disp_params['onclick'] , 'htmlattr' ).'"' : '' )
+					.' title="'.format_to_output( T_('Select this skin!'), 'htmlattr' ).'">';
 			$select_a_end = '</a>';
 		}
-		elseif( isset( $disp_params[ 'function_url' ] ) )
-		{
-			$skin_url = $disp_params[ 'function_url' ];
-			$select_a_begin = '<a href="'.$disp_params[ 'function_url' ].'" title="'.T_('Install NOW!').'">';
+		elseif( isset( $disp_params['function_url'] ) )
+		{	// Initialize params for link to INSTALL new skin and probably select this automatically for collection:
+			$skin_url = $disp_params['function_url'];
+			$select_a_begin = '<a href="'.$disp_params['function_url'].'"'
+				.( isset( $disp_params['onclick'] ) ? ' onclick="'.format_to_output( $disp_params['onclick'] , 'htmlattr' ).'"' : '' )
+				.' title="'.format_to_output( T_('Install NOW!'), 'htmlattr' ).'">';
 			$select_a_end = '</a>';
 		}
 		else
-		{
+		{	// No link:
 			$skin_url = '';
 			$select_a_begin = '';
 			$select_a_end = '';
@@ -785,7 +884,7 @@ class Skin extends DataObject
 						echo '<a href="'.$skin_url.'" title="'.$link_text.'">';
 						echo $link_text.'</a>';
 					}
-					if( empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+					if( empty( $kind ) && get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
 					{	// Don't display the checkbox on new collection creating form and when we install one skin for the selected collection:
 						$skin_name_before = '<label><input type="checkbox" name="skin_folders[]" value="'.$skin_name.'" /> ';
 						$skin_name_after = '</label>';
@@ -847,9 +946,10 @@ class Skin extends DataObject
 	 *
 	 * @param string Setting name
 	 * @param string Input group name
+	 * @param mixed Default value, Set to different than NULL only if it is called from a Skin::get_param_definitions() function to avoid infinite loop
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname, $group = NULL )
+	function get_setting( $parname, $group = NULL, $default_value = NULL )
 	{
 		global $Collection, $Blog, $Settings;
 
@@ -879,7 +979,28 @@ class Skin extends DataObject
 			return $value;
 		}
 
+		if( $default_value !== NULL )
+		{	// Use defined default value when it is not saved in DB yet:
+			// (This call is used to get a value from function Skin::get_param_definition() to avoid infinite loop)
+			return $default_value;
+		}
+
 		return $this->get_setting_default_value( $group.$parname, $group );
+	}
+
+
+	/**
+	 * Get value of setting with format "checklist" which values are stored as array
+	 *
+	 * @param string Setting name
+	 * @param string Option name
+	 * @return string|NULL Option value or NULL if setting doesn't exist
+	 */
+	function get_checklist_setting( $setting_name, $option_name )
+	{
+		$setting_values = $this->get_setting( $setting_name );
+
+		return isset( $setting_values[ $option_name ] ) ? $setting_values[ $option_name ] : NULL;
 	}
 
 
@@ -980,7 +1101,7 @@ class Skin extends DataObject
 		if( $params['type'] == 'image_file' )
 		{	// Special setting type as ID of image file:
 			if( $this->get_setting( $setting_name ) &&
-					( $FileCache = & get_FileCache() ) && 
+					( $FileCache = & get_FileCache() ) &&
 					( $image_File = & $FileCache->get_by_ID( $this->get_setting( $setting_name ), false, false ) ) &&
 					$image_File->exists() )
 			{
@@ -1049,13 +1170,25 @@ class Skin extends DataObject
 			}
 		}
 
+		// Replace mask with setting value:
+		$this->add_dynamic_style( str_replace( '$setting_value$', $setting_value, $style_template ) );
+	}
+
+
+	/**
+	 * Add style rule in array $this->dynamic_styles
+	 *
+	 * @param string Style rule
+	 */
+	function add_dynamic_style( $style_rule )
+	{
 		if( ! isset( $this->dynamic_styles ) )
 		{
 			$this->dynamic_styles = array();
 		}
 
 		// Replace mask with setting value:
-		$this->dynamic_styles[] = str_replace( '$setting_value$', $setting_value, $style_template );
+		$this->dynamic_styles[] = $style_rule;
 	}
 
 
@@ -1190,7 +1323,7 @@ class Skin extends DataObject
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
 	 * If this doesn't do what you need you may add functions like the following to your skin's display_init():
-	 * require_js() , require_css() , add_js_headline()
+	 * require_js_async() , require_js_defer() , require_css() , add_js_headline()
 	 *
 	 * @param array of possible features you want to include. If empty, will default to {'b2evo_base', 'style', 'colorbox'} for backwards compatibility.
 	 */
@@ -1220,9 +1353,36 @@ class Skin extends DataObject
 
 			switch( $feature )
 			{
+				case 'superbundle':
+					// Include jQuery + Bootstrap + General front-office scripts:
+					require_js_defer( 'build/bootstrap-evo_frontoffice-superbundle.bmin.js', 'blog' );
+					// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+					init_fontawesome_icons( 'fontawesome-glyphicons', 'blog', false /* Don't load CSS file because it is bundled */ );
+					// Include the bootstrap-b2evo_base CSS (NEW / v6 style) - Use this when you use Bootstrap:
+					if( $debug )
+					{	// Use readable CSS:
+						// rsc/css/font-awesome.css
+						// rsc/css/bootstrap/bootstrap.css
+						// rsc/build/bootstrap-b2evo_base.bundle.css:
+						//  - rsc/less/bootstrap-basic_styles.less
+						//  - rsc/less/bootstrap-basic.less
+						//  - rsc/less/bootstrap-blog_base.less
+						//  - rsc/less/bootstrap-item_base.less
+						//  - rsc/less/bootstrap-evoskins.less
+						require_css( 'bootstrap-b2evo_base-superbundle.bundle.css', 'blog' ); // CSS concatenation of the above
+					}
+					else
+					{	// Use minified CSS:
+						require_css( 'bootstrap-b2evo_base-superbundle.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
+					}
+					break;
+
 				case 'jquery':
 					// Include jQuery:
-					require_js( '#jquery#', 'blog' );
+					if( ! in_array( 'superbundle', $features ) )
+					{	// Don't include when it is already bundled:
+						require_js_defer( '#jquery#', 'blog' );
+					}
 					break;
 
 				case 'font_awesome':
@@ -1232,8 +1392,11 @@ class Skin extends DataObject
 
 				case 'bootstrap':
 					// Include Bootstrap:
-					require_js( '#bootstrap#', 'blog' );
-					require_css( '#bootstrap_css#', 'blog' );
+					if( ! in_array( 'superbundle', $features ) )
+					{	// Don't include when it is already bundled:
+						require_js_defer( '#bootstrap#', 'blog' );
+						require_css( '#bootstrap_css#', 'blog' );
+					}
 					break;
 
 				case 'bootstrap_theme_css':
@@ -1242,6 +1405,10 @@ class Skin extends DataObject
 					break;
 
 				case 'bootstrap_evo_css':
+					if( in_array( 'superbundle', $features ) )
+					{	// Don't include when it is already bundled:
+						break;
+					}
 					// Include the bootstrap-b2evo_base CSS (NEW / v6 style) - Use this when you use Bootstrap:
 					if( $debug )
 					{	// Use readable CSS:
@@ -1256,11 +1423,6 @@ class Skin extends DataObject
 					{	// Use minified CSS:
 						require_css( 'bootstrap-b2evo_base.bmin.css', 'blog' ); // Concatenation + Minifaction of the above
 					}
-					break;
-
-				case 'bootstrap_init_tooltips':
-					// JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions):
-					add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
 					break;
 
 				case 'bootstrap_messages':
@@ -1340,14 +1502,13 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Collection, $Blog, $Item, $current_User;
+					global $Collection, $Blog, $Item;
 
 					if( ! empty( $Item ) && $Item->can_receive_webmentions() )
 					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
 						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
 						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
 						add_headline( '<link rel="webmention" href="'.$webmention_url.'" />' );
-						add_headline( '<link rel="http://webmention.org/" href="'.$webmention_url.'" />' );// used for older version of the protocol specification
 					}
 
 					// Used to set rating for a new comment:
@@ -1367,27 +1528,24 @@ class Skin extends DataObject
 
 					if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
 					{ // Load jquery UI to animate background color on change comment status or on vote:
-						require_js( '#jqueryUI#', 'blog' );
+						require_js_defer( '#jqueryUI#', 'blog' );
 					}
 
-					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					if( $Blog->get_setting( 'use_workflow' ) && check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 					{	// Initialize JS to autcomplete user logins and date picker to edit workflow properties:
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
 
-					// Used to quick upload several files:
-					init_fileuploader_js( 'blog' );
-
 					// Used to change link position:
-					require_js( 'backoffice.js', 'blog' );
+					require_js_defer( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_users':
 					// Specific features for disp=users:
 
 					// Used to add new search field "Specific criteria":
-					require_js( '#jqueryUI#', 'blog' );
+					require_js_defer( '#jqueryUI#', 'blog' );
 					require_css( '#jqueryUI_css#', 'blog' );
 					// Load jQuery QueryBuilder plugin files for user list filters:
 					init_querybuilder_js( 'blog' );
@@ -1399,11 +1557,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_messages':
@@ -1419,26 +1573,14 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
-
-					// Require Fine Uploader js and css:
-					require_js( 'multiupload/fine-uploader.js', 'blog' );
-					require_css( 'fine-uploader.css', 'blog' );
-
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#', 'blog' );
-					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_contacts':
 					// Specific features for disp=contacts:
 
 					// Used for combo box "Add all selected contacts to this group":
-					require_js( 'form_extensions.js', 'blog' );
+					require_js_defer( 'form_extensions.js', 'blog' );
 
 					// Require results.css to display contact query results in a table
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1447,11 +1589,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_threads':
@@ -1471,12 +1609,8 @@ class Skin extends DataObject
 						require_css( 'results.css', 'blog' ); // Results/tables styles
 					}
 
-					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
+					// Require functions.js to show/hide a panel with filters
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_search':
@@ -1494,8 +1628,10 @@ class Skin extends DataObject
 					global $Settings, $Plugins;
 
 					if( can_use_hashed_password() )
-					{ // Include JS for client-side password hashing:
-						require_js( 'build/sha1_md5.bmin.js', 'blog' );
+					{	// Include JS for client-side password hashing:
+						require_js_defer( 'build/sha1_md5.bmin.js', 'blog' );
+						require_js_defer( '#jquery#', 'blog' );
+						require_js_defer( 'src/evo_init_display_login_js_handler.js', 'blog' );
 					}
 					break;
 
@@ -1506,14 +1642,14 @@ class Skin extends DataObject
 					init_userfields_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to crop profile pictures:
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
+					require_js_defer( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
 					break;
 
@@ -1521,15 +1657,20 @@ class Skin extends DataObject
 					// Specific features for disp=avatar:
 
 					// Used to crop profile pictures:
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
+					require_js_defer( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
+					break;
+
+				case 'disp_visits':
+					// Require functions.js to show/hide a panel with filters
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_pwdchange':
@@ -1544,7 +1685,7 @@ class Skin extends DataObject
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
 					break;
 
@@ -1566,10 +1707,10 @@ class Skin extends DataObject
 					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to switch to advanced editing and for link position changing:
-					require_js( 'backoffice.js', 'blog' );
+					require_js_defer( 'backoffice.js', 'blog' );
 
 					// Used to automatically checks the matching extracat when we select a new main cat:
-					require_js( 'extracats.js', 'blog' );
+					require_js_defer( 'extracats.js', 'blog' );
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
@@ -1577,11 +1718,8 @@ class Skin extends DataObject
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
-
-					// Used to quick upload several files:
-					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1606,10 +1744,7 @@ class Skin extends DataObject
 					init_autocomplete_usernames_js( 'blog' );
 
 					// Used to switch to advanced editing:
-					require_js( 'backoffice.js', 'blog' );
-
-					// Used to quick upload several files:
-					init_fileuploader_js( 'blog' );
+					require_js_defer( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_useritems':
@@ -1624,37 +1759,17 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters
-					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_download':
 					// Specific features for disp=download:
 					global $Collection, $Blog;
 
-					require_js( '#jquery#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
 
 					// Initialize JavaScript to download file after X seconds
-					add_js_headline( '
-jQuery( document ).ready( function ()
-{
-	jQuery( "#download_timer_js" ).show();
-} );
-
-var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
-var downloadInterval = setInterval( function()
-{
-	jQuery( "#download_timer" ).html( b2evo_download_timer );
-	if( b2evo_download_timer == 0 )
-	{	// Stop timer and download a file:
-		clearInterval( downloadInterval );
-		jQuery( "#download_help_url" ).show();
-	}
-	b2evo_download_timer--;
-}, 1000 );' );
+					expose_var_to_js( 'evo_disp_download_delay_config', intval( $Blog->get_setting( 'download_delay' ) ) );
 					break;
 
 				default:
@@ -1663,33 +1778,35 @@ var downloadInterval = setInterval( function()
 			}
 		}
 
-		// Check if current page has a marketing popup container:
-		$marketing_popup_container_code = $Blog->get_marketing_popup_container();
-
-		// Load general JS file:
-		if( $this->get_api_version() == 6 )
-		{ // Bootstrap skin
-			require_js( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
-		}
-		else
-		{ // Standard skin
-			require_js( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
+		if( ! in_array( 'superbundle', $features ) )
+		{	// Load general JS file only when it is not bundled above:
+			if( $this->get_api_version() >= 6 )
+			{ // Bootstrap skin
+				require_js_defer( 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			}
+			else
+			{ // Standard skin
+				require_js_defer( 'build/evo_frontoffice.bmin.js', 'blog' );
+			}
 		}
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
-			global $current_User;
-			require_js( '#jquery#', 'blog' );
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			require_js_defer( '#jquery#', 'blog' );
+			if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
-				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$&mode=customizer";'
-					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$&mode=customizer";'
-					.'var b2evo_widget_list_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container=$container$&container_code=$container_code$&mode=customizer";'
+				add_js_headline( 'var b2evo_widget_edit_url = "'.get_admin_url( 'ctrl=widgets&action=edit&wi_ID=$wi_ID$&mode=customizer', '&' ).'";'
+					.'var b2evo_widget_add_url = "'.get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$&mode=customizer', '&' ).'";'
+					.'var b2evo_widget_duplicate_url = "'.get_admin_url( 'ctrl=widgets&action=duplicate&wi_ID=$wi_ID$&mode=customizer&crumb_widget=$crumb_widget$', '&' ).'";'
+					.'var b2evo_widget_list_url = "'.get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container=$container$&container_code=$container_code$&mode=customizer', '&' ).'";'
 					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
 					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
+					.'var b2evo_widget_icon_top = \''.format_to_js( get_icon( 'designer_widget_top', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_top' ) ) ).'\';'
 					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'
 					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_down' ) ) ).'\';'
+					.'var b2evo_widget_icon_bottom = \''.format_to_js( get_icon( 'designer_widget_bottom', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_bottom' ) ) ).'\';'
+					.'var b2evo_widget_icon_duplicate = \''.format_to_js( get_icon( 'duplicate', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_duplicate', 'title' => T_('Duplicate') ) ) ).'\';'
 					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_disable', 'title' => T_('Disable') ) ) ).'\';'
 					.'var b2evo_widget_icon_add = \''.format_to_js( get_icon( 'add', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_add', 'title' => T_('Add Widget to container') ) ) ).'\';'
 					.'var b2evo_widget_icon_list = \''.format_to_js( get_icon( 'designer_widget_list', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_list', 'title' => T_('Manage Widgets of container') ) ) ).'\';'
@@ -1700,8 +1817,8 @@ var downloadInterval = setInterval( function()
 					.'var evo_js_lang_server_error = \''.TS_('There was a server side error.').'\';'
 					.'var evo_js_lang_sync_error = \''.TS_('Please reload the page to be in sync with the server.').'\';' );
 			}
-			require_js( 'src/evo_widget_designer.js', 'blog' );
-			require_js( 'communication.js', 'blog' );
+			require_js_defer( 'src/evo_widget_designer.js', 'blog' );
+			require_js_defer( 'communication.js', 'blog' );
 		}
 
 		// Skin v7 specific initializations for kind of current collection:
@@ -1720,7 +1837,7 @@ var downloadInterval = setInterval( function()
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
 	 * If this doesn't do what you need you may add functions like the following to your skin's siteskin_init():
-	 * require_js() , require_css() , add_js_headline()
+	 * require_js_async(), require_js_defer(), require_css(), add_js_headline()
 	 */
 	function siteskin_init()
 	{
@@ -1793,17 +1910,17 @@ var downloadInterval = setInterval( function()
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
-							'header_start' => '',
-								'header_text' => '<div class="center"><ul class="pagination">'
+							'header_start' => '<div class="results_header clearfix">',
+								'header_text' => '<div class="evo_pager"><div class="results_summary">$nb_results$ Results $reset_filters_button$</div><ul class="pagination">'
 										.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 									.'</ul></div>',
-								'header_text_single' => '',
-							'header_end' => '',
+								'header_text_single' => '<div class="results_summary">$nb_results$ Results $reset_filters_button$</div>',
+							'header_end' => '</div>',
 							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
-							'filter_button_class'  => 'btn-sm btn-info',
+							'filter_button_class'  => 'evo_btn_apply_filters btn-sm btn-info',
 							'filter_button_before' => '<div class="form-group pull-right">',
 							'filter_button_after'  => '</div>',
 							'messages_start' => '<div class="messages form-inline">',
@@ -1854,7 +1971,7 @@ var downloadInterval = setInterval( function()
 									'total_col_end' => "</td>\n",
 								'total_line_end' => "</tr>\n\n",
 							'list_end' => "</table></div>\n\n",
-							'footer_start' => '',
+							'footer_start' => '<div class="results_footer">',
 							'footer_text' => '<div class="center"><ul class="pagination">'
 									.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 								.'</ul></div><div class="center">$page_size$</div>'
@@ -1878,7 +1995,7 @@ var downloadInterval = setInterval( function()
 								'scroll_list_range' => 5,
 							'footer_end' => "\n\n",
 							'no_results_start' => '<div class="panel-footer">'."\n",
-							'no_results_end'   => '$no_results$</div>'."\n\n",
+							'no_results_end'   => '$no_results$ $reset_filters_button$</div>'."\n\n",
 							'content_end' => '</div>',
 							'after' => '</div>',
 							'sort_type' => 'basic'
@@ -2310,11 +2427,12 @@ var downloadInterval = setInterval( function()
 	 * this function is used to add unique version number for each skin
 	 *
 	 * @param string Name of CSS file relative to <base> tag (current skin folder)
+	 * @param string Position where the CSS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_css( $css_file )
+	function require_css( $css_file, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_css( $this->get_url().$css_file, 'absolute', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long, false, $position );
 	}
 
 
@@ -2324,11 +2442,42 @@ var downloadInterval = setInterval( function()
 	 * this function is used to add unique version number for each skin
 	 *
 	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+	 *                'immediate' or FALSE to load javascript immediately
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js( $js_file )
+	function require_js( $js_file, $async_defer = false, $output = false, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_js( $this->get_url().$js_file, 'absolute', $async_defer, $output, $this->folder.'+'.$this->version.'+'.$app_version_long, $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "async"
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_async( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, 'async', $output, $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, 'defer', $output, $position );
 	}
 
 
@@ -2361,22 +2510,18 @@ var downloadInterval = setInterval( function()
 	 * Returns an option list for font customization
 	 *
 	 * Uses: $this->font_definitions
+	 * @param string Type: 'select' - for skin setting <select>, 'style' - for using in styles
 	 */
-	function get_font_definitions()
+	function get_font_definitions( $type = 'select' )
 	{
-		// Pull font array keys
-		$font_options = array_keys($this->font_definitions);
-
-		// Pull first value from each array key
-		$font_names = array();
-		foreach ($this->font_definitions as $f) {
-				$font_names[] = current($f);
+		$fonts = array();
+		foreach( $this->font_definitions as $font_key => $font_data )
+		{
+			$font_data_index = $type == 'style' ? 1 : 0;
+			$fonts[ $font_key ] = isset( $font_data[ $font_data_index ] ) ? $font_data[ $font_data_index ] : $font_data[0];
 		}
 
-		// Create array in format: 'system_arial' => 'arial', etc.
-		$dropdown_option_list = array_combine($font_options, $font_names);
-
-		return $dropdown_option_list;
+		return $fonts;
 	}
 
 
@@ -2453,6 +2598,36 @@ var downloadInterval = setInterval( function()
 		$access = $this->get_setting( 'access_login_containers' );
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
+	}
+
+
+	/**
+	 * Additional JavaScript code for skin settings form
+	 */
+	function echo_settings_form_js()
+	{
+	}
+
+
+	/**
+	 * Call skin function with suffix that is current collection kind
+	 *
+	 * @param string Function name
+	 * @param array Function parameters
+	 * @return 
+	 */
+	function call_func_by_coll_type( $func_name, $params )
+	{
+		global $Blog;
+
+		if( ! empty( $Blog ) &&
+		    $this->get_api_version() == 7 && 
+		    method_exists( $this, $func_name.'_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			return call_user_func_array( array( $this, $func_name.'_'.$Blog->get( 'type' ) ), $params );
+		}
+
+		return NULL;
 	}
 }
 

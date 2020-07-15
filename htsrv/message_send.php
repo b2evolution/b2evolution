@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -342,7 +342,16 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 				'uf_varchar' => $text_value,
 			);
 		userfield_prepare( $userfield );
-		$html_value = $userfield->uf_varchar;
+		if( is_pro() )
+		{	// Format user field value by PRO function:
+			load_funcs( '_core/_pro_features.funcs.php' );
+			$html_value = pro_get_user_field_value( $userfield );
+			$text_value = strip_tags( $html_value );
+		}
+		else
+		{	// Display normal value:
+			$html_value = $userfield->uf_varchar;
+		}
 
 		$send_additional_fields[] = array(
 				'title'       => $UserField->get( 'name' ),
@@ -532,16 +541,22 @@ if( $success_message )
 				'Comment'           => $Comment,
 			);
 
+		$email_headers = array();
+		if( ! is_logged_in() )
+		{	// Allow to reply only to anonymous user:
+			$email_headers['Reply-To'] = $sender_address;
+		}
+
 		if( empty( $recipient_User ) )
 		{	// Send email to visitor/anonymous:
 			// Get a message text from template file
 			$email_template_params['anonymous_recipient_name'] = $recipient_name;
 			$message = mail_template( 'contact_message_new', 'text', $email_template_params );
-			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, $email_headers );
 		}
 		else
 		{	// Send mail to registered user:
-			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, $email_headers );
 		}
 	}
 

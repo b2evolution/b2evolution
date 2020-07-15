@@ -132,13 +132,11 @@ function filter_subregions( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_subregions',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=subregions' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=subregions' );
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Country'),
@@ -176,7 +174,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -221,7 +219,7 @@ function subrg_td_actions($subrg_enabled, $subrg_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),

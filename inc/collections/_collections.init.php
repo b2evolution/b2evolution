@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -65,6 +65,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__version_link'      => $tableprefix.'items__version_link',
 		'T_items__votes'             => $tableprefix.'items__votes',
 		'T_items__status_type'       => $tableprefix.'items__status_type',
+		'T_items__checklist_lines'   => $tableprefix.'items__checklist_lines',
 		'T_items__pricing'           => $tableprefix.'items__pricing',
 		'T_links'                    => $tableprefix.'links',
 		'T_links__vote'              => $tableprefix.'links__vote',
@@ -111,6 +112,7 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'wpimportxml'  => 'tools/wpimportxml.ctrl.php',
 		'phpbbimport'  => 'tools/phpbbimport.ctrl.php',
 		'mdimport'     => 'tools/mdimport.ctrl.php',
+		'itimport'     => 'tools/itimport.ctrl.php',
 	) );
 
 
@@ -254,7 +256,7 @@ function & get_ItemStatusCache()
 	if( ! isset( $ItemStatusCache ) )
 	{	// Cache doesn't exist yet:
 		load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
-		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name', 'pst_name', NT_('No status') );
+		$ItemStatusCache = new DataObjectCache( 'ItemStatus', false, 'T_items__status', 'pst_', 'pst_ID', 'pst_name', 'pst_order', NT_('No status'), 0 );
 	}
 
 	return $ItemStatusCache;
@@ -295,6 +297,24 @@ function & get_ItemTagCache()
 	}
 
 	return $ItemTagCache;
+}
+
+/**
+ * Get the ChecklistLineCache
+ * 
+ * @return ChecklistLineCache
+ */
+function & get_ChecklistLineCache()
+{
+	global $ChecklistLineCache;
+
+	if( ! isset( $ChecklistLineCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'items/model/_checklistline.class.php', 'ChecklistLine' );
+		$ChecklistLineCache = new DataObjectCache( 'ChecklistLine', false, 'T_items__checklist_lines', 'check_', 'check_ID', 'check_label' );
+	}
+
+	return $ChecklistLineCache;
 }
 
 /**
@@ -711,10 +731,6 @@ class collections_Module extends Module
 	function build_menu_1()
 	{
 		global $blog, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		global $Settings;
 		/**
@@ -722,12 +738,12 @@ class collections_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{ // don't show these menu entries if user hasn't at least admin restricted permission
 			return;
 		}
 
-		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
+		$perm_admin_normal = check_user_perm( 'admin', 'normal' );
 
 		$site_menu = array(
 			'text' => T_('Site'),
@@ -740,7 +756,7 @@ class collections_Module extends Module
 		);
 		if( $perm_admin_normal )
 		{ // User has an access to backoffice
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // User has an access to view settings
 				$site_menu['entries']['settings'] = array(
 					'text' => T_('Site Settings'),
@@ -764,6 +780,10 @@ class collections_Module extends Module
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=tablet'
 							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=alt'
+							),
 							'manage_skins' => array(
 								'text' => T_('Manage skins'),
 								'href' => $admin_url.'?ctrl=skins&amp;tab=site_skin'
@@ -772,14 +792,14 @@ class collections_Module extends Module
 					);
 				}
 			}
-			if( $current_User->check_perm( 'slugs', 'view' ) )
+			if( check_user_perm( 'slugs', 'view' ) )
 			{ // User has an access to view slugs
 				$site_menu['entries']['slugs'] = array(
 					'text' => T_('Slugs'),
 					'href' => $admin_url.'?ctrl=slugs'
 				);
 			}
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // User has an access to view settings
 				$site_menu['entries']['tags'] = array(
 					'text' => T_('Tags'),
@@ -813,10 +833,6 @@ class collections_Module extends Module
 	function build_menu_2()
 	{
 		global $loc_transinfo, $ctrl, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
@@ -837,8 +853,8 @@ class collections_Module extends Module
 					'order' => 'group_last' ),
 			);
 
-		$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $blog );
-		$perm_cats = $current_User->check_perm( 'blog_cats', '', false, $blog );
+		$perm_comments = check_user_perm( 'blog_comments', 'view', false, $blog );
+		$perm_cats = check_user_perm( 'blog_cats', '', false, $blog );
 
 		// Posts
 		$collection_menu_entries['posts'] = array(
@@ -847,12 +863,12 @@ class collections_Module extends Module
 			);
 		$last_group_menu_entry = 'posts';
 
-		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
-		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
+		if( $perm_comments || check_user_perm( 'meta_comment', 'view', false, $blog ) )
+		{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
 					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
-						// Set url to meta comments page if user has a perm to view only meta comments:
+						// Set url to internal comments page if user has a perm to view only internal comments:
 						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';
@@ -872,7 +888,7 @@ class collections_Module extends Module
 
 		$AdminUI->add_menu_entries( 'collections', $collection_menu_entries );
 
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+		if( check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 		{ // Display these menus only when some blog is selected and current user has an access to edit the blog properties
 
 			// BLOG SETTINGS:
@@ -900,12 +916,18 @@ class collections_Module extends Module
 							'userdir' => array(
 								'text' => T_('User directory'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir&amp;blog='.$blog ),
+							'search' => array(
+								'text' => T_('Search'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=search&amp;blog='.$blog ),
 							'other' => array(
 								'text' => T_('Other displays'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other&amp;blog='.$blog ),
 							'popup' => array(
 								'text' => T_('Popups'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup&amp;blog='.$blog ),
+							'metadata' => array(
+								'text' => T_('Meta data'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=metadata&amp;blog='.$blog ),
 							'more' => array(
 								'text' => T_('More'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$blog ),
@@ -926,7 +948,11 @@ class collections_Module extends Module
 							'skin_tablet' => array(
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
-							)
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=alt'
+							),
 						),
 					),
 					'widgets' => array(
@@ -944,7 +970,11 @@ class collections_Module extends Module
 							'skin_tablet' => array(
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=tablet'
-							)
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=alt'
+							),
 						),
 						'order' => 'group_last', ),
 					'settings' => array(
@@ -967,7 +997,7 @@ class collections_Module extends Module
 					),
 				) );
 
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // Manage skins
 				$AdminUI->add_menu_entries( array( 'collections', 'skin' ), array(
 					'manage_skins' => array(
@@ -976,7 +1006,7 @@ class collections_Module extends Module
 				) );
 			}
 
-			if( $current_User->check_perm( 'options', 'view', false, $blog ) )
+			if( check_user_perm( 'options', 'view', false, $blog ) )
 			{ // Post Types & Statuses
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'types' => array(
@@ -1011,7 +1041,7 @@ class collections_Module extends Module
 					) );
 			}
 
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{ // Check if current user has a permission to view the common settings of the blogs
 				$AdminUI->add_menu_entries( array( 'collections', 'settings' ), array(
 					'blog_settings' => array(
@@ -1033,22 +1063,18 @@ class collections_Module extends Module
 	function build_menu_3()
 	{
 		global $blog, $loc_transinfo, $ctrl, $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Collection, $Blog;
 		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'normal' ) )
+		if( ! check_user_perm( 'admin', 'normal' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{	// Permission to view settings:
 			$AdminUI->add_menu_entries( 'options', array(
 					'misc' => array(
@@ -1178,7 +1204,7 @@ class collections_Module extends Module
 				// Check permission:
 				$LinkOwner->check_perm( 'edit', true );
 
-				if( $current_User->check_perm( 'files', 'edit' ) )
+				if( check_user_perm( 'files', 'edit' ) )
 				{	// If current User has permission to edit/delete files:
 					// Get number of objects where this file is attached to:
 					// TODO: attila>this must be handled with a different function
@@ -1198,7 +1224,7 @@ class collections_Module extends Module
 
 						$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-						if( $current_User->check_perm( 'files', 'edit' ) )
+						if( check_user_perm( 'files', 'edit' ) )
 						{ // current User has permission to edit/delete files
 							$file_name = $linked_File->get_name();
 							$links_count--;
@@ -1655,7 +1681,7 @@ class collections_Module extends Module
 				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
 				// Check perms:
-				$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+				check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 				if( empty( $item_tags ) && $edited_Item->get_type_setting( 'use_tags' ) == 'required' )
 				{	// Tags must be entered:
@@ -1679,6 +1705,98 @@ class collections_Module extends Module
 				{	// Exit here when AJAX request, so we don't need a redirect after this function:
 					exit(0);
 				}
+
+			case 'checklist_line':
+				global $DB;
+
+				load_class('items/model/_checklistline.class.php', 'ChecklistLine' );
+
+				// Add/Update checklist line:
+				$item_action     = param( 'item_action', 'string', 'add' );
+				$item_ID         = param( 'item_ID', 'integer', true );
+				$checklist_ID    = param( 'check_ID', 'integer', NULL );
+
+				$ItemCache = & get_ItemCache();
+				$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+				// Check perms:
+				check_user_perm( 'meta_comment', 'add', true, $edited_Item->get_blog_ID() );
+
+				if( $item_action == 'add' )
+				{
+					$checklist_label = param( 'check_label', 'string', true );
+
+					if( empty( $checklist_ID ) )
+					{
+						$checklistLine = new ChecklistLine();
+						$checklistLine->set_Item( $edited_Item );
+						$checklistLine->set( 'label', $checklist_label );
+						$checklistLine->dbsave();
+						$status = 'add';
+					}
+					else
+					{
+						$ChecklistLineCache = & get_ChecklistLineCache();
+						$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+						if( $checklist_label != $checklistLine->label )
+						{
+							$checklistLine->set( 'label', $checklist_label );
+						}
+						$checklistLine->dbsave();
+						$status = 'update';
+					}
+
+					$response = array(
+							'status'      => $status,
+							'check_ID'    => $checklistLine->ID,
+							'check_label' => $checklistLine->label,
+						);
+				}
+				elseif( $item_action == 'toggle_check' )
+				{
+					$checklist_checked = param( 'check_checked', 'boolean', NULL );
+
+					$ChecklistLineCache = & get_ChecklistLineCache();
+					$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+					if( isset( $checklist_checked ) )
+					{
+						$checklistLine->set( 'checked', $checklist_checked ? 1 : 0 );
+					}
+					$checklistLine->dbsave();
+					$status = 'toggle_check';
+
+					$response = array(
+							'status'        => $status,
+							'check_ID'      => $checklistLine->ID,
+							'check_checked' => $checklistLine->checked,
+						);
+				}
+				elseif( $item_action == 'delete' )
+				{
+					$ChecklistLineCache = & get_ChecklistLineCache();
+					$checklistLine = & $ChecklistLineCache->get_by_ID( $checklist_ID );
+
+					$response = array(
+							'status'   => 'delete',
+							'check_ID' => $checklist_ID,
+						);
+
+					$checklistLine->dbdelete();
+				}
+				elseif( $item_action == 'reorder' )
+				{
+					$checklist_order = param( 'item_order', 'array', true );
+					$update_query = 'UPDATE T_items__checklist_lines SET check_order = FIELD(check_ID, '
+							.$DB->quote( $checklist_order ).') WHERE check_ID IN ('.$DB->quote( $checklist_order ).')';
+					$DB->query( $update_query );
+
+					$response = array(
+							'status' => 'reorder',
+							'order'  => $checklist_order,
+						);
+				}
+
+				exit( evo_json_encode( $response ) );
 		}
 	}
 }

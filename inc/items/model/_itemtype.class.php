@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -26,6 +26,9 @@ class ItemType extends DataObject
 	var $name;
 	var $description;
 	var $usage;
+	var $template_excerpt;
+	var $template_normal;
+	var $template_full;
 	var $template_name;
 	var $schema = '';
 	var $add_aggregate_rating = 1;
@@ -47,6 +50,7 @@ class ItemType extends DataObject
 	var $use_meta_keywds = 'optional';
 	var $use_tags = 'optional';
 	var $allow_featured = 1;
+	var $allow_switchable = 1;
 	var $use_country = 'never';
 	var $use_region = 'never';
 	var $use_sub_region = 'never';
@@ -74,6 +78,7 @@ class ItemType extends DataObject
 	var $front_order_excerpt     = NULL;
 	var $front_order_url         = NULL;
 	var $front_order_location    = NULL;
+	var $front_order_workflow    = 50;
 
 	/**
 	 * Custom fields
@@ -112,6 +117,9 @@ class ItemType extends DataObject
 			$this->name = $db_row->ityp_name;
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
+			$this->template_excerpt = isset( $db_row->ityp_template_excerpt ) ? $db_row->ityp_template_excerpt : NULL;
+			$this->template_normal = isset( $db_row->ityp_template_normal ) ? $db_row->ityp_template_normal : NULL;
+			$this->template_full = isset( $db_row->ityp_template_full ) ? $db_row->ityp_template_full : NULL;
 			$this->template_name = $db_row->ityp_template_name;
 			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
 			$this->add_aggregate_rating = isset( $db_row->ityp_add_aggregate_rating ) ? $db_row->ityp_add_aggregate_rating : $this->add_aggregate_rating;
@@ -133,6 +141,7 @@ class ItemType extends DataObject
 			$this->use_meta_keywds = $db_row->ityp_use_meta_keywds;
 			$this->use_tags = $db_row->ityp_use_tags;
 			$this->allow_featured = $db_row->ityp_allow_featured;
+			$this->allow_switchable = $db_row->ityp_allow_switchable;
 			$this->use_country = $db_row->ityp_use_country;
 			$this->use_region = $db_row->ityp_use_region;
 			$this->use_sub_region = $db_row->ityp_use_sub_region;
@@ -155,6 +164,7 @@ class ItemType extends DataObject
 			$this->front_order_short_title = isset( $db_row->ityp_front_order_short_title ) ? $db_row->ityp_front_order_short_title : NULL;
 			$this->front_order_instruction = isset( $db_row->ityp_front_order_instruction ) ? $db_row->ityp_front_order_instruction : NULL;
 			$this->front_order_attachments = isset( $db_row->ityp_front_order_attachments ) ? $db_row->ityp_front_order_attachments : NULL;
+			$this->front_order_workflow = isset( $db_row->ityp_front_order_workflow ) ? $db_row->ityp_front_order_workflow : NULL;
 			$this->front_order_text = isset( $db_row->ityp_front_order_text ) ? $db_row->ityp_front_order_text : NULL;
 			$this->front_order_tags = isset( $db_row->ityp_front_order_tags ) ? $db_row->ityp_front_order_tags : NULL;
 			$this->front_order_excerpt = isset( $db_row->ityp_front_order_excerpt ) ? $db_row->ityp_front_order_excerpt : NULL;
@@ -218,7 +228,19 @@ class ItemType extends DataObject
 		param( 'ityp_usage', 'string' );
 		$this->set_from_Request( 'usage', NULL, true );
 
-		// Template name
+		// Template for Excerpt display
+		param( 'ityp_template_excerpt', 'string' );
+		$this->set_from_Request( 'template_excerpt', NULL, true );
+
+		// Template for Teaser display
+		param( 'ityp_template_normal', 'string' );
+		$this->set_from_Request( 'template_normal', NULL, true );
+
+		// Template for Full content display
+		param( 'ityp_template_full', 'string' );
+		$this->set_from_Request( 'template_full', NULL, true );
+
+		// PHP Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
 
@@ -320,6 +342,10 @@ class ItemType extends DataObject
 		param( 'ityp_front_order_attachments', 'integer', NULL );
 		$this->set_from_Request( 'front_order_attachments' );
 
+		// Front-Office Order (Workflow)
+		param( 'ityp_front_order_workflow', 'integer', NULL );
+		$this->set_from_Request( 'front_order_workflow' );
+
 		// Use excerpt
 		param( 'ityp_use_excerpt', 'string' );
 		$this->set_from_Request( 'use_excerpt' );
@@ -351,6 +377,10 @@ class ItemType extends DataObject
 		// Allow featured
 		param( 'ityp_allow_featured', 'integer', 0 );
 		$this->set_from_Request( 'allow_featured' );
+
+		// Allow switchable
+		param( 'ityp_allow_switchable', 'integer', 0 );
+		$this->set_from_Request( 'allow_switchable' );
 
 		// Use country, region, sub-region, city:
 		$use_country = param( 'ityp_use_country', 'string', 'never' );
@@ -435,6 +465,9 @@ class ItemType extends DataObject
 		// Field names array is used to check the diplicates
 		$field_names = array();
 
+		// Get previous computed custom fields:
+		$old_computed_custom_fields = $this->get_custom_fields( 'computed' );
+
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
@@ -464,17 +497,21 @@ class ItemType extends DataObject
 			'public'          => array( 'integer', 0 ),
 			'format'          => 'string',
 			'formula'         => 'string',
+			'disp_condition'  => 'string',
 			'header_class'    => 'string',
 			'cell_class'      => 'string',
 			'link'            => array( 'string', 'nolink' ),
 			'link_nofollow'   => 'integer',
 			'link_class'      => 'string',
-			'line_highlight'  => 'string',
-			'green_highlight' => 'string',
-			'red_highlight'   => 'string',
+			'line_highlight'  => array( 'string', 'never' ),
+			'green_highlight' => array( 'string', 'never' ),
+			'red_highlight'   => array( 'string', 'never' ),
 			'description'     => 'html',
 			'merge'           => array( 'integer', 0 ),
 		);
+
+		// Flag to inform user once about changed formula:
+		$formula_was_changed = false;
 
 		for( $i = 1 ; $i <= $custom_field_count; $i++ )
 		{
@@ -484,7 +521,23 @@ class ItemType extends DataObject
 				// Get input data:
 				$input_type = is_array( $input_data ) ? $input_data[0] : $input_data;
 				$input_default_value = is_array( $input_data )  ? $input_data[1] : NULL;
-				$input_value = isset( $custom_fields_data->{$input_name.$i} ) ? $custom_fields_data->{$input_name.$i} : $input_default_value;
+				if( isset( $custom_fields_data->{$input_name.$i} ) )
+				{
+					if( $input_type == 'string' &&
+					    $input_default_value !== NULL &&
+					    $custom_fields_data->{$input_name.$i} === '' )
+					{	// Use default value for empty string:
+						$input_value = $input_default_value;
+					}
+					else
+					{	// Use submitted value:
+						$input_value = $custom_fields_data->{$input_name.$i};
+					}
+				}
+				else
+				{	// Use default value:
+					$input_value = $input_default_value;
+				}
 
 				if( $input_value !== $input_default_value )
 				{	// Format input value to requested type only when it is not default value:
@@ -548,6 +601,25 @@ class ItemType extends DataObject
 			{
 				$field_names[] = $custom_field_data['name'];
 			}
+
+			// Checks for computed custom fields:
+			if( $custom_field_data['type'] == 'computed' )
+			{
+				if( $custom_field_data['formula'] === '' )
+				{	// Formula must be not empty:
+					$Messages->add( sprintf( TB_('Please enter formula for computed custom field "%s".'), $custom_field_data['label'] ) );
+				}
+
+				if( ! $formula_was_changed &&
+				    ! $custom_field_is_new &&
+				    isset( $old_computed_custom_fields[ $custom_field_data['name'] ] ) &&
+				    $old_computed_custom_fields[ $custom_field_data['name'] ]['formula'] != $custom_field_data['formula'] )
+				{	// Inform once user about changed formula:
+					$Messages->add( TB_('You changed one or several formulas. All posts need to be re-saved to update the results of these formulas.'), 'warning' );
+					$formula_was_changed = true;
+				}
+			}
+
 			if( $custom_field_is_new )
 			{ // Insert custom field
 				$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
@@ -555,6 +627,85 @@ class ItemType extends DataObject
 			else
 			{ // Update custom field
 				$this->update_custom_fields[ $custom_field_ID ] = $custom_field_data;
+			}
+		}
+
+		// Check formulas of computed fields:
+		$custom_fields = $this->get_custom_fields();
+		foreach( $custom_fields as $custom_field )
+		{
+			if( $custom_field['type'] != 'computed' )
+			{	// Skip not computed field:
+				continue;
+			}
+
+			$formula_has_wrong_field = false;
+			if( preg_match_all( '#\$(.+?)\$#', $custom_field['formula'], $formula_fields ) )
+			{	// If formula has at least one field:
+				foreach( $formula_fields[1] as $formula_field )
+				{
+					if( ! isset( $custom_fields[ $formula_field ] ) )
+					{	// Not found field:
+						$Messages->add( sprintf( TB_('The field name %s is not recognized (in the formula %s of the field "%s".'),
+								'<code>'.$formula_field.'</code>',
+								'<code>'.$custom_field['formula'].'</code>',
+								$custom_field['label']
+							), 'warning' );
+						$formula_has_wrong_field = true;
+					}
+					elseif( ! in_array( $custom_fields[ $formula_field ]['type'], array( 'double', 'computed' ) ) )
+					{	// Field with wrong type is used in formula:
+						$Messages->add( sprintf( TB_('Only numeric or computed fields can be used in formulas. Please remove the field %s from the formula %s of the field "%s".'),
+								'<code>'.$formula_field.'</code>',
+								'<code>'.$custom_field['formula'].'</code>', 
+								$custom_field['label']
+							), 'warning' );
+						$formula_has_wrong_field = true;
+					}
+				}
+			}
+
+			if( $formula_uses_function = preg_match( '#[a-z0-9_]+\s*\(.*?\)#i', $custom_field['formula'] ) )
+			{	// Don't allow to use functions in formula:
+				$Messages->add( sprintf( T_('Forbidden to use functions in formula, please fix %s of the field "%s".'),
+						'<code>'.$custom_field['formula'].'</code>',
+						$custom_field['label']
+					), 'warning' );
+			}
+
+			if( ! $formula_has_wrong_field &&
+			    ! $formula_uses_function &&
+			    $custom_field['formula'] !== '' )
+			{	// Check for correct formula:
+				$test_formula = preg_replace( '#\$(.+?)\$#', '1', $custom_field['formula'] );
+				try
+				{	// Compute value:
+					ob_start();
+					$test_value = eval( "return $test_formula;" );
+					$formula_code_output = ob_get_clean();
+					if( ( $formula_code_output !== '' && $formula_code_output !== false ) ||
+							! is_numeric( $test_value ) )
+					{	// If output buffer contains some text it means there is some error;
+						// Don't allow to use not numeric value for the "computed" custom field:
+						$test_value = NULL;
+					}
+				}
+				catch( Error $e )
+				{	// Set NULL value for wrong formula:
+					$test_value = NULL;
+				}
+				catch( ParseError $e )
+				{	// Set NULL value for wrong formula:
+					$test_value = NULL;
+				}
+
+				if( $test_value === NULL )
+				{	// Display warning when formula cannot be executed properly:
+					$Messages->add( sprintf( TB_('Please check formula %s of the field "%s" because it cannot be evaluated properly.'),
+							'<code>'.$custom_field['formula'].'</code>',
+							$custom_field['label']
+						), 'warning' );
+				}
 			}
 		}
 	}
@@ -593,8 +744,15 @@ class ItemType extends DataObject
 					VALUES ( '.$this->ID.', '.$Blog->ID.' )' );
 			}
 		}
+		else
+		{
+			$DB->rollback();
+			return false;
+		}
 
 		$DB->commit();
+
+		return true;
 	}
 
 
@@ -616,6 +774,8 @@ class ItemType extends DataObject
 
 		// BLOCK CACHE INVALIDATION:
 		BlockCache::invalidate_key( 'item_type_'.$this->ID, 1 ); // Item Type has changed (useful for compare widget which needs to check several item_IDs, including from different collections)
+
+		return true;
 	}
 
 
@@ -676,6 +836,7 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['public'] ).', '
 						.$DB->quote( $custom_field['format'] ).', '
 						.$DB->quote( $custom_field['formula'] ).', '
+						.$DB->quote( $custom_field['disp_condition'] ).', '
 						.$DB->quote( $custom_field['header_class'] ).', '
 						.$DB->quote( $custom_field['cell_class'] ).', '
 						.$DB->quote( $custom_field['link'] ).', '
@@ -687,7 +848,7 @@ class ItemType extends DataObject
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).', '
 						.$DB->quote( $custom_field['merge'] ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_meta, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_meta, itcf_public, itcf_format, itcf_formula, itcf_disp_condition, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -710,6 +871,7 @@ class ItemType extends DataObject
 						itcf_format = '.$DB->quote( $custom_field['format'] ).',
 						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
 						itcf_cell_class = '.$DB->quote( $custom_field['cell_class'] ).',
+						itcf_disp_condition = '.$DB->quote( $custom_field['disp_condition'] ).',
 						itcf_header_class = '.$DB->quote( $custom_field['header_class'] ).',
 						itcf_link = '.$DB->quote( $custom_field['link'] ).',
 						itcf_link_nofollow = '.$DB->quote( $custom_field['link_nofollow'] ).',
@@ -791,14 +953,20 @@ class ItemType extends DataObject
 			{ // Get the custom fields from DB
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop as schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
-				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+				$SQL->SELECT( '*' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-				$this->custom_fields = $DB->get_results( $SQL, ARRAY_A );
+				$custom_fields = $DB->get_results( $SQL, ARRAY_A );
+				$this->custom_fields = array();
+				foreach( $custom_fields as $c => $custom_field )
+				{
+					$this->custom_fields[ $c ] = array();
+					foreach( $custom_field as $custom_field_key => $custom_field_value )
+					{
+						$this->custom_fields[ $c ][ substr( $custom_field_key, 5 ) ] = $custom_field_value;
+					}
+				}
 			}
 		}
 

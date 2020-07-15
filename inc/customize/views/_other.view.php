@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $AdminUI, $Settings, $current_User, $admin_url, $customizer_url;
+global $AdminUI, $Settings;
 
 // Display customizer tabs to switch between site/collection skins and widgets in special div on customizer mode:
 $AdminUI->display_customizer_tabs( array(
@@ -26,12 +26,12 @@ $AdminUI->display_customizer_tabs( array(
 echo '<div class="evo_customizer__content">';
 
 // Check if current User can edit site options:
-$can_edit_site_options = ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) );
+$can_edit_site_options = ( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) );
 
 if( $can_edit_site_options )
 {	// Start of list of sites:
 	echo '<ul class="evo_customizer__other_lists">'
-		.'<li><a href="'.$customizer_url.'?view=site_skin&amp;blog='.get_working_blog().'" target="_parent">'.T_('Site').'</a></li>';
+		.'<li><a href="'.get_customizer_url().'?view=site_skin&amp;blog='.get_working_blog().'" target="_parent">'.T_('Site').'</a></li>';
 }
 
 // List of collections:

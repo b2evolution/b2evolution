@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -662,14 +662,14 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
  */
 function blocked_emails_memorize( $email )
 {
-	global $current_User, $cache_blocked_emails;
+	global $cache_blocked_emails;
 
 	if( empty( $email ) )
 	{ // Empty email, Exit here
 		return;
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'view' ) )
+	if( check_user_perm( 'users', 'view' ) )
 	{ // User has permissions to view other users
 		if( mail_is_blocked( $email ) )
 		{ // Check if the email address is blocked
@@ -906,7 +906,7 @@ function & get_Swift_SmtpTransport()
 	}
 
 	// Load Swift Mailer functions:
-	load_funcs( '_ext/swift/swift_required.php' );
+	load_funcs( '_ext/swift/vendor/autoload.php' );
 
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
 	$smtp_server_port = $Settings->get( 'smtp_server_port' );
@@ -915,7 +915,7 @@ function & get_Swift_SmtpTransport()
 	$smtp_server_password = $Settings->get( 'smtp_server_password' );
 
 	// Create the Transport:
-	$Swift_SmtpTransport = Swift_SmtpTransport::newInstance( $smtp_server_host, $smtp_server_port );
+	$Swift_SmtpTransport = new Swift_SmtpTransport( $smtp_server_host, $smtp_server_port );
 	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
 	{	// Set encryption:
 		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
@@ -961,7 +961,7 @@ function & get_Swift_Mailer()
 
 	if( $connection_result === true )
 	{ // Create the Mailer using the created Transport
-		$Swift_Mailer = Swift_Mailer::newInstance( $Swift_SmtpTransport );
+		$Swift_Mailer = new Swift_Mailer( $Swift_SmtpTransport );
 	}
 	else
 	{ // Some errors on SMTP connection
@@ -1088,7 +1088,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 		$charset = ( isset( $headers['Content-Type'] ) && preg_match( '#charset=(.+)$#i', $headers['Content-Type'], $charset ) ) ? $charset[1] : NULL;
 
 		// Create a Swift_Message object
-		$Swift_Message = Swift_Message::newInstance();
+		$Swift_Message = new Swift_Message();
 		// Subject:
 		$Swift_Message->setSubject( $subject );
 		// To:
@@ -1122,7 +1122,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 					// HTML:
 				case 'text/plain':
 					// TEXT:
-					$Swift_Message->setBody( $message['full'], $content_type, $charset );
+					$Swift_Message->setBody( $message['full'], $content_type[0], $charset );
 					break;
 
 				default:
@@ -1154,7 +1154,8 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 		}
 		if( ! empty( $headers['Date'] ) )
 		{ // Date:
-			$Swift_Message->setDate( is_string( $headers['Date'] ) ? strtotime( $headers['Date'] ) : $headers['Date'] );
+			$DateTime = new DateTime( is_string( $headers['Date'] ) ? $headers['Date'] : date( 'Y-m-d H:i:s', $headers['Date'] ) );
+			$Swift_Message->setDate( $DateTime );
 		}
 
 		// Send the message by SMTP transport:
@@ -1670,12 +1671,11 @@ function emails_sent_log_results( & $emails_Results, $params = array() )
 
 	if( $params['display_actions'] )
 	{	// Display Actions column:
-		global $current_User;
 		$emails_Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => ( $current_User->check_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
+				'td' => ( check_user_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
 			);
 	}
 }
@@ -1702,12 +1702,12 @@ function emret_td_address( $emret_address )
  */
 function emret_td_actions( $emret_ID, $emret_address )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
 	$r = action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID='.$emret_ID )
 		.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords='.$emret_address );
 
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{
 		$r .= action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=return&amp;action=returned_delete&amp;emret_ID='.$emret_ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'email' ), '', 1, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this record?').'\');' ) );
 	}

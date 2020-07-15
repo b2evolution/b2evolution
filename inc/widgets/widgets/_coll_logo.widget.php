@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -52,7 +52,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Logo title');
+		return T_('Logo');
 	}
 
 
@@ -140,7 +140,7 @@ class coll_logo_Widget extends ComponentWidget
 					),
 					'height' => array(
 						'label' => T_('Image height'),
-						'note' => '',
+						'note' => T_('Leave blank for auto.'),
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
@@ -151,7 +151,6 @@ class coll_logo_Widget extends ComponentWidget
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
-					'label' => T_('Leave blank for auto.'),
 				),
 				'alt' => array(
 					'label' => T_('Image Alt text'),

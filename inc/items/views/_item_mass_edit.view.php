@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -24,9 +24,9 @@ global $Collection, $Blog;
  */
 global $ItemList;
 
-global $redirect_to, $current_User, $admin_url;
+global $redirect_to, $admin_url;
 
-$perm_slugs_view = $current_User->check_perm( 'slugs', 'view' );
+$perm_slugs_view = check_user_perm( 'slugs', 'view' );
 
 $Form = new Form();
 

@@ -88,6 +88,9 @@ code {
   background-color: rgba(27, 31, 35, 0.05);
   color: #24292e;
 }
+.pointer {
+  cursor: pointer;
+}
 img {
   border: none;
   max-width: 100%;
@@ -141,10 +144,17 @@ img.rounded,
 .evo_image_block.rounded img {
   border-radius: 4px;
 }
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-  border-radius: 50%;
+.evo_image_block.contain img {
+  object-fit: contain !important;
+}
+.evo_image_block.cover img {
+  object-fit: cover !important;
+}
+img.imgerror,
+.image_block.imgerror img,
+.evo_image_block.imgerror img {
+  border: 1px solid red;
+  box-shadow: 0 0 10px red;
 }
 .floatleft {
   float: left;
@@ -178,6 +188,31 @@ img.round,
 }
 .margin2ex {
   margin: 2ex;
+}
+.margin-top-sm {
+  margin-top: 10px;
+}
+.margin-top-md {
+  margin-top: 20px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-bottom-sm {
+  margin-bottom: 10px;
+}
+.margin-bottom-md {
+  margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .indented {
   padding-left: 3em;
@@ -231,7 +266,7 @@ span.icon.voted {
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
 }
-a.rollover_sprite:hover span.icon:before {
+a.rollover_sprite:hover span.icon::before {
   visibility: visible !important;
   background: inherit;
   float: left;
@@ -296,26 +331,26 @@ a:hover .fa-x-rollover-grey {
 a:hover .fa-flag.fa-x--hover {
   color: #F00 !important;
 }
-a:hover .fa-flag.fa-x--hover:before {
+a:hover .fa-flag.fa-x--hover::before {
   content: "\f11d";
 }
 a:hover .fa-flag-o.fa-x--hover {
   color: #F00 !important;
 }
-a:hover .fa-flag-o.fa-x--hover:before {
+a:hover .fa-flag-o.fa-x--hover::before {
   content: "\f024";
 }
-.fa-x-external-link--nudge:before {
+.fa-x-external-link--nudge::before {
   position: relative;
   top: 0.05em;
   left: 0.11em;
 }
-.fa-x-linkedin--nudge:before {
+.fa-x-linkedin--nudge::before {
   position: relative;
   top: -0.05em;
   left: 0.04em;
 }
-.fa-x-google-plus--nudge:before {
+.fa-x-google-plus--nudge::before {
   position: relative;
   left: 0.1em;
 }
@@ -344,7 +379,7 @@ input.loader_img {
   min-width: 64px;
   min-height: 64px;
 }
-.evo_rest_api_loading:before {
+.evo_rest_api_loading::before {
   content: "";
   position: absolute;
   background: #FFF;
@@ -712,6 +747,12 @@ input.loader_img {
   padding: 4px 5px 5px;
   margin: 0;
 }
+.filter_item div .identity_link_username {
+  color: #FFF;
+}
+.filter_item div.icon a.action_icon > span {
+  color: #FFF !important;
+}
 .filter_item .name {
   background: #3d8f3d;
 }
@@ -780,6 +821,9 @@ input.loader_img {
 }
 .filter_item div.icon {
   height: 22px;
+}
+a {
+  word-break: break-all;
 }
 .visible-xs,
 .visible-sm,
@@ -1032,8 +1076,8 @@ span.roundbutton_red:hover {
   border-left: none;
   border-right: 1px solid #787878;
 }
-.roundbutton_group .roundbutton:before,
-.roundbutton_group .roundbutton_text:before {
+.roundbutton_group .roundbutton::before,
+.roundbutton_group .roundbutton_text::before {
   border-left: 1px solid #b1b1b1;
   content: "";
   position: absolute;
@@ -1041,9 +1085,9 @@ span.roundbutton_red:hover {
   bottom: 0;
   left: -1px;
 }
-.roundbutton_group .roundbutton:first-child:before,
-.roundbutton_group .roundbutton_text:first-child:before,
-.roundbutton_group .roundbutton_text.first-child:before {
+.roundbutton_group .roundbutton:first-child::before,
+.roundbutton_group .roundbutton_text:first-child::before,
+.roundbutton_group .roundbutton_text.first-child::before {
   border: none;
 }
 .roundbutton_group .roundbutton:first-child,
@@ -1107,8 +1151,8 @@ a.roundbutton_text_noicon span {
   background-image: -o-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
   background-image: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
 }
-.roundbutton.rbtn_black:before,
-.roundbutton_group .roundbutton.rbtn_black:before {
+.roundbutton.rbtn_black::before,
+.roundbutton_group .roundbutton.rbtn_black::before {
   border-color: #1a1a1a;
 }
 .roundbutton.rbtn_black:hover,
@@ -1273,4 +1317,19 @@ div.message_toolbars div.edit_toolbar {
 }
 .widget_core_coll_category_list .evo_cat_meta input[disabled="disabled"] {
   visibility: hidden;
+}
+.w-100 {
+  width: 100% !important;
+}
+.w-75 {
+  width: 75% !important;
+}
+.w-50 {
+  width: 50% !important;
+}
+.w-25 {
+  width: 25% !important;
+}
+.w-auto {
+  width: auto !important;
 }

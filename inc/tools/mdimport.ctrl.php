@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -13,8 +13,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 load_class( 'tools/model/_markdownimport.class.php', 'MarkdownImport' );
 
@@ -34,6 +34,13 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
+if( param( 'md_blog_ID', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'md_blog_ID' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'md_blog_ID' ), 'markdown' );
+}
 
 switch( $action )
 {
@@ -41,38 +48,23 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'mdimport' );
 
-		$md_blog_ID = param( 'md_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'md_blog_ID', T_('Please select a collection!') );
-
-		// Import File/Folder:
-		$import_file = param( 'import_file', 'string', '' );
-
 		// Initialize markdown import object:
 		if( $app_pro )
 		{	// Use PRO markdown import:
 			load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
-			$MarkdownImport = new MarkdownImportPro( $md_blog_ID, $import_file );
+			$MarkdownImport = new MarkdownImportPro();
 		}
 		else
 		{	// Use default markdown import:
-			$MarkdownImport = new MarkdownImport( $md_blog_ID, $import_file );
+			$MarkdownImport = new MarkdownImport();
 		}
 
-		$check_result = $MarkdownImport->check_source();
-
-		if( $check_result !== true )
+		// Load import data from request:
+		if( ! $MarkdownImport->load_from_Request() )
 		{	// Don't import if errors have been detected:
-			param_error( 'import_file', $check_result );
 			$action = 'file';
 			break;
 		}
-
-		// Set import options:
-		$MarkdownImport->set_option( 'mode', param( 'import_type', 'string', 'update' ) );
-		$MarkdownImport->set_option( 'reuse_cats', param( 'reuse_cats', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'delete_files', param( 'delete_files', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'convert_md_links', param( 'convert_md_links', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'force_item_update', param( 'force_item_update', 'integer', 0 ) );
 		break;
 }
 
@@ -81,10 +73,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('Markdown Importer'), $admin_url.'?ctrl=mdimport' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( TB_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( TB_('Markdown Importer'), $admin_url.'?ctrl=mdimport' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'markdown-importer' );
@@ -109,6 +101,18 @@ switch( $action )
 	case 'file':
 	default:
 		// Step 1:
+		if( ! isset( $MarkdownImport ) )
+		{	// Initialize markdown import object:
+			if( $app_pro )
+			{	// Use PRO markdown import:
+				load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
+				$MarkdownImport = new MarkdownImportPro();
+			}
+			else
+			{	// Use default markdown import:
+				$MarkdownImport = new MarkdownImport();
+			}
+		}
 		$AdminUI->disp_view( 'tools/views/_md_file.form.php' );
 		break;
 }

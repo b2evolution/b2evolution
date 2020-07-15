@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -16,8 +16,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_funcs( 'cron/_cron.funcs.php' );
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'options', 'cron', 'list' );
 
@@ -31,7 +31,7 @@ if( param( 'ctsk_ID', 'integer', '', true) )
 	{
 		unset( $edited_Cronjob );
 		forget_param( 'ctsk_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Scheduled job') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Scheduled job') ), 'error' );
 		$action = 'list';
 	}
 }
@@ -40,7 +40,7 @@ switch( $action )
 {
 	case 'new':
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		load_class( 'cron/model/_cronjob.class.php', 'Cronjob' );
 		$edited_Cronjob = new Cronjob();
@@ -52,7 +52,7 @@ switch( $action )
 	case 'edit':
 	case 'copy':
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		if( ( $action == 'edit' && $edited_Cronjob->get_status() != 'pending' ) ||
 		    ( $action == 'copy' && $edited_Cronjob->get_status() != 'error' ) )
@@ -74,7 +74,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'crontask' );
 
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		if( !empty( $edited_Cronjob ) )
 		{ // It is a copy action, we should save the fields "key" & "params"
@@ -102,7 +102,7 @@ switch( $action )
 			// Save to DB:
 			$edited_Cronjob->dbinsert();
 
-			$Messages->add( T_('New job has been scheduled.'), 'success' );
+			$Messages->add( TB_('New job has been scheduled.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=crontab', 303 ); // Will EXIT
@@ -115,18 +115,18 @@ switch( $action )
 		$Session->assert_received_crumb( 'crontask' );
 
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		if( $edited_Cronjob->load_from_Request() )
 		{	// We could load data from form without errors:
 
 			if( $edited_Cronjob->dbupdate() )
 			{	// The job was updated successfully
-				$Messages->add( T_('The scheduled job has been updated.'), 'success' );
+				$Messages->add( TB_('The scheduled job has been updated.'), 'success' );
 			}
 			else
 			{	// Errors on updating, probably this job has not "pending" status
-				$Messages->add( T_('This scheduled job can not be updated.'), 'error' );
+				$Messages->add( TB_('This scheduled job can not be updated.'), 'error' );
 			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -144,7 +144,7 @@ switch( $action )
 		param( 'ctsk_ID', 'integer', true );
 
 		// Check that we have permission to edit options:
-		$current_User->check_perm( 'options', 'edit', true, NULL );
+		check_user_perm( 'options', 'edit', true, NULL );
 
 		// TODO: prevent deletion of running tasks.
 		$DB->begin();
@@ -159,7 +159,7 @@ switch( $action )
 		{
 			$DB->rollback();
 
-			$Messages->add(  sprintf( T_('Job #%d is currently running. It cannot be deleted.'), $ctsk_ID ), 'error' );
+			$Messages->add(  sprintf( TB_('Job #%d is currently running. It cannot be deleted.'), $ctsk_ID ), 'error' );
 		}
 		else
 		{
@@ -173,7 +173,7 @@ switch( $action )
 
 			$DB->commit();
 
-			$Messages->add(  sprintf( T_('Scheduled job #%d deleted.'), $ctsk_ID ), 'success' );
+			$Messages->add(  sprintf( TB_('Scheduled job #%d deleted.'), $ctsk_ID ), 'success' );
 		}
 
 		//forget_param( 'ctsk_ID' );
@@ -190,7 +190,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'cronsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$cron_jobs = get_cron_jobs_config( 'name' );
 		foreach( $cron_jobs as $cron_job_key => $cron_job_name )
@@ -217,7 +217,7 @@ switch( $action )
 			{
 				case 'send-email-campaign':
 					// Send a chunk of x emails for the campaign:
-					if( $current_User->check_perm( 'emails', 'edit' ) )
+					if( check_user_perm( 'emails', 'edit' ) )
 					{	// Allow to edit email cron setting "Chunk Size" only if user has a permission:
 						$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
 					}
@@ -271,7 +271,7 @@ switch( $action )
 					}
 					if( count( $reminder_config ) < 4 )
 					{	// If no reminder has been selected:
-						param_error( 'activate_account_reminder_config_0', T_('Please select at least one reminder for account activation reminder after subscription.') );
+						param_error( 'activate_account_reminder_config_0', TB_('Please select at least one reminder for account activation reminder after subscription.') );
 					}
 					if( empty( $reminder_config[ $reminder_config_num - 2 ] ) )
 					{	// If "Mark as Failed / Pending delete" is not selected:
@@ -311,21 +311,21 @@ switch( $action )
 						{	// Store only a filled reminder:
 							if( empty( $reminder_delay_day ) )
 							{	// If one field is not filled:
-								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( T_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
+								param_error( 'unread_message_reminder_delay_day_'.$i, sprintf( TB_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
 								$reminder_delay_day = 0;
 							}
 							elseif( $prev_reminder_delay_day >= $reminder_delay_day )
 							{	// If current value is less than previous:
-								param_error( 'unread_message_reminder_delay_day_'.$i, T_('The values of the unread private messages reminder must be ascending.') );
+								param_error( 'unread_message_reminder_delay_day_'.$i, TB_('The values of the unread private messages reminder must be ascending.') );
 							}
 							if( empty( $reminder_delay_spacing ) )
 							{	// If one field is not filled:
-								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( T_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, sprintf( TB_('Please fill both fields of the unread private messages reminder #%d.'), $i ) );
 								$reminder_delay_spacing = 0;
 							}
 							elseif( $prev_reminder_delay_spacing >= $reminder_delay_spacing )
 							{	// If current value is less than previous:
-								param_error( 'unread_message_reminder_delay_spacing_'.$i, T_('The values of the unread private messages reminder must be ascending.') );
+								param_error( 'unread_message_reminder_delay_spacing_'.$i, TB_('The values of the unread private messages reminder must be ascending.') );
 							}
 							$reminder_delay[] = $reminder_delay_day.':'.$reminder_delay_spacing;
 							$prev_reminder_delay_day = $reminder_delay_day;
@@ -335,7 +335,7 @@ switch( $action )
 					}
 					if( empty( $reminder_delay ) )
 					{	// If no reminder has been selected:
-						param_error( 'unread_message_reminder_delay_day_1', T_('Please select at least one reminder for unread private messages.') );
+						param_error( 'unread_message_reminder_delay_day_1', TB_('Please select at least one reminder for unread private messages.') );
 						// Set one empty reminder in order to display all 10 reminders on the error form:
 						$reminder_delay[] = '0:0';
 					}
@@ -345,9 +345,9 @@ switch( $action )
 				case 'manage-email-statuses':
 					// Manage email address statuses:
 					$manage_email_statuses_min_delay = param_duration( 'manage_email_statuses_min_delay' );
-					param_check_not_empty( 'manage_email_statuses_min_delay', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Minimum delay since last error') ) );
+					param_check_not_empty( 'manage_email_statuses_min_delay', sprintf( TB_('The field &laquo;%s&raquo; cannot be empty.'), TB_('Minimum delay since last error') ) );
 					$Settings->set( 'manage_email_statuses_min_delay', $manage_email_statuses_min_delay );
-					param_integer_range( 'manage_email_statuses_min_sends', 1, 999999999, sprintf( T_('The minimum value of the field "%s" is %d.'), T_('Minimum sends since last error'), 1 ) );
+					param_integer_range( 'manage_email_statuses_min_sends', 1, 999999999, sprintf( TB_('The minimum value of the field "%s" is %d.'), TB_('Minimum sends since last error'), 1 ) );
 					$Settings->set( 'manage_email_statuses_min_sends', $manage_email_statuses_min_sends );
 					break;
 			}
@@ -361,7 +361,7 @@ switch( $action )
 		// Update settings:
 		$Settings->dbupdate();
 
-		$Messages->add( T_('Scheduler settings have been updated.'), 'success' );
+		$Messages->add( TB_('Scheduler settings have been updated.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=crontab&tab='.$tab, 303 ); // Will EXIT
@@ -378,7 +378,7 @@ switch( $action )
 		$cjob_row = $DB->get_row( $sql, OBJECT, 0, 'Get cron job and log' );
 		if( empty( $cjob_row ) )
 		{
-			$Messages->add( sprintf( T_('Job #%d does not exist any longer.'), $cjob_ID ), 'error' );
+			$Messages->add( sprintf( TB_('Job #%d does not exist any longer.'), $cjob_ID ), 'error' );
 			$action = 'list';
 		}
 		break;
@@ -394,8 +394,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Scheduler'), $admin_url.'?ctrl=crontab' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Scheduler'), $admin_url.'?ctrl=crontab' );
 
 // Set an url for manual page:
 switch( $action )

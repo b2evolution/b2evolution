@@ -127,7 +127,7 @@ foreach( $blog_owners as $moderator_ID => $moderator_blogs )
 }
 
 // Set notify moderation condition
-$def_send_moderation_reminder = $UserSettings->get( 'send_cmt_moderation_reminder' );
+$def_send_moderation_reminder = $UserSettings->get_default( 'send_cmt_moderation_reminder' );
 if( $def_send_moderation_reminder )
 { // Send comment moderation reminder is set by default
 	$send_moderation_reminder_cond = '( ( uset_value IS NOT NULL AND uset_value <> \'0\' ) OR ( uset_value IS NULL ) )';

@@ -7,14 +7,13 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
@@ -128,7 +127,7 @@ class Menu extends Widget
 		{ // find index of menu itemafter which to insert new entries
 			$keys = array_keys( $entries );
 
-			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys );
+			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys, true );
 		}
 
 		if( ( $index === false ) || ($index === NULL) )
@@ -231,8 +230,6 @@ class Menu extends Widget
 	 */
 	function get_html_menu( $path = NULL, $template = 'main', $level = 0, $force_empty = false )
 	{
-		global $current_User;
-
 		$r = '';
 
 		if( is_null($path) )
@@ -314,6 +311,10 @@ class Menu extends Widget
 				{
 					$anchor .= ' target="'.$loop_details['target'].'"';
 				}
+				if( isset($loop_details['rel']) )
+				{
+					$anchor .= ' rel="'.$loop_details['rel'].'"';
+				}
 				if( isset($loop_details['style']) )
 				{
 					$anchor .= ' style="'.$loop_details['style'].'"';
@@ -329,6 +330,14 @@ class Menu extends Widget
 				if( isset($loop_details['title']) )
 				{
 					$anchor .= ' title="'.$loop_details['title'].'"';
+				}
+				if( isset($loop_details['shortcut']) )
+				{
+					$anchor .= ' data-shortcut="'.$loop_details['shortcut'].'"';
+				}
+				if( isset($loop_details['shortcut-top']) )
+				{
+					$anchor .= ' data-shortcut-top="'.$loop_details['shortcut-top'].'"';
 				}
 
 				// CLASS

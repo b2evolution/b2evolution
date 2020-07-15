@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -50,6 +50,7 @@ $schema_queries['T_basedomains'] = array(
 			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_comment VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+			dom_source_tag VARCHAR(32) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_name ( dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -58,7 +59,7 @@ $schema_queries['T_track__keyphrase'] = array(
 		'Creating table for Hit-Logs keyphrases',
 		"CREATE TABLE T_track__keyphrase (
 			keyp_ID      INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			keyp_phrase  VARCHAR( 255 ) COLLATE utf8_bin NOT NULL,
+			keyp_phrase  VARCHAR( 250 ) COLLATE utf8mb4_bin NOT NULL,
 			keyp_count_refered_searches INT UNSIGNED DEFAULT 0,
 			keyp_count_internal_searches INT UNSIGNED DEFAULT 0,
 			PRIMARY KEY        ( keyp_ID ),
@@ -81,7 +82,7 @@ $schema_queries['T_hitlog'] = array(
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
-			hit_keyphrase         VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+			hit_keyphrase         VARCHAR(250) COLLATE utf8mb4_bin DEFAULT NULL,
 			hit_serprank          SMALLINT UNSIGNED DEFAULT NULL,
 			hit_coll_ID           INT(10) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr       VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL,"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
@@ -164,6 +165,17 @@ $schema_queries['T_track__goalhit'] = array(
 		  PRIMARY KEY  (ghit_ID),
 		  KEY ghit_goal_ID (ghit_goal_ID),
 		  KEY ghit_hit_ID (ghit_hit_ID)
+		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
+
+$schema_queries['T_track__goalhit_aggregate'] = array(
+		'Creating table for aggregations of goal hits',
+		"CREATE TABLE T_track__goalhit_aggregate (
+		  ghag_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+		  ghag_date    DATE NOT NULL DEFAULT '2000-01-01',
+		  ghag_goal_ID INT(10) UNSIGNED NOT NULL,
+		  ghag_count   INT(10) UNSIGNED NOT NULL,
+		  PRIMARY KEY  (ghag_ID),
+		  UNIQUE       ghag_date_goal_ID (ghag_date, ghag_goal_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
 $schema_queries['T_track__goalcat'] = array(

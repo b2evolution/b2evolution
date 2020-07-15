@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -36,32 +36,18 @@ $params = array_merge( array(
 		'search_date_format'         => locale_datefmt(),
 	), $params );
 
-// ------------------------ START OF SEARCH FORM WIDGET ------------------------
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'coll_search_form',
-		// Optional display params
-		'block_start'                => '',
-		'block_end'                  => '',
-		'block_display_title'        => false,
-		'disp_search_options'        => 0,
-		'search_class'               => $params['search_class'],
-		'search_input_before'        => $params['search_input_before'],
-		'search_input_after'         => $params['search_input_after'],
-		'search_submit_before'       => $params['search_submit_before'],
-		'search_submit_after'        => $params['search_submit_after'],
-		'search_input_author_before' => $params['search_input_author_before'],
-		'search_input_author_after'  => $params['search_input_author_after'],
-		'search_input_age_before'    => $params['search_input_age_before'],
-		'search_input_age_after'     => $params['search_input_age_after'],
-		'search_input_type_before'   => $params['search_input_type_before'],
-		'search_input_type_after'    => $params['search_input_type_after'],
-		'search_line_before'         => $params['search_line_before'],
-		'search_line_after'          => $params['search_line_after'],
-		'search_template'            => $params['search_template'],
-		'use_search_disp'            => 1,
-	) );
-// ------------------------- END OF SEARCH FORM WIDGET -------------------------
+// ------------------------- "Search Area" CONTAINER EMBEDDED HERE --------------------------
+// Display container and contents:
+widget_container( 'search_area', array(
+	// The following params will be used as defaults for widgets included in this container:
+	'container_display_if_empty' => false, // If no widget, don't display container at all
+	'container_start'     => '<div class="evo_container $wico_class$">',
+	'container_end'       => '</div>',
+	'block_start'         => '<div class="evo_widget $wi_class$">',
+	'block_end'           => '</div>',
+	'block_display_title' => false,
+) );
+// ----------------------------- END OF "Search Area" CONTAINER -----------------------------
 
 // Perform search (after having displayed the first part of the page) & display results:
 search_result_block( array(

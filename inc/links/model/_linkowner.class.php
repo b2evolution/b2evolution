@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -77,8 +77,8 @@ class LinkOwner
 	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
 	 * function get_positions( $file_ID = NULL ); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
-	 * function get_edit_url(); // get link owner edit url
-	 * function get_view_url(); // get link owner view url
+	 * function get_edit_url( $glue = '&amp;', $url_type = NULL ); // get link owner edit url
+	 * function get_view_url( $glue = '&amp;', $url_type = NULL ); // get link owner view url
 	 * function load_Links(); // load link owner all links
 	 * function add_link( $file_ID, $position, $order, $update_owner = true ); // add a new link to link owner
 	 * function load_Blog(); // set Link Owner Blog
@@ -122,7 +122,15 @@ class LinkOwner
 			else
 			{	// Create new temporary object:
 				$tmp_link_Object = new TemporaryID();
-				$tmp_link_Object->set( 'type', $this->type );
+				if( $this->type == 'comment' && $link_Object->type == 'meta' )
+				{	// Special case for internal (meta) comment so we can determine between internal and regular comments:
+					$tmp_link_Object_type = 'metacomment';
+				}
+				else
+				{
+					$tmp_link_Object_type = $this->type;
+				}
+				$tmp_link_Object->set( 'type', $tmp_link_Object_type );
 				if( ! empty( $this->link_Object->blog_ID ) )
 				{	// Set parent collection ID of Item:
 					$tmp_link_Object->set( 'coll_ID', $this->link_Object->blog_ID );
@@ -170,7 +178,7 @@ class LinkOwner
 				$this->link_Object->tmp_ID = $tmp_link_Object->ID;
 				$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
 				$this->link_Object->tmp_item_ID = $tmp_link_Object->get( 'item_ID' );
-				$this->link_Object->type = $tmp_link_Object->get( 'type' );
+				$this->link_Object->tmp_type = $tmp_link_Object->get( 'type' );
 			}
 		}
 	}

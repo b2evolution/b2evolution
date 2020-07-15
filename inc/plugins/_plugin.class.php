@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -1055,6 +1055,7 @@ class Plugin
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
+	 * Remember to set adminUI_set_path() function to set the correct full selected path.
 	 */
 	function AdminAfterMenuInit()
 	{
@@ -1094,6 +1095,8 @@ class Plugin
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
+	 * 
+	 * Be careful, this is used inside an output buffer in some places.
 	 *
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
@@ -2112,6 +2115,20 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the beginning of {@link Comment::dbupdate() updating
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentUpdateTransact( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: called at the end of {@link Comment::dbupdate() updating
 	 * a comment in the database}.
 	 *
@@ -2121,6 +2138,20 @@ class Plugin
 	 *                  before they got applied (since 1.9)
 	 */
 	function AfterCommentUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Comment::dbinsert() inserting
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentInsertTransact( & $params )
 	{
 	}
 
@@ -2184,11 +2215,10 @@ class Plugin
 	}
 
 	/**
-	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
+	 * Event handler: called to filter the comment's anonymous author name
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the name of the author/blog (by reference)
-	 *   - 'makelink': true, if the "data" contains a link
 	 *   - 'Comment': the {@link Comment} object
 	 */
 	function FilterCommentAuthor( & $params )
@@ -2350,6 +2380,21 @@ class Plugin
 		}
 	}
 
+
+	/**
+	 * Event handler: called at the beginning of {@link Message::dbinsert_discussion() or Message::dbinsert_message() inserting
+	 * an Message in the database}.
+	 *
+	 * Use this to manipulate the {@link Message}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Message': the related Message (by reference)
+	 */
+	function PrependMessageInsertTransact( & $params )
+	{
+	}
+
+
 	/**
 	 * Event handler: Called when rendering message contents as HTML. (CACHED)
 	 *
@@ -2454,6 +2499,35 @@ class Plugin
 			}
 		}
 	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbinsert() inserting
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailInsertTransact( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbupdate() updating
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailUpdateTransact( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
@@ -3333,6 +3407,22 @@ class Plugin
 	}
 
 
+	/**
+	 * Event handler: Called to ask the plugin for authorization links to specified social networks providers.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'providers': array of names of social network providers.
+	 *   - 'links': array that will contain the links (by reference)
+	 *   - 'link_params': array of parameters for displaying the link
+	 *
+	 * @return string link to authorization
+	 */
+	function GetAuthLinksForSocialNetworks( & $params )
+	{
+		return false;
+	}
+
+
 	/*
 	 * Event handlers }}}
 	 */
@@ -3871,9 +3961,9 @@ class Plugin
 	 */
 	function get_help_file()
 	{
-		global $default_locale, $plugins_path, $current_User;
+		global $default_locale, $plugins_path;
 
-		if( empty( $current_User ) || !$current_User->check_perm( 'options', 'view', false ) )
+		if( ! check_user_perm( 'options', 'view' ) )
 		{ // README gets displayed through plugins controller, which requires these perms
 			// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
 			return false;
@@ -3927,9 +4017,9 @@ class Plugin
 	 */
 	function get_edit_settings_url()
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! $current_User->check_perm( 'options', 'edit', false ) )
+		if( ! check_user_perm( 'options', 'edit', false ) )
 		{
 			return false;
 		}
@@ -4019,21 +4109,22 @@ class Plugin
 	/**
 	 * Display widget title
 	 *
-	 * @param string Title
+	 * @param string Title, NULL to use title from widget param 'title'
+	 * @param array Params
 	 */
-	function display_widget_title( $title = NULL, $params = array() )
+	function display_widget_title( $widget_title = NULL, $params = array() )
 	{
 		$this->init_widget_params( $params );
 
-		if( $title === NULL )
-		{
-			$title = $this->widget_params['title'];
+		if( $widget_title === NULL )
+		{	// Use title from widget param:
+			$widget_title = $this->get_widget_setting( 'title' );
 		}
 
-		if( $this->widget_params['block_display_title'] && ! empty( $title ) )
-		{	// Display title:
+		if( $this->widget_params['block_display_title'] && ! empty( $widget_title ) )
+		{	// We want to display a title for the widget block:
 			echo $this->widget_params['block_title_start'];
-			echo format_to_output( $title );
+			echo format_to_output( $widget_title );
 			echo $this->widget_params['block_title_end'];
 		}
 	}
@@ -4367,6 +4458,36 @@ class Plugin
 		$Blog->delete_setting( $blog_setting_name );
 	}
 
+
+	/**
+	 * Get a specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		$value = $this->Settings->get( $parname );
+
+		if( $value !== NULL )
+		{ // We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->GetDefaultSettings( $tmp_params );
+
+		return $this->get_default_setting( $parname, $params, $group );
+	}
+
 	/**
 	 * Get a message specific param value
 	 *
@@ -4656,12 +4777,28 @@ class Plugin
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of CSS file relative to current plugin folder
-	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
 	 */
-	function require_css( $css_file, $output = false )
+	function require_css( $css_file, $output = false, $position = 'headlines', $async = false )
 	{
 		global $app_version_long;
-		require_css( $this->get_plugin_url().$css_file, 'relative', NULL, NULL, $this->version.'+'.$app_version_long, $output );
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, $async );
+	}
+
+
+	/**
+	 * Require CSS file to load asynchronously
+	 * 
+	 * @param string Name of CSS file relative to current plugin folder
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_css_async( $css_file, $output = false, $position = 'headlines' )
+	{
+		global $app_version_long;
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, true );
 	}
 
 
@@ -4672,11 +4809,41 @@ class Plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+	 *                'immediate' or FALSE to load javascript immediately
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js( $js_file, $output = false )
+	function require_js( $js_file, $output = false, $async_defer = false, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'relative', false, $output, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'absolute', $async_defer, $output, $this->version.'+'.$app_version_long, $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "async"
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_async( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, $output, 'async', $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, $output, 'defer', $position );
 	}
 
 
@@ -4709,10 +4876,65 @@ class Plugin
 				break;
 
 			default:
-				$group_array = $this->Settings->get( $group_name );
+				$group_array = $this->get_setting( $group_name );
 		}
 
 		return isset( $group_array[ $setting_name ] ) ? $group_array[ $setting_name ] : NULL;
+	}
+
+
+	/**
+	 * Event handler: Called for additional initialization of importer classes
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 */
+	function ImporterConstruct( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called to set Item field from Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'field_type' - Field type, e.g. 'yaml',
+	 *   - 'field_name' - Field name
+	 *   - 'field_data' - Field data
+	 */
+	function ImporterSetItemField( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called for additional updating Item after it was imported
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'data'     - Data of the Item from imported file,
+	 */
+	function ImporterAfterItemImport( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after Items were deleted in Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'             - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer'         - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'deleted_item_IDs' - IDs of deleted Items,
+	 */
+	function ImporterAfterItemsDelete( & $params )
+	{
 	}
 }
 

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -22,7 +22,7 @@ $welcome_content_Widget = new Widget( 'block_item' );
 	$welcome_content_Widget->title = T_('Quick start wizard');
 	$welcome_content_Widget->disp_template_replaced( 'block_start' );
 
-	echo '<p>'.T_('Your b2evolution installation is installed and working but there is no content yet.').'</p>';
+	echo '<p>'.T_('Your b2evolution CMS is installed and working but there is no content yet.').'</p>';
 	echo '<p>'.T_('Would you like to create some demo contents to get a better understanding of how things work? You can easily delete these demo contents when you no longer need them.').'</p>';
 	$enable_create_demo_users = get_table_count( 'T_users', 'user_ID != 1' ) === 0;
 	$show_create_email_lists = ( get_table_count( 'T_email__newsletter' ) === 0 );

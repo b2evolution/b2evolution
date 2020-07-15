@@ -7,17 +7,15 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var User
- */
-global $current_User;
+load_class( '_core/ui/_table.class.php', 'Table' );
+
 /**
  * @var Plugins
  */
@@ -146,7 +144,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 		$Table->display_col_start();
 			$registrations = $admin_Plugins->count_regs($loop_Plugin->classname);
 
-			if( $current_User->check_perm( 'options', 'edit', false )
+			if( check_user_perm( 'options', 'edit', false )
 					&& ( ! isset( $loop_Plugin->number_of_installs )
 					     || $registrations < $loop_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet and user has "edit options" perms

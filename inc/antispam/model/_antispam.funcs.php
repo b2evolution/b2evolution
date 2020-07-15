@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  * Parts of this file are copyright (c)2005 by The University of North Carolina at Charlotte as
@@ -439,8 +439,6 @@ function get_ban_domain( $url )
  */
 function blog_restrict( $delstatuses )
 {
-	global $current_User;
-
 	if( empty( $delstatuses ) )
 	{ // none of the statuses should be deleted
 		return ' AND false';
@@ -448,7 +446,7 @@ function blog_restrict( $delstatuses )
 
 	// asimo> Currently only global blogs editall permission gives rights to permanently delete comments
 	// Probably this function must be changed when the advanced collection perms will be finished
-	if( !$current_User->check_perm( 'blogs', 'editall', false ) )
+	if( ! check_user_perm( 'blogs', 'editall', false ) )
 	{ // User has permission to permanently delete comments on this blog
 		return ' AND false';
 	}
@@ -476,8 +474,6 @@ function blog_restrict( $delstatuses )
  */
 function echo_affected_comments( $affected_comments, $status, $keyword, $noperms_count )
 {
-	global $current_User;
-
 	$num_comments = count( $affected_comments );
 	if( $num_comments == 0 )
 	{
@@ -493,7 +489,7 @@ function echo_affected_comments( $affected_comments, $status, $keyword, $noperms
 	}
 
 	echo '<p>';
-	if( $current_User->check_perm( 'blogs', 'editall', false ) )
+	if( check_user_perm( 'blogs', 'editall', false ) )
 	{ // current User has rights to permanently delete comments
 		$checkbox_status = 'checked="checked"';
 	}
@@ -1357,7 +1353,7 @@ function antispam_increase_counter( $counter_name )
  */
 function antispam_get_whois( $query = NULL, $window_height = NULL )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	load_class('_ext/phpwhois/whois.main.php', 'whois' );
 
@@ -1421,7 +1417,7 @@ function antispam_get_whois( $query = NULL, $window_height = NULL )
 			}
 
 			// Make IP ranges clickable
-			if( $current_User->check_perm( 'spamblacklist', 'view' ) &&
+			if( check_user_perm( 'spamblacklist', 'view' ) &&
 					preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
 			{
 				$aipr_status_titles = aipr_status_titles();
@@ -1440,7 +1436,7 @@ function antispam_get_whois( $query = NULL, $window_height = NULL )
 				$whois_IPs = explode( '-', $ip_range_text );
 				$whois_IP_start = isset( $whois_IPs[0] ) ? trim( $whois_IPs[0] ) : '';
 				$whois_IP_end = isset( $whois_IPs[1] ) ? trim( $whois_IPs[1] ) : '';
-				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				if( check_user_perm( 'spamblacklist', 'edit' ) )
 				{	// If current user has a permission to edit IP ranges:
 					if( $IPRange )
 					{	// If IP range is found in DB:
@@ -1489,11 +1485,11 @@ function antispam_get_whois( $query = NULL, $window_height = NULL )
 				$result['rawdata'][$i] = str_replace( $matches[2][0], $ip_range_text, $result['rawdata'][$i] );
 			}
 		}
-		$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+		$winfo .= format_to_output( implode( "\n", $result['rawdata'] ) );
 	}
 	else
 	{
-		$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+		$winfo = format_to_output( implode( "\n", $whois->Query['errstr'] ) )."<br></br>";
 	}
 	$winfo .= '</pre>';
 

@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -26,7 +26,7 @@ $Timer->start( '_init_session' );
 load_funcs( '_core/_url.funcs.php' );
 if( !empty($is_admin_page) )
 {	// Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through:
-	if( ! is_same_url( $ReqHost.$ReqPath, $admin_url, true ) )
+	if( ! is_same_url( $ReqHost.$ReqPath, get_admin_url(), true ) )
 	{	// The requested URL does not look like it's under the admin URL...
 		if( is_same_url( $ReqHost.$ReqPath, $baseurl.'admin.php', true ) )
 		{	// Permanent redirect from obsolete admin.php url:

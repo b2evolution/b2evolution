@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -49,9 +49,9 @@ else
 			'visitor_after'  => '</span>',
 		) );
 }
-if( $params['notify_type'] == 'meta_comment' )
-{ // Meta comment
-	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
+if( $params['notify_type'] == 'meta_comment' || $params['notify_type'] == 'meta_comment_mentioned' )
+{ // Internal comment
+	$info_text = T_( '%s posted a new internal comment on %s in %s.' );
 }
 else
 { // Normal comment
@@ -62,6 +62,10 @@ $notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$a
 if( $params['notify_type'] == 'comment_mentioned' )
 {	// Add this info line if user was mentioned in the comment content:
 	$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_( 'You were mentioned in this comment.' )."</p>\n";
+}
+elseif( $params['notify_type'] == 'meta_comment_mentioned' )
+{	// Add this info line if user was mentioned in the internal comment content:
+	$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_( 'You were mentioned in this internal comment.' )."</p>\n";
 }
 
 if( $params['notify_full'] )
@@ -182,9 +186,16 @@ switch( $params['notify_type'] )
 
 	case 'comment_mentioned':
 		// user is mentioned in the comment
-		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' ).'<br />'
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mentions your name in a comment.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		break;
+
+	case 'meta_comment_mentioned':
+		// user is mentioned in the internal comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this internal comment, and you are receiving notifications when anyone mentions your name in an internal comment.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in an internal comment, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=meta_comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'blog_subscription':
@@ -219,9 +230,9 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'meta_comment':
-		// meta comment subscription
-		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' ).'<br />'
-			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
+		// internal comment subscription
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when internal comment is added on this post.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications about internal comments, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -127,6 +127,7 @@ class Group extends DataObject
 		return array(
 				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
 				array( 'table'=>'T_users__invitation_code', 'fk'=>'ivc_grp_ID', 'msg'=>T_('%d user invitation codes in this group') ),
+				array( 'table'=>'T_users__fielddefs', 'fk'=>'ufdf_grp_ID', 'msg'=>T_('%d user fields use this group') ),
 			);
 	}
 
@@ -639,12 +640,12 @@ class Group extends DataObject
 			return false;
 		}
 
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{	// Allow to assing any group if current user has full access to edit users:
 			return true;
 		}
 
-		if( ! $current_User->check_perm( 'users', 'moderate' ) )
+		if( ! check_user_perm( 'users', 'moderate' ) )
 		{	// User must has a permission at least to modearate the users:
 			return false;
 		}

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -48,6 +48,9 @@ $headlines = array();
 // ############ Get ReqPath & ReqURI ##############
 list($ReqPath,$ReqURI) = get_ReqURI();
 
+// Remove all invalid chars:
+$sanitized_ReqPath = preg_replace( '#[^a-zA-Z0-9./_\-:;\s]#', '', urldecode( $ReqPath ) );
+
 /**
  * Full requested Host (including protocol).
  *
@@ -68,6 +71,7 @@ $ReqURL = $ReqHost.$ReqURI;
 $Debuglog->add( 'vars: $ReqHost: '.$ReqHost, 'request' );
 $Debuglog->add( 'vars: $ReqURI: '.$ReqURI, 'request' );
 $Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
+$Debuglog->add( 'vars: $sanitized_ReqPath: '.$sanitized_ReqPath, 'request' );
 
 /**
  * Same domain htsrv url.

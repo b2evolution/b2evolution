@@ -1,13 +1,13 @@
 <?php
 /**
- * This file implements the Current filters Widget class.
+ * This file implements the Current Item filters Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -53,7 +53,7 @@ class coll_current_filters_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Current filters');
+		return T_('Current Item filters');
 	}
 
 
@@ -71,7 +71,7 @@ class coll_current_filters_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Summary of the current filters.');
+		return T_('Summary of the current Item filters.');
 	}
 
 
@@ -87,7 +87,7 @@ class coll_current_filters_Widget extends ComponentWidget
 			'title' => array(
 					'type' => 'text',
 					'label' => T_('Block title'),
-					'defaultvalue' => T_('Current filters'),
+					'defaultvalue' => T_('Current Item filters'),
 					'maxlength' => 100,
 				),
 			'show_filters' => array(
@@ -102,7 +102,8 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'assignee', T_('Assignee'), 1 ),
 						array( 'locale', T_('Locale'), 1 ),
 						array( 'status', T_('Status'), 1 ),
-						array( 'visibility', T_('Visibility'), 1 ),
+						array( 'itemtype', T_('Item Type'), 0 ),
+						array( 'visibility', T_('Visibility'), 0 ),
 						array( 'time', T_('Past/Future'), 0 ),
 						array( 'limit', T_('Limit by days'), 1 ),
 						array( 'flagged', T_('Flagged'), 1 ),
@@ -152,6 +153,7 @@ class coll_current_filters_Widget extends ComponentWidget
 		$filters =  implode( ' '.T_('AND').' ', $params['ItemList']->get_filter_titles( array(), array(
 				'categories_text'     => '',
 				'categories_nor_text' => T_('NOT').' ',
+				'statuses_nor_text'   => T_('NOT').' ',
 				'tags_nor_text'       => T_('NOT').' ',
 				'authors_nor_text'    => T_('NOT').' ',
 				'group_mask'          => '$filter_items$',
@@ -179,6 +181,7 @@ class coll_current_filters_Widget extends ComponentWidget
 				'display_locale'     => ! empty( $this->disp_params['show_filters']['locale'] ),
 				'display_status'     => ! empty( $this->disp_params['show_filters']['status'] ),
 				'display_visibility' => ! empty( $this->disp_params['show_filters']['visibility'] ),
+				'display_itemtype'   => ! empty( $this->disp_params['show_filters']['itemtype'] ),
 				'display_time'       => ! empty( $this->disp_params['show_filters']['time'] ),
 				'display_limit'      => ! empty( $this->disp_params['show_filters']['limit'] ),
 				'display_flagged'    => ! empty( $this->disp_params['show_filters']['flagged'] ),
@@ -188,7 +191,7 @@ class coll_current_filters_Widget extends ComponentWidget
 		if( empty( $filters ) && ! $params['display_empty_filter'] )
 		{	// No filters
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
-			return;
+			return false;
 		}
 
 		// START DISPLAY:
@@ -205,7 +208,24 @@ class coll_current_filters_Widget extends ComponentWidget
 			{
 				if( is_admin_page() && get_param( 'tab' ) == 'type' )
 				{ // Try to get a title for current selected post type on back-office pages:
-					$current_post_type_title = '"'.get_param( 'tab_type' ).'"';
+					switch( get_param( 'tab_type' ) )
+					{
+						case 'page':
+							$current_post_type_title = T_('Pages');
+							break;
+						case 'special':
+							$current_post_type_title = T_('Special Items');
+							break;
+						case 'intro':
+							$current_post_type_title = T_('Intros');
+							break;
+						case 'content-block':
+							$current_post_type_title = T_('Content Blocks');
+							break;
+						default: // post
+							$current_post_type_title = T_('Posts');
+					}
+					$current_post_type_title = '"'.$current_post_type_title.'"';
 				}
 				if( empty( $current_post_type_title ) )
 				{ // Use this title by default for unknown selected post type:
@@ -219,9 +239,11 @@ class coll_current_filters_Widget extends ComponentWidget
 			echo $filters;
 
 			if( $params['display_button_reset'] )
-			{ // Button to reset all filters
-				echo '<p>'.action_icon( T_('Reset all filters!'), 'reset_filters',
-					regenerate_url( 'catsel,cat,'
+			{	// Display link/button to reset all filters:
+				global $Blog;
+				if( is_admin_page() || ! isset( $Blog )  )
+				{	// Regenerate URL by removing all filters from current URL on back-office:
+					$remove_filters_url = regenerate_url( 'catsel,cat,'
 						.$params['ItemList']->param_prefix.'tag,'
 						.$params['ItemList']->param_prefix.'author,'
 						.$params['ItemList']->param_prefix.'author_login,'
@@ -245,8 +267,15 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'show_past,'
 						.$params['ItemList']->param_prefix.'show_future,'
 						.$params['ItemList']->param_prefix.'flagged,'
-						.$params['ItemList']->param_prefix.'mustread' ),
-					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
+						.$params['ItemList']->param_prefix.'mustread' );
+				}
+				else
+				{	// Use home page of the current Collection on front-office:
+					$remove_filters_url = $Blog->get( 'url' );
+				}
+
+				echo '<p>'.action_icon( T_('Remove filters'), 'reset_filters',
+					$remove_filters_url, ' '.T_('Remove filters'), 3, 4 ).'<p>';
 			}
 		}
 

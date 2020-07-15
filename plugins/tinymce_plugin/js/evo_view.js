@@ -198,9 +198,58 @@
 				 * @param {Boolean} force Rerender all view nodes.
 				 */
 				render: function( force ) {
+						var self = this,
+							   params = [];
+
 						$.each( instances, function( index, instance ) {
-								instance.render( null, force );
+								if( !instance.renderedHTML ) {
+									params.push( 'tags[]=' + encodeURI( instance.text ) );
+								}
 							} );
+
+						// Fetch rendered HTML fragments:
+						if(params.length) {
+
+							params = params.join( '&' );
+
+							evo.View.prototype.getEditors( function( editor ) {
+								tinymce.util.XHR.send( {
+										url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&type='
+												+ editor.getParam( 'target_type' )
+												+ '&id=' + ( editor.getParam( 'target_ID' ) == undefined ? '' : editor.getParam( 'target_ID' ) )
+												+ ( editor.getParam( 'temp_ID' ) ? '&temp_link_owner_ID=' + editor.getParam( 'temp_ID' ) : '' ),
+										content_type : 'application/x-www-form-urlencoded',
+										data: params,
+										success: function( data ) {
+												if(data)
+												{
+													var returnedTags = tinymce.util.JSON.parse( data );
+													for( var shortTag in returnedTags )
+													{
+														var wrapper = editor.dom.create('div');
+														var df = editor.dom.createFragment( returnedTags[shortTag] );
+														wrapper.appendChild( df );
+														if( shortTag != wrapper.innerHTML )
+														{
+															var instance = self.getInstance( shortTag );
+															instance.renderedHTML = wrapper.innerHTML;
+														}
+													}
+												}
+
+												$.each( instances, function( index, instance ) {
+													instance.render( instance.renderedHTML, force );
+												} );
+											}
+									} );
+							} );
+						}
+						else
+						{
+							$.each( instances, function( index, instance ) {
+								instance.render( instance.renderedHTML, force );
+							} );
+						}
 					},
 
 				/**
@@ -346,10 +395,6 @@
 									$( node ).data( 'rendered', true );
 									self.bindNode.call( self, editor, node, contentNode );
 								}, force ? null : false );
-						}
-						else
-						{
-							//this.setLoader();
 						}
 					},
 
@@ -821,31 +866,7 @@
 					var self = this;
 					var	params = [];
 
-
-					params.push( 'tags[]=' + encodeURI( self.text ) );
-					//params.push( 'image_size=fit-256x256' );
-
-					if( params.length )
-					{
-						params = params.join( '&' );
-					}
-					this.getEditors( function( editor ) {
-							tinymce.util.XHR.send( {
-									url: editor.getParam( 'anon_async_url' ) + '?action=render_inlines&type='
-											+ editor.getParam( 'target_type' )
-											+ '&id=' + ( editor.getParam( 'target_ID' ) == undefined ? '' : editor.getParam( 'target_ID' ) )
-											+ ( editor.getParam( 'temp_ID' ) ? '&temp_link_owner_ID=' + editor.getParam( 'temp_ID' ) : '' ),
-									content_type : 'application/x-www-form-urlencoded',
-									data: params,
-									success: function( data ) {
-											var returnedTags = tinymce.util.JSON.parse( data );
-											var wrapper = editor.dom.create( 'div' );
-											var df = editor.dom.createFragment( returnedTags[self.text] );
-											wrapper.appendChild( df );
-											self.render( wrapper.innerHTML );
-										}
-								} );
-						} );
+					self.renderedHTML = null;
 				}
 			} );
 

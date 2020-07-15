@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 $AdminUI->set_path( 'users', 'usersettings', 'accountclose' );
 
@@ -26,7 +26,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'accountclose' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// UPDATE the account closing settings:
 		param( 'account_close_enabled', 'integer', 0 );
@@ -47,7 +47,7 @@ switch ( $action )
 				// invalidate all PageCaches
 				invalidate_pagecaches();
 
-				$Messages->add( T_('The settings of account closing have been updated.'), 'success' );
+				$Messages->add( TB_('The settings of account closing have been updated.'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=accountclose', 303 ); // Will EXIT
 				// We have EXITed already at this point!!
@@ -59,9 +59,9 @@ switch ( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Account closing'), '?ctrl=accountclose' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Account closing'), '?ctrl=accountclose' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'user-settings-account-closing-tab' );

@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,8 +28,8 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
 				skin_class   varchar(32) COLLATE ascii_general_ci NOT NULL,
-				skin_name    varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
+				skin_name    varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+				skin_type    enum('normal','feed','sitemap','mobile','tablet','alt','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
@@ -69,6 +69,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_normal_skin_ID  int(10) unsigned NULL,
 			blog_mobile_skin_ID  int(10) unsigned NULL,
 			blog_tablet_skin_ID  int(10) unsigned NULL,
+			blog_alt_skin_ID     int(10) unsigned NULL,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -114,9 +115,9 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating components container table',
 		"CREATE TABLE T_widget__container (
 			wico_ID        INT(10) UNSIGNED auto_increment,
-			wico_code      VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			wico_skin_type ENUM( 'normal', 'mobile', 'tablet' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
-			wico_name      VARCHAR( 40 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			wico_code      VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			wico_skin_type ENUM( 'normal', 'mobile', 'tablet', 'alt' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
+			wico_name      VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 			wico_coll_ID   INT(10) NULL DEFAULT NULL,
 			wico_order     INT(10) NOT NULL,
 			wico_main      TINYINT(1) NOT NULL DEFAULT 0,
@@ -201,7 +202,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') COLLATE ascii_general_ci NOT NULL DEFAULT '',
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
-			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			post_renderers              VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
 			post_ctry_ID                INT(10) UNSIGNED NULL,
@@ -252,10 +253,12 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_date               TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_last_touched_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_content            text COLLATE utf8mb4_unicode_ci NOT NULL,
-			comment_renderers          VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			comment_renderers          VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			comment_rating             TINYINT(1) NULL DEFAULT NULL,
 			comment_featured           TINYINT(1) NOT NULL DEFAULT 0,
-			comment_nofollow           TINYINT(1) NOT NULL DEFAULT 1,
+			comment_author_url_nofollow  TINYINT(1) NOT NULL DEFAULT 1,
+			comment_author_url_ugc       TINYINT(1) NOT NULL DEFAULT 1,
+			comment_author_url_sponsored TINYINT(1) NOT NULL DEFAULT 0,
 			comment_helpful_addvotes   INT NOT NULL default 0,
 			comment_helpful_countvotes INT unsigned NOT NULL default 0,
 			comment_spam_addvotes      INT NOT NULL default 0,
@@ -293,7 +296,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__prerendering(
 			itpr_itm_ID                   INT(10) UNSIGNED NOT NULL,
 			itpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
-			itpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			itpr_renderers                VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			itpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			itpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
@@ -304,7 +307,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_comments__prerendering(
 			cmpr_cmt_ID                   INT(10) UNSIGNED NOT NULL,
 			cmpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
-			cmpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			cmpr_renderers                VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			cmpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			cmpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (cmpr_cmt_ID, cmpr_format)
@@ -362,6 +365,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__status (
 			pst_ID   int(10) unsigned not null AUTO_INCREMENT,
 			pst_name varchar(30) COLLATE utf8mb4_unicode_ci not null,
+			pst_order   int(11) NULL DEFAULT NULL,
 			primary key ( pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -372,6 +376,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_name              VARCHAR(30) COLLATE utf8mb4_unicode_ci NOT NULL,
 			ityp_description       TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			ityp_usage             VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'post',
+			ityp_template_excerpt  VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			ityp_template_normal   VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			ityp_template_full     VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			ityp_template_name     VARCHAR(40) NULL DEFAULT NULL,
 			ityp_schema            ENUM( 'Article', 'WebPage', 'BlogPosting', 'ImageGallery', 'DiscussionForumPosting', 'TechArticle', 'Product', 'Review' ) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			ityp_add_aggregate_rating TINYINT DEFAULT 1,
@@ -393,6 +400,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_use_meta_keywds   ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_use_tags          ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_allow_featured    TINYINT DEFAULT 1,
+			ityp_allow_switchable  TINYINT DEFAULT 1,
 			ityp_use_country       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_region        ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
 			ityp_use_sub_region    ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'never',
@@ -415,6 +423,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_front_order_short_title  SMALLINT NULL,
 			ityp_front_order_instruction  SMALLINT NULL,
 			ityp_front_order_attachments  SMALLINT NULL,
+			ityp_front_order_workflow     SMALLINT NULL,
 			ityp_front_order_text         SMALLINT NULL,
 			ityp_front_order_tags         SMALLINT NULL,
 			ityp_front_order_excerpt      SMALLINT NULL,
@@ -439,6 +448,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_public          TINYINT DEFAULT 1,
 			itcf_format          VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			itcf_formula         VARCHAR(2000) COLLATE ascii_general_ci NULL,
+			itcf_disp_condition  VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			itcf_header_class    VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_cell_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl', 'fieldurlblank' ) COLLATE ascii_general_ci NOT NULL default 'nolink',
@@ -474,7 +484,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Tags',
 		"CREATE TABLE T_items__tag (
 			tag_ID   INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-			tag_name VARCHAR(50) COLLATE utf8_bin NOT NULL,
+			tag_name VARCHAR(50) COLLATE utf8mb4_bin NOT NULL,
 			PRIMARY KEY (tag_ID),
 			UNIQUE tag_name( tag_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -538,6 +548,18 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY (itvt_item_ID, itvt_user_ID),
 			KEY itvt_item_ID (itvt_item_ID),
 			KEY itvt_user_ID (itvt_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__checklist_lines' => array(
+		'Creating table for checklists',
+		"CREATE TABLE T_items__checklist_lines (
+			check_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			check_item_ID INT(10) UNSIGNED NOT NULL,
+			check_checked TINYINT(1) NOT NULL DEFAULT 0,
+			check_label   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			check_order   INT(11) NOT NULL DEFAULT 1,
+			PRIMARY KEY (check_ID),
+			KEY check_item_ID (check_item_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__pricing' => array(

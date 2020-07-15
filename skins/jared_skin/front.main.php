@@ -111,6 +111,7 @@ if( $Skin->get_setting( 'section_1_display' ) ) {
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

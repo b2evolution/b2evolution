@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -120,6 +120,14 @@ function skin_init( $disp )
 					header_redirect( get_login_url( 'no access to must read content', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
 					// Exit here.
 				}
+				if( ! is_pro() )
+				{	// Forbid access for not PRO version:
+					global $disp, $disp_detail;
+					$disp = '404';
+					$disp_detail = '404-not-supported';
+					$Messages->add( T_('"Must Read" is supported only on b2evolution PRO.'), 'error' );
+					break;
+				}
 				if( ! $Blog->get_setting( 'track_unread_content' ) )
 				{	// Forbid access to "must read" content if collection doesn't track unread content:
 					global $disp;
@@ -159,9 +167,8 @@ function skin_init( $disp )
 
 		case 'search':
 			// Searching post, comments and categories
+			// Load functions to work with search results:
 			load_funcs( 'collections/_search.funcs.php' );
-			// Check previous search keywords so it can be displayed in the search input box
-			param( 's', 'string', '', true );
 			break;
 	}
 
@@ -172,6 +179,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 			if( $disp == 'terms' && ! $Item )
 			{	// Wrong post ID for terms page:
@@ -203,6 +211,13 @@ function skin_init( $disp )
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview &&
+			    is_pro() &&
+			    $Item->get_setting( 'external_canonical_url' ) &&
+			    $Item->get( 'url' ) != '' )
+			{	// Use post link to URL as an External Canonical URL:
+				add_headline( '<link rel="canonical" href="'.format_to_output( $Item->get( 'url' ), 'htmlattr' ).'" />' );
+			}
+			elseif( ! $preview &&
 			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 			      || $Blog->get_setting( 'relcanonical_item_urls' )
 			      || $Blog->get_setting( 'self_canonical_item_urls' )
@@ -221,13 +236,10 @@ function skin_init( $disp )
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
 					$canonical_url = $main_canonical_url;
 				}
-				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
-				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
-				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
-					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
-				}
+				// Keep ONLY allowed noredir params from current URL in the canonical URL:
+				$canonical_url = url_clear_noredir_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
-						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
+						&& check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
 				{ // A revision of the post, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );
@@ -247,10 +259,8 @@ function skin_init( $disp )
 							continue;
 						}
 						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
-						if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
-						{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
-							$cat_canonical_url = url_add_param( $cat_canonical_url, implode( '&', $page_param[1] ), '&' );
-						}
+						// Keep ONLY allowed noredir params from current URL in the category canonical URL:
+						$cat_canonical_url = url_clear_noredir_params( $cat_canonical_url );
 						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{	// We have found the same URL, stop find another and stay on the current page without redirect:
 							break;
@@ -296,11 +306,9 @@ function skin_init( $disp )
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
-					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
-					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
-					    ) )
+					    ! $Item->stay_in_cross_posted_collection( 'auto', $Blog->ID ) ) // If the Item cannot stay in the current Collection
 					{	// REDIRECT TO THE CANONICAL URL:
-						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
+						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].', 'request' );
 						header_redirect( $canonical_url, true );
 						// EXITED.
 					}
@@ -326,6 +334,19 @@ function skin_init( $disp )
 			if( empty( $Item ) )
 			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
 				debug_die( 'Invalid page URL!' );
+			}
+
+			$seo_page_type = 'Download page';
+			if( $Blog->get_setting( $disp.'_noindex' ) )
+			{ // We prefer robots not to index these pages:
+				$robots_index = false;
+			}
+			if( ! $Blog->get_setting( 'download_enable' ) )
+			{	// If download is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-download-disabled';
+				break;
 			}
 
 			$download_link_ID = param( 'download', 'integer', 0 );
@@ -354,16 +375,16 @@ function skin_init( $disp )
 			// Use meta tag to download file when JavaScript is NOT enabled
 			add_headline( '<meta http-equiv="refresh" content="'.intval( $Blog->get_setting( 'download_delay' ) )
 				.'; url='.$download_Link->get_download_url( array( 'type' => 'action' ) ).'" />' );
-
-			$seo_page_type = 'Download page';
-
-			if( $Blog->get_setting( $disp.'_noindex' ) )
-			{ // We prefer robots not to index these pages:
-				$robots_index = false;
-			}
 			break;
 
 		case 'posts':
+			if( ! $Blog->get_setting( 'postlist_enable' ) )
+			{	// If post list is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-post-list-disabled';
+				break;
+			}
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
@@ -381,6 +402,8 @@ function skin_init( $disp )
 				    || $Blog->get_setting( 'self_canonical_posts' ) )
 				{	// Check if the URL was canonical:
 					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
+					// Keep ONLY allowed noredir params from current URL in the canonical URL:
+					$canonical_url = url_clear_noredir_params( $canonical_url );
 					if( $is_next_pages )
 					{	// Set param for paged url:
 						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
@@ -418,9 +441,16 @@ function skin_init( $disp )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
-					if( $Blog->get_setting( 'paged_noindex' ) )
-					{	// We prefer robots not to index category pages:
-						$robots_index = false;
+
+					if( has_featured_Item() )
+					{	// If current next page has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'paged_intro_noindex' );
+					}
+					else
+					{	// If current next page has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'paged_noindex' );
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
@@ -434,7 +464,9 @@ function skin_init( $disp )
 
 					global $cat, $catsel;
 
-					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
+					if( ( empty( $catsel ) || // 'catsel' filter is not defined
+					      ( is_array( $catsel ) && count( $catsel ) == 1 ) // 'catsel' filter is used for single cat, e.g. when skin config 'cat_array_mode' = 'parent'
+					    ) && preg_match( '~^[0-9]+$~', $cat ) ) // 'cat' filter is ID of category and NOT modifier for 'catsel' multicats
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children
@@ -463,6 +495,8 @@ function skin_init( $disp )
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
+								// Keep ONLY allowed noredir params from current URL in the canonical URL:
+								$canonical_url = url_clear_noredir_params( $canonical_url );
 								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
@@ -487,6 +521,16 @@ function skin_init( $disp )
 							$MainList->nav_target = $cat;
 						}
 
+						if( has_featured_Item() )
+						{	// If current category has Intro post:
+							$disp_detail .= '-intro';
+							$robots_index = ! $Blog->get_setting( 'chapter_intro_noindex' );
+						}
+						else
+						{	// If current category has no Intro post:
+							$disp_detail .= '-nointro';
+						}
+
 						if( empty( $Chapter ) )
 						{	// If the requested chapter was not found display 404 page:
 							$Messages->add( T_('The requested chapter was not found') );
@@ -500,16 +544,14 @@ function skin_init( $disp )
 				{ // This is a tag page
 					$disp_detail = 'posts-tag';
 					$seo_page_type = 'Tag page';
-					if( $Blog->get_setting( 'tag_noindex' ) )
-					{	// We prefer robots not to index tag pages:
-						$robots_index = false;
-					}
 
 					if( ( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 					    || $Blog->get_setting( 'relcanonical_tag_urls' )
 					    || $Blog->get_setting( 'self_canonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
+						// Keep ONLY allowed noredir params from current URL in the canonical URL:
+						$canonical_url = url_clear_noredir_params( $canonical_url );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
@@ -532,6 +574,17 @@ function skin_init( $disp )
 					{ // Tag is set and post navigation should go through the same tag, set navigation target param
 						$MainList->nav_target = $tag;
 					}
+
+					if( has_featured_Item() )
+					{	// If current tag has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'tag_intro_noindex' );
+					}
+					else
+					{	// If current tag has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'tag_noindex' );
+					}
 				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'posts', 'page' ) ) == array() ) // fp> added 'posts' 2009-05-19; can't remember why it's not in there
 				{ // This is an archive page
@@ -544,6 +597,8 @@ function skin_init( $disp )
 					    || $Blog->get_setting( 'self_canonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
+						// Keep ONLY allowed noredir params from current URL in the canonical URL:
+						$canonical_url = url_clear_noredir_params( $canonical_url );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
@@ -571,9 +626,16 @@ function skin_init( $disp )
 					// pre_dump( $active_filters );
 					$disp_detail = 'posts-filtered';
 					$seo_page_type = 'Other filtered page';
-					if( $Blog->get_setting( 'filtered_noindex' ) )
-					{	// We prefer robots not to index other filtered pages:
-						$robots_index = false;
+
+					if( has_featured_Item() )
+					{	// If current filtered page has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'filtered_intro_noindex' );
+					}
+					else
+					{	// If current filtered page has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'filtered_noindex' );
 					}
 				}
 			}
@@ -584,6 +646,12 @@ function skin_init( $disp )
 			if( $Blog->get_setting( 'filtered_noindex' ) )
 			{	// We prefer robots not to index these pages:
 				$robots_index = false;
+			}
+			if( ! $Blog->get_setting( 'search_enable' ) )
+			{	// If search is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-search-disabled';
 			}
 			break;
 
@@ -698,8 +766,8 @@ function skin_init( $disp )
 					}
 				}
 
-				if( $allow_msgform == 'email' )
-				{ // set recippient user param
+				if( empty( $recipient_id ) && ! empty( $recipient_User ) )
+				{	// Set recipient user param when it is not specified in GET/POST:
 					set_param( 'recipient_id', $recipient_User->ID );
 				}
 			}
@@ -797,9 +865,9 @@ function skin_init( $disp )
 					}
 
 					// check if user status allow to view messages
-					if( !$current_User->check_status( 'can_view_messages' ) )
+					if( ! check_user_status( 'can_view_messages' ) )
 					{ // user status does not allow to view messages
-						if( $current_User->check_status( 'can_be_validated' ) )
+						if( check_user_status( 'can_be_validated' ) )
 						{ // user is logged in but his/her account is not activate yet
 							$Messages->add( T_( 'You must activate your account before you can read & send messages. <b>See below:</b>' ) );
 							header_redirect( get_activate_info_url(), 302 );
@@ -812,7 +880,7 @@ function skin_init( $disp )
 					}
 
 					// check if user permissions allow to view messages
-					if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{ // Redirect to the blog url for users without messaging permission
 						$Messages->add( 'You are not allowed to view Messages!' );
 						header_redirect( $Blog->gen_blogurl(), 302 );
@@ -848,9 +916,9 @@ function skin_init( $disp )
 						// will have exited
 					}
 
-					if( !$current_User->check_status( 'can_view_contacts' ) )
+					if( ! check_user_status( 'can_view_contacts' ) )
 					{ // user is logged in, but his status doesn't allow to view contacts
-						if( $current_User->check_status( 'can_be_validated' ) )
+						if( check_user_status( 'can_be_validated' ) )
 						{ // user is logged in but his/her account was not activated yet
 							// Redirect to the account activation page
 							$Messages->add( T_( 'You must activate your account before you can manage your contacts. <b>See below:</b>' ) );
@@ -875,7 +943,7 @@ function skin_init( $disp )
 					// Get action parameter from request:
 					$action = param_action();
 
-					if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{ // Redirect to the blog url for users without messaging permission
 						$Messages->add( 'You are not allowed to view Contacts!' );
 						$blogurl = $Blog->gen_blogurl();
@@ -906,7 +974,7 @@ function skin_init( $disp )
 										$Messages->add( 'User has been added to your contacts.', 'success' );
 									}
 								}
-								header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+								header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ) );
 							}
 							break;
 
@@ -939,7 +1007,7 @@ function skin_init( $disp )
 									}
 									else
 									{ // Redirect to the user profile page
-										header_redirect( $Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$user_ID, 'glue' => '&' ) ) );
+										header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ) );
 									}
 								}
 							}
@@ -1022,9 +1090,9 @@ function skin_init( $disp )
 						// will have exited
 					}
 
-					if( !$current_User->check_status( 'can_view_threads' ) )
+					if( ! check_user_status( 'can_view_threads' ) )
 					{ // user status does not allow to view threads
-						if( $current_User->check_status( 'can_be_validated' ) )
+						if( check_user_status( 'can_be_validated' ) )
 						{ // user is logged in but his/her account is not activate yet
 							$Messages->add( T_( 'You must activate your account before you can read & send messages. <b>See below:</b>' ) );
 							header_redirect( get_activate_info_url(), 302 );
@@ -1040,7 +1108,7 @@ function skin_init( $disp )
 						// will have exited
 					}
 
-					if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{ // Redirect to the blog url for users without messaging permission
 						$Messages->add( 'You are not allowed to view Messages!' );
 						$blogurl = $Blog->gen_blogurl();
@@ -1075,7 +1143,7 @@ function skin_init( $disp )
 					{
 						case 'new':
 							// Check permission:
-							$current_User->check_perm( 'perm_messaging', 'reply', true );
+							check_user_perm( 'perm_messaging', 'reply', true );
 
 							global $edited_Thread, $edited_Message;
 
@@ -1116,7 +1184,7 @@ function skin_init( $disp )
 
 						default:
 							// Check permission:
-							$current_User->check_perm( 'perm_messaging', 'reply', true );
+							check_user_perm( 'perm_messaging', 'reply', true );
 							break;
 					}
 					break;
@@ -1182,7 +1250,7 @@ function skin_init( $disp )
 
 			if( is_logged_in() )
 			{ // User is already logged in
-				if( $current_User->check_status( 'can_be_validated' ) )
+				if( check_user_status( 'can_be_validated' ) )
 				{ // account is not active yet, redirect to the account activation page
 					$Messages->add( T_( 'You are logged in but your account is not activated. You will find instructions about activating your account below:' ) );
 					header_redirect( get_activate_info_url(), 302 );
@@ -1293,7 +1361,7 @@ function skin_init( $disp )
 				// will have exited
 			}
 
-			if( !$current_User->check_status( 'can_be_validated' ) )
+			if( ! check_user_status( 'can_be_validated' ) )
 			{ // don't display activateinfo screen
 				$after_email_validation = $Settings->get( 'after_email_validation' );
 				if( $after_email_validation == 'return_to_original' )
@@ -1319,7 +1387,7 @@ function skin_init( $disp )
 					$redirect_to = '';
 				}
 
-				if( $current_User->check_status( 'is_validated' ) )
+				if( check_user_status( 'is_validated' ) )
 				{
 					$Messages->add( T_( 'Your account has already been activated.' ) );
 				}
@@ -1345,6 +1413,7 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'social':
 		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
@@ -1409,6 +1478,17 @@ function skin_init( $disp )
 			// Check if current user has an access to view a profile of the requested user:
 			check_access_user_profile( $user_ID );
 
+			if( $Blog->get_setting( 'canonical_user_urls' ) && $redir == 'yes' )
+			{	// Check if current user profile URL can be canonical:
+				$canonical_url = $Blog->get( 'userurl', array( 'user_ID' => $user_ID, 'glue' => '&' ) );
+				// Keep ONLY allowed noredir params from current URL in the canonical URL:
+				$canonical_url = url_clear_noredir_params( $canonical_url );
+				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+				{	// Redirect to canonical user profile URL:
+					header_redirect( $canonical_url, true );
+				}
+			}
+
 			// Initialize users list from session cache in order to display prev/next links:
 			// It is used to navigate between users
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
@@ -1454,7 +1534,7 @@ function skin_init( $disp )
 
 		case 'edit':
 		case 'proposechange':
-			global $current_User, $post_ID;
+			global $current_User, $post_ID, $admin_url;
 
 			// Post ID, go from $_GET when we edit a post from Front-office
 			//          or from $_POST when we switch from Back-office
@@ -1468,9 +1548,9 @@ function skin_init( $disp )
 				// will have exited
 			}
 
-			if( !$current_User->check_status( 'can_edit_post' ) )
+			if( ! check_user_status( 'can_edit_post' ) )
 			{
-				if( $current_User->check_status( 'can_be_validated' ) )
+				if( check_user_status( 'can_be_validated' ) )
 				{ // user is logged in but his/her account was not activated yet
 					// Redirect to the account activation page
 					$Messages->add( T_( 'You must activate your account before you can create & edit posts. <b>See below:</b>' ) );
@@ -1491,9 +1571,8 @@ function skin_init( $disp )
 			if( ! blog_has_cats( $Blog->ID ) )
 			{ // No categories are in this blog
 				$error_message = T_('Since this blog has no categories, you cannot post into it.');
-				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 				{ // If current user has a permission to create a category
-					global $admin_url;
 					$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID.'"');
 				}
 				$Messages->add( $error_message, 'error' );
@@ -1528,9 +1607,9 @@ function skin_init( $disp )
 				// will have exited
 			}
 
-			if( !$current_User->check_status( 'can_edit_comment' ) )
+			if( ! check_user_status( 'can_edit_comment' ) )
 			{
-				if( $current_User->check_status( 'can_be_validated' ) )
+				if( check_user_status( 'can_be_validated' ) )
 				{ // user is logged in but his/her account was not activated yet
 					// Redirect to the account activation page
 					$Messages->add( T_( 'You must activate your account before you can edit comments. <b>See below:</b>' ) );
@@ -1555,7 +1634,7 @@ function skin_init( $disp )
 			$edited_Comment = $CommentCache->get_by_ID( $comment_ID );
 			$comment_Item = $edited_Comment->get_Item();
 
-			if( ! $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment ) )
+			if( ! check_user_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment ) )
 			{ // If User has no permission to edit comments with this comment status:
 				$Messages->add( 'You are not allowed to edit the previously selected comment!' );
 				header_redirect( $Blog->gen_blogurl(), 302 );
@@ -1576,13 +1655,6 @@ function skin_init( $disp )
 
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
-
-			// require Fine Uploader js and css:
-			require_js( 'multiupload/fine-uploader.js' );
-			require_css( 'fine-uploader.css' );
-			// Load JS files to make the links table sortable:
-			require_js( '#jquery#' );
-			require_js( 'jquery/jquery.sortable.min.js' );
 			break;
 
 		case 'useritems':
@@ -1683,7 +1755,7 @@ function skin_init( $disp )
 			break;
 
 		case 'closeaccount':
-			global $current_User, $disp;
+			global $disp;
 			if( ! $Settings->get( 'account_close_enabled' ) )
 			{	// If an account closing page is disabled - Display 404 page with error message:
 				$disp = is_logged_in() ? 'profile' : 'login';
@@ -1694,7 +1766,7 @@ function skin_init( $disp )
 				$disp = 'login';
 				$Messages->add( T_('You must log in before you can close your account.'), 'error' );
 			}
-			elseif( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+			elseif( check_user_perm( 'users', 'edit', false ) )
 			{	// Don't allow admins close own accounts from front office:
 				$disp = 'profile';
 				$Messages->add( T_('You have user moderation privileges. In order to prevent mistakes, you cannot close your own account. Please ask the admin (or another admin) to remove your user moderation privileges before closing your account.'), 'error' );
@@ -1761,6 +1833,20 @@ function skin_init( $disp )
 			break;
 	}
 
+	// NOTE: Call the update item read status only after complete initialization of $disp_detail in the code above,
+	//       because the $disp_detail is used to select correct intro Item:
+	if( ( $disp == 'posts' || $disp == 'front' ) &&
+	    ( $featured_intro_Item = & get_featured_Item( $disp, NULL, true ) ) )
+	{	// We assume the current user will have read the entire intro Item and all its current comments:
+		$featured_intro_Item->update_read_timestamps( true, true );
+	}
+
+	// Enable shortcut keys:
+	if( is_logged_in() )
+	{
+		init_hotkeys_js( 'blog' );
+	}
+
 	// Add hreflang tags for Items with several versions:
 	if( $version_Item = & get_current_Item() )
 	{	// If current Item is detected
@@ -1825,6 +1911,8 @@ function skin_init( $disp )
 			// This MAY or MAY not have exited -- will exit on 30x redirect, otherwise will return here.
 			// Just in case some dumb robot needs extra directives on this:
 			$robots_index = false;
+			// Load functions to work with search results:
+			load_funcs( 'collections/_search.funcs.php' );
 			break;
 	}
 
@@ -1900,9 +1988,13 @@ function & get_site_Skin()
 			{	// Tablet session:
 				$skin_ID = $Settings->get( 'tablet_skin_ID' );
 			}
+			elseif( $Session->is_alt_session() )
+			{	// Session for alternative skin:
+				$skin_ID = $Settings->get( 'alt_skin_ID' );
+			}
 		}
 		if( empty( $skin_ID ) )
-		{	// Use normal skin ID by default when mobile and tablet skins are not defined for site:
+		{	// Use normal skin ID by default when mobile, tablet and alt skins are not defined for site:
 			$skin_ID = $Settings->get( 'normal_skin_ID' );
 		}
 
@@ -2088,6 +2180,11 @@ function skin_include( $template_name, $params = array() )
 				'disp_compare'               => '_compare.disp.php',
 				'disp_cart'                  => '_cart.disp.php',
 			);
+
+		if( is_pro() )
+		{	// Additional disp handler for PRO version:
+			$disp_handlers['disp_social'] = '_profile.disp.php';
+		}
 
 		// Add plugin disp handlers:
 		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetHandledDispModes' ) )
@@ -2449,7 +2546,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+	elseif( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-topcat-nointro', 'posts-subcat-intro', 'posts-subcat-nointro' ) ) )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{
@@ -2555,8 +2652,10 @@ function skin_opengraph_tags()
 {
 	global $Collection, $Blog, $disp, $MainList;
 
-	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_open_graph' ) )
-	{ // Open Graph tags are not allowed
+	if( empty( $Blog ) ||
+	    ! $Blog->get_setting( 'tags_open_graph' ) ||
+	    in_array( $disp, array( 'content_requires_login', 'access_requires_login', 'access_denied' ) ) )
+	{	// Open Graph tags are not allowed for current Collection or for current disp:
 		return;
 	}
 
@@ -2772,7 +2871,7 @@ function skin_structured_data()
 					}
 					if( empty( $publisher_logo_url ) )
 					{ // No publisher logo found, fallback to collection logo:
-						$collection_logo_file_ID = $Blog->get_setting( 'logo_file_ID' );
+						$collection_logo_file_ID = $Blog->get_setting( 'collection_logo_file_ID' );
 						$collection_logo_File = & $FileCache->get_by_ID( $collection_logo_file_ID, false, false );
 						if( $collection_logo_File && $collection_logo_File->is_image() )
 						{
@@ -3023,6 +3122,49 @@ function widget_container( $container_code, $params = array() )
 
 
 /**
+ * Display all widget containers for the requested Item
+ *
+ * @param integer Item ID
+ * @param array Additional widget container params
+ */
+function widget_page_containers( $item_ID, $params = array() )
+{
+	global $Blog;
+
+	if( empty( $Blog ) )
+	{	// Skip wrong reuqest without current Collection:
+		return;
+	}
+
+	// Try to find widget container by code for current collection and skin type:
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	$widget_containers = $WidgetContainerCache->get_by_coll_skintype( $Blog->ID, $Blog->get_skin_type() );
+
+	if( empty( $widget_containers ) )
+	{	// No widget containers for current Collection and skin type:
+		return;
+	}
+
+	// Set params for widget page containers:
+	$params = array_merge( $params, array(
+			// Signal that we are displaying within an Item:
+			'widget_context' => 'item',
+			// Restrict Page Container with these item ID and item type ID:
+			'container_item_ID' => $item_ID,
+		) );
+
+	foreach( $widget_containers as $WidgetContainer )
+	{
+		if( $WidgetContainer->get_type() == 'page' &&
+		    $WidgetContainer->get( 'item_ID' ) == $item_ID )
+		{	// Display only widget page container for the requested Item:
+			widget_container( $WidgetContainer->get( 'code' ), $params );
+		}
+	}
+}
+
+
+/**
  * Customize params with widget container properties on designer mode;
  * Replace variables/masks in params with widget container properties;
  * possible variables/masks in params:
@@ -3035,7 +3177,7 @@ function widget_container( $container_code, $params = array() )
  */
 function widget_container_customize_params( $params, $wico_code, $wico_name )
 {
-	global $Collection, $Blog, $Session, $current_User;
+	global $Collection, $Blog, $Session;
 
 	$params = array_merge( array(
 			'container_display_if_empty' => true, // FALSE - If no widget, don't display container at all, TRUE - Display container anyway
@@ -3056,7 +3198,7 @@ function widget_container_customize_params( $params, $wico_code, $wico_name )
 					'data-name' => $wico_name,
 					'data-code' => $wico_code,
 				);
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Set data to know current user has a permission to edit this widget:
 				$designer_mode_data['data-can-edit'] = 1;
 			}
@@ -3122,6 +3264,7 @@ function get_skin_default_containers()
 			'item_single_header'        => array( NT_('Item Single Header'), 50 ),
 			'item_single'               => array( NT_('Item Single'), 51 ),
 			'item_page'                 => array( NT_('Item Page'), 55 ),
+			'comment_list'              => array( NT_('Comment List'), 57 ),
 			'comment_area'              => array( NT_('Comment Area'), 60 ),
 			'sidebar'                   => array( NT_('Sidebar'), 80 ),
 			'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),
@@ -3136,6 +3279,8 @@ function get_skin_default_containers()
 			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
 			'shopping_cart'             => array( NT_('Shopping Cart'), 190 ),
 			'photo_index'               => array( NT_('Photo Index'), 190 ),
+			'search_area'               => array( NT_('Search Area'), 200 ),
+			'sitemap'                   => array( NT_('Site Map'), 210 ),
 		);
 }
 
@@ -3259,7 +3404,7 @@ function skin_installed( $name )
 
 
 /**
- * Display a blog skin setting fieldset which can be normal, mobile or tablet ( used on _coll_skin_settings.form.php )
+ * Display a blog skin setting fieldset which can be normal, mobile, tablet or alt ( used on _coll_skin_settings.form.php )
  *
  * @param object Form
  * @param integer skin ID
@@ -3271,7 +3416,7 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 
 	if( $mode != 'customizer' )
 	{	// Except of skin customer mode:
-		$Form->begin_fieldset( $display_params[ 'fieldset_title' ].get_manual_link('blog-skin-settings').' '.$display_params[ 'fieldset_links' ] );
+		$Form->begin_fieldset( $display_params[ 'fieldset_title' ].' '.$display_params[ 'fieldset_links' ] );
 	}
 
 	if( !$skin_ID )
@@ -3447,6 +3592,10 @@ function skin_body_attrs( $params = array() )
 			{ // Tablet device
 				$classes[] = 'tablet_device';
 			}
+			elseif( $Session->is_alt_session() )
+			{	// Session for alternative skin:
+				$classes[] = 'alt_skin';
+			}
 			else
 			{ // Desktop device
 				$classes[] = 'desktop_device';
@@ -3508,10 +3657,10 @@ function skin_body_attrs( $params = array() )
 
 
 /**
- * Get a skin's version
+ * Get skin version by ID
  *
- * @param Integer skin's ID
- * @return String skin's version
+ * @param integer Skin ID
+ * @return string Skin version
  */
 function get_skin_version( $skin_ID )
 {
@@ -3585,7 +3734,8 @@ function get_skin_types()
 		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
 		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
 		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
-		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'alt'     => array( T_('Alt'), T_('Alt skin to display by conditions') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers and for alt skin') ),
 		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
 		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
 	);
@@ -3627,5 +3777,52 @@ function get_skin_setting( $setting_name, $fallback_value = NULL )
 	}
 
 	return $setting_value;
+}
+
+
+/**
+ * Output JavaScript code to confirm skin selection
+ */
+function echo_confirm_skin_selection_js()
+{
+	// Initialize JavaScript to build and open modal window:
+	echo_modalwindow_js();
+?>
+<script type="text/javascript">
+function confirm_skin_selection( link_obj, skin_type )
+{
+	var keep_url = jQuery( link_obj ).attr( 'href' );
+	var reset_url = keep_url + '&reset_widgets=1';
+	var modal_window_title = '';
+	var modal_reset_button_class = 'btn-default btn-danger-hover';
+	var modal_keep_button_class = 'btn-primary';
+
+	switch( skin_type )
+	{
+		case 'mobile':
+			modal_window_title = '<?php echo TS_('You are about to change the Mobile skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			break;
+		case 'tablet':
+			modal_window_title = '<?php echo TS_('You are about to change the Tablet skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			break;
+		case 'normal':
+		default:
+			modal_window_title = '<?php echo TS_('You are about to change the Normal skin of your collection. Do you want to reset the widgets to what the new skin recommends?'); ?>';
+			modal_reset_button_class = 'btn-danger';
+			modal_keep_button_class = 'btn-default';
+			break;
+	}
+
+	openModalWindow( '<p>' + modal_window_title + '</p>'
+		+ '<form>'
+		+ '<a href="' + reset_url + '" class="btn ' + modal_reset_button_class + '"><?php echo TS_('Reset widgets'); ?></a>'
+		+ '<a href="' + keep_url + '" class="btn ' + modal_keep_button_class + '"><?php echo TS_('Keep existing widgets'); ?></a>'
+		+ '</form>',
+		'500px', '', true,
+		'<span class="text-danger"><?php echo TS_('WARNING');?></span>', '', true );
+	return false;
+}
+</script>
+<?php
 }
 ?>

@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -37,7 +37,7 @@ if( !is_logged_in() )
 }
 
 // Check minimum permission:
-$current_User->check_perm( 'perm_messaging', 'reply', true );
+check_user_perm( 'perm_messaging', 'reply', true );
 
 // Save to know if errors already exist
 $error_messages_exist = $Messages->has_errors();

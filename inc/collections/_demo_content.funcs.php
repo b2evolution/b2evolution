@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -40,7 +40,7 @@ load_class( 'collections/model/_section.class.php', 'Section' );
  */
 function task_begin( $title )
 {
-	echo get_install_format_text( $title."\n" );
+	echo get_install_format_text_and_log( $title."\n" );
 	evo_flush();
 }
 
@@ -51,7 +51,25 @@ function task_begin( $title )
  */
 function task_end( $message = 'OK.' )
 {
-	echo get_install_format_text( $message."<br />\n", 'br' );
+	echo get_install_format_text_and_log( $message."<br />\n", 'br' );
+}
+
+
+/**
+ * Display task errors.
+ */
+function task_errors( $errors = array(), $type = 'danger' )
+{
+	if( empty( $errors ) )
+	{
+		return;
+	}
+
+	echo get_install_format_text_and_log( '<br />', 'br' );
+	foreach( $errors as $error )
+	{
+		echo get_install_format_text_and_log( '<span class="text-'.$type.'">'.$error.'</span><br />', 'br' );
+	}
 }
 
 
@@ -246,14 +264,14 @@ function echo_installation_options( $params = array() )
 	), $params );
 
 	$collections = array(
-			'home'     => T_('Global home page'),
-			'a'        => T_('Sample Blog A (Public)'),
-			'b'        => T_('Sample Blog B (Private)'),
-			'photos'   => T_('Photo Albums'),
-			'forums'   => T_('Forums'),
-			'manual'   => T_('Online Manual'),
-			'group'    => T_('Tracker'),
-			'catalog'  => T_('Catalog'),
+			'home'     => TD_('Global home page'),
+			'a'        => TD_('Sample Blog A (Public)'),
+			'b'        => TD_('Sample Blog B (Private)'),
+			'photos'   => TD_('Photo Albums'),
+			'forums'   => TD_('Forums'),
+			'manual'   => TD_('Online Manual'),
+			'group'    => TD_('Tracker'),
+			'catalog'  => TD_('Catalog'),
 		);
 
 	// Allow all modules to set what collections should be installed
@@ -276,19 +294,19 @@ function echo_installation_options( $params = array() )
 	$r = '<div class="checkbox">
 				<label>
 					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" />'
-					.T_('Create a demo website').'
+					.TB_('Create a demo website').'
 				</label>
 				<div id="create_sample_contents_options" style="margin:10px 0 0 20px;display:none">
 					<div class="radio" style="margin-left:1em">
 						<label>
 							<input type="radio" name="demo_content_type" id="minisite_demo" value="minisite" />'
-							.T_('Mini-Site').'
+							.TB_('Mini-Site').'
 						</label>
 					</div>
 					<div class="radio" style="margin-left:1em">
 						<label>
 							<input type="radio" name="demo_content_type" id="standard_site_demo" value="standard_site" style="margin-top:9px" />'
-							.T_('Standard Site (1 collection):').'
+							.TB_('Standard Site (1 collection):').'
 							<span class="form-inline"><select name="standard_collection" class="form-control">'.Form::get_select_options_string( $standard_collections, NULL, true ).'</span>
 							</select>
 						</label>
@@ -296,7 +314,7 @@ function echo_installation_options( $params = array() )
 					<div class="radio" style="margin-left:1em">
 						<label>
 							<input type="radio" name="demo_content_type" id="complex_site_demo" value="complex_site" checked="checked" />'
-							.T_('Complex Site, including multiple collections:').'
+							.TB_('Complex Site, including multiple collections:').'
 						</label>
 					</div>';
 
@@ -317,7 +335,7 @@ function echo_installation_options( $params = array() )
 	$r .= '<div class="checkbox" style="margin-top: 15px">
 					<label>
 						<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1"'.( $params['enable_create_demo_users'] ? '' : ' disabled="disabled"' ).' />'
-						.( $params['enable_create_demo_users'] ? T_('Create demo users') : T_('Your system already has several user accounts, so we won\'t create demo users.') ).
+						.( $params['enable_create_demo_users'] ? TB_('Create demo users') : TB_('Your system already has several user accounts, so we won\'t create demo users.') ).
 					'</label>
 					<div id="create_demo_user_options" style="margin:10px 0 0 20px;display:none">';
 
@@ -326,7 +344,7 @@ function echo_installation_options( $params = array() )
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
 							<input type="checkbox" name="create_demo_organization" id="create_demo_organization" value="1" checked="checked" disabled="disabled" />'
-							.T_('Create a demo organization / team').
+							.TB_('Create a demo organization / team').
 						'</label>
 					</div>';
 	}
@@ -336,7 +354,7 @@ function echo_installation_options( $params = array() )
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
 							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" disabled="disabled" />'
-							.T_('Create demo private messages between users').
+							.TB_('Create demo private messages between users').
 						'</label>
 					</div>';
 	}
@@ -346,7 +364,7 @@ function echo_installation_options( $params = array() )
 	$r .= '<div class="checkbox" style="margin-top: 15px">
 					<label>
 						<input type="checkbox" name="create_demo_email_lists" id="create_demo_email_lists" value="1"'.( $params['show_create_email_lists'] ? '' : ' disabled="disabled"' ).' />'
-						.( $params['show_create_email_lists'] ? T_('Create demo email lists') : T_('Your system already has an email list, so we won\'t create demo lists.') ).
+						.( $params['show_create_email_lists'] ? TB_('Create demo email lists') : TB_('Your system already has an email list, so we won\'t create demo lists.') ).
 					'</label>
 					<div id="create_demo_email_options" style="margin:10px 0 0 20px;display:none">';
 
@@ -355,7 +373,7 @@ function echo_installation_options( $params = array() )
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
 							<input type="checkbox" name="create_demo_email_campaigns" id="create_demo_email_campaigns" value="1" checked="checked" disabled="disabled" />'
-							.T_('Create demo campaigns').
+							.TB_('Create demo campaigns').
 						'</label>
 					</div>';
 	}
@@ -365,7 +383,7 @@ function echo_installation_options( $params = array() )
 		$r .= '<div class="checkbox" style="margin-left: 1em">
 						<label>
 							<input type="checkbox" name="create_demo_automations" id="create_demo_automations" value="1" checked="checked" disabled="disabled" />'
-							.T_('Create demo automations').
+							.TB_('Create demo automations').
 						'</label>
 					</div>';
 	}
@@ -448,14 +466,14 @@ function get_filler_text( $type = NULL )
 			break;
 
 		case 'info_page':
-			$filler_text = T_('<p>This website is powered by b2evolution.</p>')."\r\n"
-				.T_('<p>You are currently looking at an info page about "%s".</p>')."\r\n"
-				.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
-				.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>');
+			$filler_text = TD_('<p>This website is powered by b2evolution.</p>')."\r\n"
+				.TD_('<p>You are currently looking at an info page about "%s".</p>')."\r\n"
+				.TD_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.</p>')."\r\n"
+				.TD_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>');
 			break;
 
 		case 'markdown_examples_content':
-			$filler_text = T_('Heading
+			$filler_text = TD_('Heading
 =======
 
 Sub-heading
@@ -709,7 +727,7 @@ function create_user( $params = array() )
 	$Group = $GroupCache->get_by_ID( $params['group_ID'], false, false );
 	if( ! $Group )
 	{
-		$Messages->add( sprintf( T_('Cannot create demo user "%s" because User Group #%d was not found.'), $params['login'], $params['group_ID'] ), 'error' );
+		$Messages->add( sprintf( TB_('Cannot create demo user "%s" because User Group #%d was not found.'), $params['login'], $params['group_ID'] ), 'error' );
 		return false;
 	}
 
@@ -748,24 +766,24 @@ function create_user( $params = array() )
 	{	// Additional user fields
 		global $DB;
 		$fields_SQL = new SQL();
-		$fields_SQL->SELECT( 'ufdf_ID, ufdf_name' );
+		$fields_SQL->SELECT( 'ufdf_ID, ufdf_code' );
 		$fields_SQL->FROM( 'T_users__fielddefs' );
-		$fields_SQL->WHERE( 'ufdf_name IN ( '.$DB->quote( array_keys( $params['fields'] ) ).' )' );
+		$fields_SQL->WHERE( 'ufdf_code IN ( '.$DB->quote( array_keys( $params['fields'] ) ).' )' );
 		$fields = $DB->get_assoc( $fields_SQL->get() );
 		$user_field_records = array();
-		foreach( $fields as $field_ID => $field_name )
+		foreach( $fields as $field_ID => $field_code )
 		{
-			if( ! isset( $params['fields'][ $field_name ] ) )
-			{	// Skip wrong field
+			if( ! isset( $params['fields'][ $field_code ] ) )
+			{	// Skip wrong field:
 				continue;
 			}
 
-			if( is_string( $params['fields'][ $field_name ] ) )
+			if( is_string( $params['fields'][ $field_code ] ) )
 			{
-				$params['fields'][ $field_name ] = array( $params['fields'][ $field_name ] );
+				$params['fields'][ $field_code ] = array( $params['fields'][ $field_code ] );
 			}
 
-			foreach( $params['fields'][ $field_name ] as $field_value )
+			foreach( $params['fields'][ $field_code ] as $field_value )
 			{	// SQL record for each field value
 				$user_field_records[] = '( '.$User->ID.', '.$field_ID.', '.$DB->quote( $field_value ).' )';
 			}
@@ -861,7 +879,12 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 		if( $Organization->dbinsert() )
 		{
 			$demo_org_ID = $Organization->ID;
-			$Messages->add_to_group( sprintf( T_('The sample organization %s has been created.'), $org_name ), 'success', T_('Demo contents').':' );
+			$Messages->add_to_group( sprintf( TB_('The sample organization %s has been created.'), $org_name ), 'success', TB_('Demo contents').':' );
+		}
+		else
+		{
+			$Messages->add_to_group( sprintf( TB_('Unable to create sample organization %s.'), '"'.$org_name.'"' ), 'error', TB_('Demo contents').':' );
+			return false;
 		}
 	}
 
@@ -903,13 +926,12 @@ function get_demo_users_defaults()
 				'org_roles' => array( 'King of Spades' ),
 				'org_priorities' => array( 0 ),
 				'fields'    => array(
-						'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					)
 			),
 		'mary' => array(
@@ -922,13 +944,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'Queen of Hearts' ),
 				'fields'    => array(
-						'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'jay' => array(
@@ -941,13 +962,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'The Artist' ),
 				'fields'    => array(
-						'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'dave' => array(
@@ -960,13 +980,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'The Writer' ),
 				'fields'    => array(
-						'Micro bio'   => 'I\'m a demo author.'."\n".'I like to write!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I\'m a demo author.'."\n".'I like to write!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'paul' => array(
@@ -979,13 +998,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'The Thinker' ),
 				'fields'    => array(
-						'Micro bio'   => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'larry' => array(
@@ -996,7 +1014,7 @@ function get_demo_users_defaults()
 				'gender'    => 'M',
 				'group'     => 'Normal Users',
 				'fields'    => array(
-						'Micro bio' => 'Hi there!',
+						'microbio' => 'Hi there!',
 					),
 			),
 		'kate' => array(
@@ -1007,7 +1025,7 @@ function get_demo_users_defaults()
 				'gender'    => 'F',
 				'group'     => 'Normal Users',
 				'fields'    => array(
-						'Micro bio' => 'Just me!',
+						'microbio' => 'Just me!',
 					),
 			),
 		);
@@ -1019,9 +1037,10 @@ function get_demo_users_defaults()
  *
  * @param boolean Create the demo users if they do not exist
  * @param boolean Display ouput
+ * @param array Error messages
  * @return array Array of available demo users indexed by login
  */
-function get_demo_users( $create = false, $output = true )
+function get_demo_users( $create = false, $output = true, &$error_messages = NULL )
 {
 	$demo_users = get_demo_users_defaults();
 	$demo_users_logins = array_keys( $demo_users );
@@ -1029,7 +1048,7 @@ function get_demo_users( $create = false, $output = true )
 	$available_demo_users = array();
 	foreach( $demo_users_logins as $demo_user_login )
 	{
-		$demo_User = get_demo_user( $demo_user_login, $create, $output );
+		$demo_User = get_demo_user( $demo_user_login, $create, $output, $error_messages );
 		if( $demo_User )
 		{
 			$available_demo_users[$demo_user_login] = $demo_User;
@@ -1046,12 +1065,12 @@ function get_demo_users( $create = false, $output = true )
  * @param string User $login
  * @param boolean Create demo user if it does not exist
  * @param boolean Display output
+ * @param array Error messages
  * @return mixed object Demo user if successful, false otherwise
  */
-function get_demo_user( $login, $create = false, $output = true )
+function get_demo_user( $login, $create = false, $output = true, &$error_messages = NULL )
 {
 	global $DB;
-	global $current_User;
 	global $user_timestamp;
 
 	// Get list of demo users:
@@ -1102,7 +1121,7 @@ function get_demo_user( $login, $create = false, $output = true )
 
 		if( $output )
 		{
-			task_begin( sprintf( T_('Creating demo user %s...'), $login ) );
+			task_begin( sprintf( TB_('Creating demo user %s...'), $login ) );
 		}
 		adjust_timestamp( $user_timestamp, 360, 1440, false );
 
@@ -1115,6 +1134,11 @@ function get_demo_user( $login, $create = false, $output = true )
 		$demo_user = create_user( $user_defaults );
 		if( $demo_user === false )
 		{	// Cannot create demo user, exiting:
+			$error_messages[] = sprintf( TB_('Unable to create demo user %s.'), '"'.$login.'"' );
+			if( $output )
+			{
+				task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
+			}
 			return false;
 		}
 
@@ -1170,6 +1194,7 @@ function create_demo_messages()
 	$users_SQL->ORDER_BY( 'user_ID' );
 	$users = $DB->get_results( $users_SQL->get() );
 
+	$demo_messages = array();
 	for( $i = 0; $i < count( $users ); $i++ )
 	{
 		if( $i % 2 == 0 )
@@ -1192,11 +1217,11 @@ function create_demo_messages()
 		// Initial message
 		$loop_Message->Thread = $loop_Thread;
 		$loop_Message->Thread->set_param( 'datemodified', 'string', date( 'Y-m-d H:i:s', $localtimenow - 60 ) );
-		$loop_Message->Thread->set( 'title', sprintf( T_('Demo private conversation #%s'), $i + 1 ) );
+		$loop_Message->Thread->set( 'title', sprintf( TB_('Demo private conversation #%s'), $i + 1 ) );
 		$loop_Message->Thread->recipients_list = array( $recipient_ID );
 		$loop_Message->set( 'author_user_ID', $author_ID );
 		$loop_Message->creator_user_ID = $author_ID;
-		$loop_Message->set( 'text', sprintf( T_('This is a demo private message to %s.'), $recipient_User->login ) );
+		$loop_Message->set( 'text', sprintf( TB_('This is a demo private message to %s.'), $recipient_User->login ) );
 
 		$DB->begin();
 		$conversation_saved = false;
@@ -1212,6 +1237,7 @@ function create_demo_messages()
 						if( $loop_Message->dbupdate_last_contact_datetime() )
 						{
 							$conversation_saved = true;
+							$demo_messages[] = $loop_Message;
 						}
 					}
 				}
@@ -1227,7 +1253,7 @@ function create_demo_messages()
 			$loop_reply_Message->Thread = $loop_Thread;
 			$loop_reply_Message->set( 'author_user_ID', $recipient_ID );
 			$loop_reply_Message->creator_user_ID = $author_ID;
-			$loop_reply_Message->set( 'text', sprintf( T_('This is a demo private reply to %s.'), $author_User->login ) );
+			$loop_reply_Message->set( 'text', sprintf( TB_('This is a demo private reply to %s.'), $author_User->login ) );
 			$loop_reply_Message->set_param( 'thread_ID', 'integer', $loop_reply_Message->Thread->ID );
 
 			if( $loop_reply_Message->dbinsert() )
@@ -1258,6 +1284,7 @@ function create_demo_messages()
 					{
 						$DB->commit();
 						$conversation_saved = true;
+						$demo_messages[] = $loop_reply_Message;
 					}
 				}
 			}
@@ -1268,6 +1295,8 @@ function create_demo_messages()
 			$DB->rollback();
 		}
 	}
+
+	return $demo_messages;
 }
 
 /**
@@ -1287,7 +1316,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	{	// handle only E_USER_NOTICE
 		if( $errno == E_USER_NOTICE )
 		{
-			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
 		}
 	}
 
@@ -1423,7 +1452,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $demo_content_type == 'complex_site' || $create_sample_contents == 'full' )
 	{
-		task_begin( T_('Creating default sections...') );
+		task_begin( TB_('Creating default sections...') );
 		$SectionCache = & get_SectionCache();
 
 		$sections = array();
@@ -1453,6 +1482,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 			$sections['Catalog'] = array( 'owner_ID' => $mary_moderator_ID, 'order' => 7 );
 		}
 
+		$section_error_messages = array();
 		foreach( $sections as $section_name => $section_data )
 		{
 			if( $loop_Section = $SectionCache->get_by_name( $section_name, false, false ) )
@@ -1465,20 +1495,42 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				$new_Section->set( 'name', $section_name );
 				$new_Section->set( 'order', $section_data['order'] );
 				$new_Section->set( 'owner_user_ID', $section_data['owner_ID'] );
-				$new_Section->dbsave();
-
-				$sections[$section_name]['ID'] = $new_Section->ID;
+				$insert_section_result = $new_Section->dbsave();
+				if( $insert_section_result )
+				{
+					$sections[$section_name]['ID'] = $new_Section->ID;
+				}
+				else
+				{
+					$section_error_messages[] = sprintf( TB_('Failed to create %s section'), $section_name );
+				}
 			}
 		}
-		task_end();
+
+		if( $section_error_messages )
+		{
+			task_errors( $section_error_messages );
+		}
+		else
+		{
+			task_end();
+		}
 	}
 
 	// Create demo polls:
 	// (global $demo_poll_ID may be used in default widgets e-g for collection "Blog B")
 	global $demo_poll_ID;
-	task_begin( T_('Creating default polls...') );
+	task_begin( TB_('Creating default polls...') );
 	$demo_poll_ID = create_demo_poll();
-	task_end();
+	if( empty( $demo_poll_ID ) )
+	{
+		task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
+	}
+	else
+	{
+		task_end();
+	}
+
 
 	// Number of demo collections created:
 	$collection_created = 0;
@@ -1486,11 +1538,15 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
 
+	// Initialize for setup default widgets per collection:
+	$BlogCache = & get_BlogCache();
+
 	if( $install_collection_home )
 	{	// Install Home blog
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Home') ) );
+		$coll_error_messages = array();
+		task_begin( sprintf( TB_('Creating %s collection...'), TB_('Home') ) );
 		$section_ID = isset( $sections['Home']['ID'] ) ? $sections['Home']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1499,28 +1555,34 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
+				$Blog->setup_default_widgets();
 			}
 
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_bloga )
 	{	// Install Blog A
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Blog A') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Blog A') ) );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1529,27 +1591,33 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'</span>' );
 		}
 	}
 
 	if( $install_collection_blogb )
 	{	// Install Blog B
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Blog B') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Blog B') ) );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1558,27 +1626,33 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_photos )
 	{	// Install Photos blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Photos') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Photos') ) );
 		$section_ID = isset( $sections['Photos']['ID'] ) ? $sections['Photos']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1587,27 +1661,33 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_forums )
 	{	// Install Forums blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Forums') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Forums') ) );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1616,27 +1696,33 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_manual )
 	{	// Install Manual blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Manual') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Manual') ) );
 		$section_ID = isset( $sections['Manual']['ID'] ) ? $sections['Manual']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1645,27 +1731,33 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_tracker )
 	{	// Install Tracker blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Tracker') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Tracker') ) );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1674,18 +1766,23 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
@@ -1720,9 +1817,10 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $install_collection_minisite )
 	{	// Install Mini-site collection
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Mini-Site') ) );
-		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $use_demo_users, $timeshift, 1 ) )
+		task_begin( sprintf( TB_('Creating %s collection...'), TD_('Mini-Site') ) );
+		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $use_demo_users, $timeshift, 1, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1731,31 +1829,35 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
-			{
-				// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{	// Insert basic widgets:
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
 		}
 	}
 
 	// Install default shared widgets:
 	global $installed_default_shared_widgets;
-	task_begin( T_('Installing default shared widgets...') );
-	insert_shared_widgets( 'normal', true );
+	task_begin( TB_('Installing default shared widgets...') );
+	insert_shared_widgets( 'normal' );
 	task_end();
 	$installed_default_shared_widgets = true;
 
 	// Setting default login and default messaging collection:
-	task_begin( T_('Setting default login and default messaging collection...') );
+	task_begin( TB_('Setting default login and default messaging collection...') );
 	if( $demo_content_type == 'minisite' )
 	{
 		$Settings->set( 'login_blog_ID', 0 );
@@ -1784,7 +1886,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	}
 	task_end();
 
-	task_begin( T_('Set setting for site skins...') );
+	task_begin( TB_('Set setting for site skins...') );
 	$Settings->set( 'site_skins_enabled', $site_skins_setting );
 	$Settings->dbupdate();
 	task_end();
@@ -1794,7 +1896,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
-			task_begin( T_('Creating fake hit statistics...') );
+			task_begin( TB_('Creating fake hit statistics...') );
 			load_funcs('sessions/model/_hitlog.funcs.php');
 			load_funcs('_core/_url.funcs.php');
 			$insert_data_count = generate_hit_stat(10, 0, 5000);
@@ -1844,7 +1946,7 @@ function create_default_newsletters()
 {
 	global $DB;
 
-	task_begin( T_('Creating demo email lists...') );
+	task_begin( TB_('Creating demo email lists...') );
 
 	// Insert default newsletters:
 	$created_lists_num = $DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
@@ -1868,15 +1970,15 @@ function create_default_email_campaigns()
 {
 	global $DB, $Settings, $baseurl;
 
-	task_begin( T_('Creating demo email campaigns...') );
+	task_begin( TB_('Creating demo email campaigns...') );
 
 	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 
 	$email_campaigns = array(
 		array(
-			'name' => T_('Markdown Example'),
-			'text' => T_('Heading
+			'name' => TD_('Markdown Example'),
+			'text' => TD_('Heading
 =======
 
 Sub-heading
@@ -1913,25 +2015,25 @@ Shopping list:
 
 The rain---not the reign---in Spain.').
 "\n".
-T_('Button examples:
+TD_('Button examples:
 [button]This is a button[/button]
 [like]I like this[/like] [dislike]I don\'t like this[/dislike]
 [cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
 [cta:1:link]Call to action 1 link only[/cta]'),
 		),
 		array(
-			'name' => T_('Another example'),
-			'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
+			'name' => TD_('Another example'),
+			'text' => sprintf( TD_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".TD_('Here are some news...'),
 		),
 		array(
-			'name'  => T_('Welcome & Activate'),
-			'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
-			'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
-				.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
-				.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
-				.T_('Your login is: $login$')."\r\n\r\n"
-				.T_('Your email is: $email$')."\r\n\r\n"
-				.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
+			'name'  => TD_('Welcome & Activate'),
+			'title' => sprintf( TD_( 'Activate your account: %s' ), '$login$' ),
+			'text'  => sprintf( TD_('Hello %s!'), '$username$' )."\r\n\r\n"
+				.sprintf( TD_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
+				.'<b style="color:#d00">'.TD_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
+				.TD_('Your login is: $login$')."\r\n\r\n"
+				.TD_('Your email is: $email$')."\r\n\r\n"
+				.'[activate:primary]'.TD_( 'Activate NOW' ).'[/activate]'
 		),
 	);
 
@@ -1963,14 +2065,14 @@ function create_default_automations()
 {
 	global $DB;
 
-	task_begin( T_('Creating demo automations...') );
+	task_begin( TB_('Creating demo automations...') );
 
 	//load_funcs( 'automations/model/_automation.funcs.php' );
 	load_class( 'automations/model/_automation.class.php', 'Automation' );
 	load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 
 	$Automation = new Automation();
-	$Automation->set( 'name', T_('Sample Automation') );
+	$Automation->set( 'name', TD_('Sample Automation') );
 	$Automation->set( 'owner_user_ID', 1 );
 	$Automation->update_newsletters = true;
 	$Automation->newsletters = array( array(
@@ -2098,7 +2200,7 @@ function create_demo_comment( $item_ID, $comment_users , $status = NULL, $commen
 	else
 	{
 		$user_ID = NULL;
-		$author = T_('Anonymous Demo User') ;
+		$author = TD_('Anonymous Demo User') ;
 		$author_email = 'anonymous@example.com';
 		$author_email_url = 'http://www.example.com';
 	}
@@ -2113,14 +2215,14 @@ function create_demo_comment( $item_ID, $comment_users , $status = NULL, $commen
 	// Set demo content depending on status
 	if( $status == 'published' )
 	{
-		$content = T_('Hi!
+		$content = TD_('Hi!
 
 This is a sample comment that has been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
 	}
 	else
 	{	// draft
-		$content = T_('Hi!
+		$content = TD_('Hi!
 
 This is a sample comment that has **not** been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.');
@@ -2151,29 +2253,29 @@ Admins and moderators can very quickly approve or reject comments from the colle
  * @param integer Section ID
  * @return integer ID of created blog
  */
-function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $section_ID = 1 )
+function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $section_ID = 1, &$error_messages = NULL )
 {
 	global $install_test_features, $DB, $admin_url, $timestamp;
 	global $blog_minisite_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 
-	$default_blog_longdesc = T_('This is the long description for the collection named \'%s\'. %s');
+	$default_blog_longdesc = TD_('This is the long description for the collection named \'%s\'. %s');
 	$default_blog_access_type = 'relative';
 
 	$timestamp = time();
 	$blog_ID = NULL;
-	$blog_tagline = T_('This is the collection\'s tagline.');
+	$blog_tagline = TD_('This is the collection\'s tagline.');
 
 	switch( $collection_type )
 	{
 		// =======================================================================================================
 		case 'minisite':
-			$blog_shortname = T_('Mini-Site');
+			$blog_shortname = TD_('Mini-Site');
 			$blog_more_longdesc = '<br />
 <br />
-<strong>'.T_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
+<strong>'.TD_('The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links.').'</strong>';
 
 			$blog_minisite_ID = create_blog(
-					T_('Mini-Site Title'),
+					TD_('Mini-Site Title'),
 					$blog_shortname,
 					'minisite',
 					$blog_tagline,
@@ -2197,12 +2299,12 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 
 		// =======================================================================================================
 		case 'main':
-			$blog_shortname = T_('Home');
+			$blog_shortname = TD_('Home');
 			$blog_home_access_type = ( $install_test_features ) ? 'default' : $default_blog_access_type;
 			$blog_more_longdesc = '';
 
 			$blog_home_ID = create_blog(
-					T_('Homepage Title'),
+					TD_('Homepage Title'),
 					$blog_shortname,
 					'home',
 					$blog_tagline,
@@ -2242,7 +2344,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			}
 			$blog_stub = 'a';
 			$blog_a_ID = create_blog(
-					T_('Public Blog'),
+					TD_('Public Blog'),
 					$blog_shortname,
 					$blog_stub,
 					$blog_tagline,
@@ -2281,7 +2383,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			$blog_stub = 'b';
 
 			$blog_b_ID = create_blog(
-					T_('Members-Only Blog'),
+					TD_('Members-Only Blog'),
 					$blog_shortname,
 					$blog_stub,
 					$blog_tagline,
@@ -2339,7 +2441,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			$blog_shortname = 'Forums';
 			$blog_stub = 'forums';
 			$blog_forums_ID = create_blog(
-					T_('Forums Title'),
+					TD_('Forums Title'),
 					$blog_shortname,
 					$blog_stub,
 					$blog_tagline,
@@ -2360,7 +2462,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			$blog_shortname = 'Manual';
 			$blog_stub = 'manual';
 			$blog_manual_ID = create_blog(
-					T_('Manual Title'),
+					TD_('Manual Title'),
 					$blog_shortname,
 					$blog_stub,
 					$blog_tagline,
@@ -2381,18 +2483,24 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			$blog_shortname = 'Tracker';
 			$blog_stub = 'tracker';
 			$blog_group_ID = create_blog(
-					T_('Tracker Title'),
+					TD_('Tracker Title'),
 					$blog_shortname,
 					$blog_stub,
 					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					'Bootstrap Forums',
-					'group', 'any', 1, '#', false, 'public',
+					'group', 'any', 1, '#', false, 'member',
 					$owner_ID,
-					'public',
+					'members',
 					$section_ID );
 			if( $blog_group_ID )
 			{
+				$BlogCache = & get_BlogCache();
+				if( $group_Collection = $BlogCache->get_by_ID( $blog_group_ID, false, false ) )
+				{
+					$group_Collection->set( 'advanced_perms', 1 );
+					$group_Collection->dbupdate();
+				}
 				$blog_ID = $blog_group_ID;
 			}
 			break;
@@ -2423,13 +2531,13 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 				break;
 
 		default:
-			// do nothing
+			debug_die( 'Invalid collection type' );
 	}
 
 	if( ! empty( $blog_ID ) )
 	{
 		// Create sample contents for the collection:
-		create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user, $timeshift );
+		create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user, $timeshift, $error_messages );
 		return $blog_ID;
 	}
 	else
@@ -2448,7 +2556,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  * @param boolean Use demo users as comment authors
  * @param integer Shift post time in ms
  */
-function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
+function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400, &$error_messages = NULL )
 {
 	global $DB, $install_test_features, $timestamp, $Settings, $admin_url, $installed_collection_info_pages;
 
@@ -2473,14 +2581,14 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 	// --------------------- START OF GENERIC SAMPLE ITEMS -------------------- //
 	$demo_items['extended_post'] = array(
-		'title'    => T_('Extended post'),
+		'title'    => TD_('Extended post'),
 		'featured' => true,
 		'tags'     => 'photo,demo',
 		'category' => 'background',
-		'content'  => '<p>'.T_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.').'</p>'.get_filler_text( 'lorem_1paragraph' )
+		'content'  => '<p>'.TD_('This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
 
-<p>'.T_('This is the extended text. You only see it when you have clicked the "more" link.').'</p>'.get_filler_text( 'lorem_2more' ),
+<p>'.TD_('This is the extended text. You only see it when you have clicked the "more" link.').'</p>'.get_filler_text( 'lorem_2more' ),
 		'files' => array(
 			array( 'monument-valley/john-ford-point.jpg', 'cover' ),
 			array( 'monument-valley/monument-valley-road.jpg', 'teaser' ),
@@ -2489,11 +2597,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	);
 
 	$demo_items['post_with_images'] = array(
-		'title'      => T_('Post with Images'),
+		'title'      => TD_('Post with Images'),
 		'featured'   => true,
 		'tags'       => 'photo,demo',
 		'category'   => 'background',
-		'content'    => T_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
+		'content'    => TD_('<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>
 
 <p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>'),
 		'files' => array(
@@ -2509,13 +2617,13 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		'featured' => true,
 		'tags'     => 'photo,demo,recipe,custom fields',
 		'category' => 'recipes',
-		'type'     => '$recipe$',
+		'type'     => 'Recipe',
 		'content'  => '<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>
 <p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>
 [teaserbreak]
 <ol>
 	<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>
-	<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>
+	<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don\'t get the oil too hot.').'</li>
 	<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>
 	<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>
 	<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>
@@ -2529,11 +2637,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 			array( 'cook_time', '35' ),
 			array( 'passive_time', '5' ),
 			array( 'ingredients', TD_('vegetable oil
-1⁄2 teaspoon ginger
+1/2 teaspoon ginger
 1 tablespoon garlic
-1⁄2 cup soy sauce
-1⁄2 cup water
-3⁄4 cup dark brown sugar
+1/2 cup soy sauce
+1/2 cup water
+3/4 cup dark brown sugar
 1 lb flank steak
 1 yellow onion
 2 large green onions') ),
@@ -2548,8 +2656,8 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 		'featured' => true,
 		'tags'     => 'photo,demo,recipe,custom fields',
 		'category' => 'recipes',
-		'type'     => '$recipe$',
-		'content'  => '<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>
+		'type'     => 'Recipe',
+		'content'  => '<p>'.TD_('We found these during Happy Hour at Chiso\'s Grill in Bee Cave, Tx. W\'ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you\'re into that).').'</p>
 [teaserbreak]
 <ol>
 	<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>
@@ -2578,18 +2686,18 @@ hearty crack of pepper') ),
 	);
 
 	$demo_items['custom_fields_example'] = array(
-		'title'    => T_('Custom Fields Example'),
+		'title'    => TD_('Custom Fields Example'),
 		'tags'     => 'demo,custom fields',
 		'category' => 'background',
 		'type'     => 'Post with Custom Fields',
-		'content'  => '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>
-<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+		'content'  => '<p>'.TD_('This post has a special post type called "Post with Custom Fields".').'</p>
+<p>'.TD_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
 <p>[fields]</p>
 [teaserbreak]
-<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>'.TD_('It is also possible to selectively display only a couple of these fields:').'</p>
 <p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
-<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+<p>'.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( TD_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123' ),
 			array( 'second_numeric_field', '456' ),
@@ -2608,18 +2716,18 @@ It can have multiple lines.' ),
 	);
 
 	$demo_items['another_custom_fields_example'] = array(
-		'title'    => T_('Another Custom Fields Example'),
+		'title'    => TD_('Another Custom Fields Example'),
 		'tags'     => 'demo,custom fields',
 		'category' => 'background',
 		'type'     => 'Post with Custom Fields',
-		'content'  => '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>
-<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+		'content'  => '<p>'.TD_('This post has a special post type called "Post with Custom Fields".').'</p>
+<p>'.TD_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
 <p>[fields]</p>
 [teaserbreak]
-<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>'.TD_('It is also possible to selectively display only a couple of these fields:').'</p>
 <p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
-<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+<p>'.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( TD_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123.45' ),
 			array( 'second_numeric_field', '456' ),
@@ -2639,26 +2747,26 @@ This is an extra line.' ),
 	);
 
 	$demo_items['child_post_example'] = array(
-		'title'     => T_('Child Post Example'),
+		'title'     => TD_('Child Post Example'),
 		'tags'      => 'demo,custom fields',
 		'category'  => 'background',
 		'type'      => 'Child Post',
 		'parent_ID' => '#get_item#another_custom_fields_example#ID#',
-		'content'   => '<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
-<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
-<p>[parent:fields]</p>
-[teaserbreak]
-<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
-<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>
-<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>
-<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' ).'</p>
-<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
-<h3>'.T_('Replicated fields').'</h3>
-<p>'.T_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>
-<p>'.T_('This child post has the following fields which automatically replicate from its parent:').'</p>
-<p>[fields]</p>
-<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>
-<p>[compare:$this$,$parent$]</p>',
+		'content'   => sprintf( TD_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' )."\n\n"
+.TD_('This also allows us to access the custom fields of the parent post:')."\n\n"
+.'[parent:fields]'."\n\n"
+.'[teaserbreak]'."\n\n"
+.TD_('It is also possible to selectively display only a couple of these fields:')."\n\n"
+.'[parent:fields:first_numeric_field,first_string_field,second_numeric_field]'."\n\n"
+.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' )."\n\n"
+.sprintf( TD_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' )."\n\n"
+.sprintf( TD_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' )."\n\n"
+.'###'.TD_('Replicated fields')."\n\n"
+.TD_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).')."\n\n"
+.TD_('This child post has the following fields which automatically replicate from its parent:')."\n\n"
+.'[fields]'."\n\n"
+.sprintf( TD_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' )."\n\n"
+.'[compare:$this$,$parent$]',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123' ),
 			array( 'first_string_field', 'abc' ),
@@ -2668,24 +2776,27 @@ This is an extra line.' ),
 		'files' => array(
 			array( 'monument-valley/monument-valley-road.jpg', 'attachment', 'custom_field' => 'image_1' ),
 		),
+		'settings' => array(
+			'editor_code' => 'html', // use markup(don't use tinymce) edtior by default for this demo item
+		),
 	);
 
 	$demo_items['extended_post_with_no_teaser'] = array(
-		'title'       => T_('Extended post with no teaser'),
+		'title'       => TD_('Extended post with no teaser'),
 		'tags'        => 'demo',
 		'category'    => 'background',
 		'hide_teaser' => true,
-		'content'     => '<p>'.T_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.').'</p>'.get_filler_text( 'lorem_1paragraph' )
+		'content'     => '<p>'.TD_('This is an extended post with no teaser. This means that you won\'t see this teaser any more when you click the "more" link.').'</p>'.get_filler_text( 'lorem_1paragraph' )
 .'[teaserbreak]
 
-<p>'.T_('This is the extended text. You only see it when you have clicked the "more" link.').'</p>'.get_filler_text( 'lorem_2more' ),
+<p>'.TD_('This is the extended text. You only see it when you have clicked the "more" link.').'</p>'.get_filler_text( 'lorem_2more' ),
 	);
 
 	$demo_items['multipage_post'] = array(
-		'title'    => T_('This is a multipage post'),
+		'title'    => TD_('This is a multipage post'),
 		'tags'     => 'demo',
 		'category' => 'background',
-		'content'  => T_('<p>This is page 1 of a multipage post.</p>
+		'content'  => TD_('<p>This is page 1 of a multipage post.</p>
 
 <blockquote><p>This is a Block Quote.</p></blockquote>
 
@@ -2693,25 +2804,25 @@ This is an extra line.' ),
 
 [pagebreak]
 
-<p>'.sprintf( T_('This is page %d.'), 2 ).'</p>'.get_filler_text( 'lorem_2more' ).'
+<p>'.sprintf( TD_('This is page %d.'), 2 ).'</p>'.get_filler_text( 'lorem_2more' ).'
 
 [pagebreak]
 
-<p>'.sprintf( T_('This is page %d.'), 3 ).'</p>'.get_filler_text( 'lorem_1paragraph' ).'
+<p>'.sprintf( TD_('This is page %d.'), 3 ).'</p>'.get_filler_text( 'lorem_1paragraph' ).'
 
 [pagebreak]
 
-<p>'.sprintf( T_('This is page %d.'), 4 ).'</p>
+<p>'.sprintf( TD_('This is page %d.'), 4 ).'</p>
 
-<p>'.T_('It is the last page.').'</p>',
+<p>'.TD_('It is the last page.').'</p>',
 	);
 
 	$demo_items['featured_post'] = array(
-		'title'      => T_('Featured post'),
+		'title'      => TD_('Featured post'),
 		'featured'   => true,
 		'tags'       => 'demo',
 		'category'   => 'background',
-		'content'    => T_('<p>This is a demo of a featured post.</p>
+		'content'    => TD_('<p>This is a demo of a featured post.</p>
 
 <p>It will be featured whenever we have no specific "Intro" post to display for the current request. To see it in action, try displaying the "Announcements" category.</p>
 
@@ -2719,14 +2830,14 @@ This is an extra line.' ),
 	);
 
 	$demo_items['markdown_examples'] = array(
-		'title'    => T_('Markdown examples'),
+		'title'    => TD_('Markdown examples'),
 		'tags'     => 'demo,rendering',
 		'category' => 'background',
 		'content'  => get_filler_text( 'markdown_examples_content' ),
 	);
 
 	$demo_items['wiki_tables'] = array(
-		'title'      => T_('Wiki Tables'),
+		'title'      => TD_('Wiki Tables'),
 		'tags'       => 'demo,rendering',
 		'category'   => 'background',
 		'content'    => /* DO NOT TRANSLATE - TOO COMPLEX */ '<p>This is the topic with samples of the wiki tables.</p>
@@ -2971,11 +3082,11 @@ Hello
 	);
 
 	$demo_items['about_widgets'] = array(
-		'title'    => T_('About widgets...'),
+		'title'    => TD_('About widgets...'),
 		'tags'     => 'widgets',
 		'category' => 'background',
 		'mustread' => is_pro(),
-		'content'  => T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
+		'content'  => TD_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
 
@@ -2983,11 +3094,11 @@ Hello
 	);
 
 	$demo_items['about_skins'] = array(
-		'title'    => T_('About skins...'),
+		'title'    => TD_('About skins...'),
 		'tags'     => 'skins',
 		'category' => 'background',
 		'mustread' => is_pro(),
-		'content'  => sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
+		'content'  => sprintf( TD_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
 
@@ -3001,10 +3112,10 @@ Hello
 	);
 
 	$demo_items['apache_optimization'] = array(
-		'title'    => T_('Apache optimization...'),
+		'title'    => TD_('Apache optimization...'),
 		'category' => 'background',
 		'mustread' => is_pro(),
-		'content'  => sprintf( T_('<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please see the man page about <a %s>Tricky Stuff</a> for more information.</p>
+		'content'  => sprintf( TD_('<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please see the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
 <p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>'),
 'href="'.get_manual_url( 'tricky-stuff' ).'"',
@@ -3013,18 +3124,18 @@ Hello
 	);
 
 	$demo_items['second_post'] = array(
-		'title'    => T_('Second post'),
+		'title'    => TD_('Second post'),
 		'category' => 'news',
 		'extra_cats' => array( 'welcome' ),
-		'content'  => T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
+		'content'  => TD_('<p>This is the second post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'),
 	);
 
 	$demo_items['first_post'] = array(
-		'title'    => T_('First Post'),
+		'title'    => TD_('First Post'),
 		'category' => 'welcome',
-		'content'  => T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
+		'content'  => TD_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'),
 	);
@@ -3039,18 +3150,24 @@ Hello
 			// Sample categories:
 			$categories = array(
 				'b2evolution'  => 'b2evolution',
-				'contributors' => T_('Contributors'),
+				'contributors' => TD_('Contributors'),
 			);
 
-			// Don't install generic items for this collection type:
-			$demo_items = array();
+			// Don't install generic items(except of two recipes) for this collection type:
+			foreach( $demo_items as $demo_item_key => $demo_item_data )
+			{
+				if( $demo_item_key != 'mongolian_beef' && $demo_item_key != 'stuffed_peppers' )
+				{
+					unset( $demo_items[ $demo_item_key ] );
+				}
+			}
 
 			// Additional sample Items:
 			$demo_items['about_minisite'] = array(
-				'title'    => T_('About Minisite'),
+				'title'    => TD_('About Minisite'),
 				'category' => 'b2evolution',
 				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Mini-Site') ),
+				'content'  => sprintf( get_filler_text( 'info_page' ), TD_('Mini-Site') ),
 				'files'    => array(
 					array( 'monument-valley/monument-valley.jpg', 'cover' ),
 				),
@@ -3058,7 +3175,7 @@ Hello
 			);
 
 			$demo_items['more_info'] = array(
-				'title'    => T_('More info'),
+				'title'    => TD_('More info'),
 				'category' => 'b2evolution',
 				'type'     => 'Widget Page',
 				'files'    => array(
@@ -3075,7 +3192,7 @@ Hello
 			// Sample categories:
 			$categories = array(
 				'b2evolution'  => 'b2evolution',
-				'contributors' => T_('Contributors'),
+				'contributors' => TD_('Contributors'),
 			);
 
 			// Don't install generic items for this collection type:
@@ -3083,7 +3200,7 @@ Hello
 
 			// Additional sample Items:
 			$demo_items['terms_conditions'] = array(
-				'title'    => T_('Terms & Conditions'),
+				'title'    => TD_('Terms & Conditions'),
 				'tags'     => 'intro',
 				'category' => 'b2evolution',
 				'type'     => 'Terms & Conditions',
@@ -3147,21 +3264,33 @@ Hello
 			);
 
 			$demo_items['about_this_site'] = array(
-				'title'    => T_('About this site'),
+				'title'    => TD_('About this site'),
 				'category' => 'b2evolution',
 				'type'     => 'Standalone Page',
-				'content'  => T_('<p>This website is powered by b2evolution.</p>')."\r\n"
-					.T_('<p>You are currently looking at an info page about this site.</p>')."\r\n"
-					.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
-					.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>'),
+				'content'  => TD_('This website is powered by b2evolution.')."\r\n\r\n"
+					.TD_('You are currently looking at an info page about this site.')."\r\n\r\n"
+					.TD_('Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.')."\r\n\r\n"
+					.'[div::view=detailed]'."\r\n"
+						.sprintf( TD_('This extra information is only displayed when detailed view is requested. This is achieved by adding a display condition on a block of content like %s.'), '`[div::view=detailed] ... [/div]`' )."\r\n\r\n"
+						.TD_('Note: If needed, skins may format info pages differently from regular posts.')."\r\n"
+					.'[/div]'."\r\n\r\n"
+					.'[switcher:view:buttons]'."\r\n"
+					.'	[option:simple]Simple[/option]'."\r\n"
+					.'	[option:detailed]Detailed[/option]'."\r\n"
+					.'[/switcher]',
 				'files'    => array(
 					array( 'logos/b2evolution_1016x208_wbg.png' ),
 				),
 				'widget_info_page' => 'about_this_site',
+				'settings' => array(
+						'editor_code' => 'html',
+						'switchable'  => 1,
+						'switchable_params' => 'view=simple',
+					),
 			);
 
 			$demo_items['widget_page'] = array(
-				'title'    => T_('Widget Page'),
+				'title'    => TD_('Widget Page'),
 				'category' => 'b2evolution',
 				'type'     => 'Widget Page',
 				'files'    => array(
@@ -3171,104 +3300,104 @@ Hello
 			);
 
 			$demo_items['b2evo_the_other_blog_tool'] = array(
-				'title'    => /* TRANS: sample ad content */ T_('b2evo: The other blog tool!'),
+				'title'    => /* TRANS: sample ad content */ TD_('b2evo: The other blog tool!'),
 				'tags'     => 'photo',
 				'category' => 'b2evolution',
 				'type'     => 'Advertisement',
 				'url'      => 'http://b2evolution.net',
-				'content'  => /* TRANS: sample ad content */ T_('The other blog tool!'),
+				'content'  => /* TRANS: sample ad content */ TD_('The other blog tool!'),
 				'files'    => array(
 					array( 'banners/b2evo-125-other.png' ),
 				),
 			);
 
 			$demo_items['b2evo_better_blog_software'] = array(
-				'title'    => /* TRANS: sample ad content */ T_('b2evo: Better Blog Software!'),
+				'title'    => /* TRANS: sample ad content */ TD_('b2evo: Better Blog Software!'),
 				'tags'     => 'photo',
 				'category' => 'b2evolution',
 				'type'     => 'Advertisement',
 				'url'      => 'http://b2evolution.net',
-				'content'  => /* TRANS: sample ad content */ T_('Better Blog Software!'),
+				'content'  => /* TRANS: sample ad content */ TD_('Better Blog Software!'),
 				'files'    => array(
 					array( 'banners/b2evo-125-better.png' ),
 				),
 			);
 
 			$demo_items['b2evo_the_software_for_blog_pros'] = array(
-				'title'    => /* TRANS: sample ad content */ T_('b2evo: The software for blog pros!'),
+				'title'    => /* TRANS: sample ad content */ TD_('b2evo: The software for blog pros!'),
 				'tags'     => 'photo',
 				'category' => 'b2evolution',
 				'type'     => 'Advertisement',
 				'url'      => 'http://b2evolution.net',
-				'content'  => /* TRANS: sample ad content */ T_('The software for blog pros!'),
+				'content'  => /* TRANS: sample ad content */ TD_('The software for blog pros!'),
 				'files'    => array(
 					array( 'banners/b2evo-125-pros.png' ),
 				),
 			);
 
 			$demo_items['register_content'] = array(
-				'title'    => T_('Register content'),
+				'title'    => TD_('Register content'),
 				'slug'     => 'register-content',
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
-				'content'  => T_('The information you provide in this form will be recorded in your user account.')
+				'content'  => TD_('The information you provide in this form will be recorded in your user account.')
 					."\n\n"
-					.T_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
+					.TD_('You will be able to modify it (or even close your account) at any time after logging in with your username and password.')
 					."\n\n"
-					.T_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
+					.TD_('Should you forget your password, you will be able to reset it by receiving a link on your email address.')
 					."\n\n"
-					.T_('All other info is used to personalize your experience with this website.')
+					.TD_('All other info is used to personalize your experience with this website.')
 					."\n\n"
-					.T_('This site may allow conversation between users.')
-					.' '.T_('Your email address and password will not be shared with other users.')
-					.' '.T_('All other information may be shared with other users.')
-					.' '.T_('Do not provide information you are not willing to share.'),
+					.TD_('This site may allow conversation between users.')
+					.' '.TD_('Your email address and password will not be shared with other users.')
+					.' '.TD_('All other information may be shared with other users.')
+					.' '.TD_('Do not provide information you are not willing to share.'),
 			);
 
 			$demo_items['help_content'] = array(
-				'title'    => T_('Help content'),
+				'title'    => TD_('Help content'),
 				'slug'     => 'help-content',
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
-				'content'  => '### '.T_('Email preferences')
+				'content'  => '### '.TD_('Email preferences')
 					."\n\n"
-					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
+					.sprintf( TD_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
 					."\n\n"
-					.'### '.T_('Managing your personal information')
+					.'### '.TD_('Managing your personal information')
 					."\n\n"
-					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
+					.sprintf( TD_('You can see and correct the personal details we know about you by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
 					."\n\n"
-					.'### '.T_('Closing your account')
+					.'### '.TD_('Closing your account')
 					."\n\n"
-					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
+					.sprintf( TD_('You can close your account yourself by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
 			);
 
 			$demo_items['access_denied'] = array(
-				'title'    => T_('Access Denied'),
+				'title'    => TD_('Access Denied'),
 				'slug'     => 'access-denied',
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
-				'content'  => '<p class="center">'.T_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
+				'content'  => '<p class="center">'.TD_( 'You are not a member of this collection, therefore you are not allowed to access it.' ).'</p>',
 			);
 
 			$demo_items['login_required'] = array(
-				'title'    => T_('Login Required'),
+				'title'    => TD_('Login Required'),
 				'slug'     => 'login-required',
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
-				'content'  => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+				'content'  => '<div class="alert alert-danger" style="max-width:400px;margin:20px auto">'.TD_( 'You need to log in before you can access this section.' ).'</div>',
 			);
 
 			$demo_items['this_is_a_content_block'] = array(
-				'title'    => T_('This is a Content Block'),
+				'title'    => TD_('This is a Content Block'),
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
-				'content'  => T_('<p>This is a Post/Item of type "Content Block".</p>
+				'content'  => TD_('<p>This is a Post/Item of type "Content Block".</p>
 
 <p>A content block can be included in several places.</p>'),
 			);
@@ -3282,33 +3411,33 @@ Hello
 
 			// Sample categories:
 			$categories = array(
-				'welcome'    => T_('Welcome'),
-				'news'       => T_('News'),
-				'background' => T_('Background'),
-				'fun'        => array( T_('Fun'), 'subs' => array(
-					'in-real-life' => array( T_('In real life'), 'subs' => array(
-						'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
-						'movies'  => T_('Movies'),
-						'music'   => T_('Music'),
+				'welcome'    => TD_('Welcome'),
+				'news'       => TD_('News'),
+				'background' => TD_('Background'),
+				'fun'        => array( TD_('Fun'), 'subs' => array(
+					'in-real-life' => array( TD_('In real life'), 'subs' => array(
+						'recipes' => array( TD_('Recipes'), 'default_item_type' => 'Recipe' ),
+						'movies'  => TD_('Movies'),
+						'music'   => TD_('Music'),
 					) ),
-					'on-the-web' => T_('On the web'),
+					'on-the-web' => TD_('On the web'),
 				) ),
 			);
 
 			// Additional sample Items:
 			$demo_items['main_intro_post'] = array(
-				'title'    => T_('Main Intro post'),
+				'title'    => TD_('Main Intro post'),
 				'tags'     => 'intro',
 				'category' => 'welcome',
 				'type'     => 'Intro-Main',
-				'content'  => T_('This is the main intro post of this collection. It appears on the collection\'s front page only.'),
+				'content'  => TD_('This is the main intro post of this collection. It appears on the collection\'s front page only.'),
 			);
 
 			$demo_items['about_blog_a'] = array(
-				'title'    => T_('About Blog A'),
+				'title'    => TD_('About Blog A'),
 				'category' => 'welcome',
 				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog A') ),
+				'content'  => sprintf( get_filler_text( 'info_page' ), TD_('Blog A') ),
 			);
 			break;
 
@@ -3318,22 +3447,22 @@ Hello
 
 			// Sample categories:
 			$categories = array(
-				'welcome'    => T_('Welcome'),
-				'news'       => T_('News'),
-				'background' => T_('Background'),
-				'fun'        => array( T_('Fun'), 'subs' => array(
-					'in-real-life' => array( T_('In real life'), 'subs' => array(
-						'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
-						'movies'  => T_('Movies'),
-						'music'   => T_('Music'),
+				'welcome'    => TD_('Welcome'),
+				'news'       => TD_('News'),
+				'background' => TD_('Background'),
+				'fun'        => array( TD_('Fun'), 'subs' => array(
+					'in-real-life' => array( TD_('In real life'), 'subs' => array(
+						'recipes' => array( TD_('Recipes'), 'default_item_type' => 'Recipe' ),
+						'movies'  => TD_('Movies'),
+						'music'   => TD_('Music'),
 					) ),
-					'on-the-web' => T_('On the web'),
+					'on-the-web' => TD_('On the web'),
 				) ),
 			);
 
 			// Additional sample Items:
 			$demo_items['b2evo_skins_repository'] = array(
-				'title'    => T_('b2evo skins repository'),
+				'title'    => TD_('b2evo skins repository'),
 				'category' => 'background',
 				'type'     => 'Sidebar link',
 				'url'      => 'http://skins.b2evolution.net/',
@@ -3347,34 +3476,34 @@ Hello
 			);
 
 			$demo_items['about_blog_a'] = array(
-				'title'    => T_('About Blog B'),
+				'title'    => TD_('About Blog B'),
 				'category' => 'welcome',
 				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Blog B') ),
+				'content'  => sprintf( get_filler_text( 'info_page' ), TD_('Blog B') ),
 			);
 
 			$demo_items['widgets_tag_sub_intro_post'] = array(
-				'title'    => T_('Widgets tag &ndash; Sub Intro post'),
+				'title'    => TD_('Widgets tag &ndash; Sub Intro post'),
 				'tags'     => 'intro',
 				'category' => 'welcome',
 				'type'     => 'Intro-Tag',
-				'content'  => T_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
+				'content'  => TD_('This uses post type "Intro-Tag" and is tagged with the desired Tag(s).'),
 			);
 
 			$demo_items['b2evolution_tips_category_sub_intro_post'] = array(
-				'title'    => T_('b2evolution tips category &ndash; Sub Intro post'),
+				'title'    => TD_('b2evolution tips category &ndash; Sub Intro post'),
 				'tags'     => 'intro',
 				'category' => 'welcome',
 				'type'     => 'Intro-Cat',
-				'content'  => T_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
+				'content'  => TD_('This uses post type "Intro-Cat" and is attached to the desired Category(ies).'),
 			);
 
 			$demo_items['welcome_to_blog_b'] = array(
-				'title'    => T_('Welcome to Blog B'),
+				'title'    => TD_('Welcome to Blog B'),
 				'tags'     => 'intro',
 				'category' => 'welcome',
 				'type'     => 'Intro-Front',
-				'content'  => sprintf( T_('<p>This is the intro post for the front page of Blog B.</p>
+				'content'  => sprintf( TD_('<p>This is the intro post for the front page of Blog B.</p>
 
 <p>Blog B is currently configured to show a front page like this one instead of directly showing the blog\'s posts.</p>
 
@@ -3391,7 +3520,7 @@ Hello
 
 			// Sample categories:
 			$categories = array(
-				'landscapes' => T_('Landscapes'),
+				'landscapes' => TD_('Landscapes'),
 			);
 
 			// Don't install generic items for this collection type:
@@ -3399,17 +3528,17 @@ Hello
 
 			// Additional sample Items:
 			$demo_items['about_photos'] = array(
-				'title'    => T_('About Photos'),
+				'title'    => TD_('About Photos'),
 				'category' => 'landscapes',
 				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
+				'content'  => sprintf( get_filler_text( 'info_page' ), TD_('Photos') ),
 			);
 
 			$demo_items['bus_stop_ahead'] = array(
-				'title'    => T_('Bus Stop Ahead'),
+				'title'    => TD_('Bus Stop Ahead'),
 				'tags'     => 'photo',
 				'category' => 'landscapes',
-				'content'  => T_('In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'),
+				'content'  => TD_('In the middle of nowhere: a school bus stop where you wouldn\'t really expect it!'),
 				'files'    => array(
 					array( 'monument-valley/bus-stop-ahead.jpg', 'set_var' => 'photo_link_1_ID' ),
 					array( 'monument-valley/john-ford-point.jpg', 'aftermore', 'set_var' => 'photo_link_2_ID' ),
@@ -3437,7 +3566,7 @@ a school bus stop where you wouldn\'t really expect it!
 			}
 
 			$demo_items['sunset'] = array(
-				'title'    => T_('Sunset'),
+				'title'    => TD_('Sunset'),
 				'tags'     => 'photo',
 				'category' => 'landscapes',
 				'files'    => array(
@@ -3446,7 +3575,7 @@ a school bus stop where you wouldn\'t really expect it!
 			);
 
 			$demo_items['food'] = array(
-				'title'    => T_('Food'),
+				'title'    => TD_('Food'),
 				'tags'     => 'photo',
 				'category' => 'landscapes',
 				'files'    => array(
@@ -3462,21 +3591,20 @@ a school bus stop where you wouldn\'t really expect it!
 
 			// Sample categories:
 			$categories = array(
-				'a_forum_group'    => array( T_('A forum group'), 'meta' => true, 'order' => 1, 'subs' => array(
-					'welcome'       => array( T_('Welcome'), 'desc' => T_('Welcome description'), 'order' => 1 ),
-					'a_forum'       => array( T_('A forum'), 'desc' => T_('Short description of this forum'), 'order' => 2 ),
-					'another_forum' => array( T_('Another forum'), 'desc' => T_('Short description of this forum'), 'order' => 3 ),
+				'a_forum_group'    => array( TD_('A forum group'), 'meta' => true, 'order' => 1, 'subs' => array(
+					'welcome'       => array( TD_('Welcome'), 'desc' => TD_('Welcome description'), 'order' => 1 ),
+					'a_forum'       => array( TD_('A forum'), 'desc' => TD_('Short description of this forum'), 'order' => 2 ),
+					'another_forum' => array( TD_('Another forum'), 'desc' => TD_('Short description of this forum'), 'order' => 3 ),
 				) ),
-				'another_group'    => array( T_('Another group'), 'meta' => true, 'order' => 2, 'subs' => array(
-					'background' => array( T_('Background'), 'desc' => T_('Background description'), 'order' => 1 ),
-					'news'       => array( T_('News'), 'desc' => T_('News description'), 'order' => 2 ),
-					'fun'        => array( T_('Fun'), 'desc' => T_('Fun description'), 'order' => 3, 'subs' => array(
-						'in-real-life' => array( T_('In real life'), 'order' => 4, 'subcat_ordering' => 'alpha', 'subs' => array(
-							'movies' => T_('Movies'),
-							'music'  => T_('Music'),
-							'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+				'another_group'    => array( TD_('Another group'), 'meta' => true, 'order' => 2, 'subs' => array(
+					'background' => array( TD_('Background'), 'desc' => TD_('Background description'), 'order' => 1 ),
+					'news'       => array( TD_('News'), 'desc' => TD_('News description'), 'order' => 2 ),
+					'fun'        => array( TD_('Fun'), 'desc' => TD_('Fun description'), 'order' => 3, 'subs' => array(
+						'in-real-life' => array( TD_('In real life'), 'order' => 4, 'subcat_ordering' => 'alpha', 'subs' => array(
+							'movies' => TD_('Movies'),
+							'music'  => TD_('Music'),
 						) ),
-						'on-the-web' => array( T_('On the web'), 'order' => 4 ),
+						'on-the-web' => array( TD_('On the web'), 'order' => 4 ),
 					) ),
 				) ),
 			);
@@ -3486,11 +3614,20 @@ a school bus stop where you wouldn\'t really expect it!
 
 			// Additional sample Items:
 			$demo_items['about_forums'] = array(
-				'title'    => T_('About Forums'),
+				'title'    => TD_('About Forums'),
 				'category' => 'welcome',
 				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
+				'content'  => sprintf( get_filler_text( 'info_page' ), TD_('Photos') ),
 			);
+
+			// Don't install the following demo Items:
+			$exclude_demo_items = array(
+					'mongolian_beef',
+					'stuffed_peppers',
+					'custom_fields_example',
+					'another_custom_fields_example',
+					'child_post_example',
+				);
 			break;
 
 		// =======================================================================================================
@@ -3499,17 +3636,17 @@ a school bus stop where you wouldn\'t really expect it!
 
 			// Sample categories:
 			$categories = array(
-				'introduction'    => array( T_('Introduction'), 'order' => 10 ),
-				'getting-started' => array( T_('Getting Started'), 'order' => 20 ),
-				'user-guide'      => array( T_('User Guide'), 'order' => 30 ),
-				'reference'       => array( T_('Reference'), 'order' => 40, 'subcat_ordering' => 'alpha', 'subs' => array(
-					'collections' => array( T_('Collections'), 'order' => 10, 'subs' => array(
-						'blogs'        => array( T_('Blogs'), 'order' => 35 ),
-						'photo_albums' => array( T_('Photo Albums'), 'order' => 25 ),
-						'forums'       => array( T_('Forums'), 'order' => 5 ),
+				'introduction'    => array( TD_('Introduction'), 'order' => 10 ),
+				'getting-started' => array( TD_('Getting Started'), 'order' => 20 ),
+				'user-guide'      => array( TD_('User Guide'), 'order' => 30 ),
+				'reference'       => array( TD_('Reference'), 'order' => 40, 'subcat_ordering' => 'alpha', 'subs' => array(
+					'collections' => array( TD_('Collections'), 'order' => 10, 'subs' => array(
+						'blogs'        => array( TD_('Blogs'), 'order' => 35 ),
+						'photo_albums' => array( TD_('Photo Albums'), 'order' => 25 ),
+						'forums'       => array( TD_('Forums'), 'order' => 5 ),
 					) ),
-					'recipes'     => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
-					'other'       => array( T_('Other'), 'order' => 5 ),
+					'recipes'     => array( TD_('Recipes'), 'default_item_type' => 'Recipe' ),
+					'other'       => array( TD_('Other'), 'order' => 5 ),
 				) ),
 			);
 
@@ -3533,28 +3670,28 @@ a school bus stop where you wouldn\'t really expect it!
 
 			// Additional sample Items:
 			$demo_items['chapter_intro'] = array(
-				'title'    => T_('Chapter Intro'),
+				'title'    => TD_('Chapter Intro'),
 				'tags'     => 'intro',
 				'category' => 'reference',
 				'type'     => 'Intro-Cat',
-				'content'  => T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
-."\n\n".T_('Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default.'),
+				'content'  => TD_('This is an introduction for this chapter. It is a post using the "intro-cat" type.')
+."\n\n".TD_('Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default.'),
 			);
 
 			$demo_items['chapter_intro'] = array(
-				'title'    => T_('Chapter Intro'),
+				'title'    => TD_('Chapter Intro'),
 				'tags'     => 'intro',
 				'category' => 'introduction',
 				'type'     => 'Intro-Cat',
-				'content'  => T_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'),
+				'content'  => TD_('This is an introduction for this chapter. It is a post using the "intro-cat" type.'),
 			);
 
 			$demo_items['welcome_here'] = array(
-				'title'    => T_('Welcome here!'),
+				'title'    => TD_('Welcome here!'),
 				'tags'     => 'intro',
 				'category' => 'introduction',
 				'type'     => 'Intro-Front',
-				'content'  => T_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
+				'content'  => TD_('This is the main introduction for this demo online manual. It is a post using the type "Intro-Front". It will only appear on the front page of the manual.
 
 You may delete this post if you don\'t want such an introduction.
 
@@ -3562,10 +3699,10 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			);
 
 			$demo_items['about_this_manual'] = array(
-				'title'    => T_('About this manual'),
+				'title'    => TD_('About this manual'),
 				'category' => 'introduction',
 				'type'     => 'Standalone Page',
-				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Manual') ),
+				'content'  => sprintf( get_filler_text( 'info_page' ), TD_('Manual') ),
 			);
 			break;
 
@@ -3575,9 +3712,8 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Sample categories:
 			$categories = array(
-				'bug'             => array( T_('Bug'), 'order' => 10 ),
-				'feature_request' => array( T_('Feature Request'), 'order' => 20 ),
-				'recipes'         => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
+				'bug'             => array( TD_('Bug'), 'order' => 10 ),
+				'feature_request' => array( TD_('Feature Request'), 'order' => 20 ),
 			);
 
 			// Additional sample Items:
@@ -3600,10 +3736,10 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			for( $i = 0, $j = 0, $k = 0, $m = 0; $i < 20; $i++ )
 			{
 				$top_demo_items['task_'.$tasks[$i]] = array(
-					'title'    => sprintf( T_('Task %s'), $tasks[$i] ),
+					'title'    => sprintf( TD_('Task %s'), $tasks[$i] ),
 					'tags'     => 'demo',
 					'category' => 'bug',
-					'content'  => '<p>'.sprintf( T_('This is a demo task description for Task %s.'), $tasks[$i] ).'</p>',
+					'content'  => '<p>'.sprintf( TD_('This is a demo task description for Task %s.'), $tasks[$i] ).'</p>',
 					'priority' =>  $priorities[$j],
 					'pst_ID'   => $task_status[$k],
 				);
@@ -3649,6 +3785,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Prepend additional sample Items before generic Items:
 			$demo_items = array_merge( $top_demo_items, $demo_items );
+
+			// Don't install the following demo Items:
+			$exclude_demo_items = array(
+					'mongolian_beef',
+					'stuffed_peppers',
+					'custom_fields_example',
+					'another_custom_fields_example',
+					'child_post_example',
+				);
 			break;
 
 		// =======================================================================================================
@@ -4010,6 +4155,17 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$edited_Blog->dbupdate();
 		}
 
+		if( ! empty( $exclude_demo_items ) )
+		{	// Exclude demo items which must not be installed:
+			foreach( $exclude_demo_items as $exclude_demo_item_key )
+			{
+				if( isset( $demo_items[ $exclude_demo_item_key ] ) )
+				{
+					unset( $demo_items[ $exclude_demo_item_key ] );
+				}
+			}
+		}
+
 		// Create sample Items:
 		$item_timestamp_array = get_post_timestamp_data( count( $demo_items ) );
 		$item_i = 0;
@@ -4019,11 +4175,13 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! is_available_item_type( $blog_ID, $item_type ) )
 			{	// Skip not supported Item Type:
+				$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] ).': '.sprintf( TB_('The required %s is not found.'), TD_('Item Type') );
 				continue;
 			}
 
 			if( ! ( $category_ID = get_demo_category_ID( $demo_item['category'], $categories ) ) )
 			{	// Skip Item without category:
+				$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] ).': '.sprintf( TB_('The required %s is not found.'), TD_('Category') );
 				continue;
 			}
 
@@ -4068,7 +4226,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! empty( $demo_item['parent_ID'] ) )
 			{	// Set parent ID:
-				$new_Item->set( 'parent_ID', replace_demo_content_vars( $demo_item['parent_ID'], $demo_items, $demo_vars ) );
+				if( $parent_ID = replace_demo_content_vars( $demo_item['parent_ID'], $demo_items, $demo_vars ) )
+				{
+					$new_Item->set( 'parent_ID', $parent_ID );
+				}
+				else
+				{
+					$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] ).': '.TB_('The parent of this child post does not exist.');
+					continue;
+				}
 			}
 
 			if( ! empty( $demo_item['priority'] ) )
@@ -4090,6 +4256,14 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			if( isset( $demo_item['qty_in_stock'] ) )
 			{	// Set item quantity in stock:
 				$new_Item->set( 'qty_in_stock', $demo_item['qty_in_stock'] );
+			}
+
+			if( isset( $demo_item['settings'] ) && is_array( $demo_item['settings'] ) )
+			{	// Additional settings:
+				foreach( $demo_item['settings'] as $demo_item_setting_key => $demo_item_setting_value )
+				{
+					$new_Item->set_setting( $demo_item_setting_key, $demo_item_setting_value );
+				}
 			}
 
 			$item_date = date( 'Y-m-d H:i:s', $item_timestamp_array[ $item_i++ ] );
@@ -4115,6 +4289,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! $insert_new_item_result )
 			{	// Skip next code if Item could not be inserted successfully:
+				$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] );
 				continue;
 			}
 
@@ -4128,15 +4303,22 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				foreach( $demo_item['files'] as $f => $demo_item_file )
 				{
 					$new_File = new File( 'shared', 0, $demo_item_file[0] );
-					$new_file_link_ID = $new_File->link_to_Object( $LinkOwner, $f + 1, ( isset( $demo_item_file[1] ) ? $demo_item_file[1] : NULL ) );
-					if( isset( $demo_item_file['custom_field'] ) )
-					{	// Update custom field with new linked file:
-						$new_Item->set_custom_field( $demo_item_file['custom_field'], $new_file_link_ID );
-						$update_new_item = true;
+					if( $new_File->exists() )
+					{
+						$new_file_link_ID = $new_File->link_to_Object( $LinkOwner, $f + 1, ( isset( $demo_item_file[1] ) ? $demo_item_file[1] : NULL ) );
+						if( isset( $demo_item_file['custom_field'] ) )
+						{	// Update custom field with new linked file:
+							$new_Item->set_custom_field( $demo_item_file['custom_field'], $new_file_link_ID );
+							$update_new_item = true;
+						}
+						if( isset( $demo_item_file['set_var'] ) )
+						{	// Set var which may be used for next inserted Items:
+							$demo_vars[ $demo_item_file['set_var'] ] = $new_file_link_ID;
+						}
 					}
-					if( isset( $demo_item_file['set_var'] ) )
-					{	// Set var which may be used for next inserted Items:
-						$demo_vars[ $demo_item_file['set_var'] ] = $new_file_link_ID;
+					else
+					{
+						$error_messages[] = sprintf( TD_('Missing attachment!').' '.TB_('File <code>%s</code> not found.'), $demo_item_file[0] );
 					}
 				}
 			}
@@ -4178,6 +4360,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				case 'Post with Custom Fields':
 				case 'Child Post':
 				case '$recipe$':
+				case 'Recipe':
 				case 'Intro-Cat':
 					// Insert default comments only for Items with these Item Types:
 					$comment_item_IDs[] = array( $new_Item->ID, $item_date );
@@ -4219,7 +4402,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				$DB->query( 'INSERT INTO T_comments( comment_item_ID, comment_status, comment_author_user_ID, comment_author_IP,
 						comment_date, comment_last_touched_ts, comment_content, comment_renderers, comment_notif_status, comment_notif_flags )
 						VALUES( '.$DB->quote( $additional_comments_item_ID ).', '.$DB->quote( $comment_status ).', '.$DB->quote( $demo_user->ID ).', "127.0.0.1", '
-						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( T_('Hi!
+						.$DB->quote( $now ).', '.$DB->quote( $now ).', '.$DB->quote( TD_('Hi!
 
 This is a sample comment that has been approved by default!
 Admins and moderators can very quickly approve or reject comments from the collection dashboard.') ).', "default", "finished", "moderators_notified,members_notified,community_notified" )' );
@@ -4368,7 +4551,7 @@ function create_demo_poll()
 	$demo_users = get_demo_users( false );
 	$max_answers = 3;
 
-	$demo_question = T_('What are your favorite b2evolution feature?');
+	$demo_question = TD_('What are your favorite b2evolution feature?');
 
 	// Check if there is already a demo poll:
 	$demo_poll_ID = $DB->get_var( 'SELECT pqst_ID FROM T_polls__question WHERE pqst_question_text = '.$DB->quote( $demo_question ) );
@@ -4376,45 +4559,48 @@ function create_demo_poll()
 	if( empty( $demo_poll_ID ) )
 	{
 		// Add poll question:
-		$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		$result = $DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
 			VALUES ( 1, '.$DB->quote( $demo_question ).', '.$max_answers.' )' );
 
-		$demo_poll_ID = $DB->insert_id;
-
-		// Add poll answers:
-		$answer_texts = array(
-				array( T_('Multiple blogs'), 1 ),
-				array( T_('Photo Galleries'), 2 ),
-				array( T_('Forums'), 3 ),
-				array( T_('Online Manuals'), 4 ),
-				array( T_('Lists / E-mailing'), 5 ),
-				array( T_('Easy Maintenance'), 6 )
-			);
-
-		$answer_IDs = array();
-		foreach( $answer_texts as $answer_text )
+		if( $result )
 		{
-			$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-					VALUES ( '.$demo_poll_ID.', '.$DB->quote( $answer_text[0] ).', '.$DB->quote( $answer_text[1] ).' )' );
-			$answer_IDs[] = $DB->insert_id;
-		}
+			$demo_poll_ID = $DB->insert_id;
 
-		// Generate answers:
-		$insert_values = array();
-		foreach( $demo_users as $demo_user )
-		{
-			$answers = $answer_IDs;
-			for( $i = 0; $i < $max_answers; $i++ )
+			// Add poll answers:
+			$answer_texts = array(
+					array( TD_('Multiple blogs'), 1 ),
+					array( TD_('Photo Galleries'), 2 ),
+					array( TD_('Forums'), 3 ),
+					array( TD_('Online Manuals'), 4 ),
+					array( TD_('Lists / E-mailing'), 5 ),
+					array( TD_('Easy Maintenance'), 6 )
+				);
+
+			$answer_IDs = array();
+			foreach( $answer_texts as $answer_text )
 			{
-				$rand_key = array_rand( $answers );
-				$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
-				unset( $answers[$rand_key] );
+				$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+						VALUES ( '.$demo_poll_ID.', '.$DB->quote( $answer_text[0] ).', '.$DB->quote( $answer_text[1] ).' )' );
+				$answer_IDs[] = $DB->insert_id;
 			}
-		}
-		if( $insert_values )
-		{
-			$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-				VALUES '.implode( ', ', $insert_values ) );
+
+			// Generate answers:
+			$insert_values = array();
+			foreach( $demo_users as $demo_user )
+			{
+				$answers = $answer_IDs;
+				for( $i = 0; $i < $max_answers; $i++ )
+				{
+					$rand_key = array_rand( $answers );
+					$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
+					unset( $answers[$rand_key] );
+				}
+			}
+			if( $insert_values )
+			{
+				$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+					VALUES '.implode( ', ', $insert_values ) );
+			}
 		}
 	}
 
@@ -4445,18 +4631,28 @@ function install_demo_content()
 	$DB->begin();
 	if( $create_demo_organization )
 	{
-		echo get_install_format_text( '<h2>'.T_('Creating demo organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.TB_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $create_demo_organization )
 		{
-			task_begin( T_('Creating demo organization...') );
-			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
-			task_end();
+			task_begin( TB_('Creating demo organization...') );
+			if( $new_demo_organization = create_demo_organization( $current_User->ID ) )
+			{
+				$user_org_IDs = array( $new_demo_organization->ID );
+				task_end();
+			}
+			else
+			{
+				task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
+			}
 
-			task_begin( T_('Adding admin user to demo organization...') );
-			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-			task_end();
+			if( $user_org_IDs )
+			{
+				task_begin( TB_('Adding admin user to demo organization...') );
+				$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+				task_end();
+			}
 		}
 	}
 
@@ -4464,16 +4660,23 @@ function install_demo_content()
 
 	if( $create_demo_users && $create_demo_messages )
 	{
-		task_begin( T_('Creating demo private messages...') );
-		create_demo_messages();
-		task_end();
+		task_begin( TB_('Creating demo private messages...') );
+		$demo_messages = create_demo_messages();
+		if( $demo_messages )
+		{
+			task_end();
+		}
+		else
+		{
+			task_end( '<span class="text-danger">'.TB_('Failed').'.</span>' );
+		}
 	}
 
 	$collections_installed = 0;
 	$emails_data_installed = 0;
 	if( $create_sample_contents || $create_demo_email_lists )
 	{
-		echo get_install_format_text( '<h2>'.T_('Creating demo website...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.TB_('Creating demo website...').'</h2>', 'h2' );
 	}
 
 	if( $create_sample_contents )
@@ -4491,12 +4694,12 @@ function install_demo_content()
 	{
 		evo_flush();
 		echo '<br/>';
-		echo get_install_format_text( '<span class="text-success">'.T_('Demo elements successfully created.').'</span>' );
+		echo get_install_format_text_and_log( '<span class="text-success">'.TB_('Demo elements successfully created.').'</span>' );
 
 		if( $collections_installed )
 		{	// Display button to view website if at least one collection was created:
 			global $baseurl;
-			echo '<br/><br/><a href="'.$baseurl.'" class="btn btn-info">'.T_('View website now').' &gt;&gt;</a>';
+			echo '<br/><br/><a href="'.$baseurl.'" class="btn btn-info">'.TB_('View website now').' &gt;&gt;</a>';
 		}
 	}
 

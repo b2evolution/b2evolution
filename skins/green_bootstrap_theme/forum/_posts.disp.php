@@ -9,14 +9,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $number_of_posts_in_cat, $cat, $legend_icons;
+global $number_of_posts_in_cat, $cat, $legend_icons, $tag;
 
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
@@ -40,13 +40,43 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'suffix_text'           => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'coll_logo_size'        => 'fit-128x16',
 	) );
+
+// Display default title only for tag page without intro Item:
+request_title( array(
+		'title_before'      => '<h2 class="page_title">',
+		'title_after'       => '</h2>',
+		'format'            => 'htmlbody',
+		'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : '' ),
+	) );
+
+// Go Grab the featured post:
+if( ! in_array( $disp, array( 'single', 'page' ) ) &&
+    $Item = & get_featured_Item( 'posts', NULL, false, ( isset( $tag ) || $single_cat_ID ? false : NULL ) ) )
+{	// We have a intro post to display:
+	$featured_item_ID = $Item->ID;
+	// Use background position image of intro-post for background URL:
+	$background_image_url = $Item->get_cover_image_url( 'background' );
+	$intro_item_style = $background_image_url ? 'background-image: url("'.$background_image_url.'")' : '';
+	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+	skin_include( '_item_block_intro.inc.php', array(
+			'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+			'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+			'item_class'    => 'well evo_intro_post'.( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+			'item_style'    => $intro_item_style,
+			'Item'          => $Item,
+		) );
+	// ----------------------------END ITEM BLOCK  ----------------------------
+}
 
 if( $single_cat_ID )
 {	// Display sub-chapters:
@@ -142,8 +172,8 @@ if( count( $chapters ) > 0 )
 				</div>
 			</div>
 			<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
+			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().'<\b\r>'.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>
@@ -164,8 +194,12 @@ if( count( $chapters ) > 0 )
 }
 
 // ---------------------------------- START OF POSTS ------------------------------------
-if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs ) ||
-   ( isset( $current_Chapter ) && ! $current_Chapter->meta ) /* Note: the meta categories cannot contain the posts */ ) )
+if( isset( $MainList ) &&
+    ( ! isset( $current_Chapter ) || ! $current_Chapter->meta ) && // Note: the meta categories cannot contain the posts
+    ( empty( $single_cat_ID ) || // disp=posts List all posts
+      ! empty( $multi_cat_IDs ) || // Filter for several categories
+      isset( $current_Chapter ) ) // Posts of the current viewed category ($disp_detail = posts-cat)
+  )
 {
 	echo !empty( $chapters ) ? '<br />' : '';
 ?>
@@ -175,17 +209,18 @@ if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs )
 	{	// Display category title:
 		$ChapterCache = & get_ChapterCache();
 		if( $category = & $ChapterCache->get_by_ID( $single_cat_ID ) )
-		{ // Display category title
-			echo '<div class="panel-heading">'
-					// Buttons to post/reply:
-					.$Skin->get_post_button( $single_cat_ID, NULL, array(
+		{	// Display category title:
+			$Skin->display_posts_list_header( '<h3 class="panel-title">'.$category->get( 'name' ).'</h3>', array(
+					'actions' => $Skin->get_post_button( $single_cat_ID, NULL, array(
 							'group_class'  => 'pull-right',
 							'button_class' => 'btn-sm',
-						) )
-					// Category title:
-					.'<h3 class="panel-title">'.$category->get( 'name' ).'</h3>'
-				.'</div>';
+						) ),
+				) );
 		}
+	}
+	else
+	{	// Display header for latest topics:
+		$Skin->display_posts_list_header( T_('Latest topics') );
 	}
 	?>
 
@@ -193,9 +228,13 @@ if( isset( $MainList ) && ( empty( $single_cat_ID ) || ! empty( $multi_cat_IDs )
 <?php
 
 if( $single_cat_ID )
-{ // Go to grab the featured posts only on pages with defined category:
-	while( $Item = & get_featured_Item() )
-	{ // We have a intro post to display:
+{	// Go to grab only featured posts only on pages with defined category:
+	while( $Item = & get_featured_Item( 'posts', NULL, false, true, false ) )
+	{	// We have the featured posts to display:
+		if( isset( $featured_item_ID ) && $featured_item_ID == $Item->ID )
+		{	// Skip featured Item if it is already displayed above in intro style block:
+			continue;
+		}
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
 				'Item'       => $Item,
@@ -218,34 +257,23 @@ if( $MainList->result_num_rows > 0 )
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 }
-elseif( isset( $current_Chapter ) )
-{ // Display a message about no posts in this category
+else
+{	// Display a message about no posts:
 ?>
 <div class="ft_no_post">
-	<?php echo T_('There is no topic in this forum yet.'); ?>
+	<?php echo isset( $current_Chapter ) ? T_('There is no topic in this forum yet.') : T_('No topics.'); ?>
 </div>
 <?php
 }
 ?>
 	</section>
 
-	<div class="panel-body comments_link__pagination">
+	<div class="panel-body">
 	<?php
-		// Buttons to post/reply
-		$Skin->display_post_button( $single_cat_ID );
-		if( check_user_status( 'can_be_validated' ) )
-		{	// Display a warning if current user cannot post a topic because he must activate account:
-			global $Messages;
-			$Messages->clear();
-			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
-				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
-			$Messages->display();
-		}
-
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-				'block_start'           => '<ul class="pagination">',
-				'block_end'             => '</ul>',
+				'block_start'           => '<div class="comments_link__pagination"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
 				'page_current_template' => '<span>$page_num$</span>',
 				'page_item_before'      => '<li>',
 				'page_item_after'       => '</li>',
@@ -255,6 +283,31 @@ elseif( isset( $current_Chapter ) )
 				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+
+		if( ! is_logged_in() && ! $Blog->get_setting( 'post_anonymous' ) )
+		{	// Display a warning to log in or register before new post creating:
+			$register_link = '';
+			$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot post' ).'">'.T_( 'Log in now!' ).'</a>';
+			if( ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
+			{
+				$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( NULL, 'reg to post' ).'">'.T_( 'Register now!' ).'</a>';
+			}
+			echo '<p class="alert alert-warning alert-item-new">';
+			echo T_( 'In order to start a new topic' ).' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
+			echo '</p>';
+		}
+
+		// Buttons to post/reply
+		$Skin->display_post_button( $single_cat_ID );
+
+		if( check_user_status( 'can_be_validated' ) )
+		{	// Display a warning if current user cannot post a topic because he must activate account:
+			global $Messages;
+			$Messages->clear();
+			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
+				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
+			$Messages->display();
+		}
 	?>
 	</div>
 </div>

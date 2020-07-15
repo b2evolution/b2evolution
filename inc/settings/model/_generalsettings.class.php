@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -126,9 +126,9 @@ class GeneralSettings extends AbstractSettings
 		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: 'return_to_original' redirect_to url, or 'slug', or return to the previously set specific url
 		'after_registration_slug' => '', // Slug value for after_registration == 'slug'
 		'newusers_level' => '1',
+		'registration_master_template' => 'registration_master_standard',
 		'registration_after_quick' => 'regform',
-		'registration_require_gender' => 'hidden',
-		'registration_ask_locale' => '0',
+		'registration_no_username' => 'firstname',
 		'pass_after_quick_reg' => '1',
 
 		// Default user settings
@@ -141,6 +141,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_comment_moderation' => '1',
 		'def_notify_edit_cmt_moderation' => '1',
 		'def_notify_spam_cmt_moderation' => '1',
+		'def_notify_meta_comment_mentioned' => '1',
 		'def_notify_meta_comments' => '1',
 		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
@@ -154,6 +155,9 @@ class GeneralSettings extends AbstractSettings
 		'allow_avatars' => 1,
 		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
 		'allow_html_message' => 0, // Allow HTML in messages
+
+		// Users list settings:
+		'userlist_default_filters' => 'name_email,country',
 
 		// Welcome private message
 		'welcomepm_enabled' => 0,
@@ -189,7 +193,9 @@ class GeneralSettings extends AbstractSettings
 
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
-		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
+		'redirect_moved_posts' => 1,				// Allow to redirect moved posts link to the correct blog
+		'always_match_slug' => 1, 					// Allow to redirect to correct Collection if an Item Slug was found in any URL
+		'redirect_tinyurl' => 1, 					// Allow 301 redirect from Tiny URLs to canonical URL
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 
@@ -205,9 +211,10 @@ class GeneralSettings extends AbstractSettings
 		'newblog_cache_enabled_widget' => 0,
 
 		// Default Skins for New Collections:
-		'def_normal_skin_ID' => '1',                // Default normal skin ID
-		'def_mobile_skin_ID' => NULL,               // NULL means same as normal skin
-		'def_tablet_skin_ID' => NULL,               // NULL means same as normal skin
+		'def_normal_skin_ID' => '1',  // Default normal skin ID
+		'def_mobile_skin_ID' => NULL, // NULL means same as normal skin
+		'def_tablet_skin_ID' => NULL, // NULL means same as normal skin
+		'def_alt_skin_ID'    => NULL, // NULL means same as normal skin
 
 		// Default URL for New Collections:
 		'coll_access_type' => 'extrapath',
@@ -319,6 +326,10 @@ C message size exceeds',
 		'location_region'    => 'optional', // Editing mode of region for user:    "optional" | "required" | "hidden"
 		'location_subregion' => 'optional', // Editing mode of subregion for user: "optional" | "required" | "hidden"
 		'location_city'      => 'optional', // Editing mode of city for user:      "optional" | "required" | "hidden"
+		'birthday_year'      => 'optional', // Editing mode of birthday year for user: "optional" | "required" | "hidden"
+		'birthday_month'     => 'optional', // Editing mode of birthday month for user: "optional" | "required" | "hidden"
+		'birthday_day'       => 'optional', // Editing mode of birthday day for user: "optional" | "required" | "hidden"
+		'self_selected_age_group' => 'hidden', // Editing mode of self-selected age group for user: "optional" | "required" | "hidden"
 		'minimum_age'        => '13', // Minimum age for user forms
 		'multiple_sessions'  => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
 		'emails_msgform'     => 'adminset', // Receiving emails through a message form is allowed: "never" | "adminset" | "userset"
@@ -463,6 +474,7 @@ C message size exceeds',
 
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
+			case 'alt_skin_ID':
 				$result = parent::getx( $parname );
 				if( $result === NULL )
 				{	// Try to get default from the global settings:

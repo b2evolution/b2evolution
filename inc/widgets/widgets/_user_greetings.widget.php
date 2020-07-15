@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -176,6 +176,7 @@ class user_greetings_Widget extends ComponentWidget
 	{
 		if( ! is_logged_in() )
 		{	// Don't display because user is not logged in yet:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not logged in.' );
 			return false;
 		}
 

@@ -6,12 +6,12 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
-global $comment_template_counter, $cat;
+global $cat;
 
 // Default params:
 $params = array_merge( array(
@@ -29,15 +29,15 @@ $params = array_merge( array(
 		'comment_body_before'   => '<div class="panel-body">',
 		'comment_body_after'    => '</div>',
 
-		'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+		'comment_avatar_before' => '<span class="evo_comment_avatar'.( $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-1 col-sm-2' : '' ).'">',
 		'comment_avatar_after'  => '</span>',
 		'comment_rating_before' => '<div class="evo_comment_rating">',
 		'comment_rating_after'  => '</div>',
-		'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+		'comment_text_before'   => '<div class="evo_comment_text'.( $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-11 col-sm-10' : '' ).'">',
 		'comment_text_after'    => '</div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-		'before_image'          => '<figure class="evo_image_block">',
+		'before_image'          => '<figure class="evo_image_block raised">',
 		'before_image_legend'   => '<figcaption class="evo_image_legend">',
 		'after_image_legend'    => '</figcaption>',
 		'after_image'           => '</figure>',
@@ -55,14 +55,8 @@ if( $current_cat == 0 )
 	$current_cat = $Item->main_cat_ID;
 }
 
-if( ! isset( $comment_template_counter ) )
-{	// Initialize global comment counter:
-	$comment_template_counter = isset( $params['comment_number'] ) ? $params['comment_number'] : 1;
-	if( $disp == 'single' || $disp == 'post' )
-	{	// Increase a number, because Item has 1st number:
-		$comment_template_counter++;
-	}
-}
+// Increase a number, because Item has 1st number:
+$comment_order_shift = ( $disp == 'single' || $disp == 'page' ) ? 1 : 0;
 
 /**
  * @var Comment
@@ -82,7 +76,11 @@ $Comment->get_Item();
 $Comment->anchor();
 
 echo update_html_tag_attribs( $params['comment_start'], array(
-		'class' => 'vs_'.$Comment->status.( $Comment->is_meta() ? ' evo_comment__meta' : '' ), // Add style class for proper comment status
+		'class' =>
+			// Add style class for proper comment status:
+			'vs_'.$Comment->status.( $Comment->is_meta() ? ' evo_comment__meta' : '' ).' '.
+			// Add style for voting place mode:
+			'evo_voting_layout__'.$Skin->get_setting( 'voting_place' ),
 		'id'    => 'comment_'.$Comment->ID // Add id to know what comment is used on AJAX status changing
 	), array( 'id' => 'skip' ) );
 
@@ -92,7 +90,7 @@ switch( $Comment->get( 'type' ) )
 {
 	// ON *DISP = COMMENTS* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case $disp == 'comments': // Display a comment:
-	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="badge badge-primary"><?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -126,7 +124,7 @@ switch( $Comment->get( 'type' ) )
 		if( $params['comment_post_display'] )
 		{
 			echo $params['comment_post_before'];
-			echo ' '.T_('in response to:').' ';
+			echo ' '.T_('in response to').': ';
 			$Comment->Item->title( array(
 					'link_type' => 'permalink',
 				) );
@@ -141,15 +139,16 @@ switch( $Comment->get( 'type' ) )
 
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
-	case 'meta': // Display a meta comment:
-
+	case 'meta': // Display an internal comment:
 		if( $Comment->is_meta() )
-		{	// Meta comment:
-			?><span class="badge badge-info"><?php echo $comment_template_counter; ?></span> <?php
+		{	// Internal comment:
+			$permalink_text = $Comment->get_inlist_order();
+			$permalink_class = 'badge badge-info';
 		}
 		else
 		{	// Normal comment:
-			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $comment_template_counter; ?></a> <?php
+			$permalink_text = $Comment->get_inlist_order() + $comment_order_shift;
+			$permalink_class = 'badge badge-primary';
 		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
@@ -159,9 +158,9 @@ switch( $Comment->get( 'type' ) )
 		{	// Normal comment
 			$Comment->permanent_link( array(
 					'before'    => '',
-					'after'     => '',
-					'text'      => '',
-					'class'     => 'evo_comment_type',
+					'after'     => ' ',
+					'text'      => $permalink_text,
+					'class'     => $permalink_class,
 					'nofollow'  => true,
 				) );
 		}
@@ -207,6 +206,17 @@ switch( $Comment->get( 'type' ) )
 			) );
 		$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 		break;
+
+	case 'webmention': // Display a webmention:
+		$Comment->permanent_link( array(
+				'before'   => '',
+				'after'    => ' '.T_('from:').' ',
+				'text'     => T_('Webmention'),
+				'class'    => 'evo_comment_type',
+				'nofollow' => true,
+			) );
+		$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
+		break;
 }
 
 echo $params['comment_status_before'];
@@ -216,7 +226,7 @@ if( $Skin->enabled_status_banner( $Comment->status ) && $Comment->ID > 0 )
 { // Don't display status for previewed comments
 		echo '<div class="cell2">';
 		$Comment->format_statuses( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 		echo '</div>';
 		$legend_statuses[] = $Comment->status;
@@ -228,11 +238,19 @@ echo $params['comment_body_before'];
 
 // Avatar:
 echo $params['comment_avatar_before'];
-$Comment->author2( array(
-					'link_text'  => 'only_avatar',
-					'thumb_size' => 'crop-top-80x80',
-					'after_user' => ''
-				) );
+if( $Skin->get_setting( 'voting_place' ) == 'left_score' && ! $Comment->is_meta() )
+{	// Display voting panel instead of author avatar:
+	$Skin->display_comment_voting_panel( $Comment, 'left_score' );
+}
+else
+{	// Display author avatar:
+	$Comment->author2( array(
+			'link_text'  => 'only_avatar',
+			'thumb_size' => 'crop-top-80x80',
+			'after_user' => '', // After registered user
+			'after'      => '', // After anonymous user
+		) );
+}
 echo $params['comment_avatar_after'];
 
 // Rating:
@@ -253,7 +271,7 @@ echo $params['comment_body_after'];
 /* ======================== START OF COMMENT FOOTER ======================== */
 ?>
 <div class="panel-footer small clearfix">
-		<a href="<?php
+	<a href="<?php
 		if( $disp == 'comments' )
 		{	// We are displaying a comment in the Latest comments page:
 			echo $Blog->get('lastcommentsurl');
@@ -277,45 +295,39 @@ echo $params['comment_body_after'];
 	}
 	if( $bbcode_plugin_is_enabled && $commented_Item && $commented_Item->can_comment( NULL ) )
 	{ // Display button to quote this comment
-		echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+		echo '<a href="'.$commented_Item->get_permanent_url().'?quote_comment='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.format_to_output( T_('Reply with quote'), 'htmlattr' ).'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 	}
 
 	$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */
 
 	if( $params['display_vote_helpful'] )
 	{	// Display a voting panel for comment:
-		$Skin->display_comment_voting_panel( $Comment );
+		$Skin->display_comment_voting_panel( $Comment, 'under_content' );
 	}
 
 	// Display Spam Voting system
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
-	echo '<div class="pull-right">';
-		$comment_redirect_url = rawurlencode( $Comment->get_permanent_url() );
-		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ), '&amp;', true, $comment_redirect_url ); /* Link for editing */
-		echo ' <span class="'.button_class( 'group' ).'">';
-		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+	echo '<span class="pull-left">';
+		$comment_redirect_url = $Comment->get_permanent_url();
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+	echo '</span>';
+	echo '<div class="action_btn_group">';
+		$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
+		echo '<span class="'.button_class( 'group' ).'">';
+		$delete_button_is_displayed = check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
 				'ajax_button' => true,
 				'class'       => button_class( 'text' ),
 				'redirect_to' => $comment_redirect_url,
 				'detect_last' => !$delete_button_is_displayed,
 			) );
-		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', rawurlencode( $commented_Item->get_permanent_url() ) ); /* Link to backoffice for deleting */
+		$Comment->delete_link( '', '', '#', T_('Delete this reply'), button_class( 'text' ), false, '&amp;', true, false, '#', $commented_Item->get_permanent_url() ); /* Link to backoffice for deleting */
 
 		echo '</span>';
 	echo '</div>';
-?>
+	?>
 </div>
 
 <?php echo $params['comment_end'];
-
-if( $Comment->is_meta() )
-{	// Decrease a counter for meta comments:
-	$comment_template_counter--;
-}
-else
-{	// Increase a counter for normal comments:
-	$comment_template_counter++;
-}
 ?>

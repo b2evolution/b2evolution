@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author tor
  *
@@ -219,7 +219,7 @@ function mw_editpost( $m, $item_type = 'post' )
 	}
 
 	// We need to be able to edit this post:
-	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{
 		return xmlrpcs_resperror( 3 ); // Permission denied
 	}

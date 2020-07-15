@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author tor
  * @author tblue246 (Tilman BLUMENBACH)
@@ -63,7 +63,7 @@ function mt_setPostCategories($m)
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );
 	}
@@ -102,7 +102,7 @@ function mt_setPostCategories($m)
 	}
 
 	// CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
-	if( ! $current_User->check_perm( 'cats_post!'.$edited_Item->status, 'edit', false, $categories ) )
+	if( ! check_user_perm( 'cats_post!'.$edited_Item->status, 'edit', false, $categories ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -251,8 +251,8 @@ function mt_publishPost($m)
 		return xmlrpcs_resperror();
 	}
 
-	if( ! $current_User->check_perm( 'item_post!published', 'edit', false, $edited_Item )
-		/*|| ! $current_User->check_perm( 'edit_timestamp' )*/ )
+	if( ! check_user_perm( 'item_post!published', 'edit', false, $edited_Item )
+		/*|| ! check_user_perm( 'edit_timestamp' )*/ )
 	{
 		return xmlrpcs_resperror( 3 ); // Permission denied
 	}

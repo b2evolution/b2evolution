@@ -7,14 +7,14 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Collection, $Blog, $app_version;
+global $Item, $Collection, $Blog, $cat, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -75,7 +75,7 @@ $params = array_merge( array(
 			'text'   => '#icon#',
 			'class'  => button_class(),
 		) );
-	if( $Item->is_intro() )
+	if( $Item->is_intro() && ! empty( $cat ) )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )
@@ -118,6 +118,16 @@ $params = array_merge( array(
 			// This will enclose the title of each widget:
 			'block_title_start' => '<h3>',
 			'block_title_end' => '</h3>',
+			// Template params for "Breadcrumb Path" widget:
+			'override_params_for_breadcrumb_path' => array(
+					'block_start'           => '<div class="evo_widget $wi_class$"><ol class="breadcrumb">',
+					'block_end'             => '</ol></div>',
+					'separator'             => '',
+					'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+					'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+					'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+					'item_active_mask'      => '<li class="active">$title$</li>',
+				),
 			// Template params for "Item Title" widget:
 			'widget_item_title_params'  => array(
 					'before' => $params['item_title_line_before'].$params['item_title_single_before'],
@@ -249,21 +259,12 @@ $params = array_merge( array(
 	<?php
 	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
 	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-		skin_include( '_item_workflow.inc.php' );
-		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
-	}
-	?>
-
-	<?php
-	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		// ------------------ INTERNAL COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
-		// ---------------------- END OF META COMMENTS ---------------------
+		// ---------------------- END OF INTERNAL COMMENTS ---------------------
 	}
 	?>
 

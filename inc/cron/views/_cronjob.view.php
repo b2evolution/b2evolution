@@ -7,17 +7,19 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $cjob_row, $current_User, $admin_url;
+load_class( '_core/ui/_table.class.php', 'Table' );
+
+global $cjob_row, $admin_url;
 
 $Form = new Form( NULL, 'cronlog' );
 
-if( empty( $cjob_row->clog_status ) && $current_User->check_perm( 'options', 'edit', false, NULL ) )
+if( empty( $cjob_row->clog_status ) && check_user_perm( 'options', 'edit', false, NULL ) )
 { // User can edit this job:
 	$Form->global_icon( T_('Edit this job'), 'edit', $admin_url.'?ctrl=crontab&amp;action=edit&amp;ctsk_ID='.$cjob_row->ctsk_ID, T_('Edit this job').'...', 3, 3 );
 }

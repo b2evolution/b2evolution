@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -89,8 +89,15 @@ class webmention_plugin extends Plugin
 		$nosupport_urls = array();
 		$success_urls = array();
 		$failed_urls = array();
+		$skipped_urls = array();
 		foreach( $check_urls as $target_url )
 		{
+			if( is_same_url( $source_url, $target_url ) )
+			{	// If the posted URL is a permanent URL of the target Item:
+				$skipped_urls[] = get_link_tag( $target_url, '', '', 255 ).( empty( $response['body'] ) ? '' : ' (<code>'.T_('Permanent URL of this Item').'</code>)' );
+				continue;
+			}
+
 			if( ! $MentionClient->discoverWebmentionEndpoint( $target_url ) )
 			{	// The URL doesn't accept webmention:
 				$nosupport_urls[] = get_link_tag( $target_url, '', '', 255 );
@@ -123,6 +130,11 @@ class webmention_plugin extends Plugin
 		if( count( $failed_urls ) )
 		{	// Failed URLs:
 			$messages[] = sprintf( T_('Webmentions couldn\'t be accepted for the URLs: %s.'), implode( ', ', $failed_urls ) );
+		}
+
+		if( count( $skipped_urls ) )
+		{	// Skipped URLs:
+			$messages[] = sprintf( T_('Skipped URLs: %s.'), implode( ', ', $skipped_urls ) );
 		}
 
 		$params['xmlrpcresp'] = array( 'message' => implode( '<br />', $messages ) );

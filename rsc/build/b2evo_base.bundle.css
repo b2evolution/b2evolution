@@ -89,6 +89,9 @@ code {
   background-color: rgba(27, 31, 35, 0.05);
   color: #24292e;
 }
+.pointer {
+  cursor: pointer;
+}
 img {
   border: none;
   max-width: 100%;
@@ -142,10 +145,17 @@ img.rounded,
 .evo_image_block.rounded img {
   border-radius: 4px;
 }
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-  border-radius: 50%;
+.evo_image_block.contain img {
+  object-fit: contain !important;
+}
+.evo_image_block.cover img {
+  object-fit: cover !important;
+}
+img.imgerror,
+.image_block.imgerror img,
+.evo_image_block.imgerror img {
+  border: 1px solid red;
+  box-shadow: 0 0 10px red;
 }
 .floatleft {
   float: left;
@@ -179,6 +189,31 @@ img.round,
 }
 .margin2ex {
   margin: 2ex;
+}
+.margin-top-sm {
+  margin-top: 10px;
+}
+.margin-top-md {
+  margin-top: 20px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-bottom-sm {
+  margin-bottom: 10px;
+}
+.margin-bottom-md {
+  margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .indented {
   padding-left: 3em;
@@ -232,7 +267,7 @@ span.icon.voted {
 a.rollover_sprite:hover span.icon {
   visibility: hidden;
 }
-a.rollover_sprite:hover span.icon:before {
+a.rollover_sprite:hover span.icon::before {
   visibility: visible !important;
   background: inherit;
   float: left;
@@ -297,26 +332,26 @@ a:hover .fa-x-rollover-grey {
 a:hover .fa-flag.fa-x--hover {
   color: #F00 !important;
 }
-a:hover .fa-flag.fa-x--hover:before {
+a:hover .fa-flag.fa-x--hover::before {
   content: "\f11d";
 }
 a:hover .fa-flag-o.fa-x--hover {
   color: #F00 !important;
 }
-a:hover .fa-flag-o.fa-x--hover:before {
+a:hover .fa-flag-o.fa-x--hover::before {
   content: "\f024";
 }
-.fa-x-external-link--nudge:before {
+.fa-x-external-link--nudge::before {
   position: relative;
   top: 0.05em;
   left: 0.11em;
 }
-.fa-x-linkedin--nudge:before {
+.fa-x-linkedin--nudge::before {
   position: relative;
   top: -0.05em;
   left: 0.04em;
 }
-.fa-x-google-plus--nudge:before {
+.fa-x-google-plus--nudge::before {
   position: relative;
   left: 0.1em;
 }
@@ -345,7 +380,7 @@ input.loader_img {
   min-width: 64px;
   min-height: 64px;
 }
-.evo_rest_api_loading:before {
+.evo_rest_api_loading::before {
   content: "";
   position: absolute;
   background: #FFF;
@@ -713,6 +748,12 @@ input.loader_img {
   padding: 4px 5px 5px;
   margin: 0;
 }
+.filter_item div .identity_link_username {
+  color: #FFF;
+}
+.filter_item div.icon a.action_icon > span {
+  color: #FFF !important;
+}
 .filter_item .name {
   background: #3d8f3d;
 }
@@ -781,6 +822,9 @@ input.loader_img {
 }
 .filter_item div.icon {
   height: 22px;
+}
+a {
+  word-break: break-all;
 }
 .visible-xs,
 .visible-sm,
@@ -1033,8 +1077,8 @@ span.roundbutton_red:hover {
   border-left: none;
   border-right: 1px solid #787878;
 }
-.roundbutton_group .roundbutton:before,
-.roundbutton_group .roundbutton_text:before {
+.roundbutton_group .roundbutton::before,
+.roundbutton_group .roundbutton_text::before {
   border-left: 1px solid #b1b1b1;
   content: "";
   position: absolute;
@@ -1042,9 +1086,9 @@ span.roundbutton_red:hover {
   bottom: 0;
   left: -1px;
 }
-.roundbutton_group .roundbutton:first-child:before,
-.roundbutton_group .roundbutton_text:first-child:before,
-.roundbutton_group .roundbutton_text.first-child:before {
+.roundbutton_group .roundbutton:first-child::before,
+.roundbutton_group .roundbutton_text:first-child::before,
+.roundbutton_group .roundbutton_text.first-child::before {
   border: none;
 }
 .roundbutton_group .roundbutton:first-child,
@@ -1108,8 +1152,8 @@ a.roundbutton_text_noicon span {
   background-image: -o-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
   background-image: -webkit-linear-gradient(90deg, rgba(0, 0, 0, 0.01) 0%, rgba(0, 0, 0, 0.01) 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.3) 100%);
 }
-.roundbutton.rbtn_black:before,
-.roundbutton_group .roundbutton.rbtn_black:before {
+.roundbutton.rbtn_black::before,
+.roundbutton_group .roundbutton.rbtn_black::before {
   border-color: #1a1a1a;
 }
 .roundbutton.rbtn_black:hover,
@@ -1275,6 +1319,21 @@ div.message_toolbars div.edit_toolbar {
 .widget_core_coll_category_list .evo_cat_meta input[disabled="disabled"] {
   visibility: hidden;
 }
+.w-100 {
+  width: 100% !important;
+}
+.w-75 {
+  width: 75% !important;
+}
+.w-50 {
+  width: 50% !important;
+}
+.w-25 {
+  width: 25% !important;
+}
+.w-auto {
+  width: auto !important;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -1347,6 +1406,16 @@ div.dev-blocks--widget--notincache {
 div.dev-blocks--widget--notincache > .dev-blocks-name {
   color: #f8bb00;
   background-color: #fff0e0;
+}
+div.dev-blocks--content-block {
+  border-color: #F60;
+}
+div.dev-blocks--content-block > .dev-blocks-name {
+  color: #F60;
+  background-color: #ffeac1;
+}
+div.dev-blocks--content-block > .dev-blocks-name a {
+  color: #F60;
 }
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
@@ -1843,6 +1912,9 @@ a.overlay_link:hover b {
 .user.anonymous.nogender {
   color: #000;
 }
+.user.normal_weight {
+  font-weight: normal;
+}
 div.debug {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
@@ -1862,6 +1934,10 @@ div.debug code {
   font-size: 9pt;
   margin: 1ex 1ex 0;
   display: block;
+}
+div.debug code.debug_code_inline {
+  display: inline;
+  margin: 0;
 }
 div.debug div.query_info {
   background-color: #fff;
@@ -2263,15 +2339,15 @@ div.avatartag.main .avatar_actions {
   display: inline-block;
   font-size: 10px;
 }
-.evobar-menu [class^=evobar-icon-]:before {
+.evobar-menu [class^=evobar-icon-]::before {
   width: 10px;
   height: 10px;
   content: "\25BC";
 }
-.evobar-menu .evobar-icon-right:before {
+.evobar-menu .evobar-icon-right::before {
   content: "\25B6";
 }
-.evobar-menu .evobar-icon-left:before {
+.evobar-menu .evobar-icon-left::before {
   content: "\25C0";
 }
 form {
@@ -2331,11 +2407,7 @@ span.checkbox_error input.checkbox {
 span.checkbox_surround {
   background: #fbf2ee;
   border: 1px solid #F825F1;
-}
-span.checkbox_surround input.checkbox {
-  background: #fbf2ee;
-}
-span.checkbox_surround_init {
+  border-radius: 2px;
   padding: 1px;
 }
 input.large,
@@ -2514,7 +2586,7 @@ div.bText div.log_container li {
   padding: 0;
   background: none;
 }
-div.bText div.log_container ul li:before {
+div.bText div.log_container ul li::before {
   content: none;
 }
 div.skin_error {
@@ -2698,7 +2770,7 @@ tr.evo_highlight td {
 }
 
 /**
- * These are the generic styles that are common to "all" skins.
+ * These are the generic styles that are common to "all" NON-bootstrap skins.
  *
  * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
  *
@@ -2711,20 +2783,12 @@ tr.evo_highlight td {
 .widget_core_item_about_author .evo_avatar img {
   border-radius: 50%;
 }
-div.widget_core_coll_item_list.evo_layout_flow .widget_flow_blocks,
-div.widget_core_coll_featured_posts.evo_layout_flow .widget_flow_blocks,
-div.widget_core_coll_post_list.evo_layout_flow .widget_flow_blocks,
-div.widget_core_coll_page_list.evo_layout_flow .widget_flow_blocks,
-div.widget_core_coll_related_post_list.evo_layout_flow .widget_flow_blocks {
+div.widget_uil_autotemp.evo_layout_flow .widget_flow_blocks {
   display: inline-block;
   text-align: center;
   width: 100%;
 }
-div.widget_core_coll_item_list.evo_layout_flow .widget_flow_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_flow .widget_flow_blocks > div,
-div.widget_core_coll_post_list.evo_layout_flow .widget_flow_blocks > div,
-div.widget_core_coll_page_list.evo_layout_flow .widget_flow_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_flow .widget_flow_blocks > div {
+div.widget_uil_autotemp.evo_layout_flow .widget_flow_blocks > div {
   padding: 8px;
   margin: 14px;
   overflow: hidden;
@@ -2736,97 +2800,57 @@ div.widget_core_coll_related_post_list.evo_layout_flow .widget_flow_blocks > div
   float: none;
   vertical-align: top;
 }
-div.widget_core_coll_item_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
-div.widget_core_coll_item_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_featured_posts.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_page_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title,
-div.widget_core_coll_related_post_list.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title {
+div.widget_uil_autotemp.evo_layout_flow.evo_withteaser .widget_flow_blocks > div .item_title,
+div.widget_uil_autotemp.evo_layout_flow.evo_withexcerpt .widget_flow_blocks > div .item_title {
   font-size: 16px;
   font-weight: 700;
   line-height: 1.5em;
   margin: 10px 0 5px;
 }
-div.widget_core_coll_item_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_featured_posts.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_post_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_page_list.evo_layout_rwd .widget_rwd_content,
-div.widget_core_coll_related_post_list.evo_layout_rwd .widget_rwd_content {
+div.widget_uil_autotemp.evo_layout_rwd .widget_rwd_content {
   padding: 8px;
   margin: 14px 0;
   overflow: hidden;
   background-color: #fafafa;
   border-radius: 4px;
 }
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div {
+div.widget_uil_autotemp.evo_layout_rwd.evo_withteaser .widget_rwd_blocks > div,
+div.widget_uil_autotemp.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks > div {
   display: inline-block;
   float: none;
   vertical-align: top;
 }
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img {
-  max-width: 100%;
-  max-height: 380px;
-  width: auto;
-  height: auto;
+div.widget_uil_autotemp.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_first_image img,
+div.widget_uil_autotemp.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_first_image img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
   margin: auto;
 }
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_item_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_featured_posts.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_page_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title,
-div.widget_core_coll_related_post_list.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title {
+div.widget_uil_autotemp.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_title,
+div.widget_uil_autotemp.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_title {
   font-size: 16px;
   font-weight: 700;
   line-height: 1.5em;
   margin: 10px 0 5px;
 }
-div.widget_core_coll_item_list.evo_1pic__special h2,
-div.widget_core_coll_featured_posts.evo_1pic__special h2,
-div.widget_core_coll_post_list.evo_1pic__special h2,
-div.widget_core_coll_page_list.evo_1pic__special h2,
-div.widget_core_coll_related_post_list.evo_1pic__special h2 {
+div.widget_uil_autotemp.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_content > p:last-of-type,
+div.widget_uil_autotemp.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_content > p:last-of-type {
+  min-height: 60px;
+  margin-bottom: 0px;
+}
+div.widget_uil_autotemp.evo_layout_rwd.evo_withteaser .widget_rwd_blocks .widget_rwd_content .item_content a,
+div.widget_uil_autotemp.evo_layout_rwd.evo_withexcerpt .widget_rwd_blocks .widget_rwd_content .item_content a {
+  margin: -20px 0 0;
+}
+div.widget_uil_autotemp.evo_1pic__special h2 {
   font-size: 30px;
 }
-div.widget_core_coll_item_list.evo_1pic__special ul,
-div.widget_core_coll_featured_posts.evo_1pic__special ul,
-div.widget_core_coll_post_list.evo_1pic__special ul,
-div.widget_core_coll_page_list.evo_1pic__special ul,
-div.widget_core_coll_related_post_list.evo_1pic__special ul {
+div.widget_uil_autotemp.evo_1pic__special ul {
   padding: 0;
   margin-left: 0;
 }
-div.widget_core_coll_item_list.evo_1pic__special ul li,
-div.widget_core_coll_featured_posts.evo_1pic__special ul li,
-div.widget_core_coll_post_list.evo_1pic__special ul li,
-div.widget_core_coll_page_list.evo_1pic__special ul li,
-div.widget_core_coll_related_post_list.evo_1pic__special ul li {
+div.widget_uil_autotemp.evo_1pic__special ul li {
   list-style: none;
   height: auto;
   display: inline-block;
@@ -2836,11 +2860,7 @@ div.widget_core_coll_related_post_list.evo_1pic__special ul li {
   padding: 0;
   vertical-align: middle;
 }
-div.widget_core_coll_item_list.evo_1pic__special ul li .item_first_image_placeholder,
-div.widget_core_coll_featured_posts.evo_1pic__special ul li .item_first_image_placeholder,
-div.widget_core_coll_post_list.evo_1pic__special ul li .item_first_image_placeholder,
-div.widget_core_coll_page_list.evo_1pic__special ul li .item_first_image_placeholder,
-div.widget_core_coll_related_post_list.evo_1pic__special ul li .item_first_image_placeholder {
+div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder {
   display: table;
   float: left;
   max-width: 380px;
@@ -2849,11 +2869,7 @@ div.widget_core_coll_related_post_list.evo_1pic__special ul li .item_first_image
   margin-right: 6px;
   border-radius: 3px;
 }
-div.widget_core_coll_item_list.evo_1pic__special ul li .item_first_image_placeholder:before,
-div.widget_core_coll_featured_posts.evo_1pic__special ul li .item_first_image_placeholder:before,
-div.widget_core_coll_post_list.evo_1pic__special ul li .item_first_image_placeholder:before,
-div.widget_core_coll_page_list.evo_1pic__special ul li .item_first_image_placeholder:before,
-div.widget_core_coll_related_post_list.evo_1pic__special ul li .item_first_image_placeholder:before {
+div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder::before {
   font-family: FontAwesome;
   display: table-cell;
   content: '\f0f6';
@@ -2862,11 +2878,7 @@ div.widget_core_coll_related_post_list.evo_1pic__special ul li .item_first_image
   vertical-align: middle;
   text-align: center;
 }
-div.widget_core_coll_item_list.evo_1pic__special ul li div.item_title,
-div.widget_core_coll_featured_posts.evo_1pic__special ul li div.item_title,
-div.widget_core_coll_post_list.evo_1pic__special ul li div.item_title,
-div.widget_core_coll_page_list.evo_1pic__special ul li div.item_title,
-div.widget_core_coll_related_post_list.evo_1pic__special ul li div.item_title {
+div.widget_uil_autotemp.evo_1pic__special ul li div.item_title {
   vertical-align: middle;
   height: 80px;
   display: -webkit-box;
@@ -2876,153 +2888,57 @@ div.widget_core_coll_related_post_list.evo_1pic__special ul li div.item_title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_featured_posts.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_page_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.widget_core_coll_related_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+div.widget_uil_autotemp.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
   font-size: 22px;
 }
-div.widget_core_coll_item_list.evo_layout_list div.item_first_image,
-div.widget_core_coll_featured_posts.evo_layout_list div.item_first_image,
-div.widget_core_coll_post_list.evo_layout_list div.item_first_image,
-div.widget_core_coll_page_list.evo_layout_list div.item_first_image,
-div.widget_core_coll_related_post_list.evo_layout_list div.item_first_image {
+div.widget_uil_autotemp.evo_layout_list div.item_first_image {
   float: left;
   margin-right: 6px;
 }
-div.widget_core_coll_item_list.evo_pics div.item_images,
-div.widget_core_coll_featured_posts.evo_pics div.item_images,
-div.widget_core_coll_post_list.evo_pics div.item_images,
-div.widget_core_coll_page_list.evo_pics div.item_images,
-div.widget_core_coll_related_post_list.evo_pics div.item_images {
+div.widget_uil_autotemp.evo_pics div.item_images {
   display: inline-block;
 }
-div.widget_core_coll_item_list.evo_pics div.item_images img,
-div.widget_core_coll_featured_posts.evo_pics div.item_images img,
-div.widget_core_coll_post_list.evo_pics div.item_images img,
-div.widget_core_coll_page_list.evo_pics div.item_images img,
-div.widget_core_coll_related_post_list.evo_pics div.item_images img {
+div.widget_uil_autotemp.evo_pics div.item_images img {
   margin: 6px 6px 0 0;
 }
-div.widget_core_coll_item_list.evo_pics.evo_1pic__special li,
-div.widget_core_coll_featured_posts.evo_pics.evo_1pic__special li,
-div.widget_core_coll_post_list.evo_pics.evo_1pic__special li,
-div.widget_core_coll_page_list.evo_pics.evo_1pic__special li,
-div.widget_core_coll_related_post_list.evo_pics.evo_1pic__special li {
+div.widget_uil_autotemp.evo_pics.evo_1pic__special li {
   display: block;
   width: 100%;
 }
-div.widget_core_coll_item_list.evo_pics.evo_1pic__special div.item_images,
-div.widget_core_coll_featured_posts.evo_pics.evo_1pic__special div.item_images,
-div.widget_core_coll_post_list.evo_pics.evo_1pic__special div.item_images,
-div.widget_core_coll_page_list.evo_pics.evo_1pic__special div.item_images,
-div.widget_core_coll_related_post_list.evo_pics.evo_1pic__special div.item_images {
+div.widget_uil_autotemp.evo_pics.evo_1pic__special div.item_images {
   float: left;
 }
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li {
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li {
   list-style: none;
   display: table;
 }
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_title a,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_title a {
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_title a,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_title a {
   text-decoration: underline;
 }
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_content blockquote {
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_content blockquote,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_content blockquote {
   margin-left: 86px;
 }
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt {
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_excerpt {
   margin-top: -2px;
 }
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p,
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p {
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_content p,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_content p,
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_excerpt p {
   margin: 0;
 }
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
-div.widget_core_coll_item_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_featured_posts.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_page_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_related_post_list.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_item_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_featured_posts.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_page_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type,
-div.widget_core_coll_related_post_list.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type {
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_content p:last-of-type,
+div.widget_uil_autotemp.evo_withexcerpt.evo_1pic__special ul li div.item_excerpt p:last-of-type,
+div.widget_uil_autotemp.evo_withteaser.evo_1pic__special ul li div.item_excerpt p:last-of-type {
   display: inline;
 }
-div.widget_core_coll_item_list.evo_withexcerpt ul li,
-div.widget_core_coll_featured_posts.evo_withexcerpt ul li,
-div.widget_core_coll_post_list.evo_withexcerpt ul li,
-div.widget_core_coll_page_list.evo_withexcerpt ul li,
-div.widget_core_coll_related_post_list.evo_withexcerpt ul li,
-div.widget_core_coll_item_list.evo_withteaser ul li,
-div.widget_core_coll_featured_posts.evo_withteaser ul li,
-div.widget_core_coll_post_list.evo_withteaser ul li,
-div.widget_core_coll_page_list.evo_withteaser ul li,
-div.widget_core_coll_related_post_list.evo_withteaser ul li {
+div.widget_uil_autotemp.evo_withexcerpt ul li,
+div.widget_uil_autotemp.evo_withteaser ul li {
   height: auto;
   width: 100%;
   clear: both;
@@ -3030,81 +2946,37 @@ div.widget_core_coll_related_post_list.evo_withteaser ul li {
   padding: 0;
   vertical-align: middle;
 }
-div.widget_core_coll_item_list.evo_withexcerpt ul li div.item_title,
-div.widget_core_coll_featured_posts.evo_withexcerpt ul li div.item_title,
-div.widget_core_coll_post_list.evo_withexcerpt ul li div.item_title,
-div.widget_core_coll_page_list.evo_withexcerpt ul li div.item_title,
-div.widget_core_coll_related_post_list.evo_withexcerpt ul li div.item_title,
-div.widget_core_coll_item_list.evo_withteaser ul li div.item_title,
-div.widget_core_coll_featured_posts.evo_withteaser ul li div.item_title,
-div.widget_core_coll_post_list.evo_withteaser ul li div.item_title,
-div.widget_core_coll_page_list.evo_withteaser ul li div.item_title,
-div.widget_core_coll_related_post_list.evo_withteaser ul li div.item_title {
+div.widget_uil_autotemp.evo_withexcerpt ul li div.item_title,
+div.widget_uil_autotemp.evo_withteaser ul li div.item_title {
   vertical-align: middle;
   display: inline;
   height: auto !important;
   width: 100%;
   font-size: 16px;
 }
-div.widget_core_coll_item_list.evo_withexcerpt ul li div.item_title a,
-div.widget_core_coll_featured_posts.evo_withexcerpt ul li div.item_title a,
-div.widget_core_coll_post_list.evo_withexcerpt ul li div.item_title a,
-div.widget_core_coll_page_list.evo_withexcerpt ul li div.item_title a,
-div.widget_core_coll_related_post_list.evo_withexcerpt ul li div.item_title a,
-div.widget_core_coll_item_list.evo_withteaser ul li div.item_title a,
-div.widget_core_coll_featured_posts.evo_withteaser ul li div.item_title a,
-div.widget_core_coll_post_list.evo_withteaser ul li div.item_title a,
-div.widget_core_coll_page_list.evo_withteaser ul li div.item_title a,
-div.widget_core_coll_related_post_list.evo_withteaser ul li div.item_title a {
+div.widget_uil_autotemp.evo_withexcerpt ul li div.item_title a,
+div.widget_uil_autotemp.evo_withteaser ul li div.item_title a {
   text-decoration: underline;
 }
-div.widget_core_coll_item_list.evo_withexcerpt blockquote,
-div.widget_core_coll_featured_posts.evo_withexcerpt blockquote,
-div.widget_core_coll_post_list.evo_withexcerpt blockquote,
-div.widget_core_coll_page_list.evo_withexcerpt blockquote,
-div.widget_core_coll_related_post_list.evo_withexcerpt blockquote,
-div.widget_core_coll_item_list.evo_withteaser blockquote,
-div.widget_core_coll_featured_posts.evo_withteaser blockquote,
-div.widget_core_coll_post_list.evo_withteaser blockquote,
-div.widget_core_coll_page_list.evo_withteaser blockquote,
-div.widget_core_coll_related_post_list.evo_withteaser blockquote {
+div.widget_uil_autotemp.evo_withexcerpt blockquote,
+div.widget_uil_autotemp.evo_withteaser blockquote {
   display: block;
   margin: 0;
   padding: 5px 15px;
 }
-div.widget_core_coll_item_list.evo_withexcerpt a.btn,
-div.widget_core_coll_featured_posts.evo_withexcerpt a.btn,
-div.widget_core_coll_post_list.evo_withexcerpt a.btn,
-div.widget_core_coll_page_list.evo_withexcerpt a.btn,
-div.widget_core_coll_related_post_list.evo_withexcerpt a.btn,
-div.widget_core_coll_item_list.evo_withteaser a.btn,
-div.widget_core_coll_featured_posts.evo_withteaser a.btn,
-div.widget_core_coll_post_list.evo_withteaser a.btn,
-div.widget_core_coll_page_list.evo_withteaser a.btn,
-div.widget_core_coll_related_post_list.evo_withteaser a.btn {
+div.widget_uil_autotemp.evo_withexcerpt a.btn,
+div.widget_uil_autotemp.evo_withteaser a.btn {
   background-color: transparent;
   float: right;
   height: 22px;
   line-height: 13px;
   padding: 0px 4px 0px 4px;
 }
-div.widget_core_coll_item_list.evo_withexcerpt a.btn:hover,
-div.widget_core_coll_featured_posts.evo_withexcerpt a.btn:hover,
-div.widget_core_coll_post_list.evo_withexcerpt a.btn:hover,
-div.widget_core_coll_page_list.evo_withexcerpt a.btn:hover,
-div.widget_core_coll_related_post_list.evo_withexcerpt a.btn:hover,
-div.widget_core_coll_item_list.evo_withteaser a.btn:hover,
-div.widget_core_coll_featured_posts.evo_withteaser a.btn:hover,
-div.widget_core_coll_post_list.evo_withteaser a.btn:hover,
-div.widget_core_coll_page_list.evo_withteaser a.btn:hover,
-div.widget_core_coll_related_post_list.evo_withteaser a.btn:hover {
+div.widget_uil_autotemp.evo_withexcerpt a.btn:hover,
+div.widget_uil_autotemp.evo_withteaser a.btn:hover {
   background-color: #e6e6e6;
 }
-div.widget_core_coll_item_list img,
-div.widget_core_coll_featured_posts img,
-div.widget_core_coll_post_list img,
-div.widget_core_coll_page_list img,
-div.widget_core_coll_related_post_list img {
+div.widget_uil_autotemp img {
   border-radius: 3px;
   max-width: 100%;
   max-height: 380px;
@@ -3112,44 +2984,41 @@ div.widget_core_coll_related_post_list img {
   height: auto;
   margin: auto;
 }
-div.widget_core_coll_item_list.evo_withgroup > ul > li,
-div.widget_core_coll_featured_posts.evo_withgroup > ul > li,
-div.widget_core_coll_post_list.evo_withgroup > ul > li,
-div.widget_core_coll_page_list.evo_withgroup > ul > li,
-div.widget_core_coll_related_post_list.evo_withgroup > ul > li {
+div.widget_uil_autotemp.evo_withgroup > ul > li {
   font-size: 17px;
 }
-div.widget_core_coll_item_list div.item_first_image,
-div.widget_core_coll_featured_posts div.item_first_image,
-div.widget_core_coll_post_list div.item_first_image,
-div.widget_core_coll_page_list div.item_first_image,
-div.widget_core_coll_related_post_list div.item_first_image {
+div.widget_uil_autotemp div.item_first_image {
   text-align: center;
 }
-div.evo_container__sidebar div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.evo_container__sidebar_2 div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.evo_container__sidebar div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-div.evo_container__sidebar_2 div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+div.evo_container__sidebar div.widget_uil_autotemp.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
+div.evo_container__sidebar_2 div.widget_uil_autotemp.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
   font-size: 16px;
 }
+div.widget_uil_autotemp.nobullets ul,
+div.widget_uil_autotemp.nobullets ul li,
+li.widget_uil_autotemp.nobullets ul,
+li.widget_uil_autotemp.nobullets ul li {
+  background: none;
+  margin-left: 0;
+  padding-left: 0;
+  list-style: none;
+}
+div.widget_uil_autotemp.nobullets ul li:before,
+ul li.widget_uil_autotemp.nobullets ul li:before {
+  content: none;
+}
 @media (max-width: 1599px) {
-  div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-  div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+  div.widget_uil_autotemp.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
     font-size: 20px;
   }
 }
 @media (max-width: 1199px) {
-  div.widget_core_coll_item_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a,
-  div.widget_core_coll_post_list.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
+  div.widget_uil_autotemp.evo_1pic__special.evo_noexcerpt.evo_noteaser div.item_title a {
     font-size: 18px;
   }
 }
 @media (max-width: 414px) {
-  div.widget_core_coll_item_list.evo_1pic__special ul li .item_first_image_placeholder,
-  div.widget_core_coll_featured_posts.evo_1pic__special ul li .item_first_image_placeholder,
-  div.widget_core_coll_post_list.evo_1pic__special ul li .item_first_image_placeholder,
-  div.widget_core_coll_page_list.evo_1pic__special ul li .item_first_image_placeholder,
-  div.widget_core_coll_related_post_list.evo_1pic__special ul li .item_first_image_placeholder {
+  div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder {
     max-width: 290px;
     max-height: 290px;
   }
@@ -3305,6 +3174,67 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
     line-height: 45px;
   }
 }
+.widget_core_item_workflow .evo_widget_item_workflow_form .controls {
+  display: inline-block;
+}
+.checklist_lines {
+  margin-bottom: 0.5rem;
+}
+.checklist_lines .checklist_line {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+}
+.checklist_lines .checklist_line label {
+  min-width: 0;
+  display: -ms-flexbox;
+  display: flex;
+}
+.checklist_lines .checklist_line label input[type="checkbox"] {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+.checklist_lines .checklist_line label .checklist_line_label {
+  word-break: break-word;
+}
+.checklist_lines .checklist_line .checklist_line_delete {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+  margin-left: 3px;
+}
+.checklist_lines .checklist_line:hover .checklist_line_delete {
+  visibility: visible !important;
+}
+.checklist_lines .checklist_line:hover.ui-draggable-dragging .checklist_line_delete {
+  visibility: hidden !important;
+}
+.checklist_lines .checklist_line input[type="checkbox"]:checked + .checklist_line_label {
+  text-decoration: line-through;
+}
+.checklist_lines .droppable-hover > label:after {
+  content: "";
+  position: absolute;
+  width: 102%;
+  height: 2px;
+  background: #F00;
+  left: 0;
+  bottom: -2px;
+}
+.checklist_lines .checklist_droparea {
+  height: 2px;
+}
+.checklist_lines .checklist_droparea.droppable-hover {
+  background: #F00;
+}
+.checklist_line_input {
+  overflow-y: hidden;
+}
+.checklist_line_input.add_checklist_line_input {
+  margin-bottom: 0.5rem;
+}
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
   top: 0;
@@ -3347,6 +3277,14 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .autocomplete_usernames {
   display: block;
+}
+.search_form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.row-gutter-sm [class*='col-'] {
+  padding-right: 3px;
+  padding-left: 3px;
 }
 .ratings_table {
   margin: 0 10px 10px 0;
@@ -3736,19 +3674,6 @@ div.container_menu_top input.search_field {
 .widget_core_user_profile_pics img {
   max-width: 100%;
   height: auto;
-}
-div.widget_core_coll_item_list.nobullets ul,
-div.widget_core_coll_item_list.nobullets ul li,
-li.widget_core_coll_item_list.nobullets ul,
-li.widget_core_coll_item_list.nobullets ul li {
-  background: none;
-  margin-left: 0;
-  padding-left: 0;
-  list-style: none;
-}
-div.widget_core_coll_item_list.nobullets ul li:before,
-ul li.widget_core_coll_item_list.nobullets ul li:before {
-  content: none;
 }
 div.tabs {
   line-height: normal;

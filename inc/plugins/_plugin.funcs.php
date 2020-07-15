@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -197,13 +197,18 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		}
 	}
 
+	if( isset( $parmeta['input_prefix'] ) )
+	{	// Use prefix before input element if it is defined:
+		$params['input_prefix'] = $parmeta['input_prefix'];
+	}
+
 	if( isset( $parmeta['input_suffix'] ) )
 	{	// Use suffix after input element if it is defined:
 		$params['input_suffix'] = $parmeta['input_suffix'];
 	}
 
 	if( $set_type == 'Skin' &&
-	    in_array( $parmeta['type'], array( 'text', 'integer', 'color', 'select' ) ) )
+	    in_array( $parmeta['type'], array( 'text', 'integer', 'color', 'select', 'select_object' ) ) )
 	{	// Append action icon to restore setting to default value by JavaScript:
 		$params['input_suffix'] = ( isset( $params['input_suffix'] ) ? $params['input_suffix'] : '' ).
 			' '.get_icon( 'reload', 'imgtag', array(
@@ -242,6 +247,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
+			case 'PluginWidget':
 				$set_value = $Obj->get_param( $parname, NULL, $group );
 				$error_value = NULL;
 				break;
@@ -315,6 +321,16 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{	// Hide this field on the editing form:
 		$original_form_fieldstart = $Form->fieldstart;
 		$Form->fieldstart = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart );
+		if( isset( $Form->fieldstart_checkbox ) )
+		{
+			$original_form_fieldstart_checkbox = $Form->fieldstart_checkbox;
+			$Form->fieldstart_checkbox = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_checkbox );
+		}
+		if( isset( $Form->fieldstart_radio ) )
+		{
+			$original_form_fieldstart_radio = $Form->fieldstart_radio;
+			$Form->fieldstart_radio = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_radio );
+		}
 	}
 
 	switch( $parmeta['type'] )
@@ -360,7 +376,15 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'select':
 			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
+			if( ! empty( $parmeta['multiple'] ) )
+			{	// Set specific size of multiple selector or use automatic size depending on count of options:
+				$params['size'] = ( isset( $parmeta['size'] ) ? $parmeta['size'] : count( $parmeta['options'] ) );
+			}
 			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, isset($parmeta['note']) ? $parmeta['note'] : NULL, $params );
+			break;
+
+		case 'select_object':
+			$Form->select_input_object( $input_name, $set_value, $parmeta['object'], $set_label, $params );
 			break;
 
 		case 'select_blog':
@@ -456,9 +480,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
 						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
 					}
-					// Unique ID of fieldset to store in user  settings or in user per collection settings:
-					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
 				}
+				// Unique ID of fieldset to store in user settings or in user per collection settings:
+				$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
 				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
 
 				if( ! empty($params['note']) )
@@ -555,7 +579,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 
 			// This div is used to insert new set of setting:
-			echo '<div id="block_add_new_setting_'.$parname.'" data-param-num="'.$k_nb.'"></div>';
+			echo '<div id="block_add_new_setting_'.$parname.'_'.$Obj->ID.'" data-param-num="'.$k_nb.'"></div>';
 
 			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
 			if( ! is_ajax_request() )
@@ -582,13 +606,13 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								set_type: \''.$set_type.'\',
 								param_name: \''.$parname.'\',
 								//param_num: jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length
-								param_num: jQuery( \'#block_add_new_setting_'.$parname.'\' ).data( \'param-num\' )
+								param_num: jQuery( \'#block_add_new_setting_'.$parname.'_'.$Obj->ID.'\' ).data( \'param-num\' )
 								'.( isset( $Blog ) ? ',blog: '.$Blog->ID : '' ).'
 								'.( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' ).'
 							},
 							function( r, status )
 							{
-								jQuery( \'#block_add_new_setting_'.$parname.'\' ).replaceWith( ajax_debug_clear( r ) );
+								jQuery( \'#block_add_new_setting_'.$parname.'_'.$Obj->ID.'\' ).replaceWith( ajax_debug_clear( r ) );
 								'.( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' ).'
 								'.( isset( $parmeta['max_number'] ) ? '
 								if( jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length >= '.intval( $parmeta['max_number'] ).' )
@@ -654,6 +678,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$params['style'] = 'width:'.( 40 + $size * 8 ).'px';
 			}
 
+			if( isset( $parmeta['suffix'] ) )
+			{	// Set suffix text after input element:
+				$params['input_suffix'] = $parmeta['suffix'];
+			}
+
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 
@@ -708,6 +737,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			}
 			break;
 
+		case 'item_selector':
+			$Form->item_selector( $input_name, $set_value, $set_label, $parmeta );
+			break;
 
 		default:
 			debug_die( 'Unsupported type ['.$parmeta['type'].'] from GetDefaultSettings()!' );
@@ -716,6 +748,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $original_form_fieldstart ) )
 	{	// Revert original field start html code:
 		$Form->fieldstart = $original_form_fieldstart;
+	}
+	if( isset( $original_form_fieldstart_checkbox ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart_checkbox = $original_form_fieldstart_checkbox;
+	}
+	if( isset( $original_form_fieldstart_radio ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart_radio = $original_form_fieldstart_radio;
 	}
 
 	if( $outer_most && $has_array_type )
@@ -799,8 +839,12 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 	{
 		case 'Settings':
 		case 'CollSettings':
-		case 'Widget':
+		case 'PluginWidget':
 			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'Widget':
+			$Plugin->set( $set_name, $setting );
 			break;
 
 		case 'UserSettings':
@@ -906,9 +950,14 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 			$defaults = $Plugin->get_email_setting_definitions( $tmp_params );
 			break;
 
-		case 'Widget':
+		case 'PluginWidget':
 			$setting = $Plugin->Settings->get( $set_name );
 			$defaults = $Plugin->get_widget_param_definitions( $tmp_params );
+			break;
+
+		case 'Widget':
+			$setting = $Plugin->get_param( $set_name );
+			$defaults = $Plugin->get_param_definitions( $tmp_params );
 			break;
 
 		case 'Skin':
@@ -1634,7 +1683,7 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 	global $inc_path, $install_db_deltas, $DB, $Messages;
 
 	// Prepare vars for DB layout changes
-	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
+	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5', 'string' );
 
 	$db_layout = $Plugin->GetDbLayout();
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)

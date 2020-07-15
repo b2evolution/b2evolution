@@ -176,13 +176,21 @@ else
 		if( !empty( $task->ctsk_repeat_after ) )
 		{ // This task wants to be repeated:
 			// Note: we use the current time for 2 reasons: 1) prevent scheduling something in the past AND 2) introduce variety so that everyone doesn't run his repeated tasks at the same exact time, especially pings, pollings...
+			if( $task->ctsk_repeat_after < 86400 )
+			{	// If "Repeat every" < 1 day, then start from current timestamp:
+				$new_start_datetime = $localtimenow;
+			}
+			else
+			{	// If "Repeat every" >= 1 day, then start from TODAY at time of "Schedule date":
+				$new_start_datetime = strtotime( date( 'Y-m-d', $localtimenow ).' '.substr( $task->ctsk_start_datetime, 11 ) );
+			}
+			$new_start_datetime += $task->ctsk_repeat_after;
 			if( $task->ctsk_key == 'poll-antispam-blacklist' )
 			{ // THIS IS A HACK. Guess why we need that!? :P  Please do not override or you'll kill our server :(
-				$new_start_datetime = $localtimenow + rand( 43200, 86400 ); // 12 to 24 hours
+				$new_start_datetime += rand( 43200, 86400 ); // 12 to 24 hours
 			}
 			else
 			{ // Normal
-				$new_start_datetime = $localtimenow + $task->ctsk_repeat_after;
 				if( ! empty( $task->ctsk_repeat_variation ) )
 				{ // Include variation param as random +/- time value
 					$new_start_datetime += rand( 0, 2 * $task->ctsk_repeat_variation ) - $task->ctsk_repeat_variation;
@@ -298,11 +306,14 @@ detect_timeout_cron_jobs( $error_task );
 
 
 if( ! $is_cli && ! is_admin_page() )
-{ // This is a web request:
+{	// This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';
 	echo '<!-- This is invalid HTML but it is SOOOOOO helpful! (Delay will be triggered when we reach that point -->';
 	echo '<meta http-equiv="Refresh" content="15" />';
+
+	// Add JavaScript and CSS files included by plugins and skin
+	include_footerlines();
 	?>
 	</body>
 	</html>

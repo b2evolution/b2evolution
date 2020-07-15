@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -52,7 +52,7 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Vote');
+		return T_('Voting');
 	}
 
 
@@ -128,7 +128,7 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $current_User, $DB;
+		global $Collection, $Blog, $DB;
 
 		$this->init_display( $params );
 
@@ -194,7 +194,7 @@ class item_vote_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 			);
 	}
 }

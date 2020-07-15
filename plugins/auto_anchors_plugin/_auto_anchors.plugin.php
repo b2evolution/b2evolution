@@ -2,7 +2,9 @@
 /**
  * This file implements the Auto Anchors plugin for b2evolution
  *
- * @author blueyed: Daniel HAHLER - {@link http://daniel.hahler.de/}
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +23,7 @@ class auto_anchors_plugin extends Plugin
 	var $code = 'auto_anchors';
 	var $name = 'Auto Anchors';
 	var $priority = 33;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -47,8 +49,8 @@ class auto_anchors_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array(
-				'default_comment_rendering' => 'opt-in',
-				'default_post_rendering' => 'opt-out'
+				'default_post_rendering' => 'opt-out',
+				'default_comment_rendering' => 'never',
 			);
 
 		if( ! empty( $params['blog_type'] ) )
@@ -64,7 +66,17 @@ class auto_anchors_plugin extends Plugin
 
 		$default_params = array_merge( $params, $default_params );
 
-		return parent::get_coll_setting_definitions( $default_params );
+		return array_merge( parent::get_coll_setting_definitions( $default_params ),
+			array(
+				'offset_scroll' => array(
+						'label' => T_('Anchor offset'),
+						'type' => 'integer',
+						'defaultvalue' => 70,
+						'suffix' => ' px',
+						'note' => T_('This will be used when scrolling to an anchor.'),
+					),
+				)
+			);
 	}
 
 
@@ -119,7 +131,7 @@ class auto_anchors_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Collection, $Blog;
+		global $Collection, $Blog, $disp;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
@@ -128,7 +140,13 @@ class auto_anchors_plugin extends Plugin
 			return;
 		}
 
-		$this->require_css( 'auto_anchors.css' );
+		$this->require_css_async( 'auto_anchors.css', false, 'footerlines' );
+
+		// JS for initialize anchor icons and for better scrolling:
+		// NOTE: we need this on each page because content bloc items may be included as widget even on front page!
+		expose_var_to_js( 'evo_plugin_auto_anchors_settings', '{
+				offset_scroll: '.format_to_js( intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ) ).'
+			}' );
 	}
 
 
@@ -151,17 +169,11 @@ class auto_anchors_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		// Get current Item to render links for anchors:
-		if( ! ( $this->current_Item = $this->get_Item_from_params( $params ) ) )
-		{	// Render anchor link only for Item or Comment:
-			return true;
-		}
-
 		// Load for replace_special_chars():
 		load_funcs( 'locales/_charset.funcs.php' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks:
-		$content = replace_content_outcode( '#(<h([1-6])((?!\sid\s*=).)*?)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -175,15 +187,26 @@ class auto_anchors_plugin extends Plugin
 	 */
 	function callback_auto_anchor( $m )
 	{
-		// Remove all HMTL tags from header text:
-		$anchor = utf8_strip_tags( $m[4] );
+		if( empty( $m[4] ) )
+		{	// Generate anchor from header text:
 
-		// Convert special chars/umlauts to ASCII,
-		// and replace all non-letter and non-digit chars to single char "-":
-		$anchor = replace_special_chars( $anchor );
+			// Remove all HMTL tags from header text:
+			$anchor = utf8_strip_tags( $m[5] );
 
-		// Make anchor lowercase:
-		$anchor = utf8_strtolower( $anchor );
+			// Convert special chars/umlauts to ASCII,
+			// and replace all non-letter and non-digit chars to single char "-":
+			$anchor = replace_special_chars( $anchor );
+
+			// Make anchor lowercase:
+			$anchor = utf8_strtolower( $anchor );
+
+			$anchor_attribute = ' id="'.$anchor.'"';
+		}
+		else
+		{	// Use custom defined anchor:
+			$anchor = $m[4];
+			$anchor_attribute = '';
+		}
 
 		if( empty( $anchor ) )
 		{	// Return original header tag when anchor is empty:
@@ -200,9 +223,7 @@ class auto_anchors_plugin extends Plugin
 			$header_tag_start .= ' class="evo_auto_anchor_header"';
 		}
 
-		$anchor_link = ' <a href="'.$this->current_Item->get_permanent_url().'#'.$anchor.'" class="evo_auto_anchor_link">'.get_icon( 'merge', 'imgtag', array( 'title' => false ) ).'</a>';
-
-		return $header_tag_start.' id="'.$anchor.'">'.$m[4].$anchor_link.$m[5];
+		return $header_tag_start.$anchor_attribute.'>'.$m[5].$m[6];
 	}
 }
 

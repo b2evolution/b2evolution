@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -57,7 +57,7 @@ $Results = new Results( $SQL->get(), 'emadr_', '---D', $UserSettings->get( 'resu
 
 $Results->title = T_('Email addresses').get_manual_link( 'email-addresses' );
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// Check permission to edit emails:
 	$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -79,12 +79,12 @@ function filter_email_blocked( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_blocked',
-	'presets' => array(
-		'all'       => array( T_('All'), $admin_url.'?ctrl=email&amp;all_statuses=1'),
-		'errors'    => array( T_('Errors'), $admin_url.'?ctrl=email&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
-		'attention' => array( T_('Need Attention'), $admin_url.'?ctrl=email&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3'),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=email&amp;all_statuses=1' );
+$Results->register_filter_preset( 'errors', T_('Errors'), $admin_url.'?ctrl=email&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer' );
+$Results->register_filter_preset( 'attention', T_('Need Attention'), $admin_url.'?ctrl=email&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3' );
+
 
 /**
  * Decode the special symbols
@@ -120,7 +120,7 @@ $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'emadr_status',
 		'td' => '$emadr_status$',
-		'td' => /* Check permission: */$current_User->check_perm( 'emails', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'emails', 'edit' ) ?
 			/* Current user can edit emails */'<a href="#" rel="$emadr_status$">%emadr_get_status_title( #emadr_status# )%</a>' :
 			/* No edit, only view the status */'%emadr_get_status_title( #emadr_status# )%',
 		'th_class' => 'shrinkwrap',
@@ -230,7 +230,7 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( T_('Filter the returned emails by this email address...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;email=$emadr_address$' )
-			.( $current_User->check_perm( 'emails', 'edit' )
+			.( check_user_perm( 'emails', 'edit' )
 			? action_icon( T_('Edit this email address...'), 'properties', $admin_url.'?ctrl=email&amp;emadr_ID=$emadr_ID$' )
 			.action_icon( T_('Delete this email address!'), 'delete', url_decode_special_symbols( regenerate_url( 'emadr_ID,action', 'emadr_ID=$emadr_ID$&amp;action=blocked_delete&amp;'.url_crumb('email_blocked') ) ) )
 			: '' )
@@ -239,7 +239,7 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 { // Check permission to edit emails:
 	// Print JS to edit an email status
 	echo_editable_column_js( array(

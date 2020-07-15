@@ -86,7 +86,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 	$Form->textarea_input( 'content', $new_Item->get( 'content' ), 16, NULL, array(
 			'cols'  => 50 ,
 			'id'    => 'itemform_post_content',
-			'class' => 'autocomplete_usernames'
+			'class' => 'autocomplete_usernames link_attachment_dropzone'
 		) );
 	$Form->switch_layout( NULL );
 	?>
@@ -107,10 +107,6 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 			'edit_layout'   => 'inskin'
 		) );
 	echo '</div>';
-
-	// set b2evoCanvas for plugins
-	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
-
 
 	// =================================== INSTRUCTION ====================================
 	if( $new_Item->get_type_setting( 'front_order_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )

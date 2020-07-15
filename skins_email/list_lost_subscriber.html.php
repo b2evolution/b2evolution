@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -141,7 +141,7 @@ else if( $subscribed_User->gender == 'F' )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('I am').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('A woman').'</td></tr>'."\n";
 }
 
-if( $Settings->get( 'registration_ask_locale' ) && $subscribed_User->locale != '' )
+if( in_array( 'locale', get_registration_template_required_fields() ) && $subscribed_User->locale != '' )
 { // Locale field is defined
 	global $locales;
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Locale').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$locales[$subscribed_User->locale]['name'].'</td></tr>'."\n";

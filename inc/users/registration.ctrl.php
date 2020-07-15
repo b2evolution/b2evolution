@@ -13,7 +13,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 $AdminUI->set_path( 'users', 'usersettings', 'registration' );
 
@@ -26,7 +26,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'registration' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// keep old newusers_canregister setting value to check if we need to invalidate pagecaches
 		$old_newusers_canregister = $Settings->get( 'newusers_canregister' );
@@ -37,7 +37,7 @@ switch ( $action )
 		param( 'quick_registration', 'integer', 0 );
 		param( 'newusers_grp_ID', 'integer', true );
 
-		param_integer_range( 'newusers_level', 0, 9, T_('User level must be between %d and %d.') );
+		param_integer_range( 'newusers_level', 0, 9, TB_('User level must be between %d and %d.') );
 
 		// UPDATE default user settings
 		param( 'enable_PM', 'integer', 0 );
@@ -49,6 +49,7 @@ switch ( $action )
 		param( 'notify_comment_moderation', 'integer', 0 );
 		param( 'notify_edit_cmt_moderation', 'integer', 0 );
 		param( 'notify_spam_cmt_moderation', 'integer', 0 );
+		param( 'notify_meta_comment_mentioned', 'integer', 0 );
 		param( 'notify_meta_comments', 'integer', 0 );
 		param( 'notify_post_mentioned', 'integer', 0 );
 		param( 'notify_post_moderation', 'integer', 0 );
@@ -56,8 +57,8 @@ switch ( $action )
 		param( 'notify_post_proposed', 'integer', 0 );
 		param( 'notify_post_assignment', 'integer', 0 );
 		param( 'def_newsletters', 'array:integer', array() );
-		param_integer_range( 'notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.') );
-		param_integer_range( 'newsletter_limit', 0, 999, T_('List limit must be between %d and %d.') );
+		param_integer_range( 'notification_email_limit', 0, 999, TB_('Notificaiton email limit must be between %d and %d.') );
+		param_integer_range( 'newsletter_limit', 0, 999, TB_('List limit must be between %d and %d.') );
 
 		// UPDATE account activation by email
 		param( 'newusers_mustvalidate', 'integer', 0 );
@@ -84,11 +85,11 @@ switch ( $action )
 				break;
 
 			case 'specific_slug':
-				param_check_not_empty( 'specific_after_registration_slug', sprintf( T_('The field &laquo;%s&raquo; cannot be empty.'), T_('Go to specific slug') ) );
+				param_check_not_empty( 'specific_after_registration_slug', sprintf( TB_('The field &laquo;%s&raquo; cannot be empty.'), TB_('Go to specific slug') ) );
 				break;
 		}
 
-		param_integer_range( 'user_minpwdlen', 1, 32, T_('Minimum password length must be between %d and %d.') );
+		param_integer_range( 'user_minpwdlen', 1, 32, TB_('Minimum password length must be between %d and %d.') );
 
 		param( 'http_auth_require', 'integer', 0 );
 		param( 'http_auth_accept', 'integer', 0 );
@@ -101,10 +102,8 @@ switch ( $action )
 		param( 'passwd_special', 'integer', 0 );
 		param( 'strict_logins', 'integer', 0 );
 		param( 'registration_after_quick', 'string', '' );
-		param( 'registration_require_country', 'integer', 0 );
-		param( 'registration_require_firstname', 'integer', 0 );
-		param( 'registration_ask_locale', 'integer', 0 );
-		param( 'registration_require_gender', 'string', '' );
+		param( 'registration_no_username', 'string', '' );
+		param( 'registration_master_template', 'string', '' );
 
 		// We are about to allow non-ASCII logins
 		// Let's check if there are users with logins starting with reserved prefix usr_
@@ -116,12 +115,12 @@ switch ( $action )
 			$user_edit_url = regenerate_url( 'ctrl,action', 'ctrl=user&amp;user_tab=profile&amp;user_ID=' );
 			foreach( $invalid_users as $inv_user )
 			{
-				$msg[] = '<li>'.action_icon( T_('Edit this user...'), 'edit', $user_edit_url.$inv_user->user_ID, 5, 0 ).' [ '.$inv_user->user_login.' ]</li>';
+				$msg[] = '<li>'.action_icon( TB_('Edit this user...'), 'edit', $user_edit_url.$inv_user->user_ID, 5, 0 ).' [ '.$inv_user->user_login.' ]</li>';
 			}
 
 			if( !empty($msg) )
 			{
-				$Messages->add( T_('The following user logins must be changed in order for you to disable "Require strict logins" setting:')
+				$Messages->add( TB_('The following user logins must be changed in order for you to disable "Require strict logins" setting:')
 							.'<ol style="list-style-type:decimal; list-style-position: inside">'.implode( "\n", $msg ).'</ol>', 'note' );
 			}
 		}
@@ -141,6 +140,7 @@ switch ( $action )
 					 array( 'def_notify_comment_moderation', $notify_comment_moderation ),
 					 array( 'def_notify_edit_cmt_moderation', $notify_edit_cmt_moderation ),
 					 array( 'def_notify_spam_cmt_moderation', $notify_spam_cmt_moderation ),
+					 array( 'def_notify_meta_comment_mentioned', $notify_meta_comment_mentioned ),
 					 array( 'def_notify_meta_comments', $notify_meta_comments ),
 					 array( 'def_notify_post_mentioned', $notify_post_mentioned ),
 					 array( 'def_notify_post_moderation', $notify_post_moderation ),
@@ -167,10 +167,8 @@ switch ( $action )
 					 array( 'passwd_special', $passwd_special ),
 					 array( 'strict_logins', $strict_logins ),
 					 array( 'registration_after_quick', $registration_after_quick ),
-					 array( 'registration_require_country', $registration_require_country ),
-					 array( 'registration_require_firstname', $registration_require_firstname ),
-					 array( 'registration_ask_locale', $registration_ask_locale ),
-					 array( 'registration_require_gender', $registration_require_gender )
+					 array( 'registration_no_username', $registration_no_username ),
+					 array( 'registration_master_template', $registration_master_template ),
 				) );
 
 		if( ! $Messages->has_errors() )
@@ -181,7 +179,7 @@ switch ( $action )
 				{ // invalidate all PageCaches
 					invalidate_pagecaches();
 				}
-				$Messages->add( T_('General settings updated.'), 'success' );
+				$Messages->add( TB_('General settings updated.'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( '?ctrl=registration', 303 ); // Will EXIT
 				// We have EXITed already at this point!!
@@ -193,9 +191,9 @@ switch ( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Registration & Login'), '?ctrl=registration' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Registration & Login'), '?ctrl=registration' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'user-settings-registration-tab' );

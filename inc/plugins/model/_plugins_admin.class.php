@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -116,7 +116,9 @@ class Plugins_admin extends Plugins
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
 
 				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
+				'PrependCommentInsertTransact' => 'This gets called before a comment is inserted into the database.',
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
+				'PrependCommentUpdateTransact' => 'This gets called before a comment gets updated in the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
 
 				'AfterCollectionDelete' => 'Gets called after a blog has been deleted from the database.',
@@ -133,7 +135,7 @@ class Plugins_admin extends Plugins
 				'AfterItemDelete' => 'This gets called after an item has been deleted from the database.',
 				'PrependItemInsertTransact' => 'This gets called before an item is inserted into the database.',
 				'AfterItemInsert' => 'This gets called after an item has been inserted into the database.',
-				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database..',
+				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database.',
 				'AfterItemUpdate' => 'This gets called after an item has been updated in the database.',
 				'AppendItemPreviewTransact' => 'This gets called when instantiating an item for preview.',
 				'ItemLoadFromRequest' => 'This gets called to load additional Item fields.',
@@ -171,7 +173,10 @@ class Plugins_admin extends Plugins
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
 				'FilterCommentContent' => 'Filters the content of a comment.',
 
+				'PrependMessageInsertTransact' => 'This gets called before a message is inserted into the database.',
 				'FilterMsgContent' => 'Filters the content of a message.',
+				'PrependEmailInsertTransact' => 'This gets called before an email campaign is inserted into the database.',
+				'PrependEmailUpdateTransact' => 'This gets called before an email campaign gets updated in the database.',
 				'FilterEmailContent' => 'Filters the content of an email.',
 
 				'EmailFormSent' => 'Called when the email form has been submitted.',
@@ -226,6 +231,7 @@ class Plugins_admin extends Plugins
 				'Logout' => 'Called when a user logs out.',
 
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
+				'GetAuthLinksForSocialNetworks' => 'Asks the plugin for authorization link to specified social network.',
 
 				// Other Plugins can use this:
 				'RequestCaptcha' => 'Return data to display captcha html code.',
@@ -274,6 +280,12 @@ class Plugins_admin extends Plugins
 				'InitImageInlineTagForm' => 'Called to initialize params for form of additional tab on the modal/popup window "Insert image into content"',
 				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
 				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
+
+				// Importer events:
+				'ImporterConstruct' => 'Called for additional initialization of importer classes.',
+				'ImporterSetItemField' => 'Called to set Item field from Importer class.',
+				'ImporterAfterItemImport' => 'Called for additional updating Item after it was imported.',
+				'ImporterAfterItemsDelete' => 'Called after Items were deleted in Importer class.',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )

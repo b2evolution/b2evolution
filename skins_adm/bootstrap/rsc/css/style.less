@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -235,12 +235,16 @@ div.delete_messages ul {
 	}
 }
 
-.evo_panel {
-	margin-bottom: 20px;
-}
-
-.evo_panel__footer {
-	padding: 10px 15px;
+// Post / Comment browsing screen
+.evo_content_block {
+	// This is not the usual results table:
+	.results_header {
+		margin-top: -20px;
+	}
+	.results_footer {
+		// Pager in footer + nb line by default select
+		padding: 5px 0 20px;
+	}
 }
 
 /*
@@ -346,14 +350,9 @@ div.delete_messages ul {
 
 // Sidebar form filters:
 .evo_sidebar_filters {
-	fieldset {
-		margin-bottom: 20px;
-		legend {
-			margin-bottom: 10px;
-		}
-	}
-	.pull-right[type=submit] {
-		margin: -3px 0 0 0;
+	.filter_buttons {
+		margin-bottom: 5px;
+		text-align: right;
 	}
 	.rating input[name$=_rating_limit] {
 		margin-right: 10px;
@@ -806,7 +805,7 @@ fieldset ul {
 // Attachments / links
 .evo_attachments_fieldset__wrapper {
 	width: 100%;
-	height: 160px;
+	height: 97px;
 	position: relative;
 	padding-bottom: 6px;
 	box-sizing: content-box;
@@ -882,17 +881,28 @@ table.filelist {
 		}
 	}
 }
-div.qq-upload-button,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button {
 	border: 2px dashed #fff;
 	background: #5bc0de;
 	.border-radius(9px);
 }
-div.qq-upload-button-hover,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-drop-area {
+	padding: 7px 0;
+	text-align: center;
+	color: transparent;
+	background: transparent;
+	font-weight: bold;
+	> div > span {
+		font-weight: normal;
+		font-size: small;
+		margin-top: 2px;
+	}
+}
+div.qq-upload-button-hover {
 	background: #5cb85c;
+}
+div.qq-upload-button-dragover {
+	background: #efbd5b !important;
 }
 ul.qq-upload-list {
 	margin: 0;
@@ -955,17 +965,6 @@ form#FilesForm {
 #fm_bar form {
 	margin-bottom: 0;
 }
-ul#uploadfileinputs {
-	list-style: none;
-	margin-left: 0;
-	label {
-		display: inline;
-	}
-	li {
-		border-bottom: 1px solid #DDD;
-		padding: 10px 0;
-	}
-}
 div.evo_fileuploader_form {
 	padding: 5px;
 	height: 65px;
@@ -989,10 +988,6 @@ tr.evo_fileuploader_form td {
 				}
 			}
 		}
-	}
-	.upload_title {
-		font-weight: bold;
-		font-size: 120%;
 	}
 	.form-group {
 		margin-bottom: 10px;
@@ -1129,6 +1124,21 @@ h2.user_title::first-line {
 	}
 }
 
+#ffield_item_switchable_params {
+	.evo_fields_table__input {
+		display: table;
+		> div {
+			display: table-cell;
+			width: 1%;
+			white-space: nowrap;
+			padding-right: 5px;
+		}
+		> input[type=text] {
+			display: table-cell;
+		}
+	}
+}
+
 // Loader animation
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1169,6 +1179,7 @@ tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
 }
 
 // Dashboard
+// Collection dashboard ?
 .browse {
 	.evo_content_block {
 		margin-right: 0;
@@ -1255,13 +1266,6 @@ div.available_widgets {
 .widget_list {
 	list-style: none;
 	margin: 0;
-	li {
-		text-indent: -25px;
-		padding-left: 25px;
-		a, .label {
-			text-indent: initial;
-		}
-	}
 }
 
 // Widget icon:
@@ -1298,6 +1302,7 @@ table.coll_kind {
 	}
 }
 
+/* Fp: UNCLEAR WHAT THIS IS FOR:
 // Support for multiline inline forms
 .filters .form-inline {
 	 margin: 0 -10px -5px;
@@ -1308,6 +1313,7 @@ table.coll_kind {
 		margin-left: 10px;
 	}
 }
+*/
 
 // Navigations
 .navbar {
@@ -1917,13 +1923,12 @@ div.query-builder .rule-container .rule-value-container {
 		}
 	}
 	.evo_customizer__available_widgets {
-		padding: 15px;
+		.panel:first-child {
+			border-top: 1px solid #ddd;
+		}
 		ul.widget_list {
 			list-style: none;
 			margin: 0 0 0 2px;
-		}
-		h3 {
-			margin: 10px 0 5px 0;
 		}
 	}
 	.evo_customizer__other_lists {
@@ -1935,6 +1940,15 @@ div.query-builder .rule-container .rule-value-container {
 	}
 	.controls .help-inline {
 		display: inline-block;
+	}
+	.form-group.checkbox-group {
+		.controls {
+			display: inline-block;
+			vertical-align: middle;
+			.checkbox {
+				padding-top: 2px;
+			}
+		}
 	}
 	.file_select_item {
 		margin: 0;
@@ -2050,10 +2064,23 @@ div.query-builder .rule-container .rule-value-container {
 			}
 		}
 	}
+	div.fieldset_wrapper+div.fieldset_wrapper {
+		margin-top: 0;
+	}
 }
 
 // Locale selector:
 table.evo_locale_selector {
 	width: auto;
 	margin-bottom: 0;
+}
+
+// Widget "Param Switcher" in customizer mode:
+form[data-widget-code="param_switcher"][target="evo_customizer__updater"] {
+	#fieldset_wrapper_buttons {
+		.control-label {
+			float: left;
+			padding-top: 7px;
+		}
+	}
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -321,7 +321,8 @@ class EmailCampaign extends DataObject
 				$mail_template = mail_template( 'newsletter',
 					( $parname == 'html_template_preview' ? 'html' : 'text' ),
 					array(
-						'message_html'       => $this->get( $parname == 'html_template_preview' ? 'email_html' : 'email_plaintext' ),
+						'message_html'       => $this->get( 'email_html' ),
+						'message_text'       => $this->get( 'email_plaintext' ),
 						'include_greeting'   => false,
 						'add_email_tracking' => false,
 						'template_mode'      => 'preview',
@@ -590,7 +591,12 @@ class EmailCampaign extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $baseurl;
+		global $baseurl, $Plugins;
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependEmailInsertTransact', $params = array( 'EmailCampaign' => & $this ) );
+		}
 
 		// Update the message fields:
 		$this->update_message_fields();
@@ -617,6 +623,13 @@ class EmailCampaign extends DataObject
 	 */
 	function dbupdate()
 	{
+		global $Plugins;
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependEmailUpdateTransact', $params = array( 'EmailCampaign' => & $this ) );
+		}
+
 		// Update the message fields:
 		$this->update_message_fields();
 
@@ -1021,8 +1034,6 @@ class EmailCampaign extends DataObject
 
 		if( $mode == 'test' )
 		{ // Send a test newsletter
-			global $current_User;
-
 			$newsletter_params['boundary'] = 'b2evo-'.md5( rand() );
 			$headers = array( 'Content-Type' => 'multipart/mixed; boundary="'.$newsletter_params['boundary'].'"' );
 
@@ -1191,7 +1202,7 @@ class EmailCampaign extends DataObject
 
 				if( $email_domains_number[ $email_domain ] >= $email_campaign_max_domain )
 				{	// Skip sending because max emails to same domain is reached:
-					$error_msg = sprintf( T_('Email sending was skipped to user %s because max emails to same domain %s is reached.'), $User->get_identity_link(), '<code>'.$email_domain.'</code>' );
+					$error_msg = sprintf( T_('Email sending was skipped to user %s because max emails to same domain %s was reached.'), $User->get_identity_link(), '<code>'.$email_domain.'</code>' );
 					if( $display_messages === 'cron_job' )
 					{
 						cron_log_action_end( $error_msg, 'warning' );
@@ -1499,11 +1510,11 @@ class EmailCampaign extends DataObject
 	 */
 	function create_cron_job( $next_chunk = false )
 	{
-		global $Messages, $servertimenow, $current_User;
+		global $Messages, $servertimenow;
 
 		if( ! $next_chunk && ( $email_campaign_Cronjob = & $this->get_Cronjob() ) )
 		{	// If we create first cron job but this email campaign already has one:
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{	// If user has an access to view cron jobs:
 				global $admin_url;
 				$Messages->add( sprintf( T_('A scheduled job was already created for this campaign, <a %s>click here</a> to view it.'),

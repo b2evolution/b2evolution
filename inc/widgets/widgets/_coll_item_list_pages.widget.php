@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_item_list_pages_Widget extends ComponentWidget
 {
-	var $icon = 'window-minimize';
+	var $icon = 'ellipsis-h';
 
 	/**
 	 * Constructor
@@ -62,7 +62,7 @@ class coll_item_list_pages_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item List Pages');
+		return T_('List Pager');
 	}
 
 

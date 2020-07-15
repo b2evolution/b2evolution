@@ -26,14 +26,14 @@ $Form->begin_form( 'fform', '' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'tab', get_param( 'tab' ) );
 
-$Form->begin_fieldset( T_( 'General settings' ).get_manual_link( 'messages-general-settings' ) );
+$Form->begin_fieldset( TB_( 'General settings' ).get_manual_link( 'messages-general-settings' ) );
 
 	$Form->checkbox( 'allow_html_message', $Settings->get( 'allow_html_message' ),
-						T_( 'Allow HTML' ), T_( 'Check to allow HTML in messages.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
+						TB_( 'Allow HTML' ), TB_( 'Check to allow HTML in messages.' ).' ('.TB_('HTML code will pass several sanitization filters.').')' );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 $Form->end_form();
 

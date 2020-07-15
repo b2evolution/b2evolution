@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -595,7 +595,7 @@ class File extends DataObject
 
 
 	/**
-	 * Is the file editable?
+	 * Is the file editable? Meaning file contents can be edited in-app.
 	 *
 	 * @param mixed true/false allow locked file types? NULL value means that FileType will decide
 	 */
@@ -614,6 +614,29 @@ class File extends DataObject
 
 		// user can edit only allowed file types
 		return $Filetype->is_allowed( $allow_locked );
+	}
+
+
+	/**
+	 * Can the file be manipulated? i.e., edited, uploaded, renamed, moved, copied, deleted, chmod
+	 *
+	 * @return bool
+	 */
+	function can_be_manipulated()
+	{
+		if( $this->is_dir() )
+		{ // directories don't have filetypes to restrict them:
+			return true;
+		}
+
+		$Filetype = & $this->get_Filetype();
+		if( empty($Filetype) )
+		{
+			return false;
+		}
+
+		// user can edit only allowed file types
+		return $Filetype->is_allowed();
 	}
 
 
@@ -681,6 +704,70 @@ class File extends DataObject
 	function get_name()
 	{
 		return $this->_name;
+	}
+
+
+	/**
+	 * Get the filename
+	 * 
+	 * @return string
+	 */
+	function get_file_link( $params = array() )
+	{
+		$params = array_merge( array(
+			'before'    => '',
+			'after'     => '',
+			'link_text' => 'filename',
+			'class'     => '',
+			'nofollow'  => false,
+		), $params );
+
+		switch( $params['link_text'] )
+		{
+			case 'filename':
+				$text = $this->dget( 'name' );
+				break;
+
+			case 'title':
+				$text = ( empty( $this->get( 'title' ) ) ? $this->dget('name') : $this->dget( 'title' ) );
+				break;
+
+			case 'icon':
+				$text = $this->get_icon();
+				break;
+
+			default:
+				$text = $this->dget( 'name' );
+		}
+
+		$r = '<a href="'.$this->get_url().'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		if( ! empty( $params['nofollow'] ) ) $r .= ' rel="nofollow"';
+		$r .= '>'.$text.'</a>';
+
+		return $r;
+	}
+
+
+	/**
+	 * Get the File's description
+	 * 
+	 * @return string
+	 */
+	function get_description( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' => '',
+				'after'  => '',
+				'format' => 'htmlbody',
+			), $params );
+
+		$r = '';
+		$r .= $params['before'];
+		$r .= format_to_output( $this->get( 'desc' ), $params['format'] );
+		$r .= $params['after'];
+
+		return $r;
 	}
 
 
@@ -1273,7 +1360,7 @@ class File extends DataObject
 	 * @param string rel= attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lightbox
 	 * @param string image class=
 	 * @param string image align=
-	 * @param string image alt=
+	 * @param string image alt=, Use '-' in order to don't display any alt text
 	 * @param string image caption/description to be displayed under the image
 	 * @param integer Link ID
 	 * @param integer Size multiplier, can be 1, 2 and etc. (Used for b2evonet slider for example)
@@ -1287,14 +1374,14 @@ class File extends DataObject
 	 *                        'none' - don't use attributes "width" & "height"
 	 * @param boolean Image style= attribute
 	 * @param boolean Add loadimg class
-	 * @param string simplified sizes= attribute for browser to select correct size from srcset=
+	 * @param string simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
 	                  $size_name = 'original', 
-	                  $image_link_to = 'original',
+	                  $image_link_to = 'original',  // can be an URL, can be empty
 	                  $image_link_title = '',	// can be text or #title# or #desc#
 	                  $image_link_rel = '',
 	                  $image_class = '',
@@ -1352,8 +1439,15 @@ class File extends DataObject
 					$img_attribs['align'] = $image_align;
 				}
 
-				if( $img_attribs['alt'] == '' )
-				{ // Image alt
+				if( $image_alt == '-' )
+				{	// Don't display any alt text:
+					if( isset( $img_attribs['alt'] ) )
+					{
+						unset( $img_attribs['alt'] );
+					}
+				}
+				elseif( $image_alt != '' )
+				{	// Overrride original image alt store in DB per this File:
 					$img_attribs['alt'] = $image_alt;
 				}
 
@@ -1682,6 +1776,11 @@ class File extends DataObject
 	 */
 	function rename_to( $newname )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		$old_file_name = $this->get_name();
 
 		// rename() will fail if newname already exists on windows
@@ -1732,6 +1831,7 @@ class File extends DataObject
 		$this->load_meta();
 
 		$this->_name = $newname;
+		unset($this->Filetype);
 		$this->Filetype = NULL; // depends on name
 
 		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
@@ -1794,6 +1894,11 @@ class File extends DataObject
 	 */
 	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		$old_file_name = $this->get_name();
 
 		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
@@ -1835,6 +1940,7 @@ class File extends DataObject
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
 		$this->_name = basename( $this->_adfp_full_path );
+		unset($this->Filetype);
 		$this->Filetype = NULL; // depends on name
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
@@ -1873,6 +1979,11 @@ class File extends DataObject
 	 */
 	function copy_to( & $dest_File )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		if( ! $this->exists() || $dest_File->exists() )
 		{
 			syslog_insert( sprintf( 'File %s could not be copied', '[['.$this->get_name().']]' ), 'info', 'file', $this->ID );
@@ -1925,6 +2036,11 @@ class File extends DataObject
 	 */
 	function unlink( $use_transactions = true, $recursively = false )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		global $DB;
 
 		$old_file_ID = $this->ID;
@@ -2000,6 +2116,11 @@ class File extends DataObject
 	 */
 	function chmod( $chmod = NULL )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		if( $chmod === NULL )
 		{
 			global $Settings;
@@ -2577,6 +2698,16 @@ class File extends DataObject
 					$img_attribs['width'] = $size_arr[0];
 					$img_attribs['height'] = $size_arr[1];
 				}
+			}
+		}
+		elseif( substr( $this->_adfp_full_path, -4 ) == '.svg' )
+		{	// Special case for SVG file because we cannot generate thumbnail for this file type:
+			$img_attribs['src'] = $this->get_url();
+			global $thumbnail_sizes;
+			if( isset( $thumbnail_sizes[ $size_name ] ) )
+			{	// Set attributes for SVG file from config of thumbnail sizes:
+				$img_attribs['width'] = $thumbnail_sizes[ $size_name ][1];
+				$img_attribs['height'] = $thumbnail_sizes[ $size_name ][2];
 			}
 		}
 		else
@@ -3211,10 +3342,8 @@ class File extends DataObject
 	 */
 	function get_target_icon()
 	{
-		global $current_User;
-
 		$r = '';
-		if( $current_User->check_perm( 'files', 'view', false, $this->get_FileRoot() ) )
+		if( check_user_perm( 'files', 'view', false, $this->get_FileRoot() ) )
 		{	// Check permission
 			if( $this->is_dir() )
 			{	// Dir
@@ -3286,7 +3415,7 @@ class File extends DataObject
 
 		// IMAGE:
 		// File type is still not defined, Try to detect image
-		if( $this->get_image_size() !== false )
+		if( is_image_file( $this->_adfp_full_path ) || $this->get_image_size() !== false )
 		{ // This is image file
 			$this->update_file_type( 'image' );
 			return;
@@ -3549,6 +3678,36 @@ class File extends DataObject
 	function get_download_count()
 	{
 		return $this->download_count;
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this File
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'size'    => 'fit-1280x720',
+				'size_2x' => 'fit-2560x1440',
+			), $params );
+
+		// Get image URL for 1x size:
+		$img_attribs_1x = $this->get_img_attribs( $params['size'] );
+
+		$styles = array( 'background-image:url( '.$img_attribs_1x['src'].' )' );
+
+		if( $params['size'] != $params['size_2x'] )
+		{	// Set image-set backgrounds only when 1x and 2x size are different:
+			// Get image URL for 2x size:
+			$img_attribs_2x = $this->get_img_attribs( $params['size_2x'] );
+			$styles[] = 'background-image: image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+			$styles[] = 'background-image: -webkit-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+		}
+
+		return implode( ';', $styles );
 	}
 }
 

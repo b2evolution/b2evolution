@@ -43,7 +43,7 @@ $schema_queries['T_messaging__message'] = array(
 			msg_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			msg_thread_ID int(10) unsigned NOT NULL,
 			msg_text text COLLATE utf8mb4_unicode_ci,
-			msg_renderers VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			msg_renderers VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			PRIMARY KEY msg_ID (msg_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" );
 
@@ -52,7 +52,7 @@ $schema_queries['T_messaging__prerendering'] = array(
 		"CREATE TABLE T_messaging__prerendering(
 			mspr_msg_ID              INT(10) UNSIGNED NOT NULL,
 			mspr_format              ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
-			mspr_renderers           VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			mspr_renderers           VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			mspr_content_prerendered MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			mspr_datemodified        TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (mspr_msg_ID, mspr_format)

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -218,6 +218,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			break;
 
 		case 'comment':
+		case 'meta':
 			$searched_parts = array( 'item_title', 'content' );
 			break;
 
@@ -369,6 +370,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 			'order'         => 'DESC',
 			'posts'         => 1000,
 			'post_ID_list'  => $exclude_posts,
+			'itemtype_usage'=> '-content-block,special',
 		);
 
 	if( ! empty( $authors ) && is_logged_in() )
@@ -453,9 +455,10 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
  * @param array all quoted parts from the search term
  * @param string If logged in, comma separated Author IDs to filter, otherwise author user login
  * @param string Content age to consider
+ * @param string Type of comments: 'comment' - normal comments with types(comment,trackback,pingback,webmention), 'meta' - only meta/internal comments
  * @return array Results
  */
-function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $content_age = '' )
+function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $content_age = '', $type = 'comment' )
 {
 	global $DB, $Collection, $Blog;
 
@@ -475,6 +478,11 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
 	if( ! is_logged_in() && ! empty( $authors ) )
 	{
 		$search_filters['authors_login'] = $authors;
+	}
+
+	if( $type == 'meta' )
+	{	// Search only for meta/internal comments:
+		$search_filters['types'] = array( 'meta' );
 	}
 
 	$search_CommentList->set_filters( $search_filters );
@@ -517,7 +525,7 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts, $aut
 			+ $scores_map['creation_date'];
 
 		$search_result[] = array(
-			'type' => 'comment',
+			'type' => $type, // 'comment' or 'meta'
 			'score' => $final_score,
 			'date' => $row->comment_date,
 			'ID' => $row->comment_ID,
@@ -706,8 +714,12 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
 		$files_SQL->WHERE_and( '( post_datestart >= '.$DB->quote( $date_min ).' OR comment_date >= '.$DB->quote( $date_min ).' )' );
 		//$files_SQL->WHERE_and( '( post_datestart <= '.$DB->quote( $date_min ).' OR comment_date <= '.$DB->quote( $date_min ).' )' );
 	}
+	// Restrict files from posts and comments which are visible for current User:
+	$files_SQL->WHERE_and( 'post_ID IS NULL OR '.statuses_where_clause( get_inskin_statuses( $Blog->ID, 'post' ), 'post_', $Blog->ID, 'blog_post!' ) );
+	$files_SQL->WHERE_and( 'comment_ID IS NULL OR '.statuses_where_clause( get_inskin_statuses( $Blog->ID, 'comment' ), 'comment_', $Blog->ID, 'blog_comment!' ) );
+	// Group same files linked with different objects:
 	$files_SQL->GROUP_BY( 'file_path, file_title, file_alt, file_desc' );
-	$files = $DB->get_results( $files_SQL, OBJECT, 'Search files query' );
+	$files = $DB->get_results( $files_SQL );
 
 	foreach( $files as $file )
 	{
@@ -749,7 +761,7 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
- * @param string What types to search: 'all', 'item', 'comment', 'category', 'tag'
+ * @param string What types to search: 'all', 'item', 'comment', 'meta', 'category', 'tag'
  *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'.
  *               An empty value is equivalent to 'all'.
  * @param string Post IDs to exclude from result, Separated with ','(comma)
@@ -812,6 +824,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 	{	// Search all result types:
 		$search_type_item     = true;
 		$search_type_comment  = true;
+		$search_type_meta     = true;
 		$search_type_category = true;
 		$search_type_tag      = true;
 		$search_type_file     = true;
@@ -821,6 +834,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		$searched_content_types = explode( ',', $searched_content_types );
 		$search_type_item       = in_array( 'item', $searched_content_types );
 		$search_type_comment    = in_array( 'comment', $searched_content_types );
+		$search_type_meta       = in_array( 'meta', $searched_content_types );
 		$search_type_category   = in_array( 'category', $searched_content_types );
 		$search_type_tag        = in_array( 'tag', $searched_content_types );
 		$search_type_file       = in_array( 'file', $searched_content_types );
@@ -834,7 +848,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 
 	$search_result = array();
 
-	if( $search_type_item )
+	if( $search_type_item &&
+	    $Blog->get_setting( 'search_include_posts' ) )
 	{	// Perform search on Items:
 		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts, $search_authors, $content_age );
 		$search_result = $item_search_result;
@@ -845,7 +860,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_comment )
+	if( $search_type_comment &&
+	    $Blog->get_setting( 'search_include_cmnts' ) )
 	{	// Perform search on Comments:
 		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age );
 		$search_result = array_merge( $search_result, $comment_search_result );
@@ -856,7 +872,21 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_category )
+	if( $search_type_meta &&
+	    $Blog->get_setting( 'search_include_metas' ) &&
+	    check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	{	// Perform search on Meta/Internal Comments:
+		$meta_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age, 'meta' );
+		$search_result = array_merge( $search_result, $meta_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $meta_search_result ).' Internal comments.</p>';
+			evo_flush();
+		}
+	}
+
+	if( $search_type_category &&
+	    $Blog->get_setting( 'search_include_cats' ) )
 	{	// Perform search on Chapters:
 		$cats_search_result = search_and_score_chapters( $search_keywords, $keywords, $quoted_parts );
 		$search_result = array_merge( $search_result, $cats_search_result );
@@ -867,7 +897,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_tag )
+	if( $search_type_tag &&
+	    $Blog->get_setting( 'search_include_tags' ) )
 	{	// Perform search on Tags:
 		$tags_search_result = search_and_score_tags( $search_keywords, $keywords, $quoted_parts );
 		$search_result = array_merge( $search_result, $tags_search_result );
@@ -878,7 +909,8 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	if( $search_type_file )
+	if( $search_type_file &&
+	    $Blog->get_setting( 'search_include_files' ) )
 	{
 		$files_search_result = search_and_score_files( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age );
 		$search_result = array_merge( $search_result, $files_search_result );
@@ -935,6 +967,10 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		{
 			$search_result[0]['nr_of_comments'] = count( $comment_search_result );
 		}
+		if( $search_type_meta )
+		{
+			$search_result[0]['nr_of_metas'] = count( $meta_search_result );
+		}
 		if( $search_type_category )
 		{
 			$search_result[0]['nr_of_cats'] = count( $cats_search_result );
@@ -986,6 +1022,9 @@ function search_result_block( $params = array() )
 			echo '<p class="text-muted">Starting a new search...</p>';
 		}
 
+		// Display search spinner:
+		echo '<div id="search_loader_wrapper" class="text-center"><span class="loader_img"></span></div>';
+
 		// Flush first part of the page before starting search, which can be long...
 		evo_flush();
 
@@ -1003,6 +1042,11 @@ function search_result_block( $params = array() )
 		{	// Search comments:
 			$searched_content_types[] = 'comment';
 		}
+		if( $Blog->get_setting( 'search_include_metas' ) &&
+		    check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		{	// Search meta/internal comments:
+			$searched_content_types[] = 'meta';
+		}
 		if( $Blog->get_setting( 'search_include_cats' ) )
 		{	// Search categories:
 			$searched_content_types[] = 'category';
@@ -1015,7 +1059,7 @@ function search_result_block( $params = array() )
 		{	// Search files:
 			$searched_content_types[] = 'file';
 		}
-		$searched_content_types = count( $searched_content_types ) == 5 ? '' : implode( ',', $searched_content_types );
+		$searched_content_types = count( $searched_content_types ) == 6 ? '' : implode( ',', $searched_content_types );
 
 		if( ! empty( $search_content_type ) )
 		{
@@ -1045,6 +1089,10 @@ function search_result_block( $params = array() )
 			{
 				echo '<li>'.sprintf( '%d comments', $search_result[0]['nr_of_comments'] ).'</li>';
 			}
+			if( isset( $search_result[0]['nr_of_metas'] ) )
+			{
+				echo '<li>'.sprintf( '%d internal comments', $search_result[0]['nr_of_metas'] ).'</li>';
+			}
 			if( isset( $search_result[0]['nr_of_cats'] ) )
 			{
 				echo '<li>'.sprintf( '%d chapters', $search_result[0]['nr_of_cats'] ).'</li>';
@@ -1069,11 +1117,6 @@ function search_result_block( $params = array() )
 	// Make sure we are not missing any display params:
 	$params = array_merge( array(
 			'no_match_message'      =>  '<p class="alert alert-info msg_nothing" style="margin: 2em 0">'.T_('Sorry, we could not find anything matching your request, please try to broaden your search.').'<p>',
-			'title_suffix_post'     => ' ('./* TRANS: noun */ T_('Post').')',
-			'title_suffix_comment'  => ' ('./* TRANS: noun */ T_('Comment').')',
-			'title_suffix_category' => ' ('./* TRANS: noun */ T_('Category').')',
-			'title_suffix_tag'      => ' ('./* TRANS: noun */ T_('Tag').')',
-			'title_suffix_file'     => ' ('./* TRANS: noun */ T_('File').')',
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
@@ -1086,6 +1129,7 @@ function search_result_block( $params = array() )
 	if( empty( $search_result ) )
 	{
 		echo $params['no_match_message'];
+		hide_spinner();
 		return;
 	}
 
@@ -1154,6 +1198,7 @@ function search_result_block( $params = array() )
 					break;
 
 				case 'comment':
+				case 'meta':
 					$CommentCache->load_list( $object_ids );
 					break;
 
@@ -1202,36 +1247,15 @@ function search_result_block( $params = array() )
 				}
 
 				$display_params = array(
-					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
-					'excerpt' => $Item->get_excerpt(),
-					'chapter' => sprintf( /* TRANS: %s gets replaced by chapter links */ T_('In %s'), $Item->get_chapter_links() ),
+					'search_result_type'   => 'item',
+					'search_result_object' => $Item,
 				);
 
-				if( $params['use_editor'] )
-				{	// Get editor info to display:
-					$lastedit_User = & $Item->get_lastedit_User();
-					if( empty( $lastedit_User ) )
-					{	// If editor is not defined yet then use author
-						$lastedit_User = & $Item->get_creator_User();
-					}
-					$display_params = array_merge( array(
-							'editor'        => $lastedit_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
-							'lastedit_date' => mysql2date( $params['date_format'], empty( $Item->datemodified ) ? $Item->datecreated : $Item->datemodified ),
-						), $display_params );
-				}
-				else
-				{	// Get author info to display:
-					$creator_User = & $Item->get_creator_User();
-					$display_params = array_merge( array(
-							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
-							'creation_date' => mysql2date( $params['date_format'], $Item->datestart ),
-							'lastedit_date' => mysql2date( $params['date_format'], $Item->datemodified ),
-						), $display_params );
-				}
 				break;
 
 			case 'comment':
-				// Prepare to display a Comment:
+			case 'meta':
+				// Prepare to display a Comment or Meta/Internal Comment:
 
 				$Comment = $CommentCache->get_by_ID( $row['ID'], false );
 
@@ -1241,14 +1265,8 @@ function search_result_block( $params = array() )
 				}
 
 				$display_params = array(
-					'title'   => $Comment->get_permanent_link( '#item#' ).$params['title_suffix_comment'],
-					'excerpt' => excerpt( $Comment->content ),
-					'author'  => $Comment->get_author( array(
-							'link_text'   => $params['author_format'],
-							'thumb_size'  => 'crop-top-15x15',
-							'thumb_class' => 'avatar_before_login'
-						) ),
-					'creation_date' => mysql2date( $params['date_format'], $Comment->date )
+					'search_result_type'   => $row['type'],
+					'search_result_object' => $Comment,
 				);
 				break;
 
@@ -1262,8 +1280,8 @@ function search_result_block( $params = array() )
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 				$display_params = array(
-					'title'   => '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>'.$params['title_suffix_category'],
-					'excerpt' => excerpt( $Chapter->get( 'description' ) ),
+					'search_result_type'   => 'category',
+					'search_result_object' => $Chapter,
 				);
 				break;
 
@@ -1272,8 +1290,10 @@ function search_result_block( $params = array() )
 
 				list( $tag_name, $post_count ) = explode( ',', $row['name'] );
 				$display_params = array(
-					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
-					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
+					'search_result_type'       => 'tag',
+					'search_result_tag'        => $tag_name,
+					'search_result_collection' => $Blog,
+					'tag_post_count'           => $post_count,
 				);
 				break;
 
@@ -1281,7 +1301,9 @@ function search_result_block( $params = array() )
 				// Prepare to display a File:
 
 				$File = $FileCache->get_by_id( $row['ID'], false );
-				$FileType = & $File->get_FileType();
+
+				
+				/* TODO: Create File function to get this:
 				$link_owners = array();
 				if( ! empty( $row['post_IDs'] ) )
 				{
@@ -1302,15 +1324,11 @@ function search_result_block( $params = array() )
 						$link_owners[] = $Comment->get_permanent_link( '#item#' );
 					}
 				}
-
-				$file_description = $File->get( 'desc' );
+				*/
 
 				$display_params = array(
-					'title' => '<a href="'.$File->get_url().'"'.( $File->get('desc') ? ' title="'.$File->dget('desc', 'htmlattr').'"' : '' ).'>'
-							.( $File->get( 'title' ) ? $File->dget( 'title' ) : $File->dget( 'name' ) ).'</a>'
-							.' ('.T_('File').': '.$File->get_view_link( $File->get_icon() ).' '.$File->get_type().')',
-					'excerpt' => $File->get_url().( ! empty( $file_description ) ? '<div>'.$file_description.'</div>' : '' ),
-					'chapter' => empty( $link_owners ) ? NULL : sprintf( /* TRANS: %s get replaced by list of post and comment links */ T_('In %s'), implode( ', ', $link_owners ) )
+					'search_result_type'   => 'file',
+					'search_result_object' => $File,
 				);
 				break;
 
@@ -1346,6 +1364,8 @@ function search_result_block( $params = array() )
 	{
 		search_page_links( $page_params );
 	}
+
+	hide_spinner();
 }
 
 
@@ -1595,78 +1615,75 @@ function search_page_links( $params = array() )
  */
 function display_search_result( $params = array() )
 {
-	global $debug;
+	global $debug, $Blog;
 
+	// TODO: Check if we still need this:
 	// Make sure we are not missing any param:
-	$params = array_merge( array(
-			'title'              => '',
-			'author'             => '',
-			'creation_date'      => '',
-			'excerpt'            => '',
-			'row_start'          => '<div class="search_result">',
-			'row_end'            => '</div>',
-			'cell_title_start'   => '<div class="search_title">',
-			'cell_title_end'     => '</div>',
-			'cell_chapter_start' => '<div class="search_info dimmed">',
-			'cell_chapter_end'   => '</div>',
-			'cell_author_start'  => '<div class="search_info dimmed">',
-			'cell_author_end'    => '</div>',
-			'cell_author_empty'  => false, // false - to display author only when it is defined, use string to print text instead of empty author
-			'cell_content_start' => '<div class="result_content">',
-			'cell_content_end'   => '</div>',
-		), $params );
+	// $params = array_merge( array(
+	// 		'title'              => '',
+	// 		'author'             => '',
+	// 		'creation_date'      => '',
+	// 		'excerpt'            => '',
+	// 		'row_start'          => '<div class="search_result">',
+	// 		'row_end'            => '</div>',
+	// 		'cell_title_start'   => '<div class="search_title">',
+	// 		'cell_title_end'     => '</div>',
+	// 		'cell_chapter_start' => '<div class="search_info dimmed">',
+	// 		'cell_chapter_end'   => '</div>',
+	// 		'cell_author_start'  => '<div class="search_info dimmed">',
+	// 		'cell_author_end'    => '</div>',
+	// 		'cell_author_empty'  => false, // false - to display author only when it is defined, use string to print text instead of empty author
+	// 		'cell_content_start' => '<div class="result_content">',
+	// 		'cell_content_end'   => '</div>',
+	// 	), $params );
 
-	// Prepare the display params of search result object by modules:
-	modules_call_method_reference_params( 'prepare_search_result_display_params', $params );
+	$render_template_objects = array();
+	switch( $params['search_result_type'] )
+	{
+		case 'item':
+			$render_template_objects['Item'] = $params['search_result_object'];
+			break;
 
-	echo $params['row_start'];
+		case 'comment':
+		case 'meta':
+			$render_template_objects['Comment'] = $params['search_result_object'];
+			break;
 
-	echo '<div class="search_result_score dimmed">'.$params['percentage'].'%</div>';
+		case 'file':
+			$render_template_objects['File'] = $params['search_result_object'];
+			break;
 
-	echo '<div class="search_content_wrap">';
+		case 'category':
+			$render_template_objects['Chapter'] = $params['search_result_object'];
+			break;
 
-	// Title
-	echo $params['cell_title_start'].$params['title'].$params['cell_title_end'];
-
-	// Content
-	echo $params['cell_content_start'];
-	echo ! empty( $params['excerpt'] ) ? $params['excerpt'] : '&nbsp;';
-	echo $params['cell_content_end'];
-
-	if( ! empty( $params['chapter'] ) )
-	{	// Display a chapter info:
-		echo $params['cell_chapter_start'];
-		echo $params['chapter'];
-		echo $params['cell_chapter_end'];
+		case 'tag':
+			$object_name = 'Tag';
+			$render_template_objects['tag'] = $params['search_result_tag'];
+			$render_template_objects['Collection'] = $params['search_result_collection'];
+			break;
 	}
 
-	if( ! empty( $params['author'] ) || ! empty( $params['editor'] ) || $params['cell_author_empty'] !== false )
-	{	// Display author or empty string when no author
-		echo $params['cell_author_start'];
-		if( ! empty( $params['author'] ) )
-		{	// Display author if it is defined
-			$lastedit_date = ( isset( $params['lastedit_date'] ) ) ? ', '.T_('last edited on').' '.$params['lastedit_date'] : '';
-			printf( T_('Published by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
-		}
-		elseif( ! empty( $params['editor'] ) )
-		{	// Display editor if it is defined
-			echo T_('Last edit by ').$params['editor'].T_(' on ').$params['lastedit_date'];
-		}
-		else// $params['cell_author_empty'] !== false
-		{	// Display empty value if author is not defined
-			echo $params['cell_author_empty'];
-		}
-		echo $params['cell_author_end'];
+	$TemplateCache = & get_TemplateCache();
+	$template_code = $Blog->get_setting( 'search_result_template_'.$params['search_result_type'] );
+	if( $template_code && ! $TemplateCache->get_by_code( $template_code, false, false ) )
+	{
+		$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$template_code.'</code>' ) );
+		return false;
 	}
 
-	echo '</div>';
+	$search_result = render_template_code( $template_code, $params, $render_template_objects );
+
+	// Modify the search result content by modules:
+	modules_call_method_reference_params( 'modify_search_result', $search_result );
+
+	// Display search result item:
+	echo $search_result;
 
 	if( $debug )
 	{
 		display_score_map( $params );
 	}
-
-	echo $params['row_end'];
 }
 
 
@@ -1888,4 +1905,24 @@ function display_search_debug_info( $search_result )
 
 		$Debuglog->add( sprintf('Result for [%s]: [Percentage:%d%%][Percentage score:%d][Total score:%d]', $score_map_key, $search_result[$index]['percentage'], $search_result[$index]['percentage_score'], $search_result[$index]['score']), 'info' );
 	}
+}
+
+
+/**
+ * Hide spinner
+ */
+function hide_spinner()
+{
+	?>
+	<script>
+	// Hide spinner:
+	( function() {
+		var search_spinner = document.querySelector( "#search_loader_wrapper" );
+		if( search_spinner )
+		{
+			search_spinner.classList.add( 'hide' );
+		}
+	} )();
+	</script>
+	<?php
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -24,6 +24,7 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class ItemStatus extends DataObject
 {
 	var $name;
+	var $order;
 
 	/**
 	 * Constructor
@@ -43,6 +44,7 @@ class ItemStatus extends DataObject
 		{
 			$this->ID   = $db_row->pst_ID;
 			$this->name = $db_row->pst_name;
+			$this->order = $db_row->pst_order;
 		}
 	}
 
@@ -70,6 +72,10 @@ class ItemStatus extends DataObject
 		// Name
 		param_string_not_empty( 'pst_name', T_('Please enter a name.') );
 		$this->set_from_Request( 'name' );
+		
+		// Order
+		param( 'pst_order', 'integer', true );
+		$this->set_from_Request( 'order' );
 
 		return ! param_errors_detected();
 	}

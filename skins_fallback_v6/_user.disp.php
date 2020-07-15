@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -120,10 +120,13 @@ echo '<div class="profile_column_right">';
 		'override_params_for_subcontainer' => array(
 			// This will enclose each widget in a block:
 			'block_start'       => '<div class="evo_widget $wi_class$"><fieldset class="fieldset"><div class="panel panel-default">',
-			'block_end'         => '</div><fieldset></div>',
+			'block_end'         => '</div></fieldset></div>',
 			// This will enclose the title of each widget:
 			'block_title_start' => '<legend class="panel-heading">',
-			'block_title_end'   => '</legend><div class="panel-body">',
+			'block_title_end'   => '</legend>',
+			// This will enclose the body of each widget:
+			'block_body_start'  => '<div class="panel-body">',
+			'block_body_end'    => '</div>',
 			// The following (optional) params will be used as defaults for widgets with code "user_info":
 			'override_params_for_user_info' => array(
 				// This will enclose each widget in a block:
@@ -132,7 +135,7 @@ echo '<div class="profile_column_right">';
 				// This will enclose the title of each widget:
 				'block_title_start' => '<label class="control-label fixedform-label">',
 				'block_title_end'   => ':</label>',
-				// This will enclose the title of each widget:
+				// This will enclose the body of each widget:
 				'block_body_start'  => '<div class="controls fixedform-controls form-control-static">',
 				'block_body_end'    => '</div>',
 			),

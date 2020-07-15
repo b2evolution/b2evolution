@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -77,7 +77,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->textarea_input( 'content', $item_content, 16, NULL, array(
 				'cols' => 50 ,
 				'id' => 'itemform_post_content',
-				'class' => 'autocomplete_usernames'
+				'class' => 'autocomplete_usernames link_attachment_dropzone'
 			) );
 		$Form->switch_layout( NULL );
 		?>

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -125,10 +125,13 @@ if( ! empty( $recipient_User ) )
 		}
 	}
 
-	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
-	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' )
+	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances:
+	if( empty( $params['email_headers']['Reply-To'] ) )
+	{	// Display the message below only when replying is not allowed to current email message (usually for email messages from anonymous users):
+		$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' )
 			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
+	}
 }
 elseif( !empty( $params['Comment'] ) )
 { // Visitor:

@@ -22,7 +22,7 @@ global $Skin;
 // Do inits depending on current $disp:
 skin_init( $disp );
 // TODO: move to Skin::display_init
-require_js( 'functions.js', 'blog' );	// for opening popup window (comments)
+require_js_defer( 'functions.js', 'blog' );	// for opening popup window (comments)
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
 		'arcdir_text'     => T_('Index'),
@@ -142,6 +142,8 @@ siteskin_include( '_site_body_header.inc.php' );
 			'category_text'     => T_('Gallery').': ',
 			'categories_text'   => T_('Galleries').': ',
 			'user_text'         => '',
+			'comments_text'     => '',
+			'search_text'       => '',
 			'display_edit_links'  => ( $disp == 'edit' ),
 			'edit_links_template' => array(
 				'before'              => '<span class="pull-right">',
@@ -164,21 +166,33 @@ siteskin_include( '_site_body_header.inc.php' );
 					'item_class'           => 'evo_post evo_content_block',
 					'item_type_class'      => 'evo_post__ptyp_',
 					'item_status_class'    => 'evo_post__',
+					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
+					'skin_form_before'      => '<div class="panel panel-default skin-form">'
+																				.'<div class="panel-heading">'
+																					.'<h3 class="panel-title">$form_title$</h3>'
+																				.'</div>'
+																				.'<div class="panel-body">',
+					'skin_form_after'       => '</div></div>',
 					// Login
-					'login_page_before'    => '<div class="login_block"><div class="evo_details">',
-					'login_page_after'     => '</div></div>',
-					// Register
-					'register_page_before' => '<div class="login_block"><div class="evo_details">',
-					'register_page_after'  => '</div></div>',
-					'display_abort_link'   => ( $Blog->get_setting( 'allow_access' ) == 'public' ), // Display link to abort login only when it is really possible
+					'display_form_messages' => true,
+					'form_title_login'      => T_('Log in to your account').'$form_links$',
+					'form_title_lostpass'   => get_request_title().'$form_links$',
+					'lostpass_page_class'   => 'evo_panel__lostpass',
+					'login_form_inskin'     => false,
+					'login_page_class'      => 'evo_panel__login',
+					'login_page_before'     => '<div class="$form_class$">',
+					'login_page_after'      => '</div>',
+					'display_reg_link'      => true,
+					'abort_link_position'   => 'form_title',
+					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
 		?>
-		
+
 		</div><!-- .col -->
-		
+
 	</div><!-- .row -->
 
 
@@ -187,10 +201,20 @@ siteskin_include( '_site_body_header.inc.php' );
 	{	// Don't display the pages on disp=catdir because we don't have a limit by page there
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-				'block_start' => '<div class="nav_pages">',
-				'block_end' => '</div>',
-				'prev_text' => '&lt;&lt;',
-				'next_text' => '&gt;&gt;',
+				// This will enclose each widget in a block:
+				'block_start'           => '<div class="center"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				// This will enclose the title of each widget:
+				'block_title_start'     => '<h3>',
+				'block_title_end'       => '</h3>',
+				// The following params will be used as default for widgets
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
+				'page_current_template' => '<span>$page_num$</span>',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	}
@@ -207,7 +231,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			// Display container and contents:
 			widget_container( 'footer', array(
-					// The following params will be used as defaults for widgets included in this container:
+					// The following params will be used as defaults for widgets included in this container
 					'container_display_if_empty' => false, // If no widget, don't display container at all
 					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
 					'container_end'   => '</div>',
@@ -267,7 +291,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

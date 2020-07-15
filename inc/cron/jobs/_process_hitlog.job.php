@@ -10,7 +10,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_funcs( '../inc/sessions/model/_hitlog.funcs.php' );
 
-$extract_keyphrase_result = extract_keyphrase_from_hitlogs();
+$extract_keyphrase_result = extract_keyphrase_from_hitlogs( 'cron_job' );
 
 if( is_string( $extract_keyphrase_result ) )
 {	// Display error message:

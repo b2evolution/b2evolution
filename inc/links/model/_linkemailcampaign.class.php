@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -58,8 +58,6 @@ class LinkEmailCampaign extends LinkOwner
 	 */
 	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			if( $assert )
@@ -71,10 +69,10 @@ class LinkEmailCampaign extends LinkOwner
 
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
-			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
 		}
 
-		return $current_User->check_perm( 'emails', $permlevel, $assert );
+		return check_user_perm( 'emails', $permlevel, $assert );
 	}
 
 	/**
@@ -171,6 +169,8 @@ class LinkEmailCampaign extends LinkOwner
 		{
 			case 'name':
 				return 'emailcampaign';
+			case 'title':
+				return $this->EmailCampaign->get_name();
 		}
 		return parent::get( $parname );
 	}
@@ -178,22 +178,31 @@ class LinkEmailCampaign extends LinkOwner
 
 	/**
 	 * Get Email Campaign edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=compose&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'tab=compose'.$glue.'ecmp_ID='.$this->EmailCampaign->ID;
 	}
+
 
 	/**
 	 * Get Email Campaign view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=send&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'tab=send'.$glue.'ecmp_ID='.$this->EmailCampaign->ID;
 	}
 
 

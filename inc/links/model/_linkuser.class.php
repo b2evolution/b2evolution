@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -68,10 +68,10 @@ class LinkUser extends LinkOwner
 
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
-			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
 		}
 
-		return $current_User->ID == $this->User->ID || $current_User->check_perm( 'users', $permlevel, $assert );
+		return $current_User->ID == $this->User->ID || check_user_perm( 'users', $permlevel, $assert );
 	}
 
 	/**
@@ -184,18 +184,30 @@ class LinkUser extends LinkOwner
 
 	/**
 	 * Get User edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$this->User->ID;
+		global $admin_url;
+
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=avatar'.$glue.'user_ID='.$this->User->ID;
 	}
 
 	/**
 	 * Get User view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return '?ctrl=user&amp;user_tab=profile&amp;user_ID='.$this->User->ID;
+		global $admin_url;
+
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=profile'.$glue.'user_ID='.$this->User->ID;
 	}
 }
 

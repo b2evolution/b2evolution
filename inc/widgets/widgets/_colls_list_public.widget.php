@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -55,7 +55,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Public collections list');
+		return T_('Collections list');
 	}
 
 

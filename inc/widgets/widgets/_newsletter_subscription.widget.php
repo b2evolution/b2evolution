@@ -53,7 +53,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Newsletter/Email list subscription');
+		return T_('Email list subscription');
 	}
 
 
@@ -221,6 +221,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 		if( ! is_logged_in() )
 		{	// Don't display when user is not logged in:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not logged in.' );
 			return false;
 		}
 
@@ -242,7 +243,8 @@ class newsletter_subscription_Widget extends ComponentWidget
 		    ! $current_User->is_allowed_newsletter( $widget_Newsletter->ID ) )
 		{	// Don't display the widget block completely when user is not subscribed
 			// and current user has no permission to be subscribed to:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not subscribed or has no permission.' );
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];

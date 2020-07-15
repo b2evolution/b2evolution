@@ -17,9 +17,9 @@ global $retrict_tag;
 global $link_ID, $tag_type, $Plugins;
 
 $tag_types = array(
-	'image'     => T_('Image'),
-	'thumbnail' => T_('Thumbnail'),
-	'inline'    => T_('Basic inline'),
+	'image'     => TB_('Image'),
+	'thumbnail' => TB_('Thumbnail'),
+	'inline'    => TB_('Basic inline'),
 );
 
 // Get additional tabs from active Plugins:
@@ -50,7 +50,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 			$Form = new Form( NULL, 'form' );
 			$Form->begin_form( 'fform' );
 			$Form->hidden( 'link_ID', $link_ID );
-			$Form->begin_fieldset( T_('Parameters') );
+			$Form->begin_fieldset( TB_('Parameters') );
 			echo '<div class="tab-content">';
 			foreach( $tag_types as $tag_type_key => $tag_type_title )
 			{
@@ -58,12 +58,32 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 				switch( $tag_type_key )
 				{
 					case 'image':
-						$Form->text( 'image_caption', get_param( 'image_caption' ), 40, T_('Caption'), '<br>
+						// Caption:
+						$image_caption_params = array();
+						if( get_param( 'image_disable_caption' ) )
+						{	// Disable input of Caption on initialize this edit form:
+							$image_caption_params['disabled'] = 'disabled';
+						}
+						$Form->text_input( 'image_caption', get_param( 'image_caption' ), 40, TB_('Caption'), '<br>
 							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
 								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'image_disable_caption' ) ? ' checked="checked"' : '' ).'>
-								<span>'.T_('Disable caption').'</span></span>', '' );
+								<span>'.TB_('Disable caption').'</span></span>', $image_caption_params );
+						// Alt text:
+						$image_alt_params = array();
+						if( get_param( 'image_disable_alt' ) )
+						{	// Disable input of Alt text on initialize this edit form:
+							$image_alt_params['disabled'] = 'disabled';
+						}
+						$Form->text_input( 'image_alt', get_param( 'image_alt' ), 40, TB_('Alt text'), '<br>
+							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
+								<input type="checkbox" name="image_disable_alt" id="image_disable_alt" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'image_disable_alt' ) ? ' checked="checked"' : '' ).'>
+								<span>'.TB_('Disable alt text').'</span></span>', $image_alt_params );
+						// HRef:
+						$Form->text( 'image_href', get_param( 'image_href' ), 40, TB_('HRef') );
+						// TODO: Size:
+						// Class:
 						$image_class = get_param( 'image_class' );
-						$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$Form->text( 'image_class', $image_class, 40, TB_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
 							<button class="btn btn-default btn-xs">noborder</button>
 							<button class="btn btn-default btn-xs">rounded</button>
@@ -71,17 +91,32 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 						break;
 
 					case 'thumbnail':
+						// Alt text:
+						$thumbnail_alt_params = array();
+						if( get_param( 'thumbnail_disable_alt' ) )
+						{	// Disable input of Alt text on initialize this edit form:
+							$thumbnail_alt_params['disabled'] = 'disabled';
+						}
+						$Form->text_input( 'thumbnail_alt', get_param( 'thumbnail_alt' ), 40, TB_('Alt text'), '<br>
+							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
+								<input type="checkbox" name="thumbnail_disable_alt" id="thumbnail_disable_alt" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'thumbnail_disable_alt' ) ? ' checked="checked"' : '' ).'>
+								<span>'.TB_('Disable alt text').'</span></span>', $thumbnail_alt_params );
+						// HRef:
+						$Form->text( 'thumbnail_href', get_param( 'thumbnail_href' ), 40, TB_('HRef') );
+						// Size:
 						$Form->radio( 'thumbnail_size', get_param( 'thumbnail_size' ), array(
 								array( 'small', 'small' ),
 								array( 'medium', 'medium' ),
 								array( 'large', 'large' )
-							), T_( 'Size') );
+							), TB_( 'Size') );
+						// Alignment:
 						$Form->radio( 'thumbnail_alignment', get_param( 'thumbnail_alignment' ), array(
 								array( 'left', 'left' ),
 								array( 'right', 'right' )
-							), T_( 'Alignment') );
+							), TB_( 'Alignment') );
+						// Class:
 						$thumbnail_class = get_param( 'thumbnail_class' );
-						$Form->text( 'thumbnail_class', get_param( 'thumbnail_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$Form->text( 'thumbnail_class', get_param( 'thumbnail_class' ), 40, TB_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
 							<button class="btn btn-default btn-xs">noborder</button>
 							<button class="btn btn-default btn-xs">rounded</button>
@@ -89,8 +124,19 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 						break;
 
 					case 'inline':
+						// Alt text:
+						$inline_alt_params = array();
+						if( get_param( 'inline_disable_alt' ) )
+						{	// Disable input of Alt text on initialize this edit form:
+							$inline_alt_params['disabled'] = 'disabled';
+						}
+						$Form->text_input( 'inline_alt', get_param( 'inline_alt' ), 40, TB_('Alt text'), '<br>
+							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
+								<input type="checkbox" name="inline_disable_alt" id="inline_disable_alt" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'inline_disable_alt' ) ? ' checked="checked"' : '' ).'>
+								<span>'.TB_('Disable alt text').'</span></span>', $inline_alt_params );
+						// Class:
 						$inline_class = get_param( 'inline_class' );
-						$Form->text( 'inline_class', get_param( 'inline_class' ), 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
+						$Form->text( 'inline_class', get_param( 'inline_class' ), 40, TB_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 								<button class="btn btn-default btn-xs">border</button>
 								<button class="btn btn-default btn-xs">noborder</button>
 								<button class="btn btn-default btn-xs">rounded</button>
@@ -198,16 +244,20 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					var caption = jQuery( 'input[name="' + tagType + '_caption"]' ).val();
 					var noCaption = jQuery( 'input[name="' + tagType + '_disable_caption"]' ).is( ':checked' );
 				}
+				var alt = jQuery( 'input[name="' + tagType + '_alt"]' ).val();
+				var noAlt = jQuery( 'input[name="' + tagType + '_disable_alt"]' ).is( ':checked' );
 				if( tagType == 'thumbnail' )
 				{
 					var alignment = jQuery( 'input[name="' + tagType + '_alignment"]:checked' ).val();
 					var size = jQuery( 'input[name="' + tagType + '_size"]:checked' ).val();
 				}
+				var href = jQuery( 'input[name="' + tagType + '_href"]' ).val();
 				var classes = jQuery( 'input[name="' + tagType + '_class"]' ).val();
 				var tag_caption = false;
 
 				var options = '';
 
+				// Caption (only for image):
 				if( tagType == 'image' )
 				{
 					if( noCaption )
@@ -220,12 +270,49 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					}
 				}
 
+				// Alt text:
+				if( alt != '' || noAlt )
+				{
+					if( tagType == 'image' )
+					{	// For image Caption is always before Alt text:
+						options += ':';
+					}
+					if( noAlt )
+					{
+						options += '-';
+					}
+					else
+					{
+						options += alt;
+					}
+				}
+
+				// HRef:
+				if( href && href.match( /^(https?:\/\/.+|\(\((.*?)\)\))$/i ) )
+				{
+					if( options == '' )
+					{	// Insert empty option for default Caption before HRef (only for image):
+						options += ( tagType == 'image' ? ':' : '' );
+					}
+					else
+					{	// Insert separator between previous option and HRef:
+						options += ':';
+					}
+					options += href;
+				}
+
 				if( tagType == 'thumbnail' )
 				{
+					// Size:
 					options += ( options == '' ? '' : ':' ) + size;
+
+					// Alignment:
 					options += ':' + alignment;
 				}
 
+				// TODO: Size (for image):
+
+				// Styles:
 				if( classes )
 				{
 					if( tagType == 'image' )
@@ -247,7 +334,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					echo "\n".'// END JS from plugin #'.$plugin_ID.'.'."\n\n";
 				}
 				?>
-				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?>, tag_caption );
+				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?>, tag_caption, <?php echo param( 'prefix', 'string' ); ?>b2evoCanvas );
 
 				closeModalWindow();
 

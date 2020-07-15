@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -164,7 +164,7 @@ class user_login_Widget extends ComponentWidget
 		//get required js files for _widget_login.form
 		if( can_use_hashed_password() )
 		{ // Include JS for client-side password hashing:
-			require_js( 'build/sha1_md5.bmin.js', 'blog' );
+			require_js_defer( 'build/sha1_md5.bmin.js', 'blog' );
 		}
 	}
 
@@ -178,11 +178,13 @@ class user_login_Widget extends ComponentWidget
 	{
 		if( is_logged_in() )
 		{	// Don't display because user is already logged in:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is already logged in.' );
 			return false;
 		}
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// Don't display a duplicate form for inskin login mode:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden in order to don\'t duplicate same form on disp=login.' );
 			return false;
 		}
 

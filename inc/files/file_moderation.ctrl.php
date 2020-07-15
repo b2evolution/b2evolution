@@ -7,17 +7,17 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check permission:
-$current_User->check_perm( 'files', 'view', true );
+check_user_perm( 'files', 'view', true );
 
 // Check permission:
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'options', 'edit', true );
 
 
 //param( 'action', 'string' );
@@ -36,26 +36,26 @@ $AdminUI->set_path( 'files', 'moderation', $tab );
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Moderation'), '?ctrl=filemod' );
+$AdminUI->breadcrumbpath_add( TB_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Moderation'), '?ctrl=filemod' );
 switch( $tab )
 {
 	case 'likes':
-		$AdminUI->breadcrumbpath_add( T_('Likes'), '?ctrl=filemod&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Likes'), '?ctrl=filemod&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'file-moderation-likes' );
 		break;
 
 	case 'suspicious':
-		$AdminUI->breadcrumbpath_add( T_('Suspicious'), '?ctrl=filemod&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Suspicious'), '?ctrl=filemod&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'file-moderation-suspicious' );
 		break;
 
 	case 'duplicates':
-		$AdminUI->breadcrumbpath_add( T_('Duplicates'), '?ctrl=filemod&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Duplicates'), '?ctrl=filemod&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'file-moderation-duplicates' );

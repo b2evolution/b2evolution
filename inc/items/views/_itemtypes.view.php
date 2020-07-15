@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog;
+global $Collection, $Blog, $admin_url;
 
 // Create query
 $SQL = new SQL();
@@ -37,20 +37,28 @@ $default_ids = ItemType::get_default_ids();
  */
 function get_actions_for_itemtype( $id )
 {
-	global $default_ids;
-	$action = action_icon( T_('Duplicate this Item Type...'), 'copy',
-										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
+	global $default_ids, $admin_url;
 
-	// Edit all item types except of not reserved item type
+	// Exit Item Type:
 	$action = action_icon( T_('Edit this Item Type...'), 'edit',
-									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
-						.$action;
+		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit' ) );
+
+	// Copy Item Type:
+	$action .= action_icon( T_('Duplicate this Item Type...'), 'copy',
+		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new' ) );
+
+	if( is_pro() && check_user_perm( 'options', 'edit' ) )
+	{	// Export Item Type only for PRO version:
+		$action .= action_icon( T_('Export this Item Type...'), 'download',
+			$admin_url.'?ctrl=exportxml&amp;action=export_itemtype&amp;ityp_ID='.$id.'&amp;'.url_crumb( 'itemtype' ) );
+	}
 
 	if( ! in_array( $id, $default_ids ) )
 	{	// Delete only the not default item types:
 		$action .= action_icon( T_('Delete this Item Type!'), 'delete',
-									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
+			regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb( 'itemtype' ) ) );
 	}
+
 	return $action;
 }
 
@@ -60,9 +68,7 @@ function get_actions_for_itemtype( $id )
  */
 function get_name_for_itemtype( $id, $name )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_name = '<a href="'.regenerate_url( 'action,ID', 'ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}
@@ -85,9 +91,9 @@ $Results->cols[] = array(
 
 function ityp_row_enabled( $enabled, $item_type_ID )
 {
-	global $current_User, $admin_url, $Collection, $Blog;
+	global $admin_url, $Collection, $Blog;
 
-	$perm_edit = $current_User->check_perm( 'options', 'edit', false );
+	$perm_edit = check_user_perm( 'options', 'edit', false );
 
 	if( $enabled )
 	{ // Enabled
@@ -95,7 +101,7 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 		{ // URL to disable the item type
 			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=disable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
 		}
-		$status_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The item type is enabled.') ) );
+		$status_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => TB_('The item type is enabled.') ) );
 	}
 	else
 	{ // Disabled
@@ -103,7 +109,14 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 		{ // URL to enable the item type
 			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=enable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
 		}
-		$status_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The item type is disabled.') ) );
+		if( $Blog->has_items_per_item_type( $item_type_ID ) )
+		{	// Use orange icon if collection has at least one Item per this disabled Item Type:
+			$status_icon = get_icon( 'bullet_orange', 'imgtag', array( 'title' => TB_('Disabled but used by some Items in this collection.') ) );
+		}
+		else
+		{	// Use "grey empty" icon if collection has no Items per this disabled Item Type:
+			$status_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => TB_('The item type is disabled.') ) );
+		}
 	}
 
 	if( isset( $status_url ) )
@@ -126,7 +139,7 @@ $Results->cols[] = array(
 
 function ityp_row_default( $item_type_ID )
 {
-	global $current_User, $admin_url, $Collection, $Blog;
+	global $admin_url, $Collection, $Blog;
 
 	if( $Blog->get_setting( 'default_post_type' ) == $item_type_ID )
 	{ // The item type is default for current collection:
@@ -134,7 +147,7 @@ function ityp_row_default( $item_type_ID )
 	}
 	else
 	{ // The item type is not default:
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 		{ // URL to use the item type as default if current user has a permission to edit collection properties:
 			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=default&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
 			$status_icon_title = sprintf( T_('Set this item type as the default for %s.'), $Blog->get( 'shortname' ) );
@@ -234,7 +247,7 @@ $Results->cols[] = array(
 		'td_class' => 'center',
 	);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -242,6 +255,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => '%get_actions_for_itemtype( #ityp_ID# )%',
 						);
+
+	$Results->global_icon( T_('Import Item Type'), 'import',
+		$admin_url.'?ctrl=itimport&amp;it_blog_IDs[]='.$Blog->ID, T_('Import Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
 				regenerate_url( 'action', 'action=new' ), T_('New Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );

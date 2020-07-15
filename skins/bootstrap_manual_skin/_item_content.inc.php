@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -20,7 +20,7 @@ global $more;
 // Default params:
 $params = array_merge( array(
 		'content_mode'             => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
-		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there. Value '$content_mode$' to use exact value as above, may be used for disp=mustread.
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
@@ -43,6 +43,14 @@ $params = array_merge( array(
 		'content_start_full_text'  => '<div class="evo_post__full_text clearfix">',
 		'content_end_full_text'    => '</div>',
 
+		// In case we display a CONTENT BLOCK (included in another post by short tag [include:item-slug]):
+		'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+		'content_block_end'           => '</div>',
+		'content_block_before_images' => '<div class="evo_content_block_images">',
+		'content_block_after_images'  => '</div>',
+		'content_block_before_text'   => '<div class="evo_content_block_text">',
+		'content_block_after_text'    => '</div>',
+
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
 		'before_content_extension' => '',
@@ -56,7 +64,7 @@ $params = array_merge( array(
 		'after_images'             => '</div>',
 		'image_class'              => 'img-responsive',
 		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ), // Standard size (for old browsers)
-		// 'image_sizes'					=> '430px: 400px, 670px: 640px, sm: 720px, md: 698px, 848px', // simplified sizes= attribute for browser to select correct size from srcset=
+// TODO: it makes no sense to use a skin setting for standard size but not have matching image_sizes.		
 		'image_sizes'					=> '(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px',
 													// Note: first we handle margins 15+640+15 = 670 in the fluid domain, then we work with bootstrap breakpoints
 		'image_limit'              =>  1000,
@@ -107,50 +115,19 @@ $params = array_merge( array(
 
 // Determine content mode to use..
 if( $Item->is_intro() )
-{
-	$content_mode = $params['intro_mode'];
+{	// Content mode for intro items:
+	// ($content_mode$ may be used for disp=mustread)
+	$content_mode = ( $params['intro_mode'] == '$content_mode$' ? $params['content_mode'] : $params['intro_mode'] );
 }
 else
-{
+{	// Content mode for normal(not intro) items:
 	$content_mode = $params['content_mode'];
 }
-if( $content_mode == 'auto' )
-{
-	// echo $disp_detail;
-	switch( $disp_detail )
-	{
-		case 'posts-cat':
-		case 'posts-topcat':
-		case 'posts-subcat':
-			$content_mode = $Blog->get_setting('chapter_content');
-			break;
-
-		case 'posts-tag':
-			$content_mode = $Blog->get_setting('tag_content');
-			break;
-
-		case 'posts-date':
-			$content_mode = $Blog->get_setting('archive_content');
-			break;
-
-		case 'single':
-		case 'page':
-			$content_mode = 'full';
-			break;
-
-		case 'posts-default':  // home page 1
-		case 'posts-next':     // next page 2, 3, etc
-			$content_mode = $Blog->get_setting('main_content');
-			break;
-
-		default: // posts-filtered, search, flagged and etc.
-			$content_mode = $Blog->get_setting('filtered_content');
-	}
-}
+$content_mode = resolve_auto_content_mode( $content_mode );
 
 if( $params['include_cover_images'] )
 { // Include the cover images on teaser place
-	$teaser_image_positions = 'cover,teaser,teaserperm,teaserlink';
+	$teaser_image_positions = 'cover,background,teaser,teaserperm,teaserlink';
 }
 else
 { // Don't include the cover images
@@ -189,7 +166,7 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
@@ -242,7 +219,7 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
@@ -254,6 +231,12 @@ switch( $content_mode )
 
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
 					'before_image'        => $params['before_image'],
@@ -315,13 +298,19 @@ switch( $content_mode )
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
 						'gallery_order'       => $params['gallery_order'],
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_extension'],
 					'after'               => $params['after_content_extension'],
 					'before_image'        => $params['before_image'],

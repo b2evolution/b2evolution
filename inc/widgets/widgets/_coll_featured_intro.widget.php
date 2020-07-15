@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -203,7 +203,7 @@ class coll_featured_intro_Widget extends ComponentWidget
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
-			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
+			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'background' );
 			if( ! empty( $LinkList ) &&
 					$Link = & $LinkList->get_next() &&
 					$File = & $Link->get_File() &&

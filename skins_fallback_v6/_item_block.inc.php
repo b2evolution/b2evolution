@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -30,6 +30,7 @@ $params = array_merge( array(
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
+			'item_link_type'             => '#',
 		'item_title_line_after'      => '</div>',
 		// Controlling the content:
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
@@ -103,6 +104,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'widget_item_title_params'  => array(
 						'before' => $params['item_title_line_before'].$params['item_title_before'],
 						'after' => $params['item_title_after'].$params['item_title_line_after'],
+						'link_type' => $params['item_link_type'],
 				),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
@@ -133,15 +135,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'widget_item_title_params'  => array(
 						'before' => $params['item_title_line_before'].( $disp == 'single' ? $params['item_title_single_before'] : $params['item_title_before'] ),
 						'after' => ( $disp == 'single' ? $params['item_title_single_after'] : $params['item_title_after'] ).$params['item_title_line_after'],
+						'link_type' => $params['item_link_type'],
 					),
 				// Item Previous Next widget
 				'widget_item_next_previous_params' => array(
-						'block_start' => '<nav><ul class="pager">',
-						'block_end' => '</ul></nav>',
-						'prev_start' => '<li class="previous">',
-						'prev_end' => '</li>',
-						'next_start' => '<li class="next">',
-						'next_end' => '</li>',
 					),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
@@ -230,54 +227,17 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 	}
-	else
-	{
+	elseif( $Item->is_intro() )
+	{	// Display item content only for intro items because for normal items we display content by widget in container "Item in List" above:
 	// this will create a <section>
-		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item content by copying the generic
-		// /skins/_item_content.inc.php file into the current skin folder.
-		// -------------------------- END OF POST CONTENT -------------------------
+		// ---------------------- POST CONTENT INCLUDED HERE ----------------------	
+		skin_include( '_item_content.inc.php', $params );	
+		// Note: You can customize the default item content by copying the generic	
+		// /skins/_item_content.inc.php file into the current skin folder.	
+		// -------------------------- END OF POST CONTENT -------------------------	
 	// this will end a </section>
 	}
 	?>
-
-	<footer>
-
-		<?php
-			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
-			{
-		?>
-
-		<nav class="post_comments_link">
-		<?php
-			// Link to comments, trackbacks, etc.:
-			$Item->feedback_link( array(
-							'type' => 'comments',
-							'link_before' => '',
-							'link_after' => '',
-							'link_text_zero' => '#',
-							'link_text_one' => '#',
-							'link_text_more' => '#',
-							'link_title' => '#',
-							// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
-							// But why do we even have a comment link on the home page ? (only when logged in)
-						) );
-
-			// Link to comments, trackbacks, etc.:
-			$Item->feedback_link( array(
-							'type' => 'trackbacks',
-							'link_before' => ' &bull; ',
-							'link_after' => '',
-							'link_text_zero' => '#',
-							'link_text_one' => '#',
-							'link_text_more' => '#',
-							'link_title' => '#',
-						) );
-		?>
-		</nav>
-		<?php } ?>
-	</footer>
 
 	<?php
 	if( is_single_page() )
@@ -303,16 +263,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
 	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-		skin_include( '_item_workflow.inc.php' );
-		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
-	}
-	?>
-
-	<?php
-	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		// ------------------ INTERNAL COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
@@ -330,7 +281,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 				'comment_info_after'    => '</small></footer></div>',
 			) );
-		// ---------------------- END OF META COMMENTS ---------------------
+		// ---------------------- END OF INTERNAL COMMENTS ---------------------
 	}
 	?>
 

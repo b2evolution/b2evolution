@@ -1,5 +1,5 @@
 /**
- * These are the generic styles that are common to "all" skins.
+ * These are the generic styles that are common to "all" NON-bootstrap skins.
  *
  * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
  *
@@ -23,6 +23,11 @@
 // Organization Members widget:
 @import "_org_members_widget.module.less";
 
+// Item Workflow widget:
+@import "_item_workflow_widget.module.less";
+
+// Checklist Items widget:
+@import "_item_checklist_lines_widget.module.less";
 
 // ----- PLUGINS -----
 
@@ -31,6 +36,12 @@
 
 // Styles for jQuery plugin "Autocomplete for Textarea":
 @import "inc/jquery.textcomplete.inc.less";
+
+
+// ----- FORMS -----
+
+// Search form:
+@import "_search_form.module.less";
 
 // -----
 
@@ -362,21 +373,6 @@ div.container_menu_top input.search_field {
 .widget_core_user_profile_pics img {
 	max-width: 100%;
 	height: auto;
-}
-
-// Advertisement widget
-div.widget_core_coll_item_list.nobullets ul,
-div.widget_core_coll_item_list.nobullets ul li,
-li.widget_core_coll_item_list.nobullets ul,
-li.widget_core_coll_item_list.nobullets ul li {
-	background: none;
-	margin-left: 0;
-	padding-left: 0;
-	list-style: none;
-}
-div.widget_core_coll_item_list.nobullets ul li:before,
-ul li.widget_core_coll_item_list.nobullets ul li:before {
-	content: none;
 }
 
 // Tabs (Used to switch between user profile pages)

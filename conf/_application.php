@@ -15,17 +15,18 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '7.0.2-beta';
+$app_version = '7.2.0-beta';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2019-07-16';
+$app_date = '2020-07-14';
 
 /**
  * Is this b2evolution PRO?
  * If the PRO modules are available some UI elements will be set up differently.
+ * This requires the PHP files for the PRO modules (otherwise there will be errors)
  * @global boolean
  */
 $app_pro = false;
@@ -43,7 +44,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 15580;
+$new_db_version = 16210;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
@@ -60,11 +61,11 @@ $required_mysql_version = array( 'application' => '5.5.3' );
 /**
  * Is displayed on the login screen:
  */
-$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version.'</strong></a>
+$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version_long.'</strong></a>
 		&ndash;
 		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
-$copyright_text = '<span class="nobr">&copy;2003-2018 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
+$copyright_text = '<span class="nobr">&copy;2003-2020 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
  * Do you want to display the help links to online documentation?
@@ -92,6 +93,7 @@ $modules = array(
 		'messaging',
 		'maintenance',
 		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
-		'export',
+		'menus',
+		'templates',
 	);
 ?>

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}
  * Parts of this file are copyright (c)2005 by Jason EDGECOMBE
  *
@@ -126,51 +126,68 @@ function create_default_data()
 					 ( 'Instant Messaging', '2' ),
 					 ( 'Phone', '3' ),
 					 ( 'Web', '4' ),
-					 ( 'Address', '5' )" );
+					 ( 'Address', '5' ),
+					 ( 'Administrative', '6' )" );
 	task_end();
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
-	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
 	$DB->query( "
-		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
-		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
-						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
-						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
-						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
-						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
-						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
-						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
-						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
-						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
-						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
-						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
-						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
-						( 3, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
-						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
-						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
-						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
-						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
-						( 4, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'googleplus',   'fa fa-google-plus fa-x-google-plus--nudge' ),
-						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
-						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
-						( 4, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', 'website',      NULL ),
-						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
-						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
-						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
-						( 4, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
-						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
-						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
-						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
-						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
-						( 4, 'url',    'Yelp',          NULL, 'optional',    'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
-						( 4, 'url',    'PayPal',        NULL, 'optional',    'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
-						( 4, 'url',    '500px',         NULL, 'optional',    'forbidden', '17', '0', '500px',        'fa fa-500px' ),
-						( 4, 'url',    'Amazon',        NULL, 'optional',    'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
-						( 4, 'url',    'Instagram',     NULL, 'optional',    'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
-						( 4, 'url',    'Vimeo',         NULL, 'optional',    'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
-						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
-						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
+		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_visibility, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
+		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'unrestricted', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
+						( 1, 'word',   'I like',        NULL, 'recommended', 'unrestricted', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
+						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'unrestricted', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+						( 1, 'list',   'Industry',      'Energy, Utilities & Resources
+Financial Services
+Health Services
+Hospitality & Tourism
+Industrial Manufacturing
+Pharma & Life Sciences
+Public Sector
+Real Estate
+Retail & Consumer Goods
+Sports Business Advisory
+Technology, Media & Telecom',                     'recommended', 'unrestricted', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
+						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'unrestricted', 'allowed',   '1',  '0', 'msnliveim',    NULL ),
+						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'unrestricted', 'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
+						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'unrestricted', 'allowed',   '3',  '0', 'aolaim',       NULL ),
+						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'unrestricted', 'allowed',   '4',  '0', 'icqid',        NULL ),
+						( 2, 'phone',  'Skype',         NULL, 'optional',    'private',      'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'private',      'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
+						( 3, 'phone',  'Main phone',    NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
+						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'private',      'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
+						( 3, 'phone',  'Office phone',  NULL, 'optional',    'private',      'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
+						( 3, 'phone',  'Home phone',    NULL, 'optional',    'private',      'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
+						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'private',      'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
+						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'private',      'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
+						( 4, 'url',    'Twitter',       NULL, 'recommended', 'unrestricted', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
+						( 4, 'url',    'Facebook',      NULL, 'recommended', 'unrestricted', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
+						( 4, 'url',    'Linkedin',      NULL, 'optional',    'unrestricted', 'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
+						( 4, 'url',    'GitHub',        NULL, 'optional',    'unrestricted', 'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
+						( 4, 'url',    'Website',       NULL, 'optional',    'unrestricted', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Blog',          NULL, 'optional',    'unrestricted', 'allowed',   '7',  '0', 'blog',         NULL ),
+						( 4, 'url',    'Myspace',       NULL, 'optional',    'unrestricted', 'forbidden', '8',  '0', 'myspace',      NULL ),
+						( 4, 'url',    'Flickr',        NULL, 'optional',    'unrestricted', 'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
+						( 4, 'url',    'YouTube',       NULL, 'optional',    'unrestricted', 'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
+						( 4, 'url',    'Digg',          NULL, 'optional',    'unrestricted', 'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
+						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'unrestricted', 'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
+						( 4, 'url',    'Pinterest',     NULL, 'optional',    'unrestricted', 'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'unrestricted', 'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
+						( 4, 'url',    'Yelp',          NULL, 'optional',    'unrestricted', 'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
+						( 4, 'url',    'PayPal',        NULL, 'optional',    'unrestricted', 'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
+						( 4, 'url',    '500px',         NULL, 'optional',    'unrestricted', 'forbidden', '17', '0', '500px',        'fa fa-500px' ),
+						( 4, 'url',    'Amazon',        NULL, 'optional',    'unrestricted', 'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
+						( 4, 'url',    'Instagram',     NULL, 'optional',    'unrestricted', 'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
+						( 4, 'url',    'Vimeo',         NULL, 'optional',    'unrestricted', 'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
+						( 5, 'text',   'Main address',  NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
+						( 5, 'text',   'Home address',  NULL, 'optional',    'private',      'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' ),
+						( 6, 'text',   'Admin notes',   NULL, 'recommended', 'admin',        'forbidden', '1',  '0', 'adminnotes',   'fa fa-edit' )" );
+
+	if( is_pro() )
+	{	// Install default user field definitions for PRO version:
+		load_funcs( '_core/_pro_features.funcs.php' );
+		pro_install_default_user_fields();
+	}
 	task_end();
 
 
@@ -179,7 +196,6 @@ function create_default_data()
 	create_default_countries();
 
 	create_default_regions();
-	create_default_subregions();
 
 
 	// Do not create organization yet
@@ -221,13 +237,12 @@ function create_default_data()
 			'org_roles' => array( 'King of Spades' ),
 			'org_priorities' => array( 0 ),
 			'fields'    => array(
-					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-					'Website'     => 'http://b2evolution.net/',
-					'Twitter'     => 'https://twitter.com/b2evolution/',
-					'Facebook'    => 'https://www.facebook.com/b2evolution',
-					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+					'website'  => 'http://b2evolution.net/',
+					'twitter'  => 'https://twitter.com/b2evolution/',
+					'facebook' => 'https://www.facebook.com/b2evolution',
+					'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+					'github'   => 'https://github.com/b2evolution/b2evolution',
 				)
 		) );
 	task_end();
@@ -252,7 +267,7 @@ function create_default_data()
 		);
 	$post_types[] = array(
 			'name'          => 'Recipe',
-			'template_name' => 'recipe',
+			'template_full' => 'recipe_content_full',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -287,6 +302,7 @@ function create_default_data()
 			'template_name'  => 'page',
 			'perm_level'     => 'restricted',
 			'use_comments'   => 0,
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Widget Page',
@@ -364,17 +380,27 @@ function create_default_data()
 			'use_comments'   => 0,
 		);
 	$post_types[] = array(
+			'name'           => 'Text Ad',
+			'usage'          => 'content-block',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'use_comments'   => 0,
+		);
+	$post_types[] = array(
 			'name'           => 'Sidebar link',
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
 			'allow_disabling_comments' => 1,
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'                   => 'Terms & Conditions',
@@ -411,11 +437,22 @@ function create_default_data()
 			'name'   => 'Review',
 			'schema' => 'Review',
 		);
+	$post_types[] = array(
+			'name'            => 'Homepage Content Tab',
+			'usage'           => 'post',
+			'use_short_title' => 'optional',
+		);
+	$post_types[] = array(
+			'name'                 => 'Task',
+			'allow_html'           => 0,
+			'front_order_workflow' => 20,
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
 			'description'              => NULL,
 			'usage'                    => 'post',
+			'template_full'            => NULL,
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
 			'use_short_title'          => 'never',
@@ -442,6 +479,7 @@ function create_default_data()
 			'use_coordinates'          => 'never',
 			'front_order_title'        => 10,
 			'front_order_attachments'  => 30,
+			'front_order_workflow'     => NULL,
 			'front_order_text'         => 80,
 			'front_order_location'     => 90,
 			'can_be_purchased_instore' => 0,
@@ -464,9 +502,9 @@ function create_default_data()
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
 	$recipe_ityp_ID = 2;
-	$product_ityp_ID = 22;
-	$digital_product_ityp_ID = 23;
-	$review_ityp_ID = 24;
+	$product_ityp_ID = 23;
+	$digital_product_ityp_ID = 24;
+	$review_ityp_ID = 25;
 	$forum_topic_ityp_ID = 8;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
@@ -503,7 +541,7 @@ function create_default_data()
 			'type'            => 'double',
 			'order'           => 180,
 			'note'            => T_('Enter a number'),
-			'format'          => '$ 0 0.00',
+			'format'          => '$ 0 0.00[.green];$ 0 0.00[.red]',
 			'cell_class'      => 'right',
 			'green_highlight' => 'lowest',
 		),
@@ -554,6 +592,14 @@ function create_default_data()
 			'note'            => T_('1 = Yes; 0 = No'),
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
+		),
+		array(
+			'label'           => TD_('Numeric Average'),
+			'name'            => 'numeric_average',
+			'type'            => 'computed',
+			'order'           => 210,
+			'cell_class'      => 'right',
+			'formula'         => '($first_numeric_field$+$second_numeric_field$)/2',
 		),
 		// for Item Type "Child Post":
 		array(
@@ -807,15 +853,6 @@ function create_default_data()
 			'order'           => 120,
 			'note'            => T_('Rating must be a value between 1 and 5 with 5 being the highest.'),
 		),
-		// for Item Type "Forum Topic":
-		array(
-			'ityp_ID'         => $forum_topic_ityp_ID,
-			'label'           => T_('Project Cost'),
-			'name'            => 'project_cost',
-			'type'            => 'double',
-			'order'           => 110,
-			'format'          => '$ 0 0.00',
-		),
 	);
 	// Default settings for custom fields:
 	$custom_field_default_settings = array(
@@ -851,9 +888,9 @@ function create_default_data()
 
 
 	task_begin( 'Creating default Post Statuses... ' );
-	$post_status = array( 'New', 'In Progress', 'Duplicate', 'Not A Bug', 'In Review', 'Fixed', 'Closed', 'OK' );
-
-	$DB->query( "INSERT INTO T_items__status ( pst_name )	VALUES ( '".implode( "' ),( '", $post_status )." ')" );
+	$post_status_with_order = array(" ( 'New', 10 ) ", " ( 'In Progress', 20 ) ", " ( 'Duplicate', 30 ) ", " ( 'Not A Bug', 40 ) ", " ( 'In Review', 50 ) ", " ( 'Fixed', 60 ) ", " ( 'Closed', 70 ) ", " ( 'OK', 80 ) ", );
+	
+	$DB->query( "INSERT INTO T_items__status ( pst_name, pst_order )	VALUES ". implode( ",", $post_status_with_order ) );
 	task_end();
 
 
@@ -914,6 +951,9 @@ function create_default_data()
 
 	// Create default scheduled jobs
 	create_default_jobs();
+
+	// Create default templates
+	create_default_templates();
 
 	task_begin( 'Creating default "help" slug... ' );
 	$DB->query( '
@@ -1455,163 +1495,8 @@ function create_default_regions()
 			(47, 233, 'WA', 'Washington'),
 			(48, 233, 'WV', 'West Virginia'),
 			(49, 233, 'WI', 'Wisconsin'),
-			(50, 233, 'WY', 'Wyoming'),".
-			/* France */"
-			(51, 74, '42', 'Alsace'),
-			(52, 74, '72', 'Aquitaine'),
-			(53, 74, '83', 'Auvergne'),
-			(54, 74, '26', 'Bourgogne'),
-			(55, 74, '53', 'Bretagne'),
-			(56, 74, '24', 'Centre'),
-			(57, 74, '21', 'Champagne-Ardenne'),
-			(58, 74, '94', 'Corse'),
-			(59, 74, '43', 'Franche-Comt\xE9'),
-			(60, 74, '11', '\xCEle-de-France'),
-			(61, 74, '91', 'Languedoc-Roussillon'),
-			(62, 74, '74', 'Limousin'),
-			(63, 74, '41', 'Lorraine'),
-			(64, 74, '73', 'Midi-Pyr\xE9n\xE9es'),
-			(65, 74, '31', 'Nord-Pas-de-Calais'),
-			(66, 74, '25', 'Basse-Normandie'),
-			(67, 74, '23', 'Haute-Normandie'),
-			(68, 74, '52', 'Pays de la Loire'),
-			(69, 74, '22', 'Picardie'),
-			(70, 74, '54', 'Poitou-Charentes'),
-			(71, 74, '93', 'Provence-Alpes-C\xF4te d\'Azur'),
-			(72, 74, '82', 'Rh\xF4ne-Alpes'),
-			(73, 74, '01', 'Guadeloupe'),
-			(74, 74, '02', 'Martinique'),
-			(75, 74, '03', 'Guyane'),
-			(76, 74, '04', 'La R\xE9union'),
-			(77, 74, '05', 'Mayotte'),
-			(78, 74, '09', 'Outre-Mer'),
-			(79, 74, '99', 'Monaco')",
+			(50, 233, 'WY', 'Wyoming')",
 		$current_charset, 'iso-8859-1' ) );
-
-	task_end();
-}
-
-
-/**
- * Create default sub-regions
- *
- */
-function create_default_subregions()
-{
-	global $DB, $current_charset;
-
-	task_begin( 'Creating default sub-regions... ' );
-	$DB->query( convert_charset("
-		INSERT INTO T_regional__subregion ( subrg_ID, subrg_rgn_ID, subrg_code, subrg_name )
-		VALUES".
-			/* France */"
-			(1, 72, '01', 'Ain'),
-			(2, 69, '02', 'Aisne'),
-			(3, 53, '03', 'Allier'),
-			(4, 71, '04', 'Alpes-de-Haute-Provence'),
-			(5, 71, '05', 'Hautes-Alpes'),
-			(6, 71, '06', 'Alpes-Maritimes'),
-			(7, 72, '07', 'Ard\xE8che'),
-			(8, 57, '08', 'Ardennes'),
-			(9, 64, '09', 'Ari\xE8ge'),
-			(10, 57, '10', 'Aube'),
-			(11, 61, '11', 'Aude'),
-			(12, 64, '12', 'Aveyron'),
-			(13, 71, '13', 'Bouches-du-Rh\xF4ne'),
-			(14, 66, '14', 'Calvados'),
-			(15, 53, '15', 'Cantal'),
-			(16, 70, '16', 'Charente'),
-			(17, 70, '17', 'Charente-Maritime'),
-			(18, 56, '18', 'Cher'),
-			(19, 62, '19', 'Corr\xE8ze'),
-			(20, 58, '2A', 'Corse-du-Sud'),
-			(21, 58, '2B', 'Haute-Corse'),
-			(22, 54, '21', 'C\xF4te-d\'Or'),
-			(23, 55, '22', 'C\xF4tes-d\'Armor'),
-			(24, 62, '23', 'Creuse'),
-			(25, 52, '24', 'Dordogne'),
-			(26, 59, '25', 'Doubs'),
-			(27, 72, '26', 'Dr\xF4me'),
-			(28, 67, '27', 'Eure'),
-			(29, 56, '28', 'Eure-et-Loir'),
-			(30, 55, '29', 'Finist\xE8re'),
-			(31, 61, '30', 'Gard'),
-			(32, 64, '31', 'Haute-Garonne'),
-			(33, 64, '32', 'Gers'),
-			(34, 52, '33', 'Gironde'),
-			(35, 61, '34', 'H\xE9rault'),
-			(36, 55, '35', 'Ille-et-Vilaine'),
-			(37, 56, '36', 'Indre'),
-			(38, 56, '37', 'Indre-et-Loire'),
-			(39, 72, '38', 'Is\xE8re'),
-			(40, 59, '39', 'Jura'),
-			(41, 52, '40', 'Landes'),
-			(42, 56, '41', 'Loir-et-Cher'),
-			(43, 72, '42', 'Loire'),
-			(44, 53, '43', 'Haute-Loire'),
-			(45, 68, '44', 'Loire-Atlantique'),
-			(46, 56, '45', 'Loiret'),
-			(47, 64, '46', 'Lot'),
-			(48, 52, '47', 'Lot-et-Garonne'),
-			(49, 61, '48', 'Loz\xE8re'),
-			(50, 68, '49', 'Maine-et-Loire'),
-			(51, 66, '50', 'Manche'),
-			(52, 57, '51', 'Marne'),
-			(53, 57, '52', 'Haute-Marne'),
-			(54, 68, '53', 'Mayenne'),
-			(55, 63, '54', 'Meurthe-et-Moselle'),
-			(56, 63, '55', 'Meuse'),
-			(57, 55, '56', 'Morbihan'),
-			(58, 63, '57', 'Moselle'),
-			(59, 54, '58', 'Ni\xE8vre'),
-			(60, 65, '59', 'Nord'),
-			(61, 69, '60', 'Oise'),
-			(62, 66, '61', 'Orne'),
-			(63, 65, '62', 'Pas-de-Calais'),
-			(64, 53, '63', 'Puy-de-D\xF4me'),
-			(65, 52, '64', 'Pyr\xE9n\xE9es-Atlantiques'),
-			(66, 64, '65', 'Hautes-Pyr\xE9n\xE9es'),
-			(67, 61, '66', 'Pyr\xE9n\xE9es-Orientales'),
-			(68, 51, '67', 'Bas-Rhin'),
-			(69, 51, '68', 'Haut-Rhin'),
-			(70, 72, '69', 'Rh\xF4ne'),
-			(71, 59, '70', 'Haute-Sa\xF4ne'),
-			(72, 54, '71', 'Sa\xF4ne-et-Loire'),
-			(73, 68, '72', 'Sarthe'),
-			(74, 72, '73', 'Savoie'),
-			(75, 72, '74', 'Haute-Savoie'),
-			(76, 60, '75', 'Paris'),
-			(77, 67, '76', 'Seine-Maritime'),
-			(78, 60, '77', 'Seine-et-Marne'),
-			(79, 60, '78', 'Yvelines'),
-			(80, 70, '79', 'Deux-S\xE8vres'),
-			(81, 69, '80', 'Somme'),
-			(82, 64, '81', 'Tarn'),
-			(83, 64, '82', 'Tarn-et-Garonne'),
-			(84, 71, '83', 'Var'),
-			(85, 71, '84', 'Vaucluse'),
-			(86, 68, '85', 'Vend\xE9e'),
-			(87, 70, '86', 'Vienne'),
-			(88, 62, '87', 'Haute-Vienne'),
-			(89, 63, '88', 'Vosges'),
-			(90, 54, '89', 'Yonne'),
-			(91, 59, '90', 'Territoire de Belfort'),
-			(92, 60, '91', 'Essonne'),
-			(93, 60, '92', 'Hauts-de-Seine'),
-			(94, 60, '93', 'Seine-Saint-Denis'),
-			(95, 60, '94', 'Val-de-Marne'),
-			(96, 60, '95', 'Val-d\'Oise'),
-			(97, 73, '971', 'Guadeloupe'),
-			(98, 74, '972', 'Martinique'),
-			(99, 75, '973', 'Guyane'),
-			(100, 76, '974', 'La R\xE9union'),
-			(101, 77, '976', 'Mayotte'),
-			(102, 78, '975', 'Saint-Pierre-et-Miquelon'),
-			(103, 78, '986', 'Wallis-et-Futuna'),
-			(104, 78, '987', 'Polyn\xE9sie fran\xE7aise'),
-			(105, 78, '988', 'Nouvelle-Cal\xE9donie'),
-			(106, 79, '99', 'Monaco')",
-		$current_charset, 'iso-8859-1') );
 
 	task_end();
 }
@@ -1711,7 +1596,6 @@ function create_default_jobs( $is_upgrade = false )
 }
 
 
-
 /**
  * Create demo users
  *
@@ -1741,8 +1625,8 @@ function create_demo_users()
 		{	// Impossible to rename the admin folder to another name
 
 			// Display the errors:
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
 
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
@@ -1794,11 +1678,856 @@ function create_default_posts_location()
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item SET
-			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
-			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+			post_ctry_ID = '.$DB->quote( '74'/* France */ ) );
 
-		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
+		echo_install_log( 'TEST FEATURE: Defining default location "France" for all posts' );
+	}
+}
+
+
+/**
+ * Create default templates that don't already exist
+ *
+ * @param boolean TRUE to use this as separate task
+ */
+function create_default_templates( $is_task = true )
+{
+	global $DB;
+
+	if( $is_task )
+	{
+		task_begin( 'Creating default templates... ' );
+	}
+
+	$templates = array(
+		// Item Info "info line" replacements:
+		'item_details_infoline_date' => array(
+			'name'     => 'Item Details: Posted on Date at Time',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
+		),
+		'item_details_infoline_standard' => array(
+			'name'     => 'Item Details: Posted by Author on Date at Time in Categories',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time|time_format=#extended_date] in [categories]</span>',
+		),
+		'item_details_infoline_long' => array(
+			'name'     => 'Item Details: Long info line',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] [Item:permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
+		),
+		'item_details_infoline_forums' => array(
+			'name'     => 'Item Details: Thread last updated on Date',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]</span>',
+		),
+
+		// Item info New :
+		'item_details_feedback_link' => array(
+			'name'     => 'Item Details: Comment Link',
+			'context'  => 'item_details',
+			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
+		),
+
+		// Item Info "Small print" replacements:
+		'item_details_smallprint_standard' => array(
+			'name'     => 'Item Details: Small Print: Standard',
+			'context'  => 'item_details',
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
+		),
+		'item_details_smallprint_long' => array(
+			'name'     => 'Item Details: Small Print: Long',
+			'context'  => 'item_details',
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
+		),
+		'item_details_revisions' => array(
+			'name'     => 'Item Details: Small Print: Revisions',
+			'context'  => 'item_details',
+			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
+		),
+
+		// Item attachments:
+		'item_details_files_list' => array(
+			'name'     => 'Item Details: Attachments: List',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=<div class="item_attachments"><ul class="bFiles">|
+				before_attach=<li>|
+				before_attach_size=<span class="file_size">(|
+				after_attach_size=)</span>|
+				after_attach=</li>|
+				after=</ul></div>|
+				file_link_format=$file_name$|
+				display_download_icon=1|
+				file_link_text=title|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
+		'item_details_files_buttons' => array(
+			'name'     => 'Item Details: Attachments: Buttons',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=|
+				before_attach=|
+				before_attach_size=(|
+				after_attach_size=)|
+				after_attach=|
+				after=|
+				attach_format=$file_link$|
+				file_link_format=$icon$ <b>Download Now!</b><br />$file_name$ $file_size$ $file_desc$|
+				display_download_icon=1|
+				file_link_text=title|
+				file_link_class=btn btn-success|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
+
+		// About Author widget:
+		'about_author' => array(
+			'name'     => 'Item Details: About Author',
+			'context'  => 'item_details',
+			'template' => '<div class="clearfix"><div class="evo_avatar">
+	[User:picture|size=crop-top-48x48]
+</div>
+<div class="evo_author_display_field">
+	[User:custom|field=microbio]
+</div></div>',
+		),
+
+		// Content List widget:
+		'content_list' => array(
+			'name'     => 'Content List',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<ul class="chapters_list posts_list">]
+[set:after_list=</ul>]
+[set:subcat_template=content_list_subcat]
+[set:item_template=content_list_item]',
+		),
+		'content_list_subcat' => array(
+			'name'     => 'Content List: Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<li class="chapter">
+	<h3>[Cat:permalink|text=#expandicon+name|class=link]</h3>
+	<div class="evo_cat__description">[Cat:description]</div>
+</li>',
+		),
+		'content_list_item' => array(
+			'name'     => 'Content List: Item',
+			'context'  => 'content_list_item',
+			'template' => '<li>
+	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
+	[Item:excerpt|
+		before=<div class="evo_post__excerpt_text">|
+		after=</div>|
+		excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+</li>',
+		),
+
+
+		// Content Tiles style 1 (default):
+		'content_tiles' => array(
+            'name'     => 'Content Tiles Style 1 (Fully clickable)',
+            'context'  => 'content_list_master',
+            'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat|          // Sub-template for displaying categories]
+[set:item_template=content_tiles_item|              // Sub-template for displaying items]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4| // RWD classes for tile containers]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow| // Modifier classes for each tile]
+[set:evo_tile_image__modifiers=|                    // Modifier classes for each tile image]
+[set:evo_tile_image__classes=evo_image_block|       // Modifier classes for each evo_image_block]
+[set:evo_tile_image__size=fit-400x320|              // Image size for old browsers]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]
+',
+		),
+		'content_tiles_contain' => array(
+			'name'     => 'Content Tiles Style 1.1 (Contained images)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat]
+[set:item_template=content_tiles_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
+[set:evo_tile_image__modifiers=]
+[set:evo_tile_image__classes=evo_image_block contain]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]
+',
+		),
+
+		'content_tiles_subcat' => array(
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Cat:image|
+					size=$evo_tile_image__size$|
+					sizes=$evo_tile_image__sizes$|
+					link_to=#category_url|
+					before=<figure class="evo_image_block">|
+					before_classes=$evo_tile_image__classes$|
+					after=</figure>]
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Cat:name]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+			</div>
+		</div>
+		[Cat:permalink|text=]
+	</div>
+</div>',
+		),
+
+		'content_tiles_item' => array(
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Item:images|
+					restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
+					limit=1|	                                      // Max 1 images
+					image_size=$evo_tile_image__size$|                // Size for old browsers
+					image_sizes=$evo_tile_image__sizes$|	          // RWD Sizes for modern browsers
+					image_link_to=|	                                  // Do NOT link to anything
+					placeholder=#file_text_icon|	                  // If no image available, display text file icon
+					before_image_classes=$evo_tile_image__classes$|	  // CSS classes to inject into evo_image_block
+				]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">
+					[Item:excerpt|
+						excerpt_more_text=| // No "more" link
+					]
+				</div>
+			</div>
+		</div>
+		[Item:permalink|text=| // This is a link without text which will cover the whole tile and make the whole tile clickable]
+	</div>
+</div>',
+		),
+
+
+		// Tiles style 2:
+		'content_tiles_btn' => array(
+			'name'     => 'Content Tiles Style 2 (Button)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_btn_subcat]
+[set:item_template=content_tiles_btn_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__shadow]
+[set:evo_tile_image__modifiers=evo_tile_image__margin]
+[set:evo_tile_image__classes=evo_image_block]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]',
+		),
+
+		'content_tiles_btn_subcat' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Cat:image|
+					size=$evo_tile_image__size$|
+					sizes=$evo_tile_image__sizes$|
+					link_to=#category_url|
+					before=<figure class="evo_image_block">|
+					after=</figure>|
+					before_classes=$evo_tile_image__classes$]
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_btn_item' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Item:images|
+					restrict_to_image_position=#cover_and_teaser_all|
+					limit=1|
+					image_size=$evo_tile_image__size$|
+					image_sizes=$evo_tile_image__sizes$|
+					image_link_to=single|
+					placeholder=#file_text_icon|
+					before_image_classes=$evo_tile_image__classes$]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+
+		// Tiles style 3 (BG image:Experimental):
+		'content_tiles_bgimg' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_bgimg_subcat]
+[set:item_template=content_tiles_bgimg_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
+[set:evo_tile_image__modifiers=]
+[set:evo_tile_image__classes=evo_image_block]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]',
+		),
+
+		'content_tiles_bgimg_subcat' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Cat:background_image_css|size=fit-400x320|size_2x=fit-720x500]"></div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_bgimg_item' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Item:background_image_css|size=fit-400x320|size_2x=fit-720x500]">
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+
+		// Content Blocks:
+		'cblock_clearfix' => array(
+			'name'     => 'Include Content Block: with clearfix',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block clearfix [echo:content_block_class]">
+	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
+	<div class="evo_cblock_text">
+		[Item:content_teaser] 
+	</div>
+	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
+</div>',
+		),
+		'cblock_noclearfix' => array(
+			'name'     => 'Include Content Block: without clearfix',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block [echo:content_block_class]">
+	[Item:images|
+		restrict_to_image_position=#teaser_all|
+		before=<div class="evo_cblock_images evo_cblock_teaser">|
+		after=</div>]
+	<div class="evo_cblock_text">
+		[Item:content_teaser] 
+	</div>
+	[Item:images|
+		restrict_to_image_position=aftermore|
+		before=<div class="evo_cblock_images evo_cblock_aftermore">|
+		after=</div>]
+</div>',
+		),
+
+		// Item Contents:
+		'item_content_excerpt' => array(
+			'name' => 'Item Excerpt',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__excerpt">
+[Item:excerpt|
+	before=<div class="evo_post__excerpt_text">|
+	after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+	excerpt_more_text=#more+arrow|
+	excerpt_after_more=</span>]
+</section>',
+		),
+		'item_content_teaser' => array(
+			'name' => 'Item Teaser content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+[Item:images|
+	restrict_to_image_position=#teaser_all|
+	image_size=fit-1280x720|
+	image_class=img-responsive|
+	before=<div class="evo_post_images">|
+	after=</div>|
+	before_image=<figure class="evo_image_block">|
+	after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|link_text=Read more &raquo;]
+</div>
+</section>',
+		),
+		'item_content_full' => array(
+			'name' => 'Item Full content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+[Item:images|
+	restrict_to_image_position=#teaser_all|
+	image_size=fit-1280x720|
+	image_class=img-responsive|
+	before=<div class="evo_post_images">|
+	after=</div>|
+	before_image=<figure class="evo_image_block">|
+	after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|anchor_text=]
+	[Item:images|
+		restrict_to_image_position=aftermore|
+		image_size=fit-1280x720|
+		image_class=img-responsive|
+		before=<div class="evo_post_images">|
+		after=</div>|
+		before_image=<figure class="evo_image_block">|
+		after_image=</figure>]
+	[Item:content_extension]
+	[Item:page_links]
+	[Item:footer]
+</div>
+</section>',
+		),
+		'recipe_content_full' => array(
+			'name' => 'Recipe Full content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+<div class="row">
+	<div class="col-sm-5">
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			image_size=crop-320x320|image_class=img-responsive|
+			before=<div class="evo_post_images">|
+			after=</div>|
+			before_image=<figure class="evo_image_block">|
+			after_image=</figure>]
+	</div>
+	<div class="col-sm-7">
+		[Item:content_teaser]
+		[Item:tags|before=<nav class="small post_tags">|after=</nav>|separator= ]
+		[Item:custom_fields|
+			fields=course,cuisine,servings|
+			custom_fields_table_start=|
+			custom_fields_row_start=<div class="row"$row_attrs$>|
+			custom_fields_row_header_field=<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>|
+			custom_fields_description_icon_class=grey|
+			custom_fields_value_default=<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>|
+			custom_fields_row_end=</div>|
+			custom_fields_table_end=]
+		[Item:custom_fields|
+			fields=prep_time,cook_time,passive_time,total_time|
+			custom_fields_table_start=<br /><div class="row">|
+			custom_fields_row_start=<span$row_attrs$>|
+			custom_fields_row_header_field=<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>|
+			custom_fields_description_icon_class=grey|
+			custom_fields_value_default=<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>|
+			custom_fields_row_end=</span>|
+			custom_fields_table_end=</div>|
+			hide_empty_lines=1]
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-3 col-sm-4">
+		<h4>[Item:custom|field=ingredients|what=label]</h4>
+		<p>[Item:custom|field=ingredients]</p>
+	</div>
+	<div class="col-lg-9 col-sm-8">
+		<h4>Directions</h4>
+		[Item:content_extension]
+		[Item:page_links]
+		[Item:footer]
+		[Item:feedback_link]
+	</div>
+</div>
+</section>',
+		),
+/*
+		'cblock_imgleft_textright' => array(
+			'name'     => 'Include Content Block: Images Left / Text Right',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block [cb_class]">
+	<img src="[teaser_image]" class="floatleft">
+	<div class="evo_content_block_text">
+		[content] 
+	</div>
+</div>',
+		),
+		'cblock_textleft_imgright' => array(
+			'name'     => 'Include Content Block: Text Left / Images Right',
+			'context'  => 'content_block',
+			'template' => '<div class="evo_content_block [cb_class]">
+	<img src="[teaser_image]" class="floatright">
+	<div class="evo_content_block_text">
+		[content] 
+	</div>
+</div>',
+		),
+*/
+
+
+		// Content Tabs:
+		'content_tabs' => array(
+			'name'     => 'Content Tabs',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="row">]
+[set:after_list=</div>]
+[set:item_template=content_tabs_item]
+[set:rwd_header_col=col-sm-5 col-xs-12]
+[set:rwd_text_col=col-sm-5 col-xs-12]
+[set:rwd_image_col=col-sm-7 pull-right-sm col-xs-12]
+[set:evo_tabs_image__size=fit-1920x1080]',
+		),
+
+		'content_tabs_item' => array(
+			'name'     => 'Content Tabs: Item',
+			'context'  => 'content_list_item',
+			'template' => '
+	<div class="[echo:rwd_header_col]">
+		<h1>[Item:title]</h1>
+	</div>
+	<div class="[echo:rwd_image_col]">
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			limit=1|
+			image_size=$evo_tabs_image__size$]
+	</div>
+	<div class="[echo:rwd_text_col]">
+		[Item:content_teaser]
+	</div>
+',
+		),
+
+
+		// Registration Templates:
+		'registration_master_standard' => array(
+			'name'     => 'Registration: Standard',
+			'context'  => 'registration_master',
+			'template' => '
+[set:reg1_template=registration_standard]
+[set:reg1_required=login,password,email]
+',
+		),
+
+		'registration_standard' => array(
+			'name'     => 'Registration: Standard',
+			'context'  => 'registration',
+			'template' => '[Form:login]
+[Form:password]
+[Form:email]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>',
+		),
+
+
+
+		// Registration Templates:
+		'registration_master_ask_name' => array(   
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'registration_master',
+			'template' => '
+[set:reg1_template=registration_ask_name]
+[set:reg1_required=firstname,password,email]
+',
+		),
+
+		'registration_ask_name' => array(
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+[Form:lastname]
+[Form:email]
+[Form:password]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>'
+		),
+
+		// Registration Templates:
+		'registration_master_email_social' => array(   
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'registration_master',
+			'template' => '
+[set:reg1_template=registration_email_social]
+[set:reg1_required=email]
+
+[set:reg2_template=registration_step2]
+[set:reg2_required=firstname]
+',
+		),
+
+		'registration_email_social' => array(
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'registration',
+			'template' => '[Form:email]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>
+[Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
+	before=<div class="evo_social_login_buttons margin-top-md">|
+	after=</div>]
+',
+		),
+
+		'registration_step2' => array(
+			'name'     => 'Registration: Step 2',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+	[Form:lastname]
+	[Form:custom_field|field=industry| // this is an example of a User custom field]
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Continue]
+',
+		),
+
+		'search_form_full' => array(
+			'name'     => 'Search Form: Full',
+			'context'  => 'search_form',
+			'template' => '<div class="row row-gutter-sm">
+	<div class="col-sm-12 margin-top-sm margin-bottom-xs">
+		<div class="input-group">
+			[Form:search_input|class=w-100]
+			<span class="input-group-btn">[Form:submit|value=Search]</span>
+		</div>
+	</div>
+</div>
+<div class="row row-gutter-sm">
+	<div class="col-sm-12 col-md-4 col-lg-5 margin-y-xs">
+		[Form:search_author]
+	</div>
+	<div class="col-sm-12 col-md-4 col-lg-4 margin-y-xs">
+		[Form:search_content_age]
+	</div>
+	<div class="col-sm-12 col-md-4 col-lg-3 margin-y-xs">
+		[Form:search_content_type]
+	</div>
+</div>',
+		),
+
+		'search_form_simple' => array(
+			'name'     => 'Search Form: Simple',
+			'context'  => 'search_form',
+			'template' => '<div class="input-group">
+	[Form:search_input|class=w-100]
+	<span class="input-group-btn">[Form:submit|value=Search]</span>
+</div>',
+		),
+
+		'search_result_item' => array(
+			'name'     => 'Search Result: Item',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Item:permalink] <span class="label label-primary">[Item:type]</span></div>
+		<div class="result_content">[Item:excerpt|excerpt_more_text=]</div>
+		<div class="search_info dimmed">[Item:categories|before=In ]</div>
+		<div class="search_info dimmed">Published by [Item:author|
+			link_text=avatar_login|
+			thumb_size=crop-top-15x15] on [Item:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_comment' => array(
+			'name'     => 'Search Result: Comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] <span class="label label-primary">Comment</span></div>
+		<div class="result_content">[Comment:excerpt]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_meta' => array(
+			'name'     => 'Search Result: Internal comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] <span class="label label-info">Internal comment</span></div>
+		<div class="result_content">[Comment:excerpt]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_file' => array(
+			'name'     => 'Search Result: File',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[File:file_link|link_text=title] <span class="label label-primary">File: [File:file_link|link_text=icon] [File:type]</span></div>
+		<div class="result_content">
+			[File:url]
+			[File:description|before=<div>|after=</div>]
+		</div>
+		<div class="search_info dimmed">File size: [File:file_size]</div>
+	</div>
+</div>',
+		),
+
+		'search_result_category' => array(
+			'name'     => 'Search Result: Category',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Cat:permalink] <span class="label label-primary">Category</span></div>
+		<div class="result_content">[Cat:description]</div>
+	</div>
+</div>',
+		),
+
+		'search_result_tag' => array(
+			'name'     => 'Search Result: Tag',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Tag:permalink] <span class="label label-primary">Tag</span></div>
+		<div class="result_content">[echo:tag_post_count] posts are tagged with "[Tag:name]"</div>
+	</div>
+</div>',
+		),
+
+		'content_list_with_thumbnail' => array(
+			'name'     => 'Content List with Thumbnail',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<ul class="evo_thumblist">]
+[set:after_list=</ul>]
+[set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
+[set:evo_thumblist_image__modifiers=|                    // Modifier classes for each thumbnail image]
+[set:evo_thumblist_image__size=crop-80x80|              // Image size for displaying image]',
+		),
+
+		'content_list_with_thumbnail_item' => array(
+			'name'     => 'Content List with Thumbnail: Item',
+			'context'  => 'content_list_item',
+			'template' => '<li>
+		<div class="evo_thumblist_image [echo:evo_thumblist_image__modifiers]">
+			[Item:images|
+				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
+				limit=1|	                                      // Max 1 images
+				image_size=$evo_thumblist_image__size$|                
+				image_link_to=single|	                                  // Link to item details
+				placeholder=#file_thumbnail_text_icon|	                  // If no image available, display text file icon
+			]
+		</div>
+		<div class="evo_thumblist_title">
+			[Item:permalink|text=#title|class=default]
+		</div>
+		<div class="evo_thumblist_body">
+			<p>[Item:excerpt|
+							excerpt_no_more_link=| // No "more" link
+							max_words=20| // how many words we will display
+			]
+			</p> 
+			[Item:permalink|text=...|class=btn btn-default  evo_thumblist_button evo_thumblist_button__transparent|title=]
+		</div>
+</li>',
+		)
+
+	);
+
+	$templates_sql = array();
+	foreach( $templates as $code => $template )
+	{
+		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['context'] ).', '.$DB->quote( $template['template'] ).' )';
+	}
+
+	// Insert/Update templates:
+	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_context, tpl_template_code )
+		VALUES '.implode( ', ', $templates_sql ).'
+		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_context = VALUES( tpl_context ), tpl_template_code = VALUES( tpl_template_code )',
+		'Creating/Updating default templates' );
+
+	if( $is_task )
+	{
+		task_end();
 	}
 }
 ?>

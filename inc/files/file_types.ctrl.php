@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 
 param( 'action', 'string' );
@@ -28,7 +28,7 @@ if( param( 'ftyp_ID', 'integer', '', true) )
 	{	// We could not find the file type to edit:
 		unset( $edited_Filetype );
 		forget_param( 'ftyp_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('File type') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('File type') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -49,29 +49,29 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edited_Filetype = new Filetype();
-		$AdminUI->append_to_titlearea( T_('Add a file type...') );
+		$AdminUI->append_to_titlearea( TB_('Add a file type...') );
 		break;
 
 	case 'copy':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Duplicate a file type by prefilling create form:
 		param( 'ftyp_ID', 'integer', true );
 		$new_Filetype = $edited_Filetype;	// COPY
 		$new_Filetype->ID = 0;
 		$edited_Filetype = & $new_Filetype;
-		$AdminUI->append_to_titlearea( T_('Copy file type...') );
+		$AdminUI->append_to_titlearea( TB_('Copy file type...') );
 		break;
 
 	case 'edit':
 		// Edit file type form...:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
@@ -86,22 +86,22 @@ switch( $action )
 		$edited_Filetype = new Filetype();
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_Filetype->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_Filetype->dbinsert();
-			$Messages->add( T_('New file type created.'), 'success' );
+			$Messages->add( TB_('New file type created.'), 'success' );
 
 			// What next?
 			param( 'submit', 'string', true );
-			if( $submit == T_('Record, then Create Similar') ) // TODO: do not use submit value for this!
+			if( $submit == TB_('Record, then Create Similar') ) // TODO: do not use submit value for this!
 			{
 				$action = 'new';
 			}
-			elseif( $submit == T_('Record, then Create New') ) // TODO: do not use submit value for this!
+			elseif( $submit == TB_('Record, then Create New') ) // TODO: do not use submit value for this!
 			{
 				$action = 'new';
 				$edited_Filetype = new Filetype();
@@ -123,7 +123,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'filetype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
@@ -133,7 +133,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update in DB:
 			$edited_Filetype->dbupdate();
-			$Messages->add( T_('File type updated.'), 'success' );
+			$Messages->add( TB_('File type updated.'), 'success' );
 			$action = 'list';
 			//save fadeout item
 			$Session->set('fadeout_id', $ftyp_ID);
@@ -150,14 +150,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'filetype' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'ftyp_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('File type &laquo;%s&raquo; deleted.'), $edited_Filetype->dget('name') );
+			$msg = sprintf( TB_('File type &laquo;%s&raquo; deleted.'), $edited_Filetype->dget('name') );
 			$edited_Filetype->dbdelete();
 			unset( $edited_Filetype );
 			forget_param( 'ftyp_ID' );
@@ -169,7 +169,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Filetype->check_delete( sprintf( T_('Cannot delete file type &laquo;%s&raquo;'), $edited_Filetype->dget('name') ) ) )
+			if( ! $edited_Filetype->check_delete( sprintf( TB_('Cannot delete file type &laquo;%s&raquo;'), $edited_Filetype->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -190,9 +190,9 @@ $AdminUI->set_path( 'files', 'settings', 'filetypes' );
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=fileset' );
-$AdminUI->breadcrumbpath_add( T_('File types'), '?ctrl=filetypes' );
+$AdminUI->breadcrumbpath_add( TB_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=fileset' );
+$AdminUI->breadcrumbpath_add( TB_('File types'), '?ctrl=filetypes' );
 
 // Set an url for manual page:
 switch( $action )
@@ -230,7 +230,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Filetype->confirm_delete(
-				sprintf( T_('Delete file type &laquo;%s&raquo;?'),  $edited_Filetype->dget('name') ),
+				sprintf( TB_('Delete file type &laquo;%s&raquo;?'),  $edited_Filetype->dget('name') ),
 				'filetype', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

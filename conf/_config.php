@@ -69,6 +69,13 @@ require_once  dirname(__FILE__).'/_locales.php';        	// locale settings
 require_once  dirname(__FILE__).'/_formatting.php';     	// formatting settings
 require_once  dirname(__FILE__).'/_stats.php';          	// stats/hitlogging settings
 require_once  dirname(__FILE__).'/_application.php';    	// application settings
+
+global $app_pro;
+if( isset( $app_pro ) && $app_pro === true )
+{	// Load social settings only for PRO version:
+	require_once dirname(__FILE__).'/_social.php';	// social settings
+}
+
 if( file_exists(dirname(__FILE__).'/_local.php') )
 { // Override for local config in there:
 	include_once dirname(__FILE__).'/_local.php';			// Will not be overridden on upgrade.

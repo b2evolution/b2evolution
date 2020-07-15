@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -102,6 +102,9 @@ $emailskins_styles = array(
 /* User Genders: */
 '.user' => '
 	font-weight: bold;
+',
+'.user.normal_weight' => '
+	font-weight: normal;
 ',
 '.user.closed' => '
 	color: #666;
@@ -288,6 +291,30 @@ $emailskins_styles = array(
 '.label-danger' => '
 	background-color: #d9534f;
 ',
+'.label-status-meta' => '
+	background-color: #5bc0de;
+',
+'.label-status-draft' => '
+	background-color: #ff9;
+	color: #000;
+	border: 1px solid #ccc;
+',
+'.label-status-private' => '
+	background-color: #DC143C;
+',
+'.label-status-review' => '
+	background-color: #CC0099;
+',
+'.label-status-protected' => '
+	background-color: #FF9C2A;
+',
+'.label-status-community' => '
+	background-color: #2E8BB9;
+',
+'.label-status-published' => '
+	background-color: #99EE44;
+	color: #000;
+',
 /* Polls */
 'li.evo_poll_option' => '
 	margin-top: 1ex;
@@ -321,7 +348,7 @@ $emailskins_styles = array(
 	max-width: 100%;
 ',
 '.evo_thumbnail__left' => '
-  float: left;
+	float: left;
 	margin: 0 4px 4px 0;
 ',
 '.evo_thumbnail__right' => '
@@ -339,6 +366,10 @@ $emailskins_styles = array(
 ',
 '.squared' => '
 	border-radius: 0;
+',
+'.imgerror' => '
+	border: 1px solid red;
+	box-shadow: 0 0 10px red;
 ',
 );
 ?>

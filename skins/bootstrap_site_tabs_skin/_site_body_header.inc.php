@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl, $Settings, $Blog, $disp, $current_User, $site_Skin;
+global $baseurl, $Settings, $Blog, $disp, $site_Skin;
 
 $notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 &&
@@ -31,7 +31,7 @@ else
 }
 ?>
 
-<div class="swhead_wrapper">
+<div id="evo_site_header" class="swhead_wrapper">
 
 		<?php if( $site_has_logo_file ) { ?>
 			<div class="swhead_sitename<?php echo $site_title_class; ?>">
@@ -42,78 +42,28 @@ else
 		<div class="container-fluid level1">
 
 			<nav>
-				<div class="pull-right">
-	<?php
-		// Optional display params for widgets below
-		$right_menu_params = array(
-				'block_start' => '',
-				'block_end' => '',
-				'block_display_title' => false,
-				'list_start' => '',
-				'list_end' => '',
-				'item_start' => '',
-				'item_end' => '',
-				'item_selected_start' => '',
-				'item_selected_end' => '',
-				'link_selected_class' => 'btn btn-default active btn-sm ',
-				'link_default_class' => 'btn btn-default btn-sm ',
-			);
-
-		if( is_logged_in() )
-		{ // Display the following menus when current user is logged in
-
-			// Profile link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'profile_menu_link',
-				// Optional display params
-				'profile_picture_size' => 'crop-top-32x32',
-			) ) );
-
-			// Messaging link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'msg_menu_link',
-				// Optional display params
-				'link_type' => 'messages',
-			) ) );
-
-			// Logout link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'basic_menu_link',
-				// Optional display params
-				'link_type' => 'logout',
-			) ) );
-		}
-		else
-		{ // Display the following menus when current user is NOT logged in
-
-			// Login link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'basic_menu_link',
-				// Optional display params
-				'link_type' => 'login',
-			) ) );
-
-			// Register link:
-			// Call widget directly (without container):
-			skin_widget( array_merge( $right_menu_params, array(
-				// CODE for the widget:
-				'widget' => 'basic_menu_link',
-				// Optional display params
-				'link_type' => 'register',
-				'link_selected_class' => $right_menu_params['link_selected_class'],
-				'link_default_class' => $right_menu_params['link_default_class'],
-			) ) );
-		}
-	?>
-				</div>
+				<?php
+					// ------------------------- "Right Navigation" CONTAINER EMBEDDED HERE --------------------------
+					widget_container( 'right_navigation', array(
+							// The following params will be used as defaults for widgets included in this container:
+							'container_display_if_empty' => false, // If no widget, don't display container at all
+							'container_start'     => '<div class="pull-right evo_container $wico_class$">',
+							'container_end'       => '</div>',
+							'block_start'         => '',
+							'block_end'           => '',
+							'block_display_title' => false,
+							'list_start'          => '',
+							'list_end'            => '',
+							'item_start'          => '',
+							'item_end'            => '',
+							'item_selected_start' => '',
+							'item_selected_end'   => '',
+							'link_selected_class' => 'btn btn-default active btn-sm ',
+							'link_default_class'  => 'btn btn-default btn-sm ',
+							'link_text_myprofile' => '$login$',
+						) );
+					// ----------------------------- END OF "Right Navigation" CONTAINER -----------------------------
+				?>
 
 				<ul class="nav nav-tabs pull-left">
 <?php
@@ -126,10 +76,8 @@ else
 <?php
 				}
 
-			if( $site_Skin->get_setting( 'grouping' ) )
+			if( ( $header_tabs = $site_Skin->get_header_tabs() ) !== false )
 			{	// Display the grouped header tabs:
-				$header_tabs = $site_Skin->get_header_tabs();
-
 				foreach( $header_tabs as $s => $header_tab )
 				{	// Display level 0 tabs:
 ?>
@@ -162,7 +110,7 @@ else
 							) );
 				// ---------------------------------- END OF COLLECTION LIST ---------------------------------
 
-				if( $Settings->get( 'info_blog_ID' ) > 0 )
+				if( $site_Skin->get_info_coll_ID() > 0 )
 				{	// We have a collection for shared content blocks:
 					// --------------------------------- START OF PAGES LIST --------------------------------
 					// Call widget directly (without container):
@@ -181,7 +129,7 @@ else
 									'item_selected_end' => '</li>',
 									'link_selected_class' => 'active',
 									'link_default_class' => '',
-									'blog_ID' => $Settings->get( 'info_blog_ID' ),
+									'blog_ID' => $site_Skin->get_info_coll_ID(),
 									'item_group_by' => 'none',
 									'order_by' => 'order',		// Order (as explicitly specified)
 							) );
@@ -216,9 +164,7 @@ else
 		</div><?php // END OF <div class="container-fluid level1"> ?>
 
 <?php
-if( $site_Skin->get_setting( 'grouping' ) &&
-    isset( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) &&
-    count( $header_tabs[ $site_Skin->header_tab_active ]['items'] ) > 1 )
+if( $site_Skin->has_sub_menus() )
 {	// Display sub menus of the selected level 0 tab only when at least two exist:
 ?>
 <div class="container-fluid level2">
@@ -252,7 +198,7 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 							'item_end' => '</li>',
 							'item_selected_start' => '<li class="active">',
 							'item_selected_end' => '</li>',
-							'blog_ID' => $Settings->get( 'info_blog_ID' ),
+							'blog_ID' => $site_Skin->get_info_coll_ID(),
 							'item_group_by' => 'none',
 							'order_by' => 'order',		// Order (as explicitly specified)
 					) );
@@ -268,39 +214,14 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 ?>
 
 	</div><?php // END OF <div class="swhead_menus"> ?>
-</div><?php // END OF <div class="swhead_wrapper"> ?>
+</div><?php // END OF <div id="evo_site_header"> ?>
 
 <?php if( $site_Skin->get_setting( 'back_to_top_button' ) )
 { // Check if "Back to Top" button is enabled
 ?>
-<a href="#" class="btn btn-primary slide-top<?php echo ( is_logged_in() ? ' logged_in_margin_top' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
-
-<script type="text/javascript">
-	// Scroll to Top
-	// ======================================================================== /
-	// browser window scroll ( in pixels ) after which the "scroll to top" link is show
-	var offset = 400,
-	// browser window scroll (in pixels) after which the "scroll to top" link opacity is reduced
-	offset_opacity = 1200,
-	// duration of the top scrolling animatiion (in ms)
-	scroll_top_duration = 700,
-	// grab the "back to top" link
-	$slide_top = jQuery( '.slide-top' );
-	
-	// hide or show the "scroll to top" link
-	jQuery( window ).scroll( function()
-	{
-		( jQuery( this ).scrollTop() > offset ) ? $slide_top.addClass( 'slide-top-visible' ) : $slide_top.removeClass( 'slide-top-visible' );
-	});
-
-	// Smooth scroll to top
-	$slide_top.on( 'click', function(event)
-	{
-		event.preventDefault();
-		jQuery( 'body, html' ).animate(
-		{
-			scrollTop: 0,
-		}, scroll_top_duration );
-	} );
+<a class="btn btn-primary slide-top<?php echo ( show_toolbar() ? ' slide-top-toolbar' : '' ).( $site_Skin->get_setting( 'fixed_header' ) ? ' slide-top-fixed-header' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
 </script>
-<?php } ?>
+<?php
+expose_var_to_js( 'evo_init_scroll_to_top', true );
+}
+?>

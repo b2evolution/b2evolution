@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -103,7 +103,7 @@ if( count( $res_hits ) )
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 					<td class="firstcol right nowrap"><?php
 						echo date( 'D '.locale_datefmt(), $last_date );
-						if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+						if( $is_live_mode && check_user_perm( 'stats', 'edit' ) )
 						{	// Display a link to prune hits only for live data and if current user has a permission:
 							echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$section_params.'&amp;'.url_crumb('stats') ) );
 						}
@@ -157,7 +157,7 @@ if( count( $res_hits ) )
 				<tr class="<?php echo ( $count%2 == 1 ) ? 'odd' : 'even'; ?>">
 				<td class="firstcol right nowrap"><?php
 					echo date( 'D '.locale_datefmt(), $this_date );
-					if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+					if( $is_live_mode && check_user_perm( 'stats', 'edit' ) )
 					{	// Display a link to prune hits only for live data and if current user has a permission:
 						echo action_icon( T_('Prune hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=stats&amp;action=prune&amp;date='.$last_date.'&amp;show=summary'.$section_params.'&amp;'.url_crumb('stats') ) );
 					}

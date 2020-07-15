@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -60,6 +60,29 @@ class Module
 	 * At some point this might be displayed differently than the 1st half.
 	 */
 	function build_menu_3()
+	{
+	}
+
+
+	/**
+	 * Builds the user menu. This is the one with the configuration features
+	 *
+	 * @param array Parameters: 'user_ID', 'page_url', 'url_params', 'is_admin_page'
+	 * @return array Menus config
+	 */
+	function build_user_menu( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Get allowed user tabs
+	 *
+	 * @return array Array:
+	 *               Key - menu key,
+	 *               Value - 'backoffice' - if user tab can be displayed only on back-office, 'frontoffice' - tab is allowed on front-office as well
+	 */
+	function get_allowed_user_tabs()
 	{
 	}
 
@@ -359,11 +382,42 @@ class Module
 
 
 	/**
-	 * Prepare the display params of search result object by modules
+	 * Modify the search result content
 	 *
-	 * @param array Parameters of the displayed search result object (param is updated by reference)
+	 * @param string Modified content (content is updated by reference)
 	 */
-	function prepare_search_result_display_params( & $params )
+	function modify_search_result( & $content )
+	{
+	}
+
+
+	/**
+	 * Handle back-office action
+	 *
+	 * @param array Parameters: 'ctrl', 'action'
+	 * @return boolean|NULL TRUE to mark that at least one module handles this action, NULL - this module does NOT handle the requested action
+	 */
+	function handle_backoffice_action( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Initialize back-office UI
+	 *
+	 * @param array Parameters: 'ctrl', 'action', 'tab'
+	 */
+	function init_backoffice_UI( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Display back-office UI
+	 *
+	 * @param array Parameters: 'ctrl', 'action', 'tab'
+	 */
+	function display_backoffice_UI( $params = array() )
 	{
 	}
 }

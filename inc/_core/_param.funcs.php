@@ -15,7 +15,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -97,6 +97,21 @@ function param_format( $value, $type = 'raw' )
 
 		case 'float':
 		case 'double':
+			// Remove all thousand separators:
+			$value = str_replace( array( ' ', '\'' ), '', $value );
+			if( preg_match( '/([\.,])\d+$/', $value, $dec_point ) )
+			{	// If value contains decimal point:
+				if( substr_count( $value, $dec_point[1] ) > 1 )
+				{	// If decimal point is used more than 1 time then consider this as thousand separator and remove them all:
+					$value = str_replace( $dec_point[1], '', $value );
+				}
+				else
+				{	// Remove decimal points what used as thousand separators:
+					$value = str_replace( array( ',', '.' ), '', $value );
+					$dec_point_pos = strlen( $value ) - strlen( $dec_point[0] ) + 1;
+					$value = substr( $value, 0, $dec_point_pos ).'.'.substr( $value, $dec_point_pos );
+				}
+			}
 			return floatval( $value );
 
 		default:
@@ -140,7 +155,7 @@ function param_format( $value, $type = 'raw' )
  * - htmlspecialchars (convert all html to special characters)
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
- * @param boolean Do we need to memorize this to regenerate the URL for this page?
+ * @param boolean|string TRUE to memorize this to regenerate the URL for this page, FALSE - don't memorize, 'auto' - to memorize only if param is coming from $_GET, $_POST or $_COOKIE
  * @param boolean Override if variable already set
  * @param boolean Force setting of variable to default if no param is sent and var wasn't set before
  * @param mixed true will refuse illegal values,
@@ -148,7 +163,7 @@ function param_format( $value, $type = 'raw' )
  *              'allow_empty' will refuse illegal values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
-function param( $var, $type = 'raw', $default = '', $memorize = false,
+function param( $var, $type, $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
 	global $Debuglog, $debug, $evo_charset, $io_charset, $is_cli;
@@ -160,7 +175,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 		{	// Change default '' into array() to avoid a notice:
 			$default = array();
 		}
-		$GLOBALS[$var] = remove_magic_quotes( $default );
+		$GLOBALS[$var] = $default;
 		$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
 
 		return $GLOBALS[$var];
@@ -179,17 +194,17 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 	{
 		if( isset($_POST[$var]) )
 		{
-			$GLOBALS[$var] = remove_magic_quotes( $_POST[$var] );
+			$GLOBALS[$var] = $_POST[$var];
 			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by POST', 'params' );
 		}
 		elseif( isset($_GET[$var]) )
 		{
-			$GLOBALS[$var] = remove_magic_quotes($_GET[$var]);
+			$GLOBALS[$var] = $_GET[$var];
 			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by GET', 'params' );
 		}
 		elseif( isset($_COOKIE[$var]))
 		{
-			$GLOBALS[$var] = remove_magic_quotes($_COOKIE[$var]);
+			$GLOBALS[$var] = $_COOKIE[$var];
 			// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.'='.$GLOBALS[$var].' set by COOKIE', 'params' );
 		}
 		elseif( $default === true )
@@ -213,9 +228,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 		}
 	}
 	else
-	{ // Variable was already set but we need to remove the auto quotes
-		$GLOBALS[$var] = remove_magic_quotes($GLOBALS[$var]);
-
+	{	// Variable was already set
 		// if( isset($Debuglog) ) $Debuglog->add( 'param(-): '.$var.' already set to ['.var_export($GLOBALS[$var], true).']!', 'params' );
 	}
 
@@ -485,7 +498,7 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 
 							case 'float':
 							case 'double':
-								$regexp = '/^(\+|-)?[0-9]+(.[0-9]+)?$/';
+								$regexp = '/^(\+|-)?[0-9 \'.,]+([.,][0-9]+)?$/';
 								break;
 
 							default:
@@ -509,6 +522,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 						}
 					}
 
+					// Format param:
+					$GLOBALS[$var] = param_format( $GLOBALS[$var], $type );
+
 					// Change the variable type:
 					settype( $GLOBALS[$var], $type );
 					if( isset($Debuglog) ) $Debuglog->add( 'param(-): <strong>'.var_export($var, true).'</strong> typed to '.$type.', new value='.var_export($GLOBALS[$var], true), 'params' );
@@ -519,8 +535,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 	/*
 	 * STEP 3: memorize the value for later url regeneration
 	 */
-	if( $memorize )
-	{ // Memorize this parameter
+	if( $memorize === true ||
+	    ( $memorize === 'auto' && ( isset( $_POST[$var] ) || isset( $_GET[$var] ) || isset( $_COOKIE[$var] ) ) ) )
+	{	// Memorize this parameter:
 		memorize_param( $var, $type, $default );
 	}
 
@@ -874,11 +891,12 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 	}
 
 	$SQL = new SQL( 'Check if already registered user has the same email address on new user registration' );
-	$SQL->SELECT( 'user_ID' );
+	$SQL->SELECT( 'user_ID, user_email, user_pass, user_pass_driver' );
 	$SQL->FROM( 'T_users' );
 	$SQL->WHERE( 'user_email = '.$DB->quote( utf8_strtolower( $value ) ) );
 	$SQL->LIMIT( 1 );
-	if( $DB->get_var( $SQL ) )
+	$result = $DB->get_row( $SQL );
+	if( $result )
 	{	// Don't allow the duplicate emails:
 		if( $link_Blog === NULL )
 		{
@@ -888,9 +906,72 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 		global $dummy_fields;
 		$lostpassword_url = ( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) );
 		$lostpassword_url = url_add_param( $lostpassword_url, $dummy_fields['login'].'='.urlencode( $value ) );
-		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know it or have forgotten it, you can <a %s>reset your password here</a>.'),
-			'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
-			'href="'.$lostpassword_url.'"' ) );
+
+		$error_message = sprintf( T_('You already have an account with email address "%s" on this site.'), $value );
+
+		if( ! empty( $result->user_pass ) )
+		{
+			$error_message .= ' '.sprintf( T_('You can <a %s>log in with your password here</a>.'), 'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"' );
+		}
+
+		// Check for linked social networks:
+		$UserCache = & get_UserCache();
+		if( $User = & $UserCache->get_by_ID( $result->user_ID, false, false ) )
+		{
+			global $Plugins;
+			$SQL = new SQL( 'Check if some social networks are linked to the account' );
+			$SQL->SELECT( 'usn_user_ID, usn_sn_ID, sn_name' );
+			$SQL->FROM( 'T_users__social_network' );
+			$SQL->FROM_add( 'LEFT JOIN T_social__network ON sn_id = usn_sn_ID' );
+			$SQL->WHERE( 'usn_user_ID = '.$DB->quote( $result->user_ID ) );
+			$SQL->ORDER_BY( 'sn_name ASC' );
+			$results = $DB->get_results( $SQL );
+
+			$links = array();
+			$providers = array();
+			foreach( $results as $row )
+			{
+				$providers[] = $row->sn_name;
+			}
+
+			$params = array(
+					'providers'   => $providers,
+					'links'       => & $links,
+					'link_params' => array(
+							'redirect_to' => param( 'redirect_to', 'url', get_current_url() ),
+							'return_to'   => param( 'return_to', 'url', get_current_url() ),
+							'show_icon'   => false,
+							'link_class'  => '',
+							'link_text_login'    => '$provider$',
+							'link_text_register' => '$provider$',
+						),
+				);
+
+			$temp_params = $params;
+			foreach( $params as $param_key => $param_value )
+			{ // Pass all params by reference, in order to give possibility to modify them by plugin
+				// So plugins can add some data before/after processing
+				$params[ $param_key ] = & $params[ $param_key ];
+			}
+
+			if( ! empty( $providers ) )
+			{
+				$Plugins->trigger_event_first_true_with_params( 'GetAuthLinksForSocialNetworks', $params );
+				if( ! empty( $params['links'] ) )
+				{
+					$error_message .= ' '.sprintf( T_('You can log in with %s.'), implode( ' / ', $params['links'] ) );
+				}
+			}
+			$params = $temp_params;
+		}
+
+		$error_message .= ' '.sprintf( T_('If you don\'t know it or have forgotten your password, you can <a %s>reset it here</a>.'), 'href="'.$lostpassword_url.'"' );
+
+		param_error( $var, $error_message );
+
+		// param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know it or have forgotten it, you can <a %s>reset your password here</a>.'),
+		// 	'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
+		// 	'href="'.$lostpassword_url.'"' ) );
 		return false;
 	}
 
@@ -923,7 +1004,7 @@ function param_check_valid_login( $var )
 		}
 		elseif( $check === 'long' )
 		{	// Special case for long logins:
-			$msg = sprintf( T_('Logins cannot be longer %d characters.'), 20 );
+			$msg = sprintf( T_('Logins cannot be longer than %d characters.'), 20 );
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
@@ -2024,7 +2105,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 		$skip = false;
 		foreach( $ignore as $ignore_pattern )
 		{
-			if( $ignore_pattern[0] == '/' )
+			if( substr( $ignore_pattern, 0, 1 ) == '/' )
 			{ // regexp:
 				if( preg_match( $ignore_pattern, $var ) )
 				{	// Skip this param!
@@ -2219,78 +2300,6 @@ function _trapError( $reset = 1 )
 }
 
 
-/*
- * Clean up the mess PHP has created with its funky quoting everything!
- */
-if( get_magic_quotes_gpc() )
-{ // That stupid PHP behaviour consisting of adding slashes everywhere is unfortunately on
-
-	if( in_array( strtolower(ini_get('magic_quotes_sybase')), array('on', '1', 'true', 'yes') ) )
-	{ // overrides "magic_quotes_gpc" and only replaces single quotes with themselves ( "'" => "''" )
-		/**
-		 * @ignore
-		 */
-		function remove_magic_quotes( $mixed )
-		{
-			if( is_array( $mixed ) )
-			{
-				foreach($mixed as $k => $v)
-				{
-					$mixed[$k] = remove_magic_quotes( $v );
-				}
-			}
-			elseif( is_string($mixed) )
-			{
-				// echo 'Removing slashes ';
-				$mixed = str_replace( '\'\'', '\'', $mixed );
-			}
-			return $mixed;
-		}
-	}
-	else
-	{
-		/**
-		 * Remove quotes from input.
-		 * This handles magic_quotes_gpc and magic_quotes_sybase PHP settings/variants.
-		 *
-		 * NOTE: you should not use it directly, but one of the param-functions!
-		 *
-		 * @param mixed string or array (function is recursive)
-		 * @return mixed Value, with magic quotes removed
-		 */
-		function remove_magic_quotes( $mixed )
-		{
-			if( is_array( $mixed ) )
-			{
-				foreach($mixed as $k => $v)
-				{
-					$mixed[$k] = remove_magic_quotes( $v );
-				}
-			}
-			elseif( is_string($mixed) )
-			{
-				// echo 'Removing slashes ';
-				$mixed = stripslashes( $mixed );
-			}
-			return $mixed;
-		}
-	}
-}
-else
-{
-	/**
-	 * @ignore
-	 */
-	function remove_magic_quotes( $mixed )
-	{
-		return $mixed;
-	}
-}
-
-
-
-
-
 /**
  * Sets an HTML parameter and checks for sanitized code.
  *
@@ -2364,7 +2373,6 @@ function param_check_gender( $var, $required = false )
 {
 	if( empty( $GLOBALS[$var] ) )
 	{	// empty is OK if not required:
-		global $current_User;
 		if( $required )
 		{
 			param_error( $var, T_( 'Please select a gender.' ) );
@@ -2533,6 +2541,16 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			}
 			// Do not add error messages in this context
 			$verbose = false;
+			break;
+
+		case 'quick_template':
+			$Group = ( $User ? $User->get_Group() : false );
+			$xhtmlvalidation  = false;
+			$allow_css_tweaks = $Group && $Group->perm_xhtml_css_tweaks;
+			$allow_javascript = $Group && $Group->perm_xhtml_javascript;
+			$allow_iframes    = $Group && $Group->perm_xhtml_iframes;
+			$allow_objects    = $Group && $Group->perm_xhtml_objects;
+			$bypass_antispam  = $Group && $Group->perm_bypass_antispam;
 			break;
 
 		default:
@@ -2820,7 +2838,7 @@ function param_check_serialized_array( $param_name )
 	}
 
 	// Search all string items in the serialized array:
-	preg_match_all( '/[{;]s:(\d+):"/', $param_value, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/[{;]s:(\d+):"/i', $param_value, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $m => $match )
 	{	// And replace its values with spaces in order to don't decide below the following string values as object structures:
 		//    a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}
@@ -2830,7 +2848,7 @@ function param_check_serialized_array( $param_name )
 	if(
 		// Allow to unserialize only arrays, main reason is an excluding of object structure like:
 		//     - O:7:"Results":1:{s:3:"sql";s:21:"SELECT * FROM T_users";}
-		( substr( $param_value, 0, 2 ) == 'a:' ) &&
+		( stripos( $param_value, 'a:' ) === 0 ) &&
 		// + Check there is no Object in the array (We NEVER want to unserialize an object):
 		//     a:1:{s:3:"key";O:8:"stdClass":1:{s:1:"x";i:1;}}
 		//     a:1:{i:123;O:8:"stdClass":1:{s:1:"x";i:1;}}
@@ -2838,7 +2856,7 @@ function param_check_serialized_array( $param_name )
 		//     a:1:{s:3:"key";a:1:{i:456;O:8:"stdClass":1:{s:1:"x";i:1;}}}
 		//   This checking exclude real string with object structure value like ';O:8:':
 		//     a:1:{s:3:"key";s:5:";O:8:";}
-		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/', $param_value ) )
+		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/i', $param_value ) )
 	)
 	{	// Correct data:
 		return true;
@@ -2980,7 +2998,7 @@ function param_format_condition( $condition, $action, $rules = NULL )
 		{	// This is a group of conditions, Run this function recursively:
 			$condition_rules[] = param_format_condition( $rule, $action, $rules );
 		}
-		elseif( $rules === NULL || 
+		elseif( $rules === NULL ||
 		        ( $rules !== NULL && in_array( $rule->id, $allowed_rules ) && ! in_array( $rule->id, $denied_rules ) ) )
 		{	// This is a single allowed field, Format condition only for this field:
 			if( ! isset( $rule->type ) )

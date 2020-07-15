@@ -151,8 +151,8 @@ class user_action_Widget extends ComponentWidget
 			case 'add_contact':
 				// Add to Contacts:
 				if( is_logged_in() && ( $current_User->ID != $target_User->ID ) &&
-						$current_User->check_perm( 'perm_messaging', 'reply' ) &&
-						$current_User->check_status( 'can_edit_contacts' ) )
+						check_user_perm( 'perm_messaging', 'reply' ) &&
+						check_user_status( 'can_edit_contacts' ) )
 				{	// User is logged in, has messaging access permission and is not the same user as displayed user:
 					$is_contact = check_contact( $target_User->ID );
 					if( $is_contact === NULL )
@@ -179,8 +179,8 @@ class user_action_Widget extends ComponentWidget
 
 				// Block Contact:
 				if( is_logged_in() && ( $current_User->ID != $target_User->ID ) &&
-						$current_User->check_perm( 'perm_messaging', 'reply' ) &&
-						$current_User->check_status( 'can_edit_contacts' ) )
+						check_user_perm( 'perm_messaging', 'reply' ) &&
+						check_user_status( 'can_edit_contacts' ) )
 				{	// User is logged in, has messaging access permission and is not the same user as displayed user:
 					$is_contact = check_contact( $target_User->ID );
 					$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$target_User->ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
@@ -200,7 +200,7 @@ class user_action_Widget extends ComponentWidget
 
 				// Report User:
 				if( is_logged_in() && ( $current_User->ID != $target_User->ID ) &&
-						$current_User->check_status( 'can_report_user' ) )
+						check_user_status( 'can_report_user', $target_User->ID ) )
 				{	// Current user must be logged in, cannot report own account, and must has a permission to report:
 					// Get current User report from edited User:
 					$current_report = get_report_from( $target_User->ID );
@@ -221,8 +221,8 @@ class user_action_Widget extends ComponentWidget
 				// Edit in Back-Office:
 				if( is_logged_in() &&
 						$current_User->can_moderate_user( $target_User->ID ) &&
-						$current_User->check_status( 'can_access_admin' ) &&
-						$current_User->check_perm( 'admin', 'restricted' )
+						check_user_status( 'can_access_admin' ) &&
+						check_user_perm( 'admin', 'restricted' )
 					)
 				{	// Current user must has an access to back-office and moderate the target user:
 					global $admin_url;
@@ -237,17 +237,17 @@ class user_action_Widget extends ComponentWidget
 				if( is_logged_in() &&
 						$target_User->ID != 1 &&
 						$current_User->ID != $target_User->ID &&
-						$current_User->check_status( 'can_access_admin' ) &&
-						$current_User->check_perm( 'admin', 'restricted' &&
-						$current_User->check_perm( 'users', 'edit' ) )
+						check_user_status( 'can_access_admin' ) &&
+						check_user_perm( 'admin', 'restricted' &&
+						check_user_perm( 'users', 'edit' ) )
 					)
 				{	// Current user must has an access to back-office and delete the target user:
 					global $admin_url;
-					$r = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$target_User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+					$r = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$target_User->ID ).'" class="btn btn-danger">'
 							.'<button type="button">'.T_('Delete').'</button>'
 						.'</a>'
 						."\n"
-						.'<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$target_User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+						.'<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$target_User->ID ).'" class="btn btn-danger">'
 							.'<button type="button">'.T_('Delete Spammer').'</button>'
 						.'</a>';
 				}

@@ -36,14 +36,18 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 }
-echo '</div>';
+echo '<div class="evo_pictured_layout">';
+if( $bg_File && $bg_File->exists() )
+{ // If it exists in media folder
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
+}
+
 ?>
 
 
@@ -162,6 +166,8 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 </div><!-- .container -->
 
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->
@@ -169,7 +175,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 	<div class="row">
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
 			<?php
 			if( $Skin->show_container_when_access_denied( 'footer' ) )
@@ -185,8 +191,8 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			} ?>
-	
-			<p>
+
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -243,10 +249,11 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 	</div><!-- .row -->
 
-
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
+
+</div><!-- .evo_pictured_layout -->
 
 
 <?php

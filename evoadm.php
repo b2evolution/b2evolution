@@ -12,7 +12,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -38,7 +38,7 @@ require_once $inc_path.'_main.inc.php';
 
 
 // Check global permission:
-if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+if( ! check_user_perm( 'admin', 'restricted' ) )
 {	// No permission to access admin...
 	// asimo> This should always denied access, but we insert a hack to create a temporary solution
 	// We do allow comments and items actions, if the redirect is set to the front office! This way users without admin access may use the comments, and items controls.
@@ -55,9 +55,9 @@ if( ! $current_User->check_perm( 'admin', 'restricted' ) )
 }
 
 // Check user email is validated to make sure users can never has access to admin without a validated email address
-if( !$current_User->check_status( 'can_access_admin' ) )
+if( ! check_user_status( 'can_access_admin' ) )
 {
-	if( $current_User->check_status( 'can_be_validated' ) )
+	if( check_user_status( 'can_be_validated' ) )
 	{ // redirect back to the login page
 		$action = 'req_activate_email';
 		require $htsrv_path.'login.php';

@@ -11,6 +11,14 @@
  *
  * @param object jQuery object
  */
+// General settings:
+var b2evo_colorbox_params = {
+	maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
+	maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
+	slideshow: true,
+	slideshowAuto: false
+};
+
 function init_colorbox( this_obj )
 {
 	if( typeof( this_obj ) != 'object' || this_obj.length == 0 )
@@ -37,6 +45,24 @@ function init_colorbox( this_obj )
 }
 jQuery( document ).ready( function()
 {
+	if( typeof( b2evo_colorbox_params_post ) == 'undefined' ||
+	    typeof( b2evo_colorbox_params_cmnt ) == 'undefined' || 
+	    typeof( b2evo_colorbox_params_user ) == 'undefined' || 
+	    typeof( b2evo_colorbox_params_other ) == 'undefined' )
+	{	// Don't initialize colorbox when configs are not defined:
+		// (This means colorbox is not desired for current back-office page or front-office Skin)
+		return;
+	}
+
+	// For post images:
+	b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
+	// For comment images:
+	b2evo_colorbox_params_cmnt = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_cmnt );
+	// For user images:
+	b2evo_colorbox_params_user = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_user );
+	// For all other images
+	b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );
+
 	jQuery( 'a[rel^="lightbox"]' ).each( function()
 	{
 		init_colorbox( jQuery( this ) );

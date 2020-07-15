@@ -4,7 +4,7 @@
  * 
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * 
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * 
  * @package evocore
  */
@@ -121,54 +121,6 @@ function get_id_coll_from_prefix( $prefix )
 
 
 /**
- * Check if permission is always enabled
- *
- * @param object the db row
- * @param string the prefix of the db row: 'bloguser_' or 'bloggroup_'
- * @param string permission name
- * @param string Collection owner user ID
- * @return boolean
- */
-function is_always_coll_perm_enabled( $row, $prefix, $perm, $coll_owner_user_ID )
-{
-	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $coll_owner_user_ID == $row->user_ID )
-	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties):
-		return true;
-	}
-
-	// Check if permission is always enabled by group setting:
-	if( ! empty( $row->user_ID ) )
-	{	// User perm:
-		$UserCache = & get_UserCache();
-		if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-		{	// Get user group:
-			$perm_Group = & $User->get_Group();
-		}
-	}
-	elseif( ! empty( $row->grp_ID ) )
-	{	// Group perm:
-		$GroupCache = & get_GroupCache();
-		$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-	}
-
-	if( ! empty( $perm_Group ) )
-	{	// Check global group setting permission:
-		$group_perm_blogs = $perm_Group->get( 'perm_blogs' );
-		if( $group_perm_blogs == 'editall' )
-		{	// If the group has a global permission to edit ALL collections:
-			return true;
-		}
-		elseif( $perm == 'ismember' && $group_perm_blogs == 'viewall' )
-		{	// If the group has a global permission to view or edit ALL collections:
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-/**
  * Get collection perm checkbox
  * 
  * @param object the db row
@@ -179,8 +131,6 @@ function is_always_coll_perm_enabled( $row, $prefix, $perm, $coll_owner_user_ID 
  */
 function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -189,7 +139,7 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -201,8 +151,18 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 	$r .= ' name="blog_'.$perm.'_'.$row->{$row_id_coll}.'"';
 
 	if( is_always_coll_perm_enabled( $row, $prefix, $perm, $row_Blog->owner_user_ID ) )
-	{	// This perm option is always enabled:
-		$r .= ' checked="checked" disabled="disabled"';
+	{	// This perm option is almost always enabled:
+		if( $perm == 'can_be_assignee' )
+		{	// This permission can be edited even for admins:
+			if( $row->{$prefix.$perm} === NULL || $row->{$prefix.$perm} )
+			{
+				$r .= ' checked="checked"';
+			}
+		}
+		else
+		{
+			$r .= ' checked="checked" disabled="disabled"';
+		}
 	}
 	else
 	{	// Check if perm option is enabled or/and disabled:
@@ -276,8 +236,6 @@ function check_default_create_comment_perm( $blog_ID, $perm_statuses )
  */
 function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -286,7 +244,7 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 	$default_status = NULL;
@@ -378,8 +336,6 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
  */
 function coll_perm_edit( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -388,7 +344,7 @@ function coll_perm_edit( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -425,8 +381,6 @@ function coll_perm_edit( $row, $prefix )
  */
 function coll_perm_edit_cmt( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -435,7 +389,7 @@ function coll_perm_edit_cmt( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -473,8 +427,6 @@ function coll_perm_edit_cmt( $row, $prefix )
  */
 function coll_perm_item_type( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -483,7 +435,7 @@ function coll_perm_item_type( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -519,8 +471,6 @@ function coll_perm_item_type( $row, $prefix )
  */
 function perm_check_all( $row, $prefix )
 {
-	global $current_User;
-
 	$BlogCache = & get_BlogCache();
 	$row_Blog = & $BlogCache->get_by_ID( $row->blog_ID, false, false );
 
@@ -529,7 +479,7 @@ function perm_check_all( $row, $prefix )
 		return '';
 	}
 
-	$permission_to_change_admin = $current_User->check_perm( 'blog_admin', 'edit', false, $row->blog_ID );
+	$permission_to_change_admin = check_user_perm( 'blog_admin', 'edit', false, $row->blog_ID );
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
@@ -622,8 +572,8 @@ function coll_grp_perm_col_member( $row )
 	{	// If the collection uses workflow:
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'can_be_assignee', format_to_output( T_('Workflow Member (Items can be assigned to members of this Group)'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_status', format_to_output( T_('Members of this Group can change task status'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
-		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_user', format_to_output( T_('Members of this Group can assign items to others'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
-		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_priority', format_to_output( T_('Members of this Group can set priority / deadline'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= coll_perm_checkbox( $row, 'bloggroup_', 'workflow_user', format_to_output( T_('Members of this Group can assign items to others'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= coll_perm_checkbox( $row, 'bloggroup_', 'workflow_priority', format_to_output( T_('Members of this Group can set priority / deadline'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 	}
 
 	return $r;
@@ -795,7 +745,7 @@ function colls_groups_perms_results( & $Results, $params = array() )
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'draft\', \''.format_to_output( T_('Permission to comment into this blog with draft status'), 'htmlattr' ).'\', \'comment\' )%'.
 					'%coll_perm_status_checkbox( {row}, \'bloggroup_\', \'deprecated\', \''.format_to_output( T_('Permission to comment into this blog with deprecated status'), 'htmlattr' ).'\', \'comment\' )%'.
 					'<span style="display: inline-block; min-width: 5px;"></span>'.
-					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post meta comments into this collection'), 'htmlattr' ).'\' )%',
+					'%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_meta_comment\', \''.format_to_output( T_('Permission to post internal comments on this collection'), 'htmlattr' ).'\' )%',
 			'td_class' => 'center nowrap',
 		);
 

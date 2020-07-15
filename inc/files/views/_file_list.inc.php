@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -27,10 +27,6 @@ global $lFile;
  * @var string
  */
 global $fm_flatmode;
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var UserSettings
  */
@@ -169,8 +165,8 @@ $Form->begin_form();
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
 
 	// Set FileList perms
-	$all_perm = $current_User->check_perm( 'files', 'all', false );
-	$edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
+	$all_perm = check_user_perm( 'files', 'all', false );
+	$edit_allowed_perm = check_user_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
 
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
@@ -190,7 +186,6 @@ $Form->begin_form();
 		/********************    Checkbox:    *******************/
 
 		echo '<td class="checkbox firstcol">';
-		echo '<span name="surround_check" class="checkbox_surround_init">';
 		echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 					name="fm_selected[]" value="'.format_to_output( $lFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_'.$countFiles.'"';
 		if( $checkall || $selected_Filelist->contains( $lFile ) )
@@ -198,7 +193,6 @@ $Form->begin_form();
 			echo ' checked="checked"';
 		}
 		echo ' />';
-		echo '</span>';
 
 		/***********  Hidden info used by Javascript:  ***********/
 
@@ -210,6 +204,7 @@ $Form->begin_form();
 		}
 
 		echo '</td>';
+		evo_flush();
 
 
 		/********************  Icon / File type:  *******************/
@@ -238,6 +233,7 @@ $Form->begin_form();
 			}
 		}
 		echo '</td>';
+		evo_flush();
 
 		/*******************  Path (flatmode): ******************/
 
@@ -246,6 +242,7 @@ $Form->begin_form();
 			echo '<td class="filepath">';
 			echo dirname( $lFile->get_rdfs_rel_path() ).'/';
 			echo '</td>';
+			evo_flush();
 		}
 
 		/*******************  File name: ******************/
@@ -269,13 +266,13 @@ $Form->begin_form();
 			{
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
-					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
+					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_filename ), 'data-toggle' => 'tooltip' ) ).'&nbsp;';
 					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
-				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
+				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_dirname ), 'data-toggle' => 'tooltip' ) ).'&nbsp;';
 				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
@@ -309,7 +306,7 @@ $Form->begin_form();
 						$link_attribs['target'] = $iframe_name;
 						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
 								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
-								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
+								.'\', \''.$lFile->get_rdfp_rel_path().'\', \''.param( 'prefix', 'string' ).'\' )';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
@@ -359,12 +356,14 @@ $Form->begin_form();
 			echo file_td_name( $lFile );
 
 		echo '</td>';
+		evo_flush();
 
 		/*******************  File type  ******************/
 
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types
 			echo '<td class="type">'.$lFile->get_type().'</td>';
+			evo_flush();
 		}
 
 		/*******************  Added by  *******************/
@@ -379,6 +378,7 @@ $Form->begin_form();
 			{
 				echo '<td class="center">unknown</td>';
 			}
+			evo_flush();
 		}
 
 		/****************  Download Count  ****************/
@@ -387,6 +387,7 @@ $Form->begin_form();
 		{ // Show download count
 			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
+			evo_flush();
 		}
 
 		/*******************  File size  ******************/
@@ -402,6 +403,7 @@ $Form->begin_form();
 			echo '<td class="timestamp" title="'.format_to_output( $lastmod_date.' '.$lastmod_time, 'htmlattr' ).'">';
 			echo file_td_lastmod( $lFile );
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File pemissions  ***************/
@@ -413,7 +415,8 @@ $Form->begin_form();
 
 			if( $edit_allowed_perm )
 			{ // User can edit:
-				echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ).'">'
+				echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='
+							.rawurlencode($lFile->get_rdfp_rel_path()) ).'&amp;'.url_crumb( 'file' ).'">'
 							.$lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' ).'</a>';
 			}
 			else
@@ -421,6 +424,7 @@ $Form->begin_form();
 				echo $lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' );
 			}
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File owner  ********************/
@@ -430,6 +434,7 @@ $Form->begin_form();
 			echo '<td class="fsowner">';
 			echo $lFile->get_fsowner_name();
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File group *********************/
@@ -439,6 +444,7 @@ $Form->begin_form();
 			echo '<td class="fsgroup">';
 			echo $lFile->get_fsgroup_name();
 			echo '</td>';
+			evo_flush();
 		}
 
 		/*****************  Action icons  ****************/
@@ -446,8 +452,10 @@ $Form->begin_form();
 		echo '<td class="actions lastcol text-nowrap">';
 		echo file_td_actions( $lFile );
 		echo '</td>';
+		evo_flush();
 
 		echo '</tr>';
+		evo_flush();
 
 		$countFiles++;
 	}
@@ -488,7 +496,7 @@ $Form->begin_form();
 	// -------------
 	// Quick upload with drag&drop button:
 	// --------------
-	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( $Settings->get( 'upload_enabled' ) && check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{	// Upload is enabled and we have permission to use it...
 	?>
 		<tr class="evo_fileuploader_form listfooter firstcol lastcol">
@@ -532,8 +540,10 @@ $Form->begin_form();
 			}
 
 			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
-				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-				.'<span class="qq-upload-drop-area-text-selector"></span>'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'	// Main dropzone
+				//The div below is not necessary because were making the main dropzone transparent so
+				// the upload button below will not be covered when the main dropzone is "displayed" on drop ((see qq-hide-dropzone doc)):
+				//.'<div>#button_text#</div>' //
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 				.'<div>#button_text#</div>'
@@ -600,18 +610,19 @@ $Form->begin_form();
 
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
-					'fileroot_ID'          => $fm_FileRoot->ID,
-					'path'                 => $path,
-					'listElement'          => 'jQuery( ".filelist_tbody" ).get(0)',
-					'list_style'           => 'table',
-					'template'             => $template,
-					'display_support_msg'  => false,
+					'fileroot_ID'            => $fm_FileRoot->ID,
+					'path'                   => $path,
+					'listElement'            => 'jQuery( ".filelist_tbody" ).get(0)',
+					'list_element'           => '.filelist_tbody',
+					'list_style'             => 'table',
+					'template'               => $template,
+					'display_support_msg'    => false,
 					'display_status_success' => false,
-					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
-					'filename_before'      => $icon_to_link_files,
-					'table_headers'        => $table_headers,
-					'noresults'            => $noresults,
-					'table_id'             => 'FilesForm',
+					'additional_dropzone'    => '[ jQuery( ".filelist_tbody" ).get(0) ]',
+					'filename_before'        => $icon_to_link_files,
+					'table_headers'          => $table_headers,
+					'noresults'              => $noresults,
+					'table_id'               => 'FilesForm',
 				) );
 			?>
 			</td>
@@ -628,7 +639,7 @@ $Form->begin_form();
 
 		<?php
 		echo '<div id="evo_multi_file_selector" class="pull-left"'.( $countFiles == 0 ? ' style="display:none"' : '' ).'>';
-			echo $Form->check_all();
+			$Form->checkbox_controls( 'fm_selected', array( 'button_class' => 'btn btn-default' ) );
 			$Form->add_crumb( 'file' );
 
 			$field_options = array();
@@ -643,9 +654,9 @@ $Form->begin_form();
 			}
 
 			if( ( $fm_Filelist->get_root_type() == 'collection' || ( ! empty( $Blog )
-						&& $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
+						&& check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
 				&& $mode != 'upload'
-				&& $current_User->check_perm( 'admin', 'normal' ) )
+				&& check_user_perm( 'admin', 'normal' ) )
 			{ // We are browsing files for a collection:
 				// User must have access to admin permission
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
@@ -661,7 +672,7 @@ $Form->begin_form();
 			if( $mode == 'upload' &&
 			    isset( $LinkOwner ) &&
 			    ( $LinkOwner->type == 'item' ||
-			      ( $LinkOwner->is_temp() && $LinkOwner->link_Object->type == 'item' )
+			      ( $LinkOwner->is_temp() && $LinkOwner->link_Object->tmp_type == 'item' )
 			    ) )
 			{	// We are uploading in a popup opened by an edit/new item form:
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
@@ -673,6 +684,7 @@ $Form->begin_form();
 				$field_options['resize'] = T_('Resize images...');
 				$field_options['delete'] = T_('Delete files...');
 				$field_options['create_zip'] = T_('Create ZIP archive').'...';
+				$field_options['unpack_zip'] = T_('Unpack ZIP archives').'...';
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 			}
 
@@ -718,7 +730,7 @@ $Form->begin_form();
 			 * CREATE FILE/FOLDER CREATE PANEL:
 			 */
 			if( ( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
-						&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+						&& check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 			{	// dir or file creation is enabled and we're allowed to add files:
 				global $create_type;
 

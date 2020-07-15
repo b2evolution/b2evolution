@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -132,6 +132,8 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		global $Blog;
+
 		// Load for function get_available_thumb_sizes():
 		load_funcs( 'files/model/_image.funcs.php' );
 
@@ -151,16 +153,28 @@ class bootstrap_forums_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_general_affix' => array(
+						'label' => T_('Fixed position for General Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 0,
+					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
 						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
-						'defaultvalue' => 'no_sidebar',
+						'defaultvalue' => isset( $Blog ) && $Blog->type == 'group' ? 'right_sidebar' : 'no_sidebar',
 						'options' => array(
 								'no_sidebar'    => T_('No Sidebar'),
 								'left_sidebar'  => T_('Left Sidebar'),
 								'right_sidebar' => T_('Right Sidebar'),
 							),
 						'type' => 'select',
+					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Fixed position for Single Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
 					),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
@@ -199,17 +213,26 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				   'workflow_display_mode' => array(
-					  'label'    => T_('Workflow column'),
-					  'note'     => '',
-					  'type'     => 'radio',
-					  'field_lines' => true,
-					  'options'  => array(
-						 array( 'status_and_author', T_('Display Status & Item Author') ),
-						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
-					  ),
-					  'defaultvalue' => 'status_and_author',
-				   ),
+					'workflow_display_mode' => array(
+						'label' => T_('Workflow column'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options'  => array(
+							array( 'status_and_author', T_('Display Status & Item Author') ),
+							array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+						),
+						'defaultvalue' => 'status_and_author',
+					),
+					'voting_place' => array(
+						'label' => T_('Voting'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options' => array(
+							array( 'under_content', T_('Under posts/comments') ),
+							array( 'left_score', T_('Show score on the left of each post/comment') ),
+						),
+						'defaultvalue' => 'under_content',
+					),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -356,6 +379,29 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Set a skin specific param value for current Blog or Site
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 */
+	function set_setting( $parname, $parvalue )
+	{
+		global $Collection, $Blog;
+
+		// Set skin setting
+		parent::set_setting( $parname, $parvalue );
+
+		if( isset( $Blog ) &&
+		    $parname == 'voting_place' && 
+		    $parvalue == 'left_score' )
+		{	// Turn on positive and negative voting for collection when score voting mode is enabled for this Skin:
+			$Blog->set_setting( 'voting_positive', 1 );
+			$Blog->set_setting( 'voting_negative', 1 );
+		}
+	}
+
+
+	/**
 	 * Get current skin post navigation setting. Always use this navigation setting where this skin is applied.
 	 */
 	function get_post_navigation()
@@ -375,14 +421,10 @@ class bootstrap_forums_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
@@ -400,19 +442,40 @@ class bootstrap_forums_Skin extends Skin
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
 		{	// Init JS to autcomplete the user logins:
-			require_js( '#bootstrap_typeahead#', 'blog' );
+			require_js_defer( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
 		}
 
+		if( $this->get_setting( 'voting_place' ) == 'left_score' )
+		{	// Initialize JS for voting for score mode on the left of each post/comment:
+			if( in_array( $disp, array( 'posts', 'flagged' ) ) )
+			{	// Used to vote on an item:
+				init_voting_item_js( 'blog' );
+			}
+			if( $disp == 'comments' )
+			{	// Used to vote on the comments:
+				init_voting_comment_js( 'blog' );
+			}
+		}
+
+		// Do not affix sidebar for screen width below and lesser:
+		add_css_headline( '@media (max-width: 992px ) { .sidebar_wrapper.affix { position: static } }' );
+
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
+
+		if( ( $this->get_setting( 'sidebar_general_affix' ) && $this->is_visible_sidebar( true, 'general' ) ) ||
+		    ( $this->get_setting( 'sidebar_single_affix' ) && $this->is_visible_sidebar( true, 'single' ) ) )
+		{	// Init JS to fix sidebars on scroll down:
+			require_js_defer( 'src/evo_affix_sidebars.js', 'blog', false, '#', 'footerlines' );
+		}
 	}
 
 
@@ -531,11 +594,11 @@ class bootstrap_forums_Skin extends Skin
 	/**
 	 * Check if we can display a sidebar for the current layout
 	 *
-	 * @param string Layout: 'general' or 'single'
 	 * @param boolean TRUE to check if at least one sidebar container is visible
+	 * @param string Layout: 'general' or 'single'
 	 * @return boolean TRUE to display a sidebar
 	 */
-	function is_visible_sidebar( $layout = 'general', $check_containers = false )
+	function is_visible_sidebar( $check_containers = false, $layout = 'general' )
 	{
 		$layout = $this->get_setting_layout( $layout );
 
@@ -644,7 +707,7 @@ class bootstrap_forums_Skin extends Skin
 		{
 			case 'cat_array_mode':
 				// What category level use to display the items on disp=posts:
-				//   - 'children' - Get items from current category and from all its sub-categories recirsively
+				//   - 'children' - Get items from current category and from all its sub-categories recursively
 				//   - 'parent' - Get items ONLY from current category WITHOUT sub-categories
 				return 'parent';
 
@@ -659,19 +722,57 @@ class bootstrap_forums_Skin extends Skin
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Item
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_item_voting_panel( $Item, $params = array() )
+	function display_item_voting_panel( $Item, $place, $params = array() )
 	{
-		skin_widget( array_merge( array(
-				// CODE for the widget:
-				'widget'      => 'item_vote',
-				// Optional display params
-				'Item'        => $Item,
-				'block_start' => '',
-				'block_end'   => '',
-				'skin_ID'     => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'      => 'item_vote',
+						// Optional display params
+						'Item'        => $Item,
+						'block_start' => '',
+						'block_end'   => '',
+						'skin_ID'     => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				global $disp;
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'                 => 'item_vote',
+						// Optional display params
+						'Item'                   => $Item,
+						'block_start'            => '',
+						'block_end'              => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'title_text'             => '',
+						'title_empty'            => '',
+						'display_summary'        => 'no',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'display_noactive'       => true,
+						'score_class'            => ( in_array( $disp, array( 'posts', 'flagged' ) ) ? 'vote_score__status_'.$Item->get_read_status() : '' ),
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+			}
 	}
 
 
@@ -679,16 +780,127 @@ class bootstrap_forums_Skin extends Skin
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Comment
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_comment_voting_panel( $Comment, $params = array() )
+	function display_comment_voting_panel( $Comment, $place, $params = array() )
 	{
-		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
-				'before_title'          => '',
-				'helpful_text'          => T_('Is this reply helpful?'),
-				'class'                 => 'vote_helpful',
-				'skin_ID'               => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title' => '',
+						'helpful_text' => T_('Is this reply helpful?'),
+						'skin_ID'      => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title'           => '',
+						'helpful_text'           => T_('Is this reply helpful?'),
+						'class'                  => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'display_noactive'       => true,
+						'title_text'             => '',
+						'title_empty'            => '',
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+		}
+	}
+
+
+	/**
+	 * Display header for posts list
+	 *
+	 * @param string Title
+	 */
+	function display_posts_list_header( $title, $params = array() )
+	{
+		global $Blog;
+
+		$params = array_merge( array(
+				'actions' => '',
+				// Normal template:
+				'before_normal_header'  => '<header class="panel-heading">',
+				'after_normal_header'   => '<div class="clearfix"></header>',
+				'before_normal_title'   => '<div class="pull-left">',
+				'after_normal_title'    => '</div>',
+				'before_normal_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'after_normal_status'   => '</div>',
+				'before_normal_actions' => '',
+				'after_normal_actions'  => '',
+				// Template with workflow task status selector:
+				'before_workflow_header'  => '<header class="panel-heading panel-heading-columns">',
+				'after_workflow_header'   => '<div class="clearfix"></header>',
+				'before_workflow_title'   => '<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">',
+				'after_workflow_title'    => '</div>',
+				'before_workflow_status'  => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">',
+				'after_workflow_status'   => '</div>',
+				'before_workflow_actions' => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 text-right">',
+				'after_workflow_actions'  => '</div>',
+			), $params );
+
+		// Check if current User can view workflow properties:
+		$can_view_workflow =
+			// Workflow must be enabled for current Collection:
+			$Blog->get_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
+
+		// Get template depending on permission of current User:
+		$template = ( $can_view_workflow ? 'workflow' : 'normal' );
+
+		echo $params['before_'.$template.'_header'];
+
+		// Title:
+		echo $params['before_'.$template.'_title'];
+		echo $title;
+		echo $params['after_'.$template.'_title'];
+
+		if( $can_view_workflow )
+		{	// Display status filter only when current User a permission to view workflow properties:
+			$ItemStatusCache = & get_ItemStatusCache();
+			$ItemStatusCache->clear();
+			$item_statuses_SQL = $ItemStatusCache->get_SQL_object();
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__status_type ON pst_ID = its_pst_ID' );
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON its_ityp_ID = itc_ityp_ID' );
+			$item_statuses_SQL->WHERE( 'itc_coll_ID = '.$Blog->ID );
+			$ItemStatusCache->load_by_sql( $item_statuses_SQL );
+			$status = param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' );
+
+			echo $params['before_workflow_status'];
+			echo '<select id="evo_workflow_status_filter" class="form-control input-sm">'
+					.'<option value="">'.T_('All statuses').'</option>'
+					.'<option value="-"'.( $status == '-' ? ' selected="selected"' : '' ).'>'.T_('No status').'</option>'
+					.$ItemStatusCache->get_option_list( $status )
+				.'</select>';
+			expose_var_to_js( 'evo_skin_bootstrap_forums__post_list_header', true );
+			echo $params['after_workflow_status'];
+		}
+
+		if( ! empty( $params['actions'] ) )
+		{	// Actions:
+			echo $params['before_'.$template.'_actions'];
+			echo $params['actions'];
+			echo $params['after_'.$template.'_actions'];
+		}
+
+		echo $params['after_'.$template.'_header'];
 	}
 }
 

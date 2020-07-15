@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -18,10 +18,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Collection, $Blog, $Session, $inc_path;
 global $action, $form_action;
 
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var Plugins
  */
@@ -137,7 +133,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$Form->hidden( 'item_featured', $edited_Item->featured );
 			$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
@@ -148,6 +144,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
 		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+		$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
+		$Form->hidden( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -159,9 +157,9 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	if( check_user_perm( 'admin', 'restricted' ) )
 	{ // These fields can be edited only by users which have an access to back-office
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // Time stamp field values
 			$Form->hidden( 'item_dateset', $edited_Item->get( 'dateset' ) );
 			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
@@ -254,7 +252,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->textarea_input( 'content', $item_content, 16, NULL, array(
 				'cols' => 50 ,
 				'id' => 'itemform_post_content',
-				'class' => 'autocomplete_usernames'
+				'class' => 'autocomplete_usernames link_attachment_dropzone'
 			) );
 		$Form->switch_layout( NULL );
 		?>
@@ -380,7 +378,7 @@ if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 
 	if( $LinkOwner->count_links() )
 	{
 		$Form->begin_fieldset( T_('Attachments') );
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'files', 'view' ) && check_user_perm( 'admin', 'restricted' ) )
 		{
 			display_attachments( $LinkOwner );
 		}

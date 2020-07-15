@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -51,10 +51,6 @@ $block_item_Widget = new Widget( 'block_item' );
 echo '<div class="evo_content_block evo_content_summary">';
 
 	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
-	if( $ItemList->is_filtered() )
-	{ // List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-	}
 
 	// Generate global icons depending on seleted tab with item type
 	item_type_global_icons( $block_item_Widget );
@@ -71,7 +67,7 @@ echo '<div class="evo_content_block evo_content_summary">';
 			'block_end'            => '',
 			'block_title_start'    => '<b>',
 			'block_title_end'      => ':</b> ',
-			'show_filters'         => array( 'time' => 1 ),
+			'show_filters'         => array( 'time' => 1, 'visibility' => 1, 'itemtype' => 1 ),
 			'display_button_reset' => false,
 			'display_empty_filter' => true,
 		) );
@@ -84,8 +80,8 @@ echo '<div class="evo_content_block evo_content_summary">';
 
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
-			'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
-			'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+			'header_start' => $admin_template['header_start'],
+			'footer_start' => $admin_template['footer_start'],
 		);
 
 $ItemList->display_init( $display_params );

@@ -14,14 +14,6 @@
 	}
 }
 
-// Footer
-.evo_container__footer {
-	text-align: right;
-	color: #A1A9B7;
-	font-size: 13px;
-	font-weight: bold;
-	text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-}
 // Powered By image background
 .powered_by {
 	a {
@@ -55,6 +47,9 @@
 ol.breadcrumb {
 	margin-left: 0;
 	float: left;
+	img {
+		margin-top: -2px;
+	}
 }
 
 // Status icons
@@ -75,11 +70,29 @@ ol.breadcrumb {
 	}
 }
 
+.fa.icon_new {
+	text-align: center;
+	background: #FFF;
+	border: 2px solid #FF6600;
+	.border-radius(50%);
+	width: 21px;
+	height: 21px;
+	line-height: 18px;
+	font-size: 12px;
+	&.big {
+		width: 28px;
+		height: 28px;
+		line-height: 25px;
+		font-size: 16px;
+	}
+}
+
 // Forums table list
 .forums_list {
 	//Disp=posts pagination
 	.comments_link__pagination {
-			text-align: center;
+		text-align: center;
+		margin-bottom: 15px;
 		.post_button {
 			float: left;
 			vertical-align: top;
@@ -88,7 +101,6 @@ ol.breadcrumb {
 			display: inline-block;
 			vertical-align: top;
 			margin: 0 auto;
-			margin-left: -76px;
 		}
 	}
 	box-shadow: none;
@@ -100,8 +112,13 @@ ol.breadcrumb {
 		h2 {
 			margin-top: 0;
 		}
-		.btn {
-			margin: -6px 0 0 6px;
+		&.panel-heading-columns {
+			padding-left: 0;
+			padding-right: 0;
+			select {
+				margin-top: 3px;
+				width: auto;
+			}
 		}
 	}
 	&.panel>a+.table {
@@ -178,14 +195,27 @@ ol.breadcrumb {
 	.ft_status_topic {
 		width: 30px;
 		padding: 0px;
-		//margin-top: 5px;
 		float: left;
-		.fa.fa-comments {
-			color: #000000;
+		.fa {
+			&.fa-comments {
+				color: #000000;
+			}
+			&.updated {
+				color: #990000;
+			}
+			&.new {
+				color: #FF6600;
+			}
+			&:hover {
+				color: inherit;
+			}
 		}
-		.fa.fa-comments:hover {
-			color: inherit;
-		}
+	}
+	.vote_score__status_new {
+		color: #FF6600;
+	}
+	.vote_score__status_updated {
+		color: #990000;
 	}
 	.ft_count {
 		margin-top: 5px;
@@ -243,7 +273,7 @@ ol.breadcrumb {
 		color: #8b96a1;
 		font-size: 90%;
 		line-height: 16px;
-		
+
 		div.ft_date_header {
 				margin-bottom: 5px;
 			}
@@ -255,9 +285,11 @@ ol.breadcrumb {
 			display: inline-block;
 		}
 	}
-	// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
 	.ft_date {
-		margin-top: 17px;
+		// .ft_date margin is set separately because we handle the same CSS for both .ft_date and .ft_workflow_info, only margin is different
+		margin-top: 10px;
+		text-align: center;
+		white-space: nowrap;
 	}
 	// When Enabled "Workflow" option, we use .ft_workflow_info instead of .ft_date
 	.ft_workflow_info {
@@ -283,23 +315,25 @@ ol.breadcrumb {
 			margin-right: 0;
 		}
 	}
-	.ft_date {
-		text-align: center;
-		white-space: nowrap;
-	}
 	.ft_date_shrinked, .ft_date_shrinked_more {
 		display: none;
 		line-height: 16px;
 		margin-top: 3px;
 		div.ft_date_header {
-				margin-bottom: 5px;
-			}
+			margin-bottom: 5px;
+		}
 		span.user.anonymous, span.identity_link_username {
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			max-width: 100%;
 			display: inline-block;
+		}
+	}
+	// Remove underline from hover
+	.ft_date, .ft_date_shrinked, .ft_date_shrinked_more {
+		a.icon_latest_reply:active, a.icon_latest_reply:hover {
+			text-decoration: none;
 		}
 	}
 	.ft_author_avatar {
@@ -329,8 +363,6 @@ ol.breadcrumb {
 	.panel-heading {
 		.evo_comment_title {
 			display: inline;
-			a {
-			}
 			a.user:hover {
 				background: #f8e0e0 none repeat scroll 0 0;
 				border-radius: 2px;
@@ -349,6 +381,12 @@ ol.breadcrumb {
 		&:hover {
 			color: #23527c;
 		}
+	}
+	.label {
+		display: inline-block;
+		padding-top: .3em;
+		position: relative;
+		top: -1px;
 	}
 }
 .bCommentAvatar {
@@ -400,6 +438,17 @@ ol.breadcrumb {
 .legend-item {
 	margin: 0px 5px 12px 5px;
 	display: inline-block;
+	.fa {
+		&.fa-comments {
+			color: #000000;
+		}
+		&.updated {
+			color: #990000;
+		}
+		&.new {
+			color: #FF6600;
+		}
+	}
 }
 ul.legend {
 	list-style: none;
@@ -471,6 +520,7 @@ ul.legend {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -484,18 +534,39 @@ ul.legend {
 		text-align: left;
 	}
 }
+
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
-	&.register-disabled {
-		width: 350px;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {
@@ -569,6 +640,7 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
+				float: left;
 				/* @MILOS > Still testing to see if this is overrulled by: line 992
 				span > img.loadimg, a > img.loadimg {
 					border-radius: 50% !important;
@@ -600,10 +672,41 @@ ul.legend {
 			display: inline-block;
 		}
 	}
+	// Special style for enabled voting panel with left score mode:
+	.evo_voting_layout__left_score {
+		.post_main, .evo_comment_text {
+			padding-left: 25px;
+		}
+	}
 }
 body.round_avatars .single_topic .evo_content_block .ft_avatar {
 	> a:before, > a, > span, a > img {
 		.border-radius(50%);
+	}
+}
+.evo_content_block, .evo_comment {
+	.panel-footer {
+		> a, > span:not(.btn-group), > div {
+			margin-top: 2px;
+			margin-bottom: 2px;
+		}
+		.vote_spam {
+			margin-right: 10px;
+			.btn-group a {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		}
+		.comment_edit_btn {
+			display: none;
+			margin-right: 5px;
+		}
+		.action_btn_group {
+			float: right;
+			.comment_edit_btn {
+				display: inline-block;
+			}
+		}
 	}
 }
 
@@ -626,6 +729,27 @@ a.btn+.vote_spam {
 	line-height: 22px;
 	span.fa {
 		line-height: 20px;
+	}
+}
+.evo_voting_panel__left_score {
+	height: auto;
+	text-align: center;
+	margin: 0;
+	a.action_icon span.fa {
+		margin: 0;
+	}
+	.vote_score {
+		display: block;
+		font-weight: bold;
+	}
+	> span.fa {
+		margin: 0 2px;
+	}
+}
+.ft_avatar, .evo_comment_avatar {
+	.evo_voting_panel__left_score {
+		width: 100%;
+		float: none;
 	}
 }
 // A link to reply on comment:
@@ -654,12 +778,14 @@ a.btn+.vote_spam {
 
 // Search form
 main .widget_core_coll_search_form {
-	float: right;
-	width: 40%;
-	min-width: 250px;
-	margin: 0 0 20px 5px;
-	div.compact_search_form input.search_field {
-		width: 100%;
+	div.index_compact_search_form {
+		float: right;
+		width: 40%;
+		min-width: 250px;
+		margin: 0 0 20px 5px;
+		input.search_field {
+			width: 100%;
+		}
 	}
 }
 
@@ -671,19 +797,19 @@ aside .widget_core_coll_search_form {
 
 // Search disp
 .extended_search_form {
-	width: 100%;
-	display: inline-block;
-	vertical-align: center;
+	max-width: 600px;
+	margin: 0 auto;
+	display: block;
 	text-align: center;
 	input {
 		text-align: left;
 		display: inline-block;
 	}
 	.SearchField {
-		width: 50%;
+		//width: 50%;
 	}
 	.search_submit {
-		margin-top: -2px;
+		//margin-top: -2px;
 	}
 }
 .evo_search_navigation {
@@ -709,6 +835,19 @@ aside .widget_core_coll_search_form {
 	.posts_panel {
 		.ft_count {
 			margin-top: 12px !important;
+		}
+	}
+	.evo_content_block, .evo_comment {
+		.panel-footer {
+			.comment_edit_btn {
+				display: inline-block;
+			}
+			.action_btn_group {
+				float: left;
+				.comment_edit_btn {
+					display: none;
+				}
+			}
 		}
 	}
 }
@@ -793,7 +932,7 @@ aside .widget_core_coll_search_form {
 			float: left;
 			margin-top: 4px;
 			line-height: 22px;
-			
+
 			span {
 				vertical-align: top;
 			}
@@ -822,8 +961,6 @@ aside .widget_core_coll_search_form {
 		.evo_comment_post_title {
 			display: block !important;
 		}
-	}
-	.vs_published {
 		.evo_comment_avatar {
 			margin-right: 15px;
 		}
@@ -912,9 +1049,10 @@ aside .widget_core_coll_search_form {
 			display: none;
 		}
 		.ft_date_shrinked.item_list {
-			float: none;
-			text-align: left;
 			display: inline;
+			float: none;
+			padding-right: 0;
+			text-align: left;
 			margin-top: 4px;
 		}
 	}
@@ -1031,6 +1169,18 @@ aside .widget_core_coll_search_form {
 	}
 }
 
+@media screen and (max-width: 360px) {
+	/* Disp posts */
+	.posts_panel {
+		.ft_date_shrinked.item_list {
+			// Hide comment date
+			.datestamp_shrinked {
+				display: none;
+			}
+		}
+	}
+}
+
 // POSTS PANEL BADGE FIX
 .posts_panel_title_wrapper {
 	width: 100%;
@@ -1060,10 +1210,14 @@ aside .widget_core_coll_search_form {
 			float: none !important;
 			display: inline;
 		}
+		.evo_status.badge {
+			top: 0;
+		}
 	}
 }
 .cell1, .cell2 {
 	display: table-cell;
+	vertical-align: middle;
 }
 
 // Comment-footer link TO TOP size FIX
@@ -1109,7 +1263,16 @@ a.to_top {
 }
 
 // Fix styles for message that appears instead of a button to post when user must activate account:
-.comments_link__pagination .alert {
+.alert.alert-item-new {
 	margin: 0;
-	text-align: left;
+}
+
+// Wrapper for form to create new post by anonymous user:
+.panel.evo_item_new_form {
+	margin-bottom: 0;
+}
+
+// Force affixed sidebar to static top position:
+.sidebar_wrapper.affix-forced-top {
+	position: static !important;
 }

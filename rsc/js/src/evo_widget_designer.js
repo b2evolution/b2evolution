@@ -6,8 +6,11 @@ jQuery( document ).on( 'mouseover', '.evo_container[data-code]', function()
 {	// Initialize and Show container designer block:
 	var container = jQuery( this );
 
-	// To be sure all previous designer blocks are hidden before show new one:
-	jQuery( '.evo_designer__container' ).hide();
+	if( jQuery( '.evo_designer.evo_designer__widget[data-widget-block-clicked=1]' ).length == 0 )
+	{	// Unmark currently selected sub-container only when this is not event of clicking on child widget of the subcontainer:
+		// To be sure all previous designer blocks are hidden before show new one:
+		jQuery( '.evo_designer__container' ).hide();
+	}
 
 	// Initialize designer block for widget container:
 	evo_widget_initialize_designer_container_block( container );
@@ -44,7 +47,7 @@ function evo_widget_initialize_designer_container_block( container )
 	evo_widget_update_container_position( container );
 }
 
-jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
+jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function( e )
 {	// Initialize and Show widget designer block:
 	var widget = jQuery( this );
 
@@ -54,10 +57,17 @@ jQuery( document ).on( 'mouseover', '.evo_widget[data-id]', function()
 		return;
 	}
 
-	// To be sure all previous designer blocks are hidden before show new one:
-	jQuery( '.evo_designer' ).removeClass( 'evo_designer__subcontainer_active evo_designer__subcontainer_inactive' ).hide();
-	// Unmark active subcontainer widget:
-	jQuery( '.evo_widget.evo_widget__subcontainer_active' ).removeClass( 'evo_widget__subcontainer_active' );
+	jQuery( '.evo_designer.evo_designer__subcontainer_active, .evo_designer.evo_designer__subcontainer_inactive' ).each( function()
+	{
+		if( ! ( e.pageX >= jQuery( this ).offset().left - 3 && e.pageY >= jQuery( this ).offset().top - 3 && // top-left point
+		        e.pageX <= jQuery( this ).offset().left + jQuery( this ).width() + 3 && e.pageY <= jQuery( this ).offset().top + jQuery( this ).height() + 3 ) ) // bottom-right point
+		{	// If mouse cursor is outside of current active sub-container,
+			// Hide current desinger block:
+			jQuery( this ).hide();
+			// Unmark active subcontainer widget:
+			jQuery( '.evo_widget.evo_widget__subcontainer_active[data-id=' + jQuery( this ).data( 'id' )+ ']' ).removeClass( 'evo_widget__subcontainer_active' );
+		}
+	} );
 
 	// Initialize designer block for widget:
 	evo_widget_initialize_designer_block( widget );
@@ -90,18 +100,37 @@ function evo_widget_initialize_designer_block( widget )
 	jQuery( 'body' ).append( designer_block_start + '<div><div class="evo_designer__title">' + widget.data( 'type' ) + '</div></div>' + designer_block_end );
 	if( widget.data( 'can-edit' ) == '1' )
 	{	// Display a panel with actions if current user has a permission to edit widget:
+		var additional_widget_icons = '';
+		if( widget.hasClass( 'widget_core_subcontainer' ) )
+		{	// Icons to add and list widgets in sub-container:
+			additional_widget_icons += b2evo_widget_icon_add + b2evo_widget_icon_list;
+		}
 		jQuery( '>div', designer_block_selector ).append( '<div class="evo_designer__actions">' +
+				additional_widget_icons +
+				b2evo_widget_icon_top +
 				b2evo_widget_icon_up +
 				b2evo_widget_icon_down +
+				b2evo_widget_icon_bottom +
+				b2evo_widget_icon_duplicate +
 				b2evo_widget_icon_disable +
 			'</div>' );
-		if( same_widgets.eq( same_widgets.length - 1 ).next( '.evo_widget' ).length == 0 )
+		var next_widget = same_widgets.eq( same_widgets.length - 1 ).next( '.evo_widget' );
+		if( next_widget.length == 0 )
 		{	// Hide action icon to move widget down if it is the last widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_down' ).hide();
 		}
-		if( same_widgets.eq( 0 ).prev( '.evo_widget' ).length == 0 )
+		if( next_widget.next( '.evo_widget' ).length == 0 )
+		{	// Hide action icon to move widget to bottom if it is the penultimate widget in container:
+			jQuery( designer_block_selector ).find( '.evo_designer__action_order_bottom' ).hide();
+		}
+		var prev_widget = same_widgets.eq( 0 ).prev( '.evo_widget' );
+		if( prev_widget.length == 0 )
 		{	// Hide action icon to move widget up if it is the first widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_up' ).hide();
+		}
+		if( prev_widget.prev( '.evo_widget' ).length == 0 )
+		{	// Hide action icon to move widget to top if it is the second widget in container:
+			jQuery( designer_block_selector ).find( '.evo_designer__action_order_top' ).hide();
 		}
 	}
 	for( var w = 2; w <= same_widgets.length; w++ )
@@ -133,15 +162,39 @@ jQuery( document ).on( 'mouseover', '.evo_designer__widget', function()
 jQuery( document ).on( 'click', '.evo_designer__action_add, .evo_designer__action_list', function( e )
 {	// Link to add widget or to manage widgets of the container:
 	if( typeof( b2evo_widget_add_url ) != 'undefined' )
-	{	// If global widget add form url is defined:
+	{	// If global widget add/list form url is defined:
 		var container_block = jQuery( this ).closest( '.evo_designer__container' );
-		var container = jQuery( evo_widget_container_selector( container_block ) );
-		if( container.length && container.data( 'can-edit' ) == '1' )
-		{	// Load widget adding list only if it is allowed for current user:
+		if( container_block.length )
+		{	// This is a container:
+			var container = jQuery( evo_widget_container_selector( container_block ) );
+			if( container.length && container.data( 'can-edit' ) == '1' )
+			{
+				var container_name = container.data( 'name' );
+				var container_code = container.data( 'code' );
+			}
+		}
+		else
+		{	// This may be a widget "Sub-Container":
+			var widget_block = jQuery( this ).closest( '.evo_designer__widget' );
+			if( widget_block.length )
+			{
+				var widget = jQuery( evo_widget_selector( widget_block ) );
+				if( widget.length &&
+				    widget.hasClass( 'widget_core_subcontainer' ) &&
+				    widget.data( 'can-edit' ) == '1' )
+				{	// This is a widget "Sub-Container":
+					var container_name = widget.data( 'subcontainer-name' );
+					var container_code = widget.data( 'subcontainer-code' );
+				}
+			}
+		}
+
+		if( typeof( container_name ) != 'undefined' )
+		{	// Load widget add form or widgets list only if it is allowed for current user:
 			var widget_action_url = jQuery( this ).hasClass( 'evo_designer__action_add' ) ? b2evo_widget_add_url : b2evo_widget_list_url;
 			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
-				.href = widget_action_url.replace( '$container$', container.data( 'name' ) ).replace( '$container_code$', container.data( 'code' ) );
+				.href = widget_action_url.replace( '$container$', container_name ).replace( '$container_code$', container_code );
 		}
 	}
 } );
@@ -169,6 +222,10 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 		return;
 	}
 
+	// Mark currently clicking widget in order to don't hide/inactive parent subcontainer:
+	var widget_block = jQuery( this );
+	widget_block.attr( 'data-widget-block-clicked', 1 );
+
 	var widget = jQuery( evo_widget_selector( jQuery( this ) ) );
 
 	if( typeof( b2evo_widget_edit_url ) != 'undefined' )
@@ -185,7 +242,8 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			{	// Create temp for for animation:
 				jQuery( 'body', window.parent.document ).append( '<div class="evo_designer__widget_animation"></div>' );
 			}
-			jQuery( '.evo_designer__widget_animation', window.parent.document ).css(
+			jQuery( '.evo_designer__widget_animation', window.parent.document ).show()
+			.css(
 			{
 				top: jQuery( this ).position().top + jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().top,
 				left: jQuery( this ).position().left+ jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().left,
@@ -200,17 +258,36 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 				width: jQuery( '#evo_customizer__backoffice', window.parent.document ).width(),
 				height: jQuery( '#evo_customizer__backoffice', window.parent.document ).height() - 160,
 			} )
-			.animate( { opacity: 0 }, 10 );
+			.animate( { opacity: 0 }, 10, function()
+			{
+				jQuery( this ).hide();
+				// Remove flag after clict event was ended here:
+				widget_block.removeAttr( 'data-widget-block-clicked' );
+			} );
 
 			jQuery( '.evo_widget[data-z-index]' ).each( function()
 			{	// Revert z-index of previous active widget blocks,
 				// in order to keep only single current block with active html elements(links, forms, etc.):
-				jQuery( this ).css( 'z-index', jQuery( this ).data( 'z-index' ) );
+				jQuery( this ).css( 'z-index', jQuery( this ).data( 'z-index' ) )
+					.removeData( 'z-index' );
 			} );
-			// Move original widget block over designer widger block(frame/box with grey border and action icons),
-			// in order to make active html elements(links, forms, etc.) inside original widget block:
-			widget.attr( 'data-z-index', widget.css( 'z-index' ) )
-				.css( 'z-index', jQuery( this ).css( 'z-index' ) + 1 );
+
+			// NOTE: Ignore sub-containers to allow click on widgets to edit them:
+			if( ! widget.hasClass( 'widget_core_subcontainer' ) &&
+			    ! widget.hasClass( 'widget_core_subcontainer_row' ) )
+			{	// Move original widget block over designer widger block(frame/box with grey border and action icons),
+				// in order to make active html elements(links, forms, etc.) inside original widget block:
+				widget.attr( 'data-z-index', widget.css( 'z-index' ) )
+					.css( 'z-index', parseInt( jQuery( this ).css( 'z-index' ) ) + 1 );
+				// Set auto z-index for parent sub-container widgets in order to make the clicked widget active over the wrapper sub-sontainer:
+				var parent_subcontainer = widget.parents( '.widget_core_subcontainer, .widget_core_subcontainer_row' );
+				while( parent_subcontainer.length > 0 )
+				{
+					parent_subcontainer.attr( 'data-z-index', parent_subcontainer.css( 'z-index' ) )
+						.css( 'z-index', 'auto' );
+					parent_subcontainer = parent_subcontainer.parents( '.widget_core_subcontainer, .widget_core_subcontainer_row' );
+				}
+			}
 		}
 	}
 
@@ -290,11 +367,11 @@ jQuery( document ).on( 'mousemove', function( e )
 	}
 
 	if( jQuery( '.evo_designer__subcontainer_active' ).length > 0 &&
-	    ( ( typeof( evo_subcontainer_widgets ) != 'undefined' && evo_subcontainer_widgets.length > 0 ) || 
+	    ( ( typeof( evo_subcontainer_widgets ) != 'undefined' && evo_subcontainer_widgets.length > 0 ) ||
 	      ( typeof( evo_subcontainer_containers ) != 'undefined' && evo_subcontainer_containers.length > 0 ) ) )
 	{	// If sub-container is selected to edit its widgets:
 		var active_subcontainer_designer_block = jQuery( '.evo_designer__subcontainer_active' );
-		var subcontainer_zindex = active_subcontainer_designer_block.css( 'z-index' );
+		var subcontainer_zindex = parseInt( active_subcontainer_designer_block.css( 'z-index' ) );
 		var active_subcontainer_widgets = jQuery( '.evo_widget.evo_widget__subcontainer_active' );
 		var one_subcontainer_is_displayed = true; // Single sub-container widget doesn't contain other sub-containers, Set TRUE in order to don't try to search empty sub-containers below.
 		if( active_subcontainer_widgets.hasClass( 'widget_core_subcontainer_row' ) )
@@ -367,17 +444,32 @@ jQuery( document ).on( 'mousemove', function( e )
 	}
 } );
 
-jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__action_order_down', function()
+jQuery( document ).on( 'click', '.evo_designer__action_order_top, .evo_designer__action_order_up, .evo_designer__action_order_down, .evo_designer__action_order_bottom', function()
 {	// Change an order of widget:
 	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
 	var widget = jQuery( evo_widget_selector( designer_block ) );
-	var order_type = jQuery( this ).hasClass( 'evo_designer__action_order_up' ) ? 'up' : 'down';
+	var order_type = 'top';
+	if( jQuery( this ).hasClass( 'evo_designer__action_order_up' ) )
+	{
+		order_type = 'up';
+	}
+	else if( jQuery( this ).hasClass( 'evo_designer__action_order_down' ) )
+	{
+		order_type = 'down';
+	}
+	else if( jQuery( this ).hasClass( 'evo_designer__action_order_bottom' ) )
+	{
+		order_type = 'bottom';
+	}
 
 	// Re-select designer block because it may be several blocks for some widgets, e.g. for items/posts list widget in Menu container:
 	designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
 
 	// Mark current widget with process class:
 	designer_block.removeClass( 'evo_designer__status_failed' ).addClass( 'evo_designer__status_process' );
+
+	// Save current index of the widget in container:
+	var widget_index = widget.index();
 
 	// Change an order of the widget with near widget:
 	evo_widget_reorder( widget, order_type );
@@ -408,7 +500,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 			result = ajax_debug_clear( result );
 			if( result != '' )
 			{	// Error:
-				evo_widget_display_error( result, widget, order_type );
+				evo_widget_display_error( result, widget, order_type, widget_index );
 			}
 			else
 			{	// Success:
@@ -423,10 +515,22 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
-			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type );
+			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? ajax_debug_clear( jqXHR.responseText ) : evo_js_lang_server_error );
+			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type, widget_index );
 		}
 	} );
+} );
+
+jQuery( document ).on( 'click', '.evo_designer__action_duplicate', function()
+{	// Duplicate widget:
+	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
+	var widget = jQuery( evo_widget_selector( designer_block ) );
+
+	if( typeof( b2evo_widget_duplicate_url ) != 'undefined' )
+	{	// If global widget duplicate url is defined:
+		jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
+				.href = b2evo_widget_duplicate_url.replace( '$wi_ID$', widget.data( 'id' ) ).replace( '$crumb_widget$', b2evo_widget_crumb );
+	}
 } );
 
 jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
@@ -473,14 +577,14 @@ jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
+			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? ajax_debug_clear( jqXHR.responseText ) : evo_js_lang_server_error );
 			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type );
 		}
 	} );
 } );
 
 
-jQuery( document ).on( 'ready', function()
+jQuery( document ).ready( function()
 {
 	jQuery( 'div' ).scroll( function()
 	{	// Update position of all visible designer blocks on scroll all divs with enabled css overflow scroll property:
@@ -568,18 +672,19 @@ function evo_widget_container_block_selector( container_code )
 
 /**
  * Display an error after failed widget action
- * 
+ *
  * @param string Error message
  * @param object Widget
- * @param string Action: 'up', 'down', 'disable'
+ * @param string Action: 'top', 'up', 'down', 'disable'
+ * @param integer Widget index/position before action
  */
-function evo_widget_display_error( error, widget, action )
+function evo_widget_display_error( error, widget, action, widget_index )
 {
 	jQuery( evo_widget_designer_block_selector( widget ) ).removeClass( 'evo_designer__status_process' ).addClass( 'evo_designer__status_failed' );
 	alert( error );
-	if( action == 'up' || action == 'down' )
+	if( action != 'disable' )
 	{	// Revert widget order back:
-		evo_widget_reorder( widget, action == 'up' ? 'down' : 'up' );
+		evo_widget_reorder( widget, widget_index );
 	}
 }
 
@@ -588,24 +693,53 @@ function evo_widget_display_error( error, widget, action )
  * Change an order of the widget with near widget in same container
  *
  * @param object Widget
- * @param string Order direction: 'up', 'down'
+ * @param string|integer Order direction: 'top', 'up', 'down', 'bottom' or number of index
  */
 function evo_widget_reorder( widget, direction )
 {
 	var curr_widget = widget.eq( 0 );
 
-	if( direction == 'up' )
-	{	// Move HTML of the widget before previous widget:
-		var near_widget = evo_widget_get_duplicates( curr_widget.prev() );
-		near_widget.eq( 0 ).before( widget );
-	}
-	else
-	{	// Move HTML of the widget after next widget:
-		var near_widget = evo_widget_get_duplicates( widget.eq( widget.length - 1 ).next() );
-		near_widget.eq( near_widget.length - 1 ).after( widget );
+	switch( direction )
+	{
+		case 'top':
+			// Move HTML of the widget to the top:
+			var near_widget = evo_widget_get_duplicates( curr_widget.closest( '.evo_container' ).find( '.evo_widget' ).first() );
+			near_widget.eq( 0 ).before( widget );
+			break;
+
+		case 'up':
+			// Move HTML of the widget before previous widget:
+			var near_widget = evo_widget_get_duplicates( curr_widget.prev() );
+			near_widget.eq( 0 ).before( widget );
+			break;
+
+		case 'bottom':
+			// Move HTML of the widget to the bottom:
+			var near_widget = evo_widget_get_duplicates( curr_widget.closest( '.evo_container' ).find( '.evo_widget' ).last() );
+			near_widget.eq( near_widget.length - 1 ).after( widget );
+			break;
+
+		case 'down':
+			// Move HTML of the widget after next widget:
+			var near_widget = evo_widget_get_duplicates( widget.eq( widget.length - 1 ).next() );
+			near_widget.eq( near_widget.length - 1 ).after( widget );
+			break;
+
+		default:
+			// Move to specific index:
+			var widget_index = parseInt( direction );
+			var near_widget = evo_widget_get_duplicates( curr_widget.closest( '.evo_container' ).find( '.evo_widget' ).eq( widget_index ) );
+			if( widget_index == 0 )
+			{
+				near_widget.eq( 0 ).before( widget );
+			}
+			else
+			{
+				near_widget.eq( 0 ).after( widget );
+			}
 	}
 
-	// Update visibility of up/down action icons of first/last widgets:
+	// Update visibility of up/down action icons of first, second, penultimate and last widgets:
 	evo_widget_update_order_actions( evo_widget_container_wrapper( widget ) );
 
 	evo_widget_update_designer_position( widget );
@@ -630,15 +764,23 @@ function evo_widget_update_order_actions( container )
 		{	// If designer block is initialized:
 			if( prev_widget_ID != designer_block.data( 'id' ) )
 			{	// If it is block for next different widget:
-				designer_block.find( '.evo_designer__action_order_up, .evo_designer__action_order_down' ).show();
+				designer_block.find( '.evo_designer__action_order_top, .evo_designer__action_order_up, .evo_designer__action_order_down, .evo_designer__action_order_bottom' ).show();
 			}
 			if( widget_num == 1 )
 			{	// Hide action icon to move widget up for the first widget in container:
 				designer_block.find( '.evo_designer__action_order_up' ).hide();
 			}
+			if( widget_num <= 2 )
+			{	// Hide action icon to move widget to top for the second widget in container:
+				designer_block.find( '.evo_designer__action_order_top' ).hide();
+			}
 			if( widget_num == container_widgets.length )
 			{	// Hide action icon to move widget down for the last widget in container:
 				designer_block.find( '.evo_designer__action_order_down' ).hide();
+			}
+			if( widget_num >= container_widgets.length - 1 )
+			{	// Hide action icon to move widget to bottom for the penultimate widget in container:
+				designer_block.find( '.evo_designer__action_order_bottom' ).hide();
 			}
 			prev_widget_ID = designer_block.data( 'id' );
 		}

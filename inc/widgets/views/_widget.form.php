@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -38,7 +38,7 @@ $Form = new Form( NULL, 'widget_checkchanges' );
 
 if( ( $display_mode == 'normal' && empty( $mode ) ) || ! isset( $AdminUI ) || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
 {	// Display a link to close form (Don't display this link on bootstrap skin, because it already has an icon to close a modal window)
-	$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
+	$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ), '', 3, 2, array( 'class' => 'action_icon close_link' ) );
 }
 
 if( $mode == 'customizer' )
@@ -47,10 +47,10 @@ if( $mode == 'customizer' )
 }
 else
 {	// Set form title for all other display modes:
-	$form_title = sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) )
-		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) );
+	$form_title = sprintf( $creating ?  TB_('New widget "%s" in container "%s"') : TB_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) )
+		.' '.action_icon( TB_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) );
 }
-$Form->begin_form( 'fform', $form_title );
+$Form->begin_form( 'fform', $form_title, array( 'data-widget-code' => $edited_ComponentWidget->get( 'code' ) ) );
 
 // Plugin widget form event:
 $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
@@ -65,15 +65,15 @@ $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
 	$Form->hiddens_by_key( get_memorized( 'action' ) );
 
 // Display properties:
-$Form->begin_fieldset( T_('Widget info'), array( 'id' => 'widget_info' ) );
+$Form->begin_fieldset( TB_('Widget info'), array( 'id' => 'widget_info' ) );
 	if( $mode == 'customizer' )
 	{
 		$Form->info( '', $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name().' '.$edited_ComponentWidget->get_help_link( 'manual', false ), '<br>'.$edited_ComponentWidget->get_desc() );
 	}
 	else
 	{
-		$Form->info( T_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
-		$Form->info( T_('Description'), $edited_ComponentWidget->get_desc() );
+		$Form->info( TB_('Widget type'), $edited_ComponentWidget->get_icon().' '.$edited_ComponentWidget->get_name() );
+		$Form->info( TB_('Description'), $edited_ComponentWidget->get_desc() );
 	}
 $Form->end_fieldset();
 
@@ -111,7 +111,7 @@ $Form->end_fieldset();
 			$fieldset_name = 'settings_layout_start';
 			$fieldset_meta = array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Settings'),
+					'label'  => TB_('Settings'),
 				);
 			autoform_display_field( $fieldset_name, $fieldset_meta, $Form, 'Widget', $edited_ComponentWidget );
 			$opened_fieldsets++;
@@ -129,8 +129,8 @@ $Form->end_fieldset();
 
 			if( ! $Blog->get_setting( 'cache_enabled_widgets' ) )
 			{ // Widget/block cache is disabled by blog setting
-				$l_meta['allow_blockcache']['note'] = sprintf( T_('This widget could be cached but the block cache is OFF. Click <a %s>here</a> to enable.'),
-						'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching"' );
+				$l_meta['allow_blockcache']['note'] = sprintf( TB_('This widget could be cached but the block cache is OFF. Click <a %s>here</a> to enable.'),
+						'href="'.get_admin_url( 'ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID ).'#fieldset_wrapper_caching"' );
 				$l_meta['disabled'] = 'disabled';
 			}
 		}
@@ -163,15 +163,15 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 	) );
 
 $buttons = array();
-$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? TB_('Apply Changes!') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+enter,command+enter' );
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';
 	if( $mode == 'customizer' )
 	{	// Display a button-link to go back (only in customizer mode):
-		$buttons[] = array( 'button', 'button', T_('Cancel'),
+		$buttons[] = array( 'button', 'button', TB_('Cancel'),
 			'tag'    => 'link',
-			'href'   => $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container_code='.urlencode( $edited_ComponentWidget->get_container_param( 'code' ) ).'&mode=customizer',
+			'href'   => get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container_code='.urlencode( $edited_ComponentWidget->get_container_param( 'code' ) ).'&mode=customizer', '&' ),
 			'target' => '_self',
 		);
 	}
@@ -182,7 +182,7 @@ if( $mode == 'customizer' )
 }
 else
 {	// Additional button for normal mode in back-office:
-	$buttons[] = array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[update_edit]', TB_('Save and continue editing...'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
 }
 
 $Form->end_form( $buttons );

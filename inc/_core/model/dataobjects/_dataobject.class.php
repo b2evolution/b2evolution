@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -1007,8 +1007,13 @@ class DataObject
 		if( (!is_null($new_value) && $this->$parname == $new_value)
 			|| (is_null($this->$parname) && is_null($new_value)) )
 <old */
-		if( (isset($this->$parname) && $this->$parname === $new_value)
-			|| ( ! isset($this->$parname) && ! isset($new_value) ) )
+		if( ( isset( $this->$parname ) && // The param is found in the Object
+		      ( $this->$parname === $new_value || // Exact same string value
+		        intval( $this->$parname ) === $new_value || // Exact same float/double value
+		        floatval( $this->$parname ) === $new_value // Exact same integer value
+		      ) &&
+		      ! empty( $this->ID ) ) // The Object is really updating, Decide on insert we always have new value which must be inserted into DB
+		    || ( ! isset( $this->$parname ) && ! isset( $new_value ) ) ) // Wrong param, It doesn't exist for the Object
 		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
 			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.var_export( @$this->$parname, true ), 'dataobjects' );
 			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname;
@@ -1160,31 +1165,31 @@ class DataObject
 		$UserCache = & get_UserCache();
 
 		// HANDLE CREATOR STUFF
-		if( !empty($this->creator_field) && !empty($this->{$this->creator_field}) )
+		if( !empty( $this->creator_field ) && !empty( $this->{$this->creator_field} ) )
 		{	// We have a creator:
 			$creator_User = & $UserCache->get_by_ID( $this->{$this->creator_field} );
 
-			if( !empty($this->datecreated_field) && !empty($this->{$this->datecreated_field}) )
+			if( !empty($this->datecreated_field) && !empty( $this->{$this->datecreated_field} ) )
 			{	// We also have a create date:
 				$history[0] = sprintf( T_('Created on %s by %s'), mysql2localedate( $this->{$this->datecreated_field} ),
 					$creator_User->dget('preferredname') );
 			}
 			else
 			{	// We only have a cretaor:
-				$history[0] = sprintf( T_('Created by %s'), $creator_User->dget('preferredname') );
+				$history[0] = sprintf( T_('Created by %s'), $creator_User->dget( 'preferredname' ) );
 			}
 		}
-		elseif( !empty($this->datecreated_field) && !empty($this->{$this->datecreated_field}) )
+		elseif( !empty( $this->datecreated_field ) && !empty( $this->{$this->datecreated_field} ) )
 		{	// We only have a create date:
 			$history[0] = sprintf( T_('Created on %s'), mysql2localedate( $this->{$this->datecreated_field} ) );
 		}
 
 		// HANDLE LAST UPDATE STUFF
-		if( !empty($this->lasteditor_field) && !empty($this->{$this->lasteditor_field}) )
+		if( !empty( $this->lasteditor_field ) && !empty( $this->{$this->lasteditor_field} ) )
 		{	// We have a creator:
 			$creator_User = & $UserCache->get_by_ID( $this->{$this->lasteditor_field} );
 
-			if( !empty($this->datemodified_field) && !empty($this->{$this->datemodified_field}) )
+			if( !empty( $this->datemodified_field ) && !empty( $this->{$this->datemodified_field} ) )
 			{	// We also have a create date:
 				$history[1] = sprintf( T_('Last mod on %s by %s'), mysql2localedate( $this->{$this->datemodified_field} ),
 					$creator_User->dget('preferredname') );
@@ -1197,6 +1202,18 @@ class DataObject
 		elseif( !empty($this->datemodified_field) && !empty($this->{$this->datemodified_field}) )
 		{	// We only have a create date:
 			$history[1] = sprintf( T_('Last mod on %s'), mysql2localedate( $this->{$this->datemodified_field} ) );
+		}
+
+		// HANDLE CONTENT UPDATE STUFF
+		if( !empty( $this->contents_last_updated_ts ) )
+		{
+			$history[2] = T_('Contents updated').': '.mysql2localedatetime( $this->contents_last_updated_ts );
+		}
+
+		// HANDLE LAST TOUCHED STUFF
+		if( !empty( $this->last_touched_ts ) )
+		{
+			$history[3] = T_('Last touched').': '.mysql2localedatetime( $this->last_touched_ts );
 		}
 
 		return get_icon( 'history', 'imgtag', array( 'title'=>implode( ' - ', $history ) ), true );

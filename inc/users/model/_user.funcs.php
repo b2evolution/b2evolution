@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -60,6 +60,31 @@ function is_logged_in( $accept_not_active = true )
 
 
 /**
+ * Check a specific permission for current User.
+ * This is the MAIN permission check function that you should call to check any permission.
+ * This function will delegate to other functions when appropriate.
+ *
+ * @param string Permission name
+ * @param string Permission level
+ * @param boolean Execution will halt if this is !0 and permission is denied
+ * @param mixed Permission target (blog ID, array of cat IDs, Item, Comment...)
+ * @param boolean true if not active users are considerated as logged in users, false otherwise
+ * @return boolean FALSE if permission denied
+ */
+function check_user_perm( $permname, $permlevel = 'any', $assert = false, $perm_target = NULL, $accept_not_active = true )
+{
+	if( ! is_logged_in( $accept_not_active ) )
+	{	// Current User must be logged in:
+		return false;
+	}
+
+	global $current_User;
+
+	return $current_User->check_perm( $permname, $permlevel, $assert, $perm_target );
+}
+
+
+/**
  * Check if current User status permit the give action
  *
  * @param string action
@@ -68,12 +93,12 @@ function is_logged_in( $accept_not_active = true )
  */
 function check_user_status( $action, $target = NULL )
 {
-	global $current_User;
-
-	if( !is_logged_in() )
+	if( ! is_logged_in() )
 	{
 		return false;
 	}
+
+	global $current_User;
 
 	return $current_User->check_status( $action, $target );
 }
@@ -683,13 +708,13 @@ function use_in_skin_login()
  */
 function show_toolbar()
 {
-	global $current_User, $show_toolbar, $customizer_url;
+	global $show_toolbar;
 
 	return (
 		// If evo toolbar is not disabled for specific page:
 		( ! isset( $show_toolbar ) || $show_toolbar === true ) &&
 		// If current user has a permisssion to view toolbar:
-		is_logged_in() && ( $current_User->check_perm( 'admin', 'toolbar' ) ) );
+		check_user_perm( 'admin', 'toolbar' ) );
 }
 
 
@@ -988,9 +1013,9 @@ function user_admin_link( $before = '', $after = '', $link_text = '', $link_titl
  */
 function get_user_admin_link( $before = '', $after = '', $link_text = '', $link_title = '#', $not_visible = '' )
 {
-	global $admin_url, $blog, $current_User;
+	global $admin_url, $blog;
 
-	if( is_logged_in() && ! $current_User->check_perm( 'admin', 'normal' ) )
+	if( ! check_user_perm( 'admin', 'normal' ) )
 	{ // If user should NOT see admin link:
 		return $not_visible;
 	}
@@ -1134,19 +1159,25 @@ function get_user_avatar_url( $blog_ID = NULL )
 
 /**
  * Get URL to change user password
+ *
+ * @param integer Collection ID for the requested Collection. NULL for current $Blog
+ * @return string URL
  */
-function get_user_pwdchange_url()
+function get_user_pwdchange_url( $coll_ID = NULL )
 {
-	return get_user_settings_url( 'pwdchange' );
+	return get_user_settings_url( 'pwdchange', NULL, $coll_ID );
 }
 
 
 /**
  * Get URL to edit user preferences
+ *
+ * @param integer Collection ID for the requested Collection. NULL for current $Blog
+ * @return string URL
  */
-function get_user_preferences_url()
+function get_user_preferences_url( $coll_ID = NULL )
 {
-	return get_user_settings_url( 'userprefs' );
+	return get_user_settings_url( 'userprefs', NULL, $coll_ID );
 }
 
 
@@ -1187,11 +1218,12 @@ function get_user_subs_link( $before = '', $after = '', $link_text = '', $link_t
 /**
  * Get url to set notificaitons/subscription screen
  *
+ * @param integer Collection ID for the requested Collection. NULL for current $Blog
  * @return string Url to subscription screen
  */
-function get_user_subs_url()
+function get_user_subs_url( $coll_ID = NULL )
 {
-	return get_user_settings_url( 'subs' );
+	return get_user_settings_url( 'subs', NULL, $coll_ID );
 }
 
 /**
@@ -1255,7 +1287,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 		return NULL;
 	}
 
-	if( !$User->check_status( 'can_display_link' ) && !( is_admin_page() && is_logged_in( false ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+	if( ! $User->check_status( 'can_display_link' ) && ! ( is_admin_page() && check_user_perm( 'users', 'edit', false, NULL, false ) ) )
 	{ // if the account status restrict to display user profile link and current User is not an admin in admin interface, then do not return identity url!
 		return NULL;
 	}
@@ -1270,7 +1302,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 		return NULL;
 	}
 
-	if( !$current_User->check_perm( 'user', 'view', false, $User ) )
+	if( ! check_user_perm( 'user', 'view', false, $User ) )
 	{ // if the current user status restrict to view other user profile
 		return NULL;
 	}
@@ -1280,7 +1312,7 @@ function get_user_identity_url( $user_ID, $user_tab = 'profile', $blog_ID = NULL
 		return $User->get_userpage_url( $blog_ID );
 	}
 
-	if( $current_User->check_status( 'can_access_admin' ) && ( ( $current_User->ID == $user_ID ) || $current_User->check_perm( 'users', 'view' ) ) )
+	if( check_user_status( 'can_access_admin' ) && ( ( $current_User->ID == $user_ID ) || check_user_perm( 'users', 'view' ) ) )
 	{	// Go to backoffice profile:
 		return get_user_settings_url( $user_tab, $user_ID, $blog_ID );
 	}
@@ -1308,16 +1340,36 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 		debug_die( 'Active user not found.' );
 	}
 
-	if( in_array( $user_tab, array( 'marketing', 'advanced', 'admin', 'sessions', 'activity', 'export' ) ) )
+	$backoffice_user_tabs = array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' );
+	if( is_pro() )
 	{
-		$is_admin_tab = true;
+		$backoffice_user_tabs[] = 'social';
 	}
-	else
+	$frontoffice_user_tabs = array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'report' );
+
+	// Check allowed user tabs from modules:
+	$modules_allowed_user_tabs = modules_call_method( 'get_allowed_user_tabs' );
+	if( is_array( $modules_allowed_user_tabs ) )
 	{
-		$is_admin_tab = false;
+		foreach( $modules_allowed_user_tabs as $module_allowed_user_tabs )
+		{
+			if( isset( $module_allowed_user_tabs[ $user_tab ] ) )
+			{	// We found the user tab is allowed:
+				if( $module_allowed_user_tabs[ $user_tab ] == 'backoffice' )
+				{	// for back-office:
+					$backoffice_user_tabs[] = $user_tab;
+				}
+				elseif( $module_allowed_user_tabs[ $user_tab ] == 'frontoffice' )
+				{	// for front-office:
+					$frontoffice_user_tabs[] = $user_tab;
+				}
+			}
+		}
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'report' ) ) ) )
+	$is_admin_tab = in_array( $user_tab, $backoffice_user_tabs );
+
+	if( ! $is_admin_tab && ! in_array( $user_tab, $frontoffice_user_tabs ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -1354,8 +1406,8 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 
 	if( $is_admin_page || $is_admin_tab || empty( $current_Blog ) || $current_User->ID != $user_ID )
 	{
-		if( ( $current_User->ID != $user_ID && ! $current_User->check_perm( 'users', 'view' ) ) ||
-				( ! $current_User->check_perm( 'admin', 'restricted' ) || ! $current_User->check_status( 'can_access_admin' ) ) )
+		if( ( $current_User->ID != $user_ID && ! check_user_perm( 'users', 'view' ) ) ||
+				( ! check_user_perm( 'admin', 'restricted' ) || ! check_user_status( 'can_access_admin' ) ) )
 		{ // Use blog url when user has no access to backoffice
 			if( empty( $current_Blog ) )
 			{ // Check if system has at least one blog
@@ -1479,14 +1531,14 @@ function get_user_messaging_link( $before = '', $after = '', $link_text = '#', $
  */
 function get_user_messaging_url()
 {
-	global $current_User, $Collection, $Blog;
+	global $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
 		return false;
 	}
 
-	if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+	if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 	{	// No minimum permissions for messaging module
 		return false;
 	}
@@ -1543,7 +1595,7 @@ function get_user_contacts_link( $before = '', $after = '', $link_text = '#', $l
  */
 function get_user_contacts_url()
 {
-	global $current_User, $Collection, $Blog;
+	global $Collection, $Blog;
 
 	if( !is_logged_in() )
 	{
@@ -1555,14 +1607,80 @@ function get_user_contacts_url()
 
 
 /**
- * Get colored tag with user field "required"
+ * Helper function to display user field "name" in table list
  *
- * @param string required value
- * @param integer user ID for the requested user. If isn't set then return $current_User settings url.
+ * @param string Field ID
+ * @param string Field name
+ * @param string Field icon name
+ * @param string Field code
+ * @return string
  */
-function get_userfield_required( $value )
+function userfield_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
 {
-	return '<span class="userfield '.$value.'">'.T_( $value ).'</span>';
+	$field_icon = '<span class="uf_icon_block">'
+			.get_userfield_icon( $ufdf_icon_name, $ufdf_code )
+		.'</span>';
+
+	if( check_user_perm( 'users', 'edit' ) )
+	{ // We have permission to modify:
+		return $field_icon.'<a href="'.regenerate_url( 'action', 'ufdf_ID='.$ufdf_ID.'&amp;action=edit' ).'"><strong>'.T_( $ufdf_name ).'</strong></a>';
+	}
+	else
+	{
+		return $field_icon.'<strong>'.T_( $ufdf_name ).'</strong>';
+	}
+}
+
+
+/**
+ * Helper function to display user field "Type" in table list
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_type( $value )
+{
+	$titles = Userfield::get_types();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
+}
+
+
+/**
+ * Helper function to display user field "Required" in table list
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_required( $value )
+{
+	$titles = Userfield::get_requireds();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
+}
+
+
+/**
+* Helper function to display user field "Visibility" in table list
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_visibility( $value )
+{
+	$titles = Userfield::get_visibilities();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
+}
+
+
+/**
+ * Get user field "Visibility"
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_duplicate( $value )
+{
+	$titles = Userfield::get_duplicateds();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
 }
 
 
@@ -1638,10 +1756,10 @@ function profile_check_params( $params, $User = NULL )
 
 			if( param_check_valid_login( $dummy_fields[ $params['login'][1] ] ) )
 			{	// If login is valid
-				global $reserved_logins, $current_User;
+				global $reserved_logins;
 				if( ! empty( $reserved_logins ) &&
 				    in_array( $params['login'][0], $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
+				    ! check_user_perm( 'users', 'edit' ) )
 				{	// If new entered login is reserved and current logged in User cannot use this:
 					param_error( $dummy_fields[ $params['login'][1] ], T_('You cannot use this login because it is reserved.') );
 				}
@@ -1680,6 +1798,12 @@ function profile_check_params( $params, $User = NULL )
 		param_error( $params['lastname'][1], T_('Please enter your last name.') );
 	}
 
+	// Checking nick name
+	if( isset( $params['nickname'] ) && empty( $params['nickname'][0] ) )
+	{
+		param_error( $params['nickname'][1], T_('Please enter your nick name.') );
+	}
+
 	// Checking gender
 	if( isset( $params['gender'] ) )
 	{
@@ -1689,7 +1813,7 @@ function profile_check_params( $params, $User = NULL )
 		}
 		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
 		{
-			param_error( $params['gender'][1], 'Gender value is invalid' );
+			param_error( $params['gender'][1], T_('Gender value is invalid') );
 		}
 	}
 
@@ -1747,6 +1871,128 @@ function profile_check_params( $params, $User = NULL )
 
 
 /**
+ * Check profile parameters provided by social network provider and add errors through {@link param_error()}.
+ *
+ * @param array associative array.
+ *     Either array( $value, $input_name ) or just $value;
+ *     ($input_name gets used for associating it to a form fieldname)
+ *     - 'login': check for non-empty
+ *     - 'nickname': check for non-empty
+ *     - 'email': mandatory, must be well formed
+ *     - 'country': check for non-empty
+ *     - 'firstname': check for non-empty
+ *     - 'lastname': check for non-empty
+ * @param string Social network provider name
+ */
+function social_profile_check_params( $params, $provider )
+{
+	global $Messages, $Settings, $dummy_fields;
+
+	foreach( $params as $k => $v )
+	{
+		// normalize params:
+		if( $k != 'pass_required' && ! is_array( $v ) )
+		{
+			$params[ $k ] = array( $v, $k );
+		}
+	}
+
+	$error_messages_header = sprintf( T_('We cannot create an account based on your %s profile because your %s profile is missing the following information').':',
+			'<b>'.$provider.'</b>', '<b>'.$provider.'</b>' );
+
+	// checking e-mail address
+	if( isset( $params['email'][0] ) )
+	{
+		if( empty( $params['email'][0] ) )
+		{
+			param_error( $dummy_fields[ $params['email'][1] ], T_('Email address'), NULL, $error_messages_header );
+		}
+		elseif( ! is_email( $params['email'][0] ) )
+		{
+			param_error( $dummy_fields[ $params['email'][1] ], T_('The email address is invalid.'), NULL, $error_messages_header );
+		}
+	}
+
+	// Checking country
+	if( isset( $params['country'] ) && empty( $params['country'][0] ) )
+	{
+		param_error( $params['country'][1], T_('Country'), NULL, $error_messages_header );
+	}
+
+	// Checking first name
+	if( isset( $params['firstname'] ) && empty( $params['firstname'][0] ) )
+	{
+		param_error( $params['firstname'][1], T_('First name'), NULL, $error_messages_header );
+	}
+
+	// Checking last name
+	if( isset( $params['lastname'] ) && empty( $params['lastname'][0] ) )
+	{
+		param_error( $params['lastname'][1], T_('Last name'), NULL, $error_messages_header );
+	}
+
+	// Checking nick name
+	if( isset( $params['nickname'] ) && empty( $params['nickname'][0] ) )
+	{
+		param_error( $params['nickname'][1], T_('Nickname'), NULL, $error_messages_header );
+	}
+
+	// Checking gender
+	if( isset( $params['gender'] ) )
+	{
+		if( empty( $params['gender'][0] ) )
+		{
+			param_error( $params['gender'][1], T_('Gender'), NULL, $error_messages_header );
+		}
+		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
+		{
+			param_error( $params['gender'][1], T_('Gender value is invalid'), NULL, $error_messages_header );
+		}
+	}
+}
+
+
+/**
+ * Get required fields from registration master template
+ * 
+ * @param string Registration master template code
+ * @return array List of fieldnames required by template
+ */
+function get_registration_template_required_fields( $template_code = NULL )
+{
+	global $Settings;
+	
+	$required_fields = array();
+
+	if( empty( $template_code ) )
+	{
+		$template_code = $Settings->get( 'registration_master_template' );
+	}
+
+	$TemplateCache = & get_TemplateCache();
+	if( ! $TemplateCache->get_by_code( $template_code, false, false ) )
+	{	// Template not found:
+		debug_die( 'Template <code>'.$template_code.'</code> not found!' );
+	}
+
+	$temp_params = array();
+
+	// Render MASTER quick template:
+	// In theory, this should not display anything.
+	// Instead, this should set variables to define sub-templates (and potentially additional variables)
+	render_template_code( $template_code, /* BY REF */ $temp_params );
+
+	// Get required fields defined by master template:
+	if( isset( $temp_params['reg1_required'] ) )
+	{
+		$required_fields = array_map( 'trim', explode( ',', $temp_params['reg1_required'] ) );
+	}
+
+	return $required_fields;
+}
+
+
+/**
  * Get avatar <img> tag by user login
  *
  * @param string user login
@@ -1763,7 +2009,7 @@ function profile_check_params( $params, $User = NULL )
  */
 function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-top-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '', $show_avatar = true, $rel = NULL )
 {
-	global $current_User, $Settings;
+	global $Settings;
 
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $user_login );
@@ -2238,9 +2484,16 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		{
 			if( ! isset( $blog_perms[ $perm_target_ID ] ) )
 			{	// No rights set for this Blog - User/Group: remember this (in order not to have the same query next time)
+
+				// Check if the User is admin or owner of the Collection, so he must be assignee by default when no perm record is not stored in DB yet:
+				$null_row = ( $prefix == 'bloguser'
+					? array( 'user_ID' => $perm_target_ID )
+					: array( 'grp_ID'  => $perm_target_ID ) );
+				$default_can_be_assignee = is_always_coll_perm_enabled( (object)$null_row, $prefix.'_', 'can_be_assignee', $Blog->get( 'owner_user_ID' ) ) ? 1 : 0;
+
 				$blog_perms[ $perm_target_ID ] = array(
 						'blog_ismember'           => 0,
-						'blog_can_be_assignee'    => 0,
+						'blog_can_be_assignee'    => $default_can_be_assignee,
 						'blog_workflow_status'    => 0,
 						'blog_workflow_user'      => 0,
 						'blog_workflow_priority'  => 0,
@@ -2537,7 +2790,7 @@ function echo_user_actions( $Widget, $edited_User, $action )
 	if( $edited_User->ID != 0 )
 	{ // show these actions only if user already exists
 
-		if( $action != 'view' && $current_User->ID != $edited_User->ID && $current_User->check_status( 'can_report_user', $edited_User->ID ) )
+		if( $action != 'view' && $current_User->ID != $edited_User->ID && check_user_status( 'can_report_user', $edited_User->ID ) )
 		{
 			global $user_tab;
 			// get current User report from edited User
@@ -2555,14 +2808,14 @@ function echo_user_actions( $Widget, $edited_User, $action )
 			$Widget->global_icon( $report_text_title, 'warning_yellow', $admin_url.'?ctrl=user&amp;user_tab=report&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.$report_text, 3, 4, $report_user_link_attribs );
 		}
 		if( $action != 'view' &&
-		   $current_User->check_perm( 'users', 'edit', false ) &&
+		   check_user_perm( 'users', 'edit', false ) &&
 		   ( $current_User->ID != $edited_User->ID ) &&
 		   ( $edited_User->ID != 1 ) )
 		{
-			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete'), 3, 4, $link_attribs  );
-			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete spammer'), 3, 4, $link_attribs );
+			$Widget->global_icon( T_('Delete this user!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;user_ID='.$edited_User->ID, ' '.T_('Delete'), 3, 4, $link_attribs  );
+			$Widget->global_icon( T_('Delete this user as spammer!'), 'delete', $admin_url.'?ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$edited_User->ID, ' '.T_('Delete spammer'), 3, 4, $link_attribs );
 		}
-		if( $current_User->check_perm( 'files', 'all', false ) )
+		if( check_user_perm( 'files', 'all', false ) )
 		{
 			$Widget->global_icon( T_('Files').'...', 'folder', $admin_url.'?ctrl=files&root=user_'.$current_User->ID.'&new_root=user_'.$edited_User->ID, ' '.T_('Files').'...', 3, 4, $link_attribs );
 		}
@@ -2611,7 +2864,7 @@ function get_user_sub_entries( $is_admin, $user_ID )
 		$base_url = $Blog->gen_blogurl();
 	}
 
-	if( $user_ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) )
+	if( $user_ID == $current_User->ID || check_user_perm( 'users', 'view' ) )
 	{	// If user is viewing own profile or has a permission to view all other users:
 		$users_sub_entries['profile'] = array(
 							'text' => T_('Profile'),
@@ -2622,6 +2875,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 			$users_sub_entries['avatar'] = array(
 							'text' => T_('Profile picture'),
 							'href' => url_add_param( $base_url, $ctrl_param.'avatar'.$user_param ) );
+		}
+
+		if( is_pro() )
+		{	// Social Accounts tab available to PRO version only:
+			$users_sub_entries['social'] = array(
+							'text' => T_('Social Accounts'),
+							'href' => url_add_param( $base_url, $ctrl_param.'social'.$user_param ) );
 		}
 
 		if( $user_ID == $current_User->ID || $current_User->can_moderate_user( $user_ID ) )
@@ -2676,12 +2936,20 @@ function get_user_sub_entries( $is_admin, $user_ID )
 									'text' => $current_User->ID == $user_ID ? T_('My Activity') : T_('User Activity'),
 									'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=activity'.$user_param ) );
 			}
+		}
 
-			if( isset( $GLOBALS['export_Module'] ) && $current_User->can_moderate_user( $user_ID ) )
-			{	// Allow to export if current User can moderate the User:
-				$users_sub_entries['export'] = array(
-								'text' => T_('Export'),
-								'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=export'.$user_param ) );
+		// Additional user menus from modules:
+		$modules_user_menus = modules_call_method( 'build_user_menu', array(
+				'user_ID'       => $user_ID,
+				'page_url'      => $base_url,
+				'url_params'    => $user_param,
+				'is_admin_page' => $is_admin,
+			) );
+		if( is_array( $modules_user_menus ) )
+		{
+			foreach( $modules_user_menus as $module_user_menus )
+			{
+				$users_sub_entries = array_merge( $users_sub_entries, $module_user_menus );
 			}
 		}
 	}
@@ -3445,7 +3713,7 @@ function callback_options_user_new_fields( $value = 0 )
 
 	// Get list of possible field types:
 	$userfielddefs = $DB->get_results( '
-		SELECT ufdf_ID, ufdf_type, ufdf_name, ufgp_ID, ufgp_name, ufdf_suggest
+		SELECT ufdf_ID, ufdf_type, ufdf_name, ufgp_ID, ufgp_name, ufdf_suggest, ufdf_visibility
 		  FROM T_users__fielddefs
 		  LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID
 		 WHERE ufdf_required != "hidden"
@@ -3463,6 +3731,11 @@ function callback_options_user_new_fields( $value = 0 )
 		$current_group_ID = 0;
 		foreach( $userfielddefs as $f => $fielddef )
 		{
+			if( ! userfield_is_viewable( empty( $edited_User ) ? NULL : $edited_User->ID, $fielddef->ufdf_visibility, $fielddef->ufdf_type ) )
+			{	// Current user cannot add the user field:
+				continue;
+			}
+
 			if( $fielddef->ufgp_ID != $current_group_ID )
 			{	// New group
 				if( $f != 0 )
@@ -3491,6 +3764,108 @@ function callback_options_user_new_fields( $value = 0 )
 
 
 /**
+ * Check if user field can be viewable for current User
+ *
+ * @param integer ID of displayed user
+ * @param string User field visibility
+ * @param string User field type
+ * @return boolean
+ */
+function userfield_is_viewable( $user_ID, $user_field_visibility, $user_field_type )
+{
+	global $current_User;
+
+	if( ! is_pro() && $user_field_type == 'user' )
+	{	// Type "User select" is allowed only on PRO version:
+		return false;
+	}
+
+	switch( $user_field_visibility )
+	{
+		case 'unrestricted':
+			// The field is unrestricted
+			return true;
+
+		case 'private':
+			// Owner and admins can view this user field:
+			return is_logged_in() && ( $current_User->ID == $user_ID || $current_User->can_moderate_user( $user_ID ) );
+
+		case 'admin':
+			// Only admins can view this user field:
+			return is_logged_in() && $current_User->can_moderate_user( $user_ID );
+
+		default:
+			// Unknown visibility:
+			return false;
+	}
+}
+
+
+/**
+ * Get user field icon HTML code
+ *
+ * @param string Icon class
+ * @param string User field code
+ * @return string HTML code for user field icon
+ */
+function get_userfield_icon( $icon_class, $field_code )
+{
+	if( empty( $icon_class ) )
+	{	// No icon class is provided:
+		return '';
+	}
+
+	return '<span class="'.$icon_class.' ufld_'.$field_code.' ufld__textcolor"></span> ';
+}
+
+
+/**
+ * Get user field visibility icon HTML code
+ *
+ * @param string User field visibility
+ * @return string HTML code for user field visibility icon
+ */
+function get_userfield_visibility_icon( $user_field_visibility )
+{
+	switch( $user_field_visibility )
+	{
+		case 'unrestricted':
+			return '';
+
+		case 'private':
+			return get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('This field cannot be seen by other users.'), 'color' => '#5bc0de' ) );
+
+		case 'admin':
+			return get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('This field can only be seen by admins.'), 'color' => '#F00' ) );
+	}
+
+	return '';
+}
+
+
+/**
+ * Get label for input of the User Field
+ *
+ * @param object User field data
+ * @return string
+ */
+function get_userfield_input_label( $userfield_row )
+{
+	if( $userfield_row instanceof Userfield )
+	{	// The passed row is already Userfield object:
+		$Userfield = $userfield_row;
+	}
+	else
+	{	// Initialize Userfield object from row data:
+		load_class( 'users/model/_userfield.class.php', 'Userfield' );
+		$Userfield = new Userfield( $userfield_row );
+	}
+
+	return $Userfield->get_input_label();
+}
+
+
+/**
  * Display user fields from given array
  *
  * @param array User fields given from sql query with following structure:
@@ -3500,14 +3875,16 @@ function callback_options_user_new_fields( $value = 0 )
  * 						ufdf_name
  * 						uf_varchar
  * 						ufdf_required
+ * 						ufdf_visibility
  * 						ufdf_option
  * @param object Form
  * @param string Field name of the new fields ( new | add )
  * @param boolean Add a fieldset for group or don't
+ * @param integer ID of displayed user, NULL - for current User
  */
-function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_group_fieldset = true )
+function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_group_fieldset = true, $user_ID = NULL )
 {
-	global $action;
+	global $action, $current_User;
 
 	// Array contains values of the new fields from the request
 	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
@@ -3520,6 +3897,11 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	{
 		if( empty( $userfield->ufgp_ID ) )
 		{	// Don't display user field without group, because the user field definition was deleted from DB incorrectly:
+			continue;
+		}
+
+		if( ! userfield_is_viewable( $user_ID, $userfield->ufdf_visibility, $userfield->ufdf_type ) )
+		{	// Current user cannot view this user field:
 			continue;
 		}
 
@@ -3572,6 +3954,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 		$field_note = '';
 		$field_size = 40;
+
 		if( $action != 'view' )
 		{
 			if( in_array( $userfield->ufdf_duplicated, array( 'allowed', 'list' ) ) )
@@ -3605,15 +3988,9 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$field_params['autocomplete'] = 'on';
 		}
 
-		$userfield_icon = '';
-		if( ! empty( $userfield->ufdf_icon_name ) )
-		{ // Field icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
-		}
-
 		if( $action == 'view' )
 		{	// Only view
-			$Form->info( $userfield_icon.$userfield->ufdf_name, $uf_val.' '.$field_note );
+			$Form->info( get_userfield_input_label( $userfield ), $uf_val.' '.$field_note );
 		}
 		else
 		{	// Edit mode
@@ -3622,7 +3999,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 				case 'text':
 					$field_params['cols'] = 38;
 					$field_params['note'] = $field_note;
-					$Form->textarea_input( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield_icon.$userfield->ufdf_name, $field_params );
+					$Form->textarea_input( 'uf_'.$userfield->uf_ID, $uf_val, 5, get_userfield_input_label( $userfield ), $field_params );
 					break;
 
 				case 'list':
@@ -3633,13 +4010,21 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 					{	// Add empty value
 						$uf_options = array_merge( array( '---' ), $uf_options );
 					}
-					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
+					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, get_userfield_input_label( $userfield ), $field_note, $field_params );
+					break;
+
+				case 'user':
+					if( is_pro() )
+					{	// Display user selector by PRO function:
+						load_funcs( '_core/_pro_features.funcs.php' );
+						pro_display_user_field_input( 'uf_'.$userfield->uf_ID, $userfield, $uf_val, $field_note, $field_params, $Form );
+					}
 					break;
 
 				default:
 					$field_params['maxlength'] = 255;
 					$field_params['style'] = 'max-width:90%';
-					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
+					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, get_userfield_input_label( $userfield ), $field_note, $field_params );
 			}
 		}
 
@@ -3660,6 +4045,11 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
  */
 function userfield_prepare( & $userfield )
 {
+	if( isset( $userfield->_prepared ) && $userfield->_prepared )
+	{	// Userfield is already prepared, skip:
+		return;
+	}
+
 	$userfield->uf_varchar = format_to_output( $userfield->uf_varchar, 'htmlspecialchars' );
 
 	switch( $userfield->ufdf_type )
@@ -3671,36 +4061,39 @@ function userfield_prepare( & $userfield )
 			{
 				$url = 'http://'.$url;
 			}
-			$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow">'.$userfield->uf_varchar.'</a>';
+			$userfield->uf_varchar = '<a href="'.$url.'" target="_blank" rel="nofollow" class="linebreak">'.$userfield->uf_varchar.'</a>';
 			break;
 
 		case 'text':
 			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
 			break;
 	}
+
+	// Mark this userfield as prepared:
+	$userfield->_prepared = true;
 }
 
 
 /**
- * Callback to add filters on top of the result set
+ * Get config array for possible filters on users list
  *
- * @param Form
+ * @param object Form
+ * @return array
  */
-function callback_filter_userlist( & $Form )
+function get_userlist_filters_config( $Form = NULL )
 {
-	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
-	global $registered_min, $registered_max;
+	global $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 
 	$filters = array(
-		// Set default filters which are displayed on not filtered list:
-		'#default' => array(
-			'gender'   => '',
-			'criteria' => '0:contains:',
-			'lastseen' => '',
-		),
 		// Set order of the filters here, but filters are initalized below:
 		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'name_email'          => NULL, // Name / Email
+		'firstname'           => NULL, // First name
+		'lastname'            => NULL, // Last name
+		'nickname'            => NULL, // Nickname
+		'email'               => NULL, // Email
 		'gender'              => NULL, // Gender
+		'country'             => NULL, // Country
 		'criteria'            => NULL, // Specific criteria
 		'tags'                => NULL, // User tags
 		'org'                 => NULL, // Organization
@@ -3717,107 +4110,94 @@ function callback_filter_userlist( & $Form )
 		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
-	$Form->hidden( 'filter', 'new' );
+	// Name / Email:
+	$filters['name_email'] = array(
+			'label'      => T_('Name').' / '.T_('Username').' / '.T_('Email'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
-	if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
-	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
-		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), T_('Restrict to members of this blog') );
-	}
+	// First name:
+	$filters['firstname'] = array(
+			'label'      => T_('First name'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
-	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
+	// Last name:
+	$filters['lastname'] = array(
+			'label'      => T_('Last name'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
-	$location_filter_displayed = false;
-	if( user_country_visible() )
-	{ // Filter by country
-		load_class( 'regional/model/_country.class.php', 'Country' );
-		load_funcs( 'regional/model/_regional.funcs.php' );
-		if( has_cross_country_restriction( 'users', 'list' ) )
-		{ // User cannot browse other users from other country
-			global $current_User;
-			$Form->info( T_('Country'), $current_User->get_country_name() );
-			// Create a hidden country field to correct ajax request to load regions, subregions and cities
-			$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
-		}
-		else
-		{ // User can browse other users from other country
-			$CountryCache = & get_CountryCache( NT_('All') );
-			$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-			$location_filter_displayed = true;
-		}
-	}
+	// Nickname:
+	$filters['nickname'] = array(
+			'label'      => T_('Nickname'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
-	if( user_region_visible() )
-	{	// Filter by region
-		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
-		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
-		$Form->select_input_options( 'region', get_regions_option_list( get_param('country'), get_param('region') ), T_('Region') );
-		echo '</span>';
-		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
-	}
-
-	if( user_subregion_visible() )
-	{	// Filter by subregion
-		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
-		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
-		echo '</span>';
-	}
-
-	if( user_city_visible() )
-	{	// Filter by city
-		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
-		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
-		echo '</span>';
-	}
-
-	$Form->begin_line( T_('Age group'), 'age_min' );
-		$Form->text( 'age_min', get_param('age_min'), 3, '' );
-		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
-	$Form->end_line();
-
-	if( is_admin_page() && $edited_EmailCampaign )
-	{
-		$campaign_send_status = array(
-				'' => T_('All'),
-				'ready_to_send' => T_('Ready to send'),
-				'sent' => T_('Sent'),
-				'send_error' => T_('Send error'),
-				'skipped' => T_('Skipped')
-			);
-		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
-	}
-	echo '<br />';
+	// Email:
+	$filters['email'] = array(
+			'label'      => T_('Email'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// Gender:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )
-	{	// Show gender filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['gender'] = array(
-				'label'  => T_('Gender'),
+	$filters['gender'] = array(
+			'label'  => T_('Gender'),
+			'input'  => 'select',
+			'values' => array(
+					''  => T_('Any'),
+					'M' => T_('Men'),
+					'F' => T_('Women'),
+					'O' => T_('Other'),
+				),
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
+
+	// Country:
+	if( user_country_visible() )
+	{	// Show country filter only on back-office or if it is allowed by collection setting on front-office:
+		$CountryCache = & get_CountryCache();
+		if( has_cross_country_restriction( 'users', 'list' ) )
+		{	// User cannot browse other users from other country:
+			// Load only country of the current User:
+			$CountryCache->load_all = false; // Set flag to false in order to don't load ALL records in the CountryCache->get_option_array().
+			$CountryCache->load_where( 'ctry_ID = '.( is_logged_in() ? $current_User->ctry_ID : '-1'/* For normal work anonymous users have no access to this point however use this fake condition to avoid errors */ ) );
+			$country_options = array();
+		}
+		else
+		{	// User can browse other users from other country:
+			$country_options = array( '0' => T_('All') );
+		}
+		$country_options += $CountryCache->get_option_array();
+		$filters['country'] = array(
+				'label'  => T_('Country'),
 				'input'  => 'select',
-				'values' => array(
-						''  => T_('Any'),
-						'M' => T_('Men'),
-						'F' => T_('Women'),
-						'O' => T_('Other'),
-					),
-				'validation' => array( 'allow_empty_value' => 'true' ),
+				'type'   => 'integer',
+				'values' => $country_options,
 			);
 	}
 
 	// Level:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_level' ) ) )
-	{	// Show user level filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['level'] = array(
-				'label'     => T_('User level'),
-				'operators' => '=,!=,<,<=,>,>=,between,not_between',
-				'input'     => 'select',
-				'type'      => 'integer',
-				'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
-			);
-	}
+	$filters['level'] = array(
+			'label'     => T_('User level'),
+			'operators' => '=,!=,<,<=,>,>=,between,not_between',
+			'input'     => 'select',
+			'type'      => 'integer',
+			'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
+		);
 
 	// Organization:
-	if( ( is_admin_page() && empty( $edited_Organization ) ) ||
-	    ( ! is_admin_page() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_org' ) ) )
+	if( empty( $edited_Organization ) )
 	{	// Show organization filter only when organization form is not selected on back-office or if it is allowed by collection setting on front-office:
 		$OrganizationCache = & get_OrganizationCache( T_('All') );
 		$OrganizationCache->load_all();
@@ -3828,7 +4208,7 @@ function callback_filter_userlist( & $Form )
 			);
 	}
 
-	if( is_admin_page() && $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{
 		// Uses custom sender address:
 		$filters['custom_sender_email'] = array(
@@ -3854,229 +4234,309 @@ function callback_filter_userlist( & $Form )
 	}
 
 	// Specific criteria:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_criteria' ) ) )
-	{	// Show specific criteria filter only on back-office or if it is allowed by collection setting on front-office:
-		$Form->output = false;
-		$Form->switch_layout( 'none' );
-		global $user_fields_empty_name;
-		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-		$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
-		$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
-		$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
-		$Form->switch_layout( NULL );
-		$Form->output = true;
-		$filters['criteria'] = array(
-				'label' => T_('Specific criteria'),
-				'operators' => 'blank',
-				'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-				'valueGetter' => 'function( rule )
-					{
-						return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
-							+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
-							+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
-					}',
-				'valueSetter' => 'function( rule, value )
-					{
-						var val = value.split( ":" );
-						rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
-						rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
-						rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
-					}'
-			);
-	}
-
-	if( user_region_visible() )
-	{	// JS functions for AJAX loading of regions, subregions & cities
-?>
-<script>
-jQuery( '#country' ).change( function()
-{
-	var this_obj = jQuery( this );
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_regions_option_list&ctry_id=' + jQuery( this ).val(),
-	success: function( result )
-		{
-			jQuery( '#region' ).html( ajax_debug_clear( result ) );
-			if( jQuery( '#region option' ).length > 1 )
-			{
-				jQuery( '#region_filter' ).show();
-			}
-			else
-			{
-				jQuery( '#region_filter' ).hide();
-			}
-			load_subregions( 0 ); // Reset sub-regions
-		}
-	} );
-} );
-
-jQuery( '#region' ).change( function ()
-{	// Change option list with sub-regions
-	load_subregions( jQuery( this ).val() );
-} );
-
-jQuery( '#subregion' ).change( function ()
-{	// Change option list with cities
-	load_cities( jQuery( '#country' ).val(), jQuery( '#region' ).val(), jQuery( this ).val() );
-} );
-
-function load_subregions( region_ID )
-{	// Load option list with sub-regions for seleted region
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
-	success: function( result )
-		{
-			jQuery( '#subregion' ).html( ajax_debug_clear( result ) );
-			if( jQuery( '#subregion option' ).length > 1 )
-			{
-				jQuery( '#subregion_filter' ).show();
-			}
-			else
-			{
-				jQuery( '#subregion_filter' ).hide();
-			}
-			load_cities( jQuery( '#country' ).val(), region_ID, 0 );
-		}
-	} );
-}
-
-function load_cities( country_ID, region_ID, subregion_ID )
-{ // Load option list with cities for seleted region or sub-region
-	if( typeof( country_ID ) == 'undefined' )
+	if( empty( $Form ) )
 	{
-		country_ID = 0;
+		$Form = new Form();
 	}
+	$Form->output = false;
+	$Form->switch_layout( 'none' );
+	global $user_fields_empty_name;
+	$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
+	$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
+	$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
+	$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
+	$Form->switch_layout( NULL );
+	$Form->output = true;
+	$filters['criteria'] = array(
+			'label' => T_('Specific criteria'),
+			'operators' => 'blank',
+			'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+			'valueGetter' => 'function( rule )
+				{
+					return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
+				}',
+			'valueSetter' => 'function( rule, value )
+				{
+					var val = value.split( ":" );
+					rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
+				}',
+			'default_value' => '0:contains:',
+		);
 
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_cities_option_list&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
-	success: function( result )
-		{
-			jQuery( '#city' ).html( ajax_debug_clear( result ) );
-			if( jQuery( '#city option' ).length > 1 )
-			{
-				jQuery( '#city_filter' ).show();
-			}
-			else
-			{
-				jQuery( '#city_filter' ).hide();
-			}
-		}
-	} );
-}
-</script>
-<?php
-	}
-
-	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
+	if( check_user_perm( 'users', 'moderate' ) )
 	{	// If current user can moderate other users:
 
 		// User last seen:
-		if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastseen' ) ) )
-		{	// Show user last seen filter only on back-office or if it is allowed by collection setting on front-office:
-			$filters['lastseen'] = array(
-					'label'      => T_('User last seen'),
-					'type'       => 'date',
-					'validation' => array( 'allow_empty_value' => 'true' ),
-				);
-		}
-
-		if( is_admin_page() )
-		{	// Registration source:
-			$filters['source'] = array(
-					'label'      => T_('Registration source'),
-					'operators'  => 'contains,not_contains',
-				);
-		}
-	}
-
-	if( is_admin_page() )
-	{	// Filters only for back-office:
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{	// Allow "Report count" filter only for users with edit user permission:
-			$filters['report_count'] = array(
-					'label'         => T_('Report count'),
-					'type'          => 'integer',
-					'operators'     => 'greater_or_equal',
-					'default_value' => 1,
-				);
-		}
-
-		// Primary group:
-		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
-		$GroupCache->load_where( 'grp_usage = "primary"' );
-		$GroupCache->all_loaded = true;
-		$group_options_array = array(
-				'-1' => T_('All (Ungrouped)'),
-				'0'  => T_('All (Grouped)'),
-			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-		$OrganizationCache = & get_OrganizationCache( T_('All') );
-		$OrganizationCache->load_all();
-		$filters['group'] = array(
-				'label'  => T_('Primary Group'),
-				'type'   => 'integer',
-				'input'  => 'select',
-				'values' => $group_options_array,
-			);
-
-		// Secondary group:
-		$GroupCache->clear();
-		$GroupCache->load_where( 'grp_usage = "secondary"' );
-		$GroupCache->all_loaded = true;
-		$group_options_array = array(
-				'0'  => T_('All'),
-			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-		$filters['group2'] = array(
-				'label'  => T_('Secondary Group'),
-				'type'   => 'integer',
-				'input'  => 'select',
-				'values' => $group_options_array,
-			);
-
-		// Account status:
-		$filters['status'] = array(
-				'label'  => T_('Account status'),
-				'input'  => 'select',
-				'values' => get_user_statuses(),
-			);
-
-		// Registered from:
-		$filters['regdate'] = array(
-				'label'      => T_('Registration date'),
+		$filters['lastseen'] = array(
+				'label'      => T_('User last seen'),
 				'type'       => 'date',
 				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 
-		// Subscribed to:
-		if( empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
-		{	// Filter by newsletter(except of newsletter and email campaign edit forms):
-			$NewsletterCache = & get_NewsletterCache();
-			$NewsletterCache->load_all();
-			if( count( $NewsletterCache->cache ) > 0 )
-			{
-				$filters['newsletter'] = array(
-						'label'  => T_('Subscribed to'),
-						'type'   => 'integer',
-						'input'  => 'select',
-						'values' => $NewsletterCache->get_option_array_worker(),
-					);
+		// Registration source:
+		$filters['source'] = array(
+				'label'      => T_('Registration source'),
+				'operators'  => 'contains,not_contains',
+			);
+	}
+
+	if( check_user_perm( 'users', 'edit' ) )
+	{	// Allow "Report count" filter only for users with edit user permission:
+		$filters['report_count'] = array(
+				'label'         => T_('Report count'),
+				'type'          => 'integer',
+				'operators'     => 'greater_or_equal',
+				'default_value' => 1,
+			);
+	}
+
+	// Primary group:
+	$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
+	$GroupCache->load_where( 'grp_usage = "primary"' );
+	$GroupCache->all_loaded = true;
+	$group_options_array = array(
+			'-1' => T_('All (Ungrouped)'),
+			'0'  => T_('All (Grouped)'),
+		) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+	$OrganizationCache = & get_OrganizationCache( T_('All') );
+	$OrganizationCache->load_all();
+	$filters['group'] = array(
+			'label'  => T_('Primary Group'),
+			'type'   => 'integer',
+			'input'  => 'select',
+			'values' => $group_options_array,
+		);
+
+	// Secondary group:
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_usage = "secondary"' );
+	$GroupCache->all_loaded = true;
+	$group_options_array = array(
+			'0'  => T_('All'),
+		) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+	$filters['group2'] = array(
+			'label'  => T_('Secondary Group'),
+			'type'   => 'integer',
+			'input'  => 'select',
+			'values' => $group_options_array,
+		);
+
+	// Account status:
+	$filters['status'] = array(
+			'label'  => T_('Account status'),
+			'input'  => 'select',
+			'values' => get_user_statuses(),
+		);
+
+	// Registered from:
+	$filters['regdate'] = array(
+			'label'      => T_('Registration date'),
+			'type'       => 'date',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
+
+	// Subscribed to:
+	if( empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
+	{	// Filter by newsletter(except of newsletter and email campaign edit forms):
+		$NewsletterCache = & get_NewsletterCache();
+		$NewsletterCache->load_all();
+		if( count( $NewsletterCache->cache ) > 0 )
+		{
+			$filters['newsletter'] = array(
+					'label'  => T_('Subscribed to'),
+					'type'   => 'integer',
+					'input'  => 'select',
+					'values' => $NewsletterCache->get_option_array_worker(),
+				);
+		}
+	}
+
+	if( check_user_perm( 'users', 'moderate' ) )
+	{	// Filter by user tags if current user can moderate other users:
+		$filters['tags'] = array(
+				'label'  => T_('User tags'),
+				'valueGetter' => 'evo_get_filter_user_tags',
+				'valueSetter' => 'evo_set_filter_user_tags',
+				'operators'   => 'user_tagged,user_not_tagged',
+			);
+	}
+
+	// Find and remove filters which are not used for current case:
+	foreach( $filters as $filter_key => $filter_data )
+	{
+		if( $filter_data === NULL )
+		{
+			unset( $filters[ $filter_key ] );
+		}
+	}
+
+	return $filters;
+}
+
+
+/**
+ * Callback to add custom filters on top of the result set
+ *
+ * @param Form
+ */
+function callback_filter_userlist( & $Form )
+{
+	global $Settings, $current_User, $Collection, $Blog, $edited_EmailCampaign;
+
+	echo '<div class="filter-inputs">';
+
+	if( ! is_admin_page() && ! empty( $Blog ) && ( $Blog->get_setting( 'allow_access' ) == 'members' ) && ( $Blog->get_setting( 'userdir_filter_restrict_to_members' ) ) )
+	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
+		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), sprintf( T_('Only members of %s'), $Blog->get_shortname() ) );
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
+	{
+		$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Name').' / '.T_('Username'), '', 50 );
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{
+		$Form->text( 'email', get_param( 'email' ), 20, T_('Email'), '', 50 );
+	}
+
+	$location_filter_displayed = false;
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
+	{
+		{ // Filter by country
+			load_class( 'regional/model/_country.class.php', 'Country' );
+			load_funcs( 'regional/model/_regional.funcs.php' );
+			if( has_cross_country_restriction( 'users', 'list' ) )
+			{ // User cannot browse other users from other country
+				global $current_User;
+				$Form->info( T_('Country'), $current_User->get_country_name() );
+				// Create a hidden country field to correct ajax request to load regions, subregions and cities
+				$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
+			}
+			else
+			{ // User can browse other users from other country
+				$CountryCache = & get_CountryCache( NT_('All') );
+				$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
+				$location_filter_displayed = true;
 			}
 		}
+	}
 
-		if( $current_User->check_perm( 'users', 'moderate' ) )
-		{	// Filter by user tags if current user can moderate other users:
-			$filters['tags'] = array(
-					'label'  => T_('User tags'),
-					'valueGetter' => 'evo_get_filter_user_tags',
-					'valueSetter' => 'evo_set_filter_user_tags',
-					'operators'   => 'user_tagged,user_not_tagged',
-				);
+	if( user_region_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) ) ) )
+	{	// Filter by region
+		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
+		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
+		$Form->select_input_options( 'region', get_regions_option_list( get_param('country'), get_param('region') ), T_('Region') );
+		echo '</span>';
+		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
+	}
+
+	if( user_subregion_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) ) ) )
+	{	// Filter by subregion
+		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
+		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
+		echo '</span>';
+	}
+
+	if( user_city_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) ) ) )
+	{	// Filter by city
+		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
+		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
+		echo '</span>';
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) ) )
+	{
+		$Form->begin_line( T_('Age group'), 'age_min' );
+			$Form->text( 'age_min', get_param('age_min'), 3, '' );
+			$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
+		$Form->end_line();
+	}
+
+	if( is_admin_page() && $edited_EmailCampaign )
+	{
+		$campaign_send_status = array(
+				'' => T_('All'),
+				'ready_to_send' => T_('Ready to send'),
+				'sent' => T_('Sent'),
+				'send_error' => T_('Send error'),
+				'skipped' => T_('Skipped')
+			);
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
+	}
+	echo '<br />';
+
+	echo '</div>';
+
+	if( user_region_visible() )
+	{	// JS functions for AJAX loading of regions, subregions & cities
+		expose_var_to_js( 'evo_user_func__callback_filter_userlist', true );
+	}
+}
+
+
+/**
+ * Callback to add advanced filters on top of the result set
+ *
+ * @param object Form
+ * @return array Config of advanced filters
+ */
+function callback_advanced_filter_userlist( & $Form )
+{
+	global $Settings, $Collection, $Blog, $edited_EmailCampaign;
+
+	// Get filters from config:
+	$filters = get_userlist_filters_config( $Form );
+
+	// Set default filters which are displayed on not filtered list:
+	$userlist_default_filters = $Settings->get( 'userlist_default_filters' );
+	if( ! empty( $userlist_default_filters ) )
+	{
+		$userlist_default_filters = explode( ',', $userlist_default_filters );
+		$filters['#default'] = array();
+		foreach( $userlist_default_filters as $userlist_default_filter )
+		{
+			if( $userlist_default_filter == 'country' && has_cross_country_restriction( 'users', 'list' ) )
+			{	// Skip default filter "Country" when current User can view other users only from own country:
+				continue;
+			}
+
+			// Set default operator:
+			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
+			{
+				$default_operator = explode( ',', $filters[ $userlist_default_filter ]['operators'] );
+				$default_operator = $default_operator[0];
+			}
+			else
+			{
+				$default_operator = 'equal';
+			}
+			// Set default value:
+			if( isset( $filters[ $userlist_default_filter ]['default_value'] ) )
+			{
+				$default_value = $filters[ $userlist_default_filter ]['default_value'];
+			}
+			elseif( isset( $filters[ $userlist_default_filter ]['values'] ) && is_array( $filters[ $userlist_default_filter ]['values'] ) )
+			{
+				$default_value = array_keys( $filters[ $userlist_default_filter ]['values'] );
+				$default_value = isset( $default_value[0] ) ? $default_value[0] : '';
+			}
+			else
+			{
+				$default_value = '';
+			}
+
+			$filters['#default'][ $userlist_default_filter ] = array( $default_operator, $default_value );
+		}
+	}
+
+	if( ! empty( $filters['tags'] ) )
+	{	// Filter by user tags if current user can moderate other users:
 ?>
 <script>
 function evo_get_filter_user_tags( rule )
@@ -4128,16 +4588,6 @@ function evo_set_filter_user_tags( rule, value )
 }
 </script>
 <?php
-		}
-	}
-
-	// Find and remove filters which are not used for current case:
-	foreach( $filters as $filter_key => $filter_data )
-	{
-		if( $filter_data === NULL )
-		{
-			unset( $filters[ $filter_key ] );
-		}
 	}
 
 	return $filters;
@@ -4166,14 +4616,14 @@ function user_country_visible()
  */
 function has_cross_country_restriction( $type = 'users', $subtype = '' )
 {
-	global $current_User, $Settings;
+	global $Settings;
 
 	if( !is_logged_in() )
 	{ // In case of anonymous users we can't check the country, so anonymous users can't have restriction because of this
 		return false;
 	}
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // current user has global 'edit users' permission, these users have no restriction
 		return false;
 	}
@@ -4204,14 +4654,14 @@ function has_cross_country_restriction( $type = 'users', $subtype = '' )
 					}
 					break;
 			}
-			return ! $current_User->check_perm( 'cross_country_allow_profiles' );
+			return ! check_user_perm( 'cross_country_allow_profiles' );
 
 		case 'contact': // Check retsriction on contact
-			return ! $current_User->check_perm( 'cross_country_allow_contact' );
+			return ! check_user_perm( 'cross_country_allow_contact' );
 
 		case 'any': // Check if there is any retsriction
 		default:
-			return !( $current_User->check_perm( 'cross_country_allow_profiles' ) && $current_User->check_perm( 'cross_country_allow_contact' ) );
+			return !( check_user_perm( 'cross_country_allow_profiles' ) && check_user_perm( 'cross_country_allow_contact' ) );
 	}
 }
 
@@ -4647,6 +5097,8 @@ function display_voting_form( $params = array() )
 			'display_dontlike'       => true,
 			'display_inappropriate'  => true,
 			'display_spam'           => true,
+			'display_score'          => false,
+			'score_class'            => '',
 			'title_text'             => T_('My vote:'),
 			'title_like'             => T_('I like this picture'),
 			'title_like_voted'       => T_('You like this!'),
@@ -4656,6 +5108,12 @@ function display_voting_form( $params = array() )
 			'title_dontlike_voted'   => T_('You don\'t like this.'),
 			'title_inappropriate'    => T_('I think the content of this picture is inappropriate'),
 			'title_spam'             => T_('I think this picture was posted by a spammer'),
+			'icon_like_active'       => 'thumb_up',
+			'icon_like_noactive'     => 'thumb_up_disabled',
+			'icon_noopinion_active'  => 'ban',
+			'icon_noopinion_noactive'=> 'ban_disabled',
+			'icon_dontlike_active'   => 'thumb_down',
+			'icon_dontlike_noactive' => 'thumb_down_disabled',
 			// Number of votes
 			'display_numbers'        => false,
 			'msg_no_votes'           => T_('No likes yet'),
@@ -4780,6 +5238,13 @@ function display_voting_form( $params = array() )
 			$SQL->WHERE_and( 'cmvt_helpful IS NOT NULL' );
 			$vote = $DB->get_row( $SQL->get() );
 
+			if( $params['display_score'] )
+			{	// Calculate score:
+				$SQL->SELECT( 'comment_helpful_addvotes' );
+				$SQL->FROM( 'T_comments' );
+				$SQL->WHERE( 'comment_ID = '.$DB->quote( $params['vote_ID'] ) );
+				$score = $DB->get_var( $SQL );
+			}
 			break;
 
 		case 'item':
@@ -4792,13 +5257,20 @@ function display_voting_form( $params = array() )
 			$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
 			$vote = $DB->get_row( $SQL );
 
+			if( $params['display_score'] )
+			{	// Calculate score:
+				$SQL->SELECT( 'post_addvotes' );
+				$SQL->FROM( 'T_items__item' );
+				$SQL->WHERE( 'post_ID = '.$DB->quote( $params['vote_ID'] ) );
+				$score = $DB->get_var( $SQL );
+			}
 			break;
 	}
 
 	// Set all icons disabled by default:
-	$icon_like = 'thumb_up_disabled';
-	$icon_noopinion = 'ban_disabled';
-	$icon_dontlike = 'thumb_down_disabled';
+	$icon_like = $params['icon_like_noactive'];
+	$icon_noopinion = $params['icon_noopinion_noactive'];
+	$icon_dontlike = $params['icon_dontlike_noactive'];
 	$type_voted = '';
 
 	if( ! empty( $vote ) && ! is_null( $vote->result ) )
@@ -4808,7 +5280,7 @@ function display_voting_form( $params = array() )
 			case '-1':
 				// Don't like
 				$type_voted = 'dontlike';
-				$icon_dontlike = 'thumb_down';
+				$icon_dontlike = $params['icon_dontlike_active'];
 				$params_dontlike['class'] .= ' voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
 				break;
@@ -4816,7 +5288,7 @@ function display_voting_form( $params = array() )
 			case '0':
 				// No opinion
 				$type_voted = 'noopinion';
-				$icon_noopinion = 'ban';
+				$icon_noopinion = $params['icon_noopinion_active'];
 				$params_noopinion['class'] .= ' voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
 				break;
@@ -4824,7 +5296,7 @@ function display_voting_form( $params = array() )
 			case '1':
 				// Like
 				$type_voted = 'like';
-				$icon_like = 'thumb_up';
+				$icon_like = $params['icon_like_active'];
 				$params_like['class'] .= ' voted';
 				$params_like['title'] = $params['title_like_voted'];
 				break;
@@ -4880,6 +5352,11 @@ function display_voting_form( $params = array() )
 	if( $params['display_noopinion'] )
 	{	// Display 'No opinion' icon:
 		echo action_icon( '', $icon_noopinion, $url.'&vote_action=noopinion', '', 0, 0, array(), $params_noopinion );
+	}
+
+	if( $params['display_score'] && isset( $score ) )
+	{	// Display score:
+		echo '<span class="vote_score'.( empty( $params['score_class'] ) ? '' : ' '.$params['score_class'] ).'">'.$score.'</span>';
 	}
 
 	if( $params['display_dontlike'] )
@@ -5249,6 +5726,24 @@ function echo_userlist_change_groups_js()
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to change default filters on users list
+ */
+function echo_userlist_filters_js()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_filters.js":
+	echo '<script>
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_change_default_users_filters = \''.TS_('Change default users list filters...').get_manual_link( 'users-list-default-filters' ).'\';
+		var evo_js_lang_save_defaults = \''.TS_('Save defaults').'\';
+		var evo_js_userlist_filters_ajax_url = \''.get_htsrv_url().'anon_async.php'.'\';
+	</script>';
+}
+
+
+/**
  * Display user report form
  *
  * @param array Params
@@ -5264,7 +5759,7 @@ function user_report_form( $params = array() )
 			'cancel_url' => '',
 		), $params );
 
-	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! $current_User->check_status( 'can_report_user', $params['user_ID'] ) )
+	if( ! is_logged_in() || $current_User->ID == $params['user_ID'] || ! check_user_status( 'can_report_user', $params['user_ID'] ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
 		return;
 	}
@@ -5339,35 +5834,18 @@ function user_report_form( $params = array() )
  */
 function echo_user_organization_js()
 {
-	global $current_User;
-
-	if( ! $current_User->check_perm( 'orgs', 'create' ) )
+	if( ! check_user_perm( 'orgs', 'create' ) )
 	{	// Check this min permission, because even owner of one organization can accept it:
 		return;
 	}
-?>
-<script>
-jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
-{ // Change an accept status of organization
-	var this_obj = jQuery( this );
-	var params = '<?php
-		global $b2evo_icons_type;
-		echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
-	?>';
 
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-		data: 'action=change_user_org_status&status=' + this_obj.attr( 'rel' ) + '&crumb_userorg=<?php echo get_crumb( 'userorg' ); ?>' + params,
-		success: function( result )
-		{
-			this_obj.after( ajax_debug_clear( result ) ).remove();
-		}
-	} );
-} );
-</script>
-<?php
+	global $b2evo_icons_type;
+	$user_organization_config = array(
+			'params' => empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type,
+			'crumb_userorg' => get_crumb( 'userorg' ),
+		);
+
+	expose_var_to_js( 'evo_user_organization_config', evo_json_encode( $user_organization_config ) );
 }
 
 
@@ -5378,9 +5856,9 @@ jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
  */
 function echo_user_add_organization_js( $edited_Organization )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
-	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( ! check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// User must has an edit perm to add user to organization:
 		return;
 	}
@@ -5405,9 +5883,9 @@ function echo_user_add_organization_js( $edited_Organization )
  */
 function echo_user_edit_membership_js( $edited_Organization )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
-	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( ! check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// User must has an edit perm to edit user in organization:
 		return;
 	}
@@ -5433,9 +5911,9 @@ function echo_user_edit_membership_js( $edited_Organization )
  */
 function echo_user_remove_membership_js( $edited_Organization )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
-	if( ! $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+	if( ! check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 	{	// User must has an edit perm to remove user in organization:
 		return;
 	}
@@ -5815,8 +6293,7 @@ function user_sent_emails_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( ! $current_User->check_perm( 'users', 'moderate' ) || ! $current_User->check_perm( 'emails', 'view' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) || ! check_user_perm( 'emails', 'view' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -5852,7 +6329,7 @@ function user_sent_emails_results_block( $params = array() )
 	$emails_Results->title = $params['results_title'];
 	$emails_Results->no_results_text = $params['results_no_text'];
 
-	if( $params['action'] != 'view' && $emails_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+	if( $params['action'] != 'view' && $emails_Results->get_total_rows() > 0 && check_user_perm( 'emails', 'edit' ) )
 	{	// Display action icon to delete all records if at least one record exists & user has a permission:
 		$emails_Results->global_icon( sprintf( T_('Delete all emails sent to the User %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_sent_emails&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -5905,8 +6382,7 @@ function user_email_returns_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( ! $current_User->check_perm( 'users', 'moderate' ) || ! $current_User->check_perm( 'emails', 'view' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) || ! check_user_perm( 'emails', 'view' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -5941,7 +6417,7 @@ function user_email_returns_results_block( $params = array() )
 	$email_returns_Results->title = $params['results_title'];
 	$email_returns_Results->no_results_text = $params['results_no_text'];
 
-	if( $params['action'] != 'view' && $email_returns_Results->get_total_rows() > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+	if( $params['action'] != 'view' && $email_returns_Results->get_total_rows() > 0 && check_user_perm( 'emails', 'edit' ) )
 	{	// Display action icon to delete all records if at least one record exists & user has a permission:
 		$email_returns_Results->global_icon( sprintf( T_('Delete all email returns from the User\'s email address %s'), $edited_User->get( 'email' ) ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_email_returns&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb( 'user' ), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -5993,8 +6469,7 @@ function user_reports_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -6182,7 +6657,7 @@ function merge_users( $merging_user_ID, $remaining_user_ID )
  */
 function user_reports_results( & $reports_Results, $params = array() )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
 
 	$reports_Results->cols[] = array(
 		'th' => T_('Date and time'),
@@ -6214,7 +6689,7 @@ function user_reports_results( & $reports_Results, $params = array() )
 		'td' => '$urep_info$',
 	);
 
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{ // Allow actions if current user has a permission to edit the users
 		$reports_Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -6254,7 +6729,6 @@ function users_results_block( $params = array() )
 			'join_country'         => true,
 			'keywords_fields'      => NULL,
 			'where_status_closed'  => NULL,
-			'display_user_count'   => false, // user count beside the title
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
 			'display_filters'      => true,
@@ -6325,17 +6799,10 @@ function users_results_block( $params = array() )
 			'display_delspam_info' => false,
 		), $params );
 
-	global $current_User;
-	if( ! $params['force_check_user'] )
-	{
-		if( ! is_logged_in() )
-		{ // Only logged in users can access to this function
-			return;
-		}
-		if( ! $current_User->check_perm( 'users', 'view' ) )
-		{ // Check minimum permission:
-			return;
-		}
+	if( ! $params['force_check_user'] &&
+	    ! check_user_perm( 'users', 'view' ) )
+	{	// Check minimum permission to view users:
+		return;
 	}
 
 	global $DB, $UserSettings, $Settings, $Session, $action, $admin_url, $action;
@@ -6398,41 +6865,37 @@ function users_results_block( $params = array() )
 	// Execute query:
 	$UserList->query();
 
-	// Display number of rows in the title
-	if( $params['display_user_count'] )
-	{
-		$UserList->title .= ' ('.$UserList->get_total_rows().')';
-	}
-
-
 	if( $params['display_filters'] )
-	{ // Display the filters
-		$filter_presets = array(
-				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
-				'men' => array( T_('Men'), url_add_param( $params['page_url'], 'gender_men=1&amp;filter=new' ) ),
-				'women' => array( T_('Women'), url_add_param( $params['page_url'], 'gender_women=1&amp;filter=new' ) ),
-				'other' => array( T_('Other'), url_add_param( $params['page_url'], 'gender_other=1&amp;filter=new' ) ),
-			);
-
-		if( is_admin_page() )
-		{ // Add show only activated users filter only on admin interface
-			$filter_presets['activated'] = array( T_('Activated users'), url_add_param( $params['page_url'], 'status_activated=1&amp;filter=new' ) );
-			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
-			{ // Show "Reported Users" filter only for users with edit user permission
-				$filter_presets['reported'] = array( T_('Reported users'), url_add_param( $params['page_url'], 'reported=1&amp;filter=new' ) );
-			}
-		}
-
-		if( $UserList->is_filtered() )
-		{ // Display link to reset filters only if some filter is applied
-			$UserList->global_icon( T_('Reset filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Reset filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
-		}
+	{	// Display the filters:
 
 		$UserList->filter_area = array(
 			'callback' => 'callback_filter_userlist',
+			'callback_advanced' => 'callback_advanced_filter_userlist',
 			'url_ignore' => 'users_paged,u_paged,keywords',
-			'presets' => $filter_presets,
 			);
+
+		$new_filter_baseurl = url_add_param( $params['page_url'], 'filter=new' );
+		$UserList->register_filter_preset( 'all', T_('All'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'men', T_('Men'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'women', T_('Women'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'other', T_('Other'), $new_filter_baseurl );
+
+		if( is_admin_page() )
+		{	// show "activated users" filter only on admin interface:
+			$UserList->register_filter_preset( 'activated', T_('Activated users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
+
+			if( check_user_perm( 'users', 'edit' ) )
+			{	// Show "Reported Users" filter only to users with edit user permission:
+				$UserList->register_filter_preset( 'reported', T_('Reported users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
+			}
+		}
+
+		if( is_admin_page() && check_user_perm( 'users', 'edit' ) )
+		{	// Settings for default user list filters:
+			$UserList->filter_area['advanced_defaults_jsfunc'] = 'evo_users_list_default_filters()';
+			// Initialize JavaScript for AJAX loading of popup window to change default filters on users list:
+			echo_userlist_filters_js();
+		}
 	}
 
 	/*
@@ -6440,9 +6903,12 @@ function users_results_block( $params = array() )
 	 */
 	if( $params['display_btn_refresh'] )
 	{ // Display a button to refresh the users list
-		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+		$UserList->global_icon( T_('Refresh the list in case some Users have been added or deleted since your last search...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
-	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
+
+	$UserList->global_icon( T_('Import Users'), 'new', $admin_url.'?ctrl=users&amp;action=csv', T_('Import Users').' &raquo;', 3, 4 );
+
+	if( check_user_perm( 'users', 'edit', false ) )
 	{
 		if( $params['display_btn_adduser'] )
 		{ // Display a button to add user
@@ -6458,7 +6924,7 @@ function users_results_block( $params = array() )
 	{	// Display a button to add user to the organization:
 		$OrganizationCache = & get_OrganizationCache();
 		if( $Organization = & $OrganizationCache->get_by_ID( $params['org_ID'], false, false ) &&
-		    $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
+		    check_user_perm( 'orgs', 'edit', false, $Organization ) )
 		{	// If current user has a perm to edit the organization:
 			$UserList->global_icon( T_('Add user'), 'new', '#', T_('Add user'), 3, 4, array(
 					'class'   => 'action_icon btn-primary',
@@ -6485,7 +6951,7 @@ function users_results_block( $params = array() )
 
 	$user_list_buttons = array();
 
-	if( $params['display_btn_tags'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_btn_tags'] && check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add/remove tags from/to users:
 		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return add_remove_userlist_tags()">'
 				.format_to_output( T_('Add/Remove tags...') )
@@ -6494,7 +6960,7 @@ function users_results_block( $params = array() )
 		echo_userlist_tags_js();
 	}
 
-	if( $params['display_btn_account_status'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_btn_account_status'] && check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to set user account status:
 		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return set_account_status()">'
 				.format_to_output( T_('Set account status...') )
@@ -6503,7 +6969,7 @@ function users_results_block( $params = array() )
 		echo_userlist_set_account_status_js();
 	}
 
-	if( $params['display_btn_change_groups'] && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_btn_change_groups'] && check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to change user groups:
 		$user_list_buttons[] = '<a href="#" class="btn btn-default" onclick="return change_groups()">'
 				.format_to_output( T_('Change groups...') )
@@ -6512,7 +6978,7 @@ function users_results_block( $params = array() )
 		echo_userlist_change_groups_js();
 	}
 
-	if( $params['display_automation'] && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_automation'] && check_user_perm( 'options', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to add users to an automation:
 		$user_list_buttons[] = '<a href="#" class="btn btn-primary" onclick="return add_userlist_automation()">'
 				.format_to_output( T_('Add users to Automation...') )
@@ -6521,7 +6987,7 @@ function users_results_block( $params = array() )
 		echo_userlist_automation_js();
 	}
 
-	if( $params['display_newsletter'] && is_logged_in() && $current_User->check_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( $params['display_newsletter'] && check_user_perm( 'emails', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Button to change users of email campaign OR Create new email campaign for current selection:
 		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
 		if( $edited_EmailCampaign = & get_session_EmailCampaign() )
@@ -6548,14 +7014,18 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
+	$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export_users&amp;'.url_crumb( 'users' ).'" class="btn btn-primary">'
+			.format_to_output( T_('Export users (CSV)' ) )
+		.'</a>';
+
 	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
 	{	// Button to export user group data as CSV file:
-		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
-				.format_to_output( T_('Export groups as CSV') )
+		$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=users&amp;action=export&amp;'.url_crumb( 'users' ).'" class="btn btn-primary">'
+				.format_to_output( T_('Export group membership (CSV)') )
 			.'</a>';
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
+	if( check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Buttons and info to delete spammers:
 		if( $params['display_btn_delspam'] )
 		{	// Button to go to list with confirmation before spammers deleting:
@@ -6599,7 +7069,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User, $collections_Module, $admin_url;
+	global $Settings, $collections_Module, $admin_url;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -6691,7 +7161,7 @@ function users_results( & $UserList, $params = array() )
 		 * Group columns:
 		 */
 		$UserList->grp_cols[] = array(
-				'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
+				'td_class' => 'firstcol'.(check_user_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 				'td_colspan' => -1,  // nb_colds - 1
 				'td' => '<a href="?ctrl=groups&amp;grp_ID=$grp_ID$" class="label label-primary">$grp_name$</a>'
 								.'~conditional( (#grp_ID# == '.$Settings->get('newusers_grp_ID').'), \' <span class="notes">('.T_('default group for new users').')</span>\' )~',
@@ -6754,7 +7224,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => $params['th_class_login'],
 				'td_class' => $params['td_class_login'],
 				'order' => 'user_login',
-				'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "login" )%',
+				'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "force_login" )%',
 			);
 	}
 
@@ -6779,7 +7249,7 @@ function users_results( & $UserList, $params = array() )
 	if( $params['display_nickname'] )
 	{ // Display nickname
 		$nickname_editing = $Settings->get( 'nickname_editing' );
-		if( $nickname_editing != 'hidden' && $current_User->check_perm( 'users', 'edit' ) )
+		if( $nickname_editing != 'hidden' && check_user_perm( 'users', 'edit' ) )
 		{
 			$UserList->cols[] = array(
 					'th' => T_('Nickname'),
@@ -6929,7 +7399,7 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	if( $params['display_source'] && $current_User->check_perm( 'users', 'edit', false ) )
+	if( $params['display_source'] && check_user_perm( 'users', 'edit', false ) )
 	{ // Display source
 		$UserList->cols[] = array(
 				'th' => T_('Source'),
@@ -7280,7 +7750,7 @@ function users_results( & $UserList, $params = array() )
 			);
 	}
 
-	if( is_logged_in() && ! $current_User->check_perm( 'users', 'moderate' ) )
+	if( is_logged_in() && ! check_user_perm( 'users', 'moderate' ) )
 	{ // Current user has no permissions to moderate the users
 		if( isset( $userlist_col_reputaion ) )
 		{ // Display the reported users
@@ -7441,10 +7911,10 @@ function user_td_email( $email, $link_type = NULL, $user_row = NULL )
 
 function user_td_grp_actions( & $row )
 {
-	global $usedgroups, $Settings, $current_User;
+	global $usedgroups, $Settings;
 
 	$r = '';
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{
 		$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=groups&amp;action=edit&amp;grp_ID='.$row->grp_ID ) );
 
@@ -7568,12 +8038,10 @@ function user_td_pm( $user_ID, $user_login )
 
 function user_td_status( $user_status, $user_ID )
 {
-	global $current_User;
-
 	$user_status_icons = get_user_status_icons( true );
 	$status_content = $user_status_icons[ $user_status ];
 
-	if( is_admin_page() && ( $current_User->check_perm( 'users', 'edit' ) ) )
+	if( is_admin_page() && ( check_user_perm( 'users', 'edit' ) ) )
 	{ // current User is an administrator and view is displayed on admin interface, return link to user admin tab
 		return '<a href="'.get_user_identity_url( $user_ID, 'admin' ).'">'.$status_content.'</a>';
 	}
@@ -7591,7 +8059,7 @@ function user_td_status( $user_status, $user_ID )
  */
 function user_td_subscribed_list( $lists, $user_email = '' )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( empty( $lists ) )
 	{
@@ -7613,7 +8081,7 @@ function user_td_subscribed_list( $lists, $user_email = '' )
 
 		if( $loop_List = $NewsletterCache->get_by_ID( $list_ID, false ) )
 		{
-			if( $current_User->check_perm( 'emails', 'view' ) )
+			if( check_user_perm( 'emails', 'view' ) )
 			{	// Display a newsletter as link if current use has a permission to view newsletters list:
 				$user_email_filter = ( empty( $user_email ) ? '' : '&amp;filter=new&amp;keywords='.rawurlencode( $user_email ) );
 				$lists_array[] = '<a href="'.$admin_url.'?ctrl=newsletters&amp;action=edit&amp;enlt_ID='.$list_ID.'&amp;tab=subscribers'.$user_email_filter.'"'
@@ -7658,7 +8126,7 @@ function user_td_pass_status( $pass_driver )
  */
 function user_td_user_tags( $tags )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( empty( $tags ) )
 	{
@@ -7673,7 +8141,7 @@ function user_td_user_tags( $tags )
 	{
 		if( $loop_Tag = $UserTagCache->get_by_ID( $tag_ID, false ) )
 		{
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
 				$tag_links[] = '<a href="'.$admin_url.'?ctrl=usertags&amp;utag_ID='.$tag_ID.'&amp;action=edit">'.$loop_Tag->dget( 'name' ).'</a>';
 			}
@@ -7699,7 +8167,7 @@ function user_td_user_tags( $tags )
 */
 function user_td_reg_country( $user_ID, $country_code, $country_name )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$flag = country_flag( $country_code, $country_name, 'w16px', 'flag', '', false, true, '', false );
 	if( empty( $flag ) )
@@ -7707,7 +8175,7 @@ function user_td_reg_country( $user_ID, $country_code, $country_name )
 		$flag = '?';
 	}
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{ // Only users with edit all users permission can see the 'Sessions' tab
 		$flag = '<a href="'.$admin_url.'?ctrl=user&amp;user_tab=sessions&amp;user_ID='.$user_ID.'">'.$flag.'</a>';
 	}
@@ -7752,7 +8220,7 @@ function user_td_phone( $User )
 	foreach( $phone_fields as $phone_field )
 	{
 		$r .= '<div class="nowrap">'
-				.'<span class="'.$phone_field->ufdf_icon_name.' ufld_'.$phone_field->ufdf_code.' ufld__textcolor"></span> '
+				.get_userfield_icon( $phone_field->ufdf_icon_name, $phone_field->ufdf_code ).' '
 				.$phone_field->uf_varchar
 			.'</div>';
 	}
@@ -7806,7 +8274,7 @@ function user_td_actions( $user_ID )
 	{
 		$r .= get_icon( 'edit', 'noimg' );
 	}
-	if( $current_User->check_perm( 'users', 'edit', false ) )
+	if( check_user_perm( 'users', 'edit', false ) )
 	{ // Current user can edit all users
 		$r .= action_icon( T_('Duplicate this user...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=user&amp;action=new&amp;user_ID='.$user_ID.'&amp;user_tab=profile' ) );
 		if( $user_ID != 1 && $user_ID != $current_User->ID )
@@ -7832,12 +8300,10 @@ function user_td_actions( $user_ID )
  */
 function user_td_org_actions( $org_ID, $user_ID )
 {
-	global $current_User;
-
 	$r = '';
 	$OrganizationCache = & get_OrganizationCache();
 	if( ( $user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false ) ) &&
-	    $current_User->check_perm( 'orgs', 'edit', true, $user_Organization ) )
+	    check_user_perm( 'orgs', 'edit', false, $user_Organization ) )
 	{ // Current user can edit membership information:
 		$link_params = array(
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
@@ -7915,12 +8381,10 @@ function user_td_campaign_actions( $campaign_ID, $user_ID, $csnd_status )
  */
 function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
 {
-	global $current_User;
-
 	$OrganizationCache = & get_OrganizationCache();
 	$Organization = & $OrganizationCache->get_by_ID( $org_ID );
 
-	if( $current_User->check_perm( 'orgs', 'edit', false, $Organization ) )
+	if( check_user_perm( 'orgs', 'edit', false, $Organization ) )
 	{	// Set the spec params for icon if user can edit the organization:
 		$accept_icon_params = array( 'style' => 'cursor: pointer;', 'rel' => 'org_status_'.( $is_accepted ? 'y' : 'n' ).'_'.$org_ID.'_'.$user_ID );
 	}
@@ -7948,7 +8412,7 @@ function user_td_orgstatus( $user_ID, $org_ID, $is_accepted )
  */
 function user_td_email_status( $emadr_status, $emadr_ID )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( empty( $emadr_status ) )
 	{	// If email address does not exist in DB:
@@ -7957,7 +8421,7 @@ function user_td_email_status( $emadr_status, $emadr_ID )
 
 	$status_content = emadr_get_status_icon( $emadr_status ).' '.emadr_get_status_title( $emadr_status );
 
-	if( is_admin_page() && $emadr_ID > 0 && $current_User->check_perm( 'emails', 'view' ) )
+	if( is_admin_page() && $emadr_ID > 0 && check_user_perm( 'emails', 'view' ) )
 	{	// Return a link to view email address details if current User has a permission:
 		return '<a href="'.$admin_url.'?ctrl=email&amp;emadr_ID='.$emadr_ID.'">'.$status_content.'</a>';
 	}
@@ -7994,9 +8458,8 @@ function user_td_campaign_status( $csnd_status, $csnd_emlog_ID = NULL, $email_st
 
 		case 'send_error':
 		case 'cannot_send': // This status doesn't exist in DB!
-			global $current_User;
 			$status_text = ( $csnd_status == 'cannot_send' ? T_('Cannot send') : T_('Send error') );
-			if( ! empty( $csnd_emlog_ID ) && $current_User->check_perm( 'emails', 'view' ) )
+			if( ! empty( $csnd_emlog_ID ) && check_user_perm( 'emails', 'view' ) )
 			{	// Make a link to view details of error sending:
 				$status_text = '<a href="'.get_dispctrl_url( 'email', 'tab=sent&amp;emlog_ID='.$csnd_emlog_ID ).'">'.$status_text.'</a>';
 			}
@@ -8110,7 +8573,7 @@ function validate_pwd_reset_session( $reqID, $forgetful_User )
  */
 function user_domain_info_display( $field_title, $field_key, $domain_name, & $Form )
 {
-	global $current_User, $admin_url, $UserSettings;
+	global $admin_url, $UserSettings;
 
 	if( ! is_logged_in() )
 	{	// Only for logged in users:
@@ -8118,14 +8581,14 @@ function user_domain_info_display( $field_title, $field_key, $domain_name, & $Fo
 	}
 
 	$domain_name_formatted = format_to_output( $domain_name );
-	$display_user_domain = ( ! empty( $domain_name ) && $current_User->check_perm( 'stats', 'list' ) );
-	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	$display_user_domain = ( ! empty( $domain_name ) && check_user_perm( 'stats', 'list' ) );
+	$perm_stat_edit = check_user_perm( 'stats', 'edit' );
 	if( $display_user_domain )
 	{	// Get Domain:
 		$DomainCache = & get_DomainCache();
 		if( $Domain = & get_Domain_by_subdomain( $domain_name ) && $perm_stat_edit )
 		{	// Set a link to edit a top existing domain:
-			$domain_name_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')$#i',
+			$domain_name_formatted = preg_replace( '#('.preg_quote( trim( $Domain->get( 'name' ), '.' ), '#' ).')$#i',
 				'<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'">$1</a>',
 				$domain_name_formatted );
 		}
@@ -8277,6 +8740,11 @@ function get_mentioned_user_IDs( $type, $content, $exclude_user_IDs = NULL )
 			$default_setting_name = 'def_notify_comment_mentioned';
 			break;
 
+		case 'meta_comment':
+			$setting_name = 'notify_meta_comment_mentioned';
+			$default_setting_name = 'def_notify_meta_comment_mentioned';
+			break;
+
 		default:
 			debug_die( 'Unknown type "'.$type.'" for function '.__FUNCTION__ );
 	}
@@ -8317,7 +8785,7 @@ function display_user_groups_selectors( & $User, & $Form )
 
 	$GroupCache = & get_GroupCache();
 	$group_where_sql = '';
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
+	if( ! check_user_perm( 'users', 'edit' ) )
 	{	// Show the limited list for moderators:
 		$group_where_sql = 'grp_level < '.$current_User->get_Group()->get( 'level' );
 	}

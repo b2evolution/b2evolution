@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -170,7 +170,7 @@ $Results->title = T_('Scheduled jobs').get_manual_link('scheduled-jobs-list');
 
 
 $Results->global_icon( T_('Refresh'), 'refresh', regenerate_url(), T_('Refresh'), 3, 4 );
-if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
+if( check_user_perm( 'options', 'edit', false, NULL ) )
 {	// Permission to edit settings:
 	$Results->global_icon( T_('Create a new scheduled job...'), 'new', regenerate_url( 'action,cjob_ID', 'action=new' ), T_('New job').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -216,13 +216,12 @@ function filter_crontab( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_crontab',
 	'url_ignore' => 'results_crontab_page,ctst_pending,ctst_started,ctst_timeout,ctst_error,ctst_finished',	// ignor epage param and checkboxes
-	'presets' => array(
-			'schedule' => array( T_('Schedule'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' ),
-			'finished' => array( T_('Finished'), '?ctrl=crontab&amp;ctst_status[]=finished&amp;cjob_type=' ),
-			'attention' => array( T_('Attention'), '?ctrl=crontab&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' ),
-			'all' => array( T_('All'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;ctst_status[]=finished&amp;cjob_type=' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;ctst_status[]=finished&amp;cjob_type=' );
+$Results->register_filter_preset( 'schedule', T_('Schedule'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' );
+$Results->register_filter_preset( 'finished', T_('Finished'), '?ctrl=crontab&amp;ctst_status[]=finished&amp;cjob_type=' );
+$Results->register_filter_preset( 'attention', T_('Attention'), '?ctrl=crontab&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' );
 
 
 $Results->cols[] = array(
@@ -319,11 +318,11 @@ $Results->cols[] = array(
 
 function crontab_actions( $ctsk_ID, $status )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$col = '';
 
-	if( $current_User->check_perm( 'options', 'edit', false, NULL ) )
+	if( check_user_perm( 'options', 'edit', false, NULL ) )
 	{	// User can edit options:
 		if( $status == 'pending' )
 		{	// Icon for edit action

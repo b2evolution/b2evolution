@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -13,19 +13,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 load_funcs( 'tools/model/_wp.funcs.php' );
+load_class( 'tools/model/_wordpressimport.class.php', 'WordpressImport' );
 
 /**
  * @var action
  *
  * values:
  * 1) 'file'
- * 2) 'import'
+ * 2) 'confirm'
+ *   2.1) 'delete_extract'
+ *   2.2) 'use_existing_folder'
+ * 3) 'import'
  */
-param( 'action', 'string' );
+param_action();
 
 if( !empty( $action ) )
 {	// Try to obtain some serious time to do some serious processing (15 minutes)
@@ -34,36 +38,35 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
+if( param( 'wp_blog_ID', 'integer', 0, true ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'wp_blog_ID' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'wp_blog_ID' ), 'xml' );
+}
 
 switch( $action )
 {
+	case 'confirm':
+	case 'delete_extract':
+	case 'use_existing_folder':
 	case 'import':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'wpxml' );
 
-		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
+		$WordpressImport = new WordpressImport();
 
-		// Save last import collection in Session:
-		$Session->set( 'last_import_coll_ID', $wp_blog_ID );
-
-		// XML File
-		$xml_file = param( 'import_file', 'string', '' );
-		if( empty( $xml_file ) )
-		{ // File is not selected
-			param_error( 'import_file', T_('Please select file to import.') );
-		}
-		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file ) )
-		{ // Extension is incorrect
-			param_error( 'import_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
+		// Load import data from request:
+		if( ! $WordpressImport->load_from_Request() )
+		{	// Don't import if errors have been detected:
+			$action = ( $action == 'confirm' ? 'file' : 'confirm' );
 		}
 
-		if( param_errors_detected() )
-		{ // Stop import if errors exist
-			$action = 'file';
-			break;
+		if( in_array( $action, array( 'confirm', 'delete_extract', 'use_existing_folder' ) ) )
+		{	// Don't log into file for the confirm screen before start importing:
+			$WordpressImport->log_file = false;
 		}
-
 		break;
 }
 
@@ -72,10 +75,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
+$AdminUI->breadcrumbpath_add( 'System', $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( 'Maintenance', $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( 'Import', $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( 'WordPress XML Importer', $admin_url.'?ctrl=wpimportxml' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'xml-importer' );
@@ -92,7 +95,13 @@ $AdminUI->disp_payload_begin();
 
 switch( $action )
 {
-	case 'import':	// Step 2
+	case 'confirm':	// Step 2
+	case 'delete_extract': // Delete and extract again
+	case 'use_existing_folder': // Continue with existing folder
+		$AdminUI->disp_view( 'tools/views/_wpxml_confirm.form.php' );
+		break;
+
+	case 'import':	// Step 3
 		$AdminUI->disp_view( 'tools/views/_wpxml_import.form.php' );
 		break;
 

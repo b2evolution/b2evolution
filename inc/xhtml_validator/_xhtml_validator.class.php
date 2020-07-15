@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2003 by Nobuo SAKIYAMA - {@link http://www.sakichan.org/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -88,7 +88,7 @@ class XHTML_Validator
 			case 'body_extension':
 			case 'footer_extension':
 				$this->tags = array(
-					'body' => 'meta link style script',
+					'body' => '#PCDATA meta link style script',
 					'meta' => '',
 					'link' => '',
 					'style' => '#PCDATA',

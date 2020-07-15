@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -180,11 +180,11 @@ class AdminUI_general extends Menu
 	{
 		global $Hit, $check_browser_version;
 
-		require_js( '#jquery#', 'rsc_url' );
-		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+		require_js_defer( '#jquery#', 'rsc_url' );
+		require_js_defer( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
 		// Load general JS file:
-		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
+		require_js_defer( 'build/evo_backoffice.bmin.js', 'rsc_url' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:
@@ -251,13 +251,13 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
-		global $Collection, $Blog, $current_User;
+		global $Collection, $Blog;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );
 
 		$html = $text;
-		if( $current_User->check_perm( 'admin', 'normal' ) )
+		if( check_user_perm( 'admin', 'normal' ) )
 		{
 			$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
 		}
@@ -281,7 +281,7 @@ class AdminUI_general extends Menu
 	*/
 	function display_breadcrumbpath_add( $text, $url = NULL, $help = NULL, $attrs = '' )
 	{
-		global $Collection, $Blog, $current_User;
+		global $Collection, $Blog;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		if( ! empty( $url ) )
@@ -289,7 +289,7 @@ class AdminUI_general extends Menu
 			$url = str_replace( '$blog$', $blog_ID, $url );
 
 			$html = $text;
-			if( $current_User->check_perm( 'admin', 'normal' ) )
+			if( check_user_perm( 'admin', 'normal' ) )
 			{
 				$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
 			}
@@ -872,7 +872,7 @@ class AdminUI_general extends Menu
 	 */
 	function get_bloglist_buttons( $title = '' )
 	{
-		global $current_User, $blog, $pagenow;
+		global $blog, $pagenow;
 
 		$max_buttons = 7;
 
@@ -1628,7 +1628,7 @@ class AdminUI_general extends Menu
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $admin_url, $baseurl, $rsc_url;
+		global $app_shortname, $app_version, $admin_url, $baseurl, $rsc_url;
 
 		$r = '
 		<div id="header">

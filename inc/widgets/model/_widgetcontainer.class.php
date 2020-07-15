@@ -53,7 +53,7 @@ class WidgetContainer extends DataObject
 			$this->coll_ID = $db_row->wico_coll_ID;
 			$this->order = $db_row->wico_order;
 			$this->main = $db_row->wico_main;
-			$this->item_ID = $db_row->wico_item_ID;
+			$this->item_ID = isset( $db_row->wico_item_ID ) ? $db_row->wico_item_ID : NULL;
 		}
 	}
 
@@ -217,9 +217,13 @@ class WidgetContainer extends DataObject
 				// Only shared containers may be switched between main and sub:
 				$this->set( 'main', param( 'wico_container_type', 'string' ) == 'sub' ? '0' : '1' );
 				set_param( 'container_type', $this->get_type() );
+				// Shared container cannot be linked to any collection:
+				$this->set( 'coll_ID', NULL, true );
 				break;
 
 			case 'page':
+				// Page container cannot be a sub-container:
+				$this->set( 'main', '1' );
 				$container_page_type = param( 'container_page_type', 'string', NULL );
 				param_check_not_empty( 'container_page_type', T_('Please select page container type.') );
 				switch( $container_page_type )

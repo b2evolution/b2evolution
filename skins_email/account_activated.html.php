@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -99,7 +99,7 @@ else if( $activated_User->gender == 'F' )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('I am').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('A woman').'</td></tr>'."\n";
 }
 
-if( $Settings->get( 'registration_ask_locale' ) && $activated_User->locale != '' )
+if( in_array( 'locale', get_registration_template_required_fields() ) && $activated_User->locale != '' )
 { // Locale field is defined
 	global $locales;
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Locale').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$locales[$activated_User->locale]['name'].'</td></tr>'."\n";
@@ -150,6 +150,7 @@ echo empty( $user_pictures ) ? '<p'.emailskin_style( '.p' ).'><b>'.T_('No pictur
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$activated_User->ID, T_('Edit User'), 'div.buttons a+a.btn-primary' )."\n";
 echo get_link_tag( $admin_url.'?ctrl=users&action=show_recent', T_('View recent registrations'), 'div.buttons a+a.btn-default' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=users&action=delete&deltype=spammer&user_ID='.$activated_User->ID, T_('Delete Spammer'), 'div.buttons a+a.btn-danger' )."\n";
 echo "</div>\n";
 
 // Footer vars:

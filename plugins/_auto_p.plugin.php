@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -41,7 +41,7 @@ class auto_p_plugin extends Plugin
 
 	var $br_allowed_in = array(
 		// Block level:
-		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
+		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
 		// Inline:
 		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
@@ -97,13 +97,35 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		#echo '<hr style="border:1em solid blue;" />';
+		$content = & $params['data'];
 
+		// Render outside multiline short tags:
+		if( preg_match( '/\[[a-z]+:[^\]`]+\]/i', $content ) )
+		{	// Call replace_content() on everything outside multiline short tags:
+			$content = callback_on_non_matching_blocks( $content,
+				'~\[[a-z]+:[^\]`]+\]~is',
+				array( $this, 'render_autop' ) );
+		}
+		else
+		{	// No short tags, replace on the whole content:
+			$content = $this->render_autop( $content );
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Render content to apply auto <p> and <br>
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function render_autop( $content )
+	{
 		$this->use_auto_br = $this->Settings->get('br');
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
-
-		$content = & $params['data'];
 
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
@@ -118,7 +140,7 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 			$content .= $content_parts[ $i + 1 ];
 		}
 
-		return true;
+		return $content;
 	}
 
 
@@ -233,8 +255,8 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 					// Remove last opened tag from the array:
 					array_pop( $opened_tags );
 				}
-				else
-				{	// This is a start of new tag,
+				elseif( substr( $block, -2, 1 ) != '/' )
+				{	// This is a start of new tag AND this tag is not single/autoclosed tag like <hr />, <img /> and etc.,
 					// Put tag name in array to know what tags are opened and not closed yet:
 					$opened_tags[] = $blocks[ $b + 1 ];
 				}
@@ -518,9 +540,9 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 		$NL_end = '';
 		if( $ignore_NL )
 		{
-			while( isset( $block{0} ) && $block{0} == "\n" )
+			while( isset( $block[0] ) && $block[0] == "\n" )
 			{
-				$NL_start .= $block{0};
+				$NL_start .= $block[0];
 				$block = substr($block, 1);
 			}
 			while( substr($block, -1) == "\n" )

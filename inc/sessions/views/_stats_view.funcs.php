@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -41,20 +41,15 @@ function hits_results( & $Results, $params = array() )
 	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
 	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
 
-	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
-	if( !isset( $preset_referer_type ) )
-	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-	}
-
 	$Results->filter_area = array(
 		'callback' => 'filter_hits',
 		'url_ignore' => $param_prefix.'page,exclude,sess_ID,remote_IP',
-		'presets' => $filter_presets
 		);
+
+	$Results->register_filter_preset( 'all', T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$Results->register_filter_preset( 'all_but_curr', T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&ampsess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$Results->register_filter_preset( 'direct_hits', T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$Results->register_filter_preset( 'refered_hits', T_('Referred hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 
 	$Results->cols[] = array(
 			'th' => T_('Session'),
@@ -368,12 +363,12 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
 	{
-		$perm = $current_User->check_perm( 'stats', 'view' );
+		$perm = check_user_perm( 'stats', 'view' );
 	}
 
 	if( $perm == true )
@@ -600,14 +595,14 @@ function hit_iprange_status( $IP_address )
  */
 function hit_iprange_status_title( $IP_address )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	// Get status code of IP range by IP address
 	$ip_range_status = hit_iprange_status( $IP_address );
 
 	if( $ip_range_status === '' )
 	{ // No IP range for this IP address
-		if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+		if( check_user_perm( 'spamblacklist', 'edit' ) )
 		{ // Display a link to create new one if user has an access
 			return '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$IP_address.'">'.T_('Create').'</a>';
 		}
@@ -617,7 +612,7 @@ function hit_iprange_status_title( $IP_address )
 		}
 	}
 
-	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+	if( check_user_perm( 'spamblacklist', 'view' ) )
 	{ // Current user has access to view IP ranges
 		global $blog;
 		$blog_param = empty( $blog ) ? '' : '&amp;blog=1';
@@ -1154,6 +1149,53 @@ function get_hits_results_rss( $mode = 'live' )
 
 
 /**
+ * Get goal hits data for chart and table for Analytics -> Goals -> Stats
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array Hits data
+ */
+function get_hits_results_goal( $mode = 'live' )
+{
+	global $DB;
+
+	$SQL = new SQL( 'Get goal hits (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'ghit_goal_ID AS goal_ID, COUNT( ghit_ID ) AS hits,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_track__goalhit' );
+		$SQL->FROM_add( 'INNER JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated/compared data:}
+		$SQL->SELECT( 'ghag_date as day, ghag_goal_ID AS goal_ID, ghag_count AS hits,
+			EXTRACT( YEAR FROM ghag_date ) AS year,
+			EXTRACT( MONTH FROM ghag_date ) AS month,
+			EXTRACT( DAY FROM ghag_date ) AS day' );
+		$SQL->FROM( 'T_track__goalhit_aggregate' );
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'ghag_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'ghag_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day, goal_ID' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, goal_ID' );
+
+	$hits = $DB->get_results( $SQL, ARRAY_A );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$hits = fill_empty_hit_days( $hits, $hits_start_date, $hits_end_date );
+
+	return $hits;
+}
+
+
+/**
  * Display diagram for hits data
  *
  * @param string Diagram type: 'global', 'browser', 'search_referers', 'api', 'robot', 'rss'
@@ -1202,6 +1244,10 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 		case 'rss':
 			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$';
 			break;
+
+		case 'goal':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits&blog='.$blog.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
+			break;
 	}
 
 	// This defines what hits will go where
@@ -1229,6 +1275,7 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	}
 
 	$count = 0;
+	//pre_dump( $res_hits );
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
@@ -1282,6 +1329,10 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 			case 'rss':
 				$hit_key = 'rss';
 				break;
+
+			case 'goal':
+				$hit_key = $row_stats['goal_ID'];
+				break;
 		}
 
 		if( isset( $col_mapping[ $hit_key ] ) )
@@ -1306,6 +1357,7 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	}
 
 	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
+	//pre_dump( $chart );
 
 	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');

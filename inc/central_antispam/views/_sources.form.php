@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -30,15 +30,15 @@ $Form->hidden_ctrl();
 $Form->hidden( 'tab', 'reporters' );
 $Form->hidden( 'casrc_ID', $edited_CaSource->ID );
 
-$Form->begin_fieldset( T_('Edit reporter') );
+$Form->begin_fieldset( TB_('Edit reporter') );
 
-$Form->info( T_('URL'), $edited_CaSource->baseurl );
+$Form->info( TB_('URL'), $edited_CaSource->baseurl );
 
-$Form->select_input_array( 'casrc_status', $edited_CaSource->status, ca_get_source_statuses(), T_('Status') );
+$Form->select_input_array( 'casrc_status', $edited_CaSource->status, ca_get_source_statuses(), TB_('Status') );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'actionArray[source_save]', T_('Save changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[source_save]', TB_('Save changes!'), 'SaveButton' ) ) );
 
 
 // Reports of the edited source:
@@ -55,13 +55,11 @@ $CountSQL->WHERE( 'carpt_casrc_ID = '.$DB->quote( $edited_CaSource->ID ) );
 
 $Results = new Results( $SQL->get(), 'carpt_', '-D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
-$Results->title = T_('Reports');
+$Results->title = TB_('Reports');
 
 function get_link_for_keyword( $id, $keyword )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+	if( check_user_perm( 'centralantispam', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_keyword = '<a href="'.regenerate_url( 'action,tab,casrc_ID', 'action=keyword_edit&amp;cakw_ID='.$id ).'">'.$keyword.'</a>';
 	}
@@ -74,13 +72,13 @@ function get_link_for_keyword( $id, $keyword )
 }
 
 $Results->cols[] = array(
-		'th' => T_('Keyword'),
+		'th' => TB_('Keyword'),
 		'order' => 'cakw_keyword',
 		'td' => '%get_link_for_keyword( #cakw_ID#, #cakw_keyword# )%',
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Date'),
+		'th' => TB_('Date'),
 		'th_class' => 'shrinkwrap',
 		'order' => 'carpt_ts',
 		'td' => '%mysql2localedatetime_spans( #carpt_ts# )%',

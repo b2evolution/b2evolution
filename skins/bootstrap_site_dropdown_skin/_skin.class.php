@@ -10,18 +10,20 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'skins/model/_site_skin.class.php', 'site_Skin' );
+
 /**
  * Specific code for this skin.
  *
  * ATTENTION: if you make a new skin you have to change the class name below accordingly
  */
-class bootstrap_site_dropdown_Skin extends Skin
+class bootstrap_site_dropdown_Skin extends site_Skin
 {
 	/**
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '1.0.0';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -48,7 +50,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 
 
 	/**
-	 * Does this skin providesnormal (collection) skin functionality?
+	 * Does this skin provide normal (collection) skin functionality?
 	 */
 	function provides_collection_skin()
 	{
@@ -110,13 +112,12 @@ class bootstrap_site_dropdown_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Header')
 				),
-					'grouping' => array(
-						'label' => T_('Grouping'),
-						'note' => T_('Check to group collections into tabs'),
-						'type' => 'checkbox',
-						'defaultvalue' => 1,
-					),
+			),
 
+					// Generic header params:
+					$this->get_site_header_param_definitions(),
+
+			array(
 					'section_topmenu_start' => array(
 						'layout' => 'begin_fieldset',
 						'label'  => T_('Top menu settings')
@@ -265,6 +266,8 @@ class bootstrap_site_dropdown_Skin extends Skin
 	 */
 	function siteskin_init()
 	{
+		global $Blog, $Session;
+
 		// Include the enabled skin CSS files relative current SITE skin folder:
 		$css_files = $this->get_setting( 'css_files' );
 		if( is_array( $css_files ) && count( $css_files ) )
@@ -302,212 +305,74 @@ class bootstrap_site_dropdown_Skin extends Skin
 		$footer_link_color = $this->get_setting( 'footer_link_color' );
 
 
-		add_css_headline( '
-.bootstrap_site_navbar_header .navbar {
+		$css = '
+#evo_site_header .navbar {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+#evo_site_header .navbar .navbar-collapse .nav.navbar-right {
 	border-color: '.$menu_bar_border_color.';
 }
-.bootstrap_site_navbar_header .navbar-brand img {
+#evo_site_header .navbar-brand img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
-.bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a {
+#evo_site_header .navbar .nav > li:not(.active) > a {
 	color: '.$tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a:hover {
+#evo_site_header .navbar .nav > li:not(.active) > a:hover {
 	background-color: '.$hover_tab_bg_color.';
 	color: '.$hover_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav > li.active > a {
+#evo_site_header .navbar .nav > li.active > a {
 	background-color: '.$selected_tab_bg_color.';
 	color: '.$selected_tab_text_color.';
 }
 
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu {
+#evo_site_header .navbar .nav ul.dropdown-menu {
 	background-color: '.$sub_tab_bg_color.';
 	border-color: '.$sub_tab_border_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu li:not(.active) a {
+#evo_site_header .navbar .nav ul.dropdown-menu li:not(.active) a {
 	color: '.$sub_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu li:not(.active) a:hover {
+#evo_site_header .navbar .nav ul.dropdown-menu li:not(.active) a:hover {
 	background-color: '.$sub_hover_tab_bg_color.';
 	color: '.$sub_hover_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu li.active a {
+#evo_site_header .navbar .nav ul.dropdown-menu li.active a {
 	background-color: '.$sub_selected_tab_bg_color.';
 	color: '.$sub_selected_tab_text_color.';
 }
 
-footer.bootstrap_site_navbar_footer {
+footer#evo_site_footer {
 	background-color: '.$footer_bg_color.';
 	color: '.$footer_text_color.';
 }
-footer.bootstrap_site_navbar_footer .container a {
+footer#evo_site_footer .container a {
 	color: '.$footer_link_color.';
 }
-');
-	}
+';
 
-
-	/**
-	 * Get header tabs
-	 *
-	 * @return array
-	 */
-	function get_header_tabs()
-	{
-		global $Blog, $disp, $Settings;
-
-		$header_tabs = array();
-
-		// Get disp from request string if it is not initialized yet:
-		$current_disp = isset( $_GET['disp'] ) ? $_GET['disp'] : ( isset( $disp ) ? $disp : NULL );
-
-		// Get current collection ID:
-		$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
-
-		// Load all sections except of "No Section" because collections of this section are displayed as separate tabs at the end:
-		$SectionCache = & get_SectionCache();
-		$SectionCache->clear();
-		$SectionCache->load_where( 'sec_ID != 1' );
-
-		$this->header_tab_active = NULL;
-		$level0_index = 0;
-		foreach( $SectionCache->cache as $Section )
-		{
-			$tab_items = array();
-			$group_blogs = $Section->get_blogs();
-
-			$level0_is_active = false;
-
-			// Check each collection if it can be viewed by current user:
-			foreach( $group_blogs as $i => $group_Blog )
-			{
-				$coll_is_active = false;
-				if( $current_blog_ID == $group_Blog->ID &&
-						( $Settings->get( 'info_blog_ID' ) != $current_blog_ID || ( $current_disp != 'page' && $current_disp != 'msgform' ) ) )
-				{	// Mark this menu as active:
-					$coll_is_active = true;
-				}
-
-				$coll_data = array(
-						'name'   => $group_Blog->get( 'name' ),
-						'url'    => $group_Blog->get( 'url' ),
-						'active' => ( $current_blog_ID == $group_Blog->ID )
-					);
-
-				// Get value of collection setting "Show in front-office list":
-				$in_bloglist = $group_Blog->get( 'in_bloglist' );
-
-				if( $in_bloglist == 'public' )
-				{	// Everyone can view this collection, Keep this in menu:
-					$tab_items[] = $coll_data;
-					if( $coll_is_active )
-					{
-						$this->header_tab_active = $level0_index;
-					}
-					continue;
-				}
-
-				if( $in_bloglist == 'never' )
-				{	// Nobody can view this collection, Skip it:
-					continue;
-				}
-
-				if( ! is_logged_in() )
-				{	// Only logged in users have an access to this collection, Skip it:
-					continue;
-				}
-
-				if( $in_bloglist == 'member' &&
-						! $current_User->check_perm( 'blog_ismember', 'view', false, $skin_coll_ID ) )
-				{	// Only members have an access to this collection, Skip it:
-					continue;
-				}
-
-				$tab_items[] = $coll_data;
-				if( $coll_is_active )
-				{
-					$this->header_tab_active = $level0_index;
-				}
-			}
-
-			if( ! empty( $tab_items ) )
-			{	// Display section only if at least one collection is allowed for current display:
-				$header_tabs[] = array(
-						'name'  => $Section->get_name(),
-						'url'   => $tab_items[0]['url'],
-						'items' => $tab_items
-					);
-
-				$level0_index++;
-			}
+		if( $this->get_setting( 'fixed_header' ) &&
+		    ! $Session->get( 'display_containers_'.$Blog->ID ) &&
+		    ! $Session->get( 'display_includes_'.$Blog->ID ) &&
+		    ! $Session->get( 'customizer_mode_'.$Blog->ID ) )
+		{	// Enable fixed position for header only when no debug blocks:
+			$css .= '#evo_site_header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+}
+body.evo_toolbar_visible #evo_site_header {
+	top: 27px;
+}
+body {
+	padding-top: 50px;
+}';
 		}
 
-		// Load all collection from "No Section" and put them after all section tabs:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->clear();
-		$BlogCache->load_where( 'blog_sec_ID = 1' );
-
-		foreach( $BlogCache->cache as $nosec_Blog )
-		{
-			$header_tabs[] = array(
-					'name' => $nosec_Blog->get( 'shortname' ),
-					'url'  => $nosec_Blog->get( 'url' ),
-				);
-
-			if( $current_blog_ID == $nosec_Blog->ID )
-			{	// Mark this tab as active if this is a current collection:
-				$this->header_tab_active = $level0_index;
-			}
-
-			$level0_index++;
-		}
-
-		// Additional tab with pages and contact links:
-		if( isset( $Blog ) )
-		{
-			$tab_items = array( 'pages' );
-
-			if( $current_disp == 'msgform' )
-			{	// Mark this menu as active:
-				$this->header_tab_active = $level0_index;
-			}
-
-			if( $current_disp == 'page' && $Settings->get( 'info_blog_ID' ) == $Blog->ID )
-			{	// If this menu contains the links to pages of the info/shared collection:
-				$this->header_tab_active = $level0_index;
-			}
-
-			if( $contact_url = $Blog->get_contact_url() )
-			{	// If contact page is allowed for current collection:
-				$tab_item = array(
-						'name'   => T_('Contact'),
-						'url'    => $contact_url,
-						'active' => ( $current_disp == 'msgform' )
-					);
-				if( $Blog->get_setting( 'msgform_nofollowto' ) )
-				{	// Use nofollow attribute:
-					$tab_item['rel'] = 'nofollow';
-				}
-				$tab_items[] = $tab_item;
-			}
-
-			if( ! empty( $contact_url ) )
-			{	// Display additional tabs with static pages only user has an access to contact page:
-				$header_tabs[] = array(
-						'name'   => T_('About'),
-						'url'    => $contact_url,
-						'items'  => $tab_items
-					);
-			}
-		}
-
-		return $header_tabs;
+		add_css_headline( $css );
 	}
 }
-
 ?>

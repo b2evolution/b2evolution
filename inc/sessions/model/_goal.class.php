@@ -68,6 +68,7 @@ class Goal extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_track__goalhit', 'fk'=>'ghit_goal_ID', 'msg'=>T_('%d related goal hits') ),
+				array( 'table'=>'T_track__goalhit_aggregate', 'fk'=>'ghag_goal_ID', 'msg'=>T_('%d related goal hits aggregations') ),
 			);
 	}
 
@@ -100,12 +101,7 @@ class Goal extends DataObject
 	 */
 	function check_perm( $action= 'view', $assert = true )
 	{
-		/**
-		* @var User
-		*/
-		global $current_User;
-
-		return $current_User->check_perm( 'stats', $action, $assert );
+		return check_user_perm( 'stats', $action, $assert );
 	}
 
 

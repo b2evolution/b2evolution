@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -94,7 +94,7 @@ if( !empty( $template_action ) )
 }
 
 // TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-if( $current_User->check_perm('options', 'edit') )
+if( check_user_perm('options', 'edit') )
 { // default admin actions:
 	$block_item_Widget->title = T_('Testing Tools').get_manual_link( 'testing-tools' );
 	$block_item_Widget->disp_template_replaced( 'block_start' );

@@ -36,7 +36,7 @@
 
 // Mark the nofollow links with pink background color on mouseover event
 // fp> I actually want to keep this on all skins. It's an attempt to dissuade spammers to spam by showing visually them that the links are nofollow.
-a[rel~=nofollow]:not([class~=btn]):hover {
+a[rel~=nofollow]:not([class~=btn]):not([class~=badge]):hover {
 	background: #f8e0e0;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -63,15 +63,15 @@ figure {
 
 // Definitions for [thumbnail:123] tag:
 .evo_thumbnail {
-  max-width: 100%;
+	max-width: 100%;
 }
 .evo_thumbnail__left {
-  float: left;
-  margin: 0 4px 4px 0;
+	float: left;
+	margin: 0 4px 4px 0;
 }
 .evo_thumbnail__right {
-  float: right;
-  margin: 0 0 4px 4px;
+	float: right;
+	margin: 0 0 4px 4px;
 }
 
 // Used to limit max width of the replied comments,
@@ -346,7 +346,7 @@ select.field_error,
 textarea.field_error {
 	background:#fbf2ee;
 	border: 1px solid #d99;
-	+ span:before, + div + span:before {
+	+ span::before, + div + span::before {
 		content: '\f06a';
 		font: 16px FontAwesome;
 		color: #F00;
@@ -368,11 +368,7 @@ span.checkbox_error {
 span.checkbox_surround {
 	background: #fbf2ee;
 	border: 1px solid #F825F1;
-}
-span.checkbox_surround input.checkbox {
-	background: #fbf2ee;
-}
-span.checkbox_surround_init {
+	border-radius: 2px;
 	padding : 1px;
 }
 // Large inputs and textareas (with full width)
@@ -386,6 +382,21 @@ textarea.form_textarea_input {
 label.radiooption {
 	margin-right: 1em;
 	cursor: pointer;
+}
+
+// Support for multiline inline forms
+.filters .form-inline {
+	margin: 0 -10px -5px;
+
+	.filter-inputs {
+		min-height: 40px;
+	}
+	.form-group {
+	 	margin: 5px 10px;
+	}
+	.checkbox {
+		margin-left: 10px;
+	}
 }
 // ---------------- //
 

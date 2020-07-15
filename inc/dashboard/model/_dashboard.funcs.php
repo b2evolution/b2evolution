@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function b2evonet_get_updates( $force_short_delay = false )
 {
 	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
-	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
+	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $evonetsrv_verifypeer, $evonetsrv_retry_delay, $evonetsrv_short_delay, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 	global $Timer;
@@ -38,12 +38,18 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return NULL;
 	}
 
-	if( $Settings->get( 'evonet_last_error' ) > $servertimenow - 5400 )
+	if( $debug < 2 && $Settings->get( 'evonet_last_error' ) > $servertimenow - $evonetsrv_retry_delay*60 )
 	{	// The previous error was less than 90 minutes ago, skip this:
+		$Messages->add( sprintf(T_('Not trying to get updates from %s because last error was less than %d minutes ago.'), $evonetsrv_host, $evonetsrv_retry_delay), 'error' );
 		return false;
 	}
 
-	if( $debug == 2 )
+	if( !empty($evonetsrv_short_delay) )
+	{
+		$update_every = $evonetsrv_short_delay;
+		$attempt_every = $evonetsrv_short_delay;
+	}
+	elseif( $debug == 2 )
 	{
 		$update_every = 8;
 		$attempt_every = 3;
@@ -101,6 +107,10 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return false;
 	}
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port, $evonetsrv_protocol );
+	
+	// Do we want to verify SSL certificate?
+	$client->verifypeer = $evonetsrv_verifypeer;
+	
 	if( $debug > 1 )
 	{
 		$client->debug = 1;
@@ -349,14 +359,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
+		$user_permission = check_user_perm( 'meta_comment', 'edit', false, $Comment );
 		if( $user_permission )
-		{ // Put the meta comment content into this container to edit by ajax:
+		{ // Put the internal comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', true );
 		if( $user_permission )
-		{ // End of the container that is used to edit meta comment by ajax:
+		{ // End of the container that is used to edit internal comment by ajax:
 			echo '</div>';
 		}
 

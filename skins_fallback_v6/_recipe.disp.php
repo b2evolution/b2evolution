@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -33,7 +33,7 @@ $params = array_merge( array(
 		'before_content_extension' => '',
 		'after_content_extension'  => '',
 		// Controlling the images:
-		'image_positions'          => 'cover,teaser,teaserperm,teaserlink',
+		'image_positions'          => 'cover,background,teaser,teaserperm,teaserlink',
 		'before_images'            => '<div class="evo_post_images">',
 		'before_image'             => '<figure class="evo_image_block">',
 		'before_image_legend'      => '<figcaption class="evo_image_legend">',
@@ -113,12 +113,6 @@ if( mainlist_get_item() )
 				'widget_item_title_display' => false,
 				// Item Previous Next widget
 				'widget_item_next_previous_params' => array(
-						'block_start' => '<nav><ul class="pager">',
-						'block_end' => '</ul></nav>',
-						'prev_start' => '<li class="previous">',
-						'prev_end' => '</li>',
-						'next_start' => '<li class="next">',
-						'next_end' => '</li>',
 					),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
@@ -157,7 +151,7 @@ if( mainlist_get_item() )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $params['image_positions'],
 				) );
 		?>
@@ -208,7 +202,7 @@ if( mainlist_get_item() )
 			$Item->custom_fields( array(
 					'fields'                               => 'course,cuisine,servings',
 					'custom_fields_table_start'            => '',
-					'custom_fields_row_start'              => '<div class="row">',
+					'custom_fields_row_start'              => '<div class="row"$row_attrs$>',
 					'custom_fields_row_header_field'       => '<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>',
 					'custom_fields_description_icon_class' => 'grey',
 					'custom_fields_value_default'          => '<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>',
@@ -220,11 +214,11 @@ if( mainlist_get_item() )
 			$Item->custom_fields( array(
 					'fields'                               => 'prep_time,cook_time,passive_time,total_time',
 					'custom_fields_table_start'            => '<br /><div class="row">',
-					'custom_fields_row_start'              => '',
+					'custom_fields_row_start'              => '<span$row_attrs$>',
 					'custom_fields_row_header_field'       => '<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>',
 					'custom_fields_description_icon_class' => 'grey',
 					'custom_fields_value_default'          => '<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>',
-					'custom_fields_row_end'                => '',
+					'custom_fields_row_end'                => '</span>',
 					'custom_fields_table_end'              => '</div>',
 					'hide_empty_lines'                     => true,
 				) );
@@ -233,27 +227,11 @@ if( mainlist_get_item() )
 	</div>
 
 	<div class="row">
-		<?php
-		// Custom field "Ingredients" (if it exists for current Item):
-		$ingredients = $Item->get_custom_field_formatted( 'ingredients' );
-		if( $ingredients !== false )
-		{	// Display "Ingredients" only if this custom field exists for the current Item:
-		?>
 		<div class="col-lg-3 col-sm-4">
-			<h4><?php echo $Item->get_custom_field_title( 'ingredients' ); ?></h4>
-			<p><?php echo $ingredients; ?></p>
+			<h4><?php $Item->custom( array( 'field' => 'ingredients', 'what' => 'label' )  ); ?></h4>
+			<p><?php $Item->custom( array( 'field' => 'ingredients' ) ); ?></p>
 		</div>
-		<?php
-			$directions_col_size = 'col-lg-9 col-sm-8';
-		}
-		else
-		{	// Use full width if ingredients field is not detected:
-			$directions_col_size = 'col-sm-12';
-		}
-
-		// Directions:
-		?>
-		<div class="<?php echo $directions_col_size; ?>">
+		<div class="col-lg-9 col-sm-8">
 			<h4><?php echo T_('Directions'); ?></h4>
 			<?php
 			// Display the "after more" part of the text: (part after "[teaserbreak]")

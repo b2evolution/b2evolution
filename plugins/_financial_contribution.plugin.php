@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -23,7 +23,7 @@ class financial_contribution_plugin extends Plugin
 	var $name;
 	var $code = 'fin_contrib';
 	var $priority = 50;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';
@@ -35,7 +35,7 @@ class financial_contribution_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_('Financial Contribution Widget');
+		$this->name = T_('Financial Contribution');
 		$this->short_desc = T_('This skin tag displays a form for financial contribution.');
 		$this->long_desc = T_('This skin tag displays a form for financial contribution.');
 	}
@@ -111,7 +111,7 @@ class financial_contribution_plugin extends Plugin
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
 				'set_coll_ID'  => isset( $Blog ) ? $Blog->ID : NULL, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => isset( $Blog ) ? $Blog->ID : NULL, // Has the content of the displayed blog changed ?
-				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 			);
 	}

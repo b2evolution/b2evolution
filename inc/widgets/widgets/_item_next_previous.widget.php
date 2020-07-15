@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_next_previous_Widget extends ComponentWidget
 {
-	var $icon = 'window-minimize';
+	var $icon = 'angle-left';
 
 	/**
 	 * Constructor
@@ -62,7 +62,7 @@ class item_next_previous_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Next/Previous');
+		return T_('Next/Previous Item');
 	}
 
 
@@ -125,13 +125,22 @@ class item_next_previous_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		// Make sure the param  widget_item_next_previous_params' exists:
 		$params = array_merge( array(
 				'widget_item_next_previous_params' => array(),
 			), $params );
 
+		// Add defaults:
 		$widget_params = array_merge( array(
 				'block_start' => '',
 				'block_end' => '',
+				// We use defaults designed for Bootstrap because this widget was not used before v6 skins:
+				'block_start' => '<nav><ul class="pager">',
+				'block_end' => '</ul></nav>',
+				'prev_start' => '<li class="previous">',
+				'prev_end' => '</li>',
+				'next_start' => '<li class="next">',
+				'next_end' => '</li>',
 			), $params['widget_item_next_previous_params'] );
 
 		ob_start();

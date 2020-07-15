@@ -257,7 +257,7 @@ function split_url( $url, $decode=FALSE)
 	$xpchar        = $xunressub . ':@%';
 
 	// Scheme from RFC3986.
-	$xscheme        = '([a-zA-Z][a-zA-Z\d+-.]*)';
+	$xscheme        = '([a-zA-Z][a-zA-Z\d+\-.]*)';
 
 	// User info (user + password) from RFC3986.
 	$xuserinfo     = '((['  . $xunressub . '%]*)' .
@@ -272,7 +272,7 @@ function split_url( $url, $decode=FALSE)
 	// Host name from RFC1035.  Technically, must start with a letter.
 	// Relax that restriction to better parse URL structure, then
 	// leave host name validation to application.
-	$xhost_name    = '([a-zA-Z\d-.%]+)';
+	$xhost_name    = '([a-zA-Z\d\-.%]+)';
 
 	// Authority from RFC3986.  Skip IP future.
 	$xhost         = '(' . $xhost_name . '|' . $xipv4 . '|' . $xipv6 . ')';

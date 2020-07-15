@@ -47,6 +47,9 @@
 ol.breadcrumb {
 	margin-left: 0;
 	float: left;
+	img {
+		margin-top: -2px;
+	}
 }
 
 // Status icons
@@ -109,8 +112,13 @@ ol.breadcrumb {
 		h2 {
 			margin-top: 0;
 		}
-		.btn {
-			margin: -6px 0 0 6px;
+		&.panel-heading-columns {
+			padding-left: 0;
+			padding-right: 0;
+			select {
+				margin-top: 3px;
+				width: auto;
+			}
 		}
 	}
 	&.panel>a+.table {
@@ -202,6 +210,12 @@ ol.breadcrumb {
 				color: inherit;
 			}
 		}
+	}
+	.vote_score__status_new {
+		color: #FF6600;
+	}
+	.vote_score__status_updated {
+		color: #990000;
 	}
 	.ft_count {
 		margin-top: 5px;
@@ -626,6 +640,7 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
+				float: left;
 				/* @MILOS > Still testing to see if this is overrulled by: line 992
 				span > img.loadimg, a > img.loadimg {
 					border-radius: 50% !important;
@@ -655,6 +670,12 @@ ul.legend {
 		}
 		> a, > span, a > img {
 			display: inline-block;
+		}
+	}
+	// Special style for enabled voting panel with left score mode:
+	.evo_voting_layout__left_score {
+		.post_main, .evo_comment_text {
+			padding-left: 25px;
 		}
 	}
 }
@@ -710,6 +731,27 @@ a.btn+.vote_spam {
 		line-height: 20px;
 	}
 }
+.evo_voting_panel__left_score {
+	height: auto;
+	text-align: center;
+	margin: 0;
+	a.action_icon span.fa {
+		margin: 0;
+	}
+	.vote_score {
+		display: block;
+		font-weight: bold;
+	}
+	> span.fa {
+		margin: 0 2px;
+	}
+}
+.ft_avatar, .evo_comment_avatar {
+	.evo_voting_panel__left_score {
+		width: 100%;
+		float: none;
+	}
+}
 // A link to reply on comment:
 .comment_reply {
 	height: 22px;
@@ -736,12 +778,14 @@ a.btn+.vote_spam {
 
 // Search form
 main .widget_core_coll_search_form {
-	float: right;
-	width: 40%;
-	min-width: 250px;
-	margin: 0 0 20px 5px;
-	div.compact_search_form input.search_field {
-		width: 100%;
+	div.index_compact_search_form {
+		float: right;
+		width: 40%;
+		min-width: 250px;
+		margin: 0 0 20px 5px;
+		input.search_field {
+			width: 100%;
+		}
 	}
 }
 
@@ -1226,4 +1270,9 @@ a.to_top {
 // Wrapper for form to create new post by anonymous user:
 .panel.evo_item_new_form {
 	margin-bottom: 0;
+}
+
+// Force affixed sidebar to static top position:
+.sidebar_wrapper.affix-forced-top {
+	position: static !important;
 }

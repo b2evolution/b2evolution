@@ -43,7 +43,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	if( is_array( $plugin_settings ) && count( $plugin_settings ) )
 	{	// Print the settings of each plugin in separate fieldset:
 		$priority_link = '<a href="'.$loop_Plugin->get_edit_settings_url().'#ffield_edited_plugin_code">'.$loop_Plugin->priority.'</a>';
-		$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' ('.T_('Priority').': '.$priority_link.')' );
+		$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' ('.TB_('Priority').': '.$priority_link.')' );
 
 		foreach( $plugin_settings as $l_name => $l_meta )
 		{	// Display form field for this setting:
@@ -63,7 +63,7 @@ if( !empty( $plugins_settings_content ) )
 	echo $plugins_settings_content;
 }
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 $Form->end_form();
 

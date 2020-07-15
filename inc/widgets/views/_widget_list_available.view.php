@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -25,7 +25,7 @@ if( $mode == 'customizer' )
 	echo '<div class="evo_customizer__content evo_customizer__available_widgets">';
 
 	// Display page title:
-	echo '<p><b>'.sprintf( T_('Choose a widget to add to "%s":'), $WidgetContainer->get( 'name' ) ).'</b></p>';
+	echo '<p class="alert alert-info" style="margin:10px">'.sprintf( T_('Choose a widget to add to "%s":'), $WidgetContainer->get( 'name' ) ).'</p>';
 }
 else
 {	// Display this title for normal view from back-office:
@@ -62,10 +62,12 @@ foreach( $Plugin_array as $k => $Plugin )
 unset( $Plugin_array );
 
 $widget_groups = array (
-	'free_content' => T_('Free Content'),
+	'free_content' => T_('Basic blocks'),
+	'embed_blocks' => T_('Embedded contents'),
 	'menu_item'    => T_('Menu Items / Buttons'),
 	'navigation'   => T_('Navigation'),
 	'content'      => T_('Listing Contents'),
+	'disp_content' => T_('Displaying Contents'),
 	'infoitem'     => T_('Item Details'),
 	'collection'   => T_('Collection Details'),
 	'about_user'   => T_('User Details'),
@@ -75,113 +77,132 @@ $widget_groups = array (
 
 $core_componentwidget_defs = array(
 	'free_content' => array(
-			'free_text',
-			'free_html',
-			'spacer',
-			'separator',
-			'image',
-			'social_links',
-			'content_block', // Content Block
-			'display_item',  // Display Item
+			'free_text',    // Text
+			'free_html',    // HTML
+			'image',        // Image
+			'spacer',       // Spacer
+			'separator',    // Separator
 		),
-	'about_user' => array(
-			'user_profile_pics',		// Avatar of User
-			'user_links',		// Social links of coll owner
-			'user_info',
-			'user_action',
-			'user_fields',
+	'embed_blocks' => array(
+			'subcontainer',        // Sub-Container
+			'subcontainer_row',    // Columns (Sub-Containers)
+			'embed_menu',        // Embed Menu
+			'content_block',       // Content Block
+			'coll_featured_intro', // Featured/Intro Post
+			'display_item',        // Specific Item
+			'inc_file',            // .inc file
+			'poll',                // Poll
 		),
 	'menu_item' => array(
-			'basic_menu_link',
-			'msg_menu_link',
-			'flag_menu_link',
-			'profile_menu_link',
+			'basic_menu_link',   // Menu link or button
+			'embed_menu',        // Embed Menu
+			'colls_list_public', // Collections list
+			'colls_list_owner',  // Same owner's collections list
 		),
 	'navigation' => array(
-			'coll_search_form',
-			'coll_category_list',
-			'content_hierarchy',
-			'coll_tag_cloud',
-			'breadcrumb_path',
-			'coll_common_links',
-			'coll_current_filters',
-			'coll_item_list_pages',
+			'breadcrumb_path',              // Breadcrumb Path
+			'request_title',                // Request Title
+			'coll_search_form',             // Search Form
+			'site_logo',                    // Site logo
+			'cat_title',                    // Category Title
+			'coll_current_filters',         // Current Item filters
+			'coll_current_comment_filters', // Current Comment filters
+			'coll_item_list_pages',         // List Pager
+			'item_next_previous',           // Next/Previous Item
+			'coll_locale_switch',           // Language/Locale/Version switch
+			'coll_category_list',           // Category list
+			'content_hierarchy',            // Content Hierarchy
+			'coll_tag_cloud',               // Tag cloud
+			'coll_item_list_sort_order',    // Sort order
+			// Plugin: Calendar
+			// Plugin: Date Archives
 		),
 	'content' => array(
-			'coll_featured_posts',    // Simplified UIL: Featured Posts
-			'coll_post_list',         // Simple Post list
-			'coll_page_list',         // Simple Page list
-			'coll_related_post_list', // Simple Related Posts list
-			'coll_flagged_list',      // Simplified UIL: Flagged Items
+			'coll_post_list',         // Post list
+			'content_hierarchy',      // Content Hierarchy
+			'cat_content_list',       // Category Content List
+			'coll_page_list',         // Page list
+			'coll_featured_posts',    // Featured Posts list
+			'coll_related_post_list', // Related Posts list
+			'coll_flagged_list',      // Flagged Item List
 			'coll_item_list',         // Universal Item list
-			'item_fields_compare',    // Compare Item Fields
-			'coll_featured_intro',    // Featured/Intro Post
+			'coll_tabbed_items',      // Tabbed Items
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 			'display_shopping_cart',  // Shopping cart
 			'display_shipping_method' // Shipment options
 		),
+	'disp_content' => array(
+			'content_block',       // Content Block
+			'coll_featured_intro', // Featured/Intro Post
+			'display_item',        // Specific Item
+			'item_fields_compare', // Compare Items
+			'coll_tabbed_items',   // Tabbed Items
+			'param_switcher',      // Param Switcher
+		),
 	'infoitem' => array(
-			'item_title',
-			'item_info_line',
-			'item_visibility_badge',
-			'item_content',
-			'item_excerpt',
-			'item_comment_form',
-			'item_comment_feed_link',
-			'item_comment_notification',
-			'item_attachments',
-			'item_images',
-			'item_link',
-			'item_location',
-			'item_small_print',
-			'item_tags',
-			'item_about_author',
-			'item_seen_by',
-			'item_vote',
-			'item_next_previous',
-			'item_price',
-			'item_availability',
-			'add_to_cart_btn',
-			'item_custom_fields',
+			'item_title',                // Title
+			'item_visibility_badge',     // Visibility Badge
+			'item_content',              // Content
+			'item_excerpt',              // Item Excerpt
+			'item_tags',                 // Tags
+			'item_info_line',            // Info Line
+			'item_small_print',          // Small Print
+			'item_about_author',         // About Author
+			'item_custom_fields',        // Custom Fields
+			'item_attachments',          // Attachments
+			'item_images',               // Item Images
+			'item_link',                 // Item Link
+			'item_location',             // Location
+			'item_vote',                 // Voting
+			'item_seen_by',              // Seen by
+			'item_workflow',             // Workflow Properties
+			'item_checklist_lines',      // Checklist Lines
+			'item_comment_form',         // Comment Form
+			'item_comment_feed_link',    // Comment Feed Link
+			'item_comment_notification', // Comment Notification
+			'coll_item_notification',    // Subscribe to Item
+			'item_price',                // Item Price
+			'item_availability',         // Item Availability
+			'add_to_cart_btn',           // Add to cart button
 		),
 	'collection' => array(
-			'coll_logo',
-			'coll_title',
-			'coll_tagline',
-			'coll_longdesc',
-			'coll_member_count',
-			'coll_xml_feeds',
-			'coll_subscription',
-			'coll_activity_stats',
-			'cat_title',
-			'coll_item_notification',
-			'coll_comment_notification',
-			'coll_locale_switch',
+			'coll_logo',                 // Logo
+			'coll_title',                // Title
+			'coll_tagline',              // Tagline
+			'coll_longdesc',             // Long description
+			'coll_member_count',         // Member count
+			'coll_xml_feeds',            // XML Feeds (RSS / Atom)
+			'coll_subscription',         // Subscribe to Items
+			'coll_comment_notification', // Subscribe to Comments
+			'coll_activity_stats',       // Activity Statistics
+		),
+	'about_user' => array(
+			'user_profile_pics', // User Profile Picture
+			'user_links',        // User Social Links
+			'user_info',         // User info
+			'user_action',       // User action
+			'user_fields',       // User fields
 		),
 	'user' => array(
-			'user_avatars',
-			'org_members',
-			'user_login',
-			'user_greetings',
-			'user_register_quick',
-			'user_register_standard',
-			'newsletter_subscription',
-			'user_tools',
-			'online_users',
+			'user_login',              // User log in
+			'user_greetings',          // User greetings
+			'user_register_quick',     // Email capture / Quick registration
+			'user_register_standard',  // Registration form
+			'newsletter_subscription', // Newsletter/Email list subscription
+			'user_avatars',            // User list
+			'org_members',             // Organization Members
+			'online_users',            // Online users
 		),
 	'other' => array(
-			'site_logo',
-			'subcontainer',
-			'subcontainer_row',
-			'inc_file',
-			'poll',
-			'colls_list_public',
-			'colls_list_owner',
-			'currency_selector',
-			'country_selector',
-			'mobile_skin_switcher',
-			'page_404_not_found',
+			'social_links',         // Free Social Links
+			'page_404_not_found',   // 404 Not Found
+			'mobile_skin_switcher', // Mobile Skin Switcher
+			'currency_selector',    // Currency Selector
+			'country_selector',     // Country Selector
+			// Plugin: Facebook Like/Share
+			// Plugin: Financial Contribution
+			// Plugin: Who's online Widget
 		),
 );
 
@@ -193,13 +214,20 @@ if( is_pro() )
 // Set additional param to add new widget:
 $mode_url_param = $mode == 'customizer' ? '&amp;mode=customizer' : '';
 
+$Form = new Form( NULL, 'new_widget_selector', 'post', 'accordion' );
+
+$Form->begin_form( 'fform' );
+
+$Form->begin_group();
+
 foreach( $widget_groups as $widget_group_code => $widget_group_title )
 {
 	// Group title:
-	echo '<h3>'.$widget_group_title.':</h3>';
+	$Form->begin_fieldset( $widget_group_title );
 
 	if( ! isset( $core_componentwidget_defs[ $widget_group_code ] ) )
 	{ // No widgets for this group
+		$Form->end_fieldset();
 		continue;
 	}
 
@@ -222,9 +250,11 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 			$ComponentWidget = new $classname( NULL, 'core', $widget_code );
 
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'"'
+				.' title="'.format_to_output( $ComponentWidget->get_desc(), 'htmlattr' ).'"'
+				.' data-toggle="tooltip">';
 			echo $ComponentWidget->get_icon().' <strong>'.$ComponentWidget->get_name().'</strong>';
-			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
+			echo '</a> '.$ComponentWidget->get_help_link( 'manual', false );
 			echo '</li>';
 		}
 	}
@@ -235,15 +265,23 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 		foreach( $Plugin_array_grouped[ $widget_group_code ] as $Plugin )
 		{
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'"'
+				.' title="'.T_('Add this widget to the container').'"'
+				.' data-toggle="tooltip">';
 			echo $Plugin->get_widget_icon().' <strong>'.$Plugin->name.'</strong>';
-			echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
+			echo '</a> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 			echo '</li>';
 		}
 	}
 
 	echo '</ul>';
+
+	$Form->end_fieldset();
 }
+
+$Form->end_group();
+
+$Form->end_form();
 
 if( $mode == 'customizer' )
 {	// End of customizer content:

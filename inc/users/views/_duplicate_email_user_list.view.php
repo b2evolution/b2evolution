@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -24,7 +24,6 @@ $users_results_params = array(
 		'results_title'           => T_('Find duplicates'),
 		'results_order'           => '/user_email/A',
 		'page_url'                => get_dispctrl_url( 'users', 'tab3=duplicates' ),
-		'display_user_count'      => true,
 		'display_sec_groups'      => true,
 		'display_params'          => $display_params,
 		'display_contact'         => false,

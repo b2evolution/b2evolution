@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -60,7 +60,7 @@ $Results->cols[] = array(
 		'order' => 'casrc_status',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'jeditable_cell casource_status_edit',
-		'td' => /* Check permission: */$current_User->check_perm( 'centralantispam', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'centralantispam', 'edit' ) ?
 			/* Current user can edit source */'<a href="#" rel="$casrc_status$" style="color:#FFF">%ca_get_source_status_title( #casrc_status# )%</a>' :
 			/* No edit, only view the status */'%ca_get_keyword_status_title( #cakw_status# )%',
 		'extra' => array ( 'style' => 'background-color: %ca_get_source_status_color( "#casrc_status#" )%;color:#FFF', 'format_to_output' => false ),
@@ -91,7 +91,7 @@ $Results->cols[] = array(
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'centralantispam', 'edit' ) )
+if( check_user_perm( 'centralantispam', 'edit' ) )
 {	// Check permission to edit central antispam source:
 	// Print JS to edit status of central antispam source:
 	echo_editable_column_js( array(

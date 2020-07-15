@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -125,6 +125,48 @@ function get_returnto_url()
 
 
 /**
+ * Check if the requested URL is internal system URL
+ * (base URL or URL of one collection from this system)
+ *
+ * @param string URL
+ * @return boolean
+ */
+function is_internal_url( $url )
+{
+	global $Blog, $basehost, $baseurl;
+
+	if( strpos( $url, $baseurl ) === 0 ||
+	    strpos( $url, force_https_url( $baseurl ) ) === 0 ||
+	    ( ! empty( $Blog ) && strpos( $url, $Blog->gen_baseurl() ) === 0 ) ||
+	    ( ! empty( $Blog ) && strpos( $url, force_https_url( $Blog->gen_baseurl() ) ) === 0 ) )
+	{	// The URL is base URL or URL of current collection:
+		return true;
+	}
+
+	$url_domain = preg_replace( '~(https?://|//)([^/]+)/?.*~i', '$2', $url );
+
+	if( preg_match( '~\.'.preg_quote( $basehost, '~' ).'(:\d+)?$~', $url_domain ) )
+	{	// The URL goes to a subdomain of basehost:
+		return true;
+	}
+
+	// Check if URL domain is used as absolute URL for at least 1 collection on the system:
+	global $DB;
+
+	$abs_url_coll_SQL = new SQL( 'Find collection with absolute URL by requested URL domain' );
+	$abs_url_coll_SQL->SELECT( 'blog_ID' );
+	$abs_url_coll_SQL->FROM( 'T_blogs' );
+	$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
+	$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $url_domain.'/%' ) ) );
+	$abs_url_coll_SQL->LIMIT( '1' );
+	$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL );
+
+	// If at least one collection has the same domain as requested URL:
+	return ! empty( $abs_url_coll_ID );
+}
+
+
+/**
  * Sends HTTP header to redirect to the previous location (which can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
@@ -147,7 +189,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 */
 	global $Hit;
 	global $baseurl, $Collection, $Blog, $htsrv_url, $ReqHost, $ReqURL, $dispatcher;
-	global $Session, $Debuglog, $Messages;
+	global $Session, $Debuglog, $Messages, $debug;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
 	if( empty( $redirect_to ) )
@@ -206,32 +248,8 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	if( $external_redirect
 		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts'
 		&& ! $redirected_post )
-	{ // If a redirect is external and we allow to redirect to all collection domains:
-		global $basehost;
-
-		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
-
-		if( preg_match( '~\.'.preg_quote( $basehost ).'(:\d+)?$~', $redirect_to_domain ) )
-		{ // Current redirect goes to a subdomain of basehost, Allow this:
-			$allow_collection_redirect = true;
-		}
-		else
-		{ // Check if current redirect domain is used as absolute URL for at least 1 collection on the system:
-			global $DB;
-
-			$abs_url_coll_SQL = new SQL( 'phpBB: get collection by url' );
-			$abs_url_coll_SQL->SELECT( 'blog_ID' );
-			$abs_url_coll_SQL->FROM( 'T_blogs' );
-			$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
-			$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $redirect_to_domain.'/%' ) ) );
-			$abs_url_coll_SQL->LIMIT( '1' );
-
-			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL );
-			if( ! empty( $abs_url_coll_ID ) )
-			{ // We found current redirect goes to a collection domain, Allow this:
-				$allow_collection_redirect = true;
-			}
-		}
+	{	// If a redirect is external and we allow to redirect to all collection domains:
+		$allow_collection_redirect = is_internal_url( $redirect_to );
 	}
 
 	// Check if we're trying to redirect to an external URL:
@@ -264,8 +282,6 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 	if( ! empty($Session) )
 	{	// Session is required here
-
-		global $debug;
 		if( ! empty( $debug ) )
 		{	// Transfer full debug info to next page only when debug is enabled:
 			ob_start();
@@ -313,6 +329,13 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 			header_http_response( '302 Found' );
 	}
 
+	if( $debug &&
+	    ! empty( $ReqHost ) &&
+	    strpos( $redirect_to, $ReqHost ) !== 0 )
+	{	// Append param to redirect from different domain in order to see debug info of the current page after redirect:
+		$redirect_to = url_add_param( $redirect_to, 'get_redirected_debuginfo_from_sess_ID='.$Session->ID, '&' );
+	}
+
 	// debug_die($redirect_to);
 	if( headers_sent($filename, $line) )
 	{
@@ -323,6 +346,43 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	exit(0);
 }
 
+
+/**
+ * Redirect to URL with additional checking from email log
+ *
+ * @param string Redirect URL
+ * @param integer Header response status code: 301, 302, 303
+ * @param string Email log content, NULL - if we need to get email log message from DB by email log ID and key
+ * @param string Email log ID
+ * @param string Email log key
+ */
+function header_redirect_from_email( $redirect_to, $status = false, $email_log_message = NULL, $email_log_ID = NULL, $email_log_key = NULL )
+{
+	global $baseurl;
+
+	if( empty( $redirect_to ) )
+	{	// Use base site URL for redirect if it is not provided:
+		$redirect_to = $baseurl;
+	}
+
+	// 1) Try to redirect if it is allowed by config $allow_redirects_to_different_domain,
+	// (Use $return_to_caller_if_forbidden = true in order to return false without redirect)
+	$redirect_result = header_redirect( $redirect_to, $status, false, true );
+	// May be EXITed here!
+
+	// 2) Otherwise(when $redirect_result === false) use additional checking by email log:
+	if( ! check_redirect_url_by_email_log( $redirect_to, $email_log_message, $email_log_ID, $email_log_key ) )
+	{	// Deny redirect to URL what is not found in the email message:
+		$redirect_to = $baseurl;
+	}
+
+	// Campaign author explicitly wanted to link to an external URL:
+	// Use php function header() instead of b2evolution core function header_redirect(),
+	// because we already used it above to redirect and it can prevent redirection depending
+	// on some advanced settings like $allow_redirects_to_different_domain!
+	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
+	exit(0);
+}
 
 
 /**
@@ -424,7 +484,7 @@ function header_etag( $etag )
  */
 function get_request_title( $params = array() )
 {
-	global $MainList, $preview, $disp, $action, $current_User, $Collection, $Blog, $admin_url;
+	global $MainList, $preview, $disp, $action, $Collection, $Blog, $admin_url;
 
 	$r = array();
 
@@ -456,6 +516,7 @@ function get_request_title( $params = array() )
 			'msgform_text'        => T_('Contact'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
+			'requires_login_text_seo' => T_('Login Required'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
 			'register_finish_text'=> T_('Finish Registration'),
@@ -639,6 +700,15 @@ function get_request_title( $params = array() )
 			$r[] = $params['contacts_text'];
 			break;
 
+		case 'access_requires_login':
+		case 'content_requires_login':
+			// We are requesting the login form when anonymous user has no access to the Collection:
+			if( $params['auto_pilot'] == 'seo_title' )
+			{	// Use text only for <title> tag in <head>:
+				$r[] = $params['requires_login_text_seo'];
+			}
+			break;
+
 		case 'login':
 			// We are requesting the login form:
 			if( $action == 'req_activate_email' )
@@ -774,12 +844,13 @@ function get_request_title( $params = array() )
 				}
 
 				$title .= $params['edit_links_template']['before'];
-				if( $current_User->check_perm( 'admin', 'restricted' ) )
+				if( check_user_perm( 'admin', 'restricted' ) )
 				{
 					global $advanced_edit_link;
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_link['href'], ' '.T_('Advanced editing'), NULL, 3, array(
 							'onclick' => $advanced_edit_link['onclick'],
 							'class'   => $params['edit_links_template']['advanced_link_class'].' action_icon',
+							'data-shortcut' => 'f2,ctrl+f2',
 						) );
 				}
 				$title .= action_icon( T_('Cancel editing'), 'close', $cancel_url, ' '.T_('Cancel editing'), NULL, 3, array(
@@ -808,7 +879,7 @@ function get_request_title( $params = array() )
 					), $params['edit_links_template'] );
 
 				$title .= $params['edit_links_template']['before'];
-				if( $current_User->check_perm( 'admin', 'restricted' ) )
+				if( check_user_perm( 'admin', 'restricted' ) )
 				{
 					$advanced_edit_url = url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;blog='.$Blog->ID.'&amp;comment_ID='.$edited_Comment->ID );
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_url, ' '.T_('Advanced editing'), NULL, 3, array(
@@ -902,7 +973,7 @@ function get_request_title( $params = array() )
 		default:
 			if( isset( $MainList ) )
 			{
-				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ), $params ) );
+				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future', 'itemtype' ), $params ) );
 			}
 			break;
 	}
@@ -1022,17 +1093,80 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 
 /**
+ * Expose PHP variable to JS variable in order to print out them into <script> before </body>
+ *
+ * @param string Name
+ * @param string Value
+ */
+function expose_var_to_js( $name, $value, $parent_object = NULL )
+{
+	global $evo_exposed_js_vars;
+
+	if( ! is_array( $evo_exposed_js_vars ) )
+	{	// Initialize array once:
+		$evo_exposed_js_vars = array();
+	}
+
+	if( ! empty( $parent_object ) )
+	{
+		if( ! isset( $evo_exposed_js_vars[$parent_object] ) )
+		{
+			$evo_exposed_js_vars[$parent_object] = array();
+		}
+
+		$evo_exposed_js_vars[$parent_object][$name] = $value;
+	}
+	else
+	{
+		$evo_exposed_js_vars[ $name ] = $value;
+	}
+}
+
+
+/**
+ * Include ALL exposed JS variables into <script>
+ */
+function include_js_vars()
+{
+	global $evo_exposed_js_vars;
+
+	if( empty( $evo_exposed_js_vars ) ||
+	    ! is_array( $evo_exposed_js_vars ) )
+	{	// No exposed JS variables found:
+		return;
+	}
+
+	echo "<script>\n/* <![CDATA[ */\n";
+
+	foreach( $evo_exposed_js_vars as $var_name => $var_value )
+	{
+		if( is_array( $var_value ) )
+		{
+			$var_value = evo_json_encode( $var_value, JSON_FORCE_OBJECT );
+		}
+		elseif( is_bool( $var_value ) )
+		{
+			$var_value = $var_value ? 'true' : 'false';
+		}
+		echo 'var '.$var_name.' = '.$var_value.";\n";
+	}
+
+	echo "\n/* ]]> */\n</script>";
+}
+
+
+/**
  * Get library url of JS or CSS file by file name or alias
  *
  * @param string File or Alias name
- * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean|string 'relative' or true (relative to <base>) or 'absolute'(for absolute url) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string 'js' or 'css' or 'build'
  * @return string URL
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
-	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
+	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url, $rsc_uri;
 	global $Collection, $Blog, $baseurl, $assets_baseurl, $ReqURL;
 
 	if( $relative_to == 'blog' && ( is_admin_page() || empty( $Blog ) ) )
@@ -1069,8 +1203,9 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Make the file relative to current page <base>:
 		$lib_url = $lib_file;
 	}
-	elseif( preg_match( '~^(https?:)?//~', $lib_file ) )
-	{ // It's already an absolute url, keep it as is:
+	elseif( $relative_to === 'absolute' || preg_match( '~^(https?:)?//~', $lib_file ) )
+	{	// It's already an absolute url, keep it as is:
+		// (used to require CSS and JS files from Skin and Plugin because there we always use absolute URLs)
 		$lib_url = $lib_file;
 	}
 	elseif( $relative_to === 'blog' && ! empty( $Blog ) )
@@ -1094,6 +1229,10 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		{
 			$lib_url = $lib_file;
 		}
+	}
+	elseif( $relative_to === 'rsc_uri' )
+	{ // Get the file from $rsc_uri:
+		$lib_url = $rsc_uri.$subfolder.'/'.$lib_file;
 	}
 	else
 	{ // Get the file from $rsc_url:
@@ -1124,6 +1263,56 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	return $lib_url;
 }
 
+
+/**
+ * Check if the requested file is bundled in another
+ *
+ * @param string alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string 'js' or 'css' or 'build'
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
+ * @return integer Index of first file that was dequeued because it is bundled inside current requested file
+ */
+function check_bundled_file( $file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
+{
+	global $required_js, $required_css, $bundled_files;
+
+	// Store here index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = NULL;
+
+	if( isset( $bundled_files[ $file ] ) )
+	{	// If currently required file contains other JS files which must not be required twice:
+		foreach( $bundled_files[ $file ] as $bundled_file )
+		{	// Include all bundled files in the global array in order to don't call them twice:
+			$bundled_url = strtolower( get_require_url( $bundled_file, $relative_to, $subfolder, $version ) );
+			if( $subfolder == 'js' )
+			{	// JS file:
+				if( empty( $required_js ) || ! in_array( $bundled_url, $required_js ) )
+				{	// Include bundled file into this global array in order to don't require this if it will be required further:
+					$required_js[] = $bundled_url;
+				}
+			}
+			else // 'css' or 'build'
+			{	// CSS file:
+				if( empty( $required_css ) || ! in_array( $bundled_url, $required_css ) )
+				{	// Include bundled file into this global array in order to don't require this if it will be required further:
+					$required_css[] = $bundled_url;
+				}
+			}
+			// Dequeue the file if it was required before:
+			$dequeued_file_index = dequeue( $bundled_file, $relative_to );
+			if( $first_dequeued_file_index === NULL )
+			{	// We need to know first dequeued file in order to insert currently
+				// required file in that place instead of insert it as last ordered:
+				$first_dequeued_file_index = $dequeued_file_index;
+			}
+		}
+	}
+
+	return $first_dequeued_file_index;
+}
+
+
 /**
  * Memorize that a specific javascript file will be required by the current page.
  * All requested files will be included in the page head only once (when headlines is called)
@@ -1134,30 +1323,36 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
  * @param boolean|string Is the file's path relative to the base path/url?
- * @param boolean TRUE to add attribute "async" to load javascript asynchronously
+ * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+ *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+ *                'immediate' or FALSE to load javascript immediately
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
  */
-function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false, $version = '#' )
+function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#', $position = 'headlines' )
 {
-	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
-	global $dequeued_headlines;
-
-	if( isset( $dequeued_headlines[ $js_file ] ) )
-	{ // Don't require this file if it was dequeued before this request
-		return;
-	}
+	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form(), check_bundled_file())
+	global $use_defer;
 
 	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
 	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
 		return;
 	}
 
+	if( is_dequeued( $js_file, $relative_to ) )
+	{	// Don't require if the file was already dequeued once:
+		return;
+	}
+
+	// Get index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = check_bundled_file( $js_file, $relative_to, 'js', $version );
+
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{	// Dependency : ensure jQuery is loaded
 		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
 		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
-		require_js( '#jquery#', $relative_to, false, false, $version );
+		require_js_defer( '#jquery#', $relative_to, false, $version, $position );
 	}
 
 	// Get library url of JS file by alias name
@@ -1169,7 +1364,15 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		$required_js[] = strtolower( $js_url );
 
 		$script_tag = '<script';
-		$script_tag .= $async ? ' async' : '';
+		if( $async_defer == 'async' || $async_defer === true )
+		{
+			$script_tag .= ' async';
+		}
+		elseif( use_defer() && $async_defer == 'defer' )
+		{
+			$script_tag .= ' defer';
+		}
+		//else 'immediate' or false
 		$script_tag .= ' src="'.$js_url.'">';
 		$script_tag .= '</script>';
 
@@ -1179,17 +1382,53 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		}
 		else
 		{ // Add script tag to <head>
-			add_headline( $script_tag, $js_file, $relative_to );
+			if( $position == 'headlines' )
+			{
+				add_headline( $script_tag, $js_file, $relative_to, $first_dequeued_file_index );
+			}
+			elseif( $position == 'footerlines' )
+			{
+				add_footerline( $script_tag, $js_file, $relative_to, $first_dequeued_file_index );
+			}
 		}
 	}
 
 	/* Yura: Don't require this plugin when it is already concatenated in jquery.bundle.js
-	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery
+	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery */
 	if( $js_file == '#jquery#' )
 	{ // Dependency : The plugin restores deprecated features and behaviors so that older code will still run properly on jQuery 1.9 and later
-		require_js( '#jquery_migrate#', $relative_to, $async, $output );
+		require_js_defer( '#jquery_migrate#', $relative_to, $output, $version );
 	}
-	 */
+}
+
+
+/**
+ * Require javascript file to load asynchronously with attribute "async"
+ *
+ * @param string Alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ */
+function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
+{
+	require_js( $js_file, $relative_to, 'async', $output, $version, $position );
+}
+
+
+/**
+ * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+ *
+ * @param string Alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ */
+function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
+{
+	require_js( $js_file, $relative_to, 'defer', $output, $version, $position );
 }
 
 
@@ -1201,25 +1440,21 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
  * @param string alias, url or filename (relative to rsc/css) for CSS file
- * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url)  or 'rsc_uri' (relative to $rsc_uri) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
- * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
+ * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
  */
-function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
+function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines', $async = false )
 {
-	static $required_css;
-	global $dequeued_headlines;
-
-	if( isset( $dequeued_headlines[ $css_file ] ) )
-	{ // Don't require this file if it was dequeued before this request
-		return;
-	}
+	global $required_css; // Use this var as global and NOT static, because it is used in other functions(e.g. check_bundled_file())
 
 	// Which subfolder do we want to use in case of absolute paths? (doesn't appy to 'relative')
 	$subfolder = 'css';
-	if( $relative_to == 'rsc_url' || $relative_to == 'blog' )
+	if( $relative_to == 'rsc_url' || $relative_to == 'rsc_uri' || $relative_to == 'blog' )
 	{
 		if( preg_match( '/\.(bundle|bmin|min)\.css$/', $css_file ) )
 		{
@@ -1227,72 +1462,201 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 		}
 	}
 
+	if( is_dequeued( $css_file, $relative_to ) )
+	{	// Don't require if the file was already dequeued once:
+		return;
+	}
+
+	// Get index of first file that was dequeued because it is bundled inside current requested file:
+	$first_dequeued_file_index = check_bundled_file( $css_file, $relative_to, $subfolder, $version );
+
 	// Get library url of CSS file by alias name
 	$css_url = get_require_url( $css_file, $relative_to, $subfolder, $version );
 
-	// Add to headlines, if not done already:
+	// Add to headlines/footerlines, if not done already:
 	if( empty( $required_css ) || ! in_array( strtolower( $css_url ), $required_css ) )
 	{
 		$required_css[] = strtolower( $css_url );
 
-		$stylesheet_tag = '<link type="text/css" rel="stylesheet"';
+		$stylesheet_tag = '';
+
+		if( $async )
+		{
+			$stylesheet_tag .= '<link rel="preload" as="style" onload="this.onload=null;this.rel=\'stylesheet\'"';
+			$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
+			$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
+			$stylesheet_tag .= ' href="'.$css_url.'" />';
+			$stylesheet_tag .= '<noscript>';
+		}
+		
+		$stylesheet_tag .= '<link type="text/css" rel="stylesheet"';
 		$stylesheet_tag .= empty( $title ) ? '' : ' title="'.$title.'"';
 		$stylesheet_tag .= empty( $media ) ? '' : ' media="'.$media.'"';
 		$stylesheet_tag .= ' href="'.$css_url.'" />';
 
+		if( $async )
+		{
+			$stylesheet_tag .= '</noscript>';
+		}
+
 		if( $output )
-		{ // Print stylesheet tag right here
+		{	// Print stylesheet tag right here
 			echo $stylesheet_tag;
 		}
 		else
-		{ // Add stylesheet tag to <head>
-			add_headline( $stylesheet_tag, $css_file, $relative_to );
+		{	// Add stylesheet tag to <head>
+			if($position == 'headlines' )
+			{
+				add_headline( $stylesheet_tag, $css_file, $relative_to, $first_dequeued_file_index );
+			}
+			elseif( $position == 'footerlines' )
+			{
+				add_footerline( $stylesheet_tag, $css_file, $relative_to, $first_dequeued_file_index );
+			}
 		}
 	}
 }
 
 
 /**
- * Dequeue a file from $headlines array by file name or alias
+ * Require CSS file to load asynchronously
+ *
+ * @param string Alias, url or filename (relative to rsc/css) for CSS file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param string title.  The title for the link tag
+ * @param string media.  ie, 'print'
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head> or <body>
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+ */
+function require_css_async( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false, $position = 'headlines' )
+{
+	require_css( $css_file, $relative_to, $title, $media, $version, $output, $position, true );
+}
+
+
+/**
+ * Dequeue a file from $headlines and $footerlines array by file name or alias
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
- * @param boolean|string What group of headlines touch to dequeue
+ * @param boolean|string What group of headlines/footerlines touch to dequeue
+ * @return integer|NULL Index/order of the file in global array on required files, NULL - if the file was not found
  */
 function dequeue( $file_name, $group_relative_to = '#anygroup#' )
 {
-	global $headlines, $dequeued_headlines;
+	global $headline_include_file, $headline_file_index, $dequeued_headlines;
+
+	if( is_dequeued( $file_name, $group_relative_to ) )
+	{	// Don't dequeue twice:
+		pre_dump( 'is_dequeued' );
+		return NULL;
+	}
+
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
 
 	if( ! is_array( $dequeued_headlines ) )
 	{	// Initialize array first time:
 		$dequeued_headlines = array();
 	}
 
-	// Convert boolean, NULL and etc. values to string format:
-	$group_relative_to = strval( $group_relative_to );
-
 	// Store each dequeued file in order to don't require this next time:
 	$dequeued_headlines[ $group_relative_to ][ $file_name ] = true;
 
-	if( $group_relative_to == '#anygroup#' )
-	{	// Dequeue the file from any group:
-		if( $headlines )
-		{
-			foreach( $headlines as $group_key => $group_headlines )
+	// Find and store here index/order of first file:
+	$dequeued_file_index = NULL;
+
+	// Try to find and dequeue headline file:
+	if( ! empty( $headline_file_index ) )
+	{
+		$headline_file_indexes = ( $group_relative_to == '#anygroup#' ? $headline_file_index : array() );
+		if( $group_relative_to == '#anygroup#' )
+		{	// Dequeue the file from any group:
+			$headline_file_indexes = $headline_file_index;
+		}
+		elseif( isset( $headline_file_index[ $group_relative_to ] ) )
+		{	// Dequeue the file only from the requested group:
+			$headline_file_indexes = array( $group_relative_to => $headline_file_index[ $group_relative_to ] );
+		}
+		if( ! empty( $headline_file_indexes ) )
+		{	// If relative_to group is found:
+			foreach( $headline_file_indexes as $group_key => $group_headlines )
 			{
 				if( isset( $group_headlines[ $file_name ] ) )
-				{	// Dequeue this file:
-					unset( $headlines[ $group_key ][ $file_name ] );
+				{	// Dequeue html/include tag with src/href of the file:
+					$dequeued_file_index = $headline_file_index[ $group_key ][ $file_name ];
+					unset( $headline_include_file[ $group_headlines[ $file_name ] ] );
+					// Dequeue index/order of the file:
+					unset( $headline_file_index[ $group_key ][ $file_name ] );
+					// Don't find the file in next groups because it must be unique:
+					return $dequeued_file_index;
 				}
 			}
 		}
 	}
-	else
-	{	// Dequeue the file only from requested group:
-		if( isset( $headlines[ $group_relative_to ][ $file_name ] ) )
-		{	// Dequeue this file:
-			unset( $headlines[ $group_relative_to ][ $file_name ] );
+
+	// Footerlines if the files is not found in Headlines above:
+	global $footerline_include_file, $footerline_file_index, $dequeued_footerlines;
+
+	if( ! is_array( $dequeued_footerlines ) )
+	{	// Initialize array first time:
+		$dequeued_footerlines = array();
+	}
+
+	// Store each dequeued file in order to don't require this next time:
+	$dequeued_footerlines[ $group_relative_to ][ $file_name ] = true;
+
+	// Find and store here index/order of first file:
+	$dequeued_file_index = NULL;
+
+	// Try to find and dequeue footerline file:
+	if( ! empty( $footerline_file_index ) )
+	{	// Try to dequeue footerline file:
+		$footerline_file_indexes = ( $group_relative_to == '#anygroup#' ? $footerline_file_index : array() );
+		if( $group_relative_to == '#anygroup#' )
+		{	// Dequeue the file from any group:
+			$footerline_file_indexes = $footerline_file_index;
+		}
+		elseif( isset( $footerline_file_index[ $group_relative_to ] ) )
+		{	// Dequeue the file only from the requested group:
+			$footerline_file_indexes = array( $group_relative_to => $footerline_file_index[ $group_relative_to ] );
+		}
+		if( ! empty( $footerline_file_indexes ) )
+		{	// If relative_to group is found:
+			foreach( $footerline_file_indexes as $group_key => $group_footerlines )
+			{
+				if( isset( $group_footerlines[ $file_name ] ) )
+				{	// Dequeue html/include tag with src/href of the file:
+					$dequeued_file_index = $footerline_file_index[ $group_key ][ $file_name ];
+					unset( $footerline_include_file[ $group_footerlines[ $file_name ] ] );
+					// Dequeue index/order of the file:
+					unset( $footerline_file_index[ $group_key ][ $file_name ] );
+					// Don't find the file in next groups because it must be unique:
+					return $dequeued_file_index;
+				}
+			}
 		}
 	}
+
+	return $dequeued_file_index;
+}
+
+
+/**
+ * Check if file was dequeued from required list
+ *
+ * @param string Alias, url or relative file path of JS/CSS file
+ * @param boolean|string Group of file
+ */
+function is_dequeued( $file_name, $group_relative_to )
+{
+	global $dequeued_headlines, $dequeued_footerlines;
+
+	// Convert boolean, NULL and etc. values to string format:
+	$group_relative_to = strval( $group_relative_to );
+
+	return isset( $dequeued_headlines[ $group_relative_to ][ $file_name ] ) ||
+		isset( $dequeued_footerlines[ $group_relative_to ][ $file_name ] );
 }
 
 
@@ -1317,8 +1681,8 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 			case 'helper' :
 				// main helper object required
 				global $debug;
-				require_js( '#jquery#', $relative_to ); // dependency
-				require_js( 'helper.js', $relative_to );
+				require_js_defer( '#jquery#', $relative_to ); // dependency
+				require_js_defer( 'helper.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
 					b2evoHelper.Init({
@@ -1332,7 +1696,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				require_js_helper('helper', $relative_to ); // dependency
 
 				global $dispatcher;
-				require_js( 'communication.js', $relative_to );
+				require_js_defer( 'communication.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
 					b2evoCommunications.Init({
@@ -1399,31 +1763,22 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					$colorbox_params_user = 'var b2evo_colorbox_params_user = '.$colorbox_no_voting_params;
 				}
 
-				require_js( '#jquery#', $relative_to );
+				require_js_defer( '#jquery#', $relative_to );
 				// Initialize the colorbox settings:
-				add_js_headline(
-					// General settings:
-					'var b2evo_colorbox_params = {
-						maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
-						maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
-						slideshow: true,
-						slideshowAuto: false
-					};
-					'// For post images
-					.$colorbox_params_post.';
-					b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
+				add_js_footerline(
+					// For post images
+					$colorbox_params_post.';
 					'// For comment images
 					.$colorbox_params_cmnt.';
-					b2evo_colorbox_params_cmnt = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_cmnt );
 					'// For user images
 					.$colorbox_params_user.';
-					b2evo_colorbox_params_user = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_user );
 					'// For all other images
-					.$colorbox_params_other.';
-					b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );' );
+					.$colorbox_params_other.';' );
 				// TODO: translation strings for colorbox buttons
 
-				require_js( 'build/colorbox.bmin.js', $relative_to, true );
+				// Do NOT require colorbox.bmin.js here because it is grunted in evo_generic.bmin.js:
+				// require_js_defer( 'build/colorbox.bmin.js', $relative_to );
+
 				if( is_admin_page() )
 				{
 					global $AdminUI;
@@ -1468,33 +1823,87 @@ function add_js_translation( $string, $translation )
 /**
  * Add a headline, which then gets output in the HTML HEAD section.
  * If you want to include CSS or JavaScript files, please use
- * {@link require_css()} and {@link require_js()} instead.
+ * {@link require_css()} and {@link require_js_async()} and {@link require_js_defer()} instead.
  * This avoids duplicates and allows caching/concatenating those files
  * later (not implemented yet)
  *
  * @param string HTML tag like <script></script> or <link />
  * @param string File name (used to index)
  * @param boolean|string Group headlines by this group in order to allow use files with same names from several places
+ * @param integer Insert new headline in the given index, Useful to insert superbundled file instead of first bundled file
  */
-function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogroup#' )
+function add_headline( $headline, $file_name = NULL, $group_relative_to = '#nogroup#', $file_index = NULL )
 {
-	global $headlines, $dequeued_headlines;
-
-	// Convert boolean, NULL and etc. values to string format:
-	$group_relative_to = strval( $group_relative_to );
-
-	if( is_null( $file_name ) )
-	{	// Use auto index if file name is not defined:
-		$headlines[ $group_relative_to ][] = $headline;
+	if( $file_name === NULL )
+	{	// Add inline code:
+		global $headline_inline_code;
+		$headline_inline_code[] = $headline;
 	}
 	else
-	{	// Try to add headline with file name to array:
-		if( isset( $dequeued_headlines[ $group_relative_to ][ $file_name ] ) || isset( $dequeued_headlines[ '#anygroup#' ][ $file_name ] ) )
-		{	// Don't require this file if it was dequeued before this request:
+	{	// Add include file:
+		global $headline_include_file, $headline_file_index;
+		// Convert boolean, NULL and etc. values to string format:
+		$group_relative_to = strval( $group_relative_to );
+		if( isset( $headline_file_index[ $group_relative_to ][ $file_name ] ) )
+		{	// Skip already included file from the same group:
 			return;
 		}
-		// Use file name as key index in $headline array:
-		$headlines[ $group_relative_to ][ $file_name ] = $headline;
+		if( $file_index === NULL || isset( $headline_include_file[ $file_index ] ) )
+		{	// Use auto order/index:
+			$headline_include_file[] = $headline;
+			$file_index = max( array_keys( $headline_include_file ) );
+		}
+		else
+		{	// Use specific order/index when it is requested and the index is free:
+			$headline_include_file[ $file_index ] = $headline;
+		}
+		// Flag to don't include same file from same group twice,
+		// Also store value as index/order in order to dequeue it quickly:
+		$headline_file_index[ $group_relative_to ][ $file_name ] = $file_index;
+	}
+}
+
+
+/**
+ * Add a footerline, which then gets output before the </body> tag.
+ * If you want to include CSS or JavaScript files, please use
+ * {@link require_css()} and {@link require_js_async()} and {@link require_js_defer()} instead.
+ * This avoids duplicates and allows caching/concatenating those files
+ * later (not implemented yet)
+ *
+ * @param string HTML tag like <script></script> or <link />
+ * @param string File name (used to index)
+ * @param boolean|string Group footerlines by this group in order to allow use files with same names from several places
+ * @param integer Insert new headline in the given index, Useful to insert superbundled file instead of first bundled file
+ */
+function add_footerline( $footerline, $file_name = NULL, $group_relative_to = '#nogroup#', $file_index = NULL )
+{
+	if( $file_name === NULL )
+	{	// Add inline code:
+		global $footerline_inline_code;
+		$footerline_inline_code[] = $footerline;
+	}
+	else
+	{	// Add include file:
+		global $footerline_include_file, $footerline_file_index;
+		// Convert boolean, NULL and etc. values to string format:
+		$group_relative_to = strval( $group_relative_to );
+		if( isset( $footerline_file_index[ $group_relative_to ][ $file_name ] ) )
+		{	// Skip already included file from the same group:
+			return;
+		}
+		if( $file_index === NULL || isset( $footerline_include_file[ $file_index ] ) )
+		{	// Use auto order/index:
+			$footerline_include_file[] = $footerline;
+			$file_index = max( array_keys( $footerline_include_file ) );
+		}
+		else
+		{	// Use specific order/index when it is requested and the index is free:
+			$footerline_include_file[ $file_index ] = $footerline;
+		}
+		// Flag to don't include same file from same group twice,
+		// Also store value as index/order in order to dequeue it quickly:
+		$footerline_file_index[ $group_relative_to ][ $file_name ] = $file_index;
 	}
 }
 
@@ -1514,6 +1923,20 @@ function add_js_headline($headline)
 
 
 /**
+ * Add a Javascript footerline.
+ * This is an extra function, to provide consistent wrapping and allow to bundle it
+ * (i.e. create a bundle with all required JS files and these inline code snippets,
+ *  in the correct order).
+ * @param string Javascript
+ */
+function add_js_footerline($footerline)
+{
+	add_footerline("<script>\n\t/* <![CDATA[ */\n\t\t"
+		.$footerline."\n\t/* ]]> */\n\t</script>");
+}
+
+
+/**
  * Add a CSS headline.
  * This is an extra function, to provide consistent wrapping and allow to bundle it
  * (i.e. create a bundle with all required JS files and these inline code snippets,
@@ -1523,6 +1946,19 @@ function add_js_headline($headline)
 function add_css_headline($headline)
 {
 	add_headline("<style type=\"text/css\">\n\t".$headline."\n\t</style>");
+}
+
+
+/**
+ * Add a CSS footerline.
+ * This is an extra function, to provide consistent wrapping and allow to bundle it
+ * (i.e. create a bundle with all required CSS code snippets,
+ *  in the correct order).
+ * @param string CSS
+ */
+function add_css_footerline($footerline)
+{
+	add_footerline("<style type=\"text/css\">\n\t".$footerline."\n\t</style>");
 }
 
 
@@ -1548,7 +1984,7 @@ function init_ajax_forms( $relative_to = 'blog' )
 
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
-		require_js( 'communication.js', $relative_to );
+		require_js_defer( 'communication.js', $relative_to );
 	}*/
 }
 
@@ -1563,8 +1999,9 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	// fp> Note, the following test is good for $disp == 'single', not for 'posts'
 	if( $force_init || ( !empty($Item) && $Item->can_rate() ) )
 	{
-		require_js( '#jquery#', $relative_to ); // dependency
-		require_js( 'jquery/jquery.raty.min.js', $relative_to );
+		require_js_defer( '#jquery#', $relative_to ); // dependency
+		require_js_defer( 'jquery/jquery.raty.min.js', $relative_to );
+		require_js_defer( 'src/evo_init_comment_rating.js', $relative_to );
 	}
 }
 
@@ -1582,20 +2019,20 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		return;
 	}
 
-	require_js( '#jquery#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
 
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, true );
+			require_js_defer( 'build/popover.bmin.js', $relative_to );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
+			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1611,21 +2048,21 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
 	// Load to autocomplete user fields with list type
-	require_js( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, true );
+			require_js_defer( 'build/popover.bmin.js', $relative_to );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
+			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1654,20 +2091,20 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	require_js( '#jquery#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
 
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, true );
+			require_js_defer( 'build/popover.bmin.js', $relative_to );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
+			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1679,17 +2116,18 @@ function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_datepicker_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	add_js_headline( 'jQuery(document).ready( function(){
-		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.jquery_datepicker_datefmt().'",
-			monthNames: '.jquery_datepicker_month_names().',
-			dayNamesMin: '.jquery_datepicker_day_names().',
-			firstDay: '.locale_startofweek().'
-		})
-	})' );
+	// We did not use json_encode here as it will escape the dateFormat:
+	expose_var_to_js( 'evo_init_datepicker', '{'
+				.'selector: ".form_date_input",'
+				.'config: {'
+					.'dateFormat: "'.jquery_datepicker_datefmt().'",'
+					.'monthNames: '.jquery_datepicker_month_names().','
+					.'dayNamesMin: '.jquery_datepicker_day_names().','
+					.'firstDay: '.locale_startofweek().'}'
+			.'}' );
 }
 
 
@@ -1698,8 +2136,8 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
  */
 function init_tokeninput_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.tokeninput.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( 'jquery/jquery.tokeninput.js', $relative_to );
 	require_css( 'jquery/jquery.token-input-facebook.css', $relative_to );
 }
 
@@ -1709,69 +2147,36 @@ function init_tokeninput_js( $relative_to = 'rsc_url' )
  */
 function init_results_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'results.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( 'results.js', $relative_to );
 }
 
 
 /**
  * Registers headlines for initialization of functions to work with affixed Messages
  */
-function init_affix_messages_js( $offset = 50 )
+function init_affix_messages_js( $offset = NULL )
 {
-	global $display_mode;
+	global $display_mode, $site_Skin;
 
 	if( isset( $display_mode ) && $display_mode == 'js' )
 	{	// Don't use affixed Messages in JS mode from modal windows:
 		return;
 	}
 
-	add_js_headline( '
-	jQuery( document ).ready( function()
-	{
-		var msg_obj = jQuery( ".affixed_messages" );
-		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
+	if( empty( $offset ) && ! ( ( $offset === '0' ) || ( $offset === 0 ) ) )
+	{	// This should not include evobar and header height - those will be taken care of by the message affix JS script:
+		$offset = 10;
+	}
 
-		if( msg_obj.length == 0 )
-		{ // No Messages, exit
-			return;
-		}
+	$site_header_fixed = 'false';
+	if( $site_Skin )
+	{	// Get fixed header setting to pass to messages affix JS script:
+		$site_header_fixed = $site_Skin->get_setting( 'fixed_header' ) == 1 ? 'true' : 'false';
+	}
 
-		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
-		var wrapper = msg_obj.parent();
-
-		msg_obj.affix( {
-				offset: {
-					top: function() {
-						return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
-					}
-				}
-			} );
-
-		msg_obj.on( "affix.bs.affix", function()
-			{
-				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
-
-				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
-
-				jQuery( window ).on( "resize", function()
-					{ // This will resize the Messages based on the wrapper width
-						msg_obj.css( { "width": wrapper.css( "width" ) } );
-					});
-			} );
-
-		msg_obj.on( "affixed-top.bs.affix", function()
-			{
-				wrapper.css( { "min-height": "" } );
-				msg_obj.css( { "width": "", "top": "", "z-index": "" } );
-			} );
-
-		jQuery( "div.alert", msg_obj ).on( "closed.bs.alert", function()
-			{
-				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
-			} );
-	} );
-	' );
+	add_js_headline( 'evo_affix_msg_offset = '.format_to_js( $offset ).'; evo_affix_fixed_header = '.format_to_js( $site_header_fixed ).';' );
+	require_js_defer( 'src/evo_init_affix_messages.js', 'blog' );
 }
 
 
@@ -1789,18 +2194,18 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 		return false;
 	}
 
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'voting.js', $relative_to );
-	add_js_headline( '
-	jQuery( document ).ready( function()
-	{
-		var comment_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
-		jQuery( "span[id^=vote_helpful_]" ).each( function()
-		{
-			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
-		} );
-	} );
-	' );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( 'voting.js', $relative_to );
+
+	$js_config = array(
+		'action_url' => url_add_param( get_htsrv_url().'anon_async.php', array(
+					'action'           => 'voting',
+					'vote_type'        => 'comment',
+					'b2evo_icons_type' => $b2evo_icons_type
+			) ),
+		);
+
+	expose_var_to_js( 'evo_init_comment_voting_config', evo_json_encode( $js_config ) );
 }
 
 
@@ -1818,18 +2223,18 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
 		return false;
 	}
 
-	require_js( '#jquery#', $relative_to );
-	require_js( 'voting.js', $relative_to );
-	add_js_headline( '
-	jQuery( document ).ready( function()
-	{
-		var item_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type.'";
-		jQuery( "span[id^=vote_item_]" ).each( function()
-		{
-			init_voting_bar( jQuery( this ), item_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
-		} );
-	} );
-	' );
+	require_js_defer( '#jquery#', $relative_to );
+	require_js_defer( 'voting.js', $relative_to );
+
+	$js_config = array(
+		'action_url' => url_add_param( get_htsrv_url().'anon_async.php', array(
+				'action'           => 'voting',
+				'vote_type'        => 'item',
+				'b2evo_icons_type' => $b2evo_icons_type
+			) ),
+		);
+
+	expose_var_to_js( 'evo_init_item_voting_config', evo_json_encode( $js_config ) );
 }
 
 
@@ -1845,8 +2250,8 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 
 	global $current_User, $UserSettings;
 
-	require_js( '#jquery#', $relative_to );
-	require_js( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
+	require_js_defer( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
 	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
 
 	// Get preselected colors from settings of current User:
@@ -1945,66 +2350,17 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 {
 	global $Collection, $Blog;
 
-	require_js( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#jquery#', $relative_to ); // dependency
 
 	switch( $library )
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
-			require_js( '#bootstrap_typeahead#', $relative_to );
-			add_js_headline( 'jQuery( document ).ready( function()
-			{
-				jQuery( "input.autocomplete_login" ).on( "added",function()
-				{
-					jQuery( "input.autocomplete_login" ).each( function()
-					{
-						if( jQuery( this ).hasClass( "tt-input" ) || jQuery( this ).hasClass( "tt-hint" ) )
-						{	// Skip this field because typeahead is initialized before:
-							return;
-						}
-						var ajax_url = "";
-						if( jQuery( this ).hasClass( "only_assignees" ) )
-						{
-							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
-						}
-						else
-						{
-							ajax_url = restapi_url + "users/logins";
-						}
-						if( jQuery( this ).data( "status" ) )
-						{
-							ajax_url += "&status=" + jQuery( this ).data( "status" );
-						}
-						jQuery( this ).typeahead( null,
-						{
-							displayKey: "login",
-							source: function ( query, cb )
-							{
-								jQuery.ajax(
-								{
-									type: "GET",
-									dataType: "JSON",
-									url: ajax_url,
-									data: { q: query },
-									success: function( data )
-									{
-										var json = new Array();
-										for( var l in data.list )
-										{
-											json.push( { login: data.list[ l ] } );
-										}
-										cb( json );
-									}
-								} );
-							}
-						} );
-					} );
-				} );
-				jQuery( "input.autocomplete_login" ).trigger( "added" );
-				'
-				// Don't submit a form by Enter when user is editing the owner fields
-				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
-			} );' );
+			require_js_defer( '#bootstrap_typeahead#', $relative_to );
+			expose_var_to_js( 'evo_autocomplete_login_config', '{
+					url: "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'",
+					selector: "input.autocomplete_login",
+				}' );
 			break;
 
 		case 'hintbox':
@@ -2017,7 +2373,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
 			// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
 			require_css( 'jquery/jquery.hintbox.css', $relative_to );
-			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
+			require_js_defer( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
 				var ajax_url = "";
@@ -2053,21 +2409,14 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
  * Registers headlines required to jqPlot charts
  *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
  */
-function init_jqplot_js( $relative_to = 'rsc_url' )
+function init_jqplot_js( $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( '#jqplot#', $relative_to );
-	require_js( '#jqplot_barRenderer#', $relative_to );
-	require_js( '#jqplot_canvasAxisTickRenderer#', $relative_to );
-	require_js( '#jqplot_canvasTextRenderer#', $relative_to );
-	require_js( '#jqplot_categoryAxisRenderer#', $relative_to );
-	require_js( '#jqplot_enhancedLegendRenderer#', $relative_to );
-	require_js( '#jqplot_highlighter#', $relative_to );
-	require_js( '#jqplot_canvasOverlay#', $relative_to );
-	require_js( '#jqplot_donutRenderer#', $relative_to );
-	require_css( '#jqplot_css#', $relative_to );
-	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
+	require_js_defer( 'build/evo_jqplot.bmin.js', $relative_to, $output, $version, $position );
+	require_css_async( 'b2evo_jqplot.bmin.css', $relative_to, NULL, NULL, $version, $output, $position );
 }
 
 
@@ -2078,25 +2427,40 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 {
 	global $current_locale;
 
-	require_js( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#jquery#', $relative_to ); // dependency
 	require_css( '#jqueryUI_css#', $relative_to ); // dependency for date picker
-	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
-	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
-	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency
+	require_js_defer( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
+	require_js_defer( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js_defer( 'jquery/query-builder/moment.js', $relative_to ); // dependency
 
-	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
+	require_js_defer( 'jquery/query-builder/query-builder.min.js', $relative_to );
 	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
 
 	// Load language file if such file exists:
 	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
 	if( in_array( $current_locale, $query_builder_langs ) )
 	{	// Load lang by full locale name like "en-US":
-		require_js( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+		require_js_defer( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
 	}
 	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
 	{	// Load lang by locale code like "en":
-		require_js( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+		require_js_defer( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
 	}
+}
+
+
+/**
+ * Initialize Hotkeys library
+ */
+function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array(), $top_hotkeys = array() )
+{
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#hotkeys#', $relative_to );
+
+	add_js_headline( 'var shortcut_keys = '.json_encode( $hotkeys ).';' );
+	add_js_headline( 'var top_shortcut_keys = '.json_encode( $top_hotkeys ).';' );
+
+	require_js_defer( 'hotkeys/hotkeys.init.js', $relative_to );
 }
 
 
@@ -2107,31 +2471,26 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
  */
 function include_headlines()
 {
-	global $headlines;
+	global $headline_include_file, $headline_file_index, $headline_inline_code;
 
-	if( $headlines )
-	{
-		if( isset( $headlines['#nogroup#'] ) )
-		{	// Move no group head lines to the end in order to print them after files,
-			// because Safari and Firefox rewrite css of <style> with css of loaded files if they are printed after <style> in <head>:
-			$headlines_nogroup = $headlines['#nogroup#'];
-			unset( $headlines['#nogroup#'] );
-			$headlines['#nogroup#'] = $headlines_nogroup;
-		}
-		$all_headlines = array();
-		foreach( $headlines as $group_headlines )
-		{	// Go through each group to include all headlines:
-			foreach( $group_headlines as $headline )
-			{
-				$all_headlines[] = $headline;
-			}
-		}
+	$all_headlines = array();
+	if( is_array( $headline_include_file ) )
+	{	// Include files:
+		// Sort because after dequeued bundled files we need to move main superbundled file on proper order:
+		ksort( $headline_include_file );
+		$all_headlines = $headline_include_file;
+		unset( $headline_include_file, $headline_file_index );
+	}
+	if( is_array( $headline_inline_code ) )
+	{	// Include inline codes:
+		$all_headlines = array_merge( $all_headlines, $headline_inline_code );
+		unset( $headline_inline_code );
+	}
 
-		if( ! empty( $all_headlines ) )
-		{	// Include headlines only if at least one headline is found in any group:
-			echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $all_headlines );
-			echo "\n\n";
-		}
+	if( ! empty( $all_headlines ) )
+	{	// Include headlines only if at least one headline is found in any group:
+		echo "\n\t<!-- headlines: -->\n\t".implode( "\n\t", $all_headlines );
+		echo "\n\n";
 	}
 }
 
@@ -2145,25 +2504,45 @@ function include_headlines()
  */
 function include_footerlines()
 {
-	global $js_translations;
-	if( empty( $js_translations ) )
-	{ // nothing to do
-		return;
-	}
-	$r = '';
+	global $js_translations, $footerline_include_file, $footerline_file_index, $footerline_inline_code;
 
-	foreach( $js_translations as $string => $translation )
-	{ // output each translation
-		if( $string != $translation )
-		{ // this is translated
-			$r .= '<div><span class="b2evo_t_string">'.$string.'</span><span class="b2evo_translation">'.$translation.'</span></div>'."\n";
+	if( !empty( $js_translations ) )
+	{
+		$r = '';
+
+		foreach( $js_translations as $string => $translation )
+		{ // output each translation
+			if( $string != $translation )
+			{ // this is translated
+				$r .= '<div><span class="b2evo_t_string">'.$string.'</span><span class="b2evo_translation">'.$translation.'</span></div>'."\n";
+			}
+		}
+		if( $r )
+		{ // we have some translations
+			echo '<div id="b2evo_translations" style="display:none;">'."\n";
+			echo $r;
+			echo '</div>'."\n";
 		}
 	}
-	if( $r )
-	{ // we have some translations
-		echo '<div id="b2evo_translations" style="display:none;">'."\n";
-		echo $r;
-		echo '</div>'."\n";
+
+	$all_footerlines = array();
+	if( is_array( $footerline_include_file ) )
+	{	// Include files:
+		$all_footerlines = $footerline_include_file;
+		// Sort because after dequeued bundled files we need to move main superbundled file on proper order:
+		ksort( $footerline_include_file );
+		unset( $footerline_include_file, $footerline_file_index );
+	}
+	if( is_array( $footerline_inline_code ) )
+	{	// Include inline codes:
+		$all_footerlines = array_merge( $all_footerlines, $footerline_inline_code );
+		unset( $footerline_inline_code );
+	}
+
+	if( ! empty( $all_footerlines ) )
+	{	// Include footerlines only if at least one footerline is found in any group:
+		echo "\n\t<!-- footerlines: -->\n\t".implode( "\n\t", $all_footerlines );
+		echo "\n\n";
 	}
 }
 
@@ -2341,15 +2720,17 @@ function display_if_empty( $params = array() )
 /**
  * Check if current page is a single Item's page
  *
+ * @param integer|NULL ID of Item to be sure we currently see single page of the Item, NULL - to don't check
  * @return boolean
  */
-function is_single_page()
+function is_single_page( $check_item_ID = NULL )
 {
 	global $disp, $MainList, $Item;
 
 	return ( $disp == 'single' || $disp == 'page' ) &&
 		( isset( $MainList ) && $MainList->single_post ) &&
-		( isset( $Item ) && $Item->ID > 0 );
+		( isset( $Item ) && $Item->ID > 0 ) &&
+		( $check_item_ID === NULL || $check_item_ID == $Item->ID );
 }
 
 
@@ -2411,12 +2792,15 @@ function star_rating( $stars, $class = 'not-used-any-more' )
  */
 function powered_by( $params = array() )
 {
-	/**
-	 * @var AbstractSettings
-	 */
-	global $global_Cache;
+	global $global_Cache, $rsc_uri, $Blog;
 
-	global $rsc_uri;
+	if( isset( $Blog ) &&
+	    ( $Blog instanceof Blog ) &&
+	    is_pro() &&
+	    $Blog->get_setting( 'powered_by_logos' ) )
+	{	// Don't display "Powered by b2evolution" logos if it is desabled on PRO version:
+		return;
+	}
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -2558,7 +2942,7 @@ function display_ajax_form( $params )
 	global $rsc_url, $ajax_form_number, $required_js, $b2evo_icons_type;
 
 	if( is_recursive( $params ) )
-	{ // The params array contains recursion, don't try to encode, display error message instead
+	{	// The params array contains recursion, don't try to encode, display error message instead
 		// We don't use translation because this situation should not really happen ( Probably it happesn with some wrong skin )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
@@ -2579,7 +2963,7 @@ function display_ajax_form( $params )
 	}
 
 	if( empty( $ajax_form_number ) )
-	{ // Set number for ajax form to use unique ID for each new form
+	{	// Set number for ajax form to use unique ID for each new form
 		$ajax_form_number = 0;
 	}
 	$ajax_form_number++;
@@ -2592,74 +2976,15 @@ function display_ajax_form( $params )
 		echo '<a id="'.format_to_output( $comment_form_anchor.$params['p'], 'htmlattr' ).'"></a>';
 	}
 
-	// Needs json_encode function to create json type params
-	$json_params = evo_json_encode( $params );
-
 	// Display loader gif until the ajax call returns:
 	echo '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
+	$ajax_form_config = array(
+			'form_number' => $ajax_form_number,
+			'json_params' => $params,
+			'load_ajax_form_on_page_load' => !empty( $params['params']['load_ajax_form_on_page_load'] ),
+		);
+	expose_var_to_js( 'ajax_form_'.$ajax_form_number, $ajax_form_config, 'evo_ajax_form_config' );
 	?>
-	<script>
-		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
-		var request_sent_<?php echo $ajax_form_number; ?> = false;
-		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
-
-		function get_form_<?php echo $ajax_form_number; ?>()
-		{
-			var form_id = '#ajax_form_number_<?php echo $ajax_form_number; ?>';
-			ajax_form_loading_number_<?php echo $ajax_form_number; ?>++;
-			jQuery.ajax({
-				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-				type: 'POST',
-				data: <?php echo $json_params; ?>,
-				success: function(result)
-				{
-					jQuery( form_id ).html( ajax_debug_clear( result ) );
-				},
-				error: function( jqXHR, textStatus, errorThrown )
-				{
-					jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
-					if( ajax_form_loading_number_<?php echo $ajax_form_number; ?> < 3 )
-					{	// Try to load 3 times this ajax form if error occurs:
-						setTimeout( function()
-						{	// After 1 second delaying:
-							jQuery( '.loader_ajax_form', form_id ).next().remove();
-							get_form_<?php echo $ajax_form_number; ?>();
-						}, 1000 );
-					}
-				}
-			});
-		}
-
-		function check_and_show_<?php echo $ajax_form_number; ?>( force_load )
-		{
-			if( request_sent_<?php echo $ajax_form_number; ?> )
-			{	// Don't load the form twice:
-				return;
-			}
-			var load_form = ( typeof force_load == undefined ) ? false : force_load;
-			if( ! load_form )
-			{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
-				load_form = jQuery(window).scrollTop() >= ajax_form_offset_<?php echo $ajax_form_number; ?> - jQuery(window).height() - 20;
-			}
-			if( load_form )
-			{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
-				request_sent_<?php echo $ajax_form_number; ?> = true;
-				get_form_<?php echo $ajax_form_number; ?>();
-			}
-		}
-
-		jQuery(window).scroll(function() {
-			check_and_show_<?php echo $ajax_form_number; ?>();
-		});
-
-		jQuery(document).ready( function() {
-			check_and_show_<?php echo $ajax_form_number; ?>( <?php echo empty( $params['params']['load_ajax_form_on_page_load'] ) ? 'false' : 'true'; ?> );
-		});
-
-		jQuery(window).resize( function() {
-			check_and_show_<?php echo $ajax_form_number; ?>();
-		});
-	</script>
 	<noscript>
 		<?php echo '<p>'.T_( 'This section can only be displayed by javascript enabled browsers.' ).'</p>'; ?>
 	</noscript>
@@ -2890,7 +3215,7 @@ function display_login_form( $params )
 		// Passthrough REQUEST data (when login is required after having POSTed something)
 		// (Exclusion of 'login_action', 'login', and 'action' has been removed. This should get handled via detection in Form (included_input_field_names),
 		//  and "action" is protected via crumbs)
-		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ), array( 'pwd_hashed' ) );
+		$Form->hiddens_by_key( $_REQUEST, array( 'pwd_hashed', 'submit' ) );
 	}
 
 	$Form->end_form();
@@ -2898,6 +3223,50 @@ function display_login_form( $params )
 	echo $params['form_after'];
 
 	display_login_js_handler( $params );
+}
+
+
+/**
+ * Display footer under login form
+ *
+ * @param array Params
+ */
+function display_login_form_footer( $params = array() )
+{
+	global $Hit;
+
+	$params = array_merge( array(
+			'login_link_class' => 'evo_login_dialog_standard_link',
+			'ip_address_class' => 'evo_login_dialog_footer text-muted',
+			'source'           => NULL,
+			'redirect_to'      => NULL,
+			'return_to'        => NULL,
+		), $params );
+
+	if( $params['source'] === NULL )
+	{	// Default source:
+		$params['source'] = param( 'source', 'string', 'inskin login form' );
+	}
+
+	if( $params['redirect_to'] === NULL )
+	{	// Default redirect URL:
+		$params['redirect_to'] = param( 'redirect_to', 'url', '' );
+	}
+
+	if( $params['return_to'] === NULL )
+	{	// Default return URL:
+		$params['return_to'] = param( 'return_to', 'url', '' );
+	}
+
+	echo '<div class="'.$params['login_link_class'].'">'
+			.'<a href="'.get_htsrv_url( 'login' ).'login.php?source='.rawurlencode( $params['source'] ).'&amp;redirect_to='.rawurlencode( $params['redirect_to'] ).'&amp;return_to='.rawurlencode( $params['return_to'] ).'">'
+				.T_('Use basic login form instead').' &raquo;'
+			.'</a>'
+		.'</div>';
+
+	echo '<div class="'.$params['ip_address_class'].'">'
+			.sprintf( T_('Your IP address: %s'), $Hit->IP )
+		.'</div>';
 }
 
 
@@ -2912,107 +3281,16 @@ function display_login_js_handler( $params )
 
 	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
 
-?>
-	<script>
-	var requestSent = false;
-	var login = document.getElementById("<?php echo $dummy_fields[ 'login' ]; ?>");
-	if( login.value.length > 0 )
-	{ // Focus on the password field:
-		document.getElementById("<?php echo $dummy_fields[ 'pwd' ]; ?>").focus();
-	}
-	else
-	{ // Focus on the login field:
-		login.focus();
-	}
+	$login_handler_config = array(
+			'dummy_field_login'                     => $dummy_fields['login'],
+			'dummy_field_pwd'                       => $dummy_fields['pwd'],
+			'params_get_widget_login_hidden_fields' => $params['get_widget_login_hidden_fields'],
+			'params_transmit_hashed_password'       => $params['transmit_hashed_password'],
+			'session_ID'                            => $Session->ID,
+			'crumb_loginsalt'                       => get_crumb('loginsalt'),
+		);
 
-	function processSubmit(e) {
-		if (e.preventDefault) e.preventDefault();
-		if( requestSent )
-		{ // A submit request was already sent, do not send another
-			return;
-		}
-
-		requestSent = true;
-		var form = document.getElementById("login_form");
-		var username = form.<?php echo $dummy_fields[ 'login' ]; ?>.value;
-		var get_widget_login_hidden_fields = <?php echo $params['get_widget_login_hidden_fields'] ? 'true' : 'false'; ?>;
-		var sessionid = '<?php echo $Session->ID; ?>';
-
-		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pepper || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
-			return true;
-		}
-
-		jQuery.ajax({
-			type: 'POST',
-			url: '<?php echo get_htsrv_url( 'login' ); ?>anon_async.php',
-			data: {
-				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
-				'action': 'get_user_salt',
-				'get_widget_login_hidden_fields': get_widget_login_hidden_fields,
-				'crumb_loginsalt': '<?php echo get_crumb('loginsalt'); ?>',
-			},
-			success: function(result) {
-				var pwd_container = jQuery('#pwd_hashed_container');
-				var parsed_result;
-
-				try {
-					parsed_result = JSON.parse(result);
-				} catch( e ) {
-					pwd_container.html( result );
-					return;
-				}
-
-				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
-				var salts = parsed_result['salts'];
-				var hash_algo = parsed_result['hash_algo'];
-
-				if( get_widget_login_hidden_fields )
-				{
-					form.crumb_loginform.value = parsed_result['crumb'];
-					form.pepper.value = parsed_result['pepper'];
-					sessionid = parsed_result['session_id'];
-				}
-
-				for( var index in salts )
-				{
-					var pwd_hashed = eval( hash_algo[ index ] );
-					pwd_hashed = hex_sha1( pwd_hashed + form.pepper.value );
-					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
-				}
-
-				form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value = 'padding_padding_padding_padding_padding_padding_hashed_' + sessionid; /* to detect cookie problems */
-				// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
-
-				// Append the correct login action as hidden input field
-				pwd_container.append( '<input type="hidden" value="1" name="login_action[login]">' );
-				form.submit();
-			},
-			error: function( jqXHR, textStatus, errorThrown )
-			{	// Display error text on error request:
-				requestSent = false;
-				var wrong_response_code = typeof( jqXHR.status ) != 'undefined' && jqXHR.status != 200 ? '\nHTTP Response code: ' + jqXHR.status : '';
-				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')'
-					+ wrong_response_code );
-			}
-		});
-
-		// You must return false to prevent the default form behavior
-		return false;
-	}
-
-	<?php
-	if( $params[ 'transmit_hashed_password' ] )
-	{ // Hash the password onsubmit and clear the original pwd field
-		// TODO: dh> it would be nice to disable the clicked/used submit button. That's how it has been when the submit was attached to the submit button(s)
-		?>
-		// Set login form submit handler
-		jQuery( '#login_form' ).bind( 'submit', processSubmit );
-		<?php
-	}
-	?>
-
-	</script>
-<?php
+	expose_var_to_js( 'display_login_js_handler_config', json_encode( $login_handler_config ) );
 }
 
 
@@ -3190,7 +3468,6 @@ function display_activateinfo( $params )
 
 		// set email text input content only if this is not a forced request. This way the user may have bigger chance to write a correct email address.
 		$user_email = ( $force_request ? '' : $current_User->email );
-		// fp> note: 45 is the max length for evopress skin.
 		$Form->email_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
 		$Form->end_fieldset();
 
@@ -3310,162 +3587,30 @@ function display_password_indicator( $params = array() )
 {
 	global $Settings, $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
 
-	$params = array_merge( array(
-			'pass1-id'    => $dummy_fields[ 'pass1' ],
-			'pass2-id'    => $dummy_fields[ 'pass2' ],
-			'login-id'    => $dummy_fields[ 'login' ],
-			'email-id'    => $dummy_fields[ 'email' ],
-			'field-width' => 140,
-			'disp-status' => 1,
-			'disp-time'   => 0,
-			'blacklist'   => "'b2evo','b2evolution'", // Identify the password as "weak" if it includes any of these words
+	$password_indicator_config = array_merge( array(
+			'pass1_id'    => $dummy_fields[ 'pass1' ],
+			'pass2_id'    => $dummy_fields[ 'pass2' ],
+			'login_id'    => $dummy_fields[ 'login' ],
+			'email_id'    => $dummy_fields[ 'email' ],
+			'field_width' => NULL, // Use current field width
+			'disp_status' => true,
+			'disp_time'   => false,
+			'blacklist'   => array( 'b2evo', 'b2evolution' ), // Identify the password as "weak" if it includes any of these words
+			'rsc_url'     => force_https_url( $rsc_url, 'login'),
+			'msg_status_very_weak' => format_to_output( T_('Very weak'), 'htmlattr' ),
+			'msg_status_weak'      => format_to_output( T_('Weak'), 'htmlattr' ),
+			'msg_status_soso'      => format_to_output( T_('So-so'), 'htmlattr' ),
+			'msg_status_good'      => format_to_output( T_('Good'), 'htmlattr' ),
+			'msg_status_great'     => format_to_output( T_('Great'), 'htmlattr' ),
+			'msg_est_crack_time'   => T_('Estimated crack time'),
+			'msg_illegal_char'     => sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' ),
+			'msg_min_pwd_len'      => sprintf( TS_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) ),
+			'msg_pwd_not_matching' => TS_('The second password is different from the first.'),
+			'min_pwd_len'          => (int) $Settings->get( 'user_minpwdlen' ),
+			'error_icon'           => get_icon( 'xross' ),
 		), $params );
 
-	echo "<script>
-	// Load password strength estimation library
-	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".force_https_url( $rsc_url, 'login' )."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
-
-	// Call 'passcheck' function when document is loaded
-	if( document.addEventListener )
-	{
-		document.addEventListener( 'DOMContentLoaded', passcheck, false );
-	}
-	else
-	{
-		window.attachEvent( 'onload', passcheck );
-	}
-
-	function passcheck()
-	{
-		var pass1input = jQuery( 'input#".$params['pass1-id']."' );
-		if( pass1input.length == 0 ) {
-			return; // password field not found
-		}
-
-		var pass2input = jQuery( 'input#".$params['pass2-id']."' );
-		if( pass2input.length != 0 ) {
-			pass2input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
-		}
-
-		// Prepare password field
-		pass1input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
-		pass1input.attr( 'onkeyup', 'return passinfo(this);' ); // Add onkeyup attribute
-		pass1input.parent().append( \"<div id='p-container'><div id='p-result'></div><div id='p-status'></div><div id='p-time'></div></div>\" );
-
-		jQuery( 'head' ).append( '<style>' +
-				'#p-container { position: relative; margin-top: 4px; height:5px; border: 1px solid #CCC; font-size: 84%; line-height:normal; color: #999; background: #FFF } ' +
-				'#p-result { height:5px } ' +
-				'#p-status { position:absolute; width: 100px; top:-5px; left:".($params['field-width']+8)."px } ' +
-				'#p-time { position:absolute; width: 400px } ' +
-			'</style>'
-		);
-		jQuery( '#p-container' ).css( 'width', pass1input.outerWidth() - 2 );
-		var pass1input_marginleft = parseInt( pass1input.css( 'margin-left' ) );
-		if( pass1input_marginleft > 0 )
-		{
-			jQuery( '#p-container' ).css( 'margin-left', pass1input_marginleft + 'px' );
-		}
-	}
-
-	function passinfo(el)
-	{
-		var presult = document.getElementById('p-result');
-		var pstatus = document.getElementById('p-status');
-		var ptime = document.getElementById('p-time');
-
-		var vlogin = '';
-		var login = document.getElementById('".$params['login-id']."');
-		if( login != null && login.value != '' ) { vlogin = login.value; }
-
-		var vemail = '';
-		var email = document.getElementById('".$params['email-id']."');
-		if( email != null && email.value != '' ) { vemail = email.value; }
-
-		// Check the password
-		var passcheck = zxcvbn(el.value, [vlogin, vemail, ".$params['blacklist']."]);
-
-		var bar_color = 'red';
-		var bar_status = '".format_to_output( T_('Very weak'), 'htmlattr' )."';
-
-		if( el.value.length == 0 ) {
-			presult.style.display = 'none';
-			pstatus.style.display = 'none';
-			ptime.style.display = 'none';
-		} else {
-			presult.style.display = 'block';
-			pstatus.style.display = 'block';
-			ptime.style.display = 'block';
-		}
-
-		switch(passcheck.score) {
-			case 1:
-				bar_color = '#F88158';
-				bar_status = '".format_to_output( TS_('Weak'), 'htmlattr' )."';
-				break;
-			case 2:
-				bar_color = '#FBB917';
-				bar_status = '".format_to_output( TS_('So-so'), 'htmlattr' )."';
-				break;
-			case 3:
-				bar_color = '#8BB381';
-				bar_status = '".format_to_output( TS_('Good'), 'htmlattr' )."';
-				break;
-			case 4:
-				bar_color = '#59E817';
-				bar_status = '".format_to_output( TS_('Great!'), 'htmlattr' )."';
-				break;
-		}
-
-		presult.style.width = (passcheck.score * 20 + 20)+'%';
-		presult.style.background = bar_color;
-
-		if( ".$params['disp-status']." ) {
-			pstatus.innerHTML = bar_status;
-		}
-		if( ".$params['disp-time']." ) {
-			document.getElementById('p-time').innerHTML = '".TS_('Estimated crack time').": ' + passcheck.crack_time_display;
-		}
-	}
-
-	jQuery( 'input#".$params[ 'pass1-id' ].", input#".$params[ 'pass2-id' ]."' ).keyup( function()
-	{	// Validate passwords
-		var minLength = ".format_to_js( $Settings->get( 'user_minpwdlen' ) ).";
-		var pass1Field = jQuery( 'input#".$params[ 'pass1-id' ]."' );
-		var pass2Field = jQuery( 'input#".$params[ 'pass2-id' ]."' );
-		var passStatus = jQuery( '#pass2_status' );
-		var errorMsg = '';
-		const regex = /^[^\<\&\>]+$/g; // Password cannot contain the following characters: < > &
-
-		if( ( pass1Field.val().length && ( pass1Field.val().match( regex ) == null ) ) ||
-				( pass2Field.val().length && ( pass2Field.val().match( regex ) == null ) ) )
-		{
-			errorMsg = '".sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' )."';
-			pass1Field[0].setCustomValidity( pass1Field.val().match( regex ) ? '' : errorMsg );
-			pass2Field[0].setCustomValidity( pass2Field.val().match( regex ) ? '' : errorMsg );
-			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
-		}
-		else if( ( pass1Field.val().length > 0 && pass1Field.val().length < minLength ) || ( pass2Field.val().length > 0 && pass2Field.val().length < minLength ) )
-		{ // Password does not meet minimum length
-			errorMsg = '".sprintf( TS_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) )."';
-			pass1Field[0].setCustomValidity( pass1Field.val().length < minLength ? errorMsg : '' );
-			pass2Field[0].setCustomValidity( pass2Field.val().length < minLength ? errorMsg : '' );
-			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
-		}
-		else if( pass2Field.val() != pass1Field.val() )
-		{	// Passwords are different
-			errorMsg = '".TS_('The second password is different from the first.')."';
-			pass1Field[0].setCustomValidity( '' );
-			pass2Field[0].setCustomValidity( errorMsg );
-			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
-		}
-		else
-		{
-			pass1Field[0].setCustomValidity( errorMsg );
-			pass2Field[0].setCustomValidity( errorMsg );
-			passStatus.html( errorMsg );
-		}
-	} );
-</script>";
+	expose_var_to_js( 'evo_init_password_indicator_config', evo_json_encode( $password_indicator_config ) );
 }
 
 
@@ -3478,110 +3623,12 @@ function display_password_js_edit()
 {
 	global $Settings;
 
-	echo '<script>
-jQuery( "#current_user_pass" ).keyup( function()
-{
-	var error_obj = jQuery( this ).parent().find( "span.field_error" );
-	if( error_obj.length )
-	{
-		if( jQuery( this ).val() == "" )
-		{
-			error_obj.show();
-		}
-		else
-		{
-			error_obj.hide();
-		}
-	}
+	$password_edit_config = array(
+			'user_minpwdlen' => intval( $Settings->get('user_minpwdlen') ),
+			'msg_pwd_trim_warning' => T_('The leading and trailing spaces will be trimmed.'),
+		);
 
-	user_pass_clear_style( "#current_user_pass" );
-} );
-
-jQuery( "#edited_user_pass1, #edited_user_pass2" ).keyup( function()
-{
-	var minpass_obj = jQuery( this ).parent().find( ".pass_check_min" );
-	if( minpass_obj.length )
-	{ // Hide/Show a message about min pass length
-		if( jQuery.trim( jQuery( this ).val() ).length >= '.intval( $Settings->get('user_minpwdlen') ).' )
-		{
-			minpass_obj.hide();
-		}
-		else
-		{
-			minpass_obj.show();
-		}
-	}
-
-	var diff_obj = jQuery( ".pass_check_diff" );
-	if( diff_obj.length && jQuery( "#edited_user_pass1" ).val() == jQuery( " #edited_user_pass2" ).val() )
-	{ // Hide message about different passwords
-		diff_obj.hide();
-	}
-
-	// Hide message about that new password must be entered
-	var new_obj = jQuery( this ).parent().find( ".pass_check_new" );
-	if( new_obj.length )
-	{
-		if( jQuery( this ).val() == "" )
-		{
-			new_obj.show();
-		}
-		else
-		{
-			new_obj.hide();
-		}
-	}
-
-	// Hide message about that new password must be entered twice
-	var twice_obj = jQuery( this ).parent().find( ".pass_check_twice" );
-	if( twice_obj.length )
-	{
-		if( jQuery( this ).val() == "" )
-		{
-			twice_obj.show();
-		}
-		else
-		{
-			twice_obj.hide();
-		}
-	}
-
-	var warning_obj = jQuery( this ).parent().find( ".pass_check_warning" );
-	if( jQuery.trim( jQuery( this ).val() ) != jQuery( this ).val() )
-	{ // Password contains the leading and trailing spaces
-		if( ! warning_obj.length )
-		{
-			jQuery( this ).parent().append( "<span class=\"pass_check_warning notes field_error\">.'.TS_('The leading and trailing spaces will be trimmed.').'</span>" );
-		}
-	}
-	else if( warning_obj.length )
-	{ // No spaces, Remove warning
-		warning_obj.remove();
-	}
-
-	user_pass_clear_style( "#edited_user_pass1, #edited_user_pass2" );
-} );
-
-/**
- * Hide/Show error style of input depending on visibility of the error messages
- *
- * @param string jQuery selector
- */
-function user_pass_clear_style( obj_selector )
-{
-	jQuery( obj_selector ).each( function()
-	{
-		if( jQuery( this ).parent().find( "span.field_error span:visible" ).length )
-		{
-			jQuery( this ).addClass( "field_error" );
-		}
-		else
-		{
-			jQuery( this ).removeClass( "field_error" );
-		}
-	} );
-}
-</script>';
+	expose_var_to_js( 'evo_init_password_edit_config', evo_json_encode( $password_edit_config ) );
 }
 
 
@@ -3594,63 +3641,20 @@ function display_login_validator( $params = array() )
 {
 	global $rsc_url, $dummy_fields;
 
-	$params = array_merge( array(
-			'login-id' => $dummy_fields[ 'login' ],
-		), $params );
+	$login_validator_config = array(
+			'login_id'             => $dummy_fields[ 'login' ],
+			'rsc_url'              => $rsc_url,
+			'login_htsrv_url'      => get_htsrv_url( 'login' ),
+			'login_icon_load'      => '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="margin:2px 0 0 5px" align="top" />',
+			'login_icon_available' => get_icon( 'allowback', 'imgtag', array( 'title' => T_('This username is available.') ) ),
+			'login_icon_exists'    => get_icon( 'xross', 'imgtag', array( 'title' => T_('This username is already in use. Please choose another one.') ) ),
+			'login_icon_error'     => get_icon( 'xross', 'imgtag', array( 'title' => '$error_msg$' ) ),
+			'login_text_empty'     => T_('Choose a username'),
+			'login_text_available' => T_('This username is available.'),
+			'login_text_exists'    => T_('This username is already in use. Please choose another one.'),
+		);
 
-	echo '<script>
-	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.TS_('Loading...').'" title="'.TS_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
-	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
-	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
-	var login_icon_error = \''.get_icon( 'xross', 'imgtag', array( 'title' => '$error_msg$' ) ).'\';
-
-	var login_text_empty = \''.TS_('Choose a username').'.\';
-	var login_text_available = \''.TS_('This username is available.').'\';
-	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
-
-	var login_field = jQuery( "#register_form input#'.$params[ 'login-id' ].'" );
-	login_field.change( function()
-	{	// Validate if username is available
-		var note_Obj = jQuery( "#login_status_msg" );
-		if( jQuery( this ).val() == "" )
-		{	// Login is empty
-			jQuery( "#login_status" ).html( "" );
-			note_Obj.html( login_text_empty ).attr( "class", "notes" );
-		}
-		else
-		{	// Validate login
-			jQuery( "#login_status" ).html( login_icon_load );
-			jQuery.ajax( {
-				type: "POST",
-				url: "'.get_htsrv_url( 'login' ).'anon_async.php",
-				data: "action=validate_login&login=" + jQuery( this ).val(),
-				success: function( result )
-				{
-					result = ajax_debug_clear( result );
-					if( result == "exists" )
-					{	// Login already exists
-						jQuery( "#login_status" ).html( "" );
-						note_Obj.html( login_icon_exists + " " + login_text_exists ).attr( "class", "red" );
-						login_field[0].setCustomValidity( login_text_exists );
-					}
-					else if( result == "available" )
-					{	// Login is available
-						jQuery( "#login_status" ).html( "" );
-						//note_Obj.html( login_icon_available + " " + login_text_available ).attr( "class", "green" );
-						note_Obj.html( "" );
-						login_field[0].setCustomValidity( "" );
-					}
-					else
-					{	// Errors
-						jQuery( "#login_status" ).html( "" );
-						note_Obj.html( login_icon_error.replace( "$error_msg$", result.replace( /(<([^>]+)>)/ig, "" ) ) + " " + result ).attr( "class", "red" );
-						login_field[0].setCustomValidity( result.replace( /(<([^>]+)>)/ig, "" ) );
-					}
-				}
-			} );
-		}
-	} );
-</script>';
+	expose_var_to_js( 'evo_init_login_validator_config', evo_json_encode( $login_validator_config ) );
 }
 
 
@@ -3670,7 +3674,7 @@ function init_field_editor_js( $params = array() )
 			'relative_to'  => 'rsc_url',
 		), $params );
 
-	require_js( '#jquery#', $params['relative_to'] ); // dependency
+	require_js_defer( '#jquery#', $params['relative_to'] ); // dependency
 
 	add_js_headline( 'jQuery( document ).on( "click", "[id^='.$params['field_prefix'].']", function()
 {
@@ -3782,32 +3786,11 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
 	global $Collection, $Blog;
 
-	if( is_admin_page() )
-	{ // Check to enable it in back-office
-		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
-		{ // Blog setting doesn't allow to autocomplete usernames
-			return;
-		}
-	}
-	else
-	{ // Check to enable it in front-office
-		global $Item, $Skin, $disp;
-		if( ! empty( $Skin ) && ! $Skin->get_setting( 'autocomplete_usernames' ) )
-		{ // Skin disables to autocomplete usernames
-			return;
-		}
-		if( $disp != 'search' && $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
-		{ // It is not a search form and not an edit post/comment form and No form to comment of this post
-			return;
-		}
-	}
-
-	require_js( '#jquery#', $relative_to );
 	if( ! empty( $Blog ) )
 	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
 		add_js_headline( 'var blog = '.$Blog->ID );
 	}
-	require_js( 'build/textcomplete.bmin.js', $relative_to );
+	require_js_defer( 'build/textcomplete.bmin.js', $relative_to );
 }
 
 
@@ -3835,16 +3818,19 @@ function get_prevent_key_enter_js( $jquery_selection )
  *               - 'fontawesome' - Use only font-awesome icons
  *               - 'fontawesome-glyphicons' - Use font-awesome icons as a priority over the glyphicons
  * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE - to require css file, FALSE - is used when css file is already loaded inside superbundle file
  */
-function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url' )
+function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url', $require_files = true )
 {
 	global $b2evo_icons_type;
 
 	// Use font-awesome icons, @see get_icon()
 	$b2evo_icons_type = $icons_type;
 
-	// Load main CSS file of font-awesome icons
-	require_css( '#fontawesome#', $relative_to );
+	if( $require_files )
+	{	// Load main CSS file of font-awesome icons
+		require_css( '#fontawesome#', $relative_to );
+	}
 }
 
 
@@ -3939,17 +3925,21 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
  */
 function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
 {
-	// Require Fine Uploader js and css files:
-	require_js( 'multiupload/fine-uploader.js', $relative_to );
-	require_css( 'fine-uploader.css', $relative_to );
-
+	require_js_defer( '#jquery#', $relative_to, true );
 	// Used to make uploader area resizable:
-	require_js( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to, true );
 
 	if( $load_sortable_js )
-	{	// Load JS files to make the links table sortable:
-		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+	{	// Load JS file uploader with sortable feature for links/attachments:
+		require_js_defer( 'build/evo_fileuploader_sortable.bmin.js', $relative_to, true );
 	}
+	else
+	{	// Load JS file uploader:
+		require_js_defer( 'build/evo_fileuploader.bmin.js', $relative_to, true );
+	}
+
+	// Styles for file uploader:
+	require_css( 'fine-uploader.css', $relative_to, NULL, NULL, '#', true );
 }
 
 
@@ -3961,5 +3951,61 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 function get_pro_label()
 {
 	return '<span class="label label-sm label-primary">PRO</span>';
+}
+
+
+/**
+ * Resolve auto content mode depending on current disp detail
+ *
+ * @param string Content mode
+ * @param object Collection
+ * @return string Content mode
+ */
+function resolve_auto_content_mode( $content_mode, $setting_Blog = NULL )
+{
+	global $disp_detail;
+
+	if( $content_mode != 'auto' )
+	{	// Use this function only for auto content mode:
+		return $content_mode;
+	}
+
+	if( $setting_Blog === NULL )
+	{	// Use current Collection:
+		global $Blog;
+		$setting_Blog = $Blog;
+	}
+
+	if( empty( $setting_Blog ) )
+	{	// Collection must be defined on call this function:
+		debug_die( 'Collection is not initialized to resolve auto content mode!' );
+	}
+
+	switch( $disp_detail )
+	{
+		case 'posts-cat':
+		case 'posts-topcat-intro':
+		case 'posts-topcat-nointro':
+		case 'posts-subcat-intro':
+		case 'posts-subcat-nointro':
+			return $setting_Blog->get_setting('chapter_content');
+
+		case 'posts-tag':
+			return $setting_Blog->get_setting('tag_content');
+
+		case 'posts-date':
+			return $setting_Blog->get_setting('archive_content');
+
+		case 'single':
+		case 'page':
+			return 'full';
+
+		case 'posts-default':  // home page 1
+		case 'posts-next':     // next page 2, 3, etc
+			return $setting_Blog->get_setting('main_content');
+
+		default: // posts-filtered, search, flagged and etc.
+			return $setting_Blog->get_setting('filtered_content');
+	}
 }
 ?>

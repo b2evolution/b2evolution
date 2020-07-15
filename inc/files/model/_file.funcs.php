@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -357,6 +357,31 @@ function cleardir_r( $path )
 	return $r;
 }
 
+
+/**
+ * Fast check if the requested file is image
+ *
+ * @param string File path
+ * @return boolean TRUE - if file is image
+ */
+function is_image_file( $file_path )
+{
+	if( ! file_exists( $file_path ) )
+	{
+		return false;
+	}
+
+	if( substr( $file_path, -4 ) == '.svg' )
+	{	// Consider all SVG file is image, because not SVG files has a mime type as 'image/svg':
+		return true;
+	}
+
+	$file_info = finfo_open( FILEINFO_MIME_TYPE );
+	$file_type = finfo_file( $file_info, $file_path );
+
+	return in_array( $file_type, array( 'image/png', 'image/jpeg', 'image/gif', 'image/svg', 'image/svg+xml' ) );
+}
+
 /**
  * Get the size of an image file
  *
@@ -377,8 +402,9 @@ function imgsize( $path, $param = 'widthheight' )
 	{
 		$size = $cache_imgsize[$path];
 	}
-	elseif( !($size = @getimagesize( $path )) )
-	{
+	elseif( ! is_image_file( $path ) || // Fast check for image file
+	        ! ( $size = @getimagesize( $path ) ) ) // Try to get size of image file
+	{	// If file is not image, or size could not get by some reason:
 		return false;
 	}
 	else
@@ -647,7 +673,8 @@ function validate_filename( $filename, $allow_locked_filetypes = NULL )
 			}
 			else
 			{	// Filename hasn't an allowed extension
-				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), htmlentities($match[1]) );
+				return sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+						'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
 			}
 		}
 		else
@@ -758,12 +785,12 @@ function get_upload_restriction( $params = array() )
 			'ext_last_separator' => ' &amp; ',
 		), $params );
 
-	global $DB, $Settings, $current_User;
+	global $DB, $Settings;
 	$restrictNotes = array();
 
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( check_user_perm( 'files', 'all' ) && !empty( $admins_can_manipulate_sensitive_files ) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -846,10 +873,8 @@ function rel_path_to_base( $path )
  */
 function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_full_path = NULL, $radios = false, $rds_rel_path = NULL, $is_recursing = false, $action = 'view' )
 {
-	static $js_closeClickIDs; // clickopen IDs that should get closed
 	static $instance_ID = 0;
 	static $fm_highlight;
-	global $current_User;
 
 	// A folder might be highlighted (via "Locate this directory!")
 	if( ! isset($fm_highlight) )
@@ -862,7 +887,6 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 	{	// This is not a recursive call (yet):
 		// Init:
 		$instance_ID++;
-		$js_closeClickIDs = array();
 		$ret = '<ul class="clicktree">';
 	}
 	else
@@ -877,7 +901,7 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		foreach( $_roots as $l_Root )
 		{
-			if( ! $current_User->check_perm( 'files', $action, false, $l_Root ) )
+			if( ! check_user_perm( 'files', $action, false, $l_Root ) )
 			{	// current user does not have permission to "view" (or other $action) this root
 				continue;
 			}
@@ -899,38 +923,38 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 
 		$id_path = 'id_path_'.$instance_ID.md5( $ads_full_path );
 
-		$r['string'] = '<span class="folder_in_tree"';
+		$r = '<span class="folder_in_tree"';
 
-		if( $ads_full_path == $ads_selected_full_path )
-		{ // This is the current open path
-			$r['opened'] = true;
+		if( strpos( $ads_selected_full_path, $ads_full_path ) === 0 )
+		{ // This is the current or parent open path
+			$dir_is_opened = true;
 
 			if( $fm_highlight && $fm_highlight == substr($rds_rel_path, 0, -1) )
 			{
-				$r['string'] .= ' id="fm_highlighted"';
+				$r .= ' id="fm_highlighted"';
 				unset($fm_highlight);
 			}
 		}
 		else
 		{
-	 		$r['opened'] = NULL;
+			$dir_is_opened = false;
 		}
 
-		$r['string'] .= '>';
+		$r .= '>';
 
 		if( $radios )
 		{ // Optional radio input to select this path:
 			$root_and_path = format_to_output( implode( '::', array($Root->ID, $rds_rel_path) ), 'formvalue' );
 
-			$r['string'] .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
+			$r .= '<input type="radio" name="root_and_path" value="'.$root_and_path.'" id="radio_'.$id_path.'"';
 
-			if( $r['opened'] )
+			if( $dir_is_opened )
 			{	// This is the current open path
-				$r['string'] .= ' checked="checked"';
+				$r .= ' checked="checked"';
 			}
 
 			//.( ! $has_sub_dirs ? ' style="margin-right:'.get_icon( 'collapse', 'size', array( 'size' => 'width' ) ).'px"' : '' )
-			$r['string'] .= ' /> &nbsp; &nbsp;';
+			$r .= ' /> &nbsp; &nbsp;';
 		}
 
 		// Folder Icon + Name:
@@ -944,56 +968,44 @@ function get_directory_tree( $Root = NULL, $ads_full_path = NULL, $ads_selected_
 		// Handle potential subdir:
 		if( ! $has_sub_dirs )
 		{	// No subdirs
-			$r['string'] .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).'&nbsp;'.$label.'</span>';
+			$r .= get_icon( 'expand', 'noimg', array( 'class'=>'' ) ).$label.'</span>';
 		}
 		else
 		{ // Process subdirs
-			$r['string'] .= get_icon( 'collapse', 'imgtag', array( 'onclick' => 'toggle_clickopen(\''.$id_path.'\');',
-						'id' => 'clickimg_'.$id_path,
+			$r .= get_icon( $dir_is_opened ? 'collapse' : 'expand', 'imgtag', array(
+						'data-dir-path' => $Root->ID.':'.$rds_rel_path,
 						'style'=>'margin:0 2px'
 					) )
-				.'&nbsp;'.$label.'</span>'
-				.'<ul class="clicktree" id="clickdiv_'.$id_path.'">'."\n";
+				.$label.'</span>';
 
-			while( $l_File = & $Nodelist->get_next( 'dir' ) )
-			{
-				$rSub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path(), true );
+			if( $dir_is_opened )
+			{	// Load sub-directories only of currently opened directory:
+				$r .= //'<br>- '.$ads_full_path.'<br>- '.$ads_selected_full_path.'<br>- '.$rds_rel_path
+							'<ul class="clicktree">'."\n";
 
-				if( $rSub['opened'] )
-				{ // pass opened status on, if given
-					$r['opened'] = $rSub['opened'];
+				while( $l_File = & $Nodelist->get_next( 'dir' ) )
+				{
+					$r_sub = get_directory_tree( $Root, $l_File->get_full_path(), $ads_selected_full_path, $radios, $l_File->get_rdfs_rel_path(), true );
+
+					$r .= '<li>'.$r_sub.'</li>';
 				}
-
-				$r['string'] .= '<li>'.$rSub['string'].'</li>';
+				$r .= '</ul>';
 			}
-
-			if( !$r['opened'] )
-			{
-				$js_closeClickIDs[] = $id_path;
-			}
-			$r['string'] .= '</ul>';
 		}
 
-   	if( $is_recursing )
+		if( $is_recursing )
 		{
 			return $r;
 		}
 		else
 		{
-			$ret .= '<li>'.$r['string'].'</li>';
+			$ret .= '<li>'.$r.'</li>';
 		}
 	}
 
 	if( ! $is_recursing )
 	{
- 		$ret .= '</ul>';
-
-		if( ! empty($js_closeClickIDs) )
-		{ // there are IDs of checkboxes that we want to close
-			$ret .= "\n".'<script>toggle_clickopen( \''
-						.implode( "' );\ntoggle_clickopen( '", $js_closeClickIDs )
-						."' );\n</script>";
-		}
+		$ret .= '</ul>';
 	}
 
 	return $ret;
@@ -1243,7 +1255,7 @@ function is_absolute_pathname($path)
  */
 function file_controller_build_tabs()
 {
-	global $AdminUI, $current_User, $blog, $admin_url;
+	global $AdminUI, $blog, $admin_url;
 
 	$AdminUI->add_menu_entries(
 			'files',
@@ -1254,19 +1266,7 @@ function file_controller_build_tabs()
 					)
 				);
 
-	if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
-	{ // Permission to upload: (no subtabs needed otherwise)
-		$AdminUI->add_menu_entries(
-				'files',
-				array(
-						'upload' => array(
-							'text' => /* TRANS: verb */ T_('Advanced Upload'),
-							'href' => $admin_url.'?ctrl=upload' ),
-					)
-			);
-	}
-
-	if( $current_User->check_perm( 'options', 'view' ) )
+	if( check_user_perm( 'options', 'view' ) )
 	{	// Permission to view settings:
 		$AdminUI->add_menu_entries(
 			'files',
@@ -1291,7 +1291,7 @@ function file_controller_build_tabs()
 			);
 	}
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Permission to edit settings:
 		$AdminUI->add_menu_entries(
 			'files',
@@ -1441,7 +1441,7 @@ function check_showparams( & $Filelist )
  */
 function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perms = true, $upload_quickmode = true, $warn_invalid_filenames = true, $min_size = 0 )
 {
-	global $Settings, $Plugins, $Messages, $current_User, $force_upload_forbiddenext;
+	global $Settings, $Plugins, $Messages, $current_User, $force_upload_forbiddenext, $admins_can_manipulate_sensitive_files;
 
 	if( empty($_FILES) )
 	{	// We have NO uploaded files to process...
@@ -1476,7 +1476,7 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 		return NULL;
 	}
 
-	if( $check_perms && ( !isset( $current_User ) || $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+	if( $check_perms && ( !isset( $current_User ) || check_user_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 	{ // Permission check required but current User has no permission to upload:
 		return NULL;
 	}
@@ -1940,14 +1940,21 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 	while( $newFile->exists() )
 	{ // The file already exists in the target location!
 		$num_ext++;
-		$ext_pos = strrpos( $newName, '.');
+		$ext_pos = strrpos( $newName, '.' );
 		if( $num_ext == 1 )
 		{
 			if( $newFile->is_image() && $image_info == NULL )
 			{	// Get image info only for real image files:
 				$image_info = getimagesize( $newFile->get_full_path() );
 			}
-			$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+			if( $ext_pos === false )
+			{	// If file/folder name has no '.' dot:
+				$newName .= '-'.$num_ext;
+			}
+			else
+			{
+				$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+			}
 			if( $image_info )
 			{	// Get thumbnail of old image:
 				$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
@@ -1959,6 +1966,10 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 		}
 		else
 		{
+			if( $ext_pos === false )
+			{	// If file/folder name has no '.' dot:
+				$ext_pos = strlen( $newName );
+			}
 			$replace_length = strlen( '-'.($num_ext-1) );
 			$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
 		}
@@ -2120,7 +2131,7 @@ function copy_file( $file_path, $root_ID, $path, $check_perms = true )
 		return NULL;
 	}
 
-	if( $check_perms && ( !isset( $current_User ) || $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) ) )
+	if( $check_perms && ( !isset( $current_User ) || check_user_perm( 'files', 'add', false, $fm_FileRoot ) ) )
 	{	// Permission check required but current User has no permission to upload:
 		return NULL;
 	}
@@ -2336,16 +2347,17 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB;
+	global $blog, $Settings, $b2evo_icons_type, $DB, $admins_can_manipulate_sensitive_files;
 
 	$params = array_merge( array(
-			'before'           => '',
-			'after'            => '',
-			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
-			'path'             => '', // Subpath for the file/folder
-			'listElement'      => 'null',
-			'list_style'       => 'list',  // 'list' or 'table'
-			'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="'.TS_('Drop files here').'">
+			'before'                 => '',
+			'after'                  => '',
+			'fileroot_ID'            => 0, // Root type and ID, e.g. collection_1
+			'path'                   => '', // Subpath for the file/folder
+			'listElement'            => 'null',
+			'list_element'           => NULL, //jQuery selector of list element
+			'list_style'             => 'list',  // 'list' or 'table'
+			'template'               => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="'.TS_('Drop files here').'">
 																<div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
 																		<div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
 																</div>
@@ -2414,7 +2426,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'noresults'              => '',
-			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
 			'table_id'               => 'attachments_fieldset_table', // ID of table with files (without 'fieldset_prefix')
 		), $params );
 
@@ -2428,10 +2440,14 @@ function display_dragdrop_upload_button( $params = array() )
 		return;
 	}
 
+	// Initialize quick uploader:
+	init_fileuploader_js( ( is_admin_page() ? 'rsc_url' : 'blog' ), ( $LinkOwner !== NULL /* Sortable only attached files */ ) );
+
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
-	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'
+	$quick_upload_url = get_htsrv_url().'quick_upload.php'
+		.'?b2evo_icons_type='.$b2evo_icons_type
 		.( empty( $blog ) ? '' : '&blog='.$blog )
-		.'&b2evo_icons_type='.$b2evo_icons_type;
+		.'&prefix='.$params['fieldset_prefix'];
 
 	echo $params['before'];
 
@@ -2439,13 +2455,13 @@ function display_dragdrop_upload_button( $params = array() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
 		echo '<input type="hidden" name="temp_link_owner_ID_nojs" value="'.$LinkOwner->get_ID().'" />';
 		// Set correct name only when JS is enabled:
-		echo '<script type="text/javascript">jQuery( "input[name=temp_link_owner_ID_nojs]" ).attr( "name", "temp_link_owner_ID" )</script>';
+		echo '<script>document.querySelector( "input[name=temp_link_owner_ID_nojs]" ).setAttribute( "name", "temp_link_owner_ID" )</script>';
 	}
 
 	// Get list of allowed filetype extensions
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( check_user_perm( 'files', 'all' ) && !empty($admins_can_manipulate_sensitive_files) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -2468,458 +2484,84 @@ function display_dragdrop_upload_button( $params = array() )
 		</noscript>
 	</div>
 	<input id="saveBtn" type="submit" style="display:none" name="saveBtn" value="<?php echo T_('Save modified files'); ?>" class="ActionButton" />
-	<script>
-		if( 'draggable' in document.createElement('span') )
-		{
-			var button_text = '<?php echo TS_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>') ?>';
-			var file_uploader_note_text = '<?php echo TS_('Your browser supports full upload functionality.') ?>';
-		}
-		else
-		{
-			var button_text = '<?php echo TS_('Click to manually select files...') ?>';
-			var file_uploader_note_text = '<?php echo TS_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.') ?>';
-		}
+	
+	<?php
+	$dragdrop_upload_button_config = array(
+			'fieldset_prefix'          => $params['fieldset_prefix'],
+			'draggable_button_text'    => T_('Drag & Drop files to upload here <br /><span>or click to manually select files...</span>'),
+			'draggable_note_text'      => T_('Your browser supports full upload functionality.'),
+			'nondraggable_button_text' => T_('Click to manually select files...'),
+			'nondraggable_note_text'   => T_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.'),
 
-		var <?php echo $params['fieldset_prefix']; ?>url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
-		var <?php echo $params['fieldset_prefix']; ?>root_and_path = '<?php echo $root_and_path ?>';
+			'quickupload_url' => $quick_upload_url.'&'.url_crumb( 'file' ),
+			'root_and_path'   => $root_and_path,
+			'crumb_file'      => url_crumb( 'file' ),
+			'link_owner'      => $LinkOwner !== NULL ? $LinkOwner->type.'_'.$LinkOwner->get_ID().'_'.intval( $LinkOwner->is_temp() ) : NULL,
+			'fm_mode'         => isset( $params['fm_mode'] ) ? $params['fm_mode'] : NULL,
+			'list_element'    => $params['list_element'],
+			'extra_dropzones' => empty( $params['additional_dropzone'] ) ? '[]' : $params['additional_dropzone'],
+			'list_style'      => $params['list_style'],
+			'size_limit'      => $Settings->get( 'upload_maxkb' ) * 1024,
 
-		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
-		{
-			<?php echo $params['fieldset_prefix']; ?>url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
-			<?php echo $params['fieldset_prefix']; ?>root_and_path = this.value;
-			<?php echo $params['fieldset_prefix']; ?>uploader.setParams({root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path});
-		} );
+			'msg_type_error'         => /* TRANS: strings in {} must NOT be translated */ T_('{file} has an invalid extension. Only {extensions} are allowed.'),
+			'msg_size_error'         => /* TRANS: strings in {} must NOT be translated */ T_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'),
+			'msg_min_size_error'     => /* TRANS: strings in {} must NOT be translated */ T_('{file} is too small. The minimum file size is {minSizeLimit}.'),
+			'msg_empty_error'        => /* TRANS: strings in {} must NOT be translated */ T_('{file} is empty. Please select non-empty files.'),
+			'msg_on_leave'           => T_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'),
+			'msg_format_progress'    => /* TRANS: strings in {} must NOT be translated */ T_('Uploading {total_size}...'),
+			'msg_upload_error'       => T_('Upload ERROR'),
+			'msg_dropped_connection' => T_('Server dropped the connection.'),
+			'msg_upload_ok'          => T_('Upload OK'),
+			'msg_upload_conflict'    => T_('Upload Conflict'),
+			'msg_replace_file'       => T_('Use this new file to replace the old file'),
+			'msg_revert'             => T_('Revert'),
+			'msg_old_file'           => T_('(Old File)'),
 
-		<?php
-		if( $LinkOwner !== NULL )
-		{	// Add params to link a file right after uploading:
-			echo $params['fieldset_prefix'].'url += "&link_owner='.$LinkOwner->type.'_'.$LinkOwner->get_ID().'_'.intval( $LinkOwner->is_temp() ).'";';
-		}
-		if( ! empty( $params['fm_mode'] ) && $params['fm_mode'] == 'file_select' )
-		{
-			echo $params['fieldset_prefix'].'url += "&fm_mode='.$params['fm_mode'].'";';
-		}
+			'size_symbol_kb' => /* TRANS: Abbr. for Kilobytes */ T_('KB'),
+			'size_symbol_mb' =>  /* TRANS: Abbr. for Megabytes */ T_('MB'),
+			'size_symbol_gb' =>  /* TRANS: Abbr. for Gigabytes */ T_('GB'),
+			'size_symbol_tb' =>  /* TRANS: Abbr. for Terabytes */ T_('TB'),
+			'size_symbol_pb' =>  /* TRANS: Abbr. for Petabytes */ T_('PB'),
+			'size_symbol_eb' =>  /* TRANS: Abbr. for Exabytes  */ T_('EB'),
+
+			'validation_size_limit'   => min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) ),
+			'allowed_extensions'      => $allowed_extensions,
+			'table_headers'           => format_to_js( $params['table_headers'] ),
+			'table_id'                => $params['table_id'],
+			'resize_frame'            => $params['resize_frame'] ? true : false,
+			'warning_icon'            => get_icon( 'warning_yellow' ),
+			'filename_before'         => str_replace( "'", "\'", $params['filename_before'] ),
+			'display_status_success'  => $params['display_status_success'] ? true : false,
+			'display_support_message' => $params['display_support_msg'] ? true : false,
+			'status_conflict_place'   => $params['status_conflict_place'],
+			'button_class'            => button_class( 'text' ),
+			'no_results'              => preg_replace( "/\s+/", " ", $params['noresults'] ),
+			'fileroot_ID'             => $params['fileroot_ID'],
+			'path'                    => $params['path'],
+			'conflict_file_format'    => $params['conflict_file_format'],
+			'crumb_conflictfiles'     => get_crumb( 'conflictfiles' ),
+		);
+	
+	if( is_ajax_request() )
+	{
 		?>
-
-		jQuery( document ).ready( function()
-		{
-			<?php echo $params['fieldset_prefix']; ?>uploader = new qq.FineUploader(
+		<script>
+		jQuery( document ).ready( function() {
+			if( typeof( window.evo_init_dragdrop_button_config ) == 'undefined' )
 			{
-				request: {
-					endpoint: <?php echo $params['fieldset_prefix']; ?>url,
-					params: { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path }
-				},
-				template: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>qq-template' ),
-				element: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>file-uploader' ),
-				listElement: <?php echo $params['listElement']; ?>,
-				dragAndDrop: {
-					extraDropzones: <?php echo empty( $params['additional_dropzone'] ) ? '""' : $params['additional_dropzone']; ?>
-				},
-				list_style: '<?php echo $params['list_style']; ?>',
-				action: <?php echo $params['fieldset_prefix']; ?>url,
-				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
-				debug: false,
-				messages: {
-					typeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} has an invalid extension. Only {extensions} are allowed.'); ?>',
-					sizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} cannot be uploaded because it is too large ({fileSize}). The maximum allowed upload size is {sizeLimit}.'); ?>',
-					minSizeError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is too small. The minimum file size is {minSizeLimit}.'); ?>',
-					emptyError: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('{file} is empty. Please select non-empty files.'); ?>',
-					onLeave: '<?php echo TS_('Files are currently being uploaded. If you leave this page now, the upload will be cancelled.'); ?>'
-				},
-				text: {
-					formatProgress: '<?php echo /* TRANS: strings in {} must NOT be translated */ TS_('Uploading {total_size}...');?>',
-					sizeSymbols: [
-						'<?php echo /* TRANS: Abbr. for Kilobytes */ TS_('KB') ?>',
-						'<?php echo /* TRANS: Abbr. for Megabytes */ TS_('MB') ?>',
-						'<?php echo /* TRANS: Abbr. for Gigabytes */ TS_('GB') ?>',
-						'<?php echo /* TRANS: Abbr. for Terabytes */ TS_('TB') ?>',
-						'<?php echo /* TRANS: Abbr. for Petabytes */ TS_('PB') ?>',
-						'<?php echo /* TRANS: Abbr. for Exabytes  */ TS_('EB') ?>'
-					],
-				},
-				validation: {
-					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
-					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
-				},
-				callbacks: {
-					onSubmit: function( id, fileName )
-					{
-						var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr.noresults' );
-						if( noresults_row.length )
-						{ // Add table headers and remove "No results" row
-							<?php
-							if( $params['table_headers'] != '' )
-							{ // Append table headers if they are defined
-							?>
-							noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
-							<?php } ?>
-							noresults_row.remove();
-						}
-
-						setTimeout( function()
-							{
-								evo_link_fix_wrapper_height( '<?php echo $params['fieldset_prefix']; ?>' );
-								<?php
-								if( $params['resize_frame'] )
-								{	// Resize attachments fieldset after upload new image:
-								?>
-								update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
-								jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
-								<?php } ?>
-							}, 10 );
-					},
-					onProgress: function( id, fileName, uploadedBytes, totalBytes )
-					{
-						var progressbar = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr[qq-file-id=' + id + '] .progress-bar' );
-						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
-
-						//progressbar.style.width = percentCompleted;
-						progressbar.get(0).style.width = percentCompleted; // This should fix jQuery's .css() issue with some browsers
-
-						progressbar.text( percentCompleted );
-						<?php
-						if( $params['resize_frame'] )
-						{
-							echo 'update_iframe_height( \''.$params['fieldset_prefix'].'\' );';
-						}
-						?>
-					},
-					onComplete: function( id, fileName, responseJSON )
-					{
-						if( responseJSON != undefined )
-						{
-							var text;
-							if( responseJSON.data.text )
-							{
-								if( responseJSON.specialchars == 1 )
-								{
-									text = htmlspecialchars_decode( responseJSON.data.text );
-								}
-								else
-								{
-									text = responseJSON.data.text;
-								}
-							}
-							text = base64_decode( text );
-
-							<?php
-							if( $params['list_style'] == 'list' )
-							{ // List view
-							?>
-							if( responseJSON.data.status != undefined && responseJSON.data.status == 'rename' )
-							{
-								jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> #saveBtn' ).show();
-							}
-							<?php } ?>
-						}
-						<?php
-						if( $params['list_style'] == 'table' )
-						{ // Table view
-						?>
-						var this_row = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr[qq-file-id=' + id + ']' );
-
-						if( responseJSON == undefined || responseJSON.data == undefined || responseJSON.data.status == 'error' || responseJSON.data.status == 'fatal' )
-						{ // Failed
-							this_row.find( '.qq-upload-status' ).html( '<span class="red"><?php echo TS_('Upload ERROR'); ?></span>' );
-							if( responseJSON.error )
-							{
-								text = responseJSON.error;
-							}
-							else if( typeof( text ) == 'undefined' || text == '' )
-							{ // Message for unknown error
-								text = '<?php echo TS_('Server dropped the connection.'); ?>';
-							}
-							this_row.find( '.qq-upload-file-selector' ).append( ' <span class="result_error">' + text + '</span>' );
-							this_row.find( '.qq-upload-image-selector, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
-						}
-						else
-						{ // Success/Conflict
-							var table_view = typeof( responseJSON.data.link_ID ) != 'undefined' ? 'link' : 'file';
-
-							var filename_before = '<?php echo str_replace( "'", "\'", $params['filename_before'] ); ?>';
-							if( filename_before != '' )
-							{
-								filename_before = filename_before.replace( '$file_path$', responseJSON.data.path );
-							}
-
-							var select_file_template = '';
-							if( responseJSON.data.select_link_button )
-							{	// Add select file button:
-								select_file_template = responseJSON.data.select_link_button;
-							}
-
-							var warning = '';
-							if( responseJSON.data.warning != '' )
-							{
-								warning = '<div class="orange">' + responseJSON.data.warning + '</div>';
-							}
-							// File name or url to view file
-							var file_name = ( typeof( responseJSON.data.link_url ) != 'undefined' ) ? responseJSON.data.link_url : responseJSON.data.newname;
-
-							this_row.find( '.qq-upload-checkbox' ).html( responseJSON.data.checkbox );
-
-							if( responseJSON.data.status == 'success' )
-							{ // Success upload
-								<?php
-								if( $params['display_status_success'] )
-								{ // Display this message only if it is enabled
-								?>
-								this_row.find( '.qq-upload-status-text-selector' ).html( '<span class="green"><?php echo TS_('Upload OK'); ?></span>' );
-								<?php } else { ?>
-								this_row.find( '.qq-upload-status-text-selector' ).html( '' );
-								<?php } ?>
-								this_row.find( '.qq-upload-image' ).html( text );
-								this_row.find( '.qq-upload-file-selector' ).html( filename_before
-								  + select_file_template
-									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
-									+ '<span class="fname">' + file_name + '</span>' + warning );
-								this_row.find( '.qq-upload-size-selector' ).html( responseJSON.data.filesize );
-
-								if( responseJSON.data.filetype )
-								{
-									this_row.find( '.qq-upload-file-type' ).html( responseJSON.data.filetype );
-								}
-
-								if( responseJSON.data.creator )
-								{
-									this_row.find( '.qq-upload-file-creator' ).html( responseJSON.data.creator );
-								}
-
-								if( responseJSON.data.downloads != null )
-								{
-									this_row.find( '.qq-upload-downloads' ).html( responseJSON.data.downloads );
-								}
-
-								if( responseJSON.data.owner )
-								{
-									this_row.find( '.fsowner' ).html( responseJSON.data.owner );
-								}
-
-								if( responseJSON.data.group )
-								{
-									this_row.find( '.fsgroup' ).html( responseJSON.data.group );
-								}
-
-								if( responseJSON.data.file_date )
-								{
-									this_row.find( '.fsdate' ).html( responseJSON.data.file_date );
-								}
-
-								if( responseJSON.data.file_actions )
-								{
-									this_row.find( '.actions' ).html( responseJSON.data.file_actions );
-								}
-
-								if( jQuery( '#evo_multi_file_selector' ).length )
-								{	// Show files selector for additional actions:
-									jQuery( '#evo_multi_file_selector' ).show();
-								}
-							}
-							else if( responseJSON.data.status == 'rename' )
-							{ // Conflict on upload
-								<?php
-								$status_conflict_message = '<span class="orange">'.TS_('Upload Conflict').'</span>';
-								if( $params['status_conflict_place'] == 'default' )
-								{ // Default place for a conflict message
-								?>
-								this_row.find( '.qq-upload-status-text-selector' ).html( '<?php echo $status_conflict_message; ?>' );
-								<?php } else { ?>
-								this_row.find( '.qq-upload-status-text-selector' ).html( '' );
-								<?php } ?>
-								this_row.find( '.qq-upload-image-selector' ).append( htmlspecialchars_decode( responseJSON.data.file ) );
-								this_row.find( '.qq-upload-file-selector' ).html( filename_before
-									+ select_file_template
-									+ '<input type="hidden" value="' + responseJSON.data.newpath + '" />'
-									+ '<span class="fname">' + file_name + '</span>'
-									<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
-									+ ' - <a href="#" '
-									+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
-									+ 'old="' + responseJSON.data.oldname + '" '
-									+ 'new="' + responseJSON.data.newname + '">'
-									+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
-									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
-									+ '</a>'
-									+ warning );
-								var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> input[type=hidden][value="' + responseJSON.data.oldpath + '"]' );
-								if( old_file_obj.length > 0 )
-								{
-									old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
-								}
-							}
-							if( table_view == 'link' )
-							{ // Update the cells for link view, because these data exist in response
-								this_row.find( '.qq-upload-link-id' ).html( '<span data-order="' + responseJSON.data.link_order
-										+ '">' + responseJSON.data.link_ID + '</span>' );
-								this_row.find( '.qq-upload-image' ).html( responseJSON.data.link_preview );
-								this_row.find( '.qq-upload-link-actions' ).prepend( responseJSON.data.link_actions );
-								if( typeof( responseJSON.data.link_position ) != 'undefined' )
-								{
-									this_row.find( '.qq-upload-link-position' ).html( responseJSON.data.link_position );
-								}
-							}
-							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
-							evo_link_sort_list( '<?php echo $params['fieldset_prefix']; ?>' );
-						}
-						<?php
-						}
-						else
-						{ // Simple list
-						?>
-							jQuery( <?php echo $params['fieldset_prefix']; ?>uploader.getItemByFileId( id ) ).append( text );
-							if( responseJSON.data == undefined && responseJSON != '' )
-							{ // Display the fatal errors
-								jQuery( <?php echo $params['fieldset_prefix']; ?>uploader.getItemByFileId( id ) ).append( responseJSON );
-							}
-						<?php
-						}
-
-						if( $params['resize_frame'] )
-						{	// Resize attachments fieldset after upload new image:
-						?>
-						update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
-						jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
-						<?php } ?>
-					},
-					onCancel: function( id, fileName )
-					{
-						<?php
-						if( $params['list_style'] == 'table' )
-						{
-						?>
-							setTimeout( function()
-							{ // allow some time to remove cancelled row first before determining the number of rows
-								var container = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> .filelist_tbody' );
-								var rows = container.find( 'tr' );
-								if( !rows.length )
-								{
-									var noresult = '<?php echo preg_replace( "/\s+/", " ", $params['noresults'] );?>';
-									container.append( noresult );
-								}
-							}, 10 );
-						<?php
-						}
-						?>
-					}
-				}
-			} );
-
-			// Update upload button text
-			jQuery( 'div.qq-upload-button-selector > div' ).html( button_text );
-		} );
-
-		<?php
-		if( $params['resize_frame'] )
-		{	// Resize attachments fieldset after upload new image:
-		?>
-		function update_iframe_height( fieldset_prefix )
-		{
-			var table_height = jQuery( '#' + fieldset_prefix + '<?php echo $params['table_id']; ?>' ).height();
-			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
-		}
-		<?php } ?>
-
-		<?php
-		if( $params['list_style'] == 'table' )
-		{
-		// A click event for button to replace old file with name
-		?>
-		jQuery( document ).on( 'click', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> .qq-conflict-replace', function()
-		{
-			var this_obj = jQuery( this );
-
-			var is_replace = this_obj.children( 'div:first' ).is( ':visible' );
-
-			var old_file_name = this_obj.attr( 'old' );
-			var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> input[type=hidden][value="' + old_file_name + '"]' );
-			// Element found with old file name on the page
-			var old_file_exists = ( old_file_obj.length > 0 );
-			this_obj.hide();
-
-			// Highlight the rows with new and old files
-			var tr_rows = this_obj.parent().parent().children( 'td' );
-			if( old_file_exists )
-			{
-				tr_rows = tr_rows.add( old_file_obj.parent().parent().children( 'td' ) );
+				window.evo_init_dragdrop_button_config = {};
 			}
-			tr_rows.css( 'background', '#FFFF00' );
-			// Remove previous errors
-			tr_rows.find( 'span.error' ).remove();
-
-			jQuery.ajax(
-			{ // Replace old file name with new
-				type: 'POST',
-				url: '<?php echo get_htsrv_url(); ?>async.php',
-				data:
-				{
-					action: 'conflict_files',
-					fileroot_ID: '<?php echo $params['fileroot_ID']; ?>',
-					path: '<?php echo $params['path']; ?>',
-					oldfile: old_file_name.replace( /^(.+\/)?([^\/]+)$/, '$2' ),
-					newfile: this_obj.attr( 'new' ).replace( /^(.+\/)?([^\/]+)$/, '$2' ),
-					format: '<?php echo $params['conflict_file_format']; ?>',
-					crumb_conflictfiles: '<?php echo get_crumb( 'conflictfiles' ); ?>'
-				},
-				success: function( result )
-				{
-					var data = jQuery.parseJSON( result );
-					if( typeof data.error == 'undefined' )
-					{ // Success
-						this_obj.show();
-						var new_filename_obj = this_obj.parent().find( 'span.fname' );
-						if( is_replace )
-						{ // The replacing was executed, Change data of html elements
-							this_obj.children( 'div:first' ).hide();
-							this_obj.children( 'div:last' ).show();
-						}
-						else
-						{ // The replacing was reverting, Put back the data of html elements
-							this_obj.children( 'div:first' ).show();
-							this_obj.children( 'div:last' ).hide();
-						}
-						if( old_file_exists )
-						{ // If old file element exists on the page, we can:
-							// Swap old and new names
-							var old_filename_obj = old_file_obj.parent().find( 'span.fname' );
-							var old_filename_obj_html = old_filename_obj.html();
-							old_filename_obj.html( new_filename_obj.html() );
-							new_filename_obj.html( old_filename_obj_html );
-
-							var old_icon_link = old_filename_obj.prev();
-							if( old_icon_link.length == 0 || old_icon_link.get(0).tagName != 'A' )
-							{
-								old_icon_link = old_filename_obj.parent().prev();
-							}
-							if( old_icon_link.length > 0 && old_icon_link.get(0).tagName == 'A' )
-							{ // The icons exist to link files, We should swap them
-								var old_href = old_icon_link.attr( 'href' );
-								old_icon_link.attr( 'href', new_filename_obj.prev().attr( 'href' ) );
-								new_filename_obj.prev().attr( 'href', old_href );
-							}
-						}
-						else
-						{ // No old file element, Get data from request
-							new_filename_obj.html( is_replace ? data.old : data.new );
-						}
-					}
-					else
-					{ // Failed
-						this_obj.show();
-						this_obj.parent().append( '<span class="error"> - ' + data.error + '</span>' );
-					}
-					tr_rows.css( 'background', '' );
-				}
-			} );
-
-			return false;
-		} );<?php } ?>
-
+			window.evo_init_dragdrop_button_config['fieldset_<?php echo $params['fieldset_prefix'];?>'] = <?php echo evo_json_encode( $dragdrop_upload_button_config );?>;
+			window.init_uploader( evo_init_dragdrop_button_config['fieldset_<?php echo $params['fieldset_prefix'];?>'] );
+		} );
+		</script>
 		<?php
-		if( $params['display_support_msg'] )
-		{ // Display a message about the dragdrop supproting by current browser
-		?>
-		document.write( '<p class="note">' + file_uploader_note_text + '</p>' );
-		<?php } ?>
-	</script>
+	}
+	else
+	{
+		expose_var_to_js( 'fieldset_'.$params['fieldset_prefix'], $dragdrop_upload_button_config, 'evo_init_dragdrop_button_config' );
+	}
+	?>
 
 	<script type="text/template" id="<?php echo $params['fieldset_prefix']; ?>qq-template">
 	<?php echo $params['template'];?>
@@ -3108,7 +2750,7 @@ function open_temp_file( & $temp_file_name )
 
 
 /**
- * Initialize JavaScript for AJAX loading of popup window to report user
+ * Initialize JavaScript for AJAX loading of popup window to edit file properties
  *
  * @param array Params
  */
@@ -3122,7 +2764,7 @@ function echo_file_properties()
 <script>
 	//<![CDATA[
 	// Window to edit file
-	function file_properties( root, path, file )
+	function file_properties( root, path, file, link_owner_type, link_owner_ID, from )
 	{
 		openModalWindow( '<span class="loader_img loader_file_edit absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 			'80%', '', true,
@@ -3140,6 +2782,9 @@ function echo_file_properties()
 				'path': path,
 				'fm_selected': [ file ],
 				'mode': 'modal',
+				'link_owner_type': typeof( link_owner_type ) == 'undefined' ? '' : link_owner_type,
+				'link_owner_ID': typeof( link_owner_ID ) == 'undefined' ? '' : link_owner_ID,
+				'from': typeof( from ) == 'undefined' ? '' : from,
 				'crumb_file': '<?php echo get_crumb( 'file' ); ?>',
 			},
 			success: function( result )
@@ -3149,6 +2794,37 @@ function echo_file_properties()
 					'<?php echo TS_('Save Changes!'); ?>', false, true );
 			}
 		} );
+
+		if( typeof( link_owner_type ) != 'undefined' &&
+		    typeof( link_owner_ID ) != 'undefined' &&
+		    ( typeof( evo_form_file_properties__is_initialized ) == 'undefined' || evo_form_file_properties__is_initialized !== true ) )
+		{	// If we edit file properties from links/attachments table we should submit the form by AJAX:
+			evo_form_file_properties__is_initialized = true; // Use this flag in order to don't init the form submitting twice:
+			jQuery( document ).on( 'submit', 'form#fm_properties_checkchanges', function( e )
+			{
+				var form = jQuery( this );
+				e.preventDefault();
+				// Close modal window:
+				closeModalWindow();
+				// Submit form by AJAX request:
+				jQuery.ajax(
+				{
+					type: 'POST',
+					url: jQuery( this ).attr( 'action' ),
+					data: jQuery( this ).serialize() + '&mode=link',
+					success: function()
+					{	// On success updating,
+						// Refresh links/attachments table:
+						evo_link_refresh_list( form.find( '[name=link_owner_type]' ).val(), form.find( '[name=link_owner_ID]' ).val() );
+					},
+					error: function( jqXHR )
+					{	// On failed updating,
+						// Display error:
+						alert( jqXHR.responseText.replace( /<.+?>/g, "\n" ) );
+					}
+				} );
+			} );
+		}
 		return false;
 	}
 	//]]>
@@ -3338,7 +3014,7 @@ function get_social_tag_image_file( $disp )
 			{
 				global $disp_detail;
 
-				if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+				if( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-nointro', 'posts-subcat-nointro' ) ) )
 				{ // No intro post or intro post has no image, use current category's social media boiler plate or category image as fallback:
 					global $MainList;
 					// Get current category ID:
@@ -3395,8 +3071,7 @@ function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
 		{	// Halt the denied access:
 			debug_die( 'You have no permission to upload new files!' );
 		}
-		global $current_User;
-		return $current_User->check_perm( 'files', 'add', $assert, $FileRoot );
+		return check_user_perm( 'files', 'add', $assert, $FileRoot );
 	}
 	else
 	{	// Check perm when we upload new files for the object like Item, Comment, Message or EmailCampaign:
@@ -3485,9 +3160,9 @@ function file_td_name( & $File )
 	}
 	else
 	{	// File
-		if( $view_link = $File->get_view_link( '<span class="fname">'.$File->get_name().'</span>', NULL, NULL ) )
+		if( $view_link = $File->get_view_link( $File->get_name(), NULL, NULL ) )
 		{
-			$r .= $view_link;
+			$r .= '<span class="fname">'.$view_link.'</span>';
 		}
 		else
 		{	// File extension unrecognized
@@ -3498,9 +3173,10 @@ function file_td_name( & $File )
 	// File meta data:
 	$r .= '<span class="filemeta">';
 	// Optionally display IMAGE pixel size:
-	if( $UserSettings->get( 'fm_getimagesizes' ) )
+	if( $UserSettings->get( 'fm_getimagesizes' ) &&
+	    ( $file_image_size = $File->get_image_size( 'widthxheight' ) ) !== false )
 	{
-		$r .= ' ('.$File->get_image_size( 'widthxheight' ).')';
+		$r .= ' ('.$file_image_size.')';
 	}
 	// Optionally display meta data title:
 	if( $File->meta == 'loaded' )
@@ -3521,11 +3197,11 @@ function file_td_name( & $File )
  */
 function file_td_actions( & $File )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	if( ! is_logged_in() ||
 			! ( $FileRoot = & $File->get_FileRoot() ) ||
-			! $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+			! check_user_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 	{	// User cannot edit files in the File Root:
 		return '';
 	}
@@ -3537,7 +3213,7 @@ function file_td_actions( & $File )
 	$action_crumb_url = $action_url.url_crumb( 'file' ).'&amp;';
 
 	$r = '';
-	if( $File->is_editable( $current_User->check_perm( 'files', 'all', false ) ) )
+	if( $File->is_editable( check_user_perm( 'files', 'all', false ) ) )
 	{
 		$r .= action_icon( T_('Edit file...'), 'edit', $action_crumb_url.'action=edit_file' );
 	}
@@ -3546,12 +3222,91 @@ function file_td_actions( & $File )
 		$r .= get_icon( 'edit', 'noimg' );
 	}
 
-	$r .= action_icon( T_('Edit properties...'), 'properties', $action_crumb_url.'action=edit_properties', NULL, NULL, NULL,
-		array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$File->get_rdfp_rel_path().'\' )' ) );
-	$r .= action_icon( T_('Move'), 'file_move', $action_url.'action=file_move&amp;fm_sources_root='.$FileRoot->ID );
-	$r .= action_icon( T_('Copy'), 'file_copy', $action_url.'action=file_copy&amp;fm_sources_root='.$FileRoot->ID );
-	$r .= action_icon( T_('Delete'), 'file_delete', $action_crumb_url.'action=delete' );
+	if( $File->can_be_manipulated() )
+	{
+		$r .= action_icon( T_('Edit properties...'), 'properties', $action_crumb_url.'action=edit_properties', NULL, NULL, NULL,
+			array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$File->get_rdfp_rel_path().'\' )' ) );
+		$r .= action_icon( T_('Move'), 'file_move', $action_url.'action=file_move&amp;fm_sources_root='.$FileRoot->ID );
+		$r .= action_icon( T_('Copy'), 'file_copy', $action_url.'action=file_copy&amp;fm_sources_root='.$FileRoot->ID );
+		$r .= action_icon( T_('Delete'), 'file_delete', $action_crumb_url.'action=delete' );
+	}
 
 	return $r;
+}
+
+
+/**
+ * Move all files and sub-folders of single top level folder to top/root level of the folder
+ *
+ * @param string Top/root folder path
+ * @return boolean
+ */
+function move_single_dir_to_top_level( $root_folder_path )
+{
+	$root_folder_path = rtrim( $root_folder_path, '/' );
+
+	$folders_num = 1;
+	$files_num = 0;
+	$check_folder_path = $root_folder_path;
+	$top_empty_folder_path = NULL;
+	while( $folders_num == 1 && $files_num == 0 )
+	{
+		if( ! ( $dir_handle = @opendir( $check_folder_path ) ) )
+		{	// Unable to open dir:
+			break;
+		}
+
+		$folders_num = 0;
+		$files_num = 0;
+		while( $file = readdir( $dir_handle ) )
+		{
+			if( $file == '.' || $file == '..' )
+			{	// Skip reserved folders:
+				continue;
+			}
+
+			if( is_dir( $check_folder_path.'/'.$file ) )
+			{	// Count folders:
+				$folders_num++;
+				$single_folder_name = $file;
+			}
+			else
+			{	// Count files:
+				$files_num++;
+			}
+
+			if( $files_num == 2 )
+			{	// Stop if the folder already contains more 1 files or folder:
+				break;
+			}
+		}
+
+		// Close the folder handler:
+		closedir( $dir_handle );
+
+		if( $folders_num == 1 && $files_num == 0 )
+		{	// The current folder has only single folder, go to search next level down:
+			$check_folder_path = $check_folder_path.'/'.$single_folder_name;
+			if( $top_empty_folder_path === NULL )
+			{	// Store top empty folder in order to clear this below:
+				$top_empty_folder_path = $check_folder_path;
+			}
+		}
+	}
+
+	if( $check_folder_path != $root_folder_path )
+	{	// Move contens of single root folder to top/root folder:
+		$result = move_files_r( $check_folder_path, $root_folder_path );
+		if( $top_empty_folder_path !== NULL && is_empty_directory( $top_empty_folder_path ) )
+		{	// Remove the single empty folder:
+			rmdir_r( $top_empty_folder_path );
+		}
+	}
+	else
+	{	// No need to move because root folder has not only single folder:
+		$result = true;
+	}
+
+	return $result;
 }
 ?>

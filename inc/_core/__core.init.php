@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -59,6 +59,7 @@ $db_config['aliases'] = array(
 		'T_pluginusersettings'     => $tableprefix.'pluginusersettings',
 		'T_plugingroupsettings'    => $tableprefix.'plugingroupsettings',
 		'T_settings'               => $tableprefix.'settings',
+		'T_social__network'        => $tableprefix.'social__network',
 		'T_users'                  => $tableprefix.'users',
 		'T_users__fielddefs'       => $tableprefix.'users__fielddefs',
 		'T_users__fieldgroups'     => $tableprefix.'users__fieldgroups',
@@ -73,6 +74,7 @@ $db_config['aliases'] = array(
 		'T_users__profile_visit_counters' => $tableprefix.'users__profile_visit_counters',
 		'T_users__tag'             => $tableprefix.'users__tag',
 		'T_users__usertag'         => $tableprefix.'users__usertag',
+		'T_users__social_network'  => $tableprefix.'users__social_network',
 		'T_slug'                   => $tableprefix.'slug',
 		'T_email__log'             => $tableprefix.'email__log',
 		'T_email__returns'         => $tableprefix.'email__returns',
@@ -131,7 +133,6 @@ $ctrl_mappings = array(
 		'groups'           => 'users/groups.ctrl.php',
 		'organizations'    => 'users/organizations.ctrl.php',
 		'accountclose'     => 'users/account_close.ctrl.php',
-		'upload'           => 'files/upload.ctrl.php',
 		'slugs'            => 'slugs/slugs.ctrl.php',
 		'email'            => 'tools/email.ctrl.php',
 		'newsletters'      => 'email_campaigns/newsletters.ctrl.php',
@@ -139,6 +140,7 @@ $ctrl_mappings = array(
 		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 		'customize'        => 'customize/customize.ctrl.php',
+		'pro_only'         => 'pro_only/pro_only.ctrl.php',
 		'payments'         => 'orders/payments.ctrl.php',
 	);
 
@@ -1171,13 +1173,13 @@ class _core_Module extends Module
 
 		global $Settings;
 
-		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
-		$perm_admin_restricted = $current_User->check_perm( 'admin', 'restricted' );
-		$perm_users_view = $current_User->check_perm( 'users', 'view' );
-		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
-		$perm_emails = $current_User->check_perm( 'emails', 'view' );
-		$perm_maintenance = $current_User->check_perm( 'maintenance', 'upgrade' );
+		$perm_admin_normal = check_user_perm( 'admin', 'normal' );
+		$perm_admin_restricted = check_user_perm( 'admin', 'restricted' );
+		$perm_users_view = check_user_perm( 'users', 'view' );
+		$perm_options = check_user_perm( 'options', 'view' );
+		$perm_spam = check_user_perm( 'spamblacklist', 'view' );
+		$perm_emails = check_user_perm( 'emails', 'view' );
+		$perm_maintenance = check_user_perm( 'maintenance', 'upgrade' );
 		$entries = NULL;
 
 		$working_blog = get_working_blog();
@@ -1220,7 +1222,7 @@ class _core_Module extends Module
 				)
 			);
 
-			if( $perm_admin_normal && $current_User->check_perm( 'options', 'view' ) )
+			if( $perm_admin_normal && check_user_perm( 'options', 'view' ) )
 			{	// If current User has an access to backoffice and can view settings:
 				$entries['site']['entries'][] = array( 'separator' => true );
 				$entries['site']['entries']['settings'] = array(
@@ -1281,18 +1283,15 @@ class _core_Module extends Module
 					}
 
 					$entries['site']['entries']['email']['entries'] += array(
-								'settings' => array(
-									'text' => T_('Settings').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
-								'blocked' => array(
-									'text' => T_('Addresses').'&hellip;',
-									'href' => $admin_url.'?ctrl=email' ),
 								'sent' => array(
 									'text' => T_('Sent').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=sent' ),
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
+								'blocked' => array(
+										'text' => T_('Addresses').'&hellip;',
+										'href' => $admin_url.'?ctrl=email' ),
 								);
 				}
 
@@ -1364,27 +1363,32 @@ class _core_Module extends Module
 							'text' => T_('Open b2evolution.net'),
 							'href' => 'http://b2evolution.net/',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'forums' => array(
 							'text' => T_('Open Support forums'),
 							'href' => 'http://forums.b2evolution.net/',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'manual' => array(
 							'text' => T_('Open Online manual'),
 							'href' => get_manual_url( NULL ),
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'sep' => array( 'separator' => true ),
 					'twitter' => array(
 							'text' => T_('b2evolution on twitter'),
 							'href' => 'http://twitter.com/b2evolution',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'facebook' => array(
 							'text' => T_('b2evolution on facebook'),
 							'href' => 'http://www.facebook.com/b2evolution',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						)
 					)
 				);
@@ -1407,6 +1411,7 @@ class _core_Module extends Module
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
 							'edit_front'   => NULL,
 							'edit_back'    => NULL,
+							'edit_widgets' => NULL,
 							'propose'      => NULL,
 							'view_back'    => NULL,
 							'view_history' => NULL,
@@ -1432,15 +1437,15 @@ class _core_Module extends Module
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
-			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
+			    check_user_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
 				if( ( $disp == 'edit' || $disp == 'proposechange' || $ctrl == 'items' ) &&
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
-				{	// If current user has a permission to edit a current viewing post:
+				{	// If current user has a permission to edit the post currently viewed:
 					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
@@ -1460,19 +1465,33 @@ class _core_Module extends Module
 						$entries['page']['entries']['edit_front'] = array(
 								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
 								'href' => $edit_item_url,
+								'shortcut' => 'f2',
+								'shortcut-top' => 'f2'
 							);
 					}
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
 					{	// Display menu entries to edit and view the post in back-office:
 						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
-						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
+						if( $perm_admin_restricted && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
 						{	// Menu item to edit post in back-office:
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+									'shortcut' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut-top' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
+
+							if( $disp == 'widget_page' )
+							{
+								$entries['page']['entries']['edit_widgets'] = array(
+									'text' => T_('Edit widgets in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID,
+									'shortcut' => 'f2',
+									'shortcut-top' => 'f2',
+								);
+							}
 						}
-						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						if( $perm_admin_restricted && check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 						{	// Menu item to view post in back-office:
 							$entries['page']['entries']['view_back'] = array(
 									'text' => T_('View in Back-Office').'&hellip;',
@@ -1500,6 +1519,57 @@ class _core_Module extends Module
 						$entries['page']['text'] = T_('Page');
 					}
 				}
+				elseif( ! is_admin_page() &&
+					$perm_admin_restricted &&
+					( ( $disp == 'posts' && has_featured_Item( 'posts' ) ) || ( $disp == 'front' && has_featured_Item( 'front' ) ) ) )
+				{
+					// Get Featured/Intro Item:
+					$featured_intro_Item = & get_featured_Item( $disp, NULL, true );
+
+					if( $Blog->get_setting( 'in_skin_editing' ) &&
+					    $edit_item_url = $featured_intro_Item->get_edit_url() )
+					{	// Display menu entry to edit the post in front-office:
+						$entries['page']['entries']['edit_front'] = array(
+								'text' => sprintf( T_('Edit "%s" in Front-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $edit_item_url,
+								'shortcut' => 'f2',
+								'shortcut-top' => 'f2',
+							);
+					}
+					if( $featured_intro_Item->ID > 0 )
+					{	// Display menu entries to edit and view the post in back-office:
+						if( $perm_admin_restricted && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $featured_intro_Item ) )
+						{	// Menu item to edit post in back-office:
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
+									'shortcut' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut-top' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+								);
+						}
+						if( $perm_admin_restricted && check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{	// Menu item to view post in back-office:
+							$entries['page']['entries']['view_back'] = array(
+									'text' => T_('View in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && ( $item_history_url = $featured_intro_Item->get_history_url() ) )
+						{
+							$entries['page']['entries']['view_history'] = array(
+								'text' => T_('View Change History').'&hellip;',
+								'href' => $item_history_url,
+							);
+						}
+						if( $disp != 'proposechange' && ( $propose_change_item_url = $featured_intro_Item->get_propose_change_url() ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $propose_change_item_url,
+								);
+						}
+					}
+				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
 				{	// Enable menu to create new item if current User has a permission in current collection:
 					if( ! empty( $default_new_ItemType ) )
@@ -1523,7 +1593,7 @@ class _core_Module extends Module
 				);
 
 				$display_separator = false;
-				if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 				{ // Check if current user has an access to post lists
 					$items_url = $admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=restore';
 
@@ -1540,6 +1610,16 @@ class _core_Module extends Module
 						);
 
 					$entries['blog']['entries'][] = array( 'separator' => true );
+
+					$contents_submenu = array();
+
+					if( $Blog->get_setting( 'use_workflow' ) && check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					{ // Workflow view
+						$contents_submenu['workflow'] = array(
+								'text' => T_('Workflow view').'&hellip;',
+								'href' => $items_url.'&amp;tab=tracker',
+							);
+					}
 
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
@@ -1558,41 +1638,54 @@ class _core_Module extends Module
 						{	// No selected category and item/post:
 							$manual_view_cat_param = '';
 						}
-						$entries['blog']['entries']['manual'] = array(
+						$contents_submenu['manual'] = array(
 								'text' => T_('Manual view').'&hellip;',
 								'href' => $items_url.'&amp;tab=manual'.$manual_view_cat_param,
 							);
 					}
 
-					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-					{ // Workflow view
-						$entries['blog']['entries']['workflow'] = array(
-								'text' => T_('Workflow view').'&hellip;',
-								'href' => $items_url.'&amp;tab=tracker',
-							);
+					$contents_submenu['full'] = array(
+							'text' => T_('All').'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+
+					$contents_submenu['summary'] = array(
+							'text' => T_('Summary').'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+
+					$type_tabs = get_item_type_tabs();
+					foreach( $type_tabs as $type_tab => $type_tab_name )
+					{
+						$type_tab_key = 'type_'.str_replace( ' ', '_', utf8_strtolower( $type_tab ) );
+						$contents_submenu[ $type_tab_key ] = array(
+							'text' => T_( $type_tab_name ).'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=type&amp;tab_type='.urlencode( $type_tab ).'&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
 					}
 
 					$entries['blog']['entries']['posts'] = array(
-							'text' => T_('Contents').'&hellip;',
+							'text' => T_('Contents'),
 							'href' => $items_url,
+							'entries' => $contents_submenu,
 						);
 					$display_separator = true;
 				}
 
-				$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID );
-				if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
-				{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
+				$perm_comments = check_user_perm( 'blog_comments', 'view', false, $Blog->ID );
+				if( $perm_comments || check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+				{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
 							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore'
-								// Set url to meta comments page if user has a perm to view only meta comments:
+								// Set url to internal comments page if user has a perm to view only internal comments:
 								.( $perm_comments ? '' : '&amp;tab3=meta' ),
 						);
 					$display_separator = true;
 				}
 
 				// Chapters / Categories:
-				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 				{ // Either permission for a specific blog or the global permission:
 					$entries['blog']['entries']['chapters'] = array(
 							'text' => T_('Categories').'&hellip;',
@@ -1610,7 +1703,7 @@ class _core_Module extends Module
 				$entries['blog']['entries']['files'] = NULL;
 
 				// BLOG SETTINGS:
-				if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 				{ // We have permission to edit blog properties:
 					$blog_param = '&amp;blog='.$Blog->ID;
 
@@ -1638,6 +1731,10 @@ class _core_Module extends Module
 											'text' => T_('User directory').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=userdir'.$blog_param,
 										),
+									'search' => array(
+											'text' => T_('Search').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=search'.$blog_param,
+										),
 									'other' => array(
 											'text' => T_('Other displays').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=other'.$blog_param,
@@ -1645,6 +1742,10 @@ class _core_Module extends Module
 									'popup' => array(
 											'text' => T_('Popups').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup'.$blog_param,
+										),
+									'metadata' => array(
+											'text' => T_('Meta data').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=metadata'.$blog_param,
 										),
 									'more' => array(
 											'text' => T_('More').'&hellip;',
@@ -1704,7 +1805,7 @@ class _core_Module extends Module
 								)
 						);
 
-					if( $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
+					if( check_user_perm( 'options', 'view', false, $Blog->ID ) )
 					{ // Post Types & Statuses
 						$entries['blog']['entries']['general']['entries']['item_types'] = array(
 								'text' => T_('Item Types').'&hellip;',
@@ -1733,7 +1834,7 @@ class _core_Module extends Module
 						);
 					}
 
-					if( $current_User->check_perm( 'options', 'view' ) )
+					if( check_user_perm( 'options', 'view' ) )
 					{ // Check if current user has a permission to view the common settings of the blogs
 						$entries['blog']['entries']['general']['entries']['common_settings'] = array(
 								'text' => T_('Common Settings').'&hellip;',
@@ -1748,21 +1849,23 @@ class _core_Module extends Module
 		{	// Only front-office collection pages:
 
 			if( $perm_admin_restricted &&
-			    ( ( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) ||
-			      $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			    ( ( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) ) ||
+			      check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			  )
 			{	// If current user has an access to back-office and to edit site or collection properties:
 				global $Session;
 				$customizer_mode = $Session->get( 'customizer_mode_'.$Blog->ID );
 				$entries['skin'] = array(
-					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
-					'href'        => $Blog->get( 'customizer_url', ( $customizer_mode ? array( 'mode' => 'disable' ) : array() ) ),
-					'entry_class' => 'rwdhide',
-					'class'       => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
+					'text'         => '<span class="fa fa-sliders"></span> '.T_('Customize'),
+					'href'         => $Blog->get( 'customizer_url', ( $customizer_mode ? array( 'mode' => 'disable' ) : array() ) ),
+					'entry_class'  => 'rwdhide',
+					'class'        => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
+					'shortcut'     => 'f4',
+					'shortcut-top' => 'f4',
 				);
 			}
 
-			if( $perm_admin_restricted && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+			if( $perm_admin_restricted && check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// If current user has an access to back-office and to edit collection properties:
 				// Display menu item "Features" with depending on $disp:
 				global $disp, $disp_detail;
@@ -1847,6 +1950,15 @@ class _core_Module extends Module
 					);
 				}
 
+				global $http_response_code;
+				if( ! empty( $http_response_code ) )
+				{
+					$dev_entries['http_response_code'] = array(
+						'text' => 'HTTP Resp: '.$http_response_code,
+						'disabled' => true,
+					);
+				}
+
 				if( $robots_index === false )
 				{
 					$debug_text = 'NO INDEX';
@@ -1858,6 +1970,11 @@ class _core_Module extends Module
 
 				$dev_entries['noindex'] = array(
 						'text' => $debug_text,
+						'disabled' => true,
+					);
+
+				$dev_entries['defer'] = array(
+						'text' => use_defer() ? 'Using Deferred loading' : 'Using Normal loading',
 						'disabled' => true,
 					);
 			}
@@ -1997,7 +2114,7 @@ class _core_Module extends Module
 		$userprefs_entries = array(
 			'name' => array(
 					'text' => $current_User->get_avatar_imgtag( 'crop-top-32x32', '', 'left' ).'&nbsp;'
-										.$current_User->get_preferred_name()
+										.$current_User->get( 'login' )
 										.'<br />&nbsp;<span class="note">'.$current_user_Group->get_name().'</span>',
 					'href' => get_user_profile_url(),
 				),
@@ -2047,7 +2164,7 @@ class _core_Module extends Module
 		}
 
 		$entries['userprefs'] = array(
-				'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
+				'text'    => '<strong>'.$current_User->get_colored_login().'</strong>',
 				'href'    => get_user_profile_url(),
 				'entries' => $userprefs_entries,
 			);
@@ -2057,7 +2174,7 @@ class _core_Module extends Module
 				'entry_class' => 'rwdhide'
 			);
 
-		if( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'admin', 'normal' ) && check_user_perm( 'options', 'view' ) )
 		{ // Make time as link to Timezone settings if permission
 			$entries['time']['disabled'] = false;
 			$entries['time']['href'] = $admin_url.'?ctrl=time';
@@ -2116,9 +2233,9 @@ class _core_Module extends Module
 		 */
 		global $AdminUI;
 
-		$perm_admin_normal = $current_User->check_perm( 'admin', 'normal' );
-		$perm_options = $current_User->check_perm( 'options', 'view' );
-		$perm_users = $current_User->check_perm( 'users', 'view' );
+		$perm_admin_normal = check_user_perm( 'admin', 'normal' );
+		$perm_options = check_user_perm( 'options', 'view' );
+		$perm_users = check_user_perm( 'users', 'view' );
 
 		/**** Users | My profile ****/
 		if( $perm_admin_normal && $perm_users )
@@ -2185,7 +2302,7 @@ class _core_Module extends Module
 
 		$AdminUI->add_menu_entries( NULL, array( 'users' => $users_entries ) );
 
-		if( $current_User->check_perm( 'orgs', 'create' ) )
+		if( check_user_perm( 'orgs', 'create' ) )
 		{	// Display a menu item for organizations if user has a perm at least to create own organization:
 			$AdminUI->add_menu_entries( array( 'users' ), array(
 					'organizations' => array(
@@ -2195,7 +2312,7 @@ class _core_Module extends Module
 		}
 
 		/**** Emails ****/
-		$perm_emails = $current_User->check_perm( 'emails', 'view' );
+		$perm_emails = check_user_perm( 'emails', 'view' );
 		if( $perm_admin_normal && $perm_options && $perm_emails )
 		{ // Permission to view email management:
 			$AdminUI->add_menu_entries( NULL, array( 'email' => array(
@@ -2261,7 +2378,7 @@ class _core_Module extends Module
 					), 'campaigns' );
 			}
 
-			if( $current_User->check_perm( 'emails', 'edit' ) )
+			if( check_user_perm( 'emails', 'edit' ) )
 			{	// Allow to test a returned email and smtp sending only if user has a permission to edit email settings:
 				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
 						'test' => array(
@@ -2285,7 +2402,7 @@ class _core_Module extends Module
 							'href' => $admin_url.'?ctrl=system'
 				) ) );
 
-			$perm_spam = $current_User->check_perm( 'spamblacklist', 'view' );
+			$perm_spam = check_user_perm( 'spamblacklist', 'view' );
 
 			if( $perm_admin_normal && ( $perm_options || $perm_spam ) )
 			{ // Permission to view tools or antispam.
@@ -2339,7 +2456,7 @@ class _core_Module extends Module
 								'text' => T_('Countries'),
 								'href' => '?ctrl=antispam&amp;tab3=countries' ) ) );
 
-						if( $current_User->check_perm( 'stats', 'list' ) )
+						if( check_user_perm( 'stats', 'list' ) )
 						{
 							$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 								'domains' => array(
@@ -2352,7 +2469,7 @@ class _core_Module extends Module
 								'text' => T_('Settings'),
 								'href' => '?ctrl=antispam&amp;tab3=settings' ) ) );
 
-						if( $current_User->check_perm( 'options', 'edit' ) )
+						if( check_user_perm( 'options', 'edit' ) )
 						{
 							$AdminUI->add_menu_entries( array( 'options', 'antispam' ), array(
 								'tools' => array(
@@ -2418,7 +2535,7 @@ class _core_Module extends Module
 					) ),
 			) );
 
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
 				$AdminUI->add_menu_entries( 'options', array(
 						'syslog' => array(

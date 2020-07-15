@@ -1,11 +1,10 @@
 /**
- * These are the generic styles that are common to "all" skins.
+ * These are the generic styles that are common to "all" Bootstrap skins.
  *
  * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
  *
  * Override this with style.css in your skin folder.
  */
-
 
 // ----- WIDGETS -----
 
@@ -24,6 +23,14 @@
 // Organization Members widget:
 @import "_org_members_widget.module.less";
 
+// Item Tags widget:
+@import "_item_tags_widget.module.less";
+
+// Item Workflow widget:
+@import "_item_workflow_widget.module.less";
+
+// Checklist Items widget:
+@import "_item_checklist_lines_widget.module.less";
 
 // ----- PLUGINS -----
 
@@ -31,12 +38,38 @@
 @import "inc/video-js-overrides.inc.less";
 
 
+// ----- FORMS -----
+
+// Search form:
+@import "_search_form.module.less";
+
+
+// ----- ALL PURPOSE MODULES (can be in templates in multiple widgets) -----
+
+// Tiles style 2
+@import "_evo_tile_2.module.less";
+
+// -----
+
+// Thumblist style
+@import "_evo_thumblist.module.less";
+
 // -----
 
 
 // Rating Summary for all comments of the selected post on disp=single:
 @import "inc/star_rating.inc.less";
 
+// This can be used in sub-containers and multiple column widgets to control display of children widgets:
+div.children-widgets-inline > div.evo_widget {
+	display: inline-block;
+	margin-right: 4px;
+}
+// This can be used in individual widgets to hide border:
+.evo_widget.widget-no-border {
+	border: none;
+	box-shadow: none;
+}
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -52,7 +85,7 @@
 
 // MILOS > Intro posts style padding alignment
 main .well {
-	padding: 15px 15px 25px 15px;
+	padding: 15px 15px 5px 15px;
 	header .small.text-muted {
 		margin: 4px 0px 10px 0px;
 		a {
@@ -62,7 +95,7 @@ main .well {
 }
 .post_tags {
 	margin: 15px 0px 10px 0px;
-	a {
+	> a, > span {
 		display: inline-block;
 		padding: 3px 5px;
 		margin-bottom: 5px;
@@ -70,14 +103,23 @@ main .well {
 		.border-radius;
 		color: black;
 		margin-right: 3px;
-		&:before {
-			font-family: FontAwesome;
-			content: '\f02b \00a0 ';
-			color: #aaa;
-		}
 		&:hover {
 			text-decoration: none;
 			background: #ddd;
+		}
+	}
+	> a::before {
+		font-family: FontAwesome;
+		content: '\f02b \00a0 ';
+		color: #aaa;
+	}
+	> span {
+		a {
+			color: black;
+		}
+		span.fa {
+			font-size: inherit;
+			color: #aaa;
 		}
 	}
 }
@@ -159,7 +201,7 @@ td#next {
 
 
 div.powered_by {
-	margin: 16px 0;
+	margin: 16px 0 0 0;
 	text-align: center;
 }
 div.error_404,
@@ -179,6 +221,9 @@ div.error_additional_content {
 	list-style-position: inside;
 	// Here we need only bottom margin to match general concept of separating elements (e-g: p tags have 10px bottom margin as well)
 	margin: 0 0 10px 0px;
+	ul {
+		margin: 0 0 0 20px;
+	}
 }
 .evo_comment_rating {
 	margin: 3px;
@@ -272,7 +317,7 @@ div.widget_core_user_profile_pics {
 }
 
 // Profile menu link widget alignment issue fix
-.widget_core_profile_menu_link ul li a img {
+.evo_widget_basic_menu_link_myprofile ul li a img {
 	vertical-align: middle;
 	.border-radius;
 }
@@ -325,21 +370,6 @@ div.extended_search_form {
 .widget_core_user_profile_pics img {
 	max-width: 100%;
 	height: auto;
-}
-
-// Advertisement widget
-div.widget_core_coll_item_list.nobullets ul,
-div.widget_core_coll_item_list.nobullets ul li,
-li.widget_core_coll_item_list.nobullets ul,
-li.widget_core_coll_item_list.nobullets ul li {
-	background: none;
-	margin-left: 0;
-	padding-left: 0;
-	list-style: none;
-}
-div.widget_core_coll_item_list.nobullets ul li:before,
-ul li.widget_core_coll_item_list.nobullets ul li:before {
-	content: none;
 }
 
 .action_icon {
@@ -666,8 +696,16 @@ div.results {
 	font-size: 125%;
 	color: #666;
 }
-.search_title a {
-	text-decoration: underline;
+.search_title {
+	a {
+		text-decoration: underline;
+	}
+	.label a {
+		color: #FFF;
+		&:hover {
+			color: #abc6e0;
+		}
+	}
 }
 .search_result {
 	padding: 15px 15px 5px;
@@ -917,6 +955,17 @@ form#comment_edit {
 	}
 }
 
+// Item custom fields in RWD style:
+div.item_custom_fields {
+	div.row {
+		margin-top: 8px;
+		word-break: break-all;
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+}
+
 // Fix the form elements:
 .evo_form__comment {
 	.panel {
@@ -1092,17 +1141,28 @@ form#comment_edit {
 		padding: 0;
 	}
 }
-div.qq-upload-button,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button {
 	border: 2px dashed #fff;
 	background: #5bc0de;
 	.border-radius(9px);
 }
-div.qq-upload-button-hover,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-drop-area {
+	padding: 7px 0;
+	text-align: center;
+	color: transparent;
+	background: transparent;
+	font-weight: bold;
+	> div > span {
+		font-weight: normal;
+		font-size: small;
+		margin-top: 2px;
+	}
+}
+div.qq-upload-button-hover {
 	background: #5cb85c;
+}
+div.qq-upload-button-dragover {
+	background: #efbd5b !important;
 }
 ul.qq-upload-list {
 	margin: 0;
@@ -1114,7 +1174,84 @@ div.evo_fileuploader_form {
 }
 .evo_attachments_fieldset__wrapper {
 	width: 100%;
-	height: 160px;
+	height: 97px;
+	position: relative;
+	padding-bottom: 6px;
+	box-sizing: content-box;
+	.evo_attachments_fieldset__block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
+		background: #c0c0c0;
+		height: 6px;
+		bottom: 0;
+		&::after {
+			content: "...";
+			font-size: 10px;
+			top: -7px;
+			position: relative;
+			text-align: center;
+			display: block;
+		}
+	}
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+			z-index: 1000;
+		}
+		td {
+			cursor: move;
+		}
+	}
+	.evo_attachments_fieldset__overlay {
+		position: absolute;
+		top: -43px;
+		z-index: 1;
+		width: 100%;
+		height: 140px;
+		background: rgba( 0, 0, 0, 0.5 );
+		color: #FFF;
+		text-align: center;
+		font-size: 200%;
+		b {
+			width: 100%;
+			margin: 0;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	}
+}
+@media (max-width: 768px) {
+	.evo_attachments_fieldset__wrapper {
+		.evo_attachments_fieldset__overlay {
+			font-size: 170%;
+		}
+	}
+}
+@media (max-width: 431px) {
+	.evo_attachments_fieldset__wrapper {
+		.evo_attachments_fieldset__overlay {
+			top: -65px;
+			height: 162px;
+			font-size: 140%;
+		}
+	}
+}
+
+.evo_attachments_tab_pane__wrapper {
+	width: 100%;
+	height: auto;
 	position: relative;
 	padding-bottom: 6px;
 	box-sizing: content-box;
@@ -1173,14 +1310,14 @@ div.evo_fileuploader_form {
 	}
 }
 @media (max-width: 768px) {
-	.evo_attachments_fieldset__wrapper {
+	.evo_attachments_tab_pane__wrapper {
 		.evo_attachments_fieldset__overlay {
 			font-size: 170%;
 		}
 	}
 }
 @media (max-width: 431px) {
-	.evo_attachments_fieldset__wrapper {
+	.evo_attachments_tab_pane__wrapper {
 		.evo_attachments_fieldset__overlay {
 			top: -65px;
 			height: 162px;
@@ -1300,6 +1437,24 @@ div.evo_fileuploader_form {
 			outline: 1px solid #ccc;
 			outline-offset: -1px;
 			vertical-align: top;
+		}
+	}
+}
+
+// Widget "Menu link or button":
+.evo_widget.widget_core_basic_menu_link {
+	img {
+		margin-top: -2px;
+	}
+}
+// Item form tab pane text colors: 
+.evo_tab_pane_itemform_content {
+	.tab_pane_pads {
+		.btn-primary {
+			color: #fff !important;
+		}
+		a {
+			color: #337ab7 !important;
 		}
 	}
 }

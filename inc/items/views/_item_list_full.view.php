@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -45,6 +45,10 @@ global $postIDarray;
 $postIDarray = $ItemList->get_page_ID_array();
 
 
+// Display a panel to confirm mass action with selected items:
+display_mass_items_confirmation_panel();
+
+
 $block_item_Widget = new Widget( 'block_item' );
 
 // This block is used to keep correct css style for the post status banners
@@ -71,10 +75,6 @@ if( $action == 'view' )
 else
 { // We are displaying multiple posts ( Not a single post! )
 	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
-	if( $ItemList->is_filtered() )
-	{ // List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-	}
 
 	// Generate global icons depending on seleted tab with item type
 	item_type_global_icons( $block_item_Widget );
@@ -91,7 +91,7 @@ else
 			'block_end'            => '',
 			'block_title_start'    => '<b>',
 			'block_title_end'      => ':</b> ',
-			'show_filters'         => array( 'time' => 1 ),
+			'show_filters'         => array( 'time' => 1, 'visibility' => 1, 'itemtype' => 1 ),
 			'display_button_reset' => false,
 			'display_empty_filter' => true,
 		) );
@@ -104,8 +104,8 @@ else
 
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
-			'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
-			'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+			'header_start' => $admin_template['header_start'],
+			'footer_start' => $admin_template['footer_start'],
 		);
 }
 
@@ -114,7 +114,7 @@ $ItemList->display_init( $display_params );
 // Display navigation:
 $ItemList->display_nav( 'header' );
 
-$allow_items_list_form = ( $action != 'view' && $ItemList->total_rows > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) );
+$allow_items_list_form = ( $action != 'view' && $ItemList->total_rows > 0 && check_user_perm( 'blog_post_statuses', 'edit', false, $blog ) );
 if( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
 	global $admin_url;
@@ -123,6 +123,7 @@ if( $allow_items_list_form )
 
 	$Form->begin_form();
 	$Form->hidden( 'ctrl', 'items' );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
 	$Form->hidden( 'blog', $blog );
 	$Form->hidden( 'page', $ItemList->page );
 	$Form->add_crumb( 'items' );
@@ -152,6 +153,8 @@ while( $Item = & $ItemList->get_item() )
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
+						'after'  => ' '.action_icon( T_('Copy Item Slug to the clipboard.'), 'clipboard-copy', '#',
+							NULL, NULL, NULL, array( 'class' => 'small clipboard-copy', 'data-clipboard-text' => $Item->urltitle, 'onclick' => 'return false;' ) ),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(
@@ -159,7 +162,7 @@ while( $Item = & $ItemList->get_item() )
 						'after'  => ''
 					) );
 				global $admin_url;
-				if( $current_User->check_perm( 'slugs', 'view' ) )
+				if( check_user_perm( 'slugs', 'view' ) )
 				{ // user has permission to view slugs:
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
@@ -169,7 +172,7 @@ while( $Item = & $ItemList->get_item() )
 				if( $parent_Item = $Item->get_parent_Item() )
 				{	// Display parent ID if the Item has it:
 					echo ' &middot; '.T_('Parent ID').': ';
-					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
+					if( check_user_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
 					{	// Display parent ID as link to view the parent post if current user has a permission:
 						echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$parent_Item->get_blog_ID().'&amp;p='.$parent_Item->ID.'" title="'.$parent_Item->dget( 'title', 'htmlattr' ).'">'.$parent_Item->ID.'</a>';
 					}
@@ -183,7 +186,7 @@ while( $Item = & $ItemList->get_item() )
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
 
-				if( $action != 'view' && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+				if( $action != 'view' && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 				{	// Display checkbox to select item for action only on items list:
 					echo '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" /> ';
 				}
@@ -271,6 +274,7 @@ while( $Item = & $ItemList->get_item() )
 					$edit_buttons[] = array(
 						'url'  => $item_edit_url,
 						'text' => get_icon( 'edit_button' ).' '.T_('Edit'),
+						'shortcut' => 'f2,ctrl+f2',
 					);
 				}
 				if( $item_propose_change_url = $Item->get_propose_change_url() )
@@ -299,7 +303,9 @@ while( $Item = & $ItemList->get_item() )
 				if( $edit_buttons_num > 1 )
 				{	// Display buttons in dropdown style:
 					echo '<div class="'.button_class( 'group' ).'">';
-					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'"'
+							.( isset( $edit_buttons[0]['shortcut'] ) ? ' data-shortcut="'.$edit_buttons[0]['shortcut'].'"' : '' ).'>'
+							.$edit_buttons[0]['text'].'</a>';
 					echo '<button type="button" class="'.button_class( 'text' ).' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
 					echo '<ul class="dropdown-menu">';
 					for( $b = 1; $b < $edit_buttons_num; $b++ )
@@ -314,7 +320,9 @@ while( $Item = & $ItemList->get_item() )
 				elseif( $edit_buttons_num == 1 )
 				{	// Display single button:
 					echo '<span class="'.button_class( 'group' ).'">';
-					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'"'
+							.( isset( $edit_buttons[0]['shortcut'] ) ? ' data-shortcut="'.$edit_buttons[0]['shortcut'].'"' : '' ).'>'
+							.$edit_buttons[0]['text'].'</a>';
 					echo '</span>';
 				}
 
@@ -392,8 +400,8 @@ while( $Item = & $ItemList->get_item() )
 						'gallery_cell_end'    => '</div>',
 						'gallery_image_limit' => 1000,
 						'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
+						'restrict_to_image_position' => 'cover,background,background,teaser,teaserperm,teaserlink',
 					) );
 			?>
 
@@ -451,7 +459,7 @@ while( $Item = & $ItemList->get_item() )
 		{ // We are looking at a single post, include files and comments:
 
 			if( $comment_type == 'meta' && ! $Item->can_see_meta_comments() )
-			{ // Current user cannot views meta comments
+			{ // Current user cannot views internal comments
 				$comment_type = 'feedback';
 			}
 
@@ -480,7 +488,7 @@ while( $Item = & $ItemList->get_item() )
 						'class'   => 'btn btn-default'
 					) );
 			if( $comment_type != 'meta' )
-			{ // Don't display "Recycle bin" link for meta comments, because they are deleted directly without recycle bin
+			{ // Don't display "Recycle bin" link for internal comments, because they are deleted directly without recycle bin
 				echo get_opentrash_link( true, false, array(
 						'before' => ' <span id="recycle_bin">',
 						'after' => '</span>',
@@ -490,7 +498,7 @@ while( $Item = & $ItemList->get_item() )
 			echo '</div>';
 
 			if( $Item->can_see_meta_comments() )
-			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
+			{ // Display tabs to switch between user and internal comments Only if current user can views internal comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
 				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total', true );
 				$switch_comment_type_tabs = array(
@@ -499,7 +507,7 @@ while( $Item = & $ItemList->get_item() )
 							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total', true ).'</span>' ),
 						'meta' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
-							'title' => T_('Meta discussion').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
+							'title' => T_('Internal comments').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
 					);
 				?>
 				<div class="feedback-tabs btn-group">
@@ -560,7 +568,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			if( $comment_type != 'meta' )
-			{ // Display this filter only for not meta comments
+			{ // Display this filter only for not internal comments
 				?>
 				<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 				<div class="tile">
@@ -598,7 +606,7 @@ while( $Item = & $ItemList->get_item() )
 			echo_item_comments( $blog, $Item->ID, $statuses, $currentpage, NULL, array(), '', $expiry_statuses, $comment_type );
 			echo '</div>';
 
-			if( ( $comment_type == 'meta' && $Item->can_meta_comment() ) // User can add meta comment on the Item
+			if( ( $comment_type == 'meta' && $Item->can_meta_comment() ) // User can add internal comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
 
@@ -623,7 +631,7 @@ while( $Item = & $ItemList->get_item() )
 
 			?>
 			<!-- ========== FORM to add a comment ========== -->
-			<h4><?php echo $comment_type == 'meta' ? T_('Leave a meta comment') : T_('Leave a comment'); ?>:</h4>
+			<h4><?php echo $comment_type == 'meta' ? T_('Leave an internal comment') : T_('Leave a comment'); ?>:</h4>
 
 			<?php
 
@@ -702,7 +710,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->inputstart .= $comment_toolbar;
 			$Form->textarea_input( $dummy_fields['content'], $comment_content, 12, T_('Comment text'), array(
 					'cols'  => 40,
-					'class' => 'autocomplete_usernames'
+					'class' => ( check_autocomplete_usernames( $Comment ) ? 'autocomplete_usernames ' : '' ).'link_attachment_dropzone'
 				) );
 			$Form->inputstart = $form_inputstart;
 
@@ -840,8 +848,11 @@ while( $Item = & $ItemList->get_item() )
 	} // / comments requested
 }
 
+// Instantiate ClipboardJS:
+expose_var_to_js( 'evo_init_item_list_clipboard_js', true );
+
 if( $action == 'view' )
-{ // Load JS functions to work with comments
+{	// Load JS functions to work with comments
 	load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 	// Handle show_comments radioboxes
@@ -849,13 +860,35 @@ if( $action == 'view' )
 }
 elseif( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
+
+	// Buttons to check/uncheck/invert all Items:
+	$Form->checkbox_controls( 'selected_items', array(
+		'before_buttons' => '<span class="btn-group">',
+		'after_buttons'  => '</span> ',
+		'button_class'   => 'btn btn-default',
+		'icon_class'     => '',
+	) );
+
 	echo T_('With checked posts').': ';
 
 	// Display a button to change visibility of selected comments:
 	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
 	echo_status_dropdown_button_js( 'post' );
 
+	echo ' <span class="btn-group">';
+	$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
+	$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
+	echo '</span> ';
+	if( is_pro() && check_user_perm( 'options', 'edit' ) )
+	{	// Export Items only for PRO version:
+		$Form->button( array( 'submit', 'actionArray[mass_export]', T_('Export to XML') ) );
+	}
+	$Form->button( array( 'submit', 'actionArray[mass_delete]', T_('Delete'), 'btn-danger' ) );
+
 	$Form->end_form();
+
+	// JavaScript code to mass change category of Items:
+	echo_item_mass_change_cat_js();
 }
 
 // Display navigation:

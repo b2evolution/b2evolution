@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -45,7 +45,6 @@ $params = array_merge( array(
 		'form_comment_redirect_to'   => $Item->get_feedback_url( $disp == 'feedback-popup', '&' ),
 		'comment_image_size'         => 'fit-400x320',
 		'comment_attach_info'        => '<br />'.get_upload_restriction(),
-		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
 		'comment_title_before'  => '<div class="bCommentTitle">',
 		'comment_title_after'   => '</div>',
@@ -119,6 +118,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				// ---------------------- END OF PREVIEW COMMENT ---------------------
 			}
 
+			$comment_cookies = $Session->get( 'core.comment_cookies_preview' );
+			$Session->delete( 'core.comment_cookies_preview' );
+
 			// Form fields:
 			$comment_content = $Comment->original_content;
 			// comment_attachments contains all file IDs that have been attached
@@ -167,6 +169,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		}
 		else
 		{ // set saved Comment attributes from Session
+			$comment_cookies = $Session->get( 'core.comment_cookies' );
+			$Session->delete( 'core.comment_cookies' );
+
 			$comment_content = $Comment->content;
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
@@ -180,20 +185,11 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$checked_attachments = $Comment->checked_attachments;
 		}
 
-		if( $params['comment_mode'] == 'quote' )
-		{	// These params go from ajax form loading, Used to reply with quote
-			set_param( 'mode', $params['comment_mode'] );
-			set_param( 'qc', $params['comment_qc'] );
-			set_param( 'qp', $params['comment_qp'] );
-			set_param( $dummy_fields[ 'content' ], $params[ $dummy_fields[ 'content' ] ] );
-		}
-
-		$mode = param( 'mode', 'string' );
-		if( $mode == 'quote' )
+		$quoted_comment_ID = param( 'quote_comment', 'integer', 0 );
+		$quoted_post_ID = param( 'quote_post', 'integer', 0 );
+		if( $quoted_comment_ID || $quoted_post_ID )
 		{ // Quote for comment/post
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
-			$quoted_comment_ID = param( 'qc', 'integer', 0 );
-			$quoted_post_ID = param( 'qp', 'integer', 0 );
 			if( ! empty( $quoted_comment_ID ) &&
 			    ( $CommentCache = & get_CommentCache() ) &&
 			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
@@ -243,9 +239,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 		param( 'comment_cookies', 'integer', NULL );
 		param( 'comment_allow_msgform', 'integer', NULL ); // checkbox
 
-		if( is_null($comment_cookies) )
-		{ // "Remember me" checked, if remembered before:
-			$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
+		if( is_null( $comment_cookies ) )
+		{	// "Remember me" checked, if remembered before:
+			$comment_cookies = isset( $_COOKIE[$cookie_name] ) || isset( $_COOKIE[$cookie_email] ) || isset( $_COOKIE[$cookie_url] );
 		}
 	}
 
@@ -267,7 +263,7 @@ function validateCommentForm(form)
 /* ]]> *
 </script>';*/
 
-	$Form = new Form( get_htsrv_url().'comment_post.php', 'bComment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
+	$Form = new Form( get_htsrv_url().'comment_post.php', 'evo_comment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 
 	$Form->switch_template_parts( $params['form_params'] );
 
@@ -366,9 +362,9 @@ function validateCommentForm(form)
 	$Form->textarea_input( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
 			'note' => $note,
 			'cols' => 38,
-			'class' => 'bComment autocomplete_usernames',
+			'class' => 'bComment'.( check_autocomplete_usernames( $Comment ) ? ' autocomplete_usernames' : '' ),
 			'display_fix_pixel' => false,
-			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+			'maxlength' => ( $Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 		) );
 	$Form->inputstart = $form_inputstart;
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,7 +25,7 @@ if( ! empty( $edited_ItemTag->merge_tag_ID ) )
 { // Display a for to confirm merge the tag to other one
 	$Form = new Form( NULL, 'itemtagmerge_checkchanges', 'post', 'compact' );
 
-	$Form->begin_form( 'fform', T_('Merge tags?'), array( 'formstart_class' => 'panel-danger' ) );
+	$Form->begin_form( 'fform', TB_('Merge tags?'), array( 'formstart_class' => 'panel-danger' ) );
 	$Form->hidden( 'tag_ID', $edited_ItemTag->merge_tag_ID );
 	$Form->hidden( 'old_tag_ID', $edited_ItemTag->ID );
 	$Form->add_crumb( 'tag' );
@@ -33,8 +33,8 @@ if( ! empty( $edited_ItemTag->merge_tag_ID ) )
 
 	echo '<p>'.$edited_ItemTag->merge_message.'</p>';
 
-	$Form->button( array( 'submit', 'actionArray[merge_confirm]', T_('Confirm'), 'SaveButton btn-danger' ) );
-	$Form->button( array( 'submit', 'actionArray[merge_cancel]', T_('Cancel'), 'SaveButton btn-default' ) );
+	$Form->button( array( 'submit', 'actionArray[merge_confirm]', TB_('Confirm'), 'SaveButton btn-danger' ) );
+	$Form->button( array( 'submit', 'actionArray[merge_cancel]', TB_('Cancel'), 'SaveButton btn-default' ) );
 
 	$Form->end_form();
 }
@@ -44,17 +44,17 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'itemtag_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', ( $return_to ? $return_to : $admin_url.'?ctrl=itemtags' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New Tag') : /* TRANS: noun */ T_('Tag') ).get_manual_link( 'item-tag-form' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New Tag') : /* TRANS: noun */ TB_('Tag') ).get_manual_link( 'item-tag-form' ) );
 
 	$Form->add_crumb( 'tag' );
 	$Form->hidden( 'action',  $creating ? 'create' : 'update' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',tag_ID' : '' ) ) );
 
-	$Form->text_input( 'tag_name', $edited_ItemTag->get( 'name' ), 50, /* TRANS: noun */ T_('Tag'), '', array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'tag_name', $edited_ItemTag->get( 'name' ), 50, /* TRANS: noun */ TB_('Tag'), '', array( 'maxlength' => 255, 'required' => true ) );
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton' ) ) );
 
 
 // Item list with this tag:
@@ -71,11 +71,11 @@ if( $edited_ItemTag->ID > 0 )
 	// Create result set:
 	$Results = new Results( $SQL->get(), 'tagitem_', 'A' );
 
-	$Results->title = T_('Posts that have this tag').' ('.$Results->get_total_rows().')';
+	$Results->title = TB_('Posts that have this tag').' ('.$Results->get_total_rows().')';
 	$Results->Cache = get_ItemCache();
 
 	$Results->cols[] = array(
-			'th'       => T_('Post ID'),
+			'th'       => TB_('Post ID'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'order'    => 'post_ID',
@@ -83,20 +83,20 @@ if( $edited_ItemTag->ID > 0 )
 		);
 
 	$Results->cols[] = array(
-			'th'    => T_('Collection'),
+			'th'    => TB_('Collection'),
 			'order' => 'blog_shortname',
 			'td'    => '$blog_shortname$',
 		);
 
 	$Results->cols[] = array(
-			'th'    => T_('Post title'),
+			'th'    => TB_('Post title'),
 			'order' => 'post_title',
 			'td'    => '<a href="@get_permanent_url()@">$post_title$</a>',
 		);
 
 	function tagitem_edit_actions( $Item )
 	{
-		global $current_User, $edited_ItemTag;
+		global $edited_ItemTag;
 
 		// Display the edit icon if current user has the rights:
 		$r = $Item->get_edit_link( array(
@@ -106,9 +106,9 @@ if( $edited_ItemTag->ID > 0 )
 			'title'  => '#',
 			'class'  => '' ) );
 
-		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Display the unlink icon if current user has the rights:
-			$r .= action_icon( T_('Unlink this tag from post!'), 'unlink',
+			$r .= action_icon( TB_('Unlink this tag from post!'), 'unlink',
 				regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID='.$edited_ItemTag->ID.'&amp;item_ID='.$Item->ID.'&amp;action=unlink&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'&amp;'.url_crumb( 'tag' ) ),
 				NULL, NULL, NULL,
 				array( 'onclick' => 'return confirm(\''.format_to_output( sprintf( TS_('Are you sure you want to remove the tag "%s" from "%s"?'),
@@ -120,7 +120,7 @@ if( $edited_ItemTag->ID > 0 )
 		return $r;
 	}
 	$Results->cols[] = array(
-			'th'       => T_('Actions'),
+			'th'       => TB_('Actions'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'td'       => '%tagitem_edit_actions( {Obj} )%',

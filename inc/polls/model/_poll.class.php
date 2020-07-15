@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -94,7 +94,7 @@ class Poll extends DataObject
 		global $current_User;
 
 		// Owner:
-		if( $current_User->check_perm( 'polls', 'edit' ) )
+		if( check_user_perm( 'polls', 'edit' ) )
 		{	// Update the owner if current user has a permission to edit all polls:
 			$pqst_owner_login = param( 'pqst_owner_login', 'string', NULL );
 			param_check_not_empty( 'pqst_owner_login', T_('Please enter the owner\'s login.') );
@@ -334,10 +334,10 @@ class Poll extends DataObject
 
 
 	/**
-	 * Get vote of the user
+	 * Get votes of the user
 	 *
 	 * @param integer User ID of specific user
-	 * @return integer|boolean Poll option ID OR FALSE if current user didn't vote on this poll yet
+	 * @return array|boolean Poll option IDs OR FALSE if current user didn't vote on this poll yet
 	 */
 	function get_user_vote( $user_ID = NULL )
 	{

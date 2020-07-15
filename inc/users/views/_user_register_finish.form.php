@@ -52,6 +52,8 @@ else
 	$params = $default_params;
 }
 
+$required_fields = get_registration_template_required_fields();
+
 $Form = new Form( $form_action, 'user_checkchanges' );
 
 $Form->switch_template_parts( $params['skin_form_params'] );
@@ -68,12 +70,12 @@ if( isset( $Blog ) )
 	$Form->hidden( 'blog', $Blog->ID );
 }
 
-$Form->begin_fieldset( T_('User Profile') );
+$Form->begin_fieldset( TB_('User Profile') );
 
 // Login
-$Form->text_input( 'edited_user_login', $edited_User->login, 22, /* TRANS: noun */ T_('Login'), '',
+$Form->text_input( 'edited_user_login', $edited_User->login, 22, /* TRANS: noun */ TB_('Login'), '',
 	array(
-			'placeholder'  => T_('Choose a username'),
+			'placeholder'  => TB_('Choose a username'),
 			'maxlength'    => 20,
 			'class'        => 'input_text',
 			'required'     => true,
@@ -89,18 +91,18 @@ $Form->text_input( 'edited_user_login', $edited_User->login, 22, /* TRANS: noun 
 if( ( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) ) &&
 		( $edited_User->get( 'pass_driver' ) != 'nopass' && ( ! isset( $edited_User->previous_pass_driver ) || $edited_User->previous_pass_driver != 'nopass' ) ) )
 {
-	if( ! $current_User->check_perm( 'users', 'edit' ) || $edited_User->ID == $current_User->ID )
+	if( ! check_user_perm( 'users', 'edit' ) || $edited_User->ID == $current_User->ID )
 	{	// Current user has no full access or editing his own password
-		$Form->password_input( 'current_user_pass', '', 20, T_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:'.$params['register_field_width'].'px' ) );
+		$Form->password_input( 'current_user_pass', '', 20, TB_('Current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:'.$params['register_field_width'].'px' ) );
 	}
 	else
 	{	// Ask password of current admin:
-		$Form->password_input( 'current_user_pass', '', 20, T_('Enter your current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:163px', 'note' => sprintf( T_('We ask for <b>your</b> (%s) <i>current</i> password as an additional security measure.'), $current_User->get( 'login' ) ) ) );
+		$Form->password_input( 'current_user_pass', '', 20, TB_('Enter your current password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'style' => 'width:163px', 'note' => sprintf( TB_('We ask for <b>your</b> (%s) <i>current</i> password as an additional security measure.'), $current_User->get( 'login' ) ) ) );
 	}
 }
-$Form->password_input( 'edited_user_pass1', '', 18, T_('Password'),
+$Form->password_input( 'edited_user_pass1', '', 18, TB_('Password'),
 	array(
-			'placeholder'  => T_('Choose a password'),
+			'placeholder'  => TB_('Choose a password'),
 			'maxlength'    => 70,
 			'class'        => 'input_text',
 			'required'     => true,
@@ -111,7 +113,7 @@ $Form->password_input( 'edited_user_pass1', '', 18, T_('Password'),
 $Form->password_input( 'edited_user_pass2', '', 18, '',
 	array(
 			'note'         => '<div id="pass2_status" class="red"></div>',
-			'placeholder'  => T_('Please type your password again'),
+			'placeholder'  => TB_('Please type your password again'),
 			'maxlength'    => 70,
 			'class'        => 'input_text',
 			'required'     => true,
@@ -121,54 +123,58 @@ $Form->password_input( 'edited_user_pass2', '', 18, '',
 	);
 
 // Email
-$Form->email_input( 'edited_user_email', $edited_User->email, 50, T_('Email'), array( 'note' => '<br />'.T_('We respect your privacy. Your email will remain strictly confidential.') ),
+$Form->email_input( 'edited_user_email', $edited_User->email, 50, TB_('Email'), array( 'note' => '<br />'.TB_('We respect your privacy. Your email will remain strictly confidential.') ),
 	array(
-			'placeholder' => T_('Email address'),
+			'placeholder' => TB_('Email address'),
 			'maxlength'   => 255,
 			'class'       => 'input_text wide_input',
 			'required'    => true,
 		)
 	);
 
-if( $Settings->get( 'registration_require_country' ) )
+if( in_array( 'country', $required_fields ) )
 {	// Country is required:
 	$CountryCache = & get_CountryCache();
-	$Form->select_country( 'country', $edited_User->ctry_ID, $CountryCache, T_('Country'), array(
+	$Form->select_country( 'country', $edited_User->ctry_ID, $CountryCache, TB_('Country'), array(
 			'allow_none' => true,
 			'required'   => true,
 		) );
 }
 
-if( $Settings->get( 'registration_require_firstname' ) )
+if( in_array( 'firstname', $required_fields ) )
 {	// Firstname is visible:
-	$Form->text_input( 'firstname', $edited_User->firstname, 18, T_('First name'), T_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
+	$Form->text_input( 'firstname', $edited_User->firstname, 18, TB_('First name'), TB_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
 }
 
-$registration_require_gender = $Settings->get( 'registration_require_gender' );
-if( $registration_require_gender != 'hidden' )
+if( in_array( 'lastname', $required_fields ) )
+{	// Lastname is visible:
+	$Form->text_input( 'lastname', $edited_User->lastname, 18, TB_('Last name'), TB_('Your real last name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
+}
+
+if( in_array( 'gender', $required_fields ) )
 {	// Display a gender field if it is not hidden:
 	$Form->radio_input( 'gender', $edited_User->gender, array(
-				array( 'value' => 'M', 'label' => T_('A man') ),
-				array( 'value' => 'F', 'label' => T_('A woman') ),
-				array( 'value' => 'O', 'label' => T_('Other') ),
-			), T_('I am'), array( 'required' => $registration_require_gender == 'required' ) );
+				array( 'value' => 'M', 'label' => TB_('A man') ),
+				array( 'value' => 'F', 'label' => TB_('A woman') ),
+				array( 'value' => 'O', 'label' => TB_('Other') ),
+			), TB_('I am'), array( 'required' => true ) );
 }
 
-if( $Settings->get( 'registration_ask_locale' ) )
+if( in_array( 'locale', $required_fields ) )
 {	// Ask user language:
-	$Form->select( 'locale', $edited_User->get( 'locale' ), 'locale_options_return', T_('Locale'), T_('Preferred language') );
+	$Form->select( 'locale', $edited_User->get( 'locale' ), 'locale_options_return', TB_('Locale'), TB_('Preferred language') );
 }
 
 $Form->end_form( array(
-		array( '', 'actionArray[update]', T_('Finish Registration').'!', 'SaveButton' ),
+		array( '', 'actionArray[update]', TB_('Finish Registration').'!', 'SaveButton' ),
 	) );
 
 // Display javascript password strength indicator bar
 display_password_indicator( array(
-			'pass1-id'    => 'edited_user_pass1',
-			'pass2-id'    => 'edited_user_pass2',
-			'login-id'    => 'edited_user_login',
-			'field-width' => $params['register_field_width'],
+			'pass1_id'    => 'edited_user_pass1',
+			'pass2_id'    => 'edited_user_pass2',
+			'login_id'    => 'edited_user_login',
+			'field_width' => $params['register_field_width'],
 	) );
 
 // Display javascript code to edit password:

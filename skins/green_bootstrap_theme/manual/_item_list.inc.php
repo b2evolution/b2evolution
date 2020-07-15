@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
@@ -23,6 +23,9 @@ $params = array_merge( array(
 		'after_title'       => '$flag_icon$</h3>$item_status$',
 		'before_title_text' => '$item_icon$',
 		'after_title_text'  => '',
+		'item_link_type'    => '#',
+		'content_mode'      => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
+		'intro_mode'        => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
 	), $params );
 
 global $Item;
@@ -92,12 +95,18 @@ foreach( $mask_params as $mask_param )
 				'before_title'    => $params['before_title_text'],
 				'after_title'     => $params['after_title_text'],
 				'post_navigation' => $params['post_navigation'],
+				'link_type'       => $params['item_link_type'],
 				'link_class'      => 'link',
 			),
 			// Item Visibility Badge widget template
 			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
 			'widget_item_visibility_badge_params'  => array(
 					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				),
+			// Params for widget "Item Content":
+			'widget_item_content_params' => array(
+					'content_mode' => $params['content_mode'],
+					'intro_mode'   => $params['intro_mode'],
 				),
 		) );
 		// ----------------------------- END OF "Item in List" CONTAINER -----------------------------

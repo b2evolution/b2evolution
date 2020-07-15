@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -19,7 +19,7 @@ class adjust_headings_plugin extends Plugin
 	var $code = 'h_levels';
 	var $name = 'Adjust headings';
 	var $priority = 105;
-	var $version = '7.0.2';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -202,7 +202,7 @@ class adjust_headings_plugin extends Plugin
 		$this->highest_level = NULL;
 
 		// Find the highest heading level in the current content:
-		replace_content_outcode( '#</h([1-6])>#i', array( $this, 'callback_find_highest_heading' ), $content, 'replace_content_callback' );
+		replace_outside_code_tags( '#</h([1-6])>#i', array( $this, 'callback_find_highest_heading' ), $content, 'replace_content_callback' );
 
 		if( is_null( $this->highest_level ) || $this->highest_level == $this->setting_level )
 		{ // The html heading tags have not been detected in the content
@@ -211,7 +211,7 @@ class adjust_headings_plugin extends Plugin
 		}
 
 		// Replace the headings with new:
-		$content = replace_content_outcode( '#<(/?)h([1-6])([^>]*)?>#i', array( $this, 'callback_adjust_headings' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#<(/?)h([1-6])([^>]*)?>#i', array( $this, 'callback_adjust_headings' ), $content, 'replace_content_callback' );
 
 		return $content;
 	}

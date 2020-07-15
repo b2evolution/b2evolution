@@ -18,7 +18,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Credits go to the WordPress team (@link http://wordpress.org), where I got the basic
  * import-mt.php script with most of the core functions. Thank you!
@@ -30,8 +30,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $admin_url;
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 /**
  * @const IMPORT_SRC_DIR directory where to be imported files get searched for.
@@ -69,6 +69,14 @@ if( function_exists( 'set_magic_quotes_runtime' ) )
 else
 {
 	@ini_set( 'magic_quotes_runtime', 0 );
+}
+
+if( param( 'default_blog', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'default_blog' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'default_blog' ), 'mt' );
 }
 
 // TODO: $io_charset !!
@@ -334,9 +342,9 @@ param( 'import_mode', 'string', 'normal' );
 			form_text( 'default_password', $default_password, 20, 'Password for new users', 'this will be the password for users created during migration (default is "changeme")', 30 , '', 'password' );
 			form_text( 'default_password2', $default_password, 20, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
 			$GroupCache = & get_GroupCache();
-			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
+			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, 'User group' );
 			$field_note = '[0 - 10]';
-			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, T_('Level'), $field_note, 2 );
+			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, 'Level', $field_note, 2 );
 			?>
 		</fieldset>
 
@@ -380,7 +388,7 @@ param( 'import_mode', 'string', 'normal' );
 		<fieldset><legend>Post/Entry defaults</legend>
 			<?php
 			form_checkbox( 'default_convert_breaks', $default_convert_breaks, 'Convert-Breaks default', 'will be used for posts with empty CONVERT BREAKS or "__default__"' );
-			form_select( 'post_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), 'Locale for posts.' );
+			form_select( 'post_locale', $Settings->get('default_locale'), 'locale_options', 'Default locale', 'Locale for posts.' );
 			form_checkbox( 'convert_html_tags', $convert_html_tags, 'Convert ugly HTML', 'this will lowercase all html tags and add a XHTML compliant closing tag to &lt;br&gt;, &lt;img&gt;, &lt;hr&gt; (you\'ll get notes)' );
 
 			if( $import_mode != 'easy' )
@@ -558,7 +566,7 @@ param( 'import_mode', 'string', 'normal' );
 				$blog_id = ($cat == '#DEFAULTBLOG#') ? $default_blog : $match[1];
 				// remember the name to create it when posts get inserted
 				// fp>dh: please use param() instead of $_POST[] (everywhere)
-				$catsmapped[ $categories[$i_cat] ] = array( 'blogid', $blog_id, remove_magic_quotes( $_POST['catmap_name'][$i_cat]) );
+				$catsmapped[ $categories[$i_cat] ] = array( 'blogid', $blog_id, $_POST['catmap_name'][$i_cat] );
 			}
 			else
 			{
@@ -631,8 +639,8 @@ param( 'import_mode', 'string', 'normal' );
 		{
 			if( !empty($replace) )
 			{
-				$urlsearch[] = remove_magic_quotes($_POST['url_search'][$i]);
-				$urlreplace[] = remove_magic_quotes( $replace );
+				$urlsearch[] = $_POST['url_search'][$i];
+				$urlreplace[] = $replace;
 			}
 			$i++;
 		}
@@ -658,7 +666,7 @@ param( 'import_mode', 'string', 'normal' );
 			}
 			elseif( $select == '#CREATENEW#' )
 			{
-				$usersmapped[ $mtauthor ] = array( 'createnew', remove_magic_quotes( $_POST['user_name'][$i_user] ) );
+				$usersmapped[ $mtauthor ] = array( 'createnew', $_POST['user_name'][$i_user] );
 			}
 			elseif( preg_match( '#\d+#', $select, $match ) )
 			{
@@ -876,7 +884,7 @@ param( 'import_mode', 'string', 'normal' );
 					case 'ignore':
 						$message .= '<li style="color:blue">User ignored!</li>';
 						echo $message.'</ul>';
-						continue;  // next post
+						continue 2;  // next post
 
 					case 'b2evo':
 						$item_Author = & $UserCache->get_by_login( $usersmapped[ $post_author ][1] );
@@ -914,7 +922,7 @@ param( 'import_mode', 'string', 'normal' );
 					default:
 						$message .= '<li style="color:red">unknown type in checkauthor ('.$usersmapped[ $author ][0].'). This should never ever happen. Post ignored. Please report it.</li>';
 						echo $message.'</ul>';
-						continue;  // next post
+						continue 2;  // next post
 				}
 
 
@@ -932,7 +940,7 @@ param( 'import_mode', 'string', 'normal' );
 							array_shift($checkcat);
 							while( $cat_id = array_shift($checkcat) )
 								$post_catids[] = $cat_id; // get all catids
-							continue;
+							continue 2;
 
 						case 'ignore': // category is ignored
 							if( $i_cat == 0 )
@@ -1252,7 +1260,7 @@ function fieldset_cats()
 		<?php
 			if( count( $ChapterCache->cache ) )
 			{
-				echo T_('Select main category in target blog and optionally check additional categories').':';
+				echo 'Select main category in target blog and optionally check additional categories'.':';
 			}
 			else
 			{
@@ -1279,7 +1287,7 @@ function fieldset_cats()
 
 			if( get_allow_cross_posting() >= 1 )
 			{ // We allow cross posting, display checkbox:
-				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.format_to_output( T_('Select as an additionnal category'), 'htmlattr' ).'" value="'.$Chapter->ID.'"';
+				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.format_to_output( 'Select as an additionnal category', 'htmlattr' ).'" value="'.$Chapter->ID.'"';
 				$r .= ' />';
 			}
 
@@ -1290,7 +1298,7 @@ function fieldset_cats()
 				{	// Assign default cat for new post
 					$default_main_cat = $Chapter->ID;
 				}
-				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.format_to_output( T_('Select as MAIN category'), 'htmlattr' ).'" value="'.$Chapter->ID.'"';
+				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.format_to_output( 'Select as MAIN category', 'htmlattr' ).'" value="'.$Chapter->ID.'"';
 				if( ($Chapter->ID == $postdata["Category"]) || ($Chapter->ID == $default_main_cat))
 					$r .= ' checked="checked"';
 				$r .= ' />';
@@ -1319,7 +1327,7 @@ function fieldset_cats()
 		{ // run recursively through the cats
 			$current_blog_ID = $i_blog->blog_ID;
 			if( ! blog_has_cats( $current_blog_ID ) ) continue;
-			#if( ! $current_User->check_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
+			#if( ! check_user_perm( 'blog_post_statuses', 'any', false, $current_blog_ID ) ) continue;
 			echo "<h4>".$i_blog->blog_name."</h4>\n";
 			echo $ChapterCache->recurse( $callbacks, $current_blog_ID, NULL, 0, 0, array( 'sorted' => true) );
 		}
@@ -1651,7 +1659,7 @@ function ripline( $prefix, &$haystack )
 
 function tidypostdata( $string )
 {
-	return str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), remove_magic_quotes( $string ) );
+	return str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), $string );
 }
 
 ?>

@@ -19,6 +19,22 @@ class ParsedownB2evo extends ParsedownExtra
 
 
 	/**
+	 * Constructor
+	 */
+	function __construct()
+	{
+		parent::__construct();
+
+		if( isset( $this->unmarkedBlockTypes ) &&
+		    is_array( $this->unmarkedBlockTypes ) &&
+		    ( $code_index = array_search( 'Code', $this->unmarkedBlockTypes ) ) !== false )
+		{	// Don't parse code blocks by indent spaces or tab:
+			unset( $this->unmarkedBlockTypes[ $code_index ] );
+		}
+	}
+
+
+	/**
 	 * Set flag to parse font styles
 	 *
 	 * @param boolean
@@ -234,14 +250,30 @@ class ParsedownB2evo extends ParsedownExtra
 	 */
 	protected function blockListContinue( $Line, array $Block )
 	{
-		if( ! empty( $Block['interrupted'] ) )
+		if( ! empty( $Block['interrupted'] ) && empty( $Line['indent'] ) )
 		{	// If a list is interrupted now(for example, new line after list line),
 			// then we should end this list in order to start one new if that exists:
 			// Do nothing here in order to end the current list element.
 		}
 		else
 		{	// Call standard preparing:
-			return parent::blockListContinue( $Line, $Block );
+			$before_list_items_num = ( isset( $Block['li']['text'] ) && is_array( $Block['li']['text'] ) ? count( $Block['li']['text'] ) : 0 );
+			$Block = parent::blockListContinue( $Line, $Block );
+
+			if( isset( $Line['body'] ) &&
+			    isset( $Block['li']['text'] ) &&
+			    is_array( $Block['li']['text'] ) )
+			{	// If list has at least one item:
+				$after_list_items_num = count( $Block['li']['text'] );
+				if( $after_list_items_num > $before_list_items_num &&
+				    $Block['li']['text'][ $after_list_items_num - 1 ] !== $Line['body'] )
+				{	// If new list item was added in parent::blockListContinue() above,
+					// We should use indent = 2 spaces instead of 4 spaces from parent class Parsedown:
+					$Block['li']['text'][ $after_list_items_num - 1 ] = preg_replace( '/^[ ]{0,2}/', '', $Line['body'] );
+				}
+			}
+
+			return $Block;
 		}
 	}
 
@@ -259,15 +291,10 @@ class ParsedownB2evo extends ParsedownExtra
 			$Block['element']['attributes'] = array();
 		}
 
-		// Append class "codeblock":
-		if( isset( $Block['element']['attributes']['class'] ) )
-		{
-			$Block['element']['attributes']['class'] .= ' codeblock';
-		}
-		else
-		{
-			$Block['element']['attributes']['class'] = 'codeblock';
-		}
+		// Append class "codeblock" and "line-numbers" for prism plugin:
+		$Block['element']['attributes']['class'] = isset( $Block['element']['attributes']['class'] )
+			? $Block['element']['attributes']['class'].' codeblock'
+			: 'codeblock';
 
 		// Add these params for correct code detecting by codehighlight plugin:
 		$element_attrs = 'line=1'; // set this param because codehighlight plugin doesn't detect language without this
@@ -275,7 +302,7 @@ class ParsedownB2evo extends ParsedownExtra
 		    preg_match( '/language-([a-z]+)/i', $Block['element']['text']['attributes']['class'], $lang_match ) )
 		{
 			$element_attrs .= ' lang='.$lang_match[1];
-			// Unset this because codehighlight plugin doesn't detect codeblock when tag <code> has any attributes:
+			// Unset class like "language-XXXX" to avoid rendering by Js of prism even when this plugin is not selected for rendered content:
 			unset( $Block['element']['text']['attributes']['class'] );
 		}
 		$Block['element']['before'] = '<!-- codeblock '.$element_attrs.' -->';
@@ -397,6 +424,27 @@ class ParsedownB2evo extends ParsedownExtra
 		// Remove newlines before embedded list,
 		// in order to don't add unnecessary <p> e.g. by plugin "Auto P":
 		return preg_replace( '#[\n\r]+<ul>#i', '<ul>', $markup );
+	}
+
+
+	/**
+	 * Parse inline URL
+	 *
+	 * @param array Excerpt
+	 * @return string
+	 */
+	protected function inlineUrl( $Excerpt )
+	{
+		$Inline = parent::inlineUrl( $Excerpt );
+
+		if( isset( $Inline['element'] ) )
+		{	// Force element type from <a> to simple text without html tag to avoid rendering of URLs as html links:
+			$Inline['element']['name'] = 'notag';
+			// NOTE: We cannot use `Parsedown->setUrlsLinked( false )` to disable rendering of URLs, because
+			// in such case URLs may be broken by char `_` to `<em>` or by `__` to `<strong>` that we don't like.
+		}
+
+		return $Inline;
 	}
 }
 

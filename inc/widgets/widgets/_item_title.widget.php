@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -62,7 +62,7 @@ class item_title_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Title');
+		return T_('Title');
 	}
 
 
@@ -184,7 +184,7 @@ class item_title_Widget extends ComponentWidget
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'     => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
-				'item_ID'     => $Item->ID, // Has the Item page changed?
+				'item_ID'     => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 			);
 	}
 }

@@ -11,6 +11,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+echo '<div id="evo_site_header">';
+
 	// ------------------------- "Site Header" CONTAINER EMBEDDED HERE --------------------------
 	widget_container( 'site_header', array(
 			// The following params will be used as defaults for widgets included in this container:
@@ -26,6 +28,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			'item_end'            => '',
 			'item_selected_start' => '',
 			'item_selected_end'   => '',
+			'link_text_myprofile' => '$login$',
 		) );
 	// ----------------------------- END OF "Site Header" CONTAINER -----------------------------
 
@@ -48,4 +51,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			'item_selected_end'   => '</li>',
 		) );
 	// ----------------------------- END OF "Navigation Hamburger" CONTAINER -----------------------------
+
+echo '</div>';
 ?>

@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -111,6 +111,15 @@ class ItemList2 extends ItemListLight
 		// Set Item params from request:
 		$Item->load_from_Request();
 
+		// Use only first slug on PREVIEW mode in order to initialize correct permanent URL:
+		$urltitles = $Item->get( 'urltitle' );
+		if( $urltitles === '' )
+		{	// If slugs are empty on preview form, try to get previous of from title:
+			$urltitles = ( empty( $this->previous_urltitle ) ? $Item->get( 'title' ) : $this->previous_urltitle );
+		}
+		$urltitles = explode( ',', $urltitles );
+		$Item->set( 'urltitle', get_urltitle( $urltitles[0] ) );
+
 		if( isset( $Item->previous_status ) )
 		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)
@@ -207,7 +216,9 @@ class ItemList2 extends ItemListLight
 		if( !empty( $this->ItemQuery->order_by ) && preg_match( '/'.preg_quote( 'postcatsorders.postcat_order' ).' (DESC|ASC)/i', $this->ItemQuery->order_by, $order_dir_match ) )
 		{	// Move the items with NULL order to the end of the list
 			$null_orders = ( $order_dir_match[1] == 'DESC' ? '-' : '' ).'999999999'; // Always keep the not ordered posts at the end
-			$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) AS temp_order';
+			$select_temp_order = ', IF( postmaincat.cat_blog_ID != T_categories.cat_blog_ID, '
+				.'( SELECT SUM( subpostcatorder.postcat_order ) FROM T_postcats AS subpostcatorder INNER JOIN T_categories AS subpostmaincat ON subpostcatorder.postcat_cat_ID = subpostmaincat.cat_ID WHERE subpostmaincat.cat_blog_ID = T_categories.cat_blog_ID AND subpostcatorder.postcat_post_ID = post_ID ), '
+				.'IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) ) AS temp_order';
 			$this->ItemQuery->ORDER_BY( str_replace( 'postcatsorders.postcat_order', 'temp_order', $this->ItemQuery->get_order_by( '' ) ) );
 		}
 
@@ -629,8 +640,11 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_assignees( $this->filters['assignees'] );
 		$next_Query->where_assignees_logins( $this->filters['assignees_login'] );
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
+		$next_Query->where_involves( $this->filters['involves'] );
+		$next_Query->where_involves_logins( $this->filters['involves_login'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
+		$next_Query->where_statuses_array( $this->filters['statuses_array'] );
 		// itemtype_usage param is kept only for the case when some custom types should be displayed
 		$next_Query->where_itemtype_usage( ! empty( $itemtype_usage ) ? $itemtype_usage : $this->filters['itemtype_usage'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -644,6 +658,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_flagged( $this->filters['flagged'] );
 		$next_Query->where_locale_visibility();
 		$next_Query->where_mustread( $this->filters['mustread'] );
+		$next_Query->where_renderers( $this->filters['renderers'] );
 
 		/*
 		 * ORDER BY stuff:

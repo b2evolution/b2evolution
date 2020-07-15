@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -54,7 +54,7 @@ class FileRootCache
 
 		if( ! empty( $special_root_ID ) &&
 		    ( $special_FileRoot = & $FileRootCache->get_by_ID( $special_root_ID, true ) ) &&
-		    $current_User->check_perm( 'files', 'view', false, $special_FileRoot ) )
+		    check_user_perm( 'files', 'view', false, $special_FileRoot ) )
 		{ // Try to add special file root if current user has an access
 			$r[ $special_FileRoot->ID ] = & $special_FileRoot;
 		}
@@ -119,8 +119,8 @@ class FileRootCache
 		// Email campaigns root:
 		$emailcampaign_ID = get_param( 'link_type' ) == 'emailcampaign' ? intval( get_param( 'link_object_ID' ) ) : 0;
 		if( ( $emailcampaign_FileRoot = & $FileRootCache->get_by_type_and_ID( 'emailcampaign', $emailcampaign_ID, true ) ) &&
-				$current_User->check_perm( 'files', 'view', false, $emailcampaign_FileRoot ) &&
-				$current_User->check_perm( 'emails', 'view' ) )
+				check_user_perm( 'files', 'view', false, $emailcampaign_FileRoot ) &&
+				check_user_perm( 'emails', 'view' ) )
 		{ // Try to add Email campaign file root if current user has an access:
 			$r[ $emailcampaign_FileRoot->ID ] = & $emailcampaign_FileRoot;
 		}

@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -46,6 +46,11 @@ if( ! $PageCache->check() )
 { // Cache miss, we have to generate:
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
+require_js_defer( '#jquery#' );
+require_js_defer( '#bootstrap#' );
+require_css( '#bootstrap_css#' );
+require_css( 'bootstrap-b2evo_base.bmin.css' );
+require_css( 'b2evo_helper_screens.min.css' );
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
@@ -59,18 +64,11 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>">
 	<head>
-		<base href="<?php echo $baseurl; ?>">
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title>b2evolution - Default Page</title>
-		<script src="rsc/js/jquery.min.js"></script>
-		<!-- Bootstrap -->
-		<script src="rsc/js/bootstrap/bootstrap.min.js"></script>
-		<link href="rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
-		<link href="rsc/build/bootstrap-b2evo_base.bmin.css" rel="stylesheet">
-		<link href="rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 		<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 	</head>
 	<body<?php skin_body_attrs(); ?>>
@@ -116,7 +114,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 			if( count( $BlogCache->cache ) == 0 )
 			{ // There is no blog on this system!
-				echo '<p><strong>'.T_('Your b2evolution installation is installed and working but there is no content yet.').'</strong></p>';
+				echo '<p><strong>'.T_('Your b2evolution CMS is installed and working but there is no content yet.').'</strong></p>';
 
 				// Display this link to create blog
 				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=dashboard">'.T_( 'Go to the dashboard & start creating' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
@@ -127,7 +125,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 
 				echo '<p>'.T_('You haven\'t set a default collection yet. Thus, you see this default page.').'</p>';
 
-				if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+				if( check_user_perm( 'blogs', 'create' ) )
 				{ // Display this link only for users who can create blog
 				?>
 				<ul class="pager"><li class="next"><a href="<?php echo $admin_url ?>?ctrl=collections&amp;tab=site_settings"><?php echo T_( 'Set a default collection' ) ?> <span aria-hidden="true">&rarr;</span></a></li></ul>
@@ -160,7 +158,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		</ul>
 
 		<?php
-			if( is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
+			if( check_user_perm( 'blogs', 'create' ) )
 			{ // Display this link only for users who can create blog
 				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new collection' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
 			}
@@ -179,6 +177,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		</div><!-- /container -->
 		<!-- End of skin_wrapper -->
 		</div>
+		<?php include_footerlines(); /* Add JavaScript and CSS files included by plugins and skin */ ?>
 	</body>
 </html>
 <?php

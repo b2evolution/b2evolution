@@ -16,7 +16,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Justin Vincent - {@link http://justinvincent.com}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://daniel.hahler.de}.
  *
@@ -779,7 +779,11 @@ class DB
 			$err_msg .= "</div>\n";
 		}
 
-		if( $this->halt_on_error )
+		if( $this->halt_on_error === 'throw' )
+		{	// Throw SQL error into Exception:
+			throw new Exception( $err_msg );
+		}
+		elseif( $this->halt_on_error )
 		{
 			if( function_exists('debug_die') )
 			{

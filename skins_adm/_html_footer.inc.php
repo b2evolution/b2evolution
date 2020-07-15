@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -61,5 +61,9 @@ include_footerlines(); // enables translation strings for js
 <!-- End of skin_wrapper -->
 </div>
 
+<?php
+// Include ALL exposed JS variables into <script>:
+include_js_vars();
+?>
 </body>
 </html>

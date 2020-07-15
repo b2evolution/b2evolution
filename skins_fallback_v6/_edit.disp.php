@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -18,10 +18,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Collection, $Blog, $Session, $inc_path;
 global $action, $form_action;
 
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var Plugins
  */
@@ -110,25 +106,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $edited_Item->can_edit_workflow( 'status' ) )
-		{	// Allow workflow status if current user can edit this property:
-			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-		}
-		if( $edited_Item->can_edit_workflow( 'status' ) )
-		{	// Allow workflow user if current user can edit this property:
-			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
-		}
-		if( $edited_Item->can_edit_workflow( 'priority' ) )
-		{	// Allow workflow priority if current user can edit this property:
-			$Form->hidden( 'item_priority', $edited_Item->priority );
-		}
-		if( $edited_Item->can_edit_workflow( 'deadline' ) )
-		{	// Allow workflow deadline if current user can edit this property:
-			$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
-			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
-		}
 		$Form->hidden( 'trackback_url', $trackback_url );
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$Form->hidden( 'item_featured', $edited_Item->featured );
 			$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
@@ -139,6 +118,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
 		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+		$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
+		$Form->hidden( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -150,9 +131,9 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	if( check_user_perm( 'admin', 'restricted' ) )
 	{ // These fields can be edited only by users which have an access to back-office
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // Time stamp field values
 			$Form->hidden( 'item_dateset', $edited_Item->get( 'dateset' ) );
 			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
@@ -169,7 +150,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-			$current_User->check_perm( 'files', 'view', false ) )
+			check_user_perm( 'files', 'view', false ) )
 	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		// Initialize this object as global because this is used in many link functions:
@@ -177,10 +158,20 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
 	}
 
+	// Display buttons to change Item Type:
+	echo_item_type_change_buttons( $edited_Item );
+
 	$front_edit_fields = $edited_Item->get_front_edit_fields();
 	foreach( $front_edit_fields as $front_edit_field )
 	{
-		$front_edit_field_is_visible = ! empty( $front_edit_field['order'] );
+		if( $front_edit_field['type'] == 'custom' )
+		{	// For custom field we should check option "Public" to know when it may be visible on front-office:
+			$front_edit_field_is_visible = ! empty( $front_edit_field['public'] );
+		}
+		else
+		{	// For other item fields we can make it visible onle when setting "Front-Office Order" is filled for the field:
+			$front_edit_field_is_visible = ! empty( $front_edit_field['order'] );
+		}
 		if( $front_edit_field['type'] == 'item' )
 		{	// Item field:
 			switch( $front_edit_field['name'] )
@@ -193,11 +184,15 @@ $Form->begin_form( 'inskin', '', $form_params );
 					}
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
+						$Form->switch_layout( 'fields_table' );
+						$Form->begin_fieldset();
 						$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array(
 								'maxlength' => intval( $edited_Item->get_type_setting( 'title_maxlen' ) ),
 								'required'  => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ),
 								'style'     => 'width:100%',
 							) );
+						$Form->end_fieldset();
+						$Form->switch_layout( NULL );
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
@@ -213,10 +208,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 					}
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
+						$Form->switch_layout( 'fields_table' );
+						$Form->begin_fieldset();
 						$Form->text_input( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ), 50, T_('Short title'), '', array(
 								'maxlength' => intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) ),
 								'style'     => 'width:100%',
 							) );
+						$Form->end_fieldset();
+						$Form->switch_layout( NULL );
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
@@ -248,12 +247,12 @@ $Form->begin_form( 'inskin', '', $form_params );
 
 						// ---------------------------- TEXTAREA -------------------------------------
 						$Form->switch_layout( 'none' );
-						$Form->fieldstart = '<div class="edit_area">';
+						$Form->fieldstart = '<div class="edit_area" data-filedrop-callback="helloWorld">';
 						$Form->fieldend = "</div>\n";
 						$Form->textarea_input( 'content', $item_content, 16, NULL, array(
 								'cols' => 50 ,
 								'id' => 'itemform_post_content',
-								'class' => 'autocomplete_usernames'
+								'class' => 'autocomplete_usernames link_attachment_dropzone'
 							) );
 						$Form->switch_layout( NULL );
 						?>
@@ -278,7 +277,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 								<div class="dropdown-menu dropdown-menu-right">'.$item_renderer_checkboxes.'</div>
 							</div>';
 							// JS code to don't hide popup on click to checkbox:
-							echo '<script>jQuery( "#itemform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+							expose_var_to_js( 'evo_itemform_renderers__click', true );
 						}
 						// CALL PLUGINS NOW:
 						$display_editor_params = array(
@@ -314,6 +313,52 @@ $Form->begin_form( 'inskin', '', $form_params );
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
 						$Form->attachments_fieldset( $edited_Item );
+					}
+					break;
+
+				case 'workflow':
+					// Workflow properties:
+					if( ! $edited_Item->can_edit_workflow() )
+					{	// Don't display workflow properties if current user has no permission:
+						break;
+					}
+
+					if( $front_edit_field_is_visible )
+					{	// Display only if it is visible on front-office:
+						$Form->begin_line( T_('Workflow') );
+
+						$edited_Item->display_workflow_field( 'status', $Form, array( 'hide_label' => true ) );
+
+						$edited_Item->display_workflow_field( 'user', $Form, array(
+								'hide_label'  => true,
+								'placeholder' => 'Assignee',
+							) );
+
+						$edited_Item->display_workflow_field( 'priority', $Form, array( 'hide_label' => true ) );
+
+						$edited_Item->display_workflow_field( 'deadline', $Form, array( 'hide_label' => true ) );
+
+						$Form->end_line();
+					}
+					else
+					{	// Print hidden fields in order to don't lost changes on switching from back-office edit form:
+						if( $edited_Item->can_edit_workflow( 'status' ) )
+						{	// Allow workflow status if current user can edit this property:
+							$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
+						}
+						if( $edited_Item->can_edit_workflow( 'status' ) )
+						{	// Allow workflow user if current user can edit this property:
+							$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+						}
+						if( $edited_Item->can_edit_workflow( 'priority' ) )
+						{	// Allow workflow priority if current user can edit this property:
+							$Form->hidden( 'item_priority', $edited_Item->priority );
+						}
+						if( $edited_Item->can_edit_workflow( 'deadline' ) )
+						{	// Allow workflow deadline if current user can edit this property:
+							$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
+							$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
+						}
 					}
 					break;
 
@@ -376,7 +421,18 @@ $Form->begin_form( 'inskin', '', $form_params );
 					}
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
-						$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, T_('Link to url'), '', array(
+						if( is_pro() )
+						{	// Only PRO feature for using of post link URL as an External Canonical URL:
+							$external_canonical_url_checkbox = '<label>'
+									.'<input name="post_external_canonical_url" value="1" type="checkbox"'.( $edited_Item->get_setting( 'external_canonical_url' ) ? ' checked="checked"' : '' ).' /> '
+									.sprintf( T_('Use as <a %s>External canonical URL</a>'), 'href="'.get_manual_url( 'external-canonical-url' ).'"' ).' '.get_pro_label()
+								.'</label>';
+						}
+						else
+						{
+							$external_canonical_url_checkbox = '';
+						}
+						$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, T_('Link to url'), $external_canonical_url_checkbox, array(
 								'maxlength' => 255,
 								'required'  => ( $edited_Item->get_type_setting( 'use_url' ) == 'required' ),
 								'style'    => 'width:100%',
@@ -385,6 +441,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
 						$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+						if( is_pro() )
+						{	// Only PRO feature for using of post link URL as an External Canonical URL:
+							$Form->hidden( 'post_external_canonical_url', $edited_Item->get_setting( 'external_canonical_url' ) );
+						}
 					}
 					break;
 

@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -28,11 +28,14 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'coll_logo_size'        => 'fit-128x16',
 	) );
 
 if( ! is_array( $legend_icons ) )
@@ -41,9 +44,8 @@ if( ! is_array( $legend_icons ) )
 }
 
 // ------------------------------- START OF POSTS ASSIGNED TO CURRENT USER -------------------------------
-if( is_logged_in() &&
-    $Blog->get_setting( 'use_workflow' ) &&
-    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+if( $Blog->get_setting( 'use_workflow' ) &&
+    check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 {	// Only if current User can be assigned to tasks of the current Collection:
 	$assigned_ItemList = new ItemList2( $Blog, NULL, NULL, 15, 'ItemCache', 'assigned_' );
 	$assigned_ItemList->set_filters( array(
@@ -51,14 +53,17 @@ if( is_logged_in() &&
 			'orderby'   => 'priority,last_touched_ts',
 			'order'     => 'ASC,DESC',
 			'page'      => param( 'assigned_paged', 'integer', 1 ),
+			'statuses'  => param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' ),
 		), false );
 	$assigned_ItemList->query();
-	if( $assigned_ItemList->result_num_rows > 0 )
-	{	// Display panel with assigned posts if at least one is found:
 ?>
 <div class="panel panel-default forums_list">
-	<header class="panel-heading"><?php echo T_('Assigned to me'); ?></header>
 <?php
+	// Display header for list of assigned tasks for current User:
+	$Skin->display_posts_list_header( T_('Assigned to me') );
+
+	if( $assigned_ItemList->result_num_rows > 0 )
+	{	// Display panel with assigned posts if at least one is found:
 		while( $Item = $assigned_ItemList->get_item() )
 		{
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -81,10 +86,14 @@ if( is_logged_in() &&
 				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );
+	}
+	else
+	{	// No assigned tasks:
+		echo '<div class="ft_no_post">'.T_('No assigned tasks.').'</div>';
+	}
 ?>
 </div>
 <?php
-	}
 }
 // -------------------------------- END OF POSTS ASSIGNED TO CURRENT USER --------------------------------
 
