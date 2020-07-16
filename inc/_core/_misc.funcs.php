@@ -8332,10 +8332,17 @@ function save_active_tab_pane_value( $blog_ID = NULL )
 	}
 
 	global $UserSettings;
-	
-	$key = ( is_array( $tab_pane_value ) ) ? array_key_first( $tab_pane_value ) : '';
-	$key = trim( $key );
-	
+
+	if( is_array( $tab_pane_value ) && ! empty( $tab_pane_value ) )
+	{	// Get first key:
+		$key = array_keys( $tab_pane_value );
+		$key = trim( $key[0] );
+	}
+	else
+	{
+		$key = '';
+	}
+
 	$value = ( isset( $tab_pane_value[ $key ] ) ) ? $tab_pane_value[ $key ] : '';
 	$value = trim( $value );
 	
