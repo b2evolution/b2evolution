@@ -1176,6 +1176,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_User->get( 'fullname' );
 			break;
 
+		case 'User:id':
+			echo $rendered_User->ID;
+			break;
+
 		case 'User:last_name':
 			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
 					'format' => 'htmlbody',		
@@ -1199,13 +1203,20 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'User:picture':
 			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
-					'block_class' => NULL,
-					'show_login'  => false,
+					'size'                => 'crop-top-64x64',
+					'class'               => 'avatar',
+					'align'               => '',
+					'zoomable'            => false,
+					'avatar_overlay_text' => '',
+					'lightbox_group'      => '',
+					'tag_size'            => NULL,
+					'protocol'            => '',
 				), $params );
-			echo $rendered_User->get_avatar_styled( $temp_params );
+			echo $rendered_User->get_avatar_imgtag( $temp_params['size'], $temp_params['class'], $temp_params['align'], $temp_params['zoomable'],
+					$temp_params['avatar_overlay_text'], $temp_params['lightbox_group'], $temp_params['tag_size'], $temp_params['protocol'] );
 			break;
 
-		case 'User:preferredname':
+		case 'User:preferred_name':
 			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
 					'format' => 'htmlbody',		
 				), $params );

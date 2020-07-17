@@ -1737,7 +1737,11 @@ function create_default_templates( $is_task = true )
 		</tr>
 		<tr>
 			<th>Preferred name</th>
-			<td>[User:preferredname]</td>
+			<td>[User:preferred_name]</td>
+		</tr>
+		<tr>
+			<th>ID</th>
+			<td>[User:id]</td>
 		</tr>
 		<tr>
 			<th>Login</th>
@@ -1817,7 +1821,7 @@ function create_default_templates( $is_task = true )
 		'about_author' => array(
 			'name'     => 'Item Details: About Author',
 			'context'  => 'item_details',
-			'template' => '<div class="clearfix"><div class="evo_avatar">
+			'template' => '<div class="clearfix"><div class="evo_avatar" rel="bubbletip_user_[User:id]">
 	[User:picture|size=crop-top-48x48]
 </div>
 <div class="evo_author_display_field">
