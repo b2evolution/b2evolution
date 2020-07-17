@@ -197,6 +197,9 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		$redirect_to = get_returnto_url();
 	}
 
+	// Keep ONLY allowed params from current URL by config:
+	$redirect_to = url_keep_params( $redirect_to );
+
 	$Debuglog->add('Preparing to redirect to: '.$redirect_to, 'request' );
 
 	// Determine if this is an external or internal redirect:

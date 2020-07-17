@@ -827,16 +827,29 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
- * Allow parameters in URL without redirect to Any(Collection, Category, Item, disp=posts, Archive, Tag, User profile) canonical URLs
- * when collection settings "301 redirect to canonical URL when possible" is enabled
+ * Allow parameters in canonical URLs
+ * These params will NOT trigger a "301 redirect to canonical" even if the checkboxes for such redirects are enabled
+ * This applies to ANY canonical URLs (Items but ALSO: Collection, Category, disp=posts, Archive, Tag, User profile) canonical URLs
  *
  * NOTE: For Item URL we automatically include enabled switchable params of the Item (see "Switchable content" on https://b2evolution.net/man/post-advanced-properties-panel)
  */
-$noredir_params = array(
+$accepted_in_canonicals__params = array(
 	'page',          // For showing a different page in a multipage post
 	'quote_post',    // For quoting a post in the forums
 	'quote_comment', // For quoting a comment in the forums
 	'get_redirected_debuginfo_from_sess_ID', // For display debug info of redirected page from different domain
+);
+
+
+/**
+ * Pass through the following params in ANY redirect.
+ * If these params exist, we include them in ANY redirect we make.
+ * We also do NOT overwrite them (e-g: in case of tiny slugs)
+ */
+$passthru_in_all_redirs__params = array(
+	'utm_source',
+	'utm_campaign',
+	'utm_medium',
 );
 
 

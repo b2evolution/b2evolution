@@ -1186,24 +1186,25 @@ function clear_url( $url, $exclude_params )
 
 
 /**
- * Keep only allowed noredir params from current URL in the given URL
+ * Keep allowed params from current URL in the given URL by config
  *
  * @param string Given URL
  * @param string Separator between URL params
- * @param array Additional noredir params for config var $noredir_params. Used for Item's switchable params
- * @return string Given URL with allowed noredir params which are found in current URL
+ * @param array Additional params for config params. Used for Item's switchable params
+ * @return string Given URL with allowed params which are found in currently opened URL
  */
-function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = array() )
+function url_keep_params( $url, $glue = '&', $custom_keep_params = array() )
 {
-	global $noredir_params;
+	// By default allow params from this config for all cases:
+	global $passthru_in_all_redirs__params;
 
-	$all_noredir_params = is_array( $custom_noredir_params ) ? $custom_noredir_params : array();
-	if( is_array( $noredir_params ) )
-	{	// Merge config and custom noredir params:
-		$all_noredir_params = array_merge( $noredir_params, $all_noredir_params );
+	$all_keep_params = is_array( $custom_keep_params ) ? $custom_keep_params : array();
+	if( is_array( $passthru_in_all_redirs__params ) )
+	{	// Merge config and custom params:
+		$all_keep_params = array_merge( $passthru_in_all_redirs__params, $all_keep_params );
 	}
 
-	if( empty( $all_noredir_params ) )
+	if( empty( $all_keep_params ) )
 	{	// No allowed params:
 		return $url;
 	}
@@ -1215,7 +1216,7 @@ function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = a
 	$allowed_params = array();
 	foreach( $_GET as $param => $value )
 	{	// Check each GET param:
-		if( in_array( $param, $all_noredir_params ) && // If param is allowed by config $noredir_params
+		if( in_array( $param, $all_keep_params ) && // If param is allowed by config and custom params
 		    ! in_array( $param, $url_params ) ) // If param is NOT defined in the given URL yet
 		{
 			$allowed_params[ $param ] = $value;
@@ -1224,6 +1225,28 @@ function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = a
 
 	// Append allowed params from current URL to the given URL:
 	return url_add_param( $url, $allowed_params, $glue );
+}
+
+
+/**
+ * Keep allowed params from current URL in the given Canonical URL
+ *
+ * @param string Canonical URL
+ * @param string Separator between URL params
+ * @param array Additional params for config params. Used for Item's switchable params
+ * @return string Canonical URL with allowed params which are found in currently opened URL
+ */
+function url_keep_canonicals_params( $canonical_url, $glue = '&', $custom_keep_params = array() )
+{
+	global $accepted_in_canonicals__params;
+
+	// For canonical URLs we should keep params from additional config:
+	if( is_array( $accepted_in_canonicals__params ) )
+	{	// Merge config and custom params:
+		$custom_keep_params = array_merge( $accepted_in_canonicals__params, $custom_keep_params );
+	}
+
+	return url_keep_params( $canonical_url, $glue, $custom_keep_params );
 }
 
 

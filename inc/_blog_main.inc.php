@@ -540,7 +540,10 @@ if( !empty($p) || !empty($title) )
 			    )
 			{	// Redirect permanently to the item main/canonical permanent url in the current collection:
 				$Debuglog->add( 'Redirecting to correct canonical slug but stay in current collection', 'url_decode_part_2' );
-				header_redirect( $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog ), 301 );
+				$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog );
+				// Keep ONLY allowed params from current URL in the canonical URL by configs AND Item's switchable params:
+				$canonical_url = url_keep_canonicals_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
+				header_redirect( $canonical_url, 301 );
 				// Exit here.
 			}
 		}
@@ -745,8 +748,8 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		// Keep ONLY allowed noredir params from current URL in the canonical URL:
-		$canonical_url = url_clear_noredir_params( $canonical_url );
+		// Keep ONLY allowed params from current URL in the canonical URL by configs:
+		$canonical_url = url_keep_canonicals_params( $canonical_url );
 		// Consider URL with possible params like disp=front or coll_locale=en-US as front canonical URL of the current Collection:
 		$current_url = preg_replace( '#[\?&]((coll_locale=[^&]+|disp='.preg_quote( $disp ).')(&|$))+#', '', $ReqURL );
 		if( ! is_same_url( $current_url, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )

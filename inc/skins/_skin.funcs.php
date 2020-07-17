@@ -236,8 +236,8 @@ function skin_init( $disp )
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
 					$canonical_url = $main_canonical_url;
 				}
-				// Keep ONLY allowed noredir params from current URL in the canonical URL:
-				$canonical_url = url_clear_noredir_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
+				// Keep ONLY allowed params from current URL in the canonical URL by configs AND Item's switchable params:
+				$canonical_url = url_keep_canonicals_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
 						&& check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
@@ -259,8 +259,8 @@ function skin_init( $disp )
 							continue;
 						}
 						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
-						// Keep ONLY allowed noredir params from current URL in the category canonical URL:
-						$cat_canonical_url = url_clear_noredir_params( $cat_canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
+						// Keep ONLY allowed params from current URL in the canonical URL by configs AND Item's switchable params:
+						$cat_canonical_url = url_keep_canonicals_params( $cat_canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{	// We have found the same URL, stop find another and stay on the current page without redirect:
 							break;
@@ -402,8 +402,8 @@ function skin_init( $disp )
 				    || $Blog->get_setting( 'self_canonical_posts' ) )
 				{	// Check if the URL was canonical:
 					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
-					// Keep ONLY allowed noredir params from current URL in the canonical URL:
-					$canonical_url = url_clear_noredir_params( $canonical_url );
+					// Keep ONLY allowed params from current URL in the canonical URL by configs:
+					$canonical_url = url_keep_canonicals_params( $canonical_url );
 					if( $is_next_pages )
 					{	// Set param for paged url:
 						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
@@ -495,8 +495,8 @@ function skin_init( $disp )
 								}
 
 								$canonical_url = $Chapter->get_permanent_url( NULL, NULL, $MainList->get_active_filter('page'), NULL, '&' );
-								// Keep ONLY allowed noredir params from current URL in the canonical URL:
-								$canonical_url = url_clear_noredir_params( $canonical_url );
+								// Keep ONLY allowed params from current URL in the canonical URL by configs:
+								$canonical_url = url_keep_canonicals_params( $canonical_url );
 								if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 								{	// fp> TODO: we're going to lose the additional params, it would be better to keep them...
 									// fp> what additional params actually?
@@ -550,8 +550,8 @@ function skin_init( $disp )
 					    || $Blog->get_setting( 'self_canonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
-						// Keep ONLY allowed noredir params from current URL in the canonical URL:
-						$canonical_url = url_clear_noredir_params( $canonical_url );
+						// Keep ONLY allowed params from current URL in the canonical URL by configs:
+						$canonical_url = url_keep_canonicals_params( $canonical_url );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
@@ -597,8 +597,8 @@ function skin_init( $disp )
 					    || $Blog->get_setting( 'self_canonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
-						// Keep ONLY allowed noredir params from current URL in the canonical URL:
-						$canonical_url = url_clear_noredir_params( $canonical_url );
+						// Keep ONLY allowed params from current URL in the canonical URL by configs:
+						$canonical_url = url_keep_canonicals_params( $canonical_url );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{
 							if( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
@@ -1481,8 +1481,8 @@ function skin_init( $disp )
 			if( $Blog->get_setting( 'canonical_user_urls' ) && $redir == 'yes' )
 			{	// Check if current user profile URL can be canonical:
 				$canonical_url = $Blog->get( 'userurl', array( 'user_ID' => $user_ID, 'glue' => '&' ) );
-				// Keep ONLY allowed noredir params from current URL in the canonical URL:
-				$canonical_url = url_clear_noredir_params( $canonical_url );
+				// Keep ONLY allowed params from current URL in the canonical URL by configs:
+				$canonical_url = url_keep_canonicals_params( $canonical_url );
 				if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 				{	// Redirect to canonical user profile URL:
 					header_redirect( $canonical_url, true );
