@@ -1480,6 +1480,11 @@ function skin_init( $disp )
 
 			if( $Blog->get_setting( 'canonical_user_urls' ) && $redir == 'yes' )
 			{	// Check if current user profile URL can be canonical:
+				if( empty( $user_ID ) && is_logged_in() )
+				{	// Use ID of current User for proper redirect to canonical url like '/user:admin':
+					global $current_User;
+					$user_ID = $current_User->ID;
+				}
 				$canonical_url = $Blog->get( 'userurl', array( 'user_ID' => $user_ID, 'glue' => '&' ) );
 				// Keep ONLY allowed params from current URL in the canonical URL by configs:
 				$canonical_url = url_keep_canonicals_params( $canonical_url );
