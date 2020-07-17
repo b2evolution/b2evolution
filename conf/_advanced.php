@@ -829,6 +829,8 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 /**
  * Allow parameters in URL without redirect to Any(Collection, Category, Item, disp=posts, Archive, Tag, User profile) canonical URLs
  * when collection settings "301 redirect to canonical URL when possible" is enabled
+ *
+ * NOTE: For Item URL we automatically include enabled switchable params of the Item (see "Switchable content" on https://b2evolution.net/man/post-advanced-properties-panel)
  */
 $noredir_params = array(
 	'page',          // For showing a different page in a multipage post

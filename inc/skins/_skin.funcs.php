@@ -260,7 +260,7 @@ function skin_init( $disp )
 						}
 						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
 						// Keep ONLY allowed noredir params from current URL in the category canonical URL:
-						$cat_canonical_url = url_clear_noredir_params( $cat_canonical_url );
+						$cat_canonical_url = url_clear_noredir_params( $cat_canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{	// We have found the same URL, stop find another and stay on the current page without redirect:
 							break;

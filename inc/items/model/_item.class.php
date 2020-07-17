@@ -14660,7 +14660,7 @@ class Item extends ItemLight
 		}
 
 		// Keep ONLY allowed noredir params from current URL in the canonical URL:
-		$redirect_to = url_clear_noredir_params( $redirect_to );
+		$redirect_to = url_clear_noredir_params( $redirect_to, '&', array_keys( $this->get_switchable_params() ) );
 
 		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect
 	}
