@@ -1710,6 +1710,70 @@ function create_default_templates( $is_task = true )
 			'context'  => 'item_details',
 			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
+		'item_details_author_details' => array(
+			'name'     => 'Item Details: Author Details',
+			'context'  => 'item_details',
+			'template' => '<table>
+	<tbody>
+		<tr>
+			<th>Picture</th>
+			<td>[User:picture|size=crop-top-128x128]</td>
+		</tr>
+		<tr>
+			<th>Fullname</th>
+			<td>[User:fullname]</td>
+		</tr>
+		<tr>
+			<th>Last name</th>
+			<td>[User:last_name]</td>
+		</tr>
+		<tr>
+			<th>First name</th>
+			<td>[User:first_name]</td>
+		</tr>
+		<tr>
+			<th>Nickname</th>
+			<td>[User:nick_name]</td>
+		</tr>
+		<tr>
+			<th>Preferred name</th>
+			<td>[User:preferredname]</td>
+		</tr>
+		<tr>
+			<th>Login</th>
+			<td>[User:login]</td>
+		</tr>
+		<tr>
+			<th>Email</th>
+			<td>[User:email]</td>
+		</tr>
+		<tr>
+			<th>Micro bio</th>
+			<td>[User:custom|field=microbio]</td>
+		</tr>
+		<tr>
+			<th>Twitter</th>
+			<td>[User:custom|field=twitter]</td>
+		</tr>
+		<tr>
+			<th>Facebook</th>
+			<td>[User:custom|field=facebook]</td>
+		</tr>
+		<tr>
+			<th>LinkedIn</th>
+			<td>[User:custom|field=linkedin]</td>
+		</tr>
+		<tr>
+			<th>GitHub</th>
+			<td>[User:custom|field=github]</td>
+		</tr>
+		<tr>
+			<th>Website</th>
+			<td>[User:custom|field=website|separator=<br />]</td>
+		</tr>
+	</tbody>
+</table>'
+		),
 
 		// Item attachments:
 		'item_details_files_list' => array(

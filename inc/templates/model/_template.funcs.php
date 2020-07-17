@@ -1128,30 +1128,33 @@ function render_template_callback( $var, $params, $objects = array() )
 					'before_item' => '',
 					'after_item'  => '',
 					'after'       => '',
+					'separator'   => '',
 					'limit'       => NULL,
 				), $params );
 			$userfield_values = $rendered_User->userfield_values_by_code( $temp_params['field'], true );
 
 			if( is_array( $userfield_values ) )
+			{	// We expect $userfield_values to be an Array:
+				if( isset( $temp_params['limit'] ) )
+				{
+					$userfield_values = array_slice( $userfield_values, 0, ( int ) $temp_params['limit'] );
+				}
+
+				if( ! empty( $temp_params['before_item'] ) || ! empty( $temp_params['after_item'] ) )
+				{
+					$temp_values = array();
+					foreach( $userfield_values as $userfield_value )
+					{
+						$temp_values[] = $temp_params['before_item'].$userfield_value.$temp_params['after_item'];
+					}
+					$userfield_values = $temp_values;
+				}
+
+				echo format_to_output( $temp_params['before'].implode( $temp_params['separator'], $userfield_values ).$temp_params['after'] );
+			}
+			else
 			{
-				$limit = count( $userfield_values );
-				if( is_int( $temp_params['limit'] ) && ( $temp_params['limit'] <= $limit ) )
-				{
-					$limit = (int) $temp_params['limit'];
-				}
-
-				$r = '';
-
-				$r .= $temp_params['before'];
-				for( $i = 0; $i < $limit; $i++ )
-				{
-					$r .= $temp_params['before_item'];
-					$r .= $userfield_values[$i];
-					$r .= $temp_params['after_item'];
-				}
-				$r .= $temp_params['after'];
-
-				echo format_to_output( $r );
+				debug_die( '$userfield_values is not an array!' );
 			}
 			break;
 
