@@ -14659,6 +14659,9 @@ class Item extends ItemLight
 			$redirect_to = pro_tinyurl_redirect_add_params( $redirect_to, $item_Blog, $slug, $slug_extra_term );
 		}
 
+		// Keep ONLY allowed params from current URL in the canonical URL by configs AND Item's switchable params:
+		$redirect_to = url_keep_canonicals_params( $redirect_to, '&', array_keys( $this->get_switchable_params() ) );
+
 		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect
 	}
 

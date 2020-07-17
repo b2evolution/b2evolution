@@ -679,14 +679,13 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
  * Identify requested collection & initialize global $blog variable to the requested collection
  * This is when we go through index.php (NOT through stub file).
  *
- * @param boolean $use_blog_param_first is used in _init_login.php --> fp>yb: WHY do we need that?
  * @param boolean try to identify a TinySlug before trying to identify a collection
  * @param boolean if the domain does not match a collection, try to process as a TinyURL and redirect before fallback to default collection
  * @return boolean true if $blog was initialized successful, false otherwise
  */
 function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true, $process_unknown_domain_as_tinyurl = true )
 {
-	global $blog, $ReqHost, $sanitized_ReqPath, $baseurl, $pagenow; 
+	global $blog, $ReqHost, $ReqURL, $sanitized_ReqPath, $baseurl, $pagenow; 
 	global $Settings;
 	global $Debuglog;
 	global $resolve_extra_path, $slug_extra_term;
@@ -856,7 +855,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	{ // We found a matching collection:
 		$Debuglog->add( 'Found matching collection: '.$blog. 'using alias '.$alias, 'url_decode_part_1' );
 		$same_protocol_alias = url_same_protocol( $alias, $ReqAbsUrl );
-		$tail_Path = str_replace( $same_protocol_alias, '', $ReqAbsUrl );
+		$tail_Path = str_replace( $same_protocol_alias, '', $ReqURL );
 		if( substr( $tail_Path, 0, 1 ) != '/' )
 		{ // Tail must start with '/'
 			$tail_Path = '/'.$tail_Path;
