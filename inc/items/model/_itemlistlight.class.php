@@ -2127,8 +2127,11 @@ class ItemListLight extends DataObjectList2
 	 */
 	function display_list( $params )
 	{
+		global $Item;
+
 		$params = array_merge( array(
 				'template' => NULL,
+				'highlight_current' => true,
 			), $params );
 
 		if( ! empty( $params['template'] ) )
@@ -2165,6 +2168,24 @@ class ItemListLight extends DataObjectList2
 			// ONLY SUPPORTING Plain list: (not grouped by category) for now
 			// TODO: maybe support group by category. Use case???
 
+			$item_template = $params['item_template'];
+
+			if( ! empty( $params['highlight_current'] ) )
+			{	// Use template for active Item only when requested to highlight currently active Item:
+				$active_item_template = isset( $params['active_item_template'] ) ? $params['active_item_template'] : $item_template;
+				if( $active_item_template == $item_template ||
+						! ( $active_item_Template = & $TemplateCache->get_by_code( $active_item_template, false, false ) ) )
+				{	// If active item template is not found in DB then use normal item template instead:
+					$active_item_template = $item_template;
+				}
+				// Highlight currently active Item ony when templates are different:
+				$highlight_current_item = ( $active_item_template != $item_template );
+			}
+			else
+			{	// Don't highlight currently active Item because it is not requested:
+				$highlight_current_item = false;
+			}
+
 			$this->restart();
 			while( $row_Item = & $this->get_item() )
 			{
@@ -2175,8 +2196,19 @@ class ItemListLight extends DataObjectList2
 						.( $params['active_item_slug'] == $row_Item->get( 'urltitle' ) ? '' : ' style="display:none"' ).'>';
 				}
 
+				if( $highlight_current_item &&
+				    ! empty( $Item ) &&
+				    $row_Item->ID == $Item->ID )
+				{	// Use different template for currently active Item:
+					$row_item_template = $active_item_template;
+				}
+				else
+				{	// Use normal template to not active Item:
+					$row_item_template = $item_template;
+				}
+
 				// Render Item by quick template:
-				echo render_template_code( $params['item_template'], $params, array( 'Item' => $row_Item ) );
+				echo render_template_code( $row_item_template, $params, array( 'Item' => $row_Item ) );
 
 				if( ! empty( $params['switch_param_code'] ) )
 				{	// End of switchable item block:
@@ -2369,7 +2401,7 @@ class ItemListLight extends DataObjectList2
 		$disp_param_prefix = $chapter_mode ? 'group_' : '';
 
 		// Is this the current item?
-		if( !empty($Item) && $disp_Item->ID == $Item->ID )
+		if( ! empty( $params['highlight_current'] ) && ! empty( $Item ) && $disp_Item->ID == $Item->ID )
 		{	// The current page is currently displaying the Item this link is pointing to
 			// Let's display it as selected
 			$link_class = $params['link_selected_class'];
