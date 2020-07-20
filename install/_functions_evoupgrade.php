@@ -13032,6 +13032,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16150, 'Installing new widgets for container "Item List"...' ) )
+	{	// part of 7.2.0-beta
+		install_new_default_widgets( 'item_list', 'request_title' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

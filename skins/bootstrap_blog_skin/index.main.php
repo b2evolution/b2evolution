@@ -143,6 +143,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'users_text'        => '',
 					'comments_text'     => '',
 					'search_text'       => '',
+					'posts_text'        => '',
 					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
 						'before'              => '<span class="pull-right">',

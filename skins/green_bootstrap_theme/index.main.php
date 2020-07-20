@@ -175,6 +175,7 @@ if( $is_pictured_page )
 					'users_text'        => '',
 					'comments_text'     => '',
 					'search_text'       => '',
+					'posts_text'        => '',
 					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
 						'before'              => '<span class="pull-right">',

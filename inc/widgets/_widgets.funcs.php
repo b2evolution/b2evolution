@@ -34,7 +34,8 @@ load_class( '_core/ui/_table.class.php', 'Table' );
  *             - 'order': Container order,
  *             - widget data array():
  *                - 0: Widget order (*mandatory field*),
- *                - 1: Widget code (*mandatory field*),
+ *                - 1: Upgrade block number (*mandatory field*) - Use number of upgrade block(@see $new_db_version in /conf/_application.php) where this widget can be started to install,
+ *                - 2: Widget code (*mandatory field*),
  *                - 'params' - Widget params(array or serialized string),
  *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
  *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
@@ -96,6 +97,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Item List */
 	$default_widgets['item_list'] = array(
+		array( 5,  16150, 'request_title' ),
 		array( 10, 15190, 'coll_item_list_pages' ),
 	);
 
