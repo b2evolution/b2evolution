@@ -3395,7 +3395,7 @@ function debug_info( $force = false, $force_clean = false )
 		require_js_defer( '#jqueryUI#', $relative_to, true );
 		require_css( '#jqueryUI_css#', $relative_to, NULL, NULL, '#', true );
 		require_js_defer( 'debug_jslog.js', $relative_to, true );
-		require_js_defer( 'jquery/jquery.cookie.min.js', $relative_to, true );
+		require_js_defer( 'ext:jquery/cookie/jquery.cookie.min.js', $relative_to, true );
 
 		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
 		$jslog_styles = array();
@@ -3728,7 +3728,7 @@ function debug_info( $force = false, $force_clean = false )
 
 			// add jquery.tablesorter to the "Debug info" table.
 			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-			require_js_defer( 'jquery/jquery.tablesorter.min.js', $relative_to, true );
+			require_js_defer( 'ext:jquery/tablesorter/jquery.tablesorter.min.js', $relative_to, true );
 			require_js_defer( 'src/evo_init_debug_timer.js', $relative_to, true );
 		}
 

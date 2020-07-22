@@ -256,7 +256,7 @@ switch( $action )
 
 if( empty( $action ) )
 { // JS to edit status of countries from list view
-	require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 }
 
 $AdminUI->breadcrumbpath_init( false );

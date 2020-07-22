@@ -195,7 +195,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'managing-item-statuses-form' );
 		break;
 	default:
-		require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
+		require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 		$AdminUI->set_page_manual_link( 'managing-item-statuses' );
 		break;
 }

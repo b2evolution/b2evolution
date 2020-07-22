@@ -538,7 +538,7 @@ if( $display_mode != 'js' )
 		case 'ipranges':
 			if( empty( $action ) )
 			{	// View a list of IP ranges
-				require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
+				require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 			}
 			elseif( ! check_user_perm( 'spamblacklist', 'edit' ) )
 			{	// Check permission to create/edit IP range
@@ -562,7 +562,7 @@ if( $display_mode != 'js' )
 		case 'countries':
 			if( check_user_perm( 'options', 'edit' ) )
 			{
-				require_js_defer( 'jquery/jquery.jeditable.js' );
+				require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js' );
 			}
 
 			// Set an url for manual page:
@@ -576,7 +576,7 @@ if( $display_mode != 'js' )
 			$AdminUI->breadcrumbpath_add( TB_('Referring domains'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			if( check_user_perm( 'stats', 'edit' ) )
 			{
-				require_js_defer( 'jquery/jquery.jeditable.js' );
+				require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js' );
 			}
 			// Load jquery UI to highlight cell on change domain type
 			require_js_defer( '#jqueryUI#' );

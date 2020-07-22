@@ -1156,7 +1156,10 @@ function include_js_vars()
  * Get library url of JS or CSS file by file name or alias
  *
  * @param string File or Alias name
- * @param boolean|string 'relative' or true (relative to <base>) or 'absolute'(for absolute url) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean|string 'relative' or true (relative to <base>),
+ *                       'absolute'(for absolute url)
+ *                       'rsc_url' (relative to $rsc_url),
+ *                       'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string 'js' or 'css' or 'build'
  * @return string URL
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
@@ -1194,6 +1197,13 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		{ // Aliases cannot be relative to <base>, make it relative to $rsc_url
 			$relative_to = 'rsc_url';
 		}
+	}
+
+	if( strpos( $lib_file, 'ext:' ) === 0 || strpos( $lib_file, 'customized:' ) === 0 )
+	{	// This file must be loaded from subfolder '/rsc/ext/' or '/rsc/customized/' :
+		$subfolder = strpos( $lib_file, 'ext:' ) === 0 ? 'ext' : 'customized';
+		// Remove prefix 'ext:' from beginning of the file:
+		$lib_file = substr( $lib_file, strlen( $subfolder ) + 1 );
 	}
 
 	if( $relative_to === 'relative' || $relative_to === true )
@@ -1997,7 +2007,7 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	if( $force_init || ( !empty($Item) && $Item->can_rate() ) )
 	{
 		require_js_defer( '#jquery#', $relative_to ); // dependency
-		require_js_defer( 'jquery/jquery.raty.min.js', $relative_to );
+		require_js_defer( 'customized:jquery/raty/jquery.raty.min.js', $relative_to );
 		require_js_defer( 'src/evo_init_comment_rating.js', $relative_to );
 	}
 }
@@ -2028,9 +2038,9 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', $relative_to );
 			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
-			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', $relative_to );
 			break;
 	}
 }
@@ -2058,9 +2068,9 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', $relative_to );
 			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
-			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', $relative_to );
 			break;
 	}
 }
@@ -2100,9 +2110,9 @@ function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', $relative_to );
 			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
-			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
+			require_css( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', $relative_to );
 			break;
 	}
 }
@@ -2134,8 +2144,8 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 function init_tokeninput_js( $relative_to = 'rsc_url' )
 {
 	require_js_defer( '#jquery#', $relative_to ); // dependency
-	require_js_defer( 'jquery/jquery.tokeninput.js', $relative_to );
-	require_css( 'jquery/jquery.token-input-facebook.css', $relative_to );
+	require_js_defer( 'customized:jquery/tokeninput/js/jquery.tokeninput.js', $relative_to );
+	require_css( 'customized:jquery/tokeninput/css/jquery.token-input-facebook.css', $relative_to );
 }
 
 
@@ -2248,8 +2258,8 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 	global $current_User, $UserSettings;
 
 	require_js_defer( '#jquery#', $relative_to );
-	require_js_defer( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
-	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
+	require_js_defer( 'ext:bootstrap/colorpicker/js/bootstrap-colorpicker.min.js', $relative_to );
+	require_css( 'ext:bootstrap/colorpicker/css/bootstrap-colorpicker.min.css', $relative_to );
 
 	// Get preselected colors from settings of current User:
 	$user_colors = $UserSettings->get( 'colorpicker', $current_User->ID );
@@ -2369,8 +2379,8 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			// fp> TODO: think about a way to bundle this with other JS on the page -- maybe always load hintbox in the backoffice
 			//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
 			// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
-			require_css( 'jquery/jquery.hintbox.css', $relative_to );
-			require_js_defer( 'jquery/jquery.hintbox.min.js', $relative_to );
+			require_css( 'ext:jquery/hintbox/css/jquery.hintbox.css', $relative_to );
+			require_js( 'ext:jquery/hintbox/js/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
 				var ajax_url = "";
@@ -2426,22 +2436,22 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 
 	require_js_defer( '#jquery#', $relative_to ); // dependency
 	require_css( '#jqueryUI_css#', $relative_to ); // dependency for date picker
-	require_js_defer( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
-	require_js_defer( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
-	require_js_defer( 'jquery/query-builder/moment.js', $relative_to ); // dependency
+	require_js_defer( 'ext:jquery/query-builder/js/doT.min.js', $relative_to ); // dependency
+	require_js_defer( 'ext:jquery/query-builder/js/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js_defer( 'ext:jquery/query-builder/js/moment.js', $relative_to ); // dependency
 
-	require_js_defer( 'jquery/query-builder/query-builder.min.js', $relative_to );
-	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
+	require_js_defer( 'ext:jquery/query-builder/js/query-builder.min.js', $relative_to );
+	require_css( 'ext:jquery/query-builder/css/jquery.query-builder.default.css', $relative_to );
 
 	// Load language file if such file exists:
 	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
 	if( in_array( $current_locale, $query_builder_langs ) )
 	{	// Load lang by full locale name like "en-US":
-		require_js_defer( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+		require_js_defer( 'ext:jquery/query-builder/js/i18n/query-builder.'.$current_locale.'.js', $relative_to );
 	}
 	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
 	{	// Load lang by locale code like "en":
-		require_js_defer( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+		require_js_defer( 'ext:jquery/query-builder/js/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
 	}
 }
 
@@ -2457,7 +2467,7 @@ function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array(), $top_hot
 	add_js_headline( 'var shortcut_keys = '.json_encode( $hotkeys ).';' );
 	add_js_headline( 'var top_shortcut_keys = '.json_encode( $top_hotkeys ).';' );
 
-	require_js_defer( 'hotkeys/hotkeys.init.js', $relative_to );
+	require_js_defer( 'ext:hotkeys/hotkeys.init.js', $relative_to );
 }
 
 
@@ -3787,6 +3797,7 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
 		add_js_headline( 'var blog = '.$Blog->ID );
 	}
+	require_js_defer( '#jquery#', $relative_to );
 	require_js_defer( 'build/textcomplete.bmin.js', $relative_to );
 }
 

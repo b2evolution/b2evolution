@@ -130,7 +130,7 @@ class item_tags_Widget extends ComponentWidget
 		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			init_tokeninput_js( 'blog' );
 			require_js_defer( '#jquery#', 'blog' );
-			require_js_defer( 'jquery/jquery.cookie.min.js', 'blog' );
+			require_js_defer( 'ext:jquery/cookie/jquery.cookie.min.js', 'blog' );
 		}
 	}
 

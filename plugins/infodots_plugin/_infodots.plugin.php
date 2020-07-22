@@ -103,8 +103,8 @@ class infodots_plugin extends Plugin
 
 		// Bubbletip
 		require_js_defer( '#jquery#', 'blog', false, '#', 'footerlines' );
-		require_js_defer( 'jquery/jquery.bubbletip.min.js', 'blog', false, '#', 'footerlines' );
-		require_css_async( 'jquery/jquery.bubbletip.css', 'blog', NULL, NULL, '#', false, 'footerlines' );
+		require_js_defer( 'customized:jquery/bubbletip/js/jquery.bubbletip.min.js', 'blog', false, '#', 'footerlines' );
+		require_css_async( 'customized:jquery/bubbletip/css/jquery.bubbletip.css', 'blog', NULL, NULL, '#', false, 'footerlines' );
 		$this->require_js_defer( 'infodots.init.js', false, 'footerlines' );
 	}
 

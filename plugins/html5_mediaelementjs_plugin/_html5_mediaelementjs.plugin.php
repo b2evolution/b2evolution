@@ -76,7 +76,7 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		// Initialize a player
 		add_js_headline( 'var evo_html5_mediaelementjs_player_width = "'.$width.'";
 			var evo_html5_mediaelementjs_player_height = "'.$height.'";' );
-		require_js_defer( 'mediaelement/mediaelement-and-player.init.js', 'blog' );
+		require_js_defer( 'ext:mediaelement/js/mediaelement-and-player.init.js', 'blog' );
 	}
 
 

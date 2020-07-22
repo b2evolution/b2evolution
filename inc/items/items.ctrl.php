@@ -2883,7 +2883,7 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( TB_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
 
 			// JS to edit an order of items from list view:
-			require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		case 'tracker':
@@ -2896,7 +2896,7 @@ function init_list_mode()
 			$AdminUI->set_page_manual_link( 'workflow-features' );
 
 			// JS to edit priority of items from list view
-			require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		default:

@@ -791,10 +791,10 @@ switch( $action )
 				$AdminUI->set_page_manual_link( 'automation-diagram-view' );
 				$AdminUI->set_path( 'email', 'automations', 'diagram' );
 				// Load files to draw diagram by plugin jsPlumb:
-				require_js_defer( 'jquery/jsplumb/jsplumb.min.js', 'rsc_url' );
-				require_css( 'jquery/jsplumb/jsplumbtoolkit-defaults.css', 'rsc_url' );
-				require_css( 'jquery/jsplumb/jsplumbtoolkit-b2evo.css', 'rsc_url' );
-				require_js_defer( 'jquery/jquery.panzoom.min.js', 'rsc_url' );
+				require_js_defer( 'ext:jquery/jsplumb/js/jsplumb.min.js', 'rsc_url' );
+				require_css( 'ext:jquery/jsplumb/css/jsplumbtoolkit-defaults.css', 'rsc_url' );
+				require_css( 'ext:jquery/jsplumb/css/jsplumbtoolkit-b2evo.css', 'rsc_url' );
+				require_js_defer( 'ext:jquery/panzoom/js/jquery.panzoom.min.js', 'rsc_url' );
 				break;
 
 			default:

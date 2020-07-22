@@ -55,7 +55,7 @@ require_js_helper( 'colorbox' );
 
 // Include files to work with charts
 require_js_defer( '#easypiechart#' );
-require_css( 'jquery/jquery.easy-pie-chart.css' );
+require_css( 'ext:jquery/easy-pie-chart/css/jquery.easy-pie-chart.css' );
 
 // Init JS to autcomplete the user logins
 init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );

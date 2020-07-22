@@ -50,7 +50,7 @@ param( 'action', 'string' );
 
 if( $tab == 'domains' && check_user_perm( 'stats', 'edit' ) )
 {
-	require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 }
 
 if( ( $blog == 0 && empty( $sec_ID ) ) || ! check_user_perm( 'stats', 'list', false, $blog ) )

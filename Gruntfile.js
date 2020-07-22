@@ -45,8 +45,8 @@ module.exports = function(grunt) {
 
 					// Superbundle Font-Awesome + Bootstrap + Front-office styles:
 					'rsc/build/bootstrap-b2evo_base-superbundle.bundle.css': [
-							'rsc/css/font-awesome.css',
-							'rsc/css/bootstrap/bootstrap.css',
+							'rsc/ext/font-awesome/css/font-awesome.css',
+							'rsc/ext/bootstrap/css/bootstrap.css',
 							'rsc/build/bootstrap-b2evo_base.bundle.css',
 						],
 
@@ -57,6 +57,13 @@ module.exports = function(grunt) {
 							'rsc/less/bootstrap-basic.less',
 							'rsc/less/bootstrap-item_base.less',		// fp> I added this because blockquote was not properly styled in the backoffice
 							'rsc/less/bootstrap-evoskins.less'			// Common styles for all bootstrap skins
+						],
+
+					// Back-office bootstrap skin styles:
+					'skins_adm/bootstrap/rsc/css/style.bundle.css': [
+							'skins_adm/bootstrap/rsc/css/style.less',
+							'rsc/less/inc/jquery.easy-pie-chart.inc.less',
+							'rsc/less/inc/jquery.jqplot.inc.less',
 						],
 
 					// Bootstrap skins
@@ -85,8 +92,8 @@ module.exports = function(grunt) {
 					'rsc/build/b2evo_helper_screens.css':    'rsc/less/b2evo_helper_screens.less',
 
 					// Colorbox
-					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
-					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
+					'rsc/customized/jquery/colorbox/css/colorbox-regular.css':   'rsc/customized/jquery/colorbox/css/colorbox-regular.less',
+					'rsc/customized/jquery/colorbox/css/colorbox-bootstrap.css': 'rsc/customized/jquery/colorbox/css/colorbox-bootstrap.less',
 
 					// evo helpdesk widget
 					'rsc/css/evo_helpdesk_widget.css': 'rsc/less/evo_helpdesk_widget.less',
@@ -145,7 +152,7 @@ module.exports = function(grunt) {
 			 */
 			// Login screen:
 			sha1_md5: {
-				src: ['rsc/js/src/sha1.js', 'rsc/js/src/md5.js', 'rsc/js/src/twin-bcrypt.js'],
+				src: ['rsc/ext/sha1.js', 'rsc/ext/md5.js', 'rsc/ext/twin-bcrypt.js'],
 				dest: 'rsc/js/build/sha1_md5.bundle.js',
 			},
 		},
@@ -174,6 +181,11 @@ module.exports = function(grunt) {
 				src: 'rsc/build/bootstrap-backoffice-b2evo_base.bundle.css',
 				dest: 'rsc/build/bootstrap-backoffice-b2evo_base.bmin.css',
 			},
+			backoffice_bootstrap_skin_style: {
+				nonull: true, // Display missing files
+				src: 'skins_adm/bootstrap/rsc/css/style.bundle.css',
+				dest: 'skins_adm/bootstrap/rsc/css/style.bmin.css',
+			},
 			bootstrap_skins: {
 				files: {
 					// Bootstrap skins
@@ -201,8 +213,8 @@ module.exports = function(grunt) {
 			},
 			colorbox: {
 				files: {
-					'rsc/build/colorbox-regular.min.css':   'rsc/css/colorbox/colorbox-regular.css',
-					'rsc/build/colorbox-bootstrap.min.css': 'rsc/css/colorbox/colorbox-bootstrap.css',
+					'rsc/build/colorbox-regular.min.css':   'rsc/customized/jquery/colorbox/css/colorbox-regular.css',
+					'rsc/build/colorbox-bootstrap.min.css': 'rsc/customized/jquery/colorbox/css/colorbox-bootstrap.css',
 				}
 			},
 			ddexitpop: {
@@ -218,7 +230,7 @@ module.exports = function(grunt) {
 				dest: 'rsc/build/b2evo_helper_screens.min.css',
 			},
 			jqplot: {
-				src: [ 'rsc/css/jquery/jquery.jqplot.css', 'rsc/css/jquery/jquery.jqplot.b2evo.css' ],
+				src: [ 'rsc/ext/jquery/jqplot/css/jquery.jqplot.css', 'rsc/ext/jquery/jqplot/css/jquery.jqplot.b2evo.css' ],
 				dest: 'rsc/build/b2evo_jqplot.bmin.css',
 			}
 		},
@@ -242,11 +254,11 @@ module.exports = function(grunt) {
 			// TinyMCE
 			tinymce: {
 				files: {
-					'rsc/js/tiny_mce/plugins/image/plugin.min.js': 'rsc/js/tiny_mce/plugins/image/plugin.js',
-					'rsc/js/tiny_mce/plugins/link/plugin.min.js': 'rsc/js/tiny_mce/plugins/link/plugin.js',
-					'rsc/js/tiny_mce/plugins/b2evo_attachments/plugin.min.js': 'rsc/js/tiny_mce/plugins/b2evo_attachments/plugin.js',
-					'rsc/js/tiny_mce/plugins/b2evo_shorttags/plugin.min.js': 'rsc/js/tiny_mce/plugins/b2evo_shorttags/plugin.js',
-					'rsc/js/tiny_mce/plugins/evo_view/plugin.min.js': 'rsc/js/tiny_mce/plugins/evo_view/plugin.js',
+					'rsc/ext/tiny_mce/plugins/image/plugin.min.js': 'rsc/ext/tiny_mce/plugins/image/plugin.js',
+					'rsc/ext/tiny_mce/plugins/link/plugin.min.js': 'rsc/ext/tiny_mce/plugins/link/plugin.js',
+					'rsc/ext/tiny_mce/plugins/b2evo_attachments/plugin.min.js': 'rsc/ext/tiny_mce/plugins/b2evo_attachments/plugin.js',
+					'rsc/ext/tiny_mce/plugins/b2evo_shorttags/plugin.min.js': 'rsc/ext/tiny_mce/plugins/b2evo_shorttags/plugin.js',
+					'rsc/ext/tiny_mce/plugins/evo_view/plugin.min.js': 'rsc/ext/tiny_mce/plugins/evo_view/plugin.js',
 					'plugins/tinymce_plugin/js/evo_view_shortcodes.bmin.js': ['plugins/tinymce_plugin/js/shortcodes.js', 'plugins/tinymce_plugin/js/evo_view.js'],
 				}
 			},
@@ -257,7 +269,7 @@ module.exports = function(grunt) {
 					banner: '/* This includes 4 files: jquery.colorbox.js, voting.js, jquery.touchswipe.js, colorbox.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/colorbox/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/js/jquery/jquery.touchswipe.js', 'rsc/js/colorbox/colorbox.init.js'],
+				src: ['rsc/customized/jquery/colorbox/js/jquery.colorbox.js', 'rsc/js/voting.js', 'rsc/ext/jquery/touchswipe/jquery.touchswipe.js', 'rsc/js/colorbox.init.js'],
 				dest: 'rsc/js/build/colorbox.bmin.js'
 			},
 			// Bubbletip
@@ -286,7 +298,7 @@ module.exports = function(grunt) {
 					banner: '/* This includes 2 files: jquery.textcomplete.js, textcomplete.init.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/jquery/jquery.textcomplete.js', 'rsc/js/textcomplete.init.js'],
+				src: ['rsc/ext/jquery/textcomplete/jquery.textcomplete.js', 'rsc/ext/jquery/textcomplete/textcomplete.init.js'],
 				dest: 'rsc/js/build/textcomplete.bmin.js'
 			},
 			// JS files that are used marketing popup container:
@@ -375,10 +387,10 @@ module.exports = function(grunt) {
 				},
 				nonull: true, // Display missing files
 				src: [
-					'rsc/js/jquery.min.js',
-					'rsc/js/jquery/jquery-migrate.min.js',
-					'rsc/js/jquery/jquery.ui.b2evo.min.js',
-					'rsc/js/bootstrap/bootstrap.min.js',
+					'rsc/ext/jquery/jquery.min.js',
+					'rsc/ext/jquery/jquery-migrate.min.js',
+					'rsc/ext/jquery/ui/js/jquery.ui.b2evo.min.js',
+					'rsc/ext/bootstrap/js/bootstrap.min.js',
 					'rsc/js/build/bootstrap-evo_frontoffice.bmin.js',
 				],
 				dest: 'rsc/js/build/bootstrap-evo_frontoffice-superbundle.bmin.js'
@@ -463,7 +475,7 @@ module.exports = function(grunt) {
 				},
 				nonull: true, // Display missing files
 				src: [
-					'rsc/js/multiupload/fine-uploader.js',
+					'rsc/customized/fileuploader/js/fine-uploader.js',
 					'rsc/js/src/evo_init_dragdrop_button.js',
 					'rsc/js/src/evo_init_attachment_fieldset.js',
 				],
@@ -476,7 +488,7 @@ module.exports = function(grunt) {
 				nonull: true, // Display missing files
 				src: [
 					'rsc/js/build/evo_fileuploader.bmin.js',
-					'rsc/js/jquery/jquery.sortable.min.js',
+					'rsc/ext/jquery/sortable/jquery.sortable.min.js',
 					'rsc/js/src/evo_init_link_sortable.js',
 				],
 				dest: 'rsc/js/build/evo_fileuploader_sortable.bmin.js'
@@ -487,15 +499,15 @@ module.exports = function(grunt) {
 				},
 				nonull: true, // Display missing files
 				src: [
-					'rsc/js/jquery/jqplot/jquery.jqplot.min.js',
-					'rsc/js/jquery/jqplot/jqplot.barRenderer.min.js',
-					'rsc/js/jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js',
-					'rsc/js/jquery/jqplot/jqplot.canvasTextRenderer.min.js',
-					'rsc/js/jquery/jqplot/jqplot.canvasOverlay.min.js',
-					'rsc/js/jquery/jqplot/jqplot.categoryAxisRenderer.min.js',
-					'rsc/js/jquery/jqplot/jqplot.donutRenderer.min.js',
-					'rsc/js/jquery/jqplot/jqplot.enhancedLegendRenderer.min.js',
-					'rsc/js/jquery/jqplot/jqplot.highlighter.min.js',	
+					'rsc/ext/jquery/jqplot/js/jquery.jqplot.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.barRenderer.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.canvasAxisTickRenderer.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.canvasTextRenderer.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.canvasOverlay.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.categoryAxisRenderer.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.donutRenderer.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.enhancedLegendRenderer.min.js',
+					'rsc/ext/jquery/jqplot/js/jqplot.highlighter.min.js',	
 				],
 				dest: 'rsc/js/build/evo_jqplot.bmin.js'
 			}

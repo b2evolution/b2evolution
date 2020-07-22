@@ -516,7 +516,7 @@ if( $action == 'dashboard' )
 
 	// Include files to work with charts
 	require_js_defer( '#easypiechart#' );
-	require_css( 'jquery/jquery.easy-pie-chart.css' );
+	require_css( 'ext:jquery/easy-pie-chart/css/jquery.easy-pie-chart.css' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
