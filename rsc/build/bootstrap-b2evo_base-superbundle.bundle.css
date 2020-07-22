@@ -14892,13 +14892,16 @@ div.message_toolbars {
 }
 #modal_window.evo_modal_window__percent_height .modal-content {
   height: 100%;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 #modal_window.evo_modal_window__percent_height .modal-body {
   height: 100%;
   overflow: hidden;
   padding-top: 0;
-  padding-bottom: 70px;
+}
+#modal_window.evo_modal_window__percent_height .modal-footer {
+  flex-shrink: 0;
 }
 .tt-dropdown-menu {
   background-color: #FFFFFF;

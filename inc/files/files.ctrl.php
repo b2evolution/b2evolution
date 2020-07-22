@@ -160,6 +160,9 @@ param( 'iframe_name', 'string', '', true );
 param( 'field_name', 'string', '', true );
 param( 'file_type', 'string', '', true );
 
+// Prefix
+param( 'prefix', 'string', '' );
+
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
 /**
@@ -1839,9 +1842,44 @@ if( $mode != 'modal' )
 	// -------------------
 	// Browsing interface:
 	// -------------------
-	// Display VIEW:
-	$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
-
+	$show_existing_attachments_tab = ( $mode == 'upload' ) && isset( $LinkOwner ) && in_array( get_class( $LinkOwner->link_Object ), array( 'Comment', 'Item', 'EmailCampaign' ) );
+	if( $show_existing_attachments_tab )
+	{	// Display existing attachments tab:
+		$attach_files_url = get_htsrv_url().'async.php?action=browse_existing_attachments&amp;root='.$root
+				.'&amp;path='.$path
+				.'&amp;prefix='.$prefix
+				.'&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type )
+				.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
+		?>
+		<div class="margin-bottom-md">
+			<ul class="nav nav-tabs">
+				<li class="active">
+					<a href="#file_browser" data-toggle="tab"><?php echo T_('File browser'); ?></a>
+				</li>
+				<li>
+					<a href="<?php echo $attach_files_url;?>" data-toggle="tabajax" data-target="#existing_attachments">
+						<?php echo T_('Existing attachments'); ?>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="tab-content">
+			<div class="tab-pane active" id="file_browser">
+				<?php
+				// Display VIEW:
+				$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
+				?>
+			</div>
+			<div class="tab-pane" id="existing_attachments"></div>
+		</div>
+		<?php
+		expose_var_to_js( 'evo_tabs_ajax_load__click', true );
+	}
+	else
+	{
+		// Display VIEW:
+		$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
+	}
 
 	// End payload block:
 	$AdminUI->disp_payload_end();

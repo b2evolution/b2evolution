@@ -548,6 +548,25 @@ jQuery( document ).ready( function()
 		} )();
 	}
 
+	// Tabs AJAX load JS
+	if( typeof( evo_tabs_ajax_load__click ) != 'undefined' )
+	{
+		jQuery( '[data-toggle="tabajax"]' ).click( function( e ) {
+			var $this = jQuery( this ),
+				loadurl = $this.attr( 'href' ),
+				target =  $this.attr( 'data-target' );
+
+			if( ! $this.closest( 'li' ).hasClass( 'active' ) )
+			{
+				jQuery.get( loadurl, function( data ) {
+						jQuery( target ).html( data );
+					} );
+				$this.tab( 'show' );
+			}
+			return false;
+		} );
+	}
+
 	// Contact List view
 	if( typeof( evo_contact_list_view_config ) != 'undefined' )
 	{

@@ -1222,13 +1222,16 @@ div.edit_toolbars, div.message_toolbars {
 #modal_window.evo_modal_window__percent_height {
 	.modal-content {
 		height: 100%;
-		overflow: hidden;
+		display: flex;
+		flex-direction: column;
 	}
 	.modal-body {
 		height: 100%;
 		overflow: hidden;
 		padding-top: 0;
-		padding-bottom: 70px;
+	}
+	.modal-footer {
+		flex-shrink: 0;
 	}
 }
 
