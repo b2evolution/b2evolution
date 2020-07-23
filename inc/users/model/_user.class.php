@@ -1139,6 +1139,14 @@ class User extends DataObject
 			param( 'edited_user_locale', 'string', true );
 			$this->set_from_Request('locale', 'edited_user_locale', true);
 
+			// Time zone
+			$user_timezone = param( 'edited_user_timezone', 'string' );
+			if( ! empty( $user_timezone ) && ! check_is_timezone( $user_timezone ) )
+			{
+				param_error( 'edited_user_timezone', sprintf( T_('Time zone must be in format %s and between %s and %s.'), '<code>+1:00</code>', '<code>-12:59</code>', '<code>+13:00</code>' ) );
+			}
+			$UserSettings->set( 'timezone', ( $user_timezone === '0' ? '' : $user_timezone ), $this->ID );
+
 			// Session timeout
 			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
 			if( isset( $edited_user_timeout_sessions ) && ( $current_User->ID == $this->ID  || $current_User->check_perm( 'users', 'edit' ) ) )

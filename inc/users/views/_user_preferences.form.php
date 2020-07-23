@@ -111,10 +111,14 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 $Form->begin_fieldset( $is_admin ? T_('Other preferences').get_manual_link('user_preferences') : '', array( 'class'=>'fieldset clear' ) );
 
+$server_timezone = date( 'P' ).' '.date_default_timezone_get();
+
 if( $action != 'view' )
 { // We can edit the values:
 
 	$Form->select( 'edited_user_locale', $edited_User->get('locale'), 'locale_options_return', T_('Preferred locale'), T_('Preferred locale for admin interface, notifications, etc.'));
+
+	$Form->text_input( 'edited_user_timezone', $UserSettings->get( 'timezone', $edited_User->ID ), 10, T_('Time zone'), sprintf( T_('Enter your time zone in format %s. Leave empty to use time zone %s of this server.'), '<code>+1:00</code>', '<code>'.$server_timezone.'</code>' ) );
 
 	// Enable/disable multiple sessions for the current user
 	$multiple_sessions = $Settings->get( 'multiple_sessions' );
@@ -207,6 +211,8 @@ if( $action != 'view' )
 else
 { // display only
 	$Form->info( T_('Preferred locale'), $edited_User->get('locale'), T_('Preferred locale for admin interface, notifications, etc.') );
+	$user_timezone = $UserSettings->get( 'timezone', $edited_User->ID );
+	$Form->info( T_('Time zone'), empty( $user_timezone ) ? $server_timezone : $user_timezone, sprintf( T_('Server time zone: %s.'), '<code>'.$server_timezone.'</code>' ) );
 	$Form->info( T_('Show online'), ( $UserSettings->get( 'show_online', $edited_User->ID ) ) ? T_('yes') : T_('no') );
 }
 

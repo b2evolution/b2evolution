@@ -112,6 +112,13 @@ require dirname(__FILE__).'/_init_login.inc.php';
 $Timer->resume( '_init_session' );
 
 
+$Timer->start( '_init_session__timezone' );
+if( is_logged_in() && check_is_timezone( $UserSettings->get( 'timezone', $current_User->ID ) ) )
+{	// Set time zone of currently logged in User:
+	$DB->query( 'SET time_zone = '.$DB->quote( $UserSettings->get( 'timezone', $current_User->ID ) ) );
+}
+$Timer->stop( '_init_session__timezone' );
+
 
 $Timer->start( '_init_session__locale' );
 /*

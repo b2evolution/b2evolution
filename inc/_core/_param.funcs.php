@@ -1574,6 +1574,37 @@ function check_is_word( $word )
 
 
 /**
+ * Check if provided time zone has a proper format like +1:00
+ * and value is between -12:59 and +13:00
+ *
+ * @param string Time zone value
+ * @return boolean TRUE if provided value is correct time zone
+ */
+function check_is_timezone( $timezone )
+{
+	if( empty( $timezone ) )
+	{	// Empty value:
+		return false;
+	}
+
+	if( ! preg_match( '/^[-+][012]?\d:[0-5]\d$/', $timezone ) )
+	{	// Wrong format:
+		return false;
+	}
+
+	// Check for allowed time zone interval between -12:59 and +13:00:
+	$timezone = explode( ':', $timezone );
+	$timezone = $timezone[0] * 60 + $timezone[1];
+	if( $timezone < -779 || $timezone > 780 )
+	{	// Time zone must be >= -12:59 and <= +13:00
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
  * Check if there have been validation errors
  *
  * We play it safe here and check for all kind of errors, not just those from this particular class.
