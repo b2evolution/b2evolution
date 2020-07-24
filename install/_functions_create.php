@@ -1837,7 +1837,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</ul>]
 [set:subcat_template=content_list_subcat]
 [set:item_template=content_list_item]
-[set:active_item_template=]',
+[set:crossposted_item_template=content_list_crossposted_item| // Use same as item_template]
+[set:active_item_template=content_list_active_item| // Use same as item_template]',
 		),
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
@@ -1859,6 +1860,18 @@ function create_default_templates( $is_task = true )
 		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </li>',
 		),
+		'content_list_crossposted_item' => array(
+			'name'     => 'Content List: Crossposted Item',
+			'context'  => 'content_list_item',
+			'template' => '<li><i>
+	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
+	[Item:excerpt|
+		before=<div class="evo_post__excerpt_text">|
+		after=</div>|
+		excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+</i></li>',
+		),
 
 		// Content Title List:
 		'content_title_list' => array(
@@ -1867,6 +1880,7 @@ function create_default_templates( $is_task = true )
 			'template' => '[set:before_list=<ul>]
 [set:after_list=</ul>]
 [set:item_template=content_title_list_item]
+[set:crossposted_item_template=| // Use same as item_template]
 [set:active_item_template=content_title_list_active_item]',
 		),
 		'content_title_list_item' => array(
@@ -1889,6 +1903,7 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat|          // Sub-template for displaying categories]
 [set:item_template=content_tiles_item|              // Sub-template for displaying items]
+[set:crossposted_item_template=|                    // Sub-template for displaying crossposted items]
 [set:active_item_template=|                         // Sub-template for displaying active item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4| // RWD classes for tile containers]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow| // Modifier classes for each tile]
@@ -1906,7 +1921,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]
-[set:active_item_template=]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
 [set:evo_tile_image__modifiers=]
@@ -1983,7 +1999,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_btn_subcat]
 [set:item_template=content_tiles_btn_item]
-[set:active_item_template=]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__shadow]
 [set:evo_tile_image__modifiers=evo_tile_image__margin]
@@ -2054,7 +2071,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_bgimg_subcat]
 [set:item_template=content_tiles_bgimg_item]
-[set:active_item_template=]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
 [set:evo_tile_image__modifiers=]
@@ -2274,7 +2292,8 @@ function create_default_templates( $is_task = true )
 			'template' => '[set:before_list=<div class="row">]
 [set:after_list=</div>]
 [set:item_template=content_tabs_item]
-[set:active_item_template=]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_header_col=col-sm-5 col-xs-12]
 [set:rwd_text_col=col-sm-5 col-xs-12]
 [set:rwd_image_col=col-sm-7 pull-right-sm col-xs-12]
@@ -2538,10 +2557,11 @@ function create_default_templates( $is_task = true )
 			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<ul class="evo_thumblist">]
 [set:after_list=</ul>]
-[set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
-[set:active_item_template=|                                       // Sub-template for displaying active item]
-[set:evo_thumblist_image__modifiers=|                    // Modifier classes for each thumbnail image]
-[set:evo_thumblist_image__size=crop-80x80|              // Image size for displaying image]',
+[set:item_template=content_list_with_thumbnail_item| // Sub-template for displaying items]
+[set:crossposted_item_template=|                     // Sub-template for displaying crossposted items]
+[set:active_item_template=|                          // Sub-template for displaying active item]
+[set:evo_thumblist_image__modifiers=|                // Modifier classes for each thumbnail image]
+[set:evo_thumblist_image__size=crop-80x80|           // Image size for displaying image]',
 		),
 
 		'content_list_with_thumbnail_item' => array(

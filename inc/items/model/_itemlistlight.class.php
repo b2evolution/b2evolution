@@ -2127,7 +2127,7 @@ class ItemListLight extends DataObjectList2
 	 */
 	function display_list( $params )
 	{
-		global $Item;
+		global $Item, $cat;
 
 		$params = array_merge( array(
 				'template' => NULL,
@@ -2172,9 +2172,9 @@ class ItemListLight extends DataObjectList2
 
 			if( ! empty( $params['highlight_current'] ) )
 			{	// Use template for active Item only when requested to highlight currently active Item:
-				$active_item_template = isset( $params['active_item_template'] ) ? $params['active_item_template'] : $item_template;
+				$active_item_template = empty( $params['active_item_template'] ) ? $item_template : $params['active_item_template'];
 				if( $active_item_template == $item_template ||
-						! ( $active_item_Template = & $TemplateCache->get_by_code( $active_item_template, false, false ) ) )
+				    ! ( $active_item_Template = & $TemplateCache->get_by_code( $active_item_template, false, false ) ) )
 				{	// If active item template is not found in DB then use normal item template instead:
 					$active_item_template = $item_template;
 				}
@@ -2184,6 +2184,13 @@ class ItemListLight extends DataObjectList2
 			else
 			{	// Don't highlight currently active Item because it is not requested:
 				$highlight_current_item = false;
+			}
+
+			$crossposted_item_template = empty( $params['crossposted_item_template'] ) ? $item_template : $params['crossposted_item_template'];
+			if( $crossposted_item_template == $item_template ||
+			    ! ( $crossposted_item_Template = & $TemplateCache->get_by_code( $crossposted_item_template, false, false ) ) )
+			{	// If crossposted item template is not found in DB then use normal item template instead:
+				$crossposted_item_template = $item_template;
 			}
 
 			$this->restart();
@@ -2201,6 +2208,12 @@ class ItemListLight extends DataObjectList2
 				    $row_Item->ID == $Item->ID )
 				{	// Use different template for currently active Item:
 					$row_item_template = $active_item_template;
+				}
+				elseif( ! empty( $cat ) &&
+				        $row_Item->main_cat_ID != $cat &&
+				        in_array( $cat, $row_Item->get( 'extra_cat_IDs' ) ) )
+				{	// Use different template for crossposted Item:
+					$row_item_template = $crossposted_item_template;
 				}
 				else
 				{	// Use normal template to not active Item:
