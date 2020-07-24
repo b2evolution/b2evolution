@@ -164,28 +164,28 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 			<script>
 			jQuery( document ).ready( function() {
-				var img = jQuery( "#image_preview img" );
-				var tagType = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
+				var img = jQuery( '#modal_window #image_preview img' );
+				var tagType = jQuery( '#modal_window .tab-content .tab-pane.active' ).attr( 'id' );
 
 				// Add class to text input
-				jQuery( 'div.tab-pane div.style_buttons button' ).click( function() {
+				jQuery( '#modal_window div.tab-pane div.style_buttons button' ).click( function() {
 					return evo_image_add_class( this, jQuery( this ).text() );
 				} );
 
 				// Apply class to preview image
-				jQuery( "input[name$='_class']" ).on( 'change keydown', debounce( function() {
+				jQuery( '#modal_window input[name$="_class"]' ).on( 'change keydown', debounce( function() {
 					apply_image_class( jQuery( this ).val() );
 				}, 200 ) );
 
-				jQuery( 'input[name$="_disable_caption"]' ).click( function() {
-						var active_tag_type = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
-						jQuery( 'input[name="' + active_tag_type + '_caption"]' ).prop( 'disabled', jQuery( this ).is( ':checked' ) );
+				jQuery( '#modal_window input[name$="_disable_caption"]' ).click( function() {
+						var active_tag_type = jQuery( '#modal_window .tab-content .tab-pane.active' ).attr( 'id' );
+						jQuery( '#modal_window input[name="' + active_tag_type + '_caption"]' ).prop( 'disabled', jQuery( this ).is( ':checked' ) );
 					});
 
 				// Update preview on tab change
-				jQuery( 'a[data-toggle="tab"]' ).on( 'shown.bs.tab', function( e ) {
+				jQuery( '#modal_window a[data-toggle="tab"]' ).on( 'shown.bs.tab', function( e ) {
 					var target = jQuery( e.target ).attr( 'href' );
-					apply_image_class( jQuery( 'div' + target + ' input[name$="_class"]' ).val() );
+					apply_image_class( jQuery( '#modal_window div' + target + ' input[name$="_class"]' ).val() );
 				} );
 
 				<?php
@@ -207,7 +207,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 			function apply_image_class( imageClasses )
 			{
-				var img = jQuery( "#image_preview img" );
+				var img = jQuery( '#modal_window #image_preview img' );
 
 				imageClasses = imageClasses.split( '.' );
 				img.removeClass();
@@ -219,8 +219,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 			function evo_image_add_class( event_obj, className )
 			{
-				var input = jQuery( "input[name$='_class']", jQuery( event_obj ).closest( "div.tab-pane" ) );
-				var img = jQuery( "#image_preview img" );
+				var input = jQuery( 'input[name$="_class"]', jQuery( event_obj ).closest( 'div.tab-pane' ) );
 				var styles = input.val();
 
 				styles = styles.split( '.' );
@@ -237,22 +236,22 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 			function evo_image_submit()
 			{
 				// Get active tab pane
-				var tagType = jQuery( '.tab-content .tab-pane.active' ).attr( 'id' );
-				var linkID = jQuery( 'input[name="link_ID"]' ).val();
+				var tagType = jQuery( '#modal_window .tab-content .tab-pane.active' ).attr( 'id' );
+				var linkID = jQuery( '#modal_window input[name="link_ID"]' ).val();
 				if( tagType == 'image' )
 				{
-					var caption = jQuery( 'input[name="' + tagType + '_caption"]' ).val();
-					var noCaption = jQuery( 'input[name="' + tagType + '_disable_caption"]' ).is( ':checked' );
+					var caption = jQuery( '#modal_window input[name="' + tagType + '_caption"]' ).val();
+					var noCaption = jQuery( '#modal_window input[name="' + tagType + '_disable_caption"]' ).is( ':checked' );
 				}
-				var alt = jQuery( 'input[name="' + tagType + '_alt"]' ).val();
-				var noAlt = jQuery( 'input[name="' + tagType + '_disable_alt"]' ).is( ':checked' );
+				var alt = jQuery( '#modal_window input[name="' + tagType + '_alt"]' ).val();
+				var noAlt = jQuery( '#modal_window input[name="' + tagType + '_disable_alt"]' ).is( ':checked' );
 				if( tagType == 'thumbnail' )
 				{
-					var alignment = jQuery( 'input[name="' + tagType + '_alignment"]:checked' ).val();
-					var size = jQuery( 'input[name="' + tagType + '_size"]:checked' ).val();
+					var alignment = jQuery( '#modal_window input[name="' + tagType + '_alignment"]:checked' ).val();
+					var size = jQuery( '#modal_window input[name="' + tagType + '_size"]:checked' ).val();
 				}
-				var href = jQuery( 'input[name="' + tagType + '_href"]' ).val();
-				var classes = jQuery( 'input[name="' + tagType + '_class"]' ).val();
+				var href = jQuery( '#modal_window input[name="' + tagType + '_href"]' ).val();
+				var classes = jQuery( '#modal_window input[name="' + tagType + '_class"]' ).val();
 				var tag_caption = false;
 
 				var options = '';
