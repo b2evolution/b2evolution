@@ -825,7 +825,7 @@ class tinymce_plugin extends Plugin
 		global $baseurl;
 
 		// Get URL of TinyMCE JS files:
-		$tiny_mce_js_files_url = ( is_admin_page() || empty( $Blog ) ? $rsc_url : $Blog->get_local_plugins_url() ).'js/tiny_mce/';
+		$tiny_mce_js_files_url = ( is_admin_page() || empty( $Blog ) ? $rsc_url : $Blog->get_local_rsc_url() ).'js/tiny_mce/';
 
 		$tmce_plugins_array = array(
 			'image',
