@@ -83,7 +83,7 @@ class contact_form_Widget extends ComponentWidget
 
 		if( $disp != 'msgform' )
 		{ // Don't use this widget on $disp != 'msgform'
-			echo '<p class="red">'.sprintf( T_('The widget %s should be used only on $disp = %s.'), '<b>'.$this->get_name().'</b>', '<b>msgform</b>' ).'</p>';
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because it should be used only on <code>disp=msgform</code>.' );
 			return false;
 		}
 
@@ -159,9 +159,15 @@ class contact_form_Widget extends ComponentWidget
 		if( empty( $recipient_address ) )
 		{ // We should never have called this in the first place!
 			// Could be that commenter did not provide an email, etc...
-			echo T_('No recipient specified!');
+			$this->display_error_message( T_('No recipient specified!') );
 			return false;
 		}
+
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
 
 		// Form to send email
 		if( ! empty( $widget_Blog ) && ( $widget_Blog->get_ajax_form_enabled() ) )
@@ -202,6 +208,10 @@ class contact_form_Widget extends ComponentWidget
 
 			require skin_template_path( '_contact_msg.form.php' );
 		}
+
+		echo $this->disp_params['block_body_end'];
+
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
