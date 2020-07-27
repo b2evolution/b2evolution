@@ -2409,7 +2409,7 @@ function create_default_templates( $is_task = true )
 		class=btn btn-default|
 		text=Already have an account... ?]
 </div>
-[Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
+[Plugin:evo_sociallogin| // Call the SkinTag of the plugin
 	before=<div class="evo_social_login_buttons margin-top-md">|
 	after=</div>]
 ',
