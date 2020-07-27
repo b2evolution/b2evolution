@@ -349,8 +349,8 @@ class bootstrap_gallery_Skin extends Skin
 		// Page link color:
 		$this->dynamic_style_rule( 'page_link_color',
 			'#skin_wrapper .container a:not(.btn .active) { color: $setting_value$ }'.
-			'ul li a:not(.btn) { color: $setting_value$ }'.
-			'ul li a:not(.btn) {background-color: transparent }'.
+			'#skin_wrapper ul li a:not(.btn) { color: $setting_value$ }'.
+			'#skin_wrapper ul li a:not(.btn) {background-color: transparent }'.
 			'.ufld_icon_links a:not(.btn) {color: #fff !important}'
 		);
 		// Current tab text color:
