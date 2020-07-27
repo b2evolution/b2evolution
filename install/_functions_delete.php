@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -17,12 +17,12 @@ function db_delete()
 {
 	global $DB, $db_config, $tableprefix;
 
-	echo get_install_format_text( "Disabling foreign key checks...<br />\n", 'br' );
+	echo get_install_format_text_and_log( "Disabling foreign key checks...<br />\n", 'br' );
 	$DB->query( 'SET FOREIGN_KEY_CHECKS=0' );
 
 	foreach( $db_config['aliases'] as $alias => $tablename )
 	{
-		echo get_install_format_text( "Dropping $tablename table...<br />\n", 'br' );
+		echo get_install_format_text_and_log( "Dropping $tablename table...<br />\n", 'br' );
 		evo_flush();
 		$DB->query( 'DROP TABLE IF EXISTS '.$tablename );
 	}
@@ -31,7 +31,7 @@ function db_delete()
 	$remaining_tables = $DB->get_col( 'SHOW TABLES FROM `'.$db_config['name'].'` LIKE "'.$tableprefix.'%"' );
 	foreach( $remaining_tables as $tablename )
 	{
-		echo get_install_format_text( "Dropping $tablename table...<br />\n", 'br' );
+		echo get_install_format_text_and_log( "Dropping $tablename table...<br />\n", 'br' );
 		evo_flush();
 		$DB->query( 'DROP TABLE IF EXISTS '.$tablename );
 	}
@@ -55,10 +55,10 @@ function uninstall_b2evolution()
 	// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
 	if( $DB->query( 'SHOW TABLES LIKE "T_blogs"' ) )
 	{ // Get all blogs
-		$blogs_SQL = new SQL();
+		$blogs_SQL = new SQL( 'Get all collections' );
 		$blogs_SQL->SELECT( 'blog_ID' );
 		$blogs_SQL->FROM( 'T_blogs' );
-		$blogs = $DB->get_col( $blogs_SQL->get() );
+		$blogs = $DB->get_col( $blogs_SQL );
 
 		$BlogCache = & get_BlogCache( 'blog_ID' );
 		foreach( $blogs as $blog_ID )
@@ -69,11 +69,13 @@ function uninstall_b2evolution()
 			$PageCache = new PageCache( $Blog );
 			$PageCache->cache_delete();
 		}
+		// Clear cache in order to avoid unexpected errors on install new collections right after uninstall:
+		$BlogCache->clear();
 	}
 
 	/* REMOVE DATABASE */
 	db_delete();
 
-	echo get_install_format_text( '<p>'.T_('Reset done!').'</p>', 'p' );
+	echo get_install_format_text_and_log( '<p>'.T_('Reset done!').'</p>', 'p' );
 }
 ?>

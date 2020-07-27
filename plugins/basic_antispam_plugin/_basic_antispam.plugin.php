@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -32,7 +32,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = 'b2evBAspm';
 	var $priority = 60;
-	var $version = '6.9.3';
+	var $version = '7.2.0';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -101,20 +101,36 @@ class basic_antispam_plugin extends Plugin
 					'note'=>T_('Block comments with both "[link=" and "[url=" tags.'),
 					'defaultvalue' => 1,
 				),
-				'nofollow_for_hours' => array(
-					'type' => 'integer',
-					'label' => T_('Apply rel="nofollow"'),
-					'note'=>T_('hours. For how long should rel="nofollow" be applied to comment links? (0 means never, -1 means always)'),
-					'defaultvalue' => '-1', // use "nofollow" infinitely by default so lazy admins won't promote spam
-					'size' => 5,
-				),
 				'check_url_referers' => array(
 					'type' => 'checkbox',
 					'label' => T_('Check referers for URL'),
 					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
 					'defaultvalue' => '0',
 				),
+			);
+	}
 
+
+	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
+	{
+		return array(
+				'comment_throttling' => array(
+					'label'        => T_('Minimum comment interval'),
+					'note'         => T_('Users from this group will only be able to post a comment every x seconds.').' '.T_('0 to disable it.'),
+					'type'         => 'integer',
+					'defaultvalue' => 2,
+					'size'         => 3,
+					'valid_range'  => array( 'min' => 0 ),
+				),
 			);
 	}
 
@@ -216,8 +232,19 @@ class basic_antispam_plugin extends Plugin
 	{
 		$comment_Item = & $params['Comment']->get_Item();
 
-		$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
-		if( $params['action'] != 'preview' && ! empty( $min_comment_interval ) )
+		if( is_logged_in() )
+		{	// If user is logged in then we can get minimum comment interval per group:
+			global $current_User;
+			$min_comment_interval = $this->GroupSettings->get( 'comment_throttling', $current_User->grp_ID );
+		}
+		else
+		{	// Use plugin setting of minimum comment interval for all anonymous users:
+			$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
+		}
+
+		if( $params['action'] != 'preview' &&
+		    ! empty( $min_comment_interval ) &&
+		    ! $params['Comment']->is_meta() )
 		{	// If a comment posting should be blocked by minumum interval:
 			global $Hit, $DB, $localtimenow;
 
@@ -227,7 +254,7 @@ class basic_antispam_plugin extends Plugin
 			$SQL->WHERE( 'comment_author_IP = '.$DB->quote( $Hit->IP ) );
 			$SQL->WHERE_or( 'comment_author_email = '.$DB->quote( $params['Comment']->get_author_email() ) );
 
-			if( $last_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			if( $last_comment_time = $DB->get_var( $SQL ) )
 			{	// If last comment is found from current IP or email address:
 				$last_comment_time = mysql2date( 'U', $last_comment_time );
 				$new_comment_time = mysql2date( 'U', date( 'Y-m-d H:i:s', $localtimenow ) );
@@ -264,90 +291,6 @@ class basic_antispam_plugin extends Plugin
 				}
 			}
 		}
-	}
-
-
-	/**
-	 * If we use "makelink", handle nofollow rel attrib.
-	 *
-	 * @uses basic_antispam_plugin::apply_nofollow()
-	 */
-	function FilterCommentAuthor( & $params )
-	{
-		if( ! $params['makelink'] )
-		{
-			return false;
-		}
-
-		$this->apply_nofollow( $params['data'], $params['Comment'] );
-	}
-
-
-	/**
-	 * Handle nofollow in author URL (if it's made clickable)
-	 *
-	 * @uses basic_antispam_plugin::FilterCommentAuthor()
-	 */
-	function FilterCommentAuthorUrl( & $params )
-	{
-		$this->FilterCommentAuthor( $params );
-	}
-
-
-	/**
-	 * Handle nofollow rel attrib in comment content.
-	 *
-	 * @uses basic_antispam_plugin::FilterCommentAuthor()
-	 */
-	function FilterCommentContent( & $params )
-	{
-		$this->apply_nofollow( $params['data'], $params['Comment'] );
-	}
-
-
-	/**
-	 * Do we want to apply rel="nofollow" tag?
-	 *
-	 * @return boolean
-	 */
-	function apply_nofollow( & $data, $Comment )
-	{
-		global $localtimenow;
-
-		$hours = $this->Settings->get('nofollow_for_hours'); // 0=never, -1 always, otherwise for x hours
-
-		if( $hours == 0 )
-		{ // "never"
-			return;
-		}
-
-		if( $hours > 0 // -1 is "always"
-			&& mysql2timestamp( $Comment->date ) <= ( $localtimenow - $hours*3600 ) )
-		{
-			return;
-		}
-
-		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', create_function( '$m', '
-				if( preg_match( \'~\brel=([\\\'"])(.*?)\1~\', $m[2], $match ) )
-				{ // there is already a rel attrib:
-					$rel_values = explode( " ", $match[2] );
-
-					if( ! in_array( \'nofollow\', $rel_values ) )
-					{
-						$rel_values[] = \'nofollow\';
-					}
-
-					return $m[1]
-						.preg_replace(
-							\'~\brel=([\\\'"]).*?\1~\',
-							\'rel=$1\'.implode( " ", $rel_values ).\'$1\',
-							$m[2] )
-						.">";
-				}
-				else
-				{
-					return $m[1].$m[2].\' rel="nofollow">\';
-				}' ), $data );
 	}
 
 

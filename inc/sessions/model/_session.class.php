@@ -12,7 +12,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -92,26 +92,53 @@ class Session
 	/**
 	 * Constructor
 	 *
-	 * If valid session cookie received: pull session from DB
+	 * If valid session cookie received or param session ID is provided: pull session from DB
 	 * Otherwise, INSERT a session into DB
+	 *
+	 * @param integer Session ID
 	 */
-	function __construct()
+	function __construct( $session_ID = NULL )
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
+		global $DB, $Debuglog, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
 		global $cookie_session, $cookie_expires;
 
 		$Debuglog->add( 'Session: cookie_domain='.get_cookie_domain(), 'request' );
 		$Debuglog->add( 'Session: cookie_path='.get_cookie_path(), 'request' );
 
-		$session_cookie = param_cookie( $cookie_session, 'string', '' );
-		if( empty( $session_cookie ) )
-		{
-			$Debuglog->add( 'Session: No session cookie received.', 'request' );
+		$timeout_sessions = NULL;
+		if( $this->user_ID != NULL )
+		{	// User is not anonymous, get custom session timeout (may return NULL):
+			$timeout_sessions = $UserSettings->get( 'timeout_sessions', $this->user_ID );
+		}
+		if( empty( $timeout_sessions ) )
+		{	// User is anonymous or has no custom session timeout. So, we use default session timeout:
+			$timeout_sessions = $Settings->get( 'timeout_sessions' );
+		}
+
+		if( $session_ID !== NULL )
+		{	// Get Session by requested ID:
+			$Debuglog->add( 'Session: ID='.$session_ID, 'request' );
+
+			$session_SQL = new SQL( 'Get session data by ID#'.$session_ID );
+			$session_SQL->SELECT( 'sess_ID, sess_key, sess_data, sess_user_ID, sess_start_ts, sess_lastseen_ts, sess_device' );
+			$session_SQL->FROM( 'T_sessions' );
+			$session_SQL->WHERE( 'sess_ID  = '.$DB->quote( $session_ID ) );
+			$session_SQL->WHERE_and( 'UNIX_TIMESTAMP(sess_lastseen_ts) > '.( $localtimenow - $timeout_sessions ) );
+			$row = $DB->get_row( $session_SQL );
+			if( empty( $row ) )
+			{
+				$Debuglog->add( 'Session: Session by ID is invalid!', 'request' );
+			}
 		}
 		else
-		{ // session ID sent by cookie
-			if( ! preg_match( '~^(\d+)_(\w+)$~', $session_cookie, $match ) )
+		{	// Get Session from cookie data ID + key:
+			$session_cookie = param_cookie( $cookie_session, 'string', '' );
+			if( empty( $session_cookie ) )
+			{
+				$Debuglog->add( 'Session: No session cookie received.', 'request' );
+			}
+			elseif( ! preg_match( '~^(\d+)_(\w+)$~', $session_cookie, $match ) )
 			{
 				$Debuglog->add( 'Session: Invalid session cookie format!', 'request' );
 			}
@@ -121,17 +148,6 @@ class Session
 				$session_key_by_cookie = $match[2];
 
 				$Debuglog->add( 'Session: Session ID received from cookie: '.$session_id_by_cookie, 'request' );
-
-				$timeout_sessions = NULL;
-				if( $this->user_ID != NULL )
-				{	// User is not anonymous, get custom session timeout (may return NULL):
-					$timeout_sessions = $UserSettings->get( 'timeout_sessions', $this->user_ID );
-				}
-
-				if( empty( $timeout_sessions ) )
-				{	// User is anonymous or has no custom session timeout. So, we use default session timeout:
-					$timeout_sessions = $Settings->get('timeout_sessions');
-				}
 
 				$row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID, sess_start_ts, sess_lastseen_ts, sess_device
@@ -143,8 +159,11 @@ class Session
 				{
 					$Debuglog->add( 'Session: Session ID/key combination is invalid!', 'request' );
 				}
-				else
-				{ // ID + key are valid: load data
+			}
+		}
+
+				if( ! empty( $row ) )
+				{	// Load session data if row is found in DB:
 					$Debuglog->add( 'Session: Session ID is valid.', 'request' );
 					$this->ID = $row->sess_ID;
 					$this->key = $row->sess_key;
@@ -197,14 +216,13 @@ class Session
 							{
 								// dh> TODO: "old" messages should rather get prepended to any existing ones from the current request, rather than appended
 								$Messages->add_messages( $sess_Messages );
+								$Messages->affixed = $sess_Messages->affixed;
 								$Debuglog->add( 'Session: Added Messages from session data.', 'request' );
 								$this->delete( 'Messages' );
 							}
 						}
 					}
 				}
-			}
-		}
 
 
 		if( $this->ID )
@@ -214,8 +232,9 @@ class Session
 				$this->session_needs_save( true );
 			}
 		}
-		else
-		{ // create a new session! :
+		elseif( $session_ID === NULL )
+		{	// Create a new session! Only for session from cookie:
+			// Do NOT create new session on request by ID!
 			$this->key = generate_random_key( 32 );
 
 			// Detect user device
@@ -280,9 +299,12 @@ class Session
 	/**
 	 * Delete sessions from database based on where condition or by object ids
 	 *
-	 * @return array
+	 * @param string where condition
+	 * @param array object ids
+	 * @param array additional params if required
+	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -471,6 +493,37 @@ class Session
 		 || $this->_data[$param][1] != $value
 		 || $expire != 0 )
 		{	// There is something to update:
+			if( isset( $this->_data[ $param ] ) )
+			{	// Log updated session var:
+				if( isset( $this->_data[ $param ][1] ) )
+				{
+					if( is_scalar( $this->_data[ $param ][1] ) )
+					{	// Display value for scalar var:
+						$session_old_value = '<code class="debug_code_inline">'.$this->_data[ $param ][1].'</code>';
+					}
+					elseif( is_array( $this->_data[ $param ][1] ) )
+					{	// Display only type for array var:
+						$session_old_value = 'Array( '.implode( ', ', array_keys( $this->_data[ $param ][1] ) ).' )';
+					}
+					elseif( is_object( $this->_data[ $param ][1] ) )
+					{	// Display class name for object var:
+						$session_old_value = 'Object: '.get_class( $this->_data[ $param ][1] );
+					}
+					else
+					{	// Display var type for others:
+						$session_old_value = gettype( $this->_data[ $param ][1] );
+					}
+				}
+				else
+				{	// No old value:
+					$session_old_value = '';
+				}
+				$action_type = 'updated (old value: '.$session_old_value.')';
+			}
+			else
+			{	// Log created session var:
+				$action_type = 'created';
+			}
 			$this->_data[$param] = array( ( $expire ? ( $localtimenow + $expire ) : NULL ), $value );
 
 			if( $param == 'Messages' )
@@ -478,7 +531,7 @@ class Session
 				$this->set( 'core.no_CachePageContent', 1 );
 			}
 
-			$Debuglog->add( 'Session: Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'request' );
+			$Debuglog->add( 'Session: Session data['.$param.'] '.$action_type.'. Expire in: '.( $expire ? $expire.'s' : 'never' ).'.', 'request' );
 
 			$this->session_needs_save( true );
 		}
@@ -588,7 +641,7 @@ class Session
 	 */
 	function create_crumb( $crumb_name )
 	{
-		global $servertimenow, $crumb_expires;
+		global $servertimenow, $crumb_expires, $Debuglog;
 
 		// Retrieve latest saved crumb:
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
@@ -600,6 +653,8 @@ class Session
 			$crumb_value = '';
 			if( $servertimenow - $crumb_time < ( $crumb_expires - 200 ) ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
 			{	// Not too old either, save as previous crumb:
+				$Debuglog->add( 'Session: Store previous value <code class="debug_code_inline">'.$crumb_value.'-'.$servertimenow.'</code> for crumb ['.$crumb_name.'].', 'request' );
+
 				$this->set( 'crumb_prev_'.$crumb_name, $crumb_recalled );
 			}
 		}
@@ -607,6 +662,8 @@ class Session
 		if( empty( $crumb_value ) )
 		{	// We need to generate a new crumb:
 			$crumb_value = generate_random_key( 32 );
+
+			$Debuglog->add( 'Session: Add new crumb ['.$crumb_name.'] = <code class="debug_code_inline">'.$crumb_value.'-'.$servertimenow.'</code> (Store the latest value).', 'request' );
 
 			// Save crumb into session so we can later compare it to what get got back from the user request:
 			$this->set( 'crumb_latest_'.$crumb_name, $crumb_value.'-'.$servertimenow );
@@ -624,44 +681,103 @@ class Session
 	 *
 	 * @param string crumb name
 	 * @param boolean true if the script should die on error
+	 * @param array Additional parameters
 	 */
-	function assert_received_crumb( $crumb_name, $die = true )
+	function assert_received_crumb( $crumb_name, $die = true, $params = array() )
 	{
 		global $servertimenow, $crumb_expires, $debug;
+
+		$params = array_merge( array(
+				'msg_format'        => 'html',
+				'msg_no_crumb'      => 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.',
+				'msg_incorrect_crumb' => T_('Incorrect crumb received!'),
+				'msg_expired_crumb'   => T_('Expired crumb received!'),
+				'error_code'        => '400 Bad Crumb Request',
+			), $params );
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
 			if( $die )
 			{
-				bad_request_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
+				// Add message to AJAX Log:
+				ajax_log_add( $params['msg_no_crumb'].' ['.$crumb_name.']', 'error' );
+				// Die with error message:
+				bad_request_die( $params['msg_no_crumb'], $params['error_code'], $params['msg_format'] );
 			}
 			return false;
 		}
 
-		// Retrieve latest saved crumb:
-		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
-		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
-		{	// Crumb is valid
-			// echo '<p>-<p>-<p>A';
-			return true;
+		// Retrieve latest and previous crumbs:
+		list( $crumb_latest, $latest_crumb_time ) = explode( '-', $this->get( 'crumb_latest_'.$crumb_name, '-0' ) );
+		list( $crumb_previous, $prev_crumb_time ) = explode( '-', $this->get( 'crumb_prev_'.$crumb_name, '-0' ) );
+
+		// Validate the latest and previous crumbs:
+		$crumb_latest_is_valid = ( $crumb_received == $crumb_latest );
+		$crumb_previous_is_valid = ( $crumb_received == $crumb_previous );
+
+		if( $crumb_latest_is_valid || $crumb_previous_is_valid )
+		{	// At least one crumb is valid, check for expired:
+			if( $crumb_latest_is_valid && $servertimenow - $latest_crumb_time <= $crumb_expires )
+			{	// The latest crumb is valid and not expired:
+				return true;
+			}
+			if( $crumb_previous_is_valid && $servertimenow - $prev_crumb_time <= $crumb_expires )
+			{	// The previous crumb is valid and not expired:
+				return true;
+			}
+			// The latest and previous crumbs are expired:
+			$crumb_info_message = $params['msg_expired_crumb'];
+			$crumb_latest_status = ( $crumb_latest_is_valid ? 'EXPIRED' : 'Invalid' );
+			$crumb_previous_status = ( $crumb_previous_is_valid ? 'EXPIRED' : 'Invalid' );
 		}
-
-		$crumb_valid_latest = $crumb_value;
-
-		// Retrieve previous saved crumb:
-		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
-		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
-		{	// Crumb is valid
-			// echo '<p>-<p>-<p>B';
-			return true;
+		else
+		{	// The latest and previous crumbs are invalid:
+			$crumb_info_message = $params['msg_incorrect_crumb'];
+			$crumb_latest_status = 'Invalid';
+			$crumb_previous_status = 'Invalid';
 		}
 
 		if( ! $die )
-		{
+		{	// Return false result when we don't need die action on error:
 			return false;
 		}
+
+		// Attempt to output an error header (will not work if the output buffer has already flushed once):
+		// This should help preventing indexing robots from indexing the error :P
+		if( ! headers_sent() )
+		{
+			load_funcs( '_core/_template.funcs.php' );
+			headers_content_mightcache( 'text/html', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+			header_http_response( $params['error_code'] );
+		}
+
+		$crumb_info_full_message = $crumb_info_message.' '.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) );
+
+		// Info for debug log:
+		$received_crumb_info = 'Received crumb: '.$crumb_received;
+		$latest_crumb_info = 'Latest saved crumb: '.( empty( $crumb_latest ) && empty( $latest_crumb_time )
+			? 'Not saved yet' // The latest crumb was not saved in Sessions yet.
+			: $crumb_latest.' (Created at: '.date( 'Y-m-d H:i:s', $latest_crumb_time ).' - '.$crumb_latest_status.')' );
+		$previous_crumb_info = 'Previous saved crumb: '.( empty( $crumb_previous ) && empty( $prev_crumb_time )
+			? 'Not saved yet' // Previous crumb was not saved in Sessions yet.
+			: $crumb_previous.' (Created at: '.date( 'Y-m-d H:i:s', $prev_crumb_time ).' - '.$crumb_previous_status.')' );
+		$session_info = 'Session ID: '.$this->ID;
+
+		// Add messages to AJAX Log:
+		ajax_log_add( $crumb_info_full_message.' (Config var: <code class="debug_code_inline">$crumb_expires</code> = '.$crumb_expires.' seconds)', 'error' );
+		ajax_log_add( $received_crumb_info, 'error' );
+		ajax_log_add( $latest_crumb_info, 'error' );
+		ajax_log_add( $previous_crumb_info, 'error' );
+		ajax_log_add( $session_info, 'error' );
+
+		if( $params['msg_format'] == 'text' )
+		{	// Display error message in TEXT format:
+			echo $crumb_info_full_message;
+			// Display AJAX Log if it was initialized:
+			ajax_log_display();
+			die();
+		}
+		// else display error message in HTML format:
 
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
@@ -672,18 +788,19 @@ class Session
 		// echo '</head>';
 
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
+		echo '<h3 style="color:#f00;">'.$crumb_info_message.' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
-		echo '<p>'.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ).'</p>';
+		echo '<p>'.$crumb_info_full_message.'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 
 		if( $debug > 0 )
-		{
+		{	// Display additional info when debug is enabled:
 			echo '<div>';
-			echo '<p>Received crumb:'.$crumb_received.'</p>';
-			echo '<p>Latest saved crumb:'.$crumb_valid_latest.'</p>';
-			echo '<p>Previous saved crumb:'.$crumb_value.'</p>';
+			echo '<p>'.$received_crumb_info.'</p>';
+			echo '<p>'.$latest_crumb_info.'</p>';
+			echo '<p>'.$previous_crumb_info.'</p>';
+			echo '<p>'.$session_info.'</p>';
 			echo '</div>';
 		}
 
@@ -692,10 +809,13 @@ class Session
 		$Form = new Form( '', 'evo_session_crumb_resend', $_SERVER['REQUEST_METHOD'] );
 		$Form->begin_form( 'inline' );
 		$Form->add_crumb( $crumb_name );
-		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ) );
+		$Form->hiddens_by_key( $_REQUEST );
 		$Form->button( array( 'submit', '', T_('Resubmit now!'), 'ActionButton' ) );
 		$Form->end_form();
 		echo '</div>';
+
+		// Display AJAX Log if it was initialized:
+		ajax_log_display();
 
 		die();
 	}
@@ -720,6 +840,40 @@ class Session
 		global $tablet_user_devices;
 
 		return array_key_exists( $this->sess_device, $tablet_user_devices );
+	}
+
+
+	/**
+	 * Was this session specially switched to alternative skin
+	 */
+	function is_alt_session()
+	{
+		global $Blog, $Hit;
+
+		if( $this->get( 'using_alt_skin' ) )
+		{	// Do additional check to know if we can continue to use Alt skin:
+			if( isset( $Blog ) &&
+			    strpos( $Hit->get_referer(), $Blog->get( 'url' ) ) === 0 )
+			{	// We can continue to use Alt skin because referer URL is started with collection base URL:
+				return true;
+			}
+			else
+			{	// Don't continue to use Alt skin because referer is not started with collection base URL:
+				$this->delete( 'using_alt_skin' );
+			}
+		}
+
+		if( isset( $Hit ) &&
+		    isset( $Blog ) &&
+		    $Blog->get_setting( 'display_alt_skin_referer' ) &&
+		    strpos( $Hit->get_referer(), $Blog->get_setting( 'display_alt_skin_referer_url' ) ) !== false )
+		{	// Current referer URL contains string from collection setting:
+			$this->set( 'using_alt_skin', true );
+			return true;
+		}
+
+		// No condition is found to display Alt skin:
+		return false;
 	}
 
 
@@ -752,7 +906,7 @@ class Session
 			$SQL->ORDER_BY( 'hit_ID ASC' );
 			$SQL->LIMIT( '1' );
 
-			$this->first_hit_params = $DB->get_row( $SQL->get(), OBJECT, NULL, $SQL->title );
+			$this->first_hit_params = $DB->get_row( $SQL );
 		}
 
 		return $this->first_hit_params;

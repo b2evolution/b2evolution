@@ -14,15 +14,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
-
-global $dispatcher;
 
 global $collections_Module;
 
@@ -37,23 +31,23 @@ $Form->begin_form( 'fform', '',
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Account closing').get_manual_link('account-closing-settings') );
+$Form->begin_fieldset( TB_('Account closing').get_manual_link('account-closing-settings') );
 
-	$Form->checkbox_input( 'account_close_enabled', $Settings->get( 'account_close_enabled' ), T_('Allow closing'), array( 'note' => T_('check to allow users to close their account themselves.') ) );
+	$Form->checkbox_input( 'account_close_enabled', $Settings->get( 'account_close_enabled' ), TB_('Allow closing'), array( 'note' => TB_('check to allow users to close their account themselves.') ) );
 
-	$Form->textarea( 'account_close_intro', $Settings->get( 'account_close_intro' ), 5, T_('Intro text'), T_('Enter a message to display to users who want to close their account.'), 60 );
+	$Form->textarea( 'account_close_intro', $Settings->get( 'account_close_intro' ), 5, TB_('Intro text'), TB_('Enter a message to display to users who want to close their account.'), 60 );
 
-	$Form->textarea( 'account_close_reasons', $Settings->get( 'account_close_reasons' ), 5, T_('Closing reasons'), T_('Enter one possible reason per line. There will always be an "Other" reason added at the end.'), 60 );
+	$Form->textarea( 'account_close_reasons', $Settings->get( 'account_close_reasons' ), 5, TB_('Closing reasons'), TB_('Enter one possible reason per line. There will always be an "Other" reason added at the end.'), 60 );
 
-	$Form->textarea( 'account_close_byemsg', $Settings->get( 'account_close_byemsg' ), 5, T_('Good-bye message'), T_('Enter a text to display after closing the account.'), 60 );
+	$Form->textarea( 'account_close_byemsg', $Settings->get( 'account_close_byemsg' ), 5, TB_('Good-bye message'), TB_('Enter a text to display after closing the account.'), 60 );
 
 $Form->end_fieldset();
 
 // --------------------------------------------
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

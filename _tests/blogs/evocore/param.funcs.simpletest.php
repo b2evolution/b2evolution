@@ -55,7 +55,7 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 
 	function test_defaults()
 	{
-		$this->assertIdentical( param( 'test1' ), '' );
+		$this->assertIdentical( param( 'test1', 'raw' ), '' );
 		$this->assertIdentical( param( 'test1', 'string', NULL ), '' ); // set from first call
 
 		$this->assertIdentical( param( 'test2', 'string', NULL ), NULL );
@@ -163,6 +163,49 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 		//   $params = NULL;
 		set_param( 'params', 'N;' );
 		$this->assertFalse( param_check_serialized_array( 'params' ) );
+	}
+
+
+	function test_numeric_fields()
+	{
+		// Positive values:
+		$this->assertIdentical( param( 'double_test1', 'double', '1.23' ), 1.23 );
+		$this->assertIdentical( param( 'double_test2', 'double', '1,23' ), 1.23 );
+		$this->assertIdentical( param( 'double_test3', 'double', '1234567.89' ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test4', 'double', '1234567,89' ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test5', 'double', '1 234 567.89' ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test6', 'double', '1 234 567,89' ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test7', 'double', '1,234,567.89' ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test8', 'double', '1.234.567,89' ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test9', 'double', "1'234'567.89" ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test10', 'double', "1'234'567,89" ), 1234567.89 );
+		$this->assertIdentical( param( 'double_test11', 'double', '1 234 567' ), floatval( 1234567 ) );
+		$this->assertIdentical( param( 'double_test12', 'double', '1,234,567' ), floatval( 1234567 ) );
+		$this->assertIdentical( param( 'double_test13', 'double', '1.234.567' ), floatval( 1234567 ) );
+		$this->assertIdentical( param( 'double_test14', 'double', "1'234'567" ), floatval( 1234567 ) );
+		$this->assertIdentical( param( 'double_test15', 'double', '1 234' ), floatval( 1234 ) );
+		$this->assertIdentical( param( 'double_test16', 'double', '1,234' ), 1.234 );
+		$this->assertIdentical( param( 'double_test17', 'double', '1.234' ), 1.234 );
+		$this->assertIdentical( param( 'double_test18', 'double', "1'234" ), floatval( 1234 ) );
+		// Negative values:
+		$this->assertIdentical( param( 'double_test19', 'double', '-1.23' ), -1.23 );
+		$this->assertIdentical( param( 'double_test20', 'double', '-1,23' ), -1.23 );
+		$this->assertIdentical( param( 'double_test21', 'double', '-1234567.89' ), -1234567.89 );
+		$this->assertIdentical( param( 'double_tesr22', 'double', '-1234567,89' ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test23', 'double', '-1 234 567.89' ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test24', 'double', '-1 234 567,89' ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test25', 'double', '-1,234,567.89' ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test26', 'double', '-1.234.567,89' ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test27', 'double', "-1'234'567.89" ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test28', 'double', "-1'234'567,89" ), -1234567.89 );
+		$this->assertIdentical( param( 'double_test29', 'double', '-1 234 567' ), floatval( -1234567 ) );
+		$this->assertIdentical( param( 'double_test30', 'double', '-1,234,567' ), floatval( -1234567 ) );
+		$this->assertIdentical( param( 'double_test31', 'double', '-1.234.567' ), floatval( -1234567 ) );
+		$this->assertIdentical( param( 'double_test32', 'double', "-1'234'567" ), floatval( -1234567 ) );
+		$this->assertIdentical( param( 'double_test33', 'double', '-1 234' ), floatval( -1234 ) );
+		$this->assertIdentical( param( 'double_test34', 'double', '-1,234' ), -1.234 );
+		$this->assertIdentical( param( 'double_test35', 'double', '-1.234' ), -1.234 );
+		$this->assertIdentical( param( 'double_test36', 'double', "-1'234" ), floatval( -1234 ) );
 	}
 }
 

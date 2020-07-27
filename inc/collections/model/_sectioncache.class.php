@@ -57,7 +57,7 @@ class SectionCache extends DataObjectCache
 
 		if( is_logged_in() )
 		{
-			if( $current_User->check_perm( 'section', 'edit' ) )
+			if( check_user_perm( 'section', 'edit' ) )
 			{	// Allow to select all sections if Current user can has a permission for this:
 				$this->load_all();
 			}

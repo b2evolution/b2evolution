@@ -64,7 +64,7 @@ class GroupSettings extends AbstractSettings
 		if( $grp_ID != 0 )
 		{
 			// Select current group permission from database
-			$SQL = new SQL();
+			$SQL = new SQL( 'Load settings from group #'.$grp_ID );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( 'T_groups__groupsettings' );
 			$SQL->WHERE( 'gset_grp_ID = '.$grp_ID );
@@ -73,7 +73,7 @@ class GroupSettings extends AbstractSettings
 
 			// Set current group permissions
 			$existing_perm = array();
-			foreach( $DB->get_results( $SQL->get(), OBJECT, 'Load settings from group #'.$grp_ID ) as $row )
+			foreach( $DB->get_results( $SQL ) as $row )
 			{
 				$existing_perm[] = $row->gset_name;
 				$this->permission_values[$row->gset_name] = $row->gset_value;
@@ -146,6 +146,9 @@ class GroupSettings extends AbstractSettings
 	 */
 	function set( $permission, $value, $grp_ID )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		if( $grp_ID != 0 )
 		{	// We can set permission, because the current group is already in database
 			$this->permission_values[$permission] = $value;

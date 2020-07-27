@@ -12,7 +12,7 @@ load_class( 'messaging/model/_message.class.php', 'Message' );
 global $current_User;
 
 // Check minimum permission:
-if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
+if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 {
 	$Messages->add( 'Sorry, you are not allowed to view threads!' );
 	header_redirect( $admin_url );
@@ -30,7 +30,7 @@ if( param( 'thrd_ID', 'integer', '', true) )
 	if( ($edited_Thread = & $ThreadCache->get_by_ID( $thrd_ID, false )) === false )
 	{	unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Thread') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Thread') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -61,7 +61,7 @@ switch( $action )
 	case 'new':
 		if( has_cross_country_restriction( 'users' ) && empty( $current_User->ctry_ID ) )
 		{ // Cross country contact is restricted but user country is not set
-			$Messages->add( T_('Please specify your country before attempting to contact other users.') );
+			$Messages->add( TB_('Please specify your country before attempting to contact other users.') );
 			header_redirect( get_user_profile_url() );
 		}
 
@@ -127,11 +127,11 @@ switch( $action )
 
 	case 'delete': // Delete thread:
 		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'delete', true );
+		check_user_perm( 'perm_messaging', 'delete', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Thread &laquo;%s&raquo; deleted.'), $edited_Thread->dget('title') );
+			$msg = sprintf( TB_('Thread &laquo;%s&raquo; deleted.'), $edited_Thread->dget('title') );
 			$edited_Thread->dbdelete();
 			unset( $edited_Thread );
 			unset( $edited_Message );
@@ -145,7 +145,7 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_Thread->check_delete( sprintf( T_('Cannot delete thread &laquo;%s&raquo;'), $edited_Thread->dget('title') ) ) )
+			if( ! $edited_Thread->check_delete( sprintf( TB_('Cannot delete thread &laquo;%s&raquo;'), $edited_Thread->dget('title') ) ) )
 			{ // There are restrictions:
 				$action = 'view';
 			}
@@ -155,14 +155,14 @@ switch( $action )
 	case 'leave': // Leave thread:
 		leave_thread( $edited_Thread->ID, $current_User->ID, false );
 
-		$Messages->add( sprintf( T_( 'You have successfuly left the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+		$Messages->add( sprintf( TB_( 'You have successfuly left the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
 		break;
 
 	case 'close': // Close thread:
 	case 'close_and_block': // Close thread and block contact:
 		leave_thread( $edited_Thread->ID, $current_User->ID, true );
 
-		$Messages->add( sprintf( T_( 'You have successfuly closed the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
+		$Messages->add( sprintf( TB_( 'You have successfuly closed the &laquo;%s&raquo; conversation!' ), $edited_Thread->get( 'title' ) ), 'success' );
 		if( $action == 'close_and_block' )
 		{ // also block the given contact
 			$block_user_ID = param( 'block_ID', 'integer', true );
@@ -170,16 +170,16 @@ switch( $action )
 			$blocked_User = $UserCache->get_by_ID( $block_user_ID );
 
 			set_contact_blocked( $block_user_ID, true );
-			$Messages->add( sprintf( T_( '&laquo;%s&raquo; was blocked.' ), $blocked_User->get( 'login' ) ), 'success' );
+			$Messages->add( sprintf( TB_( '&laquo;%s&raquo; was blocked.' ), $blocked_User->get( 'login' ) ), 'success' );
 		}
 		break;
 }
 
-init_plugins_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
+init_popover_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
-$AdminUI->breadcrumbpath_add( T_('Conversations'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( TB_('Messages'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( TB_('Conversations'), '?ctrl=threads' );
 
 // Set an url for manual page:
 switch( $action )
@@ -191,13 +191,6 @@ switch( $action )
 
 		// Require colorbox js:
 		require_js_helper( 'colorbox' );
-		// Require Fine Uploader js and css:
-		init_fineuploader_js_lang_strings();
-		require_js( 'multiupload/fine-uploader.js' );
-		require_css( 'fine-uploader.css' );
-		// Load JS files to make the links table sortable:
-		require_js( '#jquery#' );
-		require_js( 'jquery/jquery.sortable.min.js' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'conversations-list' );
@@ -227,7 +220,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Thread->confirm_delete(
-				sprintf( T_('Delete thread &laquo;%s&raquo;?'), $edited_Thread->dget('title') ),
+				sprintf( TB_('Delete thread &laquo;%s&raquo;?'), $edited_Thread->dget('title') ),
 				'messaging_threads', $action, get_memorized( 'action' ) );
 		$AdminUI->disp_view( 'messaging/views/_thread_list.view.php' );
 		break;

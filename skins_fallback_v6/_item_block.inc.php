@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -30,11 +30,12 @@ $params = array_merge( array(
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
+			'item_link_type'             => '#',
 		'item_title_line_after'      => '</div>',
 		// Controlling the content:
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
-		'image_size'                 => 'fit-1280x720',
+		'image_size'                 => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		'author_link_text'           => 'auto',
 	), $params );
 
@@ -49,64 +50,47 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 
-		// ------- Title -------
-		if( $params['disp_title'] )
+		if( $disp == 'page' )
 		{
-			echo $params['item_title_line_before'];
-
-			if( $disp == 'single' || $disp == 'page' )
+			// ------- Title -------
+			if( $params['disp_title'] )
 			{
-				$title_before = $params['item_title_single_before'];
-				$title_after = $params['item_title_single_after'];
-			}
-			else
-			{
-				$title_before = $params['item_title_before'];
-				$title_after = $params['item_title_after'];
-			}
+				echo $params['item_title_line_before'];
 
-			// POST TITLE:
-			$Item->title( array(
-					'before'    => $title_before,
-					'after'     => $title_after,
-					'link_type' => '#'
-				) );
+				// POST TITLE:
+				$Item->title( array(
+						'before'    => $params['item_title_before'],
+						'after'     => $params['item_title_after'],
+						'link_type' => '#'
+					) );
 
-			// EDIT LINK:
-			if( $Item->is_intro() )
-			{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
-				$Item->edit_link( array(
-							'before' => '<div class="'.button_class( 'group' ).'">',
-							'after'  => '</div>',
-							'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
-							'class'  => button_class( 'text' ),
-						) );
+				// EDIT LINK:
+				if( $Item->is_intro() )
+				{ // Display edit link only for intro posts, because for all other posts the link is displayed on the info line.
+					$Item->edit_link( array(
+								'before' => '<div class="'.button_class( 'group' ).'">',
+								'after'  => '</div>',
+								'text'   => $Item->is_intro() ? get_icon( 'edit' ).' '.T_('Edit Intro') : '#',
+								'class'  => button_class( 'text' ),
+							) );
+				}
+
+				echo $params['item_title_line_after'];
 			}
-
-			echo $params['item_title_line_after'];
 		}
 	?>
 
 	<?php
 	if( ! $Item->is_intro() )
 	{ // Don't display the following for intro posts
-	?>
-	<div class="small text-muted">
-	<?php
-		if( $Item->status != 'published' )
+		if( $disp == 'posts' )
 		{
-			$Item->format_status( array(
-					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-				) );
-		}
-
-		if( $disp != 'page' )
-		{
-			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+			// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
-			skin_container( /* TRANS: Widget container name */ NT_('Item Single Header'), array(
+			widget_container( 'item_in_list', array(
 				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="evo_widget $wi_class$">',
 				'block_end' => '</div>',
@@ -115,11 +99,58 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'block_title_end' => '</h3>',
 
 				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_item_title_params'  => array(
+						'before' => $params['item_title_line_before'].$params['item_title_before'],
+						'after' => $params['item_title_after'].$params['item_title_line_after'],
+						'link_type' => $params['item_link_type'],
+				),
+				// Item Visibility Badge widge template
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_params'  => array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					),
+			) );
+			// ----------------------------- END OF "Item in List" CONTAINER -----------------------------
+		}
+		elseif( $disp != 'page' )
+		{
+			// ------------------------- "Item Single - Header" CONTAINER EMBEDDED HERE --------------------------
+			// Display container contents:
+			widget_container( 'item_single_header', array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
+				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="evo_widget $wi_class$">',
+				'block_end' => '</div>',
+				// This will enclose the title of each widget:
+				'block_title_start' => '<h3>',
+				'block_title_end' => '</h3>',
+
+				'author_link_text' => $params['author_link_text'],
+
+				// Controlling the title:
+				'widget_item_title_params'  => array(
+						'before' => $params['item_title_line_before'].( $disp == 'single' ? $params['item_title_single_before'] : $params['item_title_before'] ),
+						'after' => ( $disp == 'single' ? $params['item_title_single_after'] : $params['item_title_after'] ).$params['item_title_line_after'],
+						'link_type' => $params['item_link_type'],
+					),
+				// Item Previous Next widget
+				'widget_item_next_previous_params' => array(
+					),
+				// Item Visibility Badge widge template
+				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
+				'widget_item_visibility_badge_params'  => array(
+						'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					),
 			) );
 			// ----------------------------- END OF "Item Single - Header" CONTAINER -----------------------------
 		}
 	?>
-	</div>
+	<div class="small text-muted"></div>
+
 	<?php
 	}
 	?>
@@ -128,14 +159,12 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 	if( $disp == 'single' )
 	{
-		?>
-		<div class="evo_container evo_container__item_single">
-		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+		widget_container( 'item_single', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -162,20 +191,15 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
 	}
 	elseif( $disp == 'page' )
 	{
-		?>
-		<div class="evo_container evo_container__item_page">
-		<?php
 		// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Page'), array(
+		widget_container( 'item_page', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -202,83 +226,44 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				),
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
 	}
-	else
-	{
+	elseif( $Item->is_intro() )
+	{	// Display item content only for intro items because for normal items we display content by widget in container "Item in List" above:
 	// this will create a <section>
-		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-		skin_include( '_item_content.inc.php', $params );
-		// Note: You can customize the default item content by copying the generic
-		// /skins/_item_content.inc.php file into the current skin folder.
-		// -------------------------- END OF POST CONTENT -------------------------
+		// ---------------------- POST CONTENT INCLUDED HERE ----------------------	
+		skin_include( '_item_content.inc.php', $params );	
+		// Note: You can customize the default item content by copying the generic	
+		// /skins/_item_content.inc.php file into the current skin folder.	
+		// -------------------------- END OF POST CONTENT -------------------------	
 	// this will end a </section>
 	}
 	?>
 
-	<footer>
-
-		<?php
-			if( ! $Item->is_intro() ) // Do NOT apply tags, comments and feedback on intro posts
-			{
-		?>
-
-		<nav class="post_comments_link">
-		<?php
-			// Link to comments, trackbacks, etc.:
-			$Item->feedback_link( array(
-							'type' => 'comments',
-							'link_before' => '',
-							'link_after' => '',
-							'link_text_zero' => '#',
-							'link_text_one' => '#',
-							'link_text_more' => '#',
-							'link_title' => '#',
-							// fp> WARNING: creates problem on home page: 'link_class' => 'btn btn-default btn-sm',
-							// But why do we even have a comment link on the home page ? (only when logged in)
-						) );
-
-			// Link to comments, trackbacks, etc.:
-			$Item->feedback_link( array(
-							'type' => 'trackbacks',
-							'link_before' => ' &bull; ',
-							'link_after' => '',
-							'link_text_zero' => '#',
-							'link_text_one' => '#',
-							'link_text_more' => '#',
-							'link_title' => '#',
-						) );
-		?>
-		</nav>
-		<?php } ?>
-	</footer>
-
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => true,
+				'disp_trackback_url'   => true,
+				'disp_pingbacks'       => true,
+				'disp_webmentions'     => true,
+				'disp_meta_comments'   => false,
 				'before_section_title' => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			), $params ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-	?>
-
-	<?php
-	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-		skin_include( '_item_workflow.inc.php' );
-		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
 	}
 	?>
 
 	<?php
 	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
 	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		// ------------------ INTERNAL COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
@@ -296,7 +281,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
 				'comment_info_after'    => '</small></footer></div>',
 			) );
-		// ---------------------- END OF META COMMENTS ---------------------
+		// ---------------------- END OF INTERNAL COMMENTS ---------------------
 	}
 	?>
 

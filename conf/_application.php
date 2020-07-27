@@ -15,13 +15,21 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '6.9.3-beta';
+$app_version = '7.2.0-beta';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2017-07-26';
+$app_date = '2020-07-24';
+
+/**
+ * Is this b2evolution PRO?
+ * If the PRO modules are available some UI elements will be set up differently.
+ * This requires the PHP files for the PRO modules (otherwise there will be errors)
+ * @global boolean
+ */
+$app_pro = false;
 
 /**
  * Long version string for checking differences
@@ -31,33 +39,33 @@ $app_version_long = $app_version.'-'.$app_date;
 /**
  * This is used to check if the database is up to date.
  *
- * This will be incrememented by 10 with each change in {@link upgrade_b2evo_tables()}
+ * This will be incremented by 10 with each change in {@link upgrade_b2evo_tables()}
  * in order to leave space for maintenance releases.
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 13020;
+$new_db_version = 16170;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
  * @global array
  */
-$required_php_version = array( 'application' => '5.2' );
+$required_php_version = array( 'application' => '5.6' );
 
 /**
  * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
  * @global array
  */
-$required_mysql_version = array( 'application' => '5.0.3' );
+$required_mysql_version = array( 'application' => '5.5.3' );
 
 /**
  * Is displayed on the login screen:
  */
-$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version.'</strong></a>
+$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version_long.'</strong></a>
 		&ndash;
 		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
-$copyright_text = '<span class="nobr">&copy;2003-2016 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
+$copyright_text = '<span class="nobr">&copy;2003-2020 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
  * Do you want to display the help links to online documentation?
@@ -85,5 +93,7 @@ $modules = array(
 		'messaging',
 		'maintenance',
 		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
+		'menus',
+		'templates',
 	);
 ?>

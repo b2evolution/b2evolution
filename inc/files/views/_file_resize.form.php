@@ -22,9 +22,9 @@ global $Settings, $selected_Filelist;
 
 $Form = new Form( NULL );
 
-$Form->global_icon( T_('Cancel resize!'), 'close', regenerate_url() );
+$Form->global_icon( TB_('Cancel resize!'), 'close', regenerate_url() );
 
-$Form->begin_form( 'fform', T_('Resize') );
+$Form->begin_form( 'fform', TB_('Resize') );
 
 	$Form->add_crumb( 'file' );
 	$Form->hidden_ctrl();
@@ -32,9 +32,9 @@ $Form->begin_form( 'fform', T_('Resize') );
 	$Form->hidden( 'action', 'resize' );
 	$Form->hidden( 'confirmed', 1 );
 
-	$Form->begin_fieldset( T_('Confirm resize') );
+	$Form->begin_fieldset( TB_('Confirm resize') );
 
-	echo sprintf( T_('%s images will be resized to fit %s. Are you sure?'), $selected_Filelist->count(),
+	echo sprintf( TB_('%s images will be resized to fit %s. Are you sure?'), $selected_Filelist->count(),
 			$Settings->get( 'fm_resize_width' ).'x'.$Settings->get( 'fm_resize_height' ) );
 
 	$selected_Filelist->restart();
@@ -48,6 +48,6 @@ $Form->begin_form( 'fform', T_('Resize') );
 	$Form->end_fieldset();
 
 $Form->end_form( array(
-		array( 'submit', 'submit', T_('Resize'), 'SaveButton' ) ) );
+		array( 'submit', 'submit', TB_('Resize'), 'SaveButton' ) ) );
 
 ?>

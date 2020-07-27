@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * {@internal Origin:
@@ -33,18 +33,18 @@ function hits_results_block( $params = array() )
 		return;
 	}
 
-	global $blog, $sec_ID, $current_User;
+	global $blog, $sec_ID;
 
 	if( $blog == 0 )
 	{
-		if( ! $current_User->check_perm( 'stats', 'view' ) )
+		if( ! check_user_perm( 'stats', 'view' ) )
 		{ // Current user has no permission to view all stats (aggregated stats)
 			return;
 		}
 	}
 	else
 	{
-		if( ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
+		if( ! check_user_perm( 'stats', 'list', false, $blog ) )
 		{ // Current user has no permission to view the stats of the selected blog
 			return;
 		}
@@ -267,9 +267,9 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 {
 	global $evo_charset;
 
-	if( empty( $keyphrase ) )
+	if( $keyphrase === NULL || $keyphrase === '' )
 	{
-		return '<span class="note">['.T_('n.a.').']</span>';
+		return '<span class="note">['./* TRANS: "Not Available" */ T_('N/A').']</span>';
 	}
 
 	// Save original string
@@ -497,7 +497,7 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 	$users_array = $DB->get_results('
 					SELECT user_ID
 					  FROM T_users
-					  WHERE user_status = "activated" OR user_status= "autoactivated"
+					  WHERE user_status IN ( "activated", "autoactivated", "manualactivated" )
 					  LIMIT 10'
 					, ARRAY_A );
 
@@ -747,6 +747,14 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 
+		if( isset( $Test_hit ) && ! empty( $Test_hit->ID ) && rand( 0, 2 ) == 2 )
+		{	// Insert sample goal hits per random new Hit:
+			$DB->query( 'INSERT INTO T_track__goalhit ( ghit_goal_ID, ghit_hit_ID )
+				SELECT goal_ID, '.$Test_hit->ID.' FROM T_track__goal
+				 ORDER BY RAND()
+				 LIMIT 1' );
+		}
+
 		$sessions[$rand_i] = $cur_session;
 
 		if( $display_process )
@@ -899,19 +907,32 @@ function & get_Domain_by_subdomain( $subdomain_name )
 
 	$subdomain_name = explode( '.', $subdomain_name );
 
+	// Store in this var top existing domain even with unknown status,
+	// This domain will be returned when all other subdomains have unknown status:
+	$first_existing_Domain = NULL;
+
 	for( $i = 0; $i < count( $subdomain_name ); $i++ )
 	{
 		$domain_name = implode( '.', array_slice( $subdomain_name, $i ) );
-
-		if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) ||
-		    $Domain = & $DomainCache->get_by_name( '.'.$domain_name, false, false ) )
-		{	// Domain exists with name, Get it:
-			return $Domain;
+		$domain_names = array( $domain_name, '.'.$domain_name );
+		foreach( $domain_names as $domain_name )
+		{
+			if( $Domain = & $DomainCache->get_by_name( $domain_name, false, false ) )
+			{	// If domain exists in DB:
+				if( $first_existing_Domain === NULL )
+				{	// Store first top existing domain with any status:
+					$first_existing_Domain = $Domain;
+				}
+				if( $Domain->get( 'status' ) != 'unknown' )
+				{	// Use this domain because it exists with not unknown status:
+					return $Domain;
+				}
+			}
 		}
 	}
 
-	$Domain = NULL;
-	return $Domain;
+	// Return either NULL or first top existing domain with unknown status:
+	return $first_existing_Domain;
 }
 
 
@@ -956,11 +977,13 @@ function get_hit_agent_name_by_ID( $agent_ID )
 /**
  * Extract keyphrases from the hitlog
  *
- * @return mixed boolean true on success, string message if the process is already running and not allowed to run
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
+ * @return integer Number of new inserted key phrases,
+ *         string Error message if the process is already running and not allowed to run
  */
-function extract_keyphrase_from_hitlogs()
+function extract_keyphrase_from_hitlogs( $display_messages = true )
 {
-	global $DB, $Messages;
+	global $DB, $Messages, $Timer;
 
 	// Set lock name based on the database name, table name and process name
 	$lock_name = $DB->dbname.'.T_track__keyphrase.extract_keyphrase';
@@ -971,6 +994,8 @@ function extract_keyphrase_from_hitlogs()
 		return 'Keyphrase extraction is already in progress in a different process. This new request would duplicate the effort so it is aborted.';
 	}
 
+	$inserted_keyphrases_num = 0;
+
 	// Important: If a two or more different simultanious process will arrive to this point at the same time, only one of them will acquire the lock!
 	// The other processes have to wait until the one who acquired the lock will release it. After that the other process will get it one by one.
 
@@ -978,52 +1003,161 @@ function extract_keyphrase_from_hitlogs()
 	$DB->get_var( 'SELECT GET_LOCK( '.$DB->quote( $lock_name ).', 20 )' );
 
 	// Look for unextracted keyphrases:
-	$sql = 'SELECT MIN(h.hit_ID) as min, MAX(h.hit_ID) as max
-				FROM T_hitlog as h
-				WHERE h.hit_keyphrase IS NOT NULL
-					AND h.hit_keyphrase_keyp_ID IS NULL';
-	$ids = $DB->get_row( $sql, ARRAY_A, NULL, ' Get max/min hits ids of unextracted keyphrases' );
+	$Timer->start( 'extract_keyphrase_number' );
+	$SQL = new SQL( 'Get number of hitlog records and  min/max of hit IDs that have a keyphrase that was not processed yet' );
+	$SQL->SELECT( 'COUNT( hit_ID ) AS hits_num, COUNT( DISTINCT hit_keyphrase ) AS keyphrases_num, MIN( hit_ID ) as min, MAX( hit_ID ) as max' );
+	$SQL->FROM( 'T_hitlog' );
+	$SQL->WHERE( 'hit_keyphrase IS NOT NULL' );
+	$SQL->WHERE_and( 'hit_keyphrase != ""' );
+	$SQL->WHERE_and( 'hit_keyphrase_keyp_ID IS NULL' );  // Keyphrase that has not been extracted yet!
+	$ids = $DB->get_row( $SQL, ARRAY_A );
+	$Timer->stop( 'extract_keyphrase_number' );
 
-	if( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
+	if( $display_messages )
+	{	// Display info:
+		$log_message = sprintf( TB_('Number of hitlog records that have a keyphrase that were not processed yet: %d'), intval( $ids['hits_num'] ) );
+		$log_message .= ' <span class="note">(keyphrases='.$ids['keyphrases_num'].', min='.$ids['min'].', max='.$ids['max'].')('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_number' ) ).')</span>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message );
+		}
+		else
+		{	// Print out a message:
+			echo '<p>'.$log_message.'</p>';
+			evo_flush();
+		}
+	}
+
+	if( ! empty( $ids['min'] ) && ! empty( $ids['max'] ) )
 	{	// Extract keyphrases if needed:
 
+		$Timer->start( 'extract_keyphrase_insert' );
+
+		// External keyphrases
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_refered_searches)
 					SELECT h.hit_keyphrase, 1
 					FROM T_hitlog as h
 					WHERE
 						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
 						AND h.hit_keyphrase IS NOT NULL
+						AND h.hit_keyphrase != ""
 						AND h.hit_keyphrase_keyp_ID IS NULL
 						AND h.hit_referer_type = "search"
 				ON DUPLICATE KEY UPDATE
 				T_track__keyphrase.keyp_count_refered_searches = T_track__keyphrase.keyp_count_refered_searches + 1';
 		$DB->query( $sql, ' Insert/Update external keyphrase' );
 
+		// Internal keyphrases
 		$sql = 'INSERT INTO T_track__keyphrase(keyp_phrase, keyp_count_internal_searches)
 					SELECT h.hit_keyphrase, 1
 					FROM T_hitlog as h
 					WHERE
 						(h.hit_ID >= '.$ids['min'].' AND h.hit_ID <= '.$ids['max'].')
 						AND h.hit_keyphrase IS NOT NULL
+						AND h.hit_keyphrase != ""
 						AND h.hit_keyphrase_keyp_ID IS NULL
 						AND h.hit_referer_type != "search"
 				ON DUPLICATE KEY UPDATE
 				T_track__keyphrase.keyp_count_internal_searches = T_track__keyphrase.keyp_count_internal_searches + 1';
-		$DB->query( $sql, 'Insert/Update  internal keyphrase' );
+		$DB->query( $sql, 'Insert/Update internal keyphrase' );
 
-		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
-				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
-				WHERE
-					h.hit_keyphrase = k.keyp_phrase
-					AND ( h.hit_ID >= '.$ids['min'].' )
-					AND ( h.hit_ID <= '.$ids['max'].' )
-					AND ( h.hit_keyphrase_keyp_ID IS NULL )';
-		$DB->query( $sql, 'Update hitlogs keyphrase id' );
+		$Timer->stop( 'extract_keyphrase_insert' );
+
+		if( $display_messages )
+		{	// Display info:
+			$log_message = sprintf( TB_('%d key phrases have been inserted or updated.'), intval( $ids['keyphrases_num'] ) );
+			$log_message .= ' <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_insert' ) ).')</span>';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo '<p>'.$log_message.'</p>';
+				evo_flush();
+			}
+		}
+
+		$chunk = 1000;
+		$number_of_chunks = ceil( ( $ids['max'] - $ids['min'] ) / $chunk );
+		if( $display_messages )
+		{	// Display info:
+			$log_message = TB_('Updating hit logs table...').' ('.$number_of_chunks.' chunks)';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message, NULL, '' );
+// TODO: We must FORCE writing the log to the DB here
+			}
+			else
+			{	// Print out a message:
+				echo '<p>'.$log_message;
+				evo_flush();
+			}
+		}
+
+		$Timer->start( 'extract_keyphrase_update' );
+// TODO: this still takes too much time!
+// Let's try updating 1000 lines at a time.
+		$start = $ids['min'];
+		$i = 1;
+		while( $start <= $ids['max'] )
+		{
+			$stop = min( $start+$chunk-1, $ids['max'] ); // don't go over max 
+
+			$log_message = 'Doing chunk #'.$i.' from '.$start.' to '.$stop.'...';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo '<br/>'.$log_message;
+				evo_flush();
+			}
+
+			$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
+					SET h.hit_keyphrase_keyp_ID = k.keyp_ID
+					WHERE	h.hit_keyphrase = k.keyp_phrase
+						AND h.hit_keyphrase != ""
+						AND ( h.hit_ID >= '.$start.' )
+						AND ( h.hit_ID <= '.$stop.' )
+						AND ( h.hit_keyphrase_keyp_ID IS NULL )';
+			$updated_keyphrases_num = $DB->query( $sql, 'Update hitlogs keyphrase id' );
+
+			$log_message = sprintf( TB_('%d records'), $updated_keyphrases_num );
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo $log_message;
+			}
+
+			$start += $chunk;
+			$i++;
+		}
+
+
+		$Timer->stop( 'extract_keyphrase_update' );
+		if( $display_messages )
+		{	// Display info:
+			$log_message = 'Finished <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_update' ) ).')</span>';
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo '</p><p>'.$log_message.'</p>';
+				evo_flush();
+			}
+		}
 	}
 
 	$DB->get_var( 'SELECT RELEASE_LOCK( '.$DB->quote( $lock_name ).' )' );
 
-	return true;
+	return intval( $ids['keyphrases_num'] );
 }
 
 
@@ -1040,8 +1174,7 @@ function stats_goal_hit_extra_params( $ghit_params )
 		$ItemCache = & get_ItemCache();
 		if( $Item = & $ItemCache->get_by_ID( intval( $matches[1] ), false, false ) )
 		{ // Display a link to view with current item title
-			global $current_User;
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+			if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 			{ // Link to admin view
 				return $Item->get_title( array( 'link_type' => 'admin_view' ) );
 			}
@@ -1060,10 +1193,12 @@ function stats_goal_hit_extra_params( $ghit_params )
  * Display panel with buttons to control a view of hits summary pages:
  *     - Two buttons to toggle between type of hits summary data(Live or Aggregate)
  *     - Button to aggregate hits and sessions right now
+ *
+ * @param array Diagram columns: key - code of column, value - title of column
  */
-function display_hits_summary_panel()
+function display_hits_summary_panel( $diagram_columns = array() )
 {
-	global $ReqURL, $current_User;
+	global $ReqURL;
 
 	$hits_summary_mode = get_hits_summary_mode();
 
@@ -1085,71 +1220,12 @@ function display_hits_summary_panel()
 
 	echo '</div>';
 
-	if( $hits_summary_mode == 'aggregate' )
-	{	// Filter the aggregated data by date period:
-		global $UserSettings;
-
-		echo '<div class="evo_aggregate_filter pull-left">';
-		$Form = new Form();
-		$Form->hidden_ctrl();
-		$Form->hidden( 'tab', get_param( 'tab' ) );
-		$Form->hidden( 'tab3', get_param( 'tab3' ) );
-		$Form->hidden( 'blog', get_param( 'blog' ) );
-		$Form->hidden( 'action', 'filter_aggregated' );
-		$Form->add_crumb( 'aggfilter' );
-
-		$Form->switch_layout( 'none' );
-
-		$Form->begin_form();
-
-		$Form->select_input_array( 'agg_period', $UserSettings->get( 'agg_period' ), array(
-				'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
-				'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
-				'current_month'  => T_( 'Current Month to date' ),
-				'specific_month' => T_( 'Specific Month:' ),
-			), T_('Show') );
-
-		$months_years_params = array( 'force_keys_as_values' => true );
-		if( $UserSettings->get( 'agg_period' ) != 'specific_month' )
-		{
-			$months_years_params['style'] = 'display:none';
-		}
-		$months = array();
-		for( $m = 1; $m <= 12; $m++ )
-		{
-			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
-		}
-		$agg_month = $UserSettings->get( 'agg_month' );
-		$Form->select_input_array( 'agg_month', ( empty( $agg_month ) ? date( 'n' ) : $agg_month ), $months, '', NULL, $months_years_params );
-
-		$years = array();
-		for( $y = date( 'Y' ) - 20; $y <= date( 'Y' ); $y++ )
-		{
-			$years[ $y ] = $y;
-		}
-		$agg_year = $UserSettings->get( 'agg_year' );
-		$Form->select_input_array( 'agg_year', ( empty( $agg_year ) ? date( 'Y' ) : $agg_year ), $years, '', NULL, $months_years_params );
-
-		$Form->end_form( array( array( 'submit', 'submit', T_('Filter'), 'btn-info' ) ) );
-
-		echo '<script type="text/javascript">
-			jQuery( "#agg_period" ).change( function()
-			{
-				if( jQuery( this ).val() == "specific_month" )
-				{
-					jQuery( "#agg_month, #agg_year" ).show();
-				}
-				else
-				{
-					jQuery( "#agg_month, #agg_year" ).hide();
-				}
-			} );
-			</script>';
-
-		echo '</div>';
+	if( $hits_summary_mode == 'aggregate' || ! empty( $diagram_columns ) )
+	{
+		display_hits_filter_form( 'filter', $diagram_columns, $hits_summary_mode == 'aggregate' );
 	}
 
-	if( $current_User->check_perm( 'stats', 'edit' ) )
+	if( check_user_perm( 'stats', 'edit' ) )
 	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
 		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
 			.' class="btn btn-default pull-right">'
@@ -1161,50 +1237,236 @@ function display_hits_summary_panel()
 }
 
 
-/**
- * Get dates for filter the aggregated hits
- *
- * @return array Array with two items: 0 - start date, 1 - end date
- */
-function get_filter_aggregated_hits_dates()
+function display_hits_filter_form( $mode, $diagram_columns, $display_filter_period = true )
 {
-	global $DB, $UserSettings;
+	global $UserSettings, $tab3;
 
-	switch( $UserSettings->get( 'agg_period' ) )
+	switch( $mode )
 	{
-		case 'last_60_days':
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 59 ) ); // Date of 60 days ago
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+		case 'filter':
+			$period_selector_title = T_('Show');
+			$submit_button_text = T_('Filter');
+			$prefix = 'agg_';
+			$action = 'filter_hits_diagram';
+			$display_filter_diagram_cols = true;
+			$block_style = '';
+			$period_options = array(
+				'last_30_days'   => sprintf( T_('Last %d days'), 30 ),
+				'last_60_days'   => sprintf( T_('Last %d days'), 60 ),
+				'current_month'  => T_( 'Current Month to date' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			);
+			$years_length = 20;
 			break;
 
-		case 'current_month':
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), 1 ) ); // First day of current month
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
-			break;
-
-		case 'specific_month':
-			$agg_month = $UserSettings->get( 'agg_month' );
-			$agg_year = $UserSettings->get( 'agg_year' );
-			if( empty( $agg_month ) )
-			{
-				$agg_month = date( 'm' );
-			}
-			if( empty( $agg_year ) )
-			{
-				$agg_year = date( 'Y' );
-			}
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month, 1, $agg_year ) ); // First day of the selected month
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, $agg_month + 1, 0, $agg_year ) ); // Last day of the selected month
-			break;
-
-		case 'last_30_days':
-		default:
-			$start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
-			$end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 1 ) ); // Yesterday
+		case 'compare':
+			$period_selector_title = T_('Compare to');
+			$submit_button_text = T_('Compare');
+			$prefix = 'aggcmp_';
+			$action = 'compare_hits_diagram';
+			$display_filter_diagram_cols = false;
+			$block_style = ' style="padding-left:0"';
+			$period_options = array(
+				'prev_30_days'   => sprintf( T_('Previous %d days'), 30 ),
+				'prev_60_days'   => sprintf( T_('Previous %d days'), 60 ),
+				'prev_month'  => T_( 'Previous Month' ),
+				'specific_month' => T_( 'Specific Month:' ),
+			);
+			$years_length = 21;
 			break;
 	}
 
-	return array( $start_date, $end_date );
+	echo '<div class="evo_filter_diagram_hits"'.$block_style.'>';
+	$Form = new Form();
+	$Form->hidden( 'ctrl', 'stats' );
+	$Form->hidden( 'from_ctrl', get_param( 'ctrl' ) );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
+	$Form->hidden( 'tab3', get_param( 'tab3' ) );
+	$Form->hidden( 'blog', get_param( 'blog' ) );
+	$Form->hidden( 'sec_ID', get_param( 'sec_ID' ) );
+	$Form->hidden( 'action', $action );
+	$Form->add_crumb( 'filterhitsdiagram' );
+
+	$Form->switch_layout( 'none' );
+
+	$Form->begin_form();
+
+	if( $display_filter_period )
+	{	// Filter the aggregated data by date period:
+		$Form->select_input_array( $prefix.'period', $UserSettings->get( $prefix.'period' ), $period_options, $period_selector_title );
+
+		$months_years_params = array( 'force_keys_as_values' => true );
+		if( $UserSettings->get( $prefix.'period' ) != 'specific_month' )
+		{
+			$months_years_params['style'] = 'display:none';
+		}
+		$months = array();
+		for( $m = 1; $m <= 12; $m++ )
+		{
+			$months[ $m ] = T_( date( 'F', mktime( 0, 0, 0, $m ) ) );
+		}
+		$month = $UserSettings->get( $prefix.'month' );
+		$Form->select_input_array( $prefix.'month', ( empty( $month ) ? date( 'n' ) : $month ), $months, '', NULL, $months_years_params );
+
+		$years = array();
+		for( $y = date( 'Y' ) - $years_length; $y <= date( 'Y' ); $y++ )
+		{
+			$years[ $y ] = $y;
+		}
+		$year = $UserSettings->get( $prefix.'year' );
+		$Form->select_input_array( $prefix.'year', ( empty( $year ) ? date( 'Y' ) : $year ), $years, '', NULL, $months_years_params );
+
+		echo '<script>
+			jQuery( "#'.$prefix.'period" ).change( function()
+			{
+				if( jQuery( this ).val() == "specific_month" )
+				{
+					jQuery( "#'.$prefix.'month, #'.$prefix.'year" ).show();
+				}
+				else
+				{
+					jQuery( "#'.$prefix.'month, #'.$prefix.'year" ).hide();
+				}
+			} );
+			</script>';
+	}
+
+	if( $display_filter_diagram_cols )
+	{
+		$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+		foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+		{	// Filter hits by type:
+			$Form->checkbox_basic_input( 'filter_types[]',
+				( ! isset( $filter_hits_diagram_cols[ $tab3 ] ) || empty( $filter_hits_diagram_cols[ $tab3 ] ) || in_array( $diagram_column_key, $filter_hits_diagram_cols[ $tab3 ] ) ), // Is checked?
+				'<span style="color:#'.$diagram_column_data['color'].'">'.$diagram_column_data['title'].'</span>', // Colored title
+				array( 'value' => $diagram_column_key ) ); // Value
+		}
+	}
+
+	$Form->end_form( array( array( 'submit', 'submit', $submit_button_text, 'btn-info' ) ) );
+
+	echo '</div>';
+
+	if( $mode == 'compare' )
+	{
+		echo '<div class="clear"></div>';
+	}
+}
+
+
+/**
+ * Get dates for filter the aggregated hits
+ *
+ * @param string Data mode: 'aggregate', 'compare'
+ * @return array Array with two items: 0 - start date, 1 - end date
+ */
+function get_filter_aggregated_hits_dates( $mode = 'aggregate' )
+{
+	global $DB, $UserSettings;
+
+	if( $mode == 'compare' )
+	{	// Use a filter for comparing data:
+		$period = $UserSettings->get( 'aggcmp_period' );
+	}
+	else
+	{	// Use a filter for aggregate data:
+		$period = $UserSettings->get( 'agg_period' );
+	}
+
+	$start_date = $end_date = array(
+		'm' => date( 'm' ),
+		'd' => date( 'd' ),
+		'Y' => date( 'Y' ),
+	);
+
+	switch( $period )
+	{
+		case 'prev_60_days':
+			$start_date['d'] -= 60; // Date of 120 days ago
+			$end_date['d'] -= 59; // Date of 61 days ago
+		case 'last_60_days':
+			$start_date['d'] -= 59; // Date of 60 days ago
+			$end_date['d'] -= 1; // Yesterday
+			break;
+
+		case 'prev_month':
+			$start_date['m'] -= 1; // First day of previous month
+			$end_date['d'] = 1; // Last day of previous month
+		case 'current_month':
+			$start_date['d'] = 1; // First day of current month
+			$end_date['d'] -= 1; // Yesterday
+			break;
+
+		case 'specific_month':
+			$agg_month = ( $mode == 'compare' ? $UserSettings->get( 'aggcmp_month' ) : $UserSettings->get( 'agg_month' ) );
+			$agg_year = ( $mode == 'compare' ? $UserSettings->get( 'aggcmp_year' ) : $UserSettings->get( 'agg_year' ) );
+			if( ! empty( $agg_month ) )
+			{	// Use month from setting:
+				$start_date['m'] = $agg_month;
+				$end_date['m'] = $agg_month + 1;
+			}
+			if( ! empty( $agg_year ) )
+			{	// Use year from setting:
+				$start_date['Y'] = $end_date['Y'] = $agg_year;
+			}
+			$start_date['d'] = 1; // First day of the selected month
+			$end_date['d'] = 0; // Last day of the selected month
+			break;
+
+		case 'prev_30_days':
+			$start_date['d'] -= 30; // Date of 60 days ago
+			$end_date['d'] -= 29; // Date of 31 days ago
+		case 'last_30_days':
+		default:
+			$start_date['d'] -= 29; // Date of 30 days ago
+			$end_date['d'] -= 1; // Yesterday
+			break;
+	}
+
+	return array(
+			date( 'Y-m-d', mktime( 0, 0, 0, $start_date['m'], $start_date['d'], $start_date['Y'] ) ),
+			date( 'Y-m-d', mktime( 0, 0, 0, $end_date['m'], $end_date['d'], $end_date['Y'] ) )
+		);
+}
+
+
+/**
+ * Get dates for filter the aggregated hits
+ *
+ * @param array All possible hits diagram columns
+ * @return array Filtered hits diagram columns
+ */
+function get_filtered_hits_diagram_columns( $diagram_type, $diagram_columns )
+{
+	global $UserSettings;
+
+	if( empty( $diagram_type ) )
+	{	// Unknown diagram type:
+		return $diagram_columns;
+	}
+
+	$filter_hits_diagram_cols = $UserSettings->get( 'filter_hits_diagram_cols' );
+
+	if( ! isset( $filter_hits_diagram_cols[ $diagram_type ] ) )
+	{	// No filter is defiend yet:
+		return $diagram_columns;
+	}
+
+	if( empty( $filter_hits_diagram_cols[ $diagram_type ] ) )
+	{	// If all options are unchecked then check them all:
+		return $diagram_columns;
+	}
+
+	$filtered_cols = array();
+	foreach( $filter_hits_diagram_cols[ $diagram_type ] as $filter_diagram_col )
+	{
+		if( isset( $diagram_columns[ $filter_diagram_col ] ) )
+		{
+			$filtered_cols[ $filter_diagram_col ] = $diagram_columns[ $filter_diagram_col ];
+		}
+	}
+
+	return $filtered_cols;
 }
 
 
@@ -1235,6 +1497,7 @@ function get_hits_summary_mode()
  * @param string End date of hits log in format 'YYYY-mm-dd'
  * @return array Fixed hits data
  */
+// erwin> replaced with a more generic fill_empty_days() in _misc.funcs.php
 function fill_empty_hit_days( $hits_data, $start_date, $end_date )
 {
 	$fixed_hits_data = array();
@@ -1319,5 +1582,72 @@ function fill_empty_hit_days( $hits_data, $start_date, $end_date )
 	}
 
 	return $fixed_hits_data;
+}
+
+
+/**
+ * Get full URL from hit URI and collection ID
+ *
+ * @param string Hit URI
+ * @param integer Hit collection ID
+ * @return string Full hit URL
+ */
+function get_hit_full_url( $hit_uri, $hit_coll_ID )
+{
+	$hit_host = '';
+
+	if( ! empty( $hit_coll_ID ) )
+	{	// Try to get a collection if it was a hit from collection page:
+		$BlogCache = & get_BlogCache();
+		if( $Blog = & $BlogCache->get_by_ID( $hit_coll_ID, false, false ) )
+		{	// Get collection host:
+			$hit_host = $Blog->get_baseurl_root();
+		}
+	}
+
+	return $hit_host.$hit_uri;
+}
+
+
+/**
+ * Get the search engine parameter definitions.
+ * 
+ * Based on search engine detections YAML list maintained and used by Matomo - {@link https://github.com/matomo-org/searchengine-and-social-list}
+ * 
+ * @return array of search engine definitions
+ */
+function get_search_engine_params()
+{
+	global $search_engine_params, $inc_path;
+
+	if( empty( $search_engine_params ) )
+	{
+		$search_engine_params = array();
+
+		// Load search engine definitions:
+		$search_engine_definitions = json_decode( file_get_contents( $inc_path.'_ext/matomo/SearchEngines.json' ) );
+
+		foreach( $search_engine_definitions as $name => $info )
+		{
+			if( empty( $info ) || !is_array( $info ) )
+			{
+				continue;
+			}
+
+			foreach( $info as $url_definitions )
+			{
+				$url_definitions = (array) $url_definitions;
+				foreach( $url_definitions['urls'] as $url )
+				{
+					$search_engine_data = $url_definitions;
+					unset( $search_engine_data['urls'] );
+					$search_engine_data['name'] = $name;
+					$search_engine_params[$url] = $search_engine_data;
+				}
+			}
+		}
+	}
+
+	return $search_engine_params;
 }
 ?>

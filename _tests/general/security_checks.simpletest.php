@@ -58,8 +58,7 @@ class SecurityChecksTestCase extends EvoUnitTestCase
 		'inc/_blog_main.inc.php',
 		'inc/_main.inc.php',
 		'inc/locales/_locale.funcs.php',
-		'inc/sessions/model/_search_engines.php',
-		'inc/widgets/_widgets.funcs.php',
+		'inc/sessions/model/_search_engines.json',
 	);
 
 	function __construct()

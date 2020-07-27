@@ -13,8 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
-
 // Get params from request
 $s = param( 's', 'string', '', true );
 $c = param( 'c', 'integer', 0, true );
@@ -53,8 +51,6 @@ $Results->title = T_('Regions/States').get_manual_link('regions-list');
 function rgn_td_enabled( $rgn_enabled, $rgn_ID )
 {
 
-	global $dispatcher;
-
 	$r = '';
 
 	if( $rgn_enabled == true )
@@ -73,8 +69,6 @@ function rgn_td_enabled( $rgn_enabled, $rgn_ID )
 
 function rgn_td_preferred( $rgn_preferred, $rgn_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -130,13 +124,11 @@ function filter_regions( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_regions',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=regions' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=regions' );
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Country'),
@@ -166,7 +158,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -189,13 +181,12 @@ else
  */
 function rgn_td_actions($rgn_enabled, $rgn_ID )
 {
-	global $dispatcher;
 
 	$r = '';
 
 	if( $rgn_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the region!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the region!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_region&amp;rgn_ID='.$rgn_ID.'&amp;'.url_crumb('region') ) );
 	}
 	else
@@ -212,7 +203,7 @@ function rgn_td_actions($rgn_enabled, $rgn_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -222,6 +213,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 	$Results->global_icon( T_('Create a new region...'), 'new',
 				regenerate_url( 'action', 'action=new'), T_('New region').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+
+	$Results->global_icon( T_('Import regions from CSV file ...'), 'new',
+				regenerate_url( 'action', 'action=csv'), T_('Import CSV').' &raquo;', 3, 4  );
 }
 
 $Results->display();

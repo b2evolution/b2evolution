@@ -21,7 +21,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.3';
+	var $version = '7.2.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -54,7 +54,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -98,6 +98,26 @@ class bootstrap_gallery_legacy_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_secondary_area' => NULL,
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -116,7 +136,8 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -136,18 +157,18 @@ class bootstrap_gallery_legacy_Skin extends Skin
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size in Media index'),
-						'note' => T_('Select thumbnail size for Media index images') . ' (disp=mediaidx).',
-						'defaultvalue' => 'fit-256x256',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
 					'banner_public' => array(
 						'label' => T_('Display "Public" banner'),
 						'note' => T_('Display banner for "Public" albums (albums & comments)'),
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
 					),
 				'section_image_end' => array(
 					'layout' => 'end_fieldset',
@@ -167,27 +188,24 @@ class bootstrap_gallery_legacy_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',
@@ -307,87 +325,50 @@ class bootstrap_gallery_legacy_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
 		// Skin specific initializations:
 
+		// **** Image Viewing / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Image Viewing / END ****
+
+		// **** Page Styles / START ****
+		// Page text size:
+		$this->dynamic_style_rule( 'page_text_size', '#skin_wrapper { font-size: $setting_value$ }' );
+		// Page text color:
+		$this->dynamic_style_rule( 'page_text_color', '#skin_wrapper { color: $setting_value$ }' );
+		// Page link color:
+		$this->dynamic_style_rule( 'page_link_color',
+			'#skin_wrapper .container a:not(.btn .active) { color: $setting_value$ }'.
+			'ul li a:not(.btn) { color: $setting_value$ }'.
+			'ul li a:not(.btn) {background-color: transparent }'.
+			'.ufld_icon_links a:not(.btn) {color: #fff !important}'
+		);
+		// Current tab text color:
+		$this->dynamic_style_rule( 'current_tab_text_color', 'ul.nav.nav-tabs li a.selected { color: $setting_value$ }' );
+		// Page background color:
+		$this->dynamic_style_rule( 'page_bg_color', '#skin_wrapper { background-color: $setting_value$ }' );
+		// **** Page Styles / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
+
 		// Add custom CSS:
 		$custom_css = '';
-
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'."\n";
-		}
 
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
 		$custom_styles = array();
-
-		// Text size <=== THIS IS A WORK IN PROGRESS
-		if( $text_size = $this->get_setting( 'page_text_size' ) )
-		{
-			$custom_styles[] = 'font-size: '.$text_size;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		$custom_styles = array();
-		// Text color
-		if( $text_color = $this->get_setting( 'page_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Link color
-		if( $text_color = $this->get_setting( 'page_link_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper .container a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a {color: #fff !important;}\n";
-		}
-
-		// Current tab text color
-		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	ul.nav.nav-tabs li a.selected { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Page background color
-		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
-		{
-			$custom_styles[] = 'background-color: '.$bg_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
 
 		global $thumbnail_sizes;
 		$posts_thumb_size = $this->get_setting( 'posts_thumb_size' );
@@ -416,7 +397,12 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	</style>';
 			add_headline( $custom_css );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
+
+
 	/**
 	 * Determine to display status banner or to don't display
 	 *
@@ -465,29 +451,5 @@ class bootstrap_gallery_legacy_Skin extends Skin
 				return parent::get_template( $name );
 		}
 	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
 }
-
 ?>

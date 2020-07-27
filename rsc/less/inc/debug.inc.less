@@ -18,6 +18,10 @@ div.debug code {
 	font-size: 9pt;
 	margin:1ex 1ex 0;
 	display:block;
+	&.debug_code_inline {
+		display: inline;
+		margin: 0;
+	}
 }
 
 div.debug div.query_info {
@@ -56,6 +60,18 @@ div.debug td {
 }
 div.debug td.odd {
 	background-color: #eee;
+}
+
+div.debug_session {
+	border: 1px solid #F00;
+	background: #aaa;
+	div.debug {
+		background: #aaa;
+		border: none;
+	}
+}
+pre.xdebug-var-dump {
+	overflow: auto;
 }
 
 // AJAX Debug output formatting:
@@ -139,20 +155,6 @@ ul.jslog_error {
 	border: 1px solid #d99;
 	background: #fbf2ee;
 	color: #e00;
-}
-// ---------------- //
-
-// Item Custom Fields:
-.item_custom_fields {
-	border: none;
-	margin-bottom: 10px;
-	border-collapse: collapse;
-}
-.item_custom_fields th, .item_custom_fields td {
-	padding: 0 10px 0 0;
-}
-.item_custom_fields th {
-	text-align: left;
 }
 // ---------------- //
 

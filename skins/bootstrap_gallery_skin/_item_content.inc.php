@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -20,7 +20,7 @@ global $more;
 // Default params:
 $params = array_merge( array(
 		'content_mode'             => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
-		'intro_mode'               => 'auto', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
@@ -28,10 +28,10 @@ $params = array_merge( array(
 		// Wrap images and text:
 		'content_start_excerpt'    => '<section class="evo_post__excerpt">',		// In case of compact display
 		'content_end_excerpt'      => '</section>',
-		'content_start_full'       => '<section class="evo_post__full panel panel-default">',		// In case of full display
+		'content_start_full'       => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '<section class="evo_post__full panel panel-default">',		// In case of full display
 		'content_title_start'      => '<div class="panel-heading gallery-single-content">',			// Wraps title and number of photos in the album
-		'content_title_end'         => '</div>',
-		'content_end_full'         => '</section>',
+		'content_title_end'        => '</div>',
+		'content_end_full'         => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</section>',
 
 		// In case we display a compact version of the post:
 		'excerpt_before_text'      => '<div class="evo_post__excerpt_text">',
@@ -42,8 +42,16 @@ $params = array_merge( array(
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
 		// In case we display a full version of the post:
-		'content_start_full_text'  => '<div class="evo_post__full_text panel-body">',
-		'content_end_full_text'    => '</div>',
+		'content_start_full_text'  => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '<div class="evo_post__full_text panel-body">',
+		'content_end_full_text'    => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</div>',
+
+		// In case we display a CONTENT BLOCK (included in another post by short tag [include:item-slug]):
+		'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+		'content_block_end'           => '</div>',
+		'content_block_before_images' => '<div class="evo_content_block_images">',
+		'content_block_after_images'  => '</div>',
+		'content_block_before_text'   => '<div class="evo_content_block_text">',
+		'content_block_after_text'    => '</div>',
 
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
@@ -113,45 +121,11 @@ else
 {
 	$content_mode = $params['content_mode'];
 }
-if( $content_mode == 'auto' )
-{
-	// echo $disp_detail;
-	switch( $disp_detail )
-	{
-		case 'posts-cat':
-		case 'posts-topcat':
-		case 'posts-subcat':
-			$content_mode = $Blog->get_setting('chapter_content');
-			break;
-
-		case 'posts-tag':
-			$content_mode = $Blog->get_setting('tag_content');
-			break;
-
-		case 'posts-date':
-			$content_mode = $Blog->get_setting('archive_content');
-			break;
-
-		case 'posts-filtered':
-		case 'search':
-			$content_mode = $Blog->get_setting('filtered_content');
-			break;
-
-		case 'single':
-		case 'page':
-			$content_mode = 'full';
-			break;
-
-		case 'posts-default':  // home page 1
-		case 'posts-next':     // next page 2, 3, etc
-		default:
-			$content_mode = $Blog->get_setting('main_content');
-	}
-}
+$content_mode = resolve_auto_content_mode( $content_mode );
 
 if( $params['include_cover_images'] )
 { // Include the cover images on teaser place
-	$teaser_image_positions = 'cover,teaser,teaserperm,teaserlink';
+	$teaser_image_positions = 'cover,background,teaser,teaserperm,teaserlink';
 }
 else
 { // Don't include the cover images
@@ -190,7 +164,7 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
@@ -216,7 +190,8 @@ switch( $content_mode )
 		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
-			// Title and number of photos in album
+		if( ! in_array( $disp_detail, array( 'help', 'register' ) ) )
+		{	// Title and number of photos in album
 			echo $params['content_title_start'];
 				// Flag:
 				$Item->flag( array(
@@ -233,6 +208,7 @@ switch( $content_mode )
 					printf( T_(' (%s photos)'), $Item->get_number_of_images() );
 				echo '</h4>';
 			echo $params['content_title_end'];
+		}
 
 		if( ! empty($params['image_size']) )
 		{
@@ -260,7 +236,7 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
@@ -272,6 +248,12 @@ switch( $content_mode )
 
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
 					'before_image'        => $params['before_image'],
@@ -282,6 +264,18 @@ switch( $content_mode )
 					'image_size'          => $params['image_size'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
 				) );
 
 			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
@@ -319,13 +313,19 @@ switch( $content_mode )
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
 						'gallery_order'       => $params['gallery_order'],
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_extension'],
 					'after'               => $params['after_content_extension'],
 					'before_image'        => $params['before_image'],

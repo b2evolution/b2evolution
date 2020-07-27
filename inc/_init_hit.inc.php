@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -48,6 +48,9 @@ $headlines = array();
 // ############ Get ReqPath & ReqURI ##############
 list($ReqPath,$ReqURI) = get_ReqURI();
 
+// Remove all invalid chars:
+$sanitized_ReqPath = preg_replace( '#[^a-zA-Z0-9./_\-:;\s]#', '', urldecode( $ReqPath ) );
+
 /**
  * Full requested Host (including protocol).
  *
@@ -68,6 +71,7 @@ $ReqURL = $ReqHost.$ReqURI;
 $Debuglog->add( 'vars: $ReqHost: '.$ReqHost, 'request' );
 $Debuglog->add( 'vars: $ReqURI: '.$ReqURI, 'request' );
 $Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
+$Debuglog->add( 'vars: $sanitized_ReqPath: '.$sanitized_ReqPath, 'request' );
 
 /**
  * Same domain htsrv url.
@@ -75,13 +79,6 @@ $Debuglog->add( 'vars: $ReqPath: '.$ReqPath, 'request' );
  * @global string
  */
 $samedomain_htsrv_url = get_samedomain_htsrv_url();
-
-/**
- * Secure htsrv url.
- *
- * @global string
- */
-$secure_htsrv_url = get_secure_htsrv_url();
 
 // on which page are we ?
 /* old:
@@ -123,8 +120,6 @@ $Debuglog->add( 'Login: default_locale from DB: '.$default_locale, 'locale' );
 
 $default_locale = locale_from_httpaccept(); // set default locale by autodetect
 $Debuglog->add( 'Login: default_locale from HTTP_ACCEPT: '.$default_locale, 'locale' );
-
-load_funcs('_core/_param.funcs.php');
 
 // $locale_from_get: USE CASE: allow overriding the locale via GET param &locale=, e.g. for tests.
 if( ($locale_from_get = param( 'locale', 'string', NULL, true )) )

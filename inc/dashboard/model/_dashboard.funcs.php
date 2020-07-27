@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function b2evonet_get_updates( $force_short_delay = false )
 {
 	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
-	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
+	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $evonetsrv_verifypeer, $evonetsrv_retry_delay, $evonetsrv_short_delay, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 	global $Timer;
@@ -38,12 +38,18 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return NULL;
 	}
 
-	if( $Settings->get( 'evonet_last_error' ) > $servertimenow - 5400 )
+	if( $debug < 2 && $Settings->get( 'evonet_last_error' ) > $servertimenow - $evonetsrv_retry_delay*60 )
 	{	// The previous error was less than 90 minutes ago, skip this:
+		$Messages->add( sprintf(T_('Not trying to get updates from %s because last error was less than %d minutes ago.'), $evonetsrv_host, $evonetsrv_retry_delay), 'error' );
 		return false;
 	}
 
-	if( $debug == 2 )
+	if( !empty($evonetsrv_short_delay) )
+	{
+		$update_every = $evonetsrv_short_delay;
+		$attempt_every = $evonetsrv_short_delay;
+	}
+	elseif( $debug == 2 )
 	{
 		$update_every = 8;
 		$attempt_every = 3;
@@ -101,6 +107,10 @@ function b2evonet_get_updates( $force_short_delay = false )
 		return false;
 	}
 	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port, $evonetsrv_protocol );
+	
+	// Do we want to verify SSL certificate?
+	$client->verifypeer = $evonetsrv_verifypeer;
+	
 	if( $debug > 1 )
 	{
 		$client->debug = 1;
@@ -145,7 +155,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'php_uname' => new xmlrpcval( $system_stats['php_uname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
 											'php_gid' => new xmlrpcval( $system_stats['php_gid'], 'int' ),
 											'php_gname' => new xmlrpcval( $system_stats['php_gname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
-											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.2
+											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.4
 											'php_reg_globals' => new xmlrpcval( $system_stats['php_reg_globals'] ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
 											'php_allow_url_include' => new xmlrpcval( $system_stats['php_allow_url_include'] ? 1 : 0, 'int' ),
 											'php_allow_url_fopen' => new xmlrpcval( $system_stats['php_allow_url_fopen'] ? 1 : 0, 'int' ),
@@ -235,7 +245,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
-	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
+	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\',\'webmention\') ';
 	$sql .= ' AND comment_status IN ( '.$moderation_statuses_condition.' )';
 	$sql .= ' AND '.statuses_where_clause();
 
@@ -256,7 +266,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
  */
 function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limit = 5, $comment_IDs = array(), $script = true )
 {
-	global $current_User, $dispatcher;
+	global $current_User;
 
 	if( is_null( $CommentList ) )
 	{ // Inititalize CommentList
@@ -274,7 +284,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		// Filter list:
 		$CommentList->set_filters( array(
-				'types' => array( 'comment', 'trackback', 'pingback' ),
+				'types' => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 				'statuses' => $moderation_statuses,
 				'comment_ID_list' => $exlude_ID_list,
 				'post_statuses' => array( 'published', 'community', 'protected' ),
@@ -349,14 +359,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
+		$user_permission = check_user_perm( 'meta_comment', 'edit', false, $Comment );
 		if( $user_permission )
-		{ // Put the meta comment content into this container to edit by ajax:
+		{ // Put the internal comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', true );
 		if( $user_permission )
-		{ // End of the container that is used to edit meta comment by ajax:
+		{ // End of the container that is used to edit internal comment by ajax:
 			echo '</div>';
 		}
 
@@ -436,7 +446,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_tit
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+	return intval( $DB->get_var( $SQL ) );
 }
 
 
@@ -546,14 +556,22 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 
 
 /**
- * Get percent by function log10()
+ * Get percent by logarithm functions
  *
  * @param integer Value
+ * @param integer Max value, NULL - 100000
  * @return integer Percent
  */
-function log10_percent( $value )
+function log10_percent( $value, $max = NULL )
 {
-	$percent = log10( intval( $value ) ) * 2 * 10;
+	if( $max === NULL )
+	{	// Use log10 by default where max value is 100000:
+		$percent = log10( $value ) * 2 * 10;
+	}
+	else
+	{	// Use log with custom max value:
+		$percent = log( $value, $max ) * 100;
+	}
 	return intval( $percent > 100 ? 100 : $percent );
 }
 
@@ -573,14 +591,14 @@ function display_charts( $chart_data )
 		return;
 	}
 
-	echo '<div style="display: flex; flex-flow: row nowrap;" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+	echo '<div style="display:flex;flex-flow:row wrap" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
 
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
-		{ // Calculate a percent with log10 where max value is 100000
-			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'] );
-			// Set a color for value, from green(0%) to red(100%)
+		{ // Calculate a percent with logarithm functions:
+			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'], ( isset( $chart_item['max'] ) ? $chart_item['max'] : NULL ) );
+			// Set a color for value, from green(0%) to orange(100%)
 			$chart_color = get_color_by_percent( '#61bd4f', '#f2d600', '#ffab4a', $chart_percent );
 		}
 		else

@@ -158,3 +158,20 @@ span.help-inline {
 		width: 100% !important;
 	}
 }
+
+/* Registration form: */
+.evo_panel__register .panel-body {
+	padding: 15px;
+}
+.evo_panel__register .panel-body p:last-child {
+	margin-bottom: 0;
+}
+.evo_register_buttons {
+	text-align: center;
+}
+.evo_register_buttons input.btn {
+	margin: 0 0 15px 0;
+}
+.evo_register_buttons a.btn {
+	margin: 0;
+}

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package htsrv
@@ -70,7 +70,7 @@ if( ! $public_access_to_media )
 	//pre_dump( $perm_blog );
 
 	// Check permission (#2):
-	$current_User->check_perm( 'files', 'view', true, $perm_blog );
+	check_user_perm( 'files', 'view', true, $perm_blog );
 }
 
 // Load the other params:
@@ -103,7 +103,31 @@ if( array_key_exists( 'HTTP_IF_MODIFIED_SINCE', $_SERVER ) )
 	}
 }
 
-if( ! empty( $size ) && $File->is_image() )
+$File->load_meta();
+if( $File->is_image() && !$File->exists() )
+{ // Original image file is not found, output a black thumbnail:
+
+	global $thumbnail_sizes;
+
+	load_funcs( '/files/model/_image.funcs.php' );
+	$thumb_width = NULL;
+	$thumb_height = NULL;
+	$size_name = $size;
+
+	if( ! empty( $size_name ) )
+	{
+		$thumb_path = $File->get_af_thumb_path( $size_name, NULL, true );
+		if( substr( $thumb_path, 0, 1 ) != '!' && ( $size_arr = imgsize( $thumb_path, 'widthheight_assoc' ) ) )
+		{
+			$size_arr = imgsize( $thumb_path, 'widthheight_assoc' );
+			$thumb_width = $size_arr['width'];
+			$thumb_height = $size_arr['height'];
+		}
+	}
+
+	output_error_thumb( '!Original not found.', $thumb_width, $thumb_height );
+}
+elseif( ! empty( $size ) && $File->is_image() )
 {	// We want a thumbnail:
 	// fp> TODO: for more efficient caching, this should probably redirect to the static file right after creating it (when $public_access_to_media=true OF COURSE)
 
@@ -181,42 +205,7 @@ if( ! empty( $size ) && $File->is_image() )
 	// ERROR IMAGE
 	if( !empty( $err ) )
 	{	// Generate an error image and try to squeeze an error message inside:
-		// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
-		$line_height = 11;
-		$err = substr( $err, 1 ); // crop 1st car
-		$car_width = ceil( ($thumb_width-4)/6 );
-		// $err = 'w='.$car_width.' '.$err;
-
-		// Wrap error message and split it into lines:
-		$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
-		$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
-		if( count($err_lines)*$line_height > $thumb_height )
-		{ // Message does not fit into picture:
-		  // Rewrite error messages, so they fit better into the generated images.
-			$rewritten = true;
-			if( preg_match('~Unable to open \'.*?\' for writing: Permission denied~', $err) )
-				$err = 'Cannot write: permission denied';
-			else
-				$rewritten = false;
-			// Recreate error lines, if it has been rewritten/shortened.
-			if( $rewritten )
-			{
-				$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
-			}
-		}
-
-		$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
-		$y = 0;
-		foreach( $err_lines as $err_string )
-		{
-			imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
-			$y += $line_height;
-		}
-
-		header('Content-type: image/png' );
-		header_nocache();	// Do NOT cache errors! People won't see they have fixed them!!
-
-		imagepng( $im_handle );
+		output_error_thumb( $err, $thumb_width, $thumb_height );
 	}
 }
 else

@@ -34,7 +34,7 @@ class simpletests_c_plugin extends Plugin
 
 	function AdminEndHtmlHead( & $params )
 	{
-		echo '<script type="text/javascript>';
+		echo '<script>';
 		echo 'function AdminAfterPageFooter( arg_one ) { }';
 		echo '</script>';
 		return true;

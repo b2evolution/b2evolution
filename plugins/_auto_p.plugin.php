@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '6.9.3';
+	var $version = '7.2.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -41,7 +41,7 @@ class auto_p_plugin extends Plugin
 
 	var $br_allowed_in = array(
 		// Block level:
-		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
+		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
 		// Inline:
 		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
@@ -97,13 +97,35 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		#echo '<hr style="border:1em solid blue;" />';
+		$content = & $params['data'];
 
+		// Render outside multiline short tags:
+		if( preg_match( '/\[[a-z]+:[^\]`]+\]/i', $content ) )
+		{	// Call replace_content() on everything outside multiline short tags:
+			$content = callback_on_non_matching_blocks( $content,
+				'~\[[a-z]+:[^\]`]+\]~is',
+				array( $this, 'render_autop' ) );
+		}
+		else
+		{	// No short tags, replace on the whole content:
+			$content = $this->render_autop( $content );
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Render content to apply auto <p> and <br>
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function render_autop( $content )
+	{
 		$this->use_auto_br = $this->Settings->get('br');
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
-
-		$content = & $params['data'];
 
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
@@ -118,7 +140,7 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 			$content .= $content_parts[ $i + 1 ];
 		}
 
-		return true;
+		return $content;
 	}
 
 
@@ -130,12 +152,24 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params,
-			array(
+		$default_params = array(
 				'default_comment_rendering' => 'stealth',
 				'default_post_rendering' => 'opt-out'
-			)
-		);
+			);
+
+		if( ! empty( $params['blog_type'] ) )
+		{	// Set default settings depending on collection type:
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+					$default_params['default_comment_rendering'] = 'never';
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$default_params = array_merge( $params, $default_params );
+
 		return parent::get_coll_setting_definitions( $default_params );
 	}
 
@@ -169,64 +203,73 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'stealth' ) );
+		return parent::get_shared_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * - Split text into blocks, using $block_tags pattern.
 	 *
 	 * @param string Text
-	 * @param string The HTML tag where $text is in
 	 * @return string
 	 */
-	function handle_blocks( $text, $in_tag = '' )
+	function handle_blocks( $text )
 	{
-		#echo '<h1>HANDLE_BLOCKS</h1>'; pre_dump( $text, $in_tag );
+		$blocks = preg_split( '~(</?('.$this->block_tags.')(\b[^>]*)?>)~is', $text, -1, PREG_SPLIT_DELIM_CAPTURE );
 
 		$new_text = '';
-
-		if( preg_match( '~^(.*?)(<\s*('.$this->block_tags.')(\b[^>]*)?>)~is', $text, $match ) )
-		{ // there's a block tag:
-			$tag = $match[3];
-			$before_tag = $match[1];
-
-			if( ! empty($before_tag) )
-			{ // Recurse (one pattern/callback deeper):
-				$new_text .= $this->handle_pre_blocks( $before_tag, $in_tag );
+		$tag_position = false;
+		$opened_tags = array();
+		foreach( $blocks as $b => $block )
+		{
+			if( $block === '' )
+			{	// Skip empty string:
+				continue;
 			}
 
-			$text_after_tag = substr( $text, strlen($match[0]) );
-
-			if( empty($match[4]) || substr(rtrim($match[4]), -1) != '/' )
-			{ // Opening tag (and not self-closing): handle text in tag:
-				$new_text .= $match[2];
-
-				// Find closing tag:
-				list( $text_in_tag, $closing_tag, $NL_before, $NL_after ) = $this->split_text_for_tag($tag, $text_after_tag);
-
-				if( ! empty($text_in_tag) )
-				{ // Recurse (same level):
-					$text_in_tag = $this->handle_blocks( $text_in_tag, $tag );
+			if( $tag_position !== false && $b <= $tag_position + 2 )
+			{	// Skip tag name and attributes:
+				if( $b == $tag_position + 2 )
+				{	// Tag position is ended here, next is text:
+					$tag_position = false;
 				}
-
-				$new_text .= $NL_before.$text_in_tag.$NL_after;
-
-				$new_text .= $closing_tag;
-			}
-			else
-			{ // self-closing tag:
-				$new_text .= $match[2];
+				continue;
 			}
 
-			if( ! empty($text_after_tag) )
-			{
-				#echo '<h1>RECURSE: text_after_tag (block)</h1>';
-				// Recurse (same level):
-				$new_text .= $this->handle_blocks( $text_after_tag, $in_tag );
+			if( strpos( $block, '<' ) === 0 &&
+			    isset( $blocks[ $b + 1 ] ) &&
+			    preg_match( '~^('.$this->block_tags.')$~i', $blocks[ $b + 1 ] ) )
+			{	// Block tag is opening or closing here:
+				$tag_position = $b;
+				if( substr( $block, 1, 1 ) == '/' )
+				{	// This is a closing of opened tag,
+					// Remove last opened tag from the array:
+					array_pop( $opened_tags );
+				}
+				elseif( substr( $block, -2, 1 ) != '/' )
+				{	// This is a start of new tag AND this tag is not single/autoclosed tag like <hr />, <img /> and etc.,
+					// Put tag name in array to know what tags are opened and not closed yet:
+					$opened_tags[] = $blocks[ $b + 1 ];
+				}
+				// Append start or end of block tag with all attributes:
+				$new_text .= $block;
+				continue;
 			}
+
+			// Handle text which may contain inline tags:
+			$current_tag = isset( $opened_tags[ count( $opened_tags ) - 1 ] ) ? $opened_tags[ count( $opened_tags ) - 1 ] : '';
+			$new_text .= $this->handle_pre_blocks( $block, $current_tag );
 		}
-		else
-		{ // No BLOCKS in this $text:
-			$new_text = $this->handle_pre_blocks($text, $in_tag);
-		}
 
-		#pre_dump( 'HANDLE_BLOCKS return: ', $new_text, $in_tag );
 		return $new_text;
 	}
 
@@ -497,9 +540,9 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 		$NL_end = '';
 		if( $ignore_NL )
 		{
-			while( isset( $block{0} ) && $block{0} == "\n" )
+			while( isset( $block[0] ) && $block[0] == "\n" )
 			{
-				$NL_start .= $block{0};
+				$NL_start .= $block[0];
 				$block = substr($block, 1);
 			}
 			while( substr($block, -1) == "\n" )

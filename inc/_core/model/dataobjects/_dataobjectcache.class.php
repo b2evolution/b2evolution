@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -46,6 +46,11 @@ class DataObjectCache
 	 * Object array by ID
 	 */
 	var $cache = array();
+
+	/**
+	 * Object array by name
+	 */
+	var $cache_name = array();
 
 	/**
 	 * Copy of previous object array
@@ -218,7 +223,7 @@ class DataObjectCache
 	 */
 	function load_list( $req_list, $invert = false )
 	{
-		global $Debuglog;
+		global $Debuglog, $DB;
 
 		if( ! $invert )
 			$req_list = array_diff($req_list, $this->get_ID_array());
@@ -227,7 +232,7 @@ class DataObjectCache
 			return false;
 
 		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
-		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.implode(',', $req_list).')');
+		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.$DB->quote( $req_list ).')');
 
 		return $this->load_by_sql($SQL);
 	}
@@ -276,7 +281,7 @@ class DataObjectCache
 			$SQL->title = 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
 		}
 
-		return $this->instantiate_list($DB->get_results( $SQL->get(), OBJECT, $SQL->title ));
+		return $this->instantiate_list( $DB->get_results( $SQL ) );
 	}
 
 
@@ -620,6 +625,12 @@ class DataObjectCache
 			return $r;
 		}
 
+		if( isset( $this->cache_name[ $req_name ] ) )
+		{	// Get object from cache by name:
+			$Debuglog->add( "Accessing <strong>$this->objtype($req_name)</strong> from cache by name", 'dataobjects' );
+			return $this->cache_name[ $req_name ];
+		}
+
 		// Load just the requested object:
 		$Debuglog->add( "Loading <strong>$this->objtype($req_name)</strong>", 'dataobjects' );
 		$SQL = $this->get_SQL_object();
@@ -638,18 +649,23 @@ class DataObjectCache
 					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
 				}
 			}
-			return $this->cache[$resolved_ID];
+			if( ! isset( $this->cache_name[ $req_name ] ) )
+			{	// Add object in cache by name:
+				$this->cache_name[ $req_name ] = $this->new_obj( $db_row );
+			}
 		}
-		else
-		{
+
+		if( empty( $this->cache_name[ $req_name ] ) )
+		{	// Object does not exist by requested name:
 			$Debuglog->add( 'Could not get DataObject by name.', 'dataobjects' );
 			if( $halt_on_error )
 			{
 				debug_die( "Requested $this->objtype does not exist!" );
 			}
-			$r = false;
-			return $r;
+			$this->cache_name[ $req_name ] = false;
 		}
+
+		return $this->cache_name[ $req_name ];
 	}
 
 
@@ -712,9 +728,10 @@ class DataObjectCache
 	 * @param boolean provide a choice for "none" with ID ''
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
+	 * @param array Additional attributes for <option>, Key - attribute name, Value - object property
 	 * @return string
 	 */
-	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array(), $option_attrs = array() )
 	{
 		if( !is_array( $default ) )
 		{
@@ -751,6 +768,10 @@ class DataObjectCache
 
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
+			foreach( $option_attrs as $option_attr_name => $option_attr_field )
+			{	// Additional attribute:
+				$r .=  ' '.$option_attr_name.'="'.format_to_output( $loop_Obj->get( $option_attr_field ), 'htmlattr' ).'"';
+			}
 			$r .= '>';
 			$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
 			$r .=  '</option>'."\n";

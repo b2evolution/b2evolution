@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -45,13 +45,13 @@ if( $action == 'new-selskin' )
 	// Skins that fully support the selected collection type
 	$block_item_Widget = new Widget( 'block_item' );
 	$block_item_Widget->title = sprintf( T_('Recommended skins for a "%s" collection'), $kind_title );
-	$block_item_Widget->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard',
+	$block_item_Widget->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=collections',
 			' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3 , 4, array( 'class' => 'action_icon btn-default' ) );
 
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<div class="skin_selector_block">';
 
-		if( $current_User->check_perm( 'options', 'edit', false ) )
+		if( check_user_perm( 'options', 'edit', false ) )
 		{ // A link to install new skin:
 			echo '<a href="'.$admin_url.'?ctrl=collections&amp;action=new-installskin&amp;kind='.$kind.'&amp;skin_type=normal"
 					class="skinshot skinshot_new">'.get_icon( 'new' ).T_('Install New').' &raquo;'.'</a>';

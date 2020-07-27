@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -15,9 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'T_skins__skin.*, COUNT( DISTINCT( cset_coll_ID ) ) AS nb_blogs' );
-$SQL->FROM( 'T_skins__skin LEFT JOIN T_coll_settings ON skin_ID = cset_value AND
-			( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' );
+$SQL->SELECT( 'T_skins__skin.*, SUM( IF( blog_normal_skin_ID = skin_ID, 1, 0 ) + IF( blog_mobile_skin_ID = skin_ID, 1, 0 ) + IF( blog_tablet_skin_ID = skin_ID, 1, 0 ) + IF( blog_alt_skin_ID = skin_ID, 1, 0 ) ) AS nb_blogs' );
+$SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON (skin_ID = blog_normal_skin_ID OR skin_ID = blog_mobile_skin_ID OR skin_ID = blog_tablet_skin_ID OR skin_ID = blog_alt_skin_ID )' );
 $SQL->GROUP_BY( 'skin_ID' );
 
 $count_SQL = new SQL();
@@ -28,9 +27,9 @@ $Results = new Results( $SQL->get(), 'skin_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_SkinCache();
 
-$Results->title = T_('Installed skins').get_manual_link('installed_skins');
+$Results->title = T_('Installed skins').get_manual_link('installed-skins');
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -83,7 +82,7 @@ $Results->cols[] = array(
 						'th_class' => 'shrinkwrap',
 						'order' => 'skin_type',
 						'td_class' => 'shrinkwrap',
-						'td' => '$skin_type$',
+						'td' => '%get_skin_type_title( #skin_type# )%',
 					);
 
 $Results->cols[] = array(
@@ -101,13 +100,14 @@ $Results->cols[] = array(
 						'td' => '$skin_folder$',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	global $Settings;
 	$site_skin_IDs = array(
 		intval( $Settings->get( 'normal_skin_ID' ) ),
 		intval( $Settings->get( 'mobile_skin_ID' ) ),
 		intval( $Settings->get( 'tablet_skin_ID' ) ),
+		intval( $Settings->get( 'alt_skin_ID' ) ),
 	);
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
@@ -115,8 +115,6 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( TS_('Edit skin properties...'), 'properties',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
-	                    .action_icon( TS_('Reload containers').'!', 'reload',
-	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
 											.'~conditional( #nb_blogs# < 1 && ! in_array( #skin_ID#, array( '.implode( ',', $site_skin_IDs ).' ) ), \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=delete&amp;'.url_crumb('skin').'\')%' ).'\', \''

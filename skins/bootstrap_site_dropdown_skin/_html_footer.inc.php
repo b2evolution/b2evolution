@@ -12,6 +12,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <!-- End of skin_wrapper -->
 
 <!-- /div -->
-
+    <?php include_footerlines(); /* Add javascript and css files included by plugins and skin */ ?>
 </body>
 </html>

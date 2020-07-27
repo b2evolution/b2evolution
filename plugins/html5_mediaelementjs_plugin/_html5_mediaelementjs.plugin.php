@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  *
@@ -22,7 +22,7 @@ class html5_mediaelementjs_plugin extends Plugin
 	var $code = 'b2evH5MP';
 	var $name = 'HTML 5 MediaElement.js Video and Audio Player';
 	var $priority = 80;
-	var $version = '6.9.3';
+	var $version = '7.2.0';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm', 'mp3', 'm4a' );
@@ -51,8 +51,8 @@ class html5_mediaelementjs_plugin extends Plugin
 		global $Collection, $Blog;
 
 		require_css( '#mediaelement_css#', 'blog' );
-		require_js( '#jquery#', 'blog' );
-		require_js( '#mediaelement#', 'blog' );
+		require_js_defer( '#jquery#', 'blog' );
+		require_js_defer( '#mediaelement#', 'blog' );
 		$this->require_skin();
 
 		// Set a video/audio size in css style, because option setting cannot sets correct size
@@ -74,71 +74,9 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 }' );
 
 		// Initialize a player
-		add_js_headline(
-			( $width == "100%" ?
-			// Use 100% width
-			'' :
-			// Check to make player width <= window width
-			'var html5_mediaelementjs_player_width = parseInt( "'.$width.'" );
-			if( jQuery( window ).width() < html5_mediaelementjs_player_width )
-			{
-				html5_mediaelementjs_player_width = jQuery( window ).width();
-			}'
-			).'
-			jQuery( document ).ready( function() {
-				jQuery( ".html5_mediaelementjs_player" ).mediaelementplayer( {
-					defaultVideoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_player_width' ).',
-					defaultVideoHeight: "'.$height.'",
-					videoWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_player_width' ).',
-					videoHeight: "'.$height.'",
-					audioWidth: '.( $width == "100%" ? '"100%"' : 'html5_mediaelementjs_player_width' ).',
-				} );
-			} );' );
-		/**
-		 * Plugin options:
-
-			// if the <video width> is not specified, this is the default
-			defaultVideoWidth: 480,
-			// if the <video height> is not specified, this is the default
-			defaultVideoHeight: 270,
-			// if set, overrides <video width>
-			videoWidth: -1,
-			// if set, overrides <video height>
-			videoHeight: -1,
-			// width of audio player
-			audioWidth: 400,
-			// height of audio player
-			audioHeight: 30,
-			// initial volume when the player starts
-			startVolume: 0.8,
-			// useful for <audio> player loops
-			loop: false,
-			// enables Flash and Silverlight to resize to content size
-			enableAutosize: true,
-			// the order of controls you want on the control bar (and other plugins below)
-			features: ['playpause','progress','current','duration','tracks','volume','fullscreen'],
-			// Hide controls when playing and mouse is not over the video
-			alwaysShowControls: false,
-			// force iPad's native controls
-			iPadUseNativeControls: false,
-			// force iPhone's native controls
-			iPhoneUseNativeControls: false,
-			// force Android's native controls
-			AndroidUseNativeControls: false,
-			// forces the hour marker (##:00:00)
-			alwaysShowHours: false,
-			// show framecount in timecode (##:00:00:00)
-			showTimecodeFrameCount: false,
-			// used when showTimecodeFrameCount is set to true
-			framesPerSecond: 25,
-			// turns keyboard support on and off for this instance
-			enableKeyboard: true,
-			// when this player starts, it will pause other players
-			pauseOtherPlayers: true,
-			// array of keyboard commands
-			keyActions: []
-
-		 */
+		add_js_headline( 'var evo_html5_mediaelementjs_player_width = "'.$width.'";
+			var evo_html5_mediaelementjs_player_height = "'.$height.'";' );
+		require_js_defer( 'ext:mediaelement/js/mediaelement-and-player.init.js', 'blog' );
 	}
 
 
@@ -164,17 +102,13 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
-				'use_for_posts' => array(
-					'label' => T_('Use for'),
-					'note' => T_('videos attached to posts'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-					),
-				'use_for_comments' => array(
-					'label' => '',
-					'note' => T_('videos attached to comments'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
+				'use_for' => array(
+						'label' => T_('Use for'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'posts', T_('videos attached to posts'), 1 ),
+							array( 'comments', T_('videos attached to comments'), 1 ),
+						)
 					),
 				'skin' => array(
 					'label' => T_('Skin'),
@@ -184,12 +118,10 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 					),
 				'width' => array(
 					'label' => T_('Video/Audio width (px)'),
-					'defaultvalue' => 460,
 					'note' => T_('100% width if left empty or 0'),
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
-					'defaultvalue' => 320,
 					'type' => 'integer',
 					'allow_empty' => true,
 					'valid_range' => array( 'min' => 1 ),
@@ -262,8 +194,8 @@ audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block;
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
 
-		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
-		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		if( ( ! $in_comments && ! $this->get_checklist_setting( 'use_for', 'posts', 'coll', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_checklist_setting( 'use_for', 'comments', 'coll', $item_Blog ) ) )
 		{ // Plugin is disabled for post/comment videos on this Blog
 			return false;
 		}
