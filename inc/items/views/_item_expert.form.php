@@ -329,8 +329,6 @@ $Form->begin_form( '', '', $params );
 		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
 	}
 
-	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
-
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
@@ -561,10 +559,6 @@ $Form->begin_form( '', '', $params );
 		$Form->close_tab_pane();
 	}
 
-	// ####################### PLUGIN FIELDSETS #########################
-
-	// $Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
-
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
 		// ####################### INTERNAL COMMENTS #########################
@@ -639,7 +633,11 @@ $Form->begin_form( '', '', $params );
 	}
 	$Form->close_tab_pane();
 
-	echo '</div>';
+	echo '</div><br>';
+
+	// ####################### PLUGIN FIELDSETS #########################
+
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
 	?>
 
