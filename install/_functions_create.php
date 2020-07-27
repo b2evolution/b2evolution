@@ -2389,7 +2389,7 @@ function create_default_templates( $is_task = true )
 [set:reg1_template=registration_email_social]
 [set:reg1_required=email]
 
-[set:reg2_template=registration_step2]
+[set:reg2_template=registration_step2| // Page 2 is not implemented yet]
 [set:reg2_required=firstname]
 ',
 		),
