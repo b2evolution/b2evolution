@@ -197,6 +197,42 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_title', $item_title );
 	}
 	$Form->end_fieldset();
+
+	// URL slugs:
+	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
+	$Form->hidden( 'slug_changed', 0 );
+	$edit_slug_link = '';
+	if( $edited_Item->ID > 0 && check_user_perm( 'slugs', 'view' ) )
+	{	// Current User has a permission to view slugs:
+		// Get icon to copy canonical slug to clipboard:
+		$edit_slug_link = action_icon( TB_('Copy slug to clipboard'), 'clipboard-copy', '#', TB_('Copy slug'), 3, 4, array(
+				'id'      => 'item_canonical_slug_clipboard_icon', // ID is used to highlight on coping process
+				'onclick' => 'return evo_copy_to_clipboard( \'item_canonical_slug_clipboard_icon\', \''.format_to_js( $edited_Item->get( 'urltitle' ) ).'\' )',
+			) ).' ';
+		// Get link to edit slugs page:
+		$edit_slug_link .= action_icon( TB_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, TB_('Edit slugs'), 3, 4 )
+			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this post"
+			.' '.TB_('for this post').' - ';
+	}
+
+	if( empty( $edited_Item->tiny_slug_ID ) )
+	{	// No tiny URL:
+		$tiny_slug_info = TB_('No Tiny URL yet.');
+	}
+	else
+	{	// Get a link to tiny URL:
+		$tiny_slug_info = $edited_Item->get_tinyurl_link( array(
+				'before' => TB_('Tiny URL').': ',
+				'after'  => ''
+			) ).' ';
+		// Get icon to copy tiny URL to clipboard:
+		$tiny_slug_info .= action_icon( TB_('Copy Tiny URL to clipboard'), 'clipboard-copy', '#', '', NULL, NULL, array(
+				'id'      => 'item_tiny_url_clipboard_icon', // ID is used to highlight on coping process
+				'onclick' => 'return evo_copy_to_clipboard( \'item_tiny_url_clipboard_icon\', \''.$edited_Item->get_tinyurl().'\' )',
+			) );
+	}
+	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, TB_('URL slugs'), $edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210 ) );
+
 	$Form->switch_layout( NULL );
 
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
@@ -385,30 +421,6 @@ $Form->begin_form( '', '', $params );
 	$Form->open_tab_pane( array( 'id' => 'advance_properties', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-advanced-properties-panel' ) ) );
 
 	$Form->switch_layout( 'fields_table' );
-
-	// URL slugs:
-	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
-	$Form->hidden( 'slug_changed', 0 );
-	$edit_slug_link = '';
-	if( $edited_Item->ID > 0 && check_user_perm( 'slugs', 'view' ) )
-	{ // user has permission to view slugs:
-		$edit_slug_link = action_icon( TB_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, TB_('Edit slugs'), 3, 4 )
-			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this post"
-			.' '.TB_('for this post').' - ';
-	}
-
-	if( empty( $edited_Item->tiny_slug_ID ) )
-	{
-		$tiny_slug_info = TB_('No Tiny URL yet.');
-	}
-	else
-	{
-		$tiny_slug_info = $edited_Item->get_tinyurl_link( array(
-				'before' => TB_('Tiny URL').': ',
-				'after'  => ''
-			) );
-	}
-	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, TB_('URL slugs'), $edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210 ) );
 
 	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
 	{	// Display tags:

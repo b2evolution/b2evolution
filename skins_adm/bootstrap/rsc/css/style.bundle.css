@@ -1080,6 +1080,12 @@ h2.user_title::first-line {
 #ffield_item_switchable_params .evo_fields_table__input > input[type=text] {
   display: table-cell;
 }
+#ffield_post_title .evo_fields_table__label {
+  font-size: 18px;
+}
+#ffield_post_title .form_text_input {
+  font-size: 20px;
+}
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url("../../../../rsc/img/ajax-loader/fff.gif");

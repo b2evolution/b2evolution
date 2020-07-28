@@ -360,12 +360,24 @@ function b2template_list_highlight( obj )
  * Copy text of element to clipboard
  *
  * @param string Element ID
+ * @param string Optional text, use this to copy instead of content of the Element
  */
-function evo_copy_to_clipboard( id )
+function evo_copy_to_clipboard( id, custom_text )
 {
+	if( typeof( custom_text ) == 'undefined' )
+	{	// Copy text from Element:
+		var text_obj = document.getElementById( id );
+	}
+	else
+	{	// Copy a provided Text:
+		var text_obj = document.createElement( 'span' );
+		text_obj.innerHTML = custom_text;
+		document.body.appendChild( text_obj );
+	}
+
 	// Create range to select element by ID:
 	var range = document.createRange();
-	range.selectNode( document.getElementById( id ) );
+	range.selectNode( text_obj );
 	// Clear current selection:
 	window.getSelection().removeAllRanges();
 	// Select text of the element temporary:
@@ -376,6 +388,11 @@ function evo_copy_to_clipboard( id )
 	window.getSelection().removeAllRanges();
 	// Highlight copied element:
 	evoFadeBg( '#' + id, new Array( '#ffbf00' ), { speed: 100 } );
+
+	if( typeof( custom_text ) != 'undefined' )
+	{	// Remove temp object what was used only for copying above:
+		document.body.removeChild( text_obj );
+	}
 
 	return false;
 }
