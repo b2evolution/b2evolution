@@ -329,8 +329,8 @@ $Form->begin_form( '', '', $params );
 		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
 	}
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
-	{
+	if( $edited_Item->can_see_meta_comments() )
+	{	// Meta/Internal comments are allowed only when current User has a permission to view them:
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		
 		$tab_panes[] = '#internal_comments';
@@ -338,9 +338,13 @@ $Form->begin_form( '', '', $params );
 		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
 	}
 
-	$tab_panes[] = '#checklist';
-	$unchecked_checklist_lines = $edited_Item->get_unchecked_checklist_lines();
-	echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $unchecked_checklist_lines > 0 ? ' <span id="checklist_counter" class="badge badge-important">'.$unchecked_checklist_lines.'</span>' : '' ).'</a></li>';
+	if( $edited_Item->can_see_meta_comments() && // Current User must has at least a permission to view meta comments
+	    ( ! $creating || $edited_Item->can_meta_comment() ) ) // No need to display this tab for new Item if current User cannot add checklist item
+	{	// Checklist is allowed only for users who can see meta/internal comments:
+		$tab_panes[] = '#checklist';
+		$unchecked_checklist_lines = $edited_Item->get_unchecked_checklist_lines();
+		echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $unchecked_checklist_lines > 0 ? ' <span id="checklist_counter" class="badge badge-important">'.$unchecked_checklist_lines.'</span>' : '' ).'</a></li>';
+	}
 
 	echo '</ul>';
 
@@ -559,7 +563,7 @@ $Form->begin_form( '', '', $params );
 		$Form->close_tab_pane();
 	}
 
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	if( $edited_Item->can_see_meta_comments() )
 	{
 		// ####################### INTERNAL COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
@@ -615,23 +619,27 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// ####################### CHECKLIST #########################
-	$Form->open_tab_pane( array( 'id' => 'checklist', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'item-checklist-panel' ) ) );
-	if( $creating )
-	{	// Display button to save new creating item:
-		$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ TB_('Save post to start adding Checklist lines'), 'btn-primary' ) );
+	if( $edited_Item->can_see_meta_comments() && // Current User must has at least a permission to view meta comments
+	    ( ! $creating || $edited_Item->can_meta_comment() ) ) // No need to display this tab for new Item if current User cannot add checklist item
+	{	// Checklist is allowed only for users who can see meta/internal comments:
+		$Form->open_tab_pane( array( 'id' => 'checklist', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'item-checklist-panel' ) ) );
+		if( $creating )
+		{	// Display button to save new creating item:
+			$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ TB_('Save post to start adding Checklist lines'), 'btn-primary' ) );
+		}
+		else
+		{
+			// Make sure the widget does not insert a form here!
+			skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'item_checklist_lines',
+				// Optional display params
+				'Item'  => $edited_Item,
+				'title' => NULL,
+			) );
+		}
+		$Form->close_tab_pane();
 	}
-	else
-	{
-		// Make sure the widget does not insert a form here!
-		skin_widget( array(
-			// CODE for the widget:
-			'widget' => 'item_checklist_lines',
-			// Optional display params
-			'Item'  => $edited_Item,
-			'title' => NULL,
-		) );
-	}
-	$Form->close_tab_pane();
 
 	echo '</div><br>';
 
@@ -1180,8 +1188,10 @@ echo_item_merge_js();
 echo_item_add_version_js();
 // JS code for link to link new version:
 echo_item_link_version_js();
-// Init Item Checklist JS:
-expose_var_to_js( 'evo_item_checklist_config', true );
+if( $edited_Item->can_meta_comment() )
+{	// Init Item Checklist JS to update red badge in tab of not checked lines:
+	expose_var_to_js( 'evo_item_checklist_config', true );
+}
 
 // JS to post excerpt mode switching:
 ?>

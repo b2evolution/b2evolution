@@ -1769,6 +1769,11 @@ class collections_Module extends Module
 						);
 				}
 
+				// Do not append Debuglog and debug JSlog to JSON response in order to don't break it:
+				global $debug, $debug_jslog;
+				$debug = false;
+				$debug_jslog = false;
+
 				exit( evo_json_encode( $response ) );
 		}
 	}

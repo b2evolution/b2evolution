@@ -170,15 +170,18 @@ class item_checklist_lines_Widget extends ComponentWidget
 			return false;
 		}
 
-		if( ! ( $this->get_param( 'allow_edit' ) && $Item->can_meta_comment() ) &&
-			! count( $Item->get_checklist_lines() ) )
-		{	// Nothing to display because current User cannot edit the Item and the Item has no checklist lines:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no checklist lines and you cannot add new for the Item.' );
+		// Check permission to add/edit/delete checklist lines:
+		$can_update = $this->get_param( 'allow_edit' ) && $Item->can_meta_comment();
+
+		// Get existing checklist lines:
+		$checklist_lines = $Item->get_checklist_lines();
+
+		if( ! $Item->can_see_meta_comments() || // Current User has no perm to view checklist lines
+		    ( empty( $checklist_lines ) && ! $can_update ) ) // No
+		{	// Nothing to display because current User cannot see this OR the Item has no checklist lines:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you cannot see this or current Item has no checklist lines.' );
 			return false;
 		}
-
-		// Check permission:
-		$can_update = $Item->can_meta_comment() && $this->get_param( 'allow_edit' );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
@@ -218,8 +221,6 @@ class item_checklist_lines_Widget extends ComponentWidget
 		}
 
 		echo '<div class="checklist_lines">';
-
-		$checklist_lines = $Item->get_checklist_lines();
 
 		// Extra drop area for checklist lines to first position:
 		echo '<div class="checklist_droparea"></div>';
