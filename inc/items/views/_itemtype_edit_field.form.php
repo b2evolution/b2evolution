@@ -63,7 +63,7 @@ $Form->text( 'itcf_note', get_param( 'itcf_note' ), 60, TB_('Note'), '', 255 );
 $Form->checkbox( 'itcf_required', get_param( 'itcf_required' ), TB_('Required') );
 
 // With MC(Internal Comment):
-$Form->checkbox( 'itcf_meta', get_param( 'itcf_meta' ), TB_('With MC'), TB_('Update also on Internal Comment form') );
+$Form->checkbox( 'itcf_meta', get_param( 'itcf_meta' ), TB_('With IC'), TB_('Update also on Internal Comment form') );
 
 // Public:
 $Form->checkbox( 'itcf_public', get_param( 'itcf_public' ), TB_('Public') );

@@ -1569,7 +1569,7 @@ class ItemLight extends DataObject
 			{	// This is an intro, do not link title by default:
 				$params['link_type'] = 'none';
 			}
-			elseif( is_same_url( $this->get_permanent_url( '', $blogurl, '&' ), $ReqURL ) )
+			elseif( is_single_page() )
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
@@ -1606,7 +1606,8 @@ class ItemLight extends DataObject
 
 			case 'admin_view':
 				// View in admin
-				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+				global $admin_url;
+				$url = $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
 				break;
 
 			case 'edit_view_url':

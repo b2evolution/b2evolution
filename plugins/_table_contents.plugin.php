@@ -21,7 +21,7 @@ class table_contents_plugin extends Plugin
 	var $name;
 	var $code = 'b2evoTOC';
 	var $priority = 110;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $subgroup = 'infoitem';
 	var $short_desc;
@@ -129,7 +129,7 @@ class table_contents_plugin extends Plugin
 		$this->current_content = $content;
 
 		// Replace `[toc]` short tag with nested/bullet list from all found header anchored tags:
-		$content = replace_content_outcode( '#\[toc\]#i', array( $this, 'callback_render_toc' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#\[toc\]#i', array( $this, 'callback_render_toc' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -239,7 +239,7 @@ class table_contents_plugin extends Plugin
 				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
 				'set_coll_ID'  => isset( $Blog ) ? $Blog->ID : NULL, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => isset( $Blog ) ? $Blog->ID : NULL, // Has the content of the displayed blog changed ?
-				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 			);
 	}
 

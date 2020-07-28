@@ -23,7 +23,7 @@ class auto_anchors_plugin extends Plugin
 	var $code = 'auto_anchors';
 	var $name = 'Auto Anchors';
 	var $priority = 33;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -195,7 +195,7 @@ class auto_anchors_plugin extends Plugin
 		load_funcs( 'locales/_charset.funcs.php' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks:
-		$content = replace_content_outcode( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
 
 		return true;
 	}

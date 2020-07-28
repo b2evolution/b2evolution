@@ -192,6 +192,34 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// This function MUST be overriden by custom skin and return proper Array like sample below.
+		// It is declared here only to avoid errors during upgrade in case of older/badly written Skins.
+
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		/* Sample:
+		return array(
+				'sidebar_single'       => array( NT_('Sidebar Single'), 95 ),
+				'front_page_main_area' => NULL,
+			);
+		*/
+
+		return array();
+	}
+
+
+	/**
 	 * Get supported collection kinds.
 	 *
 	 * This should be overloaded in skins.
@@ -651,14 +679,24 @@ class Skin extends DataObject
 	{
 		if( is_null( $this->container_list ) )
 		{
-			if( method_exists( $this, 'get_declared_containers' ) )
+			$skin_declared_containers = $this->get_declared_containers();
+			if( $this->get_api_version() > 5 || ! empty( $skin_declared_containers ) )
 			{	// Get default containers and containers what declared by this skin:
-				$this->container_list = array_merge( get_skin_default_containers(), $this->get_declared_containers() );
+				// All v6+ skins must use either declared containers or default containers,
+				$this->container_list = array_merge( get_skin_default_containers(), $skin_declared_containers );
 
 				foreach( $this->container_list as $wico_code => $wico_data )
 				{
 					if( $wico_data === NULL )
 					{	// Exclude containers which are not used in the current Skin:
+						unset( $this->container_list[ $wico_code ] );
+					}
+
+					if( ! is_array( $wico_data ) || // Must be array
+					    ! isset( $wico_data[0] ) || // 1st for container title
+					    ! isset( $wico_data[1] ) || // 2nd for container order
+					    ! is_number( $wico_data[1] ) ) // Order must be a number
+					{	// Skip wrong container data:
 						unset( $this->container_list[ $wico_code ] );
 					}
 				}
@@ -668,6 +706,7 @@ class Skin extends DataObject
 			}
 			else
 			{	// Get containers from skin files:
+				// Only v5 skins may use containers searched in skin files if they don't declare at least one container:
 				$this->discover_containers( false );
 			}
 		}

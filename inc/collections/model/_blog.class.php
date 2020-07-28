@@ -310,6 +310,24 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get delete restriction settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_restrictions()
+	{
+		global $admin_url;
+
+		return array(
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "default_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Default collection to display</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "login_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Collection for login/registration</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "msg_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Collection for profiles/messaging</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+				array( 'table' => 'T_settings', 'fk' => 'set_value', 'and_condition' => 'set_name = "info_blog_ID"', 'msg' => sprintf( T_('This collection cannot be deleted because it is used as <a %s>Collection for shared content blocks</a>.'), 'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"' ) ),
+			);
+	}
+
+
+	/**
 	 * Compare two Blog based on the common blog order setting
 	 *
 	 * @param Blog A
@@ -423,6 +441,7 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				$this->set_setting( 'front_disp', 'front' );
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
 				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
@@ -1218,6 +1237,7 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
 			$this->set_setting( 'search_include_posts', param( 'search_include_posts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
+			$this->set_setting( 'search_include_metas', param( 'search_include_metas', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
 			// Scoring for posts:
@@ -1257,6 +1277,7 @@ class Blog extends DataObject
 			// Quick Templates for search results:
 			$this->set_setting( 'search_result_template_item', param( 'search_result_template_item', 'string' ) );
 			$this->set_setting( 'search_result_template_comment', param( 'search_result_template_comment', 'string' ) );
+			$this->set_setting( 'search_result_template_meta', param( 'search_result_template_meta', 'string' ) );
 			$this->set_setting( 'search_result_template_file', param( 'search_result_template_file', 'string' ) );
 			$this->set_setting( 'search_result_template_category', param( 'search_result_template_category', 'string' ) );
 			$this->set_setting( 'search_result_template_tag', param( 'search_result_template_tag', 'string' ) );
@@ -1726,7 +1747,7 @@ class Blog extends DataObject
 				{	// Update custom cookie domain:
 					$cookie_domain_custom = param( 'cookie_domain_custom', 'string', NULL );
 					preg_match( '#^https?://(.+?)(:(.+?))?$#', $this->get_baseurl_root(), $coll_host );
-					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ) ).'$#i', $coll_host[1] ) )
+					if( empty( $coll_host[1] ) || ! preg_match( '#(^|\.)'.preg_quote( preg_replace( '#^\.#i', '', $cookie_domain_custom ), '#' ).'$#i', $coll_host[1] ) )
 					{	// Wrong cookie domain:
 						param_error( 'cookie_domain_custom', T_('The custom cookie domain must be a parent of the collection domain.') );
 					}
@@ -1741,7 +1762,7 @@ class Blog extends DataObject
 				if( get_param( 'cookie_path_type' ) == 'custom' )
 				{	// Update custom cookie path:
 					$cookie_path_custom = param( 'cookie_path_custom', 'string', NULL );
-					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ) ).'(/|$)#i', $this->get_basepath() ) )
+					if( ! preg_match( '#^'.preg_quote( preg_replace( '#/$#i', '', $cookie_path_custom ), '#' ).'(/|$)#i', $this->get_basepath() ) )
 					{	// Wrong cookie path:
 						param_error( 'cookie_path_custom', T_('The custom cookie path must be a parent of the collection path.') );
 					}
@@ -3143,7 +3164,18 @@ class Blog extends DataObject
 				    ( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) ||
 				      $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
 				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
-					$customizing_url = isset( $params['customizing_url'] ) ? $params['customizing_url'] : get_current_url();
+					if( ! empty( $params['customizing_url'] ) )
+					{	// Get customizing URL from passed param:
+						$customizing_url = $params['customizing_url'];
+					}
+					elseif( get_param( 'customizing_url' ) != '' )
+					{	// Get customizing URL from currently provided _GET param 'customizing_url':
+						$customizing_url = get_param( 'customizing_url' );
+					}
+					else
+					{	// Use current URL for customizing URL:
+						$customizing_url = get_current_url();
+					}
 					if( $customizing_url == '#baseurl#' )
 					{	// Use base URL of this collection:
 						$customizing_url = $this->get( 'baseurl' );
@@ -5129,7 +5161,8 @@ class Blog extends DataObject
 
 			if( $verbose )
 			{	// Display how many containers are declared or scanned by the collection skin:
-				if( method_exists( $coll_Skin, 'get_declared_containers' ) )
+				$skin_declared_containers = $coll_Skin->get_declared_containers();
+				if( $coll_Skin->get_api_version() > 5 || ! empty( $skin_declared_containers ) )
 				{	// If skin has the declared widget containers:
 					$Messages->add( sprintf( T_('%d containers declared by skin "%s".'), $skin_containers_num, $coll_Skin->get_name() ), 'note' );
 				}

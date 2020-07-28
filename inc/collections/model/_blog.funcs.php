@@ -748,7 +748,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	$BlogCache = & get_BlogCache();
 
 	// fp>yb: What is this for? Make protocol lowercase?
-	$baseurl_regex = preg_replace( '/^https?(.*)/i', 'https?$1', preg_quote( $baseurl ));
+	$baseurl_regex = preg_replace( '/^https?(.*)/i', 'https?$1', preg_quote( $baseurl, '#' ) );
 
 	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$sanitized_ReqPath, $matches ) )
 	{ // We have an URL that is of the form `http://domain.com/slug` or `http://domain.com/index.php/slug` (NOTE: may still contain `slug.php`)

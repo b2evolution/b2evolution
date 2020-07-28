@@ -145,7 +145,7 @@ function is_internal_url( $url )
 
 	$url_domain = preg_replace( '~(https?://|//)([^/]+)/?.*~i', '$2', $url );
 
-	if( preg_match( '~\.'.preg_quote( $basehost ).'(:\d+)?$~', $url_domain ) )
+	if( preg_match( '~\.'.preg_quote( $basehost, '~' ).'(:\d+)?$~', $url_domain ) )
 	{	// The URL goes to a subdomain of basehost:
 		return true;
 	}

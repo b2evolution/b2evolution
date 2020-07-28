@@ -525,7 +525,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'type'            => 'double',
 			'order'           => 180,
 			'note'            => T_('Enter a number'),
-			'format'          => '$ 0 0.00',
+			'format'          => '$ 0 0.00[.green];$ 0 0.00[.red]',
 			'cell_class'      => 'right',
 			'green_highlight' => 'lowest',
 		),
@@ -2299,7 +2299,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Item:permalink] ([Item:type])</div>
+		<div class="search_title">[Item:permalink] <span class="label label-primary">[Item:type]</span></div>
 		<div class="result_content">[Item:excerpt|excerpt_more_text=]</div>
 		<div class="search_info dimmed">[Item:categories|before=In ]</div>
 		<div class="search_info dimmed">Published by [Item:author|
@@ -2316,7 +2316,24 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Comment:permalink] (Comment)</div>
+		<div class="search_title">[Comment:permalink] <span class="label label-primary">Comment</span></div>
+		<div class="result_content">[Comment:excerpt]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_meta' => array(
+			'name'     => 'Search Result: Internal comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] <span class="label label-info">Internal comment</span></div>
 		<div class="result_content">[Comment:excerpt]</div>
 		<div class="search_info dimmed">Published by [Comment:author|
 			link_text=avatar_name|
@@ -2333,7 +2350,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[File:file_link|link_text=title] (File: [File:file_link|link_text=icon] [File:type])</div>
+		<div class="search_title">[File:file_link|link_text=title] <span class="label label-primary">File: [File:file_link|link_text=icon] [File:type]</span></div>
 		<div class="result_content">
 			[File:url]
 			[File:description|before=<div>|after=</div>]
@@ -2349,7 +2366,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Cat:permalink] (Category)</div>
+		<div class="search_title">[Cat:permalink] <span class="label label-primary">Category</span></div>
 		<div class="result_content">[Cat:description]</div>
 	</div>
 </div>',
@@ -2361,7 +2378,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Tag:permalink] (Tag)</div>
+		<div class="search_title">[Tag:permalink] <span class="label label-primary">Tag</span></div>
 		<div class="result_content">[echo:tag_post_count] posts are tagged with "[Tag:name]"</div>
 	</div>
 </div>',

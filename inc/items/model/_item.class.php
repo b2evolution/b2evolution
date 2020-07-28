@@ -1358,7 +1358,7 @@ class Item extends ItemLight
 					case 'double':
 						$param_type = 'double';
 						$field_value = param( $param_name, 'string', NULL );
-						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9 \'.,]+([.,][0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
 						{
 							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
 							$param_error = true;
@@ -2005,7 +2005,7 @@ class Item extends ItemLight
 		{	// Remove all unused inline images from the content:
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
-			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
+			$content = replace_outside_code_tags( $unused_inline_images, '', $content, 'replace_content', 'str' );
 			$Messages->add( T_('Invalid inline file placeholders won\'t be displayed.'), 'note' );
 		}
 
@@ -2145,7 +2145,7 @@ class Item extends ItemLight
 
 			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
 			{	// Don't use the content separators for intro items and if it is disabled by item type:
-				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+				$r = replace_outside_code_tags( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
 			}
 
 			return $r;
@@ -2254,7 +2254,7 @@ class Item extends ItemLight
 
 			if( $this->is_intro() || ! $this->get_type_setting( 'allow_breaks' ) )
 			{	// Don't use the content separators for intro items and if it is disabled by item type:
-				$r = replace_content_outcode( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
+				$r = replace_outside_code_tags( array( '[teaserbreak]', '[pagebreak]' ), '', $r, 'replace_content', 'str' );
 			}
 
 			$Debuglog->add( 'Generated pre-rendered content ['.$cache_key.'] for item #'.$this->ID, 'items' );
@@ -3350,26 +3350,25 @@ class Item extends ItemLight
 		$field_name = $params['field'];
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{ // Custom field with this index doesn't exist
-			echo $params['before']
-				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>'
-				.$params['after'];
+			echo '<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>';
 			return;
 		}
-
-		echo $params['before'];
 
 		switch( $params['what'] )
 		{
 			case 'label':
-				echo $this->get_custom_field_title( $params['field'] );
+				$r = $this->get_custom_field_title( $params['field'] );
 				break;
 
 			default: // formatted_value
-				echo $this->get_custom_field_formatted( $field_name, $params );
+				$r = $this->get_custom_field_formatted( $field_name, $params );
 				break;
 		}
 
-		echo $params['after'];
+		if( is_string( $r ) && $r !== '' )
+		{	// Print if value is not empty string:
+			echo $params['before'].$r.$params['after'];
+		}
 	}
 
 
@@ -5951,22 +5950,21 @@ class Item extends ItemLight
 				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
+		if( $params['show_in_single_mode'] == false && is_single_page() )
+		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we don't want to display this link
+			return;
+		}
+
 		if( isset( $Blog ) &&
 		    ( $params['stay_in_same_collection'] === true || // always stay in current collection
 		      ( $params['stay_in_same_collection'] == 'auto' && ( $item_Blog = & $this->get_Blog() ) && $item_Blog->get_setting( 'allow_crosspost_urls' ) ) // follow 'allow_crosspost_urls' to stay in current collection
 		    ) )
 		{	// Use current collection if this Item is cross posted and has at least one category from current collection:
 			$current_blog_ID = $Blog->ID;
-			$current_blog_URL = $Blog->get( 'url' );
 		}
 		else
 		{	// Use main collection of this Item:
 			$current_blog_ID = NULL;
-			$current_blog_URL = '';
-		}
-		if( $params['show_in_single_mode'] == false && is_same_url( $this->get_permanent_url( '', $current_blog_URL, '&', array(), $current_blog_ID ), $ReqURL ) )
-		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we dpn't want to display this link
-			return;
 		}
 
 		// dh> TODO:	Add plugin hook, where a Pingback plugin could hook and provide "pingbacks"
@@ -11027,7 +11025,7 @@ class Item extends ItemLight
 	/**
 	 * Get all slugs of this Item, except of tiny slug
 	 *
-	 * @param string Separator
+	 * @param string|NULL Separator, NULL - to return array
 	 * @return string Slugs list
 	 */
 	function get_slugs( $separator = ', ' )
@@ -11055,7 +11053,7 @@ class Item extends ItemLight
 			}
 		}
 
-		return implode( $separator, $this->slugs );
+		return $separator === NULL ? $this->slugs : implode( $separator, $this->slugs );
 	}
 
 

@@ -21,7 +21,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -353,8 +353,8 @@ class bootstrap_gallery_legacy_Skin extends Skin
 		// Page link color:
 		$this->dynamic_style_rule( 'page_link_color',
 			'#skin_wrapper .container a:not(.btn .active) { color: $setting_value$ }'.
-			'ul li a:not(.btn) { color: $setting_value$ }'.
-			'ul li a:not(.btn) {background-color: transparent }'.
+			'#skin_wrapper ul li a:not(.btn) { color: $setting_value$ }'.
+			'#skin_wrapper ul li a:not(.btn) {background-color: transparent }'.
 			'.ufld_icon_links a:not(.btn) {color: #fff !important}'
 		);
 		// Current tab text color:

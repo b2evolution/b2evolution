@@ -711,8 +711,16 @@ class MarkdownImport extends AbstractImport
 			'no_changed'      => 0,
 		);
 		$imported_slugs = array();
+
+		// Force SQL errors handling:
+		$current_db_halt_on_error = $DB->halt_on_error;
+		$DB->halt_on_error = 'throw';
+
 		foreach( $files as $file_path )
 		{
+
+		try
+		{	// Try and catch all SQL errors:
 			$file_path = str_replace( '\\', '/', $file_path );
 
 			if( ! preg_match( '#([^/]+)\.md$#i', $file_path, $file_match ) ||
@@ -1177,7 +1185,17 @@ class MarkdownImport extends AbstractImport
 				$this->log( '.<br>' );
 			}
 			$this->log( '<br>' );
+
 		}
+		catch( Exception $db_Exception )
+		{	// Catch SQL error:
+			$this->log( '<div style="background-color:#fdd;padding:1ex">'.$db_Exception->getMessage().'</div>', 'error' );
+			$this->log( '<p class="red">Stopping import of this file. Continue import at NEXT .md file...</p>' );
+		}
+		}
+
+		// Revert DB option:
+		$DB->halt_on_error = $current_db_halt_on_error;
 
 		foreach( $post_results_num as $post_result_type => $post_result_num )
 		{

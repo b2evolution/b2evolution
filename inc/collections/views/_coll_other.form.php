@@ -41,6 +41,7 @@ $Form->begin_fieldset( TB_('Search results').get_manual_link( 'search-results-ot
 	$Form->checklist( array(
 			array( 'search_include_posts', 1, TB_('Posts'), $edited_Blog->get_setting( 'search_include_posts' ) ),
 			array( 'search_include_cmnts', 1, TB_('Comments'), $edited_Blog->get_setting( 'search_include_cmnts' ) ),
+			array( 'search_include_metas', 1, TB_('Internal comments'), $edited_Blog->get_setting( 'search_include_metas' ) ),
 			array( 'search_include_files', 1, TB_('Files'), $edited_Blog->get_setting( 'search_include_files' ) ),
 			array( 'search_include_cats',  1, TB_('Categories'), $edited_Blog->get_setting( 'search_include_cats' ) ),
 			array( 'search_include_tags',  1, TB_('Tags'), $edited_Blog->get_setting( 'search_include_tags' ) ),
@@ -105,6 +106,7 @@ $Form->begin_fieldset( TB_('Search results').get_manual_link( 'search-results-ot
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.'&amp;blog='.$Blog->ID, NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => TB_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'search_result_template_item', $edited_Blog->get_setting( 'search_result_template_item' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Item') ), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'search_result_template_comment', $edited_Blog->get_setting( 'search_result_template_comment' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Comment') ), NULL, array( 'input_suffix' => $template_input_suffix ) );
+	$Form->select_input_array( 'search_result_template_meta', $edited_Blog->get_setting( 'search_result_template_meta' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Internal comment') ), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'search_result_template_file', $edited_Blog->get_setting( 'search_result_template_file' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('File') ), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'search_result_template_category', $edited_Blog->get_setting( 'search_result_template_category' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Category') ), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'search_result_template_tag', $edited_Blog->get_setting( 'search_result_template_tag' ), $template_options, sprintf( TB_('Template for %s search result'), TB_('Tag') ), NULL, array( 'input_suffix' => $template_input_suffix ) );

@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -659,7 +659,7 @@ class autolinks_plugin extends Plugin
 		}
 
 		// Replace @usernames with user identity link:
-		$text = replace_content_outcode_shorttags( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
+		$text = replace_outside_code_and_short_tags( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
 
 		// Make tag names clickable:
 		$text = $this->replace_tags( $text );
@@ -827,7 +827,7 @@ class autolinks_plugin extends Plugin
 					{	// Replace @usernames
 						$user_link_attrs = str_replace( '%user_ID%', $User->ID, $link_attrs );
 						$user_link = '<a href="'.$User->get_userpage_url().'"'.$user_link_attrs.'>'.$username_source.'</a>';
-						$content = preg_replace( '#'.preg_quote( $username_source ).'#', $user_link, $content, 1 );
+						$content = preg_replace( '#'.preg_quote( $username_source, '#' ).'#', $user_link, $content, 1 );
 						$this->already_linked_usernames[] = $username;
 					}
 				}

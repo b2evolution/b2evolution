@@ -21,7 +21,7 @@ class date_tag_plugin extends Plugin
 	var $code = 'evo_datetag';
 	var $name = 'Date tag';
 	var $priority = 57;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -119,7 +119,7 @@ class date_tag_plugin extends Plugin
 	 */
 	function render_dates( $content )
 	{
-		return replace_content_outcode( '#\[date(:([^\]]+))?\]#i', array( $this, 'get_date_text' ), $content, 'replace_content_callback' );
+		return replace_outside_code_tags( '#\[date(:([^\]]+))?\]#i', array( $this, 'get_date_text' ), $content, 'replace_content_callback' );
 	}
 
 

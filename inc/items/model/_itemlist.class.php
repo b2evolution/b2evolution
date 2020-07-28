@@ -111,6 +111,15 @@ class ItemList2 extends ItemListLight
 		// Set Item params from request:
 		$Item->load_from_Request();
 
+		// Use only first slug on PREVIEW mode in order to initialize correct permanent URL:
+		$urltitles = $Item->get( 'urltitle' );
+		if( $urltitles === '' )
+		{	// If slugs are empty on preview form, try to get previous of from title:
+			$urltitles = ( empty( $this->previous_urltitle ) ? $Item->get( 'title' ) : $this->previous_urltitle );
+		}
+		$urltitles = explode( ',', $urltitles );
+		$Item->set( 'urltitle', get_urltitle( $urltitles[0] ) );
+
 		if( isset( $Item->previous_status ) )
 		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 			// (ONLY if current request is updating item status)

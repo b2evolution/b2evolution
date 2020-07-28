@@ -21,7 +21,7 @@ class infodots_plugin extends Plugin
 	var $code = 'b2evoDot';
 	var $name = 'Info dots renderer';
 	var $priority = 95;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -278,7 +278,7 @@ class infodots_plugin extends Plugin
 		$this->dot_numbers = NULL;
 		$this->object_ID = $object_ID;
 
-		$content = replace_content_outcode( '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is',
+		$content = replace_outside_code_tags( '#((<br />|<p>)\r?\n?)?\[infodot:(\d+):(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)(:\d+[pxecm%]*)?\](.+?)\[enddot\](\r?\n?(<br />|</p>))?#is',
 				array( $this, 'load_infodot_from_source' ),
 				$content, 'replace_content_callback' );
 
@@ -426,7 +426,7 @@ class infodots_plugin extends Plugin
 
 		if( ! isset( $this->loaded_objects[ $this->object_ID ] ) )
 		{ // Load the info dots if they were not loaded before:
-			replace_content_outcode( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" (data-)?xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
+			replace_outside_code_tags( '#<div class="infodots_info" id="infodot_(\d+)_(\d+)" (data-)?xy="(-?\d+[pxecm%]*):(-?\d+[pxecm%]*)"[^>]*>(.+?)</div>#is', 
 				array( $this, 'load_infodot_from_rendered_content' ), $content, 'replace_content_callback' );
 			$this->loaded_objects[ $this->object_ID ] = 1;
 		}

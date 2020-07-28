@@ -26,3 +26,4 @@ media/blogs/*
 /_transifex/messages-backoffice.pot.bak
 media/import/logs
 /_backup
+_logs/

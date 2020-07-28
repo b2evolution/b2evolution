@@ -903,6 +903,12 @@ class ComponentWidget extends DataObject
 					'data-type'      => $this->get_name(),
 					'data-container' => $this->get_container_param( 'code' ),
 				);
+			if( $this->get( 'code' ) == 'subcontainer' &&
+			    ( $sub_WidgetContainer = & $this->get_sub_WidgetContainer() ) )
+			{	// For Sub-Container widget we should know what sub-container is used in order to list and add widgets on customizer mode:
+				$designer_mode_data['data-subcontainer-name'] = $sub_WidgetContainer->get( 'name' );
+				$designer_mode_data['data-subcontainer-code'] = $this->get_param( 'container' );
+			}
 			// Set data to know current user has a permission to edit this widget:
 			$designer_mode_data['data-can-edit'] = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;
 			// Don't load a widget content from cache when designer mode is enabled:
@@ -1612,6 +1618,13 @@ class ComponentWidget extends DataObject
 	 */
 	function display_error_message( $message = NULL )
 	{
+		global $current_User, $Blog;
+
+		if( isset( $this->BlockCache ) )
+		{	// Do NOT cache because this widget has an error which is dispalyed only for collection admin:
+			$this->BlockCache->abort_collect();
+		}
+
 		if( $message === NULL )
 		{
 			$message = 'Unable to display widget '.$this->get_name();
@@ -1620,7 +1633,10 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-		echo '<span class="evo_param_error">'.$message.'</span>';
+		if( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		{	// Display error only for collection admin:
+			echo '<span class="evo_param_error">'.$message.'</span>';
+		}
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 	}

@@ -23,7 +23,7 @@ class star_plugin extends Plugin
 	var $code = 'b2evStar';
 	var $name = 'Star renderer';
 	var $priority = 55;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -105,7 +105,7 @@ class star_plugin extends Plugin
 	 */
 	function render_stars( $content )
 	{
-		return replace_content_outcode( '#\[stars:([\d\.]+)(/\d+)?\]#', array( $this, 'get_stars_template' ), $content, 'replace_content_callback' );
+		return replace_outside_code_tags( '#\[stars:([\d\.]+)(/\d+)?\]#', array( $this, 'get_stars_template' ), $content, 'replace_content_callback' );
 	}
 
 

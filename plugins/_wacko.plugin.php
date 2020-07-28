@@ -22,7 +22,7 @@ class wacko_plugin extends Plugin
 	var $code = 'b2evWcko';
 	var $name = 'Wacko formatting';
 	var $priority = 30;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -90,7 +90,7 @@ class wacko_plugin extends Plugin
 				'$1<h2>$2</h2>',
 				'<hr />',
 			);
-		$content = replace_content_outcode_shorttags( $search, $replace, $content );
+		$content = replace_outside_code_and_short_tags( $search, $replace, $content );
 
 		// Find bullet lists
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )

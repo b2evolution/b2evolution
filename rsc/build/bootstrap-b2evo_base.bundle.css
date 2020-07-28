@@ -3266,7 +3266,7 @@ td#next {
   text-align: right;
 }
 div.powered_by {
-  margin: 16px 0;
+  margin: 16px 0 0 0;
   text-align: center;
 }
 div.error_404,
@@ -3716,6 +3716,12 @@ div.results .status_meta span {
 }
 .search_title a {
   text-decoration: underline;
+}
+.search_title .label a {
+  color: #FFF;
+}
+.search_title .label a:hover {
+  color: #abc6e0;
 }
 .search_result {
   padding: 15px 15px 5px;

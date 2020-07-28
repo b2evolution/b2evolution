@@ -10,18 +10,20 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( 'skins/model/_site_skin.class.php', 'site_Skin' );
+
 /**
  * Specific code for this skin.
  *
  * ATTENTION: if you make a new skin you have to change the class name below accordingly
  */
-class bootstrap_site_tabs_Skin extends Skin
+class bootstrap_site_tabs_Skin extends site_Skin
 {
 	/**
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -86,10 +88,6 @@ class bootstrap_site_tabs_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		// Set params for setting "Collection for Info Pages":
-		$BlogCache = & get_BlogCache();
-		$BlogCache->none_option_text = T_('Same as "Default collection to display"');
-
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -114,25 +112,12 @@ class bootstrap_site_tabs_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Header')
 				),
-					'grouping' => array(
-						'label' => T_('Grouping'),
-						'note' => T_('Check to group collections into tabs / sub tabs'),
-						'type' => 'checkbox',
-						'defaultvalue' => 1,
-					),
-					'info_coll_ID' => array(
-						'label' => T_('Collection for Info Pages'),
-						'type' => 'select_blog',
-						'allow_none' => true,
-						'defaultvalue' => 0,
-					),
-					'fixed_header' => array(
-						'label' => T_('Fixed position'),
-						'note' => T_('Check to fix header top on scroll down'),
-						'type' => 'checkbox',
-						'defaultvalue' => 1,
-					),
+			),
 
+					// Generic header params:
+					$this->get_site_header_param_definitions(),
+
+			array(
 					'section_topmenu_start' => array(
 						'layout' => 'begin_fieldset',
 						'label'  => T_('Top menu settings')
@@ -419,185 +404,6 @@ body {
 		}
 
 		add_css_headline( $css );
-	}
-
-
-	/**
-	 * Get header tabs
-	 *
-	 * @return array
-	 */
-	function get_header_tabs()
-	{
-		global $Blog, $disp, $current_User;
-
-		$header_tabs = array();
-
-		// Get disp from request string if it is not initialized yet:
-		$current_disp = isset( $_GET['disp'] ) ? $_GET['disp'] : ( isset( $disp ) ? $disp : NULL );
-
-		// Get current collection ID:
-		$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
-
-		// Load all sections except of "No Section" because collections of this section are displayed as separate tabs at the end:
-		$SectionCache = & get_SectionCache();
-		$SectionCache->clear();
-		$SectionCache->load_where( 'sec_ID != 1' );
-
-		$this->header_tab_active = NULL;
-		$level0_index = 0;
-		foreach( $SectionCache->cache as $Section )
-		{
-			$tab_items = array();
-			$group_blogs = $Section->get_blogs();
-
-			$level0_is_active = false;
-
-			// Check each collection if it can be viewed by current user:
-			foreach( $group_blogs as $i => $group_Blog )
-			{
-				$coll_is_active = false;
-				if( $current_blog_ID == $group_Blog->ID &&
-						( $this->get_info_coll_ID() != $current_blog_ID || ( $current_disp != 'page' && $current_disp != 'msgform' ) ) )
-				{	// Mark this menu as active:
-					$coll_is_active = true;
-				}
-
-				$coll_data = array(
-						'name'   => $group_Blog->get( 'name' ),
-						'url'    => $group_Blog->get( 'url' ),
-						'active' => ( $current_blog_ID == $group_Blog->ID )
-					);
-
-				// Get value of collection setting "Show in front-office list":
-				$in_bloglist = $group_Blog->get( 'in_bloglist' );
-
-				if( $in_bloglist == 'public' )
-				{	// Everyone can view this collection, Keep this in menu:
-					$tab_items[] = $coll_data;
-					if( $coll_is_active )
-					{
-						$this->header_tab_active = $level0_index;
-					}
-					continue;
-				}
-
-				if( $in_bloglist == 'never' )
-				{	// Nobody can view this collection, Skip it:
-					continue;
-				}
-
-				if( ! is_logged_in() )
-				{	// Only logged in users have an access to this collection, Skip it:
-					continue;
-				}
-
-				if( $in_bloglist == 'member' &&
-						! $current_User->check_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
-				{	// Only members have an access to this collection, Skip it:
-					continue;
-				}
-
-				$tab_items[] = $coll_data;
-				if( $coll_is_active )
-				{
-					$this->header_tab_active = $level0_index;
-				}
-			}
-
-			if( ! empty( $tab_items ) )
-			{	// Display section only if at least one collection is allowed for current display:
-				$header_tabs[] = array(
-						'name'  => $Section->get_name(),
-						'url'   => $tab_items[0]['url'],
-						'items' => $tab_items
-					);
-
-				$level0_index++;
-			}
-		}
-
-		// Load all collection from "No Section" and put them after all section tabs:
-		$BlogCache = & get_BlogCache();
-		$BlogCache->clear();
-		$public_colls_SQL = $BlogCache->get_public_colls_SQL();
-		$public_colls_SQL->WHERE_and( 'blog_sec_ID = 1' );
-		$BlogCache->load_by_sql( $public_colls_SQL );
-
-		foreach( $BlogCache->cache as $nosec_Blog )
-		{
-			$header_tabs[] = array(
-					'name' => $nosec_Blog->get( 'shortname' ),
-					'url'  => $nosec_Blog->get( 'url' ),
-				);
-
-			if( $current_blog_ID == $nosec_Blog->ID )
-			{	// Mark this tab as active if this is a current collection:
-				$this->header_tab_active = $level0_index;
-			}
-
-			$level0_index++;
-		}
-
-		// Additional tab with pages and contact links:
-		if( isset( $Blog ) )
-		{
-			$tab_items = array( 'pages' );
-
-			if( $current_disp == 'msgform' )
-			{	// Mark this menu as active:
-				$this->header_tab_active = $level0_index;
-			}
-
-			if( $current_disp == 'page' && $this->get_info_coll_ID() == $Blog->ID )
-			{	// If this menu contains the links to pages of the info/shared collection:
-				$this->header_tab_active = $level0_index;
-			}
-
-			if( $contact_url = $Blog->get_contact_url() )
-			{	// If contact page is allowed for current collection:
-				$tab_item = array(
-						'name'   => T_('Contact'),
-						'url'    => $contact_url,
-						'active' => ( $current_disp == 'msgform' )
-					);
-				if( $Blog->get_setting( 'msgform_nofollowto' ) )
-				{	// Use nofollow attribute:
-					$tab_item['rel'] = 'nofollow';
-				}
-				$tab_items[] = $tab_item;
-			}
-
-			if( ! empty( $contact_url ) )
-			{	// Display additional tabs with static pages only user has an access to contact page:
-				$header_tabs[] = array(
-						'name'   => T_('About'),
-						'url'    => $contact_url,
-						'items'  => $tab_items
-					);
-			}
-		}
-
-		return $header_tabs;
-	}
-
-
-	/**
-	 * Get ID of collection for Info Pages
-	 *
-	 * @return integer ID
-	 */
-	function get_info_coll_ID()
-	{
-		$info_coll_ID = $this->get_setting( 'info_coll_ID' );
-
-		if( empty( $info_coll_ID ) )
-		{	// Use same collection as "Default collection to display":
-			global $Settings;
-			return $Settings->get( 'default_blog_ID' );
-		}
-
-		return $info_coll_ID;
 	}
 }
 ?>

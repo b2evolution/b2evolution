@@ -12597,6 +12597,65 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16011, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for Search Results...' ) )
+	{	// part of 7.1.5-stable
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16012, 'Updating site skins...' ) )
+	{	// part of 7.1.5-stable
+		$SQL = new SQL( 'Get site skins for update "Grouping" setting' );
+		$SQL->SELECT( 'skin_id.set_value AS skin_ID, set_grouping.set_value AS setting_grouping, set_menu_type.set_value AS setting_menu_type' );
+		$SQL->FROM( 'T_settings AS skin_id' );
+		$SQL->FROM_add( 'INNER JOIN T_skins__skin ON skin_ID = skin_id.set_value' );
+		$SQL->FROM_add( 'LEFT JOIN T_settings AS set_grouping ON set_grouping.set_name = CONCAT( "skin", skin_ID, "_grouping" )' );
+		$SQL->FROM_add( 'LEFT JOIN T_settings AS set_menu_type ON set_menu_type.set_name = CONCAT( "skin", skin_ID, "_menu_type" )' );
+		$SQL->WHERE( 'skin_id.set_name LIKE "%_skin_ID"' );
+		$SQL->WHERE_and( 'skin_class IN( "bootstrap_site_dropdown_Skin", "bootstrap_site_navbar_Skin", "bootstrap_site_tabs_Skin" )' );
+		$site_skins = $DB->get_results( $SQL );
+		foreach( $site_skins as $site_skin )
+		{
+			if( $site_skin->setting_grouping !== NULL )
+			{	// Remove old setting "Grouping":
+				$DB->query( 'DELETE FROM T_settings
+					WHERE set_name = '.$DB->quote( 'skin'.$site_skin->skin_ID.'_grouping' ) );
+			}
+
+			if( $site_skin->setting_menu_type !== NULL )
+			{	// Don't update if "Menu type" was saved in DB:
+				continue;
+			}
+
+			if( $site_skin->setting_grouping === NUll || $site_skin->setting_grouping == 1 )
+			{	// Set value in DB only for option "Automatic - Grouped collection list",
+				// because "Automatic - Collection list" is used by default:
+				$DB->query( 'INSERT INTO T_settings ( set_name, set_value )
+					VALUES ( '.$DB->quote( 'skin'.$site_skin->skin_ID.'_menu_type' ).', "auto_grouped" )' );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16013, 'Upgrading columns to utf8mb4_bin...' ) )
+	{	// part of 7.1.5-stable
+		// Remove keyphrases with length > 250 chars before reducing column size in order to avoid duplicate entry errors:
+		$DB->query( 'DELETE FROM T_track__keyphrase
+			WHERE LENGTH( keyp_phrase ) > 250' );
+		$DB->query( 'UPDATE T_hitlog
+			  SET hit_keyphrase = NULL
+			WHERE LENGTH( hit_keyphrase ) > 250' );
+		// Drop unique key before changing column to utf8mb4(4bytes) from utf8(3bytes),
+		// because max size for unique key is 1000 bytes(4bytes * 250chars):
+		db_drop_index( 'T_track__keyphrase', 'keyp_phrase' );
+		db_modify_col( 'T_track__keyphrase', 'keyp_phrase', 'VARCHAR( 250 ) COLLATE utf8mb4_bin NOT NULL' );
+		db_add_index( 'T_track__keyphrase', 'keyp_phrase', 'keyp_phrase', 'UNIQUE' );
+		db_modify_col( 'T_hitlog', 'hit_keyphrase', 'VARCHAR(250) COLLATE utf8mb4_bin DEFAULT NULL' );
+		// Modify these columns in order to avoid errors when 4bytes char is in search string:
+		db_modify_col( 'T_items__tag', 'tag_name', 'VARCHAR(50) COLLATE utf8mb4_bin NOT NULL' );
+		db_modify_col( 'T_files', 'file_path', 'varchar(767) COLLATE utf8mb4_bin not null default ""' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

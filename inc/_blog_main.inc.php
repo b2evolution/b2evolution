@@ -712,6 +712,7 @@ elseif( $disp == '-' && !empty($Item) )
 }
 elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'front_disp' ) ) )
 {	// No specific request of any kind OR
+	$requested_disp = $disp;
 	// We consider this is home front page:
 	$disp = $Blog->get_setting( 'front_disp' );
 	// Note: the above is where we MIGHT in fact set $disp = 'front';
@@ -728,7 +729,9 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 		$current_url = preg_replace( '#[\?&]((coll_locale=[^&]+|disp='.preg_quote( $disp ).')(&|$))+#', '', $ReqURL );
 		if( ! is_same_url( $current_url, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonical blog url:
-			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+			if( $Blog->get_setting( 'canonical_homepage' ) &&
+			    $redir == 'yes' &&
+			    $requested_disp != 'front' ) // Do NOT redirect when current requested URL is like ?disp=front
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}

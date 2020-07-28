@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -344,9 +344,6 @@ class tinymce_plugin extends Plugin
 	{
 		global $wysiwyg_toggle_switch_js_initialized;
 
-		// Initialize JavaScript to build and open window, used in insert inline modals:
-		echo_modalwindow_js();
-
 		if( empty( $params['content_id'] ) )
 		{	// Value of html attribute "id" of textarea where tinymce is applied
 			// Don't allow empty id:
@@ -502,54 +499,8 @@ class tinymce_plugin extends Plugin
 				return false;
 		}
 
-		if( empty( $wysiwyg_toggle_switch_js_initialized ) )
-		{
-		?>
-			<script>
-			function toggle_switch_warning( state )
-			{
-				var activate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' );?>';
-				var deactivate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' );?>';
-				jQuery.get( ( state ? activate_link : deactivate_link ),
-						function( data )
-						{	// Fire wysiwyg warning state change event
-							jQuery( document ).trigger( 'wysiwyg_warning_changed', [ state ] );
-						} );
-				return false;
-			}
-			</script>
-		<?php
-			$wysiwyg_toggle_switch_js_initialized = true;
-		}
-
 		switch( $params['edit_layout'] )
 		{
-			case 'expert_quicksettings':
-				$params = array_merge( array(
-						'quicksetting_item_id' => 'quicksetting_wysiwyg_switch',
-						'quicksetting_item_start' => '<span id="%quicksetting_id%">',
-						'quicksetting_item_end' => '</span>'
-					), $params );
-
-				$params['quicksetting_item_start'] = str_replace( '%quicksetting_id%', $params['quicksetting_item_id'], $params['quicksetting_item_start'] );
-
-				$deactivate_warning_link = action_icon( '', 'deactivate', '', T_('Show an alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'return toggle_switch_warning( false )' ) );
-				$activate_warning_link = action_icon( '', 'activate', '', T_('Never show alert when switching from markup to WYSIWYG'), 3, 4, array( 'onclick' => 'return toggle_switch_warning( true )' ) );
-
-				echo $params['quicksetting_item_start'];
-				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $deactivate_warning_link : $activate_warning_link;
-				echo $params['quicksetting_item_end'];
-				?>
-				<script>
-					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
-					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-							quicksetting_switch.html( state ? '<?php echo format_to_js( $deactivate_warning_link );?>' : '<?php echo format_to_js( $activate_warning_link ); ?>' );
-						} );
-				</script>
-				<?php
-
-				return true;
-
 			default:
 				// Get init params, depending on edit mode: simple|expert
 				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'], $params['target_type'] );
@@ -563,53 +514,9 @@ class tinymce_plugin extends Plugin
 				</div>
 
 				<script>
-					var displayWarning = <?php echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';?>;
-
-					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-						displayWarning = state;
-					} );
-
-					function confirm_switch()
-					{
-						if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
-						{	// Do not show warning again
-							toggle_switch_warning( false );
-						}
-
-						// switch to WYSIWYG
-						tinymce_plugin_toggleEditor( '<?php echo $params['content_id']; ?>' );
-
-						// close the modal window
-						closeModalWindow();
-
-						return false;
-					}
-
 					jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
 					{
-						if( jQuery( this ).val() == 'WYSIWYG' )
-						{
-							if( displayWarning )
-							{
-								evo_js_lang_close = '<?php echo TS_('Cancel');?>';
-								openModalWindow( '<p><?php echo TS_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?');?></p>'
-									+ '<form>'
-									+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo $wysiwyg_checkbox_label;?>'
-									+ '<input type="submit" name="submit" onclick="return confirm_switch();">'
-									+ '</form>',
-									'500px', '', true,
-									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-									[ '<?php echo TS_('OK');?>', 'btn-primary' ], true );
-							}
-							else
-							{
-								tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-							}
-						}
-						else
-						{
-							tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-						}
+						tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
 					} );
 
 					/**
@@ -917,6 +824,9 @@ class tinymce_plugin extends Plugin
 
 		global $baseurl;
 
+		// Get URL of TinyMCE JS files:
+		$tiny_mce_js_files_url = ( is_admin_page() || empty( $Blog ) ? $rsc_url : $Blog->get_local_rsc_url() ).'js/tiny_mce/';
+
 		$tmce_plugins_array = array(
 			'image',
 			'importcss',
@@ -1089,7 +999,7 @@ class tinymce_plugin extends Plugin
 		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
 		$init_options[] = 'plugins : "'.$tmce_plugins.'"';
 		$init_options[] = 'external_plugins: {
-				"morebreak"    : "'.$rsc_url.'js/tiny_mce/plugins/morebreak/plugin.min.js"
+				"morebreak"    : "'.$tiny_mce_js_files_url.'plugins/morebreak/plugin.min.js"
 			}';
 		$init_options[] = 'morebreak_separator : "[teaserbreak]"';
 		$init_options[] = 'pagebreak_separator : "[pagebreak]"';
@@ -1117,7 +1027,7 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'block_formats : "Paragraph=p;Preformatted=pre;Block Quote=blockquote;Heading 2=h2;Heading 3=h3;Heading 4=h4;Heading 5=h5;Heading 6=h6;Address=address;Definition Term=dt;Definition Description=dd;DIV=div"';
 		$init_options[] = 'resize : true';
 		$init_options[] = 'language : "'.$tmce_language.'"';
-		$init_options[] = 'language_url : "'.$rsc_url.'js/tiny_mce/langs/'.$tmce_language.'.js"';
+		$init_options[] = 'language_url : "'.$tiny_mce_js_files_url.'langs/'.$tmce_language.'.js"';
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
 			$init_options[] = 'spellchecker_rpc_url: \'spellchecker.php\'';
@@ -1425,10 +1335,15 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_convert_content_to_wysiwyg( $params )
 	{
-		global $Plugins, $Session;
+		global $Plugins, $Session, $debug, $debug_jslog;
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'tinymce' );
+
+		// Do not append debug logs to response because
+		// here we expect only converted content in WYISWYG edit form:
+		$debug = false;
+		$debug_jslog = false;
 
 		$content = param( 'content', 'raw' );
 
