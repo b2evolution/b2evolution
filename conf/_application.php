@@ -15,13 +15,13 @@ $app_shortname = 'b2evo';
  * Note: This has to be compatible with {@link http://us2.php.net/en/version-compare}.
  * @global string
  */
-$app_version = '7.1.5-stable';
+$app_version = '7.1.6-stable';
 
 /**
  * Release date (ISO)
  * @global string
  */
-$app_date = '2020-07-27';
+$app_date = '2020-07-29';
 
 /**
  * Is this b2evolution PRO?

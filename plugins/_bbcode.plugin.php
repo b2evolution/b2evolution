@@ -22,7 +22,7 @@ class bbcode_plugin extends custom_tags_plugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 50;
-	var $version = '7.1.5';
+	var $version = '7.1.6';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
