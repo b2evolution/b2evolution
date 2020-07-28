@@ -76,6 +76,16 @@ $Results->filter_area = array(
 
 $Results->register_filter_preset( 'all', T_('All'), '?ctrl=templates' );
 
+$contexts = get_template_contexts();
+foreach( $contexts as $context )
+{
+	if( strpos( $context, 'custom' ) === 0 )
+	{	// Do not include custom contexts:
+		continue;
+	}
+	$Results->register_filter_preset( $context, $context, '?ctrl=templates&amp;context='.$context );
+}
+
 $Results->cols[] = array(
 		'th' => T_('Context'),
 		'td' => '$tpl_context$',
