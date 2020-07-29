@@ -12595,11 +12595,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16011, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for Search Results...' ) )
-	{	// part of 7.1.5-stable
-		upg_task_end();
-	}
-
 	if( upg_task_start( 16012, 'Updating site skins...' ) )
 	{	// part of 7.1.5-stable
 		$SQL = new SQL( 'Get site skins for update "Grouping" setting' );
@@ -12992,11 +12987,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			check_order   INT(11) NOT NULL DEFAULT 1,
 			PRIMARY KEY (check_ID),
 			KEY check_item_ID (check_item_ID)' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 16120, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for About Author...' ) )
-	{	// part of 7.2.0-beta
 		upg_task_end();
 	}
 
