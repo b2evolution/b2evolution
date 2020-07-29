@@ -76,19 +76,20 @@ $Results->filter_area = array(
 
 $Results->register_filter_preset( 'all', T_('All'), '?ctrl=templates' );
 
-$contexts = get_template_contexts();
-foreach( $contexts as $context )
+$contexts = get_template_contexts( 'raw', array( 'custom1', 'custom2', 'custom3' ) );
+foreach( $contexts as $context => $context_description )
 {
-	if( strpos( $context, 'custom' ) === 0 )
-	{	// Do not include custom contexts:
-		continue;
-	}
-	$Results->register_filter_preset( $context, $context, '?ctrl=templates&amp;context='.$context );
+	$Results->register_filter_preset( $context, $context_description, '?ctrl=templates&amp;context='.$context );
 }
 
+function td_template_context( $context )
+{
+	$contexts = get_template_contexts( 'raw' );
+	return $contexts[$context];
+}
 $Results->cols[] = array(
 		'th' => T_('Context'),
-		'td' => '$tpl_context$',
+		'td' => '%td_template_context( #tpl_context# )%',
 		'order' => 'tpl_context, tpl_base_name, tpl_name, tpl_locale, tpl_code',
 	);
 

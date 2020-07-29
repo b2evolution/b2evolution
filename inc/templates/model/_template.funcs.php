@@ -1317,13 +1317,40 @@ function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', 
 /**
  * Get list of context available to templates
  */
-function get_template_contexts()
+function get_template_contexts( $format = 'keys', $exclude = array() )
 {
-	return array(
-		'custom1', 'custom2', 'custom3',
-		'content_list_master', 'content_list_item', 'content_list_category',
-		'content_block', 'item_details', 'item_content',
-		'registration_master', 'registration',
-		'search_form', 'search_result' );
+	$template_contexts = array(
+			'custom1'               => sprintf( T_('Custom %d'), 1 ),
+			'custom2'               => sprintf( T_('Custom %d'), 2 ),
+			'custom3'               => sprintf( T_('Custom %d'), 3 ),
+			'content_list_master'   => T_('Content List Master'),
+			'content_list_item'     => T_('Content List Item'),
+			'content_list_category' => T_('Content List Category'),
+			'content_block'         => T_('Content Block'),
+			'item_details'          => T_('Item Details'),
+			'item_content'          => T_('Item Content'),
+			'registration_master'   => T_('Registration Master'),
+			'registration'          => T_('Registration'),
+			'search_form'           => T_('Search Form'),
+			'search_result'         => T_('Search Result')
+		);
+
+	if( !empty( $exclude ) )
+	{
+		$template_contexts = array_diff_key( $template_contexts, array_fill_keys( $exclude, NULL ) );
+	}
+
+	switch( $format )
+	{
+		case 'keys':
+			$template_contexts = array_keys( $template_contexts );
+			break;
+
+		case 'raw':
+		default:
+			// Do nothing
+	}
+
+	return $template_contexts;
 }
 ?>
