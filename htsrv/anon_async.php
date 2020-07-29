@@ -1725,9 +1725,9 @@ switch( $action )
 				else
 				{	// Return errors:
 					$Messages->set_params( array( 'before_group_item' => ' ' ) );
-					echo utf8_strip_tags( $Messages->display( NULL, NULL, false ) );
 					header_http_response( '400 Bad Request' );
-					break;
+					echo utf8_strip_tags( $Messages->display( NULL, NULL, false ) );
+					break;;
 				}
 				// Return new value:
 				echo $Item->get_custom_field_formatted( $field );
