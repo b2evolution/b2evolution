@@ -3707,12 +3707,14 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$edited_Blog->dbupdate();
 		}
 
-		// Exclude demo items which must not be installed:
-		foreach( $exclude_demo_items as $exclude_demo_item_key )
-		{
-			if( isset( $demo_items[ $exclude_demo_item_key ] ) )
+		if( isset( $exclude_demo_items ) )
+		{	// Exclude demo items which must not be installed:
+			foreach( $exclude_demo_items as $exclude_demo_item_key )
 			{
-				unset( $demo_items[ $exclude_demo_item_key ] );
+				if( isset( $demo_items[ $exclude_demo_item_key ] ) )
+				{
+					unset( $demo_items[ $exclude_demo_item_key ] );
+				}
 			}
 		}
 
