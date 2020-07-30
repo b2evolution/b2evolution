@@ -58,7 +58,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, TB_('Code'), '', array( 'maxlength' => 128 ) );
 
 	// Context:
-	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts(), TB_('Context') );
+	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts( 'raw' ), TB_('Context') );
 
 	// Owner:
 	$GroupCache = & get_GroupCache();

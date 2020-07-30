@@ -61,7 +61,7 @@ function filter_templates_list( & $Form )
 	$Form->text_input( 'q', get_param( 'q' ), 20, T_('Name / Code'), '', array( 'maxlength' => 50 ) );
 
 	// Context:
-	$field_options = array( NULL => T_('All contexts') ) + get_template_contexts();
+	$field_options = array( NULL => T_('All contexts') ) + get_template_contexts( 'raw' );
 	$Form->select_input_array( 'context', get_param( 'context' ), $field_options, T_('Context'), '', array( 'force_keys_as_values' => false ) );
 
 	// Owner:
