@@ -420,6 +420,16 @@ class Module
 	function display_backoffice_UI( $params = array() )
 	{
 	}
+
+
+	/**
+	 * Install additional basic plugins
+	 *
+	 * @param array 'old_db_version' - Old DB version to know when plugin can be installed
+	 */
+	function install_basic_plugins( $params )
+	{
+	}
 }
 
 ?>

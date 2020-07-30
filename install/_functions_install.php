@@ -847,6 +847,9 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'content_blocks_plugin' );
 	}
+
+	// Install additional plugins by modules:
+	modules_call_method( 'install_basic_plugins', array( 'old_db_version' => $old_db_version ) );
 }
 
 
