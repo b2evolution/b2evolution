@@ -21,7 +21,7 @@ class table_contents_plugin extends Plugin
 	var $name;
 	var $code = 'b2evoTOC';
 	var $priority = 110;
-	var $version = '7.2.1';
+	var $version = '7.3.0';
 	var $group = 'rendering';
 	var $subgroup = 'infoitem';
 	var $short_desc;
