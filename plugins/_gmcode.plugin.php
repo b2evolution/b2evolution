@@ -30,7 +30,7 @@ class gmcode_plugin extends custom_tags_plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.1.6';
+	var $version = '7.1.7';
 	var $number_of_installs = 1;
 
 	var $toolbar_label = 'GM code:';
