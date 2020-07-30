@@ -23,7 +23,7 @@ class bootstrap_site_tabs_Skin extends site_Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.2.0';
+	var $version = '7.2.1';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
