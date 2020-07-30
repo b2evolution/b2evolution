@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -152,7 +152,8 @@ function load_image( $path, $mimetype )
 	{
 		$FiletypeCache = get_Cache('FiletypeCache');
 		$correct_Filetype = $FiletypeCache->get_by_mimetype($image_info['mime']);
-		$correct_extension = array_shift($correct_Filetype->get_extensions());
+		$extensions = $correct_Filetype->get_extensions();
+		$correct_extension = array_shift( $extensions );
 
 		$path_info = pathinfo($path);
 		$wrong_extension = $path_info['extension'];
@@ -182,17 +183,20 @@ function load_image( $path, $mimetype )
 		// fp> Note: sometimes this GD call will die and there is no real way to recover :/
 		load_funcs( 'tools/model/_system.funcs.php' );
 		$memory_limit = system_check_memory_limit();
-		$curr_mem_usage = memory_get_usage( true );
-		// Calculate the aproximative memory size which would be required to create the image resource
-		$tweakfactor = 1.8; // Or whatever works for you
-		$memory_needed = round( ( $image_info[0] * $image_info[1]
-				* ( isset( $image_info['bits'] ) ? $image_info['bits'] : 4 )
-				* ( isset( $image_info['channels'] ) ? $image_info['channels'] / 8 : 1 )
-				+ Pow( 2, 16 ) // number of bytes in 64K
-			) * $tweakfactor );
-		if( ( $memory_limit - $curr_mem_usage ) < $memory_needed )// ( 4 * $image_info[0] * $image_info[1] ) )
-		{ // Don't try to load the image into the memory because it would cause 'Allowed memory size exhausted' error
-			return array( "!Cannot resize too large image", false );
+		if( $memory_limit != -1 )
+		{	// If memory is limited:
+			$curr_mem_usage = memory_get_usage( true );
+			// Calculate the aproximative memory size which would be required to create the image resource
+			$tweakfactor = 1.8; // Or whatever works for you
+			$memory_needed = round( ( $image_info[0] * $image_info[1]
+					* ( isset( $image_info['bits'] ) ? $image_info['bits'] : 4 )
+					* ( isset( $image_info['channels'] ) ? $image_info['channels'] / 8 : 1 )
+					+ Pow( 2, 16 ) // number of bytes in 64K
+				) * $tweakfactor );
+			if( ( $memory_limit - $curr_mem_usage ) < $memory_needed )// ( 4 * $image_info[0] * $image_info[1] ) )
+			{ // Don't try to load the image into the memory because it would cause 'Allowed memory size exhausted' error
+				return array( "!Cannot resize too large image", false );
+			}
 		}
 		$imh = $function( $path );
 	}
@@ -206,6 +210,13 @@ function load_image( $path, $mimetype )
 	if( $err )
 	{
 		error_log( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')' );
+	}
+
+	// By default GD uses alpha blending; this means that any transparent pixels in the PNG files will be blended with whatever color is behind it.
+	// In the case of a transparent PNG it will use the default color (usually black). We need to switch off alpha blending.
+	if( $mimetype == 'image/png' )
+	{
+		imagealphablending($imh, false);
 	}
 
 	return array( $err, $imh );
@@ -241,6 +252,8 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			break;
 
 		case 'image/png':
+			// By default GD  will not save the alpha channel for transparent PNG, we need to set the alpha flag
+			imagesavealpha($imh, true);
 			$r = @imagepng( $imh, $path );
 			break;
 
@@ -339,8 +352,8 @@ function check_thumbnail_sizes( $thumb_type, & $thumb_width, & $thumb_height, $s
 		return true;
 	}
 
-	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
-	{ // If original image sizes are less than thumbnail sizes
+	if( $src_width <= $thumb_width || $src_height <= $thumb_height )
+	{ // If at least one of original image sizes(width or height) is less than thumbnail size
 		if( $thumb_type == 'fit' )
 		{ // There is no need to resample, use original!
 			return true;
@@ -505,6 +518,67 @@ function rotate_image( $File, $degrees )
 	// Rotate image
 	if( ! $imh = @imagerotate( $imh, (int)$degrees, 0 ) )
 	{	// If func imagerorate is not defined for example:
+		return false;
+	}
+
+	// Save image:
+	$save_image_err = save_image( $imh, $File->get_full_path(), $Filetype->mimetype );
+	if( $save_image_err !== NULL )
+	{	// Some error has been detected on save image:
+		syslog_insert( substr( $save_image_err, 1 ), 'error', 'file', $File->ID );
+		return false;
+	}
+
+	// Remove the old thumbnails
+	$File->rm_cache();
+
+	return true;
+}
+
+
+/**
+ * Flip image
+ *
+ * @param object File
+ * @param string mode
+ * @return boolean TRUE if flip operation is successful
+ */
+function flip_image( $File, $mode )
+{
+	$Filetype = & $File->get_Filetype();
+	if( !$Filetype )
+	{	// Error
+		return false;
+	}
+
+	// Load image
+	list( $err, $imh ) = load_image( $File->get_full_path(), $Filetype->mimetype );
+	if( !empty( $err ) )
+	{	// Error
+		return false;
+	}
+
+	switch( $mode )
+	{
+		case 'horizontal':
+			$mode = '1'; // IMG_FLIP_HORIZONTAL
+			break;
+
+		case 'vertical':
+			$mode = '2'; // IMG_FLIP_VERTICAL
+			break;
+
+		case 'both':
+			$mode = '3'; // IMG_FLIP_BOTH
+			break;
+
+		default:
+			debug_die( 'Invalid flip mode' );
+	}
+
+	// Rotate image
+	if( ! imageflip( $imh, $mode ) )
+	{	// If func imageflip is not defined for example:
 		return false;
 	}
 
@@ -731,6 +805,64 @@ if( !function_exists( 'imagerotate' ) )
 
 
 /**
+ * Provide imageflip for undefined cases
+ *
+ * Flip an image depending of mode
+ * @param resource Image: An image resource, returned by one of the image creation functions, such as imagecreatetruecolor().
+ * @param string Modde: 1 - horizontal flip, 2 - vertical flip, 3 - both
+ * @return resource Returns an image resource for the flipped image, or FALSE on failure.
+ */
+if( !function_exists( 'imageflip') )
+{
+	function imageflip( &$imgsrc, $mode )
+	{
+
+		$width = imagesx( $imgsrc );
+		$height = imagesy( $imgsrc );
+
+		$src_x = 0;
+		$src_y = 0;
+		$src_width = $width;
+		$src_height = $height;
+
+		switch ( $mode )
+		{
+			case '1': //horizontal
+				$src_x = $width;
+				$src_width = -$width;
+			break;
+
+			case '2': //vertical
+				$src_y = $height;
+				$src_height = -$height;
+			break;
+
+			case '3': //both
+				$src_x = $width;
+				$src_y = $height;
+				$src_width = -$width;
+				$src_height = -$height;
+			break;
+
+			default:
+				return false;
+		}
+
+		$imgdest = imagecreatetruecolor( $width, $height );
+		imagealphablending($imgdest, false);
+		imagesavealpha( $imgdest, true );
+
+		if( imagecopyresampled( $imgdest, $imgsrc, 0, 0, $src_x, $src_y , $width, $height, $src_width, $src_height ) )
+		{
+			$imgsrc = $imgdest;
+			return true;
+		}
+
+		return false;
+	}
+}
+
+/**
  * Scale image to dimensions specified.
  * The scaling only happens if the source is larger than the constraint.
  *
@@ -804,4 +936,52 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 	}
 }
 
+
+/**
+ * Output a black error thumbnail
+ *
+ * @param string Error message to display in the thumbnail
+ * @param integer Thumbnail width
+ * @param integer Thumbnail height
+ */
+function output_error_thumb( $err = '!error', $thumb_width = 80, $thumb_height = 80 )
+{
+	// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+	$line_height = 11;
+	$err = substr( $err, 1 ); // crop 1st car
+	$car_width = ceil( ($thumb_width-4)/6 );
+	// $err = 'w='.$car_width.' '.$err;
+
+	// Wrap error message and split it into lines:
+	$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
+	$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+	if( count($err_lines)*$line_height > $thumb_height )
+	{ // Message does not fit into picture:
+		// Rewrite error messages, so they fit better into the generated images.
+		$rewritten = true;
+		if( preg_match('~Unable to open \'.*?\' for writing: Permission denied~', $err) )
+			$err = 'Cannot write: permission denied';
+		else
+			$rewritten = false;
+		// Recreate error lines, if it has been rewritten/shortened.
+		if( $rewritten )
+		{
+			$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
+		}
+	}
+
+	$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
+	$y = 0;
+	foreach( $err_lines as $err_string )
+	{
+		imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
+		$y += $line_height;
+	}
+
+	header('Content-type: image/png' );
+	header_nocache();	// Do NOT cache errors! People won't see they have fixed them!!
+
+	imagepng( $im_handle );
+	imagedestroy( $im_handle );
+}
 ?>

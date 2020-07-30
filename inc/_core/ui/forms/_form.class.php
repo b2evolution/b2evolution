@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004 by PROGIDISTRI - {@link http://progidistri.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -22,7 +22,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
@@ -59,8 +58,9 @@ class Form extends Widget
 	 *
 	 * - 'note': The note associated with the field.
 	 * - 'note_format': The format of the note. %s gets replaced by the note.
+	 * - 'bottom_note_format': The format of the note. %s gets replaced by the note.
 	 * - 'label': The label for the field.
-	 * - 'required': is the element required to be filled/checked? This will add a visual hint (boolean; default: false)
+	 * - 'required': set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 *
 	 * @see handle_common_params()
 	 * @var array
@@ -73,11 +73,6 @@ class Form extends Widget
 	 * @var string
 	 */
 	var $hiddens = array();
-
-	/**
-	 * Do we need to add javascript for check/uncheck all functionality
-	 */
-	var $check_all = false;
 
 	/**
 	 * Additional Javascript to append to the form, in {@link Form::end_form()}.
@@ -258,6 +253,7 @@ class Form extends Widget
 					'customstart'    => '<div class="custom_content">',
 					'customend'      => "</div>\n",
 					'note_format'    => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend'        => '</div>',
 				);
 				$layout = 'fieldset';
@@ -310,6 +306,7 @@ class Form extends Widget
 					$this->customstart    = $template['customstart'];
 					$this->customend      = $template['customend'];
 					$this->note_format    = $template['note_format'];
+					$this->bottom_note_format = isset( $template['bottom_note_format'] ) ? $template['bottom_note_format'] : '<br />'.$template['note_format'];
 					$this->formend        = $template['formend'];
 					// Additional params depending on field type:
 					$template = array_merge( array(
@@ -384,6 +381,10 @@ class Form extends Widget
 
 			if( is_array( $template ) && ! empty( $template ) )
 			{ // Template is detected on current skin, Use it
+				if( ! isset( $template['fieldset_title'] ) )
+				{	// Set default fieldset title if old template doesn't define it:
+					$template['fieldset_title'] = '';
+				}
 				foreach( $template as $t_param_name => $t_param_value )
 				{
 					$this->$t_param_name = $t_param_value;
@@ -404,6 +405,7 @@ class Form extends Widget
 																	.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt   = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -421,6 +423,7 @@ class Form extends Widget
 					$this->customstart    = '<tr><td colspan="2" class="custom_content">';
 					$this->customend      = "</td></tr>\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = "</table>\n";
 					// Additional params depending on field type:
 					// - checkbox
@@ -452,6 +455,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -468,6 +472,7 @@ class Form extends Widget
 					$this->customstart    = '<div class="custom_content">';
 					$this->customend      = "</div>\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '</div>';
 					// Additional params depending on field type:
 					// - checkbox
@@ -499,6 +504,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -516,6 +522,7 @@ class Form extends Widget
 					$this->customstart    = '';
 					$this->customend      = "\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format    = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '';
 					// Additional params depending on field type:
 					// - checkbox
@@ -547,6 +554,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_no_icons_fmt = '';
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -564,6 +572,7 @@ class Form extends Widget
 					$this->customstart    = '';
 					$this->customend      = '';
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '';
 					// Additional params depending on field type:
 					// - checkbox
@@ -596,6 +605,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_fmt   = '';          //           "
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -613,6 +623,7 @@ class Form extends Widget
 					$this->customstart    = '';
 					$this->customend      = "\n";
 					$this->note_format    = ' <span class="notes">%s</span>';
+					$this->bottom_note_format = ' <div><span class="notes">%s</span></div>';
 					$this->formend        = '';
 					// Additional params depending on field type:
 					// - checkbox
@@ -666,6 +677,7 @@ class Form extends Widget
 	 *    customstart
 	 *    customend
 	 *    note_format
+	 *    bottom_note_format
 	 *    formend
 	 */
 	function switch_template_parts( $parts )
@@ -743,6 +755,10 @@ class Form extends Widget
 		{ // Use default field start
 			$r = $this->fieldstart;
 		}
+		if( ! empty( $this->_common_params['hide'] ) && $this->_common_params['hide'] )
+		{	// Hidden field
+			$r = preg_replace( '/>$/', ' style="display:none">', $r );
+		}
 
 		if( count( $field_classes ) > 0 )
 		{
@@ -806,6 +822,11 @@ class Form extends Widget
 				$this->_common_params['note_format'] = str_replace( 'class="', 'class="oneline ', $this->_common_params['note_format'] );
 			}
 			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( !empty($this->_common_params['bottom_note'] ) )
+		{
+			$r .= sprintf( $this->_common_params['bottom_note_format'], $this->_common_params['bottom_note'] );
 		}
 
 		if( isset($this->_common_params['field_suffix']) )
@@ -890,6 +911,56 @@ class Form extends Widget
 		return $this->display_or_return( $r );
 	}
 
+	/**
+	 * Open a tab-pane block
+	 * @param array Optional params.
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function open_tab_pane( $tab_pane_params = array() )
+	{
+		$tab_pane_params = array_merge( array(
+				'class'     => 'tab-pane fade',
+			), $tab_pane_params );
+
+		$left_items = '';
+		$right_items = '';
+
+		if( isset( $tab_pane_params['left_items'] ) )
+		{
+			$left_items = $tab_pane_params['left_items'];
+			unset( $tab_pane_params['left_items'] );
+		}
+		if( isset( $tab_pane_params['right_items'] ) )
+		{
+			$right_items = $tab_pane_params['right_items'];
+			unset( $tab_pane_params['right_items'] );
+		}
+
+		$r = str_replace( '$tab_pane_attribs$', get_field_attribs_as_string( $tab_pane_params ), $this->tab_pane_open );
+		$r = str_replace( '$pull_right$', $right_items, $r );
+		$r = str_replace( '$pull_left$', $left_items, $r );
+
+		if( isset($tab_pane_params['id']) )
+		{
+			$r = str_replace( '$id$', $tab_pane_params['id'], $r );
+		}
+
+		$r = str_replace( '$class$', $tab_pane_params['class'], $r );
+
+		return $this->display_or_return( $r );
+	}
+
+	/**
+	 * close a tab-pane block.
+	 *
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function close_tab_pane()
+	{
+		$r = $this->tab_pane_close;
+
+		return $this->display_or_return( $r );
+	}
 
 	/**
 	 * Builds a fieldset tag. This is a "fieldset" element by default, but a "th" element
@@ -906,6 +977,7 @@ class Form extends Widget
 				'class'     => 'fieldset',
 				'fold'      => false, // TRUE to enable folding for this fieldset
 				'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+				'default_fold' => NULL, // Set default "fold" value for current fieldset
 			), $field_params );
 
 		if( $field_params['fold'] )
@@ -916,12 +988,17 @@ class Form extends Widget
 				global $UserSettings, $Collection, $Blog, $ctrl;
 				if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 				{ // Get user setting value
-					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
+					$value = $UserSettings->get( 'fold_'.$field_params['id'] );
 				}
 				else
 				{ // Get user-collection setting
-					$value = intval( $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID ) );
+					$value = $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID );
 				}
+				if( $value === NULL && $field_params['default_fold'] !== NULL )
+				{	// Use custom default value for this fieldset:
+					$value = $field_params['default_fold'];
+				}
+				$value = intval( $value );
 				if( $value === 1 )
 				{
 					$field_params['class'] = trim( $field_params['class'].' folded' );
@@ -937,6 +1014,7 @@ class Form extends Widget
 		}
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
+		unset( $field_params['default_fold'] );
 
 		if( ! empty( $this->fieldset_title ) )
 		{	// Replace text part of fieldset title with provided html code:
@@ -1042,6 +1120,7 @@ class Form extends Widget
 	 *                 - 'class': the CSS class to use for the <input> element
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
 	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
+	 *                 - 'required': set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
@@ -1136,6 +1215,7 @@ class Form extends Widget
 	 *                 - 'type': 'text', 'password' (defaults to 'text')
 	 *                 - 'force_to': 'UpperCase' (JS onchange handler)
 	 *                 - NOTE: any other attributes will be used as is (onchange, onkeyup, id, ..).
+	 *                 - 'required': set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @return true|string true (if output) or the generated HTML if not outputting
 	 */
 	function color_input( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
@@ -1145,11 +1225,14 @@ class Form extends Widget
 				'type'      => 'text',
 				'value'     => $field_value,
 				'note'      => $field_note,
-				'size'      => 7,
-				'maxlength' => 7,
+				'size'      => 18,
+				'maxlength' => 22,
 				'name'      => $field_name,
 				'label'     => $field_label,
 				'class'     => '', // default class 'form_text_input form-control form_color_input'
+				'transparency' => false, // TRUE to allow select transparent color
+				'input_prefix' => '',
+				'input_suffix' => '',
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -1164,6 +1247,16 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control form_color_input';
+
+		if( $field_params['transparency'] )
+		{	// Set class to initialize colorpicker with transparency option:
+			$field_params['class'] .= ' form_color_transparent';
+			unset( $field_params['transparency'] );
+		}
+
+		// Initialize colorpicker wrappers to display a color selector box after color input field:
+		$field_params['input_prefix'] = $field_params['input_prefix'].'<span class="input-group colorpicker-component">';
+		$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>'.$field_params['input_suffix'];
 
 		return $this->input_field( $field_params );
 	}
@@ -1186,6 +1279,26 @@ class Form extends Widget
 	function password_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
 	{
 		$field_params['type'] = 'password';
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
+	}
+
+
+	/**
+	 * Builds an email input field.
+	 *
+	 * Calls the text_input() method with type == 'email'.
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed in front of the field
+	 * @param string Extended attributes, see {@link text_input()}.
+	 * @return mixed true (if output) or the generated HTML if not outputting
+	 */
+	function email_input( $field_name, $field_value, $field_size, $field_label, $field_params = array() )
+	{
+		$field_params['type'] = 'email';
 
 		return $this->text_input( $field_name, $field_value, $field_size, $field_label, '', $field_params );	// TEMP: Note already in params
 	}
@@ -1217,6 +1330,7 @@ class Form extends Widget
 
 		$field_params = array_merge( array(
 				'note_format' => ' <small class="notes">%s</small>',
+				'bottom_note_format' => ' <div><small class="notes">%s</small></div>',
 			), $field_params );
 
 		if( isset($field_params['format_info']) )
@@ -1266,6 +1380,11 @@ class Form extends Widget
 		if( !empty($this->_common_params['note']) )
 		{ // We have a note
 			$r .= sprintf( $this->_common_params['note_format'], $this->_common_params['note'] );
+		}
+
+		if( !empty($this->_common_params['bottom_note']) )
+		{
+			$r .= sprintf( $this->_common_params['bottom_note_format'], $this->_common_params['bottom_note'] );
 		}
 
 		if( isset($this->_common_params['field_suffix']) )
@@ -1330,10 +1449,21 @@ class Form extends Widget
 				'size' => 20,
 				'autocapitalize' => 'off',
 				'autocorrect' => 'off',
-				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated and autoactivated, or custom statuses separated by comma like 'new,activated,autoactivated,closed,deactivated,emailchanged,failedactivation'
+				'status' => 'all', // Restrict users by status, 'all' - get users with all statuses, '' - activated, autoactivated and manually activated, or custom statuses separated by comma like 'new,activated,manualactivated,autoactivated,closed,deactivated,emailchanged,failedactivation'
 			), $field_params );
 
+		// The value of field param 'required' will be replaced by the next call to handle_common_params(), let's store the original value...
+		if( isset( $field_params['required'] ) )
+		{
+			$required_param = $field_params['required'];
+		}
+
 		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		if( isset( $required_param ) )
+		{ // restore original value of field param 'required'
+			$field_params['required'] = $required_param;
+		}
 
 		$r = $this->begin_field();
 
@@ -1654,8 +1784,8 @@ class Form extends Widget
 		{
 			$precision_mn = $matches[1];
 			$precision_s = 0;
-			// convert the precision in sec
-			$precision *= 60;
+			// convert the precision in sec:
+			$precision = $precision_mn * 60;
 		}
 		else
 		{
@@ -1776,14 +1906,18 @@ class Form extends Widget
 
 		$this->handle_common_params( $field_params, $field_prefix, $field_label );
 
-		$periods_values = array( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 50 );
+		$periods_values = array();
+		for( $p = 1; $p <= 60; $p++ )
+		{
+			$periods_values[] = $p;
+		}
 		$periods = array(
-			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1,        'size' => 1 ), // 1 seconds
-			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 50,       'size' => 60 ), // 50 seconds
-			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3000,     'size' => 3600 ), // 50 minutes
-			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 72000,    'size' => 86400 ), // 20 hours
-			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2160000,  'size' => 2592000 ), // 25 days
-			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 25920000, 'size' => 31536000 ), // 10 months
+			array( 'name' => 'second', 'title' => T_('second(s)'), 'seconds' => 1 ), // 1 second
+			array( 'name' => 'minute', 'title' => T_('minute(s)'), 'seconds' => 60 ), // 60 seconds
+			array( 'name' => 'hour',   'title' => T_('hour(s)'),   'seconds' => 3600 ), // 60 minutes
+			array( 'name' => 'day',    'title' => T_('day(s)'),    'seconds' => 86400 ), // 24 hours
+			array( 'name' => 'month',  'title' => T_('month(s)'),  'seconds' => 2592000 ), // 30 days
+			array( 'name' => 'year',   'title' => T_('year(s)'),   'seconds' => 31536000 ), // 365 days
 		);
 
 		$r = $this->begin_field();
@@ -1794,23 +1928,13 @@ class Form extends Widget
 		if( !empty( $duration ) )
 		{
 			$periods_count = count( $periods );
-			for( $p = 0; $p <= $periods_count; $p++ )
+			for( $p = $periods_count - 1; $p >= 0; $p-- )
 			{
-				$period = $periods[ $p < $periods_count ? $p : $periods_count - 1 ];
-				if( ( $p == 0 && $duration <= $period['seconds'] ) ||
-				    ( $p == $periods_count && $duration > $period['seconds'] ) ||
-				    ( $p > 0 && $duration > $periods[ $p - 1 ]['seconds'] && $duration <= $period['seconds'] ) )
+				$period = $periods[ $p ];
+				$duration_value = ( $duration / $period['seconds'] );
+				if( $duration_value >= 1 && ( $duration % $period['seconds'] ) == 0 )
 				{
-					$period = $periods[ $p > 0 ? $p - 1 : 0 ];
-					$duration_value = floor( $duration / $period['size'] );
-					foreach( $periods_values as $v => $value )
-					{
-						if( $duration_value <= $value )
-						{
-							$current_value = $value;
-							break;
-						}
-					}
+					$current_value = $duration_value;
 					$current_period = $period['name'];
 					break;
 				}
@@ -1825,7 +1949,9 @@ class Form extends Widget
 		$field_class = ' class="'.$field_class.'"';
 
 		// Display <select> with periods values
-		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class.'>';
+
+		$r .= "\n".'<select name="'.$field_prefix.'_value" id="'.Form::get_valid_id( $field_prefix ).'_value"'.$field_class
+				.( isset( $field_params['required'] ) && $field_params['required'] == 'required' ? ' required="required"' : '' ).'>';
 		if( $field_params['allow_none_value'] )
 		{	// Allow null value:
 			$r .= '<option value="0"'.( 0 == $current_value ? ' selected="selected"' : '' ).'>'.$field_params['none_value_label'].'</option>'."\n";
@@ -1837,7 +1963,8 @@ class Form extends Widget
 		$r .= '</select>'."\n";
 
 		// Display <select> with periods titles
-		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class.'>';
+		$r .= "\n".'<select name="'.$field_prefix.'_name" id="'.Form::get_valid_id( $field_prefix ).'_name"'.$field_class
+				.( isset( $field_params['required'] ) && $field_params['required'] == 'required' ? ' required="required"' : '' ).'>';
 		if( $field_params['allow_none_title'] )
 		{	// Allow none period name:
 			$r .= '<option value="0"'.( '' == $current_period ? ' selected="selected"' : '' ).'>'.$field_params['none_title_label'].'</option>'."\n";
@@ -1989,7 +2116,7 @@ class Form extends Widget
 	 * @param boolean an optional indicating whether the box is disabled or not
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
+	function checkbox( $field_name, $field_checked, $field_label = '', $field_note = '',
 											$field_class = '', $field_value = 1, $field_disabled = false )
 	{
 		$field_params = array();
@@ -2017,25 +2144,42 @@ class Form extends Widget
 
 	/**
 	 * Return links to check and uncheck all check boxes of the form
+	 * 
+	 * @deprecated use Form::checkbox_controls() instead
 	 */
 	function check_all()
 	{
-		// Need to add event click on links at the form end.
-		$this->check_all = true;
+		return $this->checkbox_controls( '$all$', array( 'button_class' => 'btn btn-default' ) );
+	}
 
-		$r = '<span class="btn-group">';
 
-		// fp> This is "name=" and I mean it!!! The JS is looking for all elements with this name!
-		$r .= '<a name="check_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
-				//.T_('Check all').' '
-				.get_icon( 'check_all', 'imgtag', NULL, true )
-				.'</a> <a name="uncheck_all_nocheckchanges" href="'.regenerate_url().'" class="btn btn-default">'
-				//.T_('Uncheck all').' '
-				.get_icon( 'uncheck_all', 'imgtag', NULL, true ).'</a> '.'&nbsp;';
+	/**
+	 * Control icon/buttons to check/uncheck/reverse all checkboxes by input name
+	 *
+	 * @param string Field name of the checkbox, '$all$' - to control all checkboxes of this Form
+	 * @param array Additional parameters
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function checkbox_controls( $field_name = '$all$', $params = array() )
+	{
+		$params = array_merge( array(
+				'before_buttons' => '<div class="btn-group">',
+				'after_buttons'  => '</div>',
+				'button_class'   => 'btn btn-default btn-xs',
+				'icon_class'     => 'middle',
+			), $params );
 
-		$r .= '</span>';
+		$r = $params['before_buttons'];
 
-		return $r;
+		$button_tag_start = '<button type="button" class="'.format_to_output( $params['button_class'], 'htmlattr' ).'" data-checkbox-control="'.format_to_output( $field_name, 'htmlattr' ).'" data-checkbox-control-type';
+
+		$r .= $button_tag_start.'="check">'.get_icon( 'check_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button> ';
+		$r .= $button_tag_start.'="uncheck">'.get_icon( 'uncheck_all', 'imgtag', array( 'class' => $params['icon_class'] ) ).'</button>';
+		$r .= $button_tag_start.'="reverse">'.T_('Invert').'</button>';
+
+		$r .= $params['after_buttons'];
+
+		return $this->display_or_return( $r );
 	}
 
 
@@ -2155,7 +2299,7 @@ class Form extends Widget
 		if( $this->form_type == 'form' )	// DO not do this for div's
 		{	// Initialization of javascript vars used to create parent_child select lists
 			// fp>yura: TODO: does this make sense to add it to every form??
-			$r .= '<script type="text/javascript">
+			$r .= '<script>
 								var nb_dynamicSelects = 0;
 								var tab_dynamicSelects = Array();
 						</script>';
@@ -2167,7 +2311,7 @@ class Form extends Widget
 			&& preg_match( '#^(.*)_checkchanges#', $this->form_name ) )
 		{ // This form will trigger the bozo validator, preset a localized bozo confirm message:
 
-			$r .= '<script type="text/javascript">
+			$r .= '<script>
 					if( typeof bozo == "object" )
 					{ // If Bozo validator is active:
 						bozo.confirm_mess = \'';
@@ -2259,17 +2403,11 @@ class Form extends Widget
 
 			// When the page loads, Initialize all the parent child select lists + other javascripts
 			$r .= '
-				<script type="text/javascript">
+				<script>
 					//<![CDATA[
 					if( typeof init_dynamicSelect == "function" )
 					{
 						jQuery( document ).bind( "ready", init_dynamicSelect );
-						';
-						if( $this->check_all )
-						{ // Init check_all event on check_all links
-							$r .= 'jQuery( document ).bind( "ready", init_check_all );';
-						}
-						$r .= '
 					}
 					';
 
@@ -2309,11 +2447,11 @@ class Form extends Widget
 	 * @param string name
 	 * @param string label
 	 * @param boolean true to surround checkboxes if they are required
-	 * @param boolean true add a surround_check span, used by check_all mouseover
+	 * @param boolean true add a surround_check span, used by check_all mouseover @deprecated
 	 * @param array Params
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checklist( $options, $field_name, $field_label, $required = false, $add_highlight_spans = false, $field_params = array() )
+	function checklist( $options, $field_name, $field_label, $required = false, $dummy = NULL, $field_params = array() )
 	{
 		$field_params = array_merge( array(
 				'wide' => false,
@@ -2321,6 +2459,11 @@ class Form extends Widget
 				'input_prefix' => '',
 				'input_suffix' => '',
 			), $field_params );
+
+		if( $required )
+		{
+			$field_params['required'] = $required;
+		}
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
@@ -2355,16 +2498,6 @@ class Form extends Widget
 			// asimo>> add id for label: id = label_for_fieldname_fieldvalue
 			$r .= '<label'.( empty( $option[6] ) ? '' : ' class="'.$option[6].'"' ).' id="label_for_'.$loop_field_name.'_'.$option[1].'"'.$extra_attribs.'>';
 
-			if( $add_highlight_spans )
-			{ // Need it to highlight checkbox for check_all and uncheck_all mouseover
-				$r .= '<span name="surround_check" class="checkbox_surround_init">';
-				$after_field_highlight = '</span>';
-			}
-			else
-			{
-				$after_field_highlight = '';
-			}
-
 			$after_field = '';
 			if( param_has_error( $field_name ) )
 			{ // There is an error message for this field, we want to mark the checkboxes with a red border:
@@ -2386,11 +2519,15 @@ class Form extends Widget
 			{ // the checkbox has to be disabled
 				$r .= ' disabled="disabled" ';
 			}
+
+			if( $required === true || ( isset( $field_params['required'] ) && $field_params['required'] === true ) )
+			{
+				$r .= ' required="required" ';
+			}
+
 			$r .= ' class="'.$this->inputclass_checkbox.'" />';
 
 			$r .= $after_field;
-
-			$r .= $after_field_highlight;
 
 			$r .= ' '.$option[2];
 
@@ -2558,7 +2695,12 @@ class Form extends Widget
 	{
 		global $edited_User;
 
-		if( isset($field_params['allow_none']) )
+		if( isset($field_params['required']) )
+		{	// 'allow_none' param value should depend on 'required' param value:
+			$allow_none = !$field_params['required'];
+			unset( $field_params['allow_none'] );
+		}
+		elseif( isset($field_params['allow_none']) )
 		{
 			$allow_none = $field_params['allow_none'];
 			unset( $field_params['allow_none'] );
@@ -2669,15 +2811,35 @@ class Form extends Widget
 
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control';
 
-		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
+		if( isset($field_params['input_prefix']) )
+		{
+			$input_prefix = $field_params['input_prefix'];
+			unset($field_params['input_prefix']); // no HTML attribute
+		}
+		else
+		{
+			$input_prefix = '';
+		}
+
+		if( isset($field_params['input_suffix']) )
+		{
+			$input_suffix = $field_params['input_suffix'];
+			unset($field_params['input_suffix']); // no HTML attribute
+		}
+		else
+		{
+			$input_suffix = "\n";
+		}
+
+		$r .= $input_prefix.'<select'.get_field_attribs_as_string( $field_params ).'>'
 			 .$field_options
-			 ."</select>\n";
+			 .'</select>'.$input_suffix;
 
 		$r .= $this->end_field();
 
 		if( !empty( $field_params['parent'] ) )
 		{ // Set up the dynamic preselection array from the parent to this select list options
-			$r .= "<script type='text/javascript'>
+			$r .= "<script>
 								tab_dynamicSelects[nb_dynamicSelects] = Array();
 								tab_dynamicSelects[nb_dynamicSelects]['parent'] = '".$field_params['parent']."';
 								tab_dynamicSelects[nb_dynamicSelects]['child'] = '$field_name';
@@ -2851,65 +3013,96 @@ class Form extends Widget
 	 */
 	function combo_box( $field_name, $field_value, $field_options, $field_label, $field_params = array() )
 	{
-		$input_class = 'form-control input-sm';
-		if( param_has_error( $field_name) )
-		{ // There is an error on the combo, so we need to set the combo input text class to 'field_error'
-			$input_class .= ' field_error';
-		}
-		elseif( isset( $field_params['required'] ) && $field_params['required'] )
-		{ // The field is required, so update its class:
-			$input_class .= ' field_required';
-		}
-		unset( $field_params['required'] ); // already handled above, do not pass to handle_common_params()
+		// Default params:
+		$field_params = array_merge( array(
+				// Params for <select>(main element):
+				'class'                    => 'form-control input-sm', // Style class
+				'onchange'                 => '', // Append JavaScript code to event "onchange" with default value "check_combo(this);"
+				'new_option_value'         => 'new', // Value of new option
+				'new_option_label'         => T_('New').': ', // Label/title of new option
+				// Params for <input>(additional element to enter new value/option):
+				'new_field_params'         => array(), // Additional attributes except of the defined below (Array: key - attr name, value - attr value)
+				'new_field_type'           => 'text', // Field type
+				'new_field_id'             => $field_name.'_combo', // Attribute "id"
+				'new_field_name'           => $field_name.'_combo', // Attribute "name"
+				'new_field_class'          => 'form-control input-sm', // Normal style class
+				'new_field_class_error'    => 'field_error', // Style class for error
+				'new_field_class_required' => 'field_required', // Style class for required
+				'new_field_size'           => 30, // Attribute "size"
+				'required'                 => false, // set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
+				'placeholder'              => NULL, // Placeholder
+			), $field_params );
 
-		// Set size param for input with new value
-		if( isset( $field_params['new_field_size'] ) )
-		{
-			$new_field_size = $field_params['new_field_size'];
+		// Set params for <input>(additional element):
+		$input_params = array_merge( $field_params['new_field_params'], array(
+				'type'  => $field_params['new_field_type'],
+				'id'    => $field_params['new_field_id'],
+				'name'  => $field_params['new_field_name'],
+				'class' => $field_params['new_field_class'],
+				'size'  => $field_params['new_field_size'],
+				'value' => $field_value,
+			) );
+
+		if( $field_params['placeholder'] !== NULL )
+		{	// Use placeholder only when it is defined:
+			$input_params['placeholder'] = $field_params['placeholder'];
 		}
-		else
-		{
-			$new_field_size = 30;
+
+		if( param_has_error( $field_name ) )
+		{	// There is an error on the combo, so we need to add error style class to the combo input:
+			$input_params['class'] .= ' '.$field_params['new_field_class_error'];
 		}
+		elseif( $field_params['required'] )
+		{	// The field is required, so update its class:
+			$input_params['class'] .= ' '.$field_params['new_field_class_required'];
+			if( $field_params['required'] === true )
+			{
+				$input_params['required'] = 'required';
+			}
+		}
+
+		// Hide additional element to enter new value when there is a selected predefined option:
+		$is_input_hidden = ( strpos( $field_options, 'selected="selected"' ) !== false );
+		if( $is_input_hidden )
+		{	// Add style to hide the input on page loading:
+			$input_params['style'] = 'display:none';
+		}
+
+		// Select option to add after the select list a combo input text:
+		$new_field_option  = '<option value="'.format_to_output( $field_params['new_option_value'], 'formvalue' ).'">'.format_to_output( $field_params['new_option_label'], 'htmlattr' ).'</option>'."\n";
+
+		// Do not pass these params to handle_common_params() of <select>:
+		unset( $field_params['new_field_params'] );
+		unset( $field_params['new_field_type'] );
+		unset( $field_params['new_field_id'] );
+		unset( $field_params['new_field_name'] );
+		unset( $field_params['new_field_class'] );
+		unset( $field_params['new_field_class_error'] );
+		unset( $field_params['new_field_class_required'] );
 		unset( $field_params['new_field_size'] );
+		unset( $field_params['placeholder'] );
+		unset( $field_params['new_option_value'] );
+		unset( $field_params['new_option_label'] );
 
-		// Set onchange event on the select, when the select changes, we check the value to display or hide an input text after it
-		$field_params['onchange']= 'check_combo( this.id, this.options[this.selectedIndex].value, "'.$input_class.'")';
+		// Append custom JS code to default onchange event, when the select changes, we check the value to display or hide an input text after it:
+		$field_params['onchange'] = 'check_combo(this);'.$field_params['onchange'];
 
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$r = $this->begin_field();
 
-		// Select option to add after the select list a combo input text:
-		$option_new  = '<option value="new">'.T_('New').': </option>'."\n";
-
-		// Add the new option to the select list:
-		$field_options = $option_new . $field_options;
-
-		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form-control input-sm';
-
-		// Select list
-		$r .="\n<select".get_field_attribs_as_string($field_params).'>'
-			 .$field_options
+		// Main element:
+		$r .="\n<select".get_field_attribs_as_string( $field_params ).'>'
+			 .$new_field_option.$field_options
 			 ."</select>\n";
 
-		if( $field_options == $option_new  || strpos( $input_class, 'field_error' ) !== false || $field_value != '' )
-		{	// The list is empty or there is an error on the combo or no field value, so we have to display the input text:
-			$visible = 'inline';
-		}
-		else
-		{ // Hide the input text:
-			$visible = 'none' ;
-		}
+		// Additional element to enter new value/option:
+		$r .= '<input'.get_field_attribs_as_string( $input_params ).'/>';
 
-		$r .= '<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="'.$new_field_size.'" class="'.$input_class.'" style="display:'.$visible.'" value="'.$field_value.'" />';
-
-		if( $visible == 'none' )
-		{ // The input text is hidden, so if no javascript activated, we always display input text:
-			$r .= '<script type="text/javascript"></script>'; // We need <script> tag here to use a <noscript> tag when javascript is deactivated:
-			$r .= '<noscript>
-							<input type="text" id="'.$field_name.'_combo" name="'.$field_name.'_combo" size="30" class="'.$input_class.'">
-						</noscript>';
+		if( $is_input_hidden )
+		{	// The input text is hidden, so if no javascript activated, we must always display the input text to enter new option:
+			unset( $input_params['style'] );
+			$r .= '<noscript><input'.get_field_attribs_as_string( $input_params ).'/></noscript>';
 		}
 
 		$r .= $this->end_field();
@@ -2959,23 +3152,6 @@ class Form extends Widget
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_textarea_input form-control';
 
-		if( isset($field_params['maxlength']) )
-		{ // attach event to the textarea to accomplish max length:
-			$this->append_javascript['textarea_maxlength'.$field_name] = '
-				if( typeof jQuery == "function" )
-				{
-				jQuery("#'.$field_params['id'].'").bind( "keyup", function(event)
-					{
-						if( this.value.length > '.$field_params['maxlength'].' )
-						{
-							this.value = this.value.substr(0,'.$field_params['maxlength'].');
-							event.preventDefault();
-						}
-					} );
-				}';
-			unset($field_params['maxlength']); // not a HTML attribute for textarea
-		}
-
 		$r = $this->begin_field();
 		$r .= $input_prefix;
 		$r .= '<textarea'
@@ -3001,7 +3177,7 @@ class Form extends Widget
 	 * @param string
 	 * @param integer
 	 * @param string
-	 * @param boolean
+	 * @param mixed set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @param string Placeholder text
 	 */
 	function textarea( $field_name, $field_value, $field_rows, $field_label, $field_note = '', $field_cols = 50 , $field_class = '', $required = false, $placeholder = '' )
@@ -3575,9 +3751,11 @@ class Form extends Widget
 			$field_params['note_format'] = '<div>'.$field_params['note_format'].'</div>';
 		}
 
-		$field_params['id'] = false; // No ID attribute for the label
+		if( isset( $field_params['required'] ) )
+		{
+			$field_required = $field_params['required'];
+		}
 		$this->handle_common_params( $field_params, $field_name, $field_label );
-		unset($field_params['id']);  // unset, so it gets handled correctly as default below
 
 		$r = $this->begin_field( NULL, NULL, false, 'radio' );
 
@@ -3590,15 +3768,6 @@ class Form extends Widget
 			// Merge defaults from $field_params:
 			$loop_radio = array_merge( $field_params, $loop_radio );
 
-			if( $field_lines )
-			{ // Start of radio option for multi line format
-				$r .= $this->radio_newline_start;
-			}
-			else
-			{ // Start of radio option for single line format
-				$r .= $this->radio_oneline_start;
-			}
-
 			// Defaults:
 			if( ! isset( $loop_radio['type'] ) )  $loop_radio['type'] = 'radio';
 			if( ! isset( $loop_radio['class'] ) ) $loop_radio['class'] = $this->inputclass_radio; // 'radio'
@@ -3608,6 +3777,11 @@ class Form extends Widget
 				$loop_radio['id'] = Form::get_valid_id( $field_params['name'].'_radio_'.( ++$count_options ) );
 			}
 
+			// Start of radio option for multi/single line format:
+			$r .= str_replace( '$radio_option_class$',
+				( isset( $loop_radio['class'] ) ? $loop_radio['class'] : '' ),
+				( $field_lines ? $this->radio_newline_start : $this->radio_oneline_start ) );
+
 			if( isset($loop_radio['checked']) )
 			{ // convert boolean:
 				if( $loop_radio['checked'] ) $loop_radio['checked'] = 'checked';
@@ -3615,6 +3789,11 @@ class Form extends Widget
 			elseif( $field_value == $loop_radio['value'] )
 			{ // Current selection:
 				$loop_radio['checked'] = 'checked';
+			}
+
+			if( isset( $field_required ) && $field_required === true )
+			{
+				$loop_radio['required'] = 'required';
 			}
 
 			// Unset non-HTML attribs:
@@ -3665,10 +3844,10 @@ class Form extends Widget
 	 * @param string label
 	 * @param boolean options on seperate lines (DIVs)
 	 * @param string notes
-	 * @param boolean required
+	 * @param mixed required set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '', $field_required = false )
+	function radio( $field_name, $field_value, $field_options, $field_label = '', $field_lines = false, $field_note = '', $field_required = false )
 	{
 		$new_field_options = array();
 
@@ -3684,11 +3863,11 @@ class Form extends Widget
 			}
 			if( isset($l_options[4]) )
 			{ // Convert "inline attribs" to "params" array
-				preg_match_all( '#(\w+)=[\'"](.*)[\'"]#', $l_options[4], $matches, PREG_SET_ORDER );
+				preg_match_all( '#(\w+)=([\'"])(.*?)\2#', $l_options[4], $matches, PREG_SET_ORDER );
 
 				foreach( $matches as $l_set_nr => $l_match )
 				{
-					$new_field_options[$l_key][$l_match[1]] = $l_match[2];
+					$new_field_options[$l_key][$l_match[1]] = $l_match[3];
 				}
 			}
 
@@ -3699,10 +3878,9 @@ class Form extends Widget
 		}
 
 		$field_params = array( 'lines' => $field_lines, 'note' => $field_note );
-		if( $field_required )
-		{	// Field is required
-			$field_params['required'] = true;
-		}
+
+		// Field is required
+		$field_params['required'] = $field_required;
 
 		return $this->radio_input( $field_name, $field_value, $new_field_options, $field_label, $field_params );
 	}
@@ -3837,6 +4015,16 @@ class Form extends Widget
 	}
 
 
+	/**
+	 * Generate a file select field
+	 *
+	 * @param string The name of the input field
+	 * @param string Initial value
+	 * @param string Label displayed with the field
+	 * @param string "help" note
+	 * @param array Extended attributes/params, "required" will only mark the field as required and no front-end validation is possible at the moment
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
 	function fileselect( $field_name, $field_value, $field_label, $field_note = '', $field_params = array() )
 	{
 		global $thumbnail_sizes, $file_select_js_initialized;
@@ -3845,7 +4033,7 @@ class Form extends Widget
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$field_params = array_merge( array(
-				'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+				'field_item_start' => '<div class="file_select_item" data-item-value="%value%" data-file-url="%url%">',
 				'field_item_end' => '</div>',
 				'size_name' => 'crop-64x64',
 				'class' => '',
@@ -3907,7 +4095,7 @@ class Form extends Widget
 
 			$button_label = ( $counter === 0 ? /* TRANS: verb */ T_('Select') : get_icon( 'new' ).' '.T_('Add') );
 
-			$r .= '<button class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return window.parent.file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
+			$r .= '<button type="button" class="btn btn-sm btn-info file_select_item" data-title="'.$field_params['window_title'].'" onclick="return file_select_attachment_window( this, false );" style="display: '.( $counter < $field_params['max_file_num'] ? 'block' : 'none' ).';">'.$button_label.'</button>';
 
 			$r .= '</div>';
 			$r .= $this->end_field();
@@ -3921,7 +4109,7 @@ class Form extends Widget
 			if( empty( $file_select_js_initialized ) )
 			{
 				$r .= '
-						<script type="text/javascript">
+						<script>
 						var fsel_size, fsel_name, fsel_type, fsel_obj, fsel_replace = false, fsel_title;
 
 						function file_select_attachment_window( event_object, replace_item, fm_highlight )
@@ -3936,7 +4124,8 @@ class Form extends Widget
 							root = field_object.data( "root" );
 							path = field_object.data( "path" );
 
-							openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
+							var func_window = ( window.top == window.self ? window : window.parent );
+							func_window.openModalWindow( \'<span class="loader_img loader_user_report absolute_center" title="'.T_('Loading...').'"></span>\',
 								"90%", "80%", true, fsel_title, "", true );
 							jQuery.ajax(
 							{
@@ -3951,11 +4140,12 @@ class Form extends Widget
 									"fm_highlight": typeof( fm_highlight ) == "undefined" ? "" : fm_highlight,
 									"field_name": field_object.attr( "name" ),
 									"file_type": field_object.data( "fileType" ),
+									"iframe_name": ( window.frameElement == null ? "" : window.frameElement.id ),
 								},
 								success: function(result)
 								{
 									result = ajax_debug_clear( result );
-									openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
+									func_window.openModalWindow( result, "90%", "80%", true, "'.$field_params['window_title'].'", "" );
 								}
 							} );
 							return false;
@@ -4055,10 +4245,16 @@ class Form extends Widget
 										// Trigger change so bozo validator will pickup the change
 										inputField.trigger( "change" );
 
+										if( typeof( parent.evo_customizer_update_style ) == "function" )
+										{	// Update style in designer customizer mode if it is enabled currently:
+											parent.evo_customizer_update_style( inputField );
+										}
+
 										// close modal if single item select
 										if( maxLength == 1 )
 										{
-											closeModalWindow();
+											var func_window = ( window.top == window.self ? window : window.parent );
+											func_window.closeModalWindow();
 										}
 									}
 							});
@@ -4104,6 +4300,11 @@ class Form extends Widget
 							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
 							inputField.trigger( "change" );
 
+							if( typeof( parent.evo_customizer_update_style ) == "function" )
+							{	// Update style in designer customizer mode if it is enabled currently:
+								parent.evo_customizer_update_style( inputField );
+							}
+
 							return false;
 						}
 						</script>';
@@ -4111,6 +4312,116 @@ class Form extends Widget
 
 			$file_select_js_initialized = true;
 			return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Generate a user tag text input
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed with the field
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
+	 * @param array Optional params, @see $this->tag_input() and $this->text_input()
+	 */
+	function usertag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		$field_params['tag_type'] = 'user';
+
+		return $this->tag_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
+	}
+
+
+	/**
+	 * Generate a tag text input
+	 *
+	 * @param string The name of the input field. This gets used for id also, if no id given in $field_params.
+	 * @param string Initial value
+	 * @param integer Size of the input field
+	 * @param string Label displayed with the field
+	 * @param string "help" note (Should provide something useful, otherwise leave it empty)
+	 * @param array Optional params. Additionally to {@link $this->text_input()} you can use:
+	 *              - 'tag_type': What tags should be displayed in suggesting list, 'user' - user tags, 'item' - item/post tags
+	 */
+	function tag_input( $field_name, $field_value, $field_size, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $tag_input_js_initialized;
+
+		$field_params = array_merge( array(
+			'tag_type'     => 'item', // 'user' - to load in suggesting tags list only existing user tags, 'item' - item/post tags
+			'input_prefix' => '<div class="evo_input__tags">',
+			'input_suffix' => '</div>',
+		), $field_params );
+
+		if( isset( $field_params['required'] ) && $field_params['required'] === true )
+		{	// We can only mark this field as required, the actual input is hidden and cannot be focused on when validation fails
+			$field_params['required'] = 'mark_only';
+		}
+
+		switch( $field_params['tag_type'] )
+		{
+			case 'user':
+				$tags_url = get_restapi_url().'usertags';
+				break;
+			case 'item':
+			default:
+				$tags_url = get_restapi_url().'tags';
+				break;
+		}
+
+		if( ! is_array( $tag_input_js_initialized ) )
+		{
+			$tag_input_js_initialized = array();
+		}
+
+		if( ! isset( $tag_input_js_initialized[ $field_params['tag_type'] ] ) )
+		{
+			$field_params['input_suffix'] .= '<script>
+						function init_autocomplete_tags_'.$field_params['tag_type'].'( selector )
+						{
+							var tags = jQuery( selector ).val();
+							var tags_json = new Array();
+							if( tags && tags.length > 0 )
+							{ // Get tags from <input>
+								tags = tags.split( \',\' );
+								for( var t in tags )
+								{
+									tags_json.push( { id: tags[t], name: tags[t] } );
+								}
+							}
+
+							jQuery( selector ).tokenInput( \''.$tags_url.'\',
+							{
+								theme: \'facebook\',
+								queryParam: \'s\',
+								propertyToSearch: \'name\',
+								tokenValue: \'name\',
+								preventDuplicates: true,
+								prePopulate: tags_json,
+								hintText: \''.TS_('Type in a tag').'\',
+								noResultsText: \''.TS_('No results').'\',
+								searchingText: \''.TS_('Searching...').'\',
+								jsonContainer: \'tags\',
+							} );
+						}
+						</script>';
+			$tag_input_js_initialized[ $field_params['tag_type'] ] = true;
+		}
+
+		$field_params['input_suffix'] .= '<script>
+					jQuery( document ).ready( function()
+					{
+						jQuery( "#'.format_to_js( $field_name ).'" ).hide();
+						init_autocomplete_tags_'.$field_params['tag_type'].'( "#'.format_to_js( $field_name ).'" );'.
+						get_prevent_key_enter_js( '#token-input-'.$field_name ).'
+					} );
+					</script>';
+
+		// Unset this param because we don't need this as attribute of the text input element:
+		unset( $field_params['tag_type'] );
+
+		return $this->text_input( $field_name, $field_value, $field_size, $field_label, $field_note, $field_params );
 	}
 
 
@@ -4185,6 +4496,19 @@ class Form extends Widget
 		{ // Set html attribute "required" (used to highlight input with red border/shadow by bootstrap)
 			$field_params['required'] = $field_params['input_required'];
 			unset( $field_params['input_required'] );
+		}
+
+		if( isset( $field_params['disabled'] ) )
+		{	// Set html attribute "disabled":
+			if( empty( $field_params['disabled'] ) )
+			{	// Don't set attribute if it must be not disabled:
+				unset( $field_params['disabled'] );
+			}
+			elseif( $field_params['disabled'] === true )
+			{	// Use proper string value instead of boolean:
+				$field_params['disabled'] = 'disabled';
+			}
+			// else use the passed value
 		}
 
 		$r = $input_prefix
@@ -4265,18 +4589,26 @@ class Form extends Widget
 
 		$r = $input_prefix;
 
-		if( $field_params['tag'] == 'button' )
+		switch( $field_params['tag'] )
 		{
-			$value = $field_params['value'];
-			unset( $field_params['value'] );
-			unset( $field_params['tag'] );
+			case 'button':
+				$value = $field_params['value'];
+				unset( $field_params['value'] );
+				unset( $field_params['tag'] );
+				$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
+				break;
 
-			$r .= '<button'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</button>';
-		}
-		else
-		{
-			unset( $field_params['tag'] );
-			$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
+			case 'link':
+				$value = $field_params['value'];
+				unset( $field_params['value'] );
+				unset( $field_params['tag'] );
+				unset( $field_params['type'] );
+				$r .= '<a'.get_field_attribs_as_string( $field_params, $format_to_output ).'>'.$value.'</a>';
+				break;
+
+			default:
+				unset( $field_params['tag'] );
+				$r .= '<input'.get_field_attribs_as_string( $field_params, $format_to_output ).' />';
 		}
 
 		$r .= $input_suffix;
@@ -4412,6 +4744,16 @@ class Form extends Widget
 			$this->_common_params['note'] = NULL;
 		}
 
+		if( isset($field_params['bottom_note']) )
+		{
+			$this->_common_params['bottom_note'] = $field_params['bottom_note'];
+			unset($field_params['bottom_note']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['bottom_note'] = NULL;
+		}
+
 		if( isset($field_params['note_format']) )
 		{
 			$this->_common_params['note_format'] = $field_params['note_format'];
@@ -4420,6 +4762,16 @@ class Form extends Widget
 		else
 		{
 			$this->_common_params['note_format'] = $this->note_format;
+		}
+
+		if( isset($field_params['bottom_note_format']) )
+		{
+			$this->_common_params['bottom_note_format'] = $field_params['bottom_note_format'];
+			unset($field_params['bottom_note_format']); // no HTML attribute
+		}
+		else
+		{
+			$this->_common_params['bottom_note_format'] = $this->bottom_note_format;
 		}
 
 		if( isset($field_params['label']) )
@@ -4466,6 +4818,11 @@ class Form extends Widget
 			unset($field_params['required']);
 		}
 
+		if( isset($field_params['hide']) )
+		{
+			$this->_common_params['hide'] = $field_params['hide'];
+			unset($field_params['hide']);
+		}
 
 		if( !empty($field_params['name']) )
 		{
@@ -4490,7 +4847,7 @@ class Form extends Widget
 		}
 
 		// Mark required fields:
-		if( isset($this->_common_params['required']) && $this->_common_params['required'] )
+		if( isset( $this->_common_params['required'] ) && $this->_common_params['required'] )
 		{ // add "field_required" class:
 			if( isset($field_params['type']) && $field_params['type'] == 'checkbox' )
 			{ // checkboxes need a span
@@ -4500,6 +4857,11 @@ class Form extends Widget
 			else
 			{
 				$field_params['class'] = isset( $field_params['class'] ) ? $field_params['class'].' field_required' : 'field_required';
+			}
+			// only add HTML5 "required" attribute if the parameter value is "true" or "required", the latter value can result from nested calls to this function
+			if( $this->_common_params['required'] === true )
+			{
+				$field_params['required'] = 'required';
 			}
 		}
 
@@ -4635,6 +4997,388 @@ class Form extends Widget
 		$r .= $this->end_field( $field_type );
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Display attachments fieldset
+	 *
+	 * @param object Object of the links owner
+	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
+	 */
+	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
+	{
+		global $attachment_tab;
+
+		// Get object type to initialize link owner
+		$object_type = get_class( $object );
+
+		if( $object_type != 'Comment' && ! is_logged_in() )
+		{	// User must logged in for all other objects like Item, Message and EmailCampaign:
+			// (for Comment we can allow to attach files by anonymous user depending on collection setting)
+			return;
+		}
+
+		// Declare this object as global because it is used in many link functions:
+		global $LinkOwner;
+
+		// Initialize link owner depending on object type:
+		switch( $object_type )
+		{
+			case 'Comment':
+				$Comment = $object;
+				$comment_Item = & $Comment->get_Item();
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments', $Comment ) || ! $comment_Item->can_attach( $Comment->temp_link_owner_ID, $Comment->type ) )
+				{	// Comment attachments must be allowed by collection setting depending on user type(anonymous, registered, member and etc.).:
+					return;
+				}
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+				break;
+
+			case 'Item':
+				$Item = $object;
+				if( ! $Item->get_type_setting( 'allow_attachments' ) )
+				{	// Item attachments must be allowed for the item type
+					return;
+				}
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				$LinkOwner = new LinkItem( $Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'Message':
+				if( ! is_admin_page() )
+				{	// Message attachments are allowed only on back-office
+					return;
+				}
+				$Message = $object;
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				$LinkOwner = new LinkMessage( $Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = $object;
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+				break;
+
+			default:
+				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
+		}
+		
+		// Display attachments:
+		if( ! $attachment_tab )
+		{
+			display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+		}
+		else
+		{
+			display_attachments_tab_pane( $this, $LinkOwner, $fold, $fieldset_prefix );
+		}
+
+		// Insert image modal window:
+		echo_image_insert_modal();
+	}
+
+
+	/**
+	 * Locale selector
+	 *
+	 * @param string Field name
+	 * @param string Main locale value
+	 * @param array Extra locale values
+	 * @param string Field label
+	 * @param string Field note
+	 * @param array Params
+	 * @return 
+	 */
+	function locale_selector( $field_name, $main_locale, $extra_locales, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $locales;
+
+		$BlogCache = & get_BlogCache();
+		$link_Blog = & $BlogCache->get_by_ID( $field_params['link_coll_ID'], false, false );
+		unset( $field_params['link_coll_ID'] );
+
+		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
+
+		$r = $this->begin_field();
+
+		$r .= '<table class="evo_locale_selector table table-striped table-hover table-condensed table-bordered">';
+
+		// Table header:
+		$r .= '<thead><tr>'
+				.'<th>'.T_('Locale').'</th>'
+				.'<th>'.T_('Main').'</th>'
+				.'<th>'.T_('Extra').'</th>'
+				.( $link_Blog ? '<th>'.T_('Link with').'</th>' : '' )
+			.'</tr></thead>';
+
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( ! $locale_data['enabled'] )
+			{	// Skip disabled locale:
+				continue;
+			}
+
+			// Locale row with radio, checkbox and name:
+			$r .= '<tr data-locale="'.$locale_key.'">'
+					.'<td>'.T_( $locale_data['name'] ).'</td>'
+					.'<td class="center"><input type="radio" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
+					.'<td class="center"><input type="checkbox" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( in_array( $locale_key, $extra_locales ) ? ' checked="checked"' : '' ).' /></td>'
+					.( $link_Blog ? '<td class="evo_coll_link_locale_selector">'.$link_Blog->get_link_locale_selector( $field_name, $locale_key ).'</td>' : '' )
+				.'</tr>';
+		}
+
+		$r .= '</table>';
+
+		// JavaScript for autoselecting extra locale:
+		$r .= '<script type="text/javascript">
+			jQuery( "input[type=radio][name='.$field_name.']" ).click( function()
+			{
+				if( jQuery( this ).is( ":checked" ) )
+				{
+					jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\'][value=\'" + jQuery( this ).val() + "\']" ).prop( "checked", true );
+				}
+			} );
+			jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				if( ! jQuery( this ).is( ":checked" ) && jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					return false;
+				}
+			} );';
+		if( $link_Blog )
+		{	// JavaScript to link with collections:
+			$r .= 'jQuery( "input[type=radio][name='.$field_name.'], input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				var locale_row = jQuery( this ).closest( "tr" );
+				var current_locale = locale_row.data( "locale" );
+				var coll_locale_selector = jQuery( "select[name=\''.$field_name.'_link_coll[" + current_locale + "]\']" );
+				if( jQuery( this ).is( ":checked" ) || jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					if( coll_locale_selector.length )
+					{
+						coll_locale_selector.hide();
+						if( coll_locale_selector.next( "span" ).length )
+						{
+							coll_locale_selector.next( "span" ).show();
+						}
+						else
+						{
+							coll_locale_selector.after( "<span>'.TS_('N/A').'</span>" );
+						}
+					}
+				}
+				else
+				{
+					if( coll_locale_selector.length )
+					{	// Show selector from cache:
+						coll_locale_selector.show();
+						coll_locale_selector.next( "span" ).hide();
+					}
+					else
+					{	// Load selector by AJAX:
+						jQuery.ajax(
+						{
+							url: "'.get_htsrv_url().'async.php",
+							type: "POST",
+							data: {
+								action: "get_link_locale_selector",
+								coll_ID: '.$link_Blog->ID.',
+								coll_locale: current_locale,
+								field_name: "'.$field_name.'",
+							},
+							success: function( result )
+							{
+								locale_row.find( "td.evo_coll_link_locale_selector" ).html( ajax_debug_clear( result ) );
+							},
+						} );
+					}
+				}
+			} );';
+		}
+		$r .= '
+		</script>';
+
+		$r .= $this->end_field();
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Builds Item selector field
+	 *
+	 * @param string Name/ID of the input field
+	 * @param string Initial value
+	 * @param string Field label
+	 * @param array Extended attributes/parameters
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function item_selector( $field_name, $selected_item_ID, $field_label, $field_params = array() )
+	{
+		global $thumbnail_sizes, $file_select_js_initialized;
+
+		$this->handle_common_params( $field_params, $field_name, $field_label );
+
+		$field_params = array_merge( array(
+				'btn_select_title'   => NT_('Select'),
+				'btn_selected_title' => NT_('Select another'),
+				'btn_select_icon'    => 'magnifier',
+				'btn_select_class'   => 'btn btn-sm btn-info',
+				'btn_deselect_title' => NT_('Deselect Item'),
+				'btn_deselect_icon'  => 'remove',
+				'window_title_page1' => NT_('Select the Item'),
+				'window_title_page2' => NT_('Select the Item').':',
+			), $field_params );
+
+			$r = $this->begin_field();
+
+			// Hidden field for a selected Item ID:
+			$r .= '<input'.get_field_attribs_as_string( array(
+					'type'  => 'hidden',
+					'id'    => $field_name,
+					'name'  => $field_name,
+					'value' => $selected_item_ID,
+				) ).' />';
+
+			// Try to get Item by initial ID:
+			$ItemCache = & get_ItemCache();
+			$selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false );
+
+			// Display info of the selected Item:
+			$r .= '<span id="'.format_to_output( 'evo_item_selector_info_'.$field_name, 'htmlattr' ).'">';
+			if( $selected_Item )
+			{
+				$r .= $selected_Item->get_form_selector_info();
+			}
+			$r .= '</span>';
+
+			// Button to select Item:
+			$btn_select_title = ( empty( $field_params['btn_select_icon'] ) ? '' : get_icon( $field_params['btn_select_icon'] ).' ' )
+				.'<span class="evo_item_selector_btn_title">'.( $selected_Item ? T_( $field_params['btn_selected_title'] ) : T_( $field_params['btn_select_title'] ) ).'</span>';
+			$r .= '<button type="button"'
+				.'id="evo_item_selector_form_btn_'.$field_name.'" '
+				.'class="'.$field_params['btn_select_class'].' evo_item_selector_form_btn" '
+				.'onclick="return evo_form_item_selector_load_window( \''.$field_name.'\' )" >'
+					.format_to_output( trim( $btn_select_title ), 'htmlbody' )
+				.'</button>';
+
+			// Icon to deselect the Item:
+			$deselector_params = array(
+					'id'      => 'evo_item_deselector_btn_'.$field_name,
+					'title'   => T_( $field_params['btn_deselect_title'] ),
+					'class'   => 'evo_item_deselector_btn pointer',
+				);
+			if( ! $selected_Item )
+			{	// Hide the deselector icon if no selected Item yet:
+				$deselector_params['style'] = 'display:none';
+			}
+			$r .= ' '.get_icon( $field_params['btn_deselect_icon'], 'imgtag', $deselector_params );
+
+			// Initialize different config per each field:
+			$r .= '<script>
+			if( typeof( evo_form_item_selector ) == "undefined" )
+			{
+				var evo_form_item_selector = {};
+			}
+			evo_form_item_selector.'.$field_name.' = {
+				window_title_page1: "'.TS_( $field_params['window_title_page1'] ).'",
+				window_title_page2: "'.TS_( $field_params['window_title_page2'] ).'",
+				btn_select_title:   "'.TS_( $field_params['btn_select_title'] ).'",
+				btn_selected_title: "'.TS_( $field_params['btn_selected_title'] ).'",
+			};
+			</script>';
+
+			if( empty( $this->item_selector_js_initialized ) )
+			{	// Initialize JS code for Item selector once:
+				global $UserSettings, $b2evo_icons_type;
+
+				// Initialize JavaScript to build and open window:
+				echo_modalwindow_js();
+
+				// Initialize JavaScript for item selector window:
+				echo_item_selector_js();
+
+				// Get last selected collection:
+				if( ! ( $last_selected_item_coll_ID = $UserSettings->get( 'last_selected_item_coll_ID' ) ) )
+				{
+					global $Blog;
+					$last_selected_item_coll_ID = empty( $Blog ) ? 0 : $Blog->ID;
+				}
+
+				$r .= '<script>
+				var evo_last_selected_item_coll_ID = '.$last_selected_item_coll_ID.';
+
+				function evo_form_item_selector_load_window( field_name )
+				{
+					return evo_item_selector_load_window( null,
+						[ evo_form_item_selector[ field_name ].window_title_page1, evo_form_item_selector[ field_name ].window_title_page2 ],
+						false,
+						[ { "text": evo_form_item_selector[ field_name ].btn_select_title, "id": "evo_item_selector_window_btn_" + field_name, "class": "btn btn-primary evo_item_selector_window_btn" } ],
+						evo_last_selected_item_coll_ID,
+						"collections"
+					);
+				}
+
+				// Submit form to use the selected Item for the form field:
+				jQuery( document ).on( "click", ".evo_item_selector_window_btn", function()
+				{
+					var field_name = jQuery( this ).attr( "id" ).replace( /^evo_item_selector_window_btn_/, "" );
+					jQuery.ajax(
+					{
+						type: "POST",
+						url: htsrv_url + "anon_async.php",
+						data: {
+							"action": "get_item_selector_info",
+							"item_ID": jQuery( "#evo_item_selector_dest_post_ID" ).val(),
+							"b2evo_icons_type": "'.( isset( $b2evo_icons_type ) ? $b2evo_icons_type : '' ).'",
+							"crumb_item_selector": "'.get_crumb( 'item_selector' ).'"
+						},
+						success: function( data )
+						{
+							data = JSON.parse( ajax_debug_clear( data ) );
+							if( typeof( data.item_ID ) == "undefined" )
+							{	// Unexpected error, do NOT translate!
+								alert( "Wrong Item, try again." );
+							}
+							else
+							{	// Update Item data in the form:
+								jQuery( "#" + field_name ).val( data.item_ID );
+								jQuery( "#evo_item_selector_info_" + field_name ).html( data.item_info );
+								jQuery( "#evo_item_selector_form_btn_" + field_name ).find( ".evo_item_selector_btn_title" ).html( evo_form_item_selector[ field_name ].btn_selected_title );
+								jQuery( "#evo_item_deselector_btn_" + field_name ).show();
+								evo_last_selected_item_coll_ID = data.coll_ID;
+							}
+							closeModalWindow();
+						}
+					} );
+				} );
+
+				// Deselect the Item:
+				jQuery( document ).on( "click", ".evo_item_deselector_btn", function()
+				{
+					var field_name = jQuery( this ).attr( "id" ).replace( /^evo_item_deselector_btn_/, "" );
+					jQuery( "#" + field_name ).val( "" );
+					jQuery( "#evo_item_selector_info_" + field_name ).html( "" );
+					jQuery( "#evo_item_selector_form_btn_" + field_name ).find( ".evo_item_selector_btn_title" ).html( evo_form_item_selector[ field_name ].btn_select_title );
+					jQuery( this ).hide();
+				} );
+				</script>';
+				$this->item_selector_js_initialized = true;
+			}
+
+			$r .= $this->end_field();
+
+			return $this->display_or_return( $r );
 	}
 }
 

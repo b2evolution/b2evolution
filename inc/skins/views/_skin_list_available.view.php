@@ -7,15 +7,16 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog, $skin_type;
+global $skins_path, $admin_url, $redirect_to, $action, $kind, $blog, $skin_type, $max_skin_api_version;
 
 $sel_skin_type = param( 'sel_skin_type', 'string', $skin_type );
+$tab = get_param( 'tab' );
 $collection_kind = param( 'collection_kind', 'string', NULL );
 
 if( $collection_kind !== NULL )
@@ -35,37 +36,45 @@ $SkinCache->load_all();
 
 $block_item_Widget = new Widget( 'block_item' );
 
-if( get_param( 'tab' ) == 'current_skin' )
+switch( $sel_skin_type )
+{
+	case 'normal':
+		$skin_type_title = /* TRANS: Skin type name */ T_('Standard');
+		break;
+	case 'mobile':
+		$skin_type_title = /* TRANS: Skin type name */ T_('Phone');
+		break;
+	case 'tablet':
+		$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
+		break;
+	case 'alt':
+		$skin_type_title = /* TRANS: Skin type name */ T_('Alt');
+		break;
+	default:
+		$skin_type_title = '';
+		break;
+}
+
+if( $tab == 'coll_skin' )
 {	// We are installing new skin for collection:
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
-	switch( $sel_skin_type )
-	{
-		case 'normal':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Normal');
-			break;
-		case 'mobile':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Mobile');
-			break;
-		case 'tablet':
-			$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
-			break;
-		default:
-			$skin_type_title = '';
-			break;
-	}
 	$block_title = sprintf( T_('Install a new %s skin for %s:'), $skin_type_title, $Blog->get( 'name' ) );
+}
+elseif( $tab == 'site_skin' )
+{	// We are installing new skin for site:
+	$block_title = sprintf( T_('Install a new %s skin for site:'), $skin_type_title );
 }
 else
 {	// We are managing the skins:
 	$block_title = T_('Skins available for installation');
 }
 
-$block_item_Widget->title = $block_title.get_manual_link( 'installing_skins' );
+$block_item_Widget->title = $block_title.get_manual_link( 'installing-skins' );
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
-	$block_item_Widget->global_icon( T_('Cancel install!'), 'close', $redirect_to );
+	$block_item_Widget->global_icon( T_('Cancel installation!'), 'close', $redirect_to );
 }
 
 $block_item_Widget->disp_template_replaced( 'block_start' );
@@ -77,16 +86,21 @@ $Form->hidden( 'action', $action );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'skin_type', get_param( 'skin_type' ) );
 $Form->hidden( 'kind', get_param( 'kind' ) );
-$Form->hidden( 'tab', get_param( 'tab' ) );
+$Form->hidden( 'tab', $tab );
 $Form->begin_form( 'skin_selector_filters' );
-$Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
+$skin_type_options = array(
 		''        => T_('All skins'),
-		'normal'  => T_('Normal skins'),
-		'mobile'  => T_('Mobile skins'),
+		'normal'  => T_('Standard skins'),
+		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
-		'feed'    => T_('Feed skins'),
-		'sitemap' => T_('Sitemap skins'),
-	), T_('Skin type'), '', array(
+		'alt'     => T_('Alt skins'),
+	);
+if( get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
+{	// Allow install feed and sitemap skins only on normal mode and don't allow when we select new skin for collection:
+	$skin_type_options['feed'] = T_('Feed skins');
+	$skin_type_options['sitemap'] = T_('Sitemap skins');
+}
+$Form->select_input_array( 'sel_skin_type', $sel_skin_type, $skin_type_options, T_('Skin type'), '', array(
 		'force_keys_as_values' => true,
 		'onchange' => 'this.form.submit()'
 	) );
@@ -97,18 +111,22 @@ if( $kind === NULL && isset( $Blog ) )
 	$kind = $Blog->type;
 }
 
-$Form->select_input_array( 'collection_kind', $kind, array(
-		'' => T_('All'),
-		'main' => T_('Main'),
-		'std' => T_('Blog'),
-		'photo' => T_('Photos'),
-		'forum' => T_('Forums'),
-		'manual' => T_('Manual'),
-		'group' => T_('Tracker')
-	), T_('Collection kind'), '', array(
-		'force_keys_as_values' => true,
-		'onchange' => 'this.form.submit()'
-	) );
+if( isset( $Blog ) )
+{	// Display a filter by collection kind:
+	$Form->select_input_array( 'collection_kind', $kind, array(
+			''         => T_('All'),
+			'minisite' => T_('Mini-Site'),
+			'main'     => T_('Main'),
+			'std'      => T_('Blog'),
+			'photo'    => T_('Photos'),
+			'forum'    => T_('Forums'),
+			'manual'   => T_('Manual'),
+			'group'    => T_('Tracker')
+		), T_('Collection kind'), '', array(
+			'force_keys_as_values' => true,
+			'onchange' => 'this.form.submit()'
+		) );
+}
 $Form->end_form();
 
 $filename_params = array(
@@ -262,7 +280,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 
 			$redirect_to_after_install = $redirect_to;
 			/*
-			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'rwd' ) ) );
+			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'alt', 'rwd' ) ) );
 			if( ! empty( $kind ) && $skin_folders_data[$skin_folder]['supported'] )
 			{ // If we are installing skin for a new collection we're currently creating:
 				$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
@@ -324,7 +342,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 
 
 			if( $kind != '' && $folder_Skin->supports_coll_kind( $kind ) != 'yes' )
-			{ // Filter skin by support for collection type
+			{	// Filter skin by support for collection type:
 				$skin_folders_data[$skin_folder]['supported'] = false;
 				$skin_folders_data[$skin_folder]['status'] = 'ignore';
 			}
@@ -345,22 +363,39 @@ foreach( $skin_folders_data as $skin_folder => $data )
 			}
 
 			if( ! empty( $sel_skin_type ) && $folder_Skin->type != $sel_skin_type &&
-					( $folder_Skin->type != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet' ) ) ) )
+					( $folder_Skin->type != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) ) )
 			{	// Filter skin by selected type;
-				// For normal, mobile, tablet skins also displays rwd skins:
+				// For normal, mobile, tablet, alt skins also displays rwd skins:
+				$skin_folders_data[$skin_folder]['status'] = 'ignore';
+				continue;
+			}
+
+			if( ( $tab == 'coll_skin' && ! $folder_Skin->provides_collection_skin() ) ||
+					( $tab == 'site_skin' && ! $folder_Skin->provides_site_skin() ) )
+			{	// This skin cannot be used because it is not provided for collection or site:
 				$skin_folders_data[$skin_folder]['status'] = 'ignore';
 				continue;
 			}
 
 			$redirect_to_after_install = $redirect_to;
-			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'rwd' ) ) );
+			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'alt', 'rwd' ) ) );
 			if( ! empty( $kind ) && $skin_compatible )
 			{ // If we are installing skin for a new collection we're currently creating:
-				$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
+				$coll_url_suffix = get_param( 'sec_ID' ) ? '&sec_ID='.get_param( 'sec_ID' ) : '';
+				$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.$coll_url_suffix.'&skin_ID=$skin_ID$';
 			}
 
-			if( $skin_compatible )
-			{
+			if( $folder_Skin->get_api_version() > $max_skin_api_version )
+			{	// Unsupported skin API version:
+				$disp_params = array(
+						'function'  => 'broken',
+						'msg'       => T_('Unsupported version!'),
+						'help_info' => sprintf( T_('The skin API version %s is not supported by this version of b2evolution'), $folder_Skin->get_api_version() ),
+				);
+				$skin_folders_data[$skin_folder]['status'] = 'unsupported api version';
+			}
+			elseif( $skin_compatible )
+			{	// Skin is compatible:
 				$disp_params = array(
 					'function'        => 'install',
 					'function_url'    => $admin_url.'?ctrl=skins&amp;action=create&amp;tab='.get_param( 'tab' )
@@ -368,12 +403,13 @@ foreach( $skin_folders_data as $skin_folder => $data )
 															.( empty( $skin_type ) ? '' : '&amp;skin_type='.$skin_type )
 															.'&amp;skin_folder='.rawurlencode( $skin_folder )
 															.'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
-															.'&amp;'.url_crumb( 'skin' )
+															.'&amp;'.url_crumb( 'skin' ),
+					'onclick'         => ( $tab == 'coll_skin' ? 'return confirm_skin_selection( this, "'.$folder_Skin->type.'" )' : '' ),
 				);
 				$skin_folders_data[$skin_folder]['status'] = 'ok';
 			}
 			else
-			{
+			{	// Wrong skin type:
 				$disp_params = array(
 						'function'      => 'broken',
 						'msg'           => T_('Wrong Type!'),
@@ -417,9 +453,9 @@ foreach( $skin_folders as $skin_folder )
 	}
 
 	if( ! empty( $sel_skin_type ) && $skin_folders_data[$skin_folder]['skin_type'] != $sel_skin_type &&
-			( $skin_folders_data[$skin_folder]['skin_type'] != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet' ) ) ) )
+			( $skin_folders_data[$skin_folder]['skin_type'] != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) ) )
 	{	// Filter skin by selected type;
-		// For normal, mobile, tablet skins also displays rwd skins:
+		// For normal, mobile, tablet, alt skins also displays rwd skins:
 		continue;
 	}
 
@@ -433,9 +469,9 @@ foreach( $skin_folders as $skin_folder )
 echo '<div class="clear"></div>';
 echo '</div>';
 
-if( $skins_exist && empty( $kind ) && get_param( 'tab' ) != 'current_skin' )
+if( $skins_exist && empty( $kind ) && $tab != 'coll_skin' && $tab != 'site_skin' )
 {	// Display form buttons only when at least one skin exists for installation:
-	// Don't enabled this feature on new collection creating and on selecting new skin for the colleciton:
+	// Don't enabled this feature on new collection creating and on selecting new skin for the collection or site:
 	$form_buttons = array(
 		array( 'type' => 'button', 'id'  => 'check_all_skins', 'value' => T_('Check All'), 'class' => 'btn btn-default' ),
 		array( 'type' => 'submit', 'value' => T_('Install Checked'), 'class' => 'btn btn-primary' ),
@@ -449,8 +485,13 @@ $Form->end_form( $form_buttons );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
+if( $tab == 'coll_skin' )
+{	// JavaScript code to confirm skin selection:
+	echo_confirm_skin_selection_js();
+}
+
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#check_all_skins' ).click( function() {
 	jQuery( 'input[name="skin_folders[]"]' ).attr( 'checked', 'checked' );
 } );

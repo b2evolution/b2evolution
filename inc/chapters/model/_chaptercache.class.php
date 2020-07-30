@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -666,7 +666,10 @@ class ChapterCache extends DataObjectCache
 			return strcmp( $Item->title, $Chapter->name );
 		}
 
-		if( $Item->order == NULL )
+		// Get item order depending on category:
+		$item_order = $Item->get_order( $Chapter->get( 'parent_ID' ) );
+
+		if( $item_order == NULL )
 		{
 			return $Chapter->order == NULL ? 0 : 1;
 		}
@@ -675,7 +678,7 @@ class ChapterCache extends DataObjectCache
 			return -1;
 		}
 
-		return ( $Item->order < $Chapter->order ) ? -1 : ( ( $Item->order > $Chapter->order ) ? 1 : 0 );
+		return ( $item_order < $Chapter->order ) ? -1 : ( ( $item_order > $Chapter->order ) ? 1 : 0 );
 	}
 
 
@@ -738,6 +741,7 @@ class ChapterCache extends DataObjectCache
 	function recurse( $callbacks, $subset_ID = NULL, $cat_array = NULL, $level = 0, $max_level = 0, $params = array() )
 	{
 		$params = array_merge( array(
+				'highlight_current' => true,
 				'sorted' => false,
 				'chapter_path' => array(),
 				'expand_all' => true,
@@ -779,8 +783,13 @@ class ChapterCache extends DataObjectCache
 		// Go through all categories at this level:
 		foreach( $cat_array as $cat )
 		{
+			if( isset($params['excluded_cat_IDs']) && in_array(  $cat->ID, $params['excluded_cat_IDs'] ) )
+			{	// Category is excluded, Skip it:
+				continue;
+			}
+			
 			// Check if category is expended
-			$params['is_selected'] = in_array( $cat->ID, $params['chapter_path'] );
+			$params['is_selected'] = $params['highlight_current'] && in_array( $cat->ID, $params['chapter_path'] );
 			$params['is_opened'] = $params['expand_all'] || $params['is_selected'];
 
 			// Display a category:
@@ -793,8 +802,8 @@ class ChapterCache extends DataObjectCache
 				$r .= $callbacks['line']( $cat, $level, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
 			}
 
-			if( ( empty( $max_level ) || $max_level > $level + 1 ) && $params['is_opened'] )
-			{ // Iterate through sub categories recursively
+			if( $params['is_opened'] || ( $max_level > $level + 1 ) )
+			{	// Iterate through sub categories recursively:
 				$params['level'] = $level;
 				$r .= $this->iterate_through_category_children( $cat, $callbacks, true, $params );
 			}
@@ -832,7 +841,7 @@ class ChapterCache extends DataObjectCache
 	 * Iterate through the given Chapter sub cats and items
 	 *
 	 * @param Object Chapter
-	 * @param array  Callback functions to display a Chapter and to display an Item
+	 * @param array Callback functions to display a Chapter and to display an Item
 	 * @param boolean Set true to iterate sub categories recursively, false otherwise
 	 * @param array Any additional params ( e.g. 'sorted', 'level', 'list_subs_start', etc. )
 	 * @return string the concatenated callbacks result
@@ -846,7 +855,9 @@ class ChapterCache extends DataObjectCache
 				'sorted'    => false,
 				'level'     => 0,
 				'max_level' => 0,
-				'subset_ID' => $Chapter->blog_ID
+				'subset_ID' => $Chapter->blog_ID,
+				'items_order_alpha_func' => 'compare_items_by_title',
+				'exclude_cats' => array(),
 			), $params );
 
 		if( $params['sorted'] && $has_sub_cats )
@@ -856,9 +867,10 @@ class ChapterCache extends DataObjectCache
 		if( ! empty( $callbacks['posts'] ) )
 		{
 			$ItemCache = & get_ItemCache();
-			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['sorted'] );
+			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['items_order_alpha_func'] );
 		}
 
+		// Does this category have content to display?
 		if( $has_sub_cats || !empty( $cat_items ) )
 		{ // Display category or posts
 			$cat_index = 0;
@@ -867,6 +879,7 @@ class ChapterCache extends DataObjectCache
 			$chapter_children_ids = array_keys( $Chapter->children );
 			$has_more_children = isset( $chapter_children_ids[$cat_index] );
 			$has_more_items = isset( $cat_items[$item_index] );
+			// alpha or manual order? 
 			$cat_order = $Chapter->get_subcat_ordering();
 			// Set post params for post display
 			$params['chapter_ID'] = $Chapter->ID;
@@ -877,22 +890,32 @@ class ChapterCache extends DataObjectCache
 				$r .= $params['list_subs_start'];
 			}
 
+			// Display all sub Chapters and items of current Chapter:
 			while( $has_more_children || $has_more_items )
 			{
 				$current_sub_Chapter = $has_more_children ? $Chapter->children[$chapter_children_ids[$cat_index]] : NULL;
 				$current_Item = $has_more_items ? $cat_items[$item_index] : NULL;
-				if( $current_Item != NULL && ( $current_sub_Chapter == NULL || ( $this->compare_item_with_chapter( $current_Item, $current_sub_Chapter, $cat_order ) <= 0 ) ) )
-				{
+
+				// Determine if the next thing to display is a Chapter or an Item:
+				if( $current_Item != NULL 
+					&& ( $current_sub_Chapter == NULL 
+						|| ( $this->compare_item_with_chapter( $current_Item, $current_sub_Chapter, $cat_order ) <= 0 ) ) )
+				{	// Next Item should display before Next Chapter/subcat
+
 					if( ! empty( $subcats_to_display ) )
 					{
 						if( $recurse )
-						{
+						{	// Display sub-contents:
 							$r .= $this->recurse( $callbacks, $params['subset_ID'], $subcats_to_display, $params['level'] + 1, $params['max_level'], $params );
 						}
 						else
-						{ // Display each category without recursion
+						{	// Display each category without recursion:
 							foreach( $subcats_to_display as $sub_Chapter )
 							{ // Display each category:
+								if( in_array( $sub_Chapter->ID, $params['exclude_cats'] ) )
+								{	// Exclude category:
+									continue;
+								}
 								if( is_array( $callbacks['line'] ) )
 								{ // object callback:
 									$r .= $callbacks['line'][0]->{$callbacks['line'][1]}( $sub_Chapter, 0, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
@@ -905,6 +928,8 @@ class ChapterCache extends DataObjectCache
 						}
 						$subcats_to_display = array();
 					}
+
+					// Display an Item:
 					if( is_array( $callbacks['posts'] ) )
 					{ // object callback:
 						$r .= $callbacks['posts'][0]->{$callbacks['posts'][1]}( $current_Item, $params['level'] + 1, $params );
@@ -916,22 +941,27 @@ class ChapterCache extends DataObjectCache
 					$has_more_items = isset( $cat_items[++$item_index] );
 				}
 				elseif( $current_sub_Chapter != NULL )
-				{
+				{ 	// Next Chapter should display before next Item:
+
 					$subcats_to_display[] = $current_sub_Chapter;
 					$has_more_children = isset( $chapter_children_ids[++$cat_index] );
 				}
 			}
 
 			if( ! empty( $subcats_to_display ) )
-			{ // Display all subcats which were not displayed yet
+			{ // Display all subcats which were not displayed yet:
 				if( $recurse )
 				{
 					$r .= $this->recurse( $callbacks, $params['subset_ID'], $subcats_to_display, $params['level'] + 1, $params['max_level'], $params );
 				}
 				else
-				{ // Display each category without recursion
+				{ // Display each category without recursion:
 					foreach( $subcats_to_display as $sub_Chapter )
 					{ // Display each category:
+						if( in_array( $sub_Chapter->ID, $params['exclude_cats'] ) )
+						{	// Exclude category:
+							continue;
+						}
 						if( is_array( $callbacks['line'] ) )
 						{ // object callback:
 							$r .= $callbacks['line'][0]->{$callbacks['line'][1]}( $sub_Chapter, 0, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
@@ -950,7 +980,8 @@ class ChapterCache extends DataObjectCache
 			}
 		}
 		elseif( isset( $callbacks['no_children'] ) )
-		{ // Display message when no children
+		{ // Display message when no children:
+			
 			if( is_array( $callbacks['no_children'] ) )
 			{ // object callback:
 				$r .= $callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $Chapter, $params['level'] + 1 ); // </li>
@@ -964,22 +995,19 @@ class ChapterCache extends DataObjectCache
 
 
 	/**
-	 * Return recursive select options list of all loaded categories
+	 * Return array of recursive select options list of all loaded categories
 	 *
-	 * @param integer selected category in the select input
 	 * @param integer NULL for all subsets
 	 * @param boolean Include the root element?
 	 * @param array GenercCategory objects to display (will recurse from those starting points)
 	 * @param integer depth of categories list
 	 * @param array IDs of categories to exclude (their children will be ignored to)
 	 *
-	 * @return string select options list of all loaded categories
+	 * @return array select options list of all loaded categories
 	 */
-	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
+	function recurse_select_options( $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
 							$level = 0, $exclude_array = array() )
 	{
-		// pre_dump( $exclude_array );
-
 		// Make sure children have been revealed for specific subset:
 		$this->reveal_children( $subset_ID );
 
@@ -988,11 +1016,14 @@ class ChapterCache extends DataObjectCache
 			$Cat_array = $this->root_cats;
 		}
 
-		$r = '';
+		// Sort categories alphabetically or manually depending on settings:
+		usort( $Cat_array, array( 'Chapter', 'compare_chapters' ) );
+
+		$options = array();
 
 		if( $include_root )
 		{
-			$r .= '<option value="">'.T_('Root').'</option>';
+			$options[] = T_('Root');
 			$level++;
 		}
 
@@ -1010,14 +1041,40 @@ class ChapterCache extends DataObjectCache
 				$indent .='&nbsp;&nbsp;';
 			}
 			// Set category option:
-			$r .= '<option value="'.$Chapter->ID.'" ';
-			if( $Chapter->ID == $selected ) $r .= ' selected="selected"';
-			$r .= ' >'.$indent.$Chapter->name.'</option>';
+			$options[ $Chapter->ID ] = $indent.$Chapter->name;
 
-			if( !empty( $Chapter->children ) )
+			if( ! empty( $Chapter->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse_select( $selected, $subset_ID, false, $Chapter->children, $level+1, $exclude_array );
+				$options += $this->recurse_select_options( $subset_ID, false, $Chapter->children, $level+1, $exclude_array );
 			}
+		}
+
+		return $options;
+	}
+
+
+	/**
+	 * Return string of recursive select options list of all loaded categories
+	 *
+	 * @param integer selected category in the select input
+	 * @param integer NULL for all subsets
+	 * @param boolean Include the root element?
+	 * @param array GenercCategory objects to display (will recurse from those starting points)
+	 * @param integer depth of categories list
+	 * @param array IDs of categories to exclude (their children will be ignored to)
+	 *
+	 * @return string select options list of all loaded categories
+	 */
+	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
+							$level = 0, $exclude_array = array() )
+	{
+		$r = '';
+
+		$options = $this->recurse_select_options( $subset_ID, $include_root, $Cat_array, $level, $exclude_array );
+
+		foreach( $options as $chapter_ID => $option_title )
+		{
+			$r .= '<option value="'.( $chapter_ID ? $chapter_ID : '' ).'"'.( $chapter_ID == $selected ? ' selected="selected"' : '' ).'>'.$option_title.'</option>';
 		}
 
 		return $r;

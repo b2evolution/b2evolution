@@ -4,10 +4,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Require this file because function evoAlert() is used here
-require_js( 'functions.js', 'blog', false, true );
+require_js_defer( 'functions.js', 'blog', true );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', 'a.evo_post_fav_btn', function()
 {
 	var me = jQuery( this );

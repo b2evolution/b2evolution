@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -32,94 +32,63 @@ $Form->hidden( 'tab', 'more' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Tracking').get_manual_link( 'tracking-other' ) );
-	$Form->checkbox( 'track_unread_content', $edited_Blog->get_setting( 'track_unread_content' ), T_('Tracking of unread content'), T_('Check this if you want this blog to display special marks in case of unread posts and comments.') );
+$Form->begin_fieldset( TB_('Tracking').get_manual_link( 'tracking-other' ) );
+	$Form->checkbox( 'track_unread_content', $edited_Blog->get_setting( 'track_unread_content' ), TB_('Tracking of unread content'), TB_('Check this if you want this blog to display special marks in case of unread posts and comments.') );
 $Form->end_fieldset();
 
 if( $notifications_mode != 'off' )
 {
-	$Form->begin_fieldset( T_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
+	$Form->begin_fieldset( TB_('Subscriptions').get_manual_link( 'subscriptions-other' ) );
 		$subscription_checkboxes = array();
 		$allow_subscriptions = $edited_Blog->get_setting( 'allow_subscriptions' );
 		$allow_comment_subscriptions = $edited_Blog->get_setting( 'allow_comment_subscriptions' );
 		$allow_item_subscriptions = $edited_Blog->get_setting( 'allow_item_subscriptions' );
+		$allow_item_mod_subscriptions = $edited_Blog->get_setting( 'allow_item_mod_subscriptions' );
 		$advanced_perms = $edited_Blog->get( 'advanced_perms' );
-		$subscription_checkboxes[] = array( 'allow_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new post.'), $allow_subscriptions );
-		$subscription_checkboxes[] = array( 'opt_out_subscription', 1, T_('Consider collection members to be subscribed for each new post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_subscription' ), $allow_subscriptions == 0 || $advanced_perms == 0 );
-		$subscription_checkboxes[] = array( 'allow_comment_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new comment.'), $allow_comment_subscriptions );
-		$subscription_checkboxes[] = array( 'opt_out_comment_subscription', 1, T_('Consider collection members to be subscribed for each new comment unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_comment_subscription' ), $allow_comment_subscriptions == 0 || $advanced_perms == 0 );
-		$subscription_checkboxes[] = array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $allow_item_subscriptions );
-		$subscription_checkboxes[] = array( 'opt_out_item_subscription', 1, T_('Consider collection members to be subscribed for comments on a post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_subscription' ), $allow_item_subscriptions == 0 || $advanced_perms == 0 );
-		$Form->checklist( $subscription_checkboxes, 'subscriptions', T_('Email subscriptions') );
+		$subscription_checkboxes[] = array( 'allow_subscriptions', 1, TB_('Allow users to subscribe and receive email notifications for each new post.'), $allow_subscriptions );
+		$subscription_checkboxes[] = array( 'opt_out_subscription', 1, TB_('Consider collection members to be subscribed for each new post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_subscription' ), $allow_subscriptions == 0 || $advanced_perms == 0 );
+		$subscription_checkboxes[] = array( 'allow_comment_subscriptions', 1, TB_('Allow users to subscribe and receive email notifications for each new comment.'), $allow_comment_subscriptions );
+		$subscription_checkboxes[] = array( 'opt_out_comment_subscription', 1, TB_('Consider collection members to be subscribed for each new comment unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_comment_subscription' ), $allow_comment_subscriptions == 0 || $advanced_perms == 0 );
+		$subscription_checkboxes[] = array( 'allow_item_mod_subscriptions', 1, TB_( 'Allow users to subscribe and receive email notifications when post is modified and user has permission to moderate it.' ), $allow_item_mod_subscriptions );
+		$subscription_checkboxes[] = array( 'opt_out_item_mod_subscription', 1, TB_('Consider collection members to be subscribed to all post modifications unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_mod_subscription' ), $allow_item_mod_subscriptions == 0 || $advanced_perms == 0 );
+		$subscription_checkboxes[] = array( 'allow_item_subscriptions', 1, TB_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $allow_item_subscriptions );
+		$subscription_checkboxes[] = array( 'opt_out_item_subscription', 1, TB_('Consider collection members to be subscribed for comments on a post unless they specifically opt-out.'), $edited_Blog->get_setting( 'opt_out_item_subscription' ), $allow_item_subscriptions == 0 || $advanced_perms == 0 );
+		$Form->checklist( $subscription_checkboxes, 'subscriptions', TB_('Email subscriptions') );
 		// TODO: checkbox 'Enable RSS/Atom feeds'
 		// TODO2: which feeds (skins)?
 	$Form->end_fieldset();
 	?>
-	<script type="text/javascript">
-		var advancedPerms = <?php echo $advanced_perms ? 'true' : 'false';?>;
-		var allowSubscriptions = jQuery( 'input[name=allow_subscriptions]' );
-		var allowCommentSubscriptions = jQuery( 'input[name=allow_comment_subscriptions]' );
-		var allowItemSubscriptions = jQuery( 'input[name=allow_item_subscriptions]' );
-		var optOutSubscription = jQuery( 'input[name=opt_out_subscription]' );
-		var optOutCommentSubscription = jQuery( 'input[name=opt_out_comment_subscription]' );
-		var optOutItemSubscription = jQuery( 'input[name=opt_out_item_subscription]' );
-
-		allowSubscriptions.on( 'click', function( event )
+	<script>
+		jQuery( 'input[name=allow_subscriptions], input[name=allow_comment_subscriptions], input[name=allow_item_subscriptions], input[name=allow_item_mod_subscriptions]' ).on( 'click', function()
+		{
+			var opt_out_object = jQuery( 'input[name=opt_out_' + jQuery( this ).attr( 'name' ).replace( /^allow_/, '' ).replace( /subscriptions$/, 'subscription' ) + ']' );
+			if( <?php echo $advanced_perms ? 'true' : 'false'; ?> && jQuery( this ).is( ':checked' ) )
 			{
-				if( allowSubscriptions.is( ':checked' ) && advancedPerms )
-				{
-					optOutSubscription.removeAttr( 'disabled' );
-				}
-				else
-				{
-					optOutSubscription.attr( 'disabled', true );
-					optOutSubscription.removeAttr( 'checked' );
-				}
-			});
-
-		allowCommentSubscriptions.on( 'click', function( event )
+				opt_out_object.prop( 'disabled', false );
+			}
+			else
 			{
-				if( allowCommentSubscriptions.is( ':checked' ) && advancedPerms )
-				{
-					optOutCommentSubscription.removeAttr( 'disabled' );
-				}
-				else
-				{
-					optOutCommentSubscription.attr( 'disabled', true );
-					optOutCommentSubscription.removeAttr( 'checked' );
-				}
-			});
-
-		allowItemSubscriptions.on( 'click', function( event )
-			{
-				if( allowItemSubscriptions.is( ':checked' ) && advancedPerms )
-				{
-					optOutItemSubscription.removeAttr( 'disabled' );
-				}
-				else
-				{
-					optOutItemSubscription.attr( 'disabled', true );
-					optOutItemSubscription.removeAttr( 'checked' );
-				}
-			});
-
+				opt_out_object.prop( 'disabled', true );
+				opt_out_object.prop( 'checked', false );
+			}
+		} );
 	</script>
 	<?php
 }
-$Form->begin_fieldset( T_('Sitemaps').get_manual_link( 'sitemaps-other' ) );
+$Form->begin_fieldset( TB_('Sitemaps').get_manual_link( 'sitemaps-other' ) );
 	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep sitemaps disabled.').'</p>';
+		echo '<p class="center orange">'.TB_('This collection is for logged in users only.').' '.TB_('It is recommended to keep sitemaps disabled.').'</p>';
 	}
 	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep sitemaps disabled.').'</p>';
+		echo '<p class="center orange">'.TB_('This collection is for members only.').' '.TB_('It is recommended to keep sitemaps disabled.').'</p>';
 	}
 	$Form->checkbox( 'enable_sitemaps', $edited_Blog->get_setting( 'enable_sitemaps' ),
-						T_( 'Enable sitemaps' ), T_( 'Check to allow usage of skins with the "sitemap" type.' ) );
+						TB_( 'Enable sitemaps' ), TB_( 'Check to allow usage of skins with the "sitemap" type.' ) );
 $Form->end_fieldset();
 
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>

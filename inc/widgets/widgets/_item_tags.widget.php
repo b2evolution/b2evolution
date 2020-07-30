@@ -64,7 +64,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Tags');
+		return T_('Tags');
 	}
 
 
@@ -106,10 +106,32 @@ class item_tags_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'Label before the list of tags' ),
 					'defaultvalue' => T_('Tags').': '
-				)
+				),
+				'allow_edit' => array(
+					'label' => T_( 'Allow editing' ),
+					'type' => 'checkbox',
+					'note' => T_( 'Check to enable AJAX editing of item tags if current user has permission.' ),
+					'defaultvalue' => 0,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
+	{
+		global $Item;
+
+		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+			init_tokeninput_js( 'blog' );
+			require_js_defer( '#jquery#', 'blog' );
+			require_js_defer( 'ext:jquery/cookie/jquery.cookie.min.js', 'blog' );
+		}
 	}
 
 
@@ -140,12 +162,20 @@ class item_tags_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		$this->init_display( $params );
+
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
-			return;
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
+			return false;
 		}
 
-		$this->init_display( $params );
+		if( ! ( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() ) &&
+		    ! count( $Item->get_tags() ) )
+		{	// Nothing to display because current User cannot edit the Item and the Item has no tags:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no tags and you cannot add new for the Item.' );
+			return false;
+		}
 
 		// We renamed some params; older skin may use the old names; let's convert those params now:
 		$this->convert_legacy_param( 'widget_coll_item_tags_before', 'widget_item_tags_before' );
@@ -153,22 +183,100 @@ class item_tags_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_item_tags_separator', 'widget_item_tags_separator' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_tags_before'      => '<nav class="small post_tags">',
-				'widget_item_tags_before_list' => $this->disp_params['before_list'],
-				'widget_item_tags_after'       => '</nav>',
-				'widget_item_tags_separator'   => ', ',
+				'widget_item_tags_before'             => '<nav class="small post_tags">',
+				'widget_item_tags_before_list_before' => '<div class="post_tags_label">',
+				'widget_item_tags_before_list'        => $this->disp_params['before_list'],
+				'widget_item_tags_before_list_after'  => '</div>',
+				'widget_item_tags_after'              => '</nav>',
+				'widget_item_tags_separator'          => '',
+				'widget_item_tags_before_quicklist'   => '<div class="evo_widget_item_tags_quicklist">',
+				'widget_item_tags_after_quicklist'    => '</div>',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// List all tags attached to the Item:
-		$Item->tags( array(
-				'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
-				'after'     => $this->disp_params['widget_item_tags_after'],
+		$tags_params = array(
 				'separator' => $this->disp_params['widget_item_tags_separator'],
-			) );
+			);
+
+		if( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() )
+		{	// Allow to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+
+			if( isset( $_COOKIE['quick_item_tags'] ) )
+			{
+				$quick_item_tags = explode( ',', $_COOKIE['quick_item_tags'] );
+			}
+			else
+			{
+				$quick_item_tags = array();
+			}
+
+			$quick_tag_buttons = $this->disp_params['widget_item_tags_before_quicklist'];
+			foreach( $quick_item_tags as $item_tag )
+			{
+				$quick_tag_buttons .= '<button type="button" class="btn btn-default btn-xs" onclick="add_quick_tag('.format_to_js( $this->ID ).', this )">'.format_to_output( $item_tag ).'</button>';
+			}
+			$quick_tag_buttons .= $this->disp_params['widget_item_tags_after_quicklist'];;
+
+			echo '<span class="evo_widget_item_tags_edit_form" id="evo_widget_item_tags_edit_form_'.$this->ID.'" style="display:none">';
+			echo $this->disp_params['widget_item_tags_before'];
+			if( $this->disp_params['widget_item_tags_before_list'] )
+			{
+				echo $this->disp_params['widget_item_tags_before_list_before'];
+				echo $this->disp_params['widget_item_tags_before_list'];
+				echo $this->disp_params['widget_item_tags_before_list_after'];
+			}
+			$Form = new Form();
+			$Form->switch_layout( 'none' );
+			$Form->begin_form();
+			$Form->add_crumb( 'collections_update_tags' );
+			$Form->text_input( 'item_tags_'.$this->ID, implode( ', ', $Item->get_tags() ), 40, '' );
+			echo $quick_tag_buttons;
+			$Form->end_form();
+			echo_autocomplete_tags( array(
+					'input_ID'       => 'item_tags_'.$this->ID,
+					'item_ID'        => $Item->ID,
+					'update_by_ajax' => true,
+					'use_quick_tags' => true,
+				) );
+			echo $this->disp_params['widget_item_tags_after'];
+			echo '</span>';
+
+			// Action icon to display a form to edit tags:
+			$this->disp_params['widget_item_tags_before'] = '<span class="evo_widget_item_tags_list" id="evo_widget_item_tags_list_'.$this->ID.'"">'
+					.$this->disp_params['widget_item_tags_before'];
+			$this->disp_params['widget_item_tags_after'] .= ' '.action_icon( T_('Edit tags'), 'edit',
+					$Item->get_edit_url( array( 'force_backoffice_editing' => true ) ).'#itemform_adv_props',
+					NULL, NULL, NULL, array( 'id' => 'evo_widget_item_tags_edit_icon_'.$this->ID ) )
+				.'</span>';
+			
+			// JS to activate an edit tags form:	
+			$js_config = array(
+					'input_ID'  => 'item_tags_'.$this->ID,
+					'widget_ID' => $this->ID
+				);
+			expose_var_to_js( 'item_tags_widget_'.$this->ID, $js_config, 'evo_item_tags_widget_config' );
+		}
+
+		if( $this->get_param( 'allow_edit' ) &&
+		    check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'options', 'edit' ) )
+		{	// Use different style for edit mode, make tag icon as link to edit item tag in back-office:
+			global $admin_url, $ReqURL;
+			$tags_params['before_tag'] = '<span>'.action_icon( T_('Edit tag'), 'tag', $admin_url.'?ctrl=itemtags&amp;action=edit&amp;tag_ID=$tag_ID$&amp;return_to='.rawurlencode( $ReqURL ) );
+			$tags_params['after_tag'] = '</span>';
+		}
+
+		echo $this->disp_params['widget_item_tags_before'];
+
+		// Display a list of all tags attached to the Item:
+		$tags_params['before'] = ( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' );
+		$tags_params['after'] = '';
+		$Item->tags( $tags_params );
+
+		echo $this->disp_params['widget_item_tags_after'];
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -190,7 +298,8 @@ class item_tags_Widget extends ComponentWidget
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
+				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 			);
 	}
 }

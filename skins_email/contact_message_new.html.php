@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.html.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $evo_charset;
+global $Session, $evo_charset, $admin_url;
 
 // Default params:
 $params = array_merge( array(
@@ -23,7 +23,7 @@ $params = array_merge( array(
 		'message_footer'   => '',
 		'Blog'             => NULL,
 		'message'          => '',
-		'comment_id'       => NULL,
+		'comment_ID'       => NULL,
 		'post_id'          => NULL,
 		'recipient_User'   => NULL,
 		'Comment'          => NULL,
@@ -36,10 +36,10 @@ $recipient_User = & $params['recipient_User'];
 if( !empty( $Blog ) )
 {
 	echo '<p'.emailskin_style( '.p' ).'>';
-	if( !empty( $params['comment_id'] ) )
+	if( !empty( $params['comment_ID'] ) )
 	{ // From comment
 		$CommentCache = & get_CommentCache();
-		$Comment = & $CommentCache->get_by_ID( $params['comment_id'] );
+		$Comment = & $CommentCache->get_by_ID( $params['comment_ID'] );
 		$Item = & $Comment->get_Item();
 		echo sprintf( T_('Message sent from your <a %s>comment</a> on %s.'),
 			'href="'.$Comment->get_permanent_url( '&', '#comments' ).'"'.emailskin_style( '.a' ).'',
@@ -78,7 +78,7 @@ if( ! empty( $params['additional_fields'] ) )
 if( ! empty( $params['contact_method'] ) )
 {	// Display a preferred contact method only if it has been selected:
 	echo '<p'.emailskin_style( '.p' ).'>'
-			.'<b>'.T_('Preferred contact method').':</b> '
+			.'<b>'.T_('Reply method').':</b> '
 			.$params['contact_method']
 		.'</p>';
 }
@@ -90,9 +90,15 @@ if( ! empty( $params['message'] ) )
 	echo "</div>\n";
 }
 
-// show sender IP address
-$ip_list = implode( ', ', get_linked_ip_list( NULL, $recipient_User ) );
-echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), $ip_list ).'</p>';
+if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+{
+	$session_ID = '<a href="'.$admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID.'">'.$Session->ID.'</a>';
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo sprintf( T_('Session ID').': %s', $session_ID );
 
 // show sender email address
 echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( 'By replying, your email will go directly to %s.' ), '<a href="mailto:'.$params['sender_address'].'"'.emailskin_style( '.a' ).'>'.$params['sender_address'].'</a>' ).'</p>';
@@ -119,10 +125,13 @@ if( ! empty( $recipient_User ) )
 		}
 	}
 
-	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
-	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' )
+	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances:
+	if( empty( $params['email_headers']['Reply-To'] ) )
+	{	// Display the message below only when replying is not allowed to current email message (usually for email messages from anonymous users):
+		$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' )
 			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
+	}
 }
 elseif( !empty( $params['Comment'] ) )
 { // Visitor:

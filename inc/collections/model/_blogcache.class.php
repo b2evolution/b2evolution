@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -97,12 +97,13 @@ class BlogCache extends DataObjectCache
 		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
 
 		$sql = 'SELECT *
-			  FROM T_blogs
-			 WHERE ( blog_access_type = "absolute"
-			         AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
-		                 OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
-			    OR ( blog_access_type = "subdom"
-			         AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )';
+						FROM T_blogs
+						WHERE ( blog_access_type = "absolute"
+							AND ( '.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" )
+								OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( blog_siteurl, "%" ) ) )
+							OR ( blog_access_type = "subdom"
+								AND '.$DB->quote( $req_url_wo_proto ).' LIKE CONCAT( "://", blog_urlname, ".'.$basehost.$baseport.'/%" ) )
+						ORDER BY blog_ID ASC';
 
 		// Match stubs like "http://base/url/STUB?param=1" on $baseurl
 		/*
@@ -170,6 +171,54 @@ class BlogCache extends DataObjectCache
 
 
 	/**
+	 * Get a blog by its URL alias.
+	 *
+	 * Load the object into cache, if necessary.
+	 *
+	 * @param string URL alias of object to load
+	 * @param string Matching alias (by reference)
+	 * @param boolean false if you want to return false on error
+	 * @return
+	 */
+	function & get_by_url_alias( $req_url, & $alias, $halt_on_error = true )
+	{
+		global $DB, $Debuglog;
+
+		// Load just the requested object:
+		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
+
+		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
+
+		$sql = 'SELECT T_blogs.*,	cua_url_alias,
+							LENGTH( REPLACE( '.$DB->quote( $req_url_wo_proto ).', SUBSTRING( cua_url_alias, POSITION( "://" IN cua_url_alias ) ), "" ) ) AS unmatched_length
+						FROM T_blogs
+						LEFT JOIN T_coll_url_aliases
+							ON cua_coll_ID = blog_ID
+						WHERE (
+							'.$DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( cua_url_alias, "%" )
+							OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( cua_url_alias, "%" ) )
+							AND NOT cua_url_alias IS NULL
+						ORDER BY unmatched_length ASC';
+
+		$row = $DB->get_row( $sql, OBJECT, 0, 'Blog::get_by_url_alias()' );
+		if( empty( $row ) )
+		{ // Requested object does not exist
+			if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
+
+			$r = false;
+			return $r; // we return by reference!
+		}
+
+		$Collection = $Blog = new Blog( $row );
+		$this->add( $Blog );
+
+		$alias = $row->cua_url_alias;
+
+		return $Blog;
+	}
+
+
+	/**
 	 * Load the cache **extensively**
 	 */
 	function load_all( $order_by = '', $order_dir = '' )
@@ -223,7 +272,7 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Get SQL to load a list of public collections
+	 * Get SQL to load a list of public collections that can be seen by currently logged in User
 	 *
 	 * @param string Order By
 	 * @param string Order Direction
@@ -243,7 +292,7 @@ class BlogCache extends DataObjectCache
 			$order_dir = $Settings->get( 'blogs_order_dir' );
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get public collections that can be seen by currently logged in User' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( $this->dbtablename );
 		$sql_where = 'blog_in_bloglist = "public"';
@@ -253,6 +302,68 @@ class BlogCache extends DataObjectCache
 			// Allow the collections that available for members:
 			global $current_User;
 			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
+					( SELECT grp_ID
+					    FROM T_groups
+					   WHERE grp_ID = '.$current_User->grp_ID.'
+					     AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
+					( SELECT bloguser_user_ID
+					    FROM T_coll_user_perms
+					   WHERE bloguser_blog_ID = blog_ID
+					     AND bloguser_ismember = 1
+					     AND bloguser_user_ID = '.$current_User->ID.' ) OR
+					( SELECT bloggroup_group_ID
+					    FROM T_coll_group_perms
+					   WHERE bloggroup_blog_ID = blog_ID
+					     AND bloggroup_ismember = 1
+					     AND ( bloggroup_group_ID = '.$current_User->grp_ID.'
+					           OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )
+					  LIMIT 1
+					)
+				) )';
+		}
+		$SQL->WHERE( '( '.$sql_where.' )' );
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		return $SQL;
+	}
+
+
+	/**
+	 * Get SQL to load a list of all collections that can be seen by currently logged in User
+	 *
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return object SQL
+	 */
+	function get_available_colls_SQL( $order_by = '', $order_dir = '' )
+	{
+		global $Settings;
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+		$default_allow_access = $CollectionSettings->get_default( 'allow_access' );
+
+		$SQL = new SQL( 'Get all collections that can be seen by currently logged in User' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON cset_coll_ID = blog_ID AND cset_name = "allow_access"' );
+		$sql_where = '( cset_value = "public"'.( $default_allow_access == "public" ? ' OR cset_value IS NULL' : '' ).' )';
+		if( is_logged_in() )
+		{	// Allow the collections that available for logged in users:
+			$sql_where .= ' OR ( cset_value = "users"'.( $default_allow_access == "users" ? ' OR cset_value IS NULL' : '' ).' )';
+			// Allow the collections that available for members:
+			global $current_User;
+			$sql_where .= ' OR ( ( cset_value = "members"'.( $default_allow_access == "members" ? ' OR cset_value IS NULL' : '' ).' ) AND (
 					( SELECT grp_ID
 					    FROM T_groups
 					   WHERE grp_ID = '.$current_User->grp_ID.'
@@ -574,9 +685,10 @@ class BlogCache extends DataObjectCache
 	 * @param boolean provide a choice for "none" with ID 0
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
+	 * @param array Additional attributes for <option>, Key - attribute name, Value - object property
 	 * @return string HTML tags <option>
 	 */
-	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array(), $option_attrs = array() )
 	{
 		// We force a full load!
 		$this->load_all();

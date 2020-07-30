@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -103,7 +103,7 @@ class Organization extends DataObject
 		global $current_User;
 
 		// Owner:
-		if( $current_User->check_perm( 'orgs', 'edit' ) )
+		if( check_user_perm( 'orgs', 'edit' ) )
 		{	// Update the owner if current user has a permission to edit all organizations:
 			$pqst_owner_login = param( 'org_owner_login', 'string', NULL );
 			param_check_not_empty( 'org_owner_login', T_('Please enter the owner\'s login.') );
@@ -141,7 +141,7 @@ class Organization extends DataObject
 		// Accept level:
 		param( 'org_accept', 'string' );
 		$this->set_from_Request( 'accept' );
-		
+
 		// Edit Role Permission:
 		param( 'org_perm_role', 'string' );
 		$this->set_from_Request( 'perm_role' );
@@ -194,6 +194,9 @@ class Organization extends DataObject
 				break;
 			case 'org_role':
 				$users_SQL->ORDER_BY( 'uorg_role ASC, user_ID ASC' );
+				break;
+			case 'org_priority':
+				$users_SQL->ORDER_BY( 'uorg_priority ASC, user_ID ASC' );
 				break;
 			case 'username':
 				$users_SQL->ORDER_BY( 'user_login ASC, user_ID ASC' );
@@ -250,8 +253,7 @@ class Organization extends DataObject
 		}
 		else
 		{	// Check permission:
-			global $current_User;
-			if( is_logged_in() && $current_User->check_perm( 'orgs', 'edit', false, $this ) )
+			if( check_user_perm( 'orgs', 'edit', false, $this ) )
 			{	// If current user has a perm to edit this organization then also allow to auto accept it:
 				return true;
 			}

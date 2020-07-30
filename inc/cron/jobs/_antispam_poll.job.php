@@ -6,7 +6,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-if( antispam_poll_abuse() )
+if( antispam_poll_abuse( true ) )
 { // Success
 	$job_ret = 1;
 }
@@ -14,9 +14,6 @@ else
 {	// Error
 	$job_ret = 100;
 }
-
-global $Messages;
-$result_message = $Messages->get_string( '', '', "\n" );
 
 return $job_ret;
 ?>

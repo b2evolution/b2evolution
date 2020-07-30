@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -19,7 +19,8 @@ load_class( 'automations/model/_automation.class.php', 'Automation' );
 load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 
 // Check permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 param_action( '', true );
 param( 'display_mode', 'string', 'normal' );
@@ -33,7 +34,7 @@ if( param( 'autm_ID', 'integer', '', true ) )
 		unset( $edited_Automation );
 		forget_param( 'autm_ID' );
 		$action = '';
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Automation') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Automation') ), 'error' );
 	}
 }
 
@@ -45,7 +46,7 @@ if( param( 'step_ID', 'integer', '', true ) )
 		unset( $edited_AutomationStep );
 		forget_param( 'autm_ID' );
 		$action = '';
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Automation step') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Automation step') ), 'error' );
 	}
 }
 
@@ -55,7 +56,7 @@ switch( $action )
 		// New Automation form:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Create object of new Automation:
 		$edited_Automation = new Automation();
@@ -63,21 +64,37 @@ switch( $action )
 
 	case 'edit':
 	case 'edit_step':
+	case 'copy_step':
 		// Edit Automation/Step forms:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
+
+		if( $action == 'copy_step' )
+		{	// Clear an order of the duplicating step in order to set this automatically right below current one:
+			$edited_AutomationStep->set( 'order', '' );
+		}
+
+		if( ( $action == 'edit_step' || $action == 'copy_step' ) && ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( TB_('You must pause the automation before changing step.'), 'warning' );
+		}
 		break;
 
 	case 'new_step':
 		// New Automation Step form:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Create object of new Automation:
 		$edited_AutomationStep = new AutomationStep();
 		$edited_AutomationStep->set( 'autm_ID', $autm_ID );
+
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( TB_('You must pause the automation before creating new step.'), 'warning' );
+		}
 		break;
 
 	case 'create':
@@ -88,14 +105,29 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to create automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_Automation->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
-			$edited_Automation->dbinsert();
-			$Messages->add( T_('New automation has been created.'), 'success' );
+			if( $edited_Automation->dbinsert() )
+			{
+				$Messages->add( TB_('New automation has been created.'), 'success' );
+
+				// Create default step automatically:
+				$default_AutomationStep = new AutomationStep();
+				$default_AutomationStep->set( 'autm_ID', $edited_Automation->ID );
+				$default_AutomationStep->set( 'order', '1' );
+				$default_AutomationStep->set( 'type', 'notify_owner' );
+				$default_AutomationStep->set( 'info', '$login$ has ENTERED automation $automation_name$ (ID: $automation_ID$)'."\n\n".'Step $step_number$ (ID: $step_ID$)' );
+				$default_AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
+				$default_AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
+				$default_AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
+				$default_AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+				$default_AutomationStep->set_label();
+				$default_AutomationStep->dbinsert( false/* Insert step even when automation is not paused */ );
+			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
@@ -111,7 +143,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to edit automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
@@ -121,7 +153,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update automation in DB:
 			$edited_Automation->dbupdate();
-			$Messages->add( T_('Automation has been updated.'), 'success' );
+			$Messages->add( TB_('Automation has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations', 303 ); // Will EXIT
@@ -137,14 +169,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// Delete from DB if confirmed:
-			$msg = sprintf( T_('The automation "%s" has been deleted.'), $edited_Automation->dget( 'name' ) );
+			$msg = sprintf( TB_('The automation "%s" has been deleted.'), $edited_Automation->dget( 'name' ) );
 			$edited_Automation->dbdelete();
 			unset( $edited_Automation );
 			forget_param( 'autm_ID' );
@@ -155,7 +187,7 @@ switch( $action )
 		}
 		else
 		{	// Check for restrictions if not confirmed yet:
-			if( ! $edited_Automation->check_delete( sprintf( T_('Cannot delete automation "%s"'), $edited_Automation->dget( 'name' ) ) ) )
+			if( ! $edited_Automation->check_delete( sprintf( TB_('Cannot delete automation "%s"'), $edited_Automation->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -170,7 +202,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to edit automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
@@ -182,13 +214,30 @@ switch( $action )
 		// Update automation in DB:
 		if( $edited_Automation->dbupdate() )
 		{
-			$Messages->add( T_('Automation status has been changed.'), 'success' );
+				$Messages->add( ( $action == 'status_paused'
+						? TB_('Automation has been paused.')
+						: TB_('Automation has been activated.')
+					), 'success' );
 			// We want to highlight the moved Step on next list display:
 			$Session->set( 'fadeout_array', array( 'autm_ID' => array( $edited_Automation->ID ) ) );
 		}
 
+		// Set a redirect to page back where the status has been changes:
+		if( $enlt_ID > 0 )
+		{	// A list of automations on the edited List page:
+			$redirect_to = $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID;
+		}
+		elseif( $tab == 'steps' || $tab == 'diagram' )
+		{	// Tab "Steps" of the edited Automation page:
+			$redirect_to = $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_Automation->ID;
+		}
+		else
+		{	// A list of all automations:
+			$redirect_to = $admin_url.'?ctrl=automations';
+		}
+
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( $enlt_ID > 0 ? $admin_url.'?ctrl=newsletters&tab=automations&action=edit&enlt_ID='.$enlt_ID : $admin_url.'?ctrl=automations', 303 ); // Will EXIT
+		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -199,7 +248,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to edit automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got IDs:
 		param( 'autm_ID', 'integer', true );
@@ -229,7 +278,7 @@ switch( $action )
 
 		if( $requeued_users_num )
 		{
-			$Messages->add( sprintf( T_('Automation has been requeued for %d users.'), $requeued_users_num ), 'success' );
+			$Messages->add( sprintf( TB_('Automation has been requeued for %d users.'), $requeued_users_num ), 'success' );
 			// We want to highlight the reduced Step on list display:
 			$Session->set( 'fadeout_array', array( 'aust_user_ID' => array( $source_user_ID ) ) );
 		}
@@ -258,7 +307,16 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to create automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
+
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( TB_('You must pause the automation before changing step.'), 'error' );
+			$action = 'edit'; // To keep same opened page
+			// We want to highlight the Step:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			break;
+		}
 
 		// Make sure we got an step_ID:
 		param( 'step_ID', 'integer', true );
@@ -312,7 +370,7 @@ switch( $action )
 		if( $result !== false )
 		{	// Update was successful:
 			$DB->commit();
-			$Messages->add( T_('Order has been changed.'), 'success' );
+			$Messages->add( TB_('Order has been changed.'), 'success' );
 			// We want to highlight the moved Step on next list display:
 			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 		}
@@ -329,26 +387,93 @@ switch( $action )
 
 	case 'create_step':
 		// Create new Automation Step:
-		$edited_AutomationStep = new AutomationStep();
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to create automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
+
+		$edited_AutomationStep = new AutomationStep();
+
+		$entered_step_order = param( 'step_order', 'integer', NULL );
 
 		// load data from request
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Insert in DB:
 			$edited_AutomationStep->dbinsert();
-			$Messages->add( T_('New automation step has been created.'), 'success' );
+			$Messages->add( TB_('New automation step has been created.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		$action = 'new_step';
+		$edited_AutomationStep->set( 'order', $entered_step_order );
+		break;
+
+	case 'duplicate_step':
+		// Duplicate Automation Step:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check that current user has permission to create automation steps:
+		check_user_perm( 'options', 'edit', true );
+
+		$duplicated_step_ID = $edited_AutomationStep->ID;
+		$duplicated_step_order = $edited_AutomationStep->get( 'order' );
+
+		$edited_AutomationStep = new AutomationStep();
+
+		$entered_step_order = param( 'step_order', 'integer', NULL );
+
+		// Load data from request:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
+			// Insert in DB:
+			$edited_AutomationStep->dbinsert();
+
+			if( empty( $entered_step_order ) )
+			{	// Move the new created step right after the duplicated step:
+				$SQL = new SQL( 'Get steps of automation #'.$edited_AutomationStep->get( 'autm_ID' ).' before insert new step right below duplicated one' );
+				$SQL->SELECT( 'step_order' );
+				$SQL->FROM( 'T_automation__step' );
+				$SQL->WHERE( 'step_autm_ID = '.$DB->quote( $edited_AutomationStep->get( 'autm_ID' ) ) );
+				$SQL->WHERE_and( 'step_order > '.$DB->quote( $duplicated_step_order ) );
+				$SQL->ORDER_BY( 'step_order' );
+				$steps = $DB->get_col( $SQL );
+				if( ! empty( $steps ) && $steps[0] == $duplicated_step_order + 1 )
+				{	// If the duplicated step is NOT last AND the next order number is NOT free
+					// then we should shift all next steps down and use next order for new created step:
+					$DB->query( 'UPDATE T_automation__step
+						  SET step_order = step_order + 1
+						WHERE step_autm_ID = '.$DB->quote( $edited_AutomationStep->get( 'autm_ID' ) ).'
+						  AND step_order > '.$DB->quote( $duplicated_step_order ).'
+						ORDER BY step_order DESC' );
+					$DB->query( 'UPDATE T_automation__step
+						  SET step_order = '.( $duplicated_step_order + 1 ).'
+						WHERE step_ID = '.$DB->quote( $edited_AutomationStep->ID ) );
+				}
+			}
+
+			$Messages->add( TB_('Automation step has been duplicated.'), 'success' );
+			// We want to highlight the moved Step on next list display:
+			$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
-		$action = 'new_step';
+		// If errors, Display the step form again to fix them:
+		$action = 'copy_step';
+		$edited_AutomationStep->ID = $duplicated_step_ID;
+		$edited_AutomationStep->set( 'order', $entered_step_order );
 		break;
 
 	case 'update_step':
@@ -358,23 +483,114 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to edit automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an step_ID:
 		param( 'step_ID', 'integer', true );
 
 		// load data from request:
-		if( $edited_AutomationStep->load_from_Request() )
-		{	// We could load data from form without errors:
+		if( $edited_AutomationStep->load_from_Request() &&
+		    $edited_AutomationStep->pause_automation() )
+		{	// We could load data from form without errors and automation can be paused:
 			// Update automation step in DB:
 			$edited_AutomationStep->dbupdate();
-			$Messages->add( T_('Automation step has been updated.'), 'success' );
+			$Messages->add( TB_('Automation step has been updated.'), 'success' );
+			if( $tab != 'diagram' )
+			{	// We want to highlight the moved Step on next list display:
+				$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
+			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab='.$tab.'&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit_step';
+		break;
+
+	case 'update_step_position':
+		// Update step position on automation diagram:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		check_user_perm( 'options', 'edit', true );
+
+		param( 'pos', 'array:integer' );
+
+		if( count( $pos ) != 2 )
+		{	// Position array must contains 2 values: row|x and column|y:
+			debug_die( 'Wrong step position!' );
+		}
+
+		// Update step position:
+		$edited_AutomationStep->set( 'diagram', implode( ':', $pos ) );
+		$edited_AutomationStep->dbupdate();
+
+		// Exit here because we don't need UI for this AJAX action:
+		exit;
+
+	case 'update_step_connection':
+		// Update steps connection on automation diagram:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		check_user_perm( 'options', 'edit', true );
+
+		param( 'connection_type', 'string', true );
+
+		if( ! in_array( $connection_type, array( 'yes', 'no', 'error' ) ) )
+		{	// Wrong connection type:
+			debug_die( 'Wrong step connection type!' );
+		}
+
+		// Set correct ID for next/target Step:
+		param( 'target_step_ID', 'integer' );
+		if( $target_step_ID > 0 )
+		{	// If step has been connected with target Step:
+			$target_AutomationStep = & $AutomationStepCache->get_by_ID( $target_step_ID );
+			if( $edited_AutomationStep->get_next_ordered_step_ID() == $target_AutomationStep->ID )
+			{	// If target Step is the next ordered Step we should use an option "Continue":
+				$target_step_ID = 0;
+			}
+			else
+			{	// Some other next target Step:
+				$target_step_ID = $target_AutomationStep->ID;
+			}
+		}
+		else
+		{	// if step has been disconnected:
+			$target_step_ID = -1;
+		}
+
+		// Update step connection or disconnection between the requested Steps:
+		$edited_AutomationStep->set( $connection_type.'_next_step_ID', $target_step_ID, true );
+		$edited_AutomationStep->dbupdate();
+
+		// Exit here because we don't need UI for this AJAX action:
+		exit;
+
+	case 'reset_diagram':
+		// Reset steps positions on automation diagram to default positions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'automationstep' );
+
+		// Check permission:
+		check_user_perm( 'options', 'edit', true );
+
+		// Reset positions of all steps of the edited Automation:
+		$DB->query( 'UPDATE T_automation__step
+			  SET step_diagram = NULL
+			WHERE step_autm_ID = '.$DB->quote( $edited_Automation->ID ) );
+
+		$Messages->add( TB_('Diagram layout has been reset.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=diagram&autm_ID='.$edited_Automation->ID, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
 		break;
 
 	case 'delete_step':
@@ -384,14 +600,18 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
 
-		if( $edited_AutomationStep->dbdelete() )
+		if( ! $edited_AutomationStep->can_be_modified() )
+		{	// If step cannot be modified currently
+			$Messages->add( TB_('You must pause the automation before deleting step.'), 'error' );
+		}
+		elseif( $edited_AutomationStep->dbdelete() )
 		{
-			$Messages->add( T_('Automation step has been deleted.'), 'success' );
+			$Messages->add( TB_('Automation step has been deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=automations&action=edit&tab=steps&autm_ID='.$edited_AutomationStep->get( 'autm_ID' ), 303 ); // Will EXIT
@@ -400,7 +620,7 @@ switch( $action )
 
 		// Display the same edit automation page with steps list because step cannot be deleted by some restriciton:
 		$action = 'edit';
-		// We want to highlight the Step which cannot de leted on next list display:
+		// We want to highlight the Step which cannot be deleted on next list display:
 		$Session->set( 'fadeout_array', array( 'step_ID' => array( $edited_AutomationStep->ID ) ) );
 		break;
 
@@ -411,7 +631,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
@@ -426,7 +646,7 @@ switch( $action )
 
 		if( $r )
 		{	// Display a result message if user really has been affected:
-			$Messages->add( sprintf( T_('Execution time has been changed to now for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+			$Messages->add( sprintf( TB_('Execution time has been changed to now for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
 			// We want to highlight the reduced Step on list display:
 			$Session->set( 'fadeout_array', array( 'aust_user_ID' => array( $step_User->ID ) ) );
 		}
@@ -450,7 +670,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
@@ -465,7 +685,7 @@ switch( $action )
 
 		if( $r )
 		{	// Display a result message if user really has been affected:
-			$Messages->add( sprintf( T_('Automation has been stopped for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+			$Messages->add( sprintf( TB_('Automation has been stopped for user %s.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
 			// We want to highlight the reduced Step on list display:
 			$Session->set( 'fadeout_array', array( 'aust_user_ID' => array( $step_User->ID ) ) );
 		}
@@ -482,7 +702,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
@@ -495,7 +715,7 @@ switch( $action )
 
 		if( $r )
 		{	// Display a result message if user really has been affected:
-			$Messages->add( sprintf( T_('User %s has been removed from this automation.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
+			$Messages->add( sprintf( TB_('User %s has been removed from this automation.'), '"'.$step_User->dget( 'login' ).'"' ), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -506,8 +726,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Emails'), $admin_url.'?ctrl=campaigns' );
-$AdminUI->breadcrumbpath_add( T_('Automations'), $admin_url.'?ctrl=automations' );
+$AdminUI->breadcrumbpath_add( TB_('Emails'), $admin_url.'?ctrl=campaigns' );
+$AdminUI->breadcrumbpath_add( TB_('Automations'), $admin_url.'?ctrl=automations' );
 
 $AdminUI->display_breadcrumbpath_init();
 
@@ -521,23 +741,27 @@ switch( $action )
 	case 'delete':
 	case 'new_step':
 	case 'edit_step':
-		$AdminUI->display_breadcrumbpath_add( T_('Automations'), $admin_url.'?ctrl=automations' );
+	case 'copy_step':
+		$AdminUI->display_breadcrumbpath_add( TB_('Automations'), $admin_url.'?ctrl=automations' );
 		if( $action != 'new' )
 		{	// Add menu level 3 entries:
 			if( empty( $edited_Automation ) )
 			{	// Get Automation of the edited Step:
 				$edited_Automation = & $edited_AutomationStep->get_Automation();
-				set_param( 'tab', 'steps' );
+				set_param( 'tab', $display_mode == 'js' ? 'diagram' : 'steps' );
 			}
 			$AdminUI->add_menu_entries( array( 'email', 'automations' ), array(
 					'settings' => array(
-						'text' => T_('Settings'),
+						'text' => TB_('Settings'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=settings&amp;autm_ID='.$edited_Automation->ID ),
 					'steps' => array(
-						'text' => T_('Steps'),
+						'text' => TB_('Steps'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=steps&amp;autm_ID='.$edited_Automation->ID ),
+					'diagram' => array(
+						'text' => TB_('Diagram view'),
+						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=diagram&amp;autm_ID='.$edited_Automation->ID ),
 					'users' => array(
-						'text' => T_('Users'),
+						'text' => TB_('Users'),
 						'href' => $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
 				) );
 			if( in_array( $action, array( 'edit', 'delete' ) ) )
@@ -548,19 +772,29 @@ switch( $action )
 		else
 		{	// Don't add level 3 entries for new creating automation, and force tab only for settings:
 			set_param( 'tab', 'settings' );
-			$AdminUI->display_breadcrumbpath_add( T_('New automation') );
+			$AdminUI->display_breadcrumbpath_add( TB_('New automation') );
 		}
 
 		switch( $tab )
 		{
 			case 'steps':
-				$AdminUI->set_page_manual_link( 'automation-steps' );
+				$AdminUI->set_page_manual_link( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) ? 'automation-step-details' : 'automation-steps' );
 				$AdminUI->set_path( 'email', 'automations', 'steps' );
 				break;
 
 			case 'users':
 				$AdminUI->set_page_manual_link( 'automation-users-queued' );
 				$AdminUI->set_path( 'email', 'automations', 'users' );
+				break;
+
+			case 'diagram':
+				$AdminUI->set_page_manual_link( 'automation-diagram-view' );
+				$AdminUI->set_path( 'email', 'automations', 'diagram' );
+				// Load files to draw diagram by plugin jsPlumb:
+				require_js_defer( 'ext:jquery/jsplumb/js/jsplumb.min.js', 'rsc_url' );
+				require_css( 'ext:jquery/jsplumb/css/jsplumbtoolkit-defaults.css', 'rsc_url' );
+				require_css( 'ext:jquery/jsplumb/css/jsplumbtoolkit-b2evo.css', 'rsc_url' );
+				require_js_defer( 'ext:jquery/panzoom/js/jquery.panzoom.min.js', 'rsc_url' );
 				break;
 
 			default:
@@ -570,27 +804,41 @@ switch( $action )
 				// Init JS to autcomplete the user logins
 				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 		}
+
+		if( $action == 'edit' )
+		{	// Initialize Hotkeys
+			init_hotkeys_js();
+		}
 		break;
 	default:
-		$AdminUI->display_breadcrumbpath_add( T_('Automations') );
+		$AdminUI->display_breadcrumbpath_add( TB_('Automations') );
 		$AdminUI->set_page_manual_link( 'automations-list' );
 		break;
 }
 
-if( in_array( $action, array( 'new_step', 'edit_step' ) ) )
+if( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) )
 {	// Load jQuery QueryBuilder plugin files:
 	$step_Automation = & $edited_AutomationStep->get_Automation();
 	init_querybuilder_js( 'rsc_url' );
+	// Initialize Hotkeys:
+	init_hotkeys_js();
+	$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
 	if( $action == 'new_step' )
 	{
-		$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
-		$AdminUI->display_breadcrumbpath_add( T_('New step') );
+		$AdminUI->display_breadcrumbpath_add( TB_('New step') );
+	}
+	elseif( $action == 'copy_step' )
+	{
+		$AdminUI->display_breadcrumbpath_add( TB_('Duplicate step').' #'.get_param( 'step_ID' ) );
 	}
 	else
 	{
-		$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
-		$AdminUI->display_breadcrumbpath_add( T_('Step').' #'.$edited_AutomationStep->dget( 'order' ) );
+		$AdminUI->display_breadcrumbpath_add( TB_('Step').' #'.$edited_AutomationStep->dget( 'order' ) );
 	}
+}
+if( $tab == 'diagram' )
+{	// Load jQuery QueryBuilder plugin files for edit step form in modal window:
+	init_querybuilder_js( 'rsc_url' );
 }
 
 if( $display_mode != 'js' )
@@ -612,7 +860,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Automation->confirm_delete(
-				sprintf( T_('Delete automation "%s"?'), $edited_Automation->dget( 'name' ) ),
+				sprintf( TB_('Delete automation "%s"?'), $edited_Automation->dget( 'name' ) ),
 				'automation', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -626,6 +874,10 @@ switch( $action )
 
 			case 'users':
 				$AdminUI->disp_view( 'automations/views/_automation_users.view.php' );
+				break;
+
+			case 'diagram':
+				$AdminUI->disp_view( 'automations/views/_automation_diagram.view.php' );
 				break;
 
 			case 'settings':
@@ -644,6 +896,7 @@ switch( $action )
 
 	case 'new_step':
 	case 'edit_step':
+	case 'copy_step':
 		// Display a form of automation step:
 		$AdminUI->disp_view( 'automations/views/_automation_step.form.php' );
 		break;

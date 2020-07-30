@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -90,7 +90,7 @@ $Results->group_by = 'file_hash';
  * Group columns:
  */
 $Results->grp_cols[] = array(
-		'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
+		'td_class' => 'firstcol'.(check_user_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 		'td_colspan' => 0,
 		'td' => sprintf( T_('%s duplicates'), '$total_duplicates$' ),
 	);
@@ -109,17 +109,15 @@ function callback_filter_file_duplicated( & $Form )
 	$Form->hidden( 'file_ID', get_param( 'file_ID' ) );
 }
 
-$filter_presets = array(
-		'all' => array( T_('All'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=0' ),
-		'inappropriate' => array( T_('Inappropriate'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=1&amp;msv=0' ),
-		'spam' => array( T_('Spam'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=1' ),
-	);
-
 $Results->filter_area = array(
 	'callback' => 'callback_filter_file_duplicated',
 	'url_ignore' => 'results_fdupl_page',
-	'presets' => $filter_presets,
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=0' );
+$Results->register_filter_preset( 'inappropriate', T_('Inappropriate'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=1&amp;msv=0' );
+$Results->register_filter_preset( 'spam', T_('Spam'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=1' );
+
 
 function td_file_duplicates_icon( $File )
 {
@@ -141,9 +139,8 @@ function td_file_duplicates_path( $File, $file_root_type, $file_root_ID, $file_p
 {
 	if( is_object( $File ) )
 	{ // Check if File object is correct
-		global $current_User;
 		$r = $File->get_view_link().' '.$File->get_target_icon();
-		if( $current_User->check_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
+		if( check_user_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
 		{ // Allow to delete a file only if current user has an access
 			global $admin_url;
 			$r .= action_icon( T_('Delete'), 'file_delete',
@@ -178,8 +175,7 @@ $Results->cols[] = array(
 
 function td_file_properties_link( $File, $link_text )
 {
-	global $current_User;
-	if( is_object( $File ) && $current_User->check_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
+	if( is_object( $File ) && check_user_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
 	{ // Check if File object is correct and current user has an access
 		return '<a href="'.url_add_param( $File->get_linkedit_url(), 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $File->get_rdfp_rel_path() ).'&amp;'.url_crumb( 'file' ) ).'">'.$link_text.'</a>';
 	}

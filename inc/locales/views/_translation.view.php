@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var User
  */
-global $admin_url, $current_User;
+global $admin_url;
 
 global $edit_locale;
 
@@ -101,11 +101,9 @@ function filter_translation( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_translation',
-	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale ),
-		'untranslated' => array( T_('Untranslated strings'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale.'&untranslated_only=1' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale );
+$Results->register_filter_preset( 'untranslated', T_('Untranslated strings'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale.'&untranslated_only=1' );
 
 $Results->cols[] = array(
 		'th' => T_('Original string'),
@@ -151,7 +149,7 @@ $Results->display();
 
 echo '<br />';
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	global $locales_path, $locales;
 
@@ -167,7 +165,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 ?>
 
-<script type="text/javascript">
+<script>
 	jQuery( '#untranslated_only' ).on( 'change', function()
 		{
 			var translated_string_input = jQuery( '#translated' );

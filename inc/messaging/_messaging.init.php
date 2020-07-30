@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for messaging module to function properly
  */
-$required_php_version[ 'messaging' ] = '5.4';
+$required_php_version[ 'messaging' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for messaging module to function properly
@@ -310,12 +310,11 @@ class messaging_Module extends Module
 		global $DB;
 		global $topleft_Menu, $topright_Menu;
 		global $admin_url;
-		global $current_User;
 
 		$left_entries = array();
 		$right_entries = array();
 
-		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+		if( check_user_perm( 'perm_messaging', 'reply' ) )
 		{
 			if( ! empty( $topleft_Menu->_menus['entries']['site']['entries'] ) )
 			{
@@ -370,22 +369,18 @@ class messaging_Module extends Module
 	function build_menu_3()
 	{
 		global $admin_url;
-		/**
-		 * @var User
-		 */
-		global $current_User;
 
 		/**
 		 * @var AdminUI_general
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+		if( check_user_perm( 'perm_messaging', 'reply' ) )
 		{ // Permission to view messaging:
 
 			// Count unread messages for current user
@@ -453,7 +448,7 @@ class messaging_Module extends Module
 		}
 
 		// Check permission:
-		$current_User->check_perm( 'perm_messaging', 'reply', true );
+		check_user_perm( 'perm_messaging', 'reply', true );
 
 		// set where to redirect
 		$redirect_to = param( 'redirect_to', 'url', NULL );
@@ -526,7 +521,7 @@ class messaging_Module extends Module
 
 					case 'delete': // delete thread
 						// Check permission:
-						$current_User->check_perm( 'perm_messaging', 'delete', true );
+						check_user_perm( 'perm_messaging', 'delete', true );
 
 						$confirmed = param( 'confirmed', 'integer', 0 );
 						if( $confirmed )
@@ -626,7 +621,7 @@ class messaging_Module extends Module
 
 					case 'delete': // delete message
 						// Check permission:
-						$current_User->check_perm( 'perm_messaging', 'delete', true );
+						check_user_perm( 'perm_messaging', 'delete', true );
 
 						$msg_ID = param( 'msg_ID', 'integer', true );
 						$MessageCache = & get_MessageCache();

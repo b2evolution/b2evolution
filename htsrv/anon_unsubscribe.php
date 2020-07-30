@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -30,6 +30,12 @@ $anon_email = param( 'anon_email', 'string', '' );
 switch( $type )
 {
 	case 'comment':
+		// Unsubscribe anonymous user from notifications of replies on Items where the user posted a comment:
+
+		// We always want to allow someone to unsubscribe from email they don't want to receive. Even if they are a suspected spammer themselves.
+		// Do NOT Stop a request from the blocked IP addresses or Domains:
+		//antispam_block_request();
+
 		if( !is_email( $anon_email ) )
 		{
 			$Messages->add( 'Your email address is not correct. Probably the unsubscribe link was modified.' );
@@ -74,7 +80,7 @@ switch( $type )
 			else
 			{
 				$Messages->add( T_('Sorry, could not send email.')
-							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+							.'<br />'.get_send_mail_error(), 'error' );
 			}
 
 			$Messages->display();

@@ -6,7 +6,7 @@ global $demo_mode;
 
 $AdminUI->set_path( 'users', 'usersettings', 'usersettings' );
 
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 param_action();
 
@@ -17,7 +17,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'usersettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Session settings
 		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'url', '' ) );
@@ -26,15 +26,15 @@ switch ( $action )
 
 		if( $timeout_sessions < $crumb_expires )
 		{ // lower than $crumb_expires: not allowed
-			param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d minutes.' ), floor($crumb_expires/60) ) );
+			param_error( 'timeout_sessions', sprintf( TB_( 'You cannot set a session timeout below %d minutes.' ), floor($crumb_expires/60) ) );
 		}
 		elseif( $timeout_sessions < 300 )
 		{ // lower than 5 minutes: not allowed
-			param_error( 'timeout_sessions', sprintf( T_( 'You cannot set a session timeout below %d minutes.' ), 5 ) );
+			param_error( 'timeout_sessions', sprintf( TB_( 'You cannot set a session timeout below %d minutes.' ), 5 ) );
 		}
 		elseif( $timeout_sessions < 86400 )
 		{ // lower than 1 day: notice/warning
-			$Messages->add( sprintf( T_( 'Warning: your session timeout is just %d minutes. Your users may have to re-login often!' ), floor($timeout_sessions/60) ), 'note' );
+			$Messages->add( sprintf( TB_( 'Warning: your session timeout is just %d minutes. Your users may have to re-login often!' ), floor($timeout_sessions/60) ), 'note' );
 		}
 		$Settings->set( 'timeout_sessions', $timeout_sessions );
 
@@ -43,11 +43,11 @@ switch ( $action )
 
 		if( $timeout_online < 300 )
 		{ // lower than 5 minutes: not allowed
-			param_error( 'timeout_online', sprintf( T_( 'You cannot set an online/offline timeout below %d minutes.' ), 5 ) );
+			param_error( 'timeout_online', sprintf( TB_( 'You cannot set an online/offline timeout below %d minutes.' ), 5 ) );
 		}
 		elseif( $timeout_online > 21600 )
 		{ // hihger than 6 hours: notice/warning
-			$Messages->add( sprintf( T_( 'You cannot set an online/offline timeout above %d hours.' ), 6 ) );
+			$Messages->add( sprintf( TB_( 'You cannot set an online/offline timeout above %d hours.' ), 6 ) );
 		}
 		$Settings->set( 'timeout_online', $timeout_online );
 
@@ -70,6 +70,10 @@ switch ( $action )
 		param( 'uset_location_region', 'string', 'optional' );
 		param( 'uset_location_subregion', 'string', 'optional' );
 		param( 'uset_location_city', 'string', 'optional' );
+		param( 'uset_birthday_year', 'string', 'optional' );
+		param( 'uset_birthday_month', 'string', 'optional' );
+		param( 'uset_birthday_day', 'string', 'optiona' );
+		param( 'uset_self_selected_age_group', 'string', 'hidden' );
 		param( 'uset_minimum_age', 'integer', 0 );
 		if( $demo_mode )
 		{
@@ -104,6 +108,10 @@ switch ( $action )
 									array( 'location_region', $uset_location_region ),
 									array( 'location_subregion', $uset_location_subregion ),
 									array( 'location_city', $uset_location_city ),
+									array( 'birthday_year', $uset_birthday_year ),
+									array( 'birthday_month', $uset_birthday_month ),
+									array( 'birthday_day', $uset_birthday_day ),
+									array( 'self_selected_age_group', $uset_self_selected_age_group ),
 									array( 'minimum_age', $uset_minimum_age ),
 									array( 'multiple_sessions', $uset_multiple_sessions ),
 									array( 'emails_msgform', $uset_emails_msgform ) ) );
@@ -117,7 +125,7 @@ switch ( $action )
 					invalidate_pagecaches();
 				}
 
-				$Messages->add( T_('General settings updated.'), 'success' );
+				$Messages->add( TB_('General settings updated.'), 'success' );
 			}
 		}
 
@@ -130,9 +138,9 @@ switch ( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Profiles'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Profiles'), '?ctrl=usersettings' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'user-settings-profiles-tab' );

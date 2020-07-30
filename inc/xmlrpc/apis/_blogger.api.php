@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @see http://b2evolution.net/man/blogger-api
  * @see http://www.blogger.com/developers/api/1_docs/
@@ -138,7 +138,7 @@ function blogger_editpost($m)
 	}
 
 	// We need to be able to edit this post:
-	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{
 		return xmlrpcs_resperror( 3 ); // Permission denied
 	}
@@ -416,7 +416,7 @@ function blogger_getrecentposts( $m )
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
-	if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 	{	// These statuses require member status:
 		$statuses = array_merge( $statuses, array( 'draft', 'deprecated' ) );
 	}

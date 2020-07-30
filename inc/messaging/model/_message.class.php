@@ -288,8 +288,8 @@ class Message extends DataObject
 			// so we do a quick copying of all links from source message to current:
 			global $DB;
 			$DB->query( 'INSERT INTO T_links
-			     ( link_msg_ID,   link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order )
-			SELECT '.$this->ID.', link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_ltype_ID, link_position, link_order
+			     ( link_msg_ID,   link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_position, link_order )
+			SELECT '.$this->ID.', link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_file_ID, link_position, link_order
 			  FROM T_links
 			 WHERE link_msg_ID = '.$source_msg_ID );
 		}
@@ -333,7 +333,7 @@ class Message extends DataObject
 					.$new_link_IDs[ $inlines[2][ $i ] ] // ID of new Link
 					.$inlines[3][ $i ].$inlines[4][ $i ].']';
 			}
-			$new_message_content = replace_content_outcode( $search_inline_tags, $replace_inline_tags, $this->text, 'replace_content', 'str' );
+			$new_message_content = replace_outside_code_tags( $search_inline_tags, $replace_inline_tags, $this->text, 'replace_content', 'str' );
 
 			// Update message content in DB:
 			$this->set( 'text', $new_message_content );
@@ -366,7 +366,7 @@ class Message extends DataObject
 	 */
 	function dbinsert_discussion( $from_User = NULL, $source_msg_ID = NULL )
 	{
-		global $DB;
+		global $DB, $Plugins;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -374,9 +374,14 @@ class Message extends DataObject
 
 		$this->get_Thread();
 
-		if ( $this->Thread->dbinsert() )
+		if( $this->Thread->dbinsert() )
 		{
-			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID );
+
+			if( isset( $Plugins ) )
+			{	// Note: Plugins may not be available during maintenance, install or test cases
+				$Plugins->trigger_event( 'PrependMessageInsertTransact', $params = array( 'Message' => & $this ) );
+			}
 
 			if( parent::dbinsert() )
 			{
@@ -450,7 +455,7 @@ class Message extends DataObject
 	 */
 	function dbinsert_message()
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $Plugins;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -463,6 +468,11 @@ class Message extends DataObject
 		if( $this->Thread->dbupdate() )
 		{
 			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+
+			if( isset( $Plugins ) )
+			{	// Note: Plugins may not be available during maintenance, install or test cases
+				$Plugins->trigger_event( 'PrependMessageInsertTransact', $params = array( 'Message' => & $this ) );
+			}
 
 			if( parent::dbinsert() )
 			{
@@ -668,13 +678,12 @@ class Message extends DataObject
 	 * Delete those messages from the database which corresponds to the given condition or to the given ids array
 	 * Note: the delete cascade arrays are handled!
 	 *
-	 * @param string the name of this class
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
+	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -717,7 +726,7 @@ class Message extends DataObject
 
 		if( $result )
 		{ // Remove messages with all of its delete cascade relations
-			$result = parent::db_delete_where( $class_name, $sql_where, $object_ids );
+			$result = parent::db_delete_where( $sql_where, $object_ids );
 		}
 
 		if( $result !== false )
@@ -731,7 +740,7 @@ class Message extends DataObject
 				HAVING COUNT(msg_ID) = 0' );
 
 			// Delete orphan threads if there are any
-			if( ( ! empty( $orphan_thread_ids ) ) && ( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids ) === false ) )
+			if( ( ! empty( $orphan_thread_ids ) ) && ( Thread::db_delete_where( NULL, $orphan_thread_ids ) === false ) )
 			{ // Deleting threads was unsuccessful
 				$result = false;
 			}
@@ -766,7 +775,7 @@ class Message extends DataObject
 	{
 		global $current_User;
 
-		return $current_User->check_perm( 'perm_messaging', $action, $assert );
+		return check_user_perm( 'perm_messaging', $action, $assert );
 	}
 
 
@@ -1000,7 +1009,7 @@ class Message extends DataObject
 		}
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array(), 'Display' );
+		$r = $Plugins->render( $r, $this->get_renderers_validated(), $format, array( 'Message' => $this ), 'Display' );
 
 		return $r;
 	}
@@ -1086,7 +1095,7 @@ class Message extends DataObject
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[m'.$this->ID.']',
-				'restrict_to_image_position' => 'inline', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'inline', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 				'exclude_inline_tagged'      => true, // Use true to exclude inline attachments which are already rendered in content by inline tags like '[image:123]'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
@@ -1239,7 +1248,7 @@ class Message extends DataObject
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 				'restrict_to_image_position' => 'inline',
 				'exclude_inline_tagged'      => true, // Use true to exclude inline attachments which are already rendered in content by inline tags like '[image:123]'
 				'data'                       => '',

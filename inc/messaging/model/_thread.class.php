@@ -290,7 +290,7 @@ class Thread extends DataObject
 		$recipients_from_different_country = array();
 		$recipients_restricted_pm = array();
 		// check if recipient user enable private messages only if sender user doesn't have 'delete' messaging permission
-		$check_enable_pm = !$current_User->check_perm( 'perm_messaging', 'delete' );
+		$check_enable_pm = ! check_user_perm( 'perm_messaging', 'delete' );
 		$cross_country_restrict = has_cross_country_restriction( 'contact' );
 		foreach( $recipients_list as $recipient )
 		{
@@ -429,7 +429,10 @@ class Thread extends DataObject
 				list( $max_new_threads, $new_threads_count ) = get_todays_thread_settings();
 				if( ( !empty( $max_new_threads ) ) && ( ( $max_new_threads - $new_threads_count ) < $recipients_count ) )
 				{ // user has a create thread limit, and recipients number exceed that limit
-					$error_msg .= '<br />';
+					if ( ! empty( $error_msg ) )
+					{
+						$error_msg .= '<br />';
+					}
 					$error_msg .= sprintf( T_( 'You are unable to send %d individual messages, because it exceeds your remaining daily limit of %d.' ), $recipients_count, $max_new_threads - $new_threads_count );
 				}
 			}
@@ -490,9 +493,7 @@ class Thread extends DataObject
 	 */
 	function check_perm( $action, $assert = true )
 	{
-		global $current_User;
-
-		return $current_User->check_perm( 'perm_messaging', $action, $assert );
+		return check_user_perm( 'perm_messaging', $action, $assert );
 	}
 
 
@@ -554,7 +555,7 @@ class Thread extends DataObject
 			return false;
 		}
 
-		if( $current_User->check_perm( 'perm_messaging', 'delete' ) )
+		if( check_user_perm( 'perm_messaging', 'delete' ) )
 		{ // users with delete permission are always able to reply to a conversation where they are involved
 			return true;
 		}

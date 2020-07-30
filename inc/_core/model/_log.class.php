@@ -11,7 +11,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -112,7 +112,6 @@ class Log
 	 * @param string the message
 	 * @param string|array the category, default is to use the object's default category.
 	 *        Can also be an array of categories to add the same message to.
-	 * @param boolean Dump (output) this directly?
 	 */
 	function add( $message, $category = NULL )
 	{

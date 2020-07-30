@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -248,7 +248,21 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 			continue;
 		}
 
-		$text_value = utf8_trim( is_array( $user_field_value ) ? implode( ', ', $user_field_value ) : $user_field_value );
+		if( ! is_array( $user_field_value ) )
+		{
+			$user_field_value = array( $user_field_value );
+		}
+
+		$text_value = array();
+		foreach( $user_field_value as $text_val )
+		{
+			$text_val = utf8_trim( $text_val );
+			if( ! empty( $text_val ) )
+			{
+				$text_value[] = $text_val;
+			}
+		}
+		$text_value = implode( ', ', $text_value );
 		if( empty( $text_value ) )
 		{	// Skip empty values:
 			continue;
@@ -257,10 +271,6 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 		if( is_logged_in() )
 		{	// Update user fields of the logged in User:
 			$userfields = $current_User->userfields_by_ID( $UserField->ID );
-			if( ! is_array( $user_field_value ) )
-			{
-				$user_field_value = array(  $user_field_value );
-			}
 			foreach( $user_field_value as $u => $uf_value )
 			{
 				if( empty( $uf_value ) )
@@ -315,10 +325,6 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 							$current_User->userfield_update( $userfield_data->uf_ID, $uf_value );
 							$update_user_fields = true;
 						}
-						elseif( $UserField->get( 'duplicated' ) == 'allowed' )
-						{	// Add second value for multiple field:
-							$add_multifield_value = true;
-						}
 
 						if( $add_multifield_value && $u > $m && $u < 2 )
 						{	// It means second value of multiple field should be added:
@@ -336,7 +342,16 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 				'uf_varchar' => $text_value,
 			);
 		userfield_prepare( $userfield );
-		$html_value = $userfield->uf_varchar;
+		if( is_pro() )
+		{	// Format user field value by PRO function:
+			load_funcs( '_core/_pro_features.funcs.php' );
+			$html_value = pro_get_user_field_value( $userfield );
+			$text_value = strip_tags( $html_value );
+		}
+		else
+		{	// Display normal value:
+			$html_value = $userfield->uf_varchar;
+		}
 
 		$send_additional_fields[] = array(
 				'title'       => $UserField->get( 'name' ),
@@ -404,6 +419,8 @@ $Plugins->trigger_event( 'MessageFormSent', array(
 	'sender_email' => & $sender_address,
 	) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'message' ) );
 
 $success_message = ( !$Messages->has_errors() );
 if( $success_message )
@@ -477,7 +494,7 @@ if( $success_message )
 
 		if( ! empty( $send_contact_method ) )
 		{	// Append a preferred contact method to the message text:
-			$send_message[1] = T_('Preferred contact method').': '.$send_contact_method;
+			$send_message[1] = T_('Reply method').': '.$send_contact_method;
 		}
 
 		if( ! empty( $message ) )
@@ -518,22 +535,28 @@ if( $success_message )
 				'message'           => $message,
 				'contact_method'    => $send_contact_method,
 				'additional_fields' => $send_additional_fields,
-				'comment_id'        => $comment_id,
+				'comment_ID'        => $comment_id,
 				'post_id'           => $post_id,
 				'recipient_User'    => $recipient_User,
 				'Comment'           => $Comment,
 			);
+
+		$email_headers = array();
+		if( ! is_logged_in() )
+		{	// Allow to reply only to anonymous user:
+			$email_headers['Reply-To'] = $sender_address;
+		}
 
 		if( empty( $recipient_User ) )
 		{	// Send email to visitor/anonymous:
 			// Get a message text from template file
 			$email_template_params['anonymous_recipient_name'] = $recipient_name;
 			$message = mail_template( 'contact_message_new', 'text', $email_template_params );
-			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, array( 'Reply-To' => $sender_address ) );
+			$success_message = send_mail( $recipient_address, $recipient_name, $send_subject, $message, NULL, NULL, $email_headers );
 		}
 		else
 		{	// Send mail to registered user:
-			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, array( 'Reply-To' => $sender_address ) );
+			$success_message = send_mail_to_User( $recipient_User->ID, $send_subject, 'contact_message_new', $email_template_params, false, $email_headers );
 		}
 	}
 
@@ -556,7 +579,7 @@ if( $success_message )
 		else
 		{
 			$Messages->add( T_('Sorry, could not send email.')
-				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+				.'<br />'.get_send_mail_error(), 'error' );
 		}
 	}
 }
@@ -586,7 +609,21 @@ if( $success_message )
 		$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
 			( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
 	}
-	if( empty( $redirect_to ) )
+	if( isset( $recipient_User, $Blog ) &&
+	    $Blog->get_owner_User() &&
+	    $recipient_User->ID == $Blog->get_owner_User()->ID )
+	{	// Message was sent to collection owner:
+		$ItemCache = & get_ItemCache();
+		if( $redirect_Item = & $ItemCache->get_by_urltitle( $Blog->get_setting( 'msgform_redirect_slug' ), false, false ) )
+		{	// Use item permanent URL from collection setting:
+			$redirect_to = $redirect_Item->get_permanent_url( '', '', '&' );
+		}
+		else
+		{	// Use collection home page URL:
+			$redirect_to = $Blog->gen_blogurl();
+		}
+	}
+	elseif( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();
 		if( !empty( $recipient_User ) )

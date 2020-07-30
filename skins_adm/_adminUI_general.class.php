@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -113,6 +113,16 @@ class AdminUI_general extends Menu
 	 * @var string
 	 */
 	var $coll_list_onclick = NULL;
+	/**
+	 * Collection List buttons: display a link to add new collection
+	 * @var boolean
+	 */
+	var $coll_list_disp_add = true;
+	/**
+	 * Collection List buttons: display a list of sections
+	 * @var boolean
+	 */
+	var $coll_list_disp_sections = false;
 
 
 	/**
@@ -170,11 +180,11 @@ class AdminUI_general extends Menu
 	{
 		global $Hit, $check_browser_version;
 
-		require_js( '#jquery#', 'rsc_url' );
-		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+		require_js_defer( '#jquery#', 'rsc_url' );
+		require_js_defer( 'customized:jquery/raty/jquery.raty.min.js', 'rsc_url' );
 
 		// Load general JS file:
-		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
+		require_js_defer( 'build/evo_backoffice.bmin.js', 'rsc_url' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:
@@ -241,13 +251,13 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
-		global $Collection, $Blog, $current_User;
+		global $Collection, $Blog;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );
 
 		$html = $text;
-		if( $current_User->check_perm( 'admin', 'normal' ) )
+		if( check_user_perm( 'admin', 'normal' ) )
 		{
 			$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
 		}
@@ -271,7 +281,7 @@ class AdminUI_general extends Menu
 	*/
 	function display_breadcrumbpath_add( $text, $url = NULL, $help = NULL, $attrs = '' )
 	{
-		global $Collection, $Blog, $current_User;
+		global $Collection, $Blog;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		if( ! empty( $url ) )
@@ -279,7 +289,7 @@ class AdminUI_general extends Menu
 			$url = str_replace( '$blog$', $blog_ID, $url );
 
 			$html = $text;
-			if( $current_User->check_perm( 'admin', 'normal' ) )
+			if( check_user_perm( 'admin', 'normal' ) )
 			{
 				$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
 			}
@@ -305,6 +315,7 @@ class AdminUI_general extends Menu
 	 */
 	function set_page_manual_link( $topic )
 	{
+		$this->page_manual_slug = $topic;
 		$this->page_manual_link = get_manual_link( $topic, NULL, T_('Manual page'), 5 );
 	}
 
@@ -358,7 +369,7 @@ class AdminUI_general extends Menu
 	function display_breadcrumbpath_get_html( $params = array() )
 	{
 		$params = array_merge( array(
-				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb" style="margin-left: 0">',
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb">',
 				'after'      => '</ol></nav></div>',
 				'beforeText' => '',
 				'beforeEach' => '<li class="breadcrumb-item">',
@@ -494,7 +505,11 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname;
 
-		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
+		if( ! empty( $this->htmltitle ) )
+		{	// Get html title which is specified for current page:
+			$r = $this->htmltitle;
+		}
+		elseif( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{	// Explicit htmltitle set:
 			$r = $htmltitle;
 		}
@@ -655,7 +670,7 @@ class AdminUI_general extends Menu
 		}
 
 		$skin_wrapper_class = 'skin_wrapper';
-		if( is_logged_in() )
+		if( show_toolbar() )
 		{ // user is logged in
 			if( $this->get_show_evobar() )
 			{ // show evobar options is enabled for this admin skin
@@ -716,6 +731,12 @@ class AdminUI_general extends Menu
 			return;
 		}
 
+		global $mode;
+		if( $mode == 'customizer' )
+		{	// Don't display this content on skin customizer mode:
+			return;
+		}
+
 		$params = array_merge( array(
 				'display_menu2' => true,
 				'display_menu3' => true,
@@ -734,7 +755,6 @@ class AdminUI_general extends Menu
 			$path0 = $this->get_path(0);
 			$r = $this->get_html_menu( $path0, 'sub', 0, ! $params['display_menu2'] );
 
-			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
 
 			// Show breadcrumbs
@@ -745,8 +765,9 @@ class AdminUI_general extends Menu
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
-			echo $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
+			$r .= $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
 
+			echo $this->replace_vars( $r );
 
 			$this->displayed_sub_begin = 1;
 		}
@@ -827,9 +848,11 @@ class AdminUI_general extends Menu
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
 	 * @param string onclick attribute format string, with %s for blog number. (NOTE: %s so that we can use this.value when selected through list)
+	 * @param boolean TRUE to display a link to add new collection
+	 * @param boolean TRUE to display a list of sections
 	 */
 	function set_coll_list_params( $permname = 'blog_ismember', $permlevel = 1, $url_params = array(),
-							$all_title = NULL, $all_url = '', $onclick = NULL )
+							$all_title = NULL, $all_url = '', $onclick = NULL, $display_add_link = true, $display_sections = false )
 	{
 		$this->coll_list_all_title = $all_title;
 		$this->coll_list_all_url = $all_url;
@@ -837,6 +860,8 @@ class AdminUI_general extends Menu
 		$this->coll_list_permlevel = $permlevel;
 		$this->coll_list_url_params = $url_params;
 		$this->coll_list_onclick = $onclick;
+		$this->coll_list_disp_add = $display_add_link;
+		$this->coll_list_disp_sections = $display_sections;
 	}
 
 
@@ -847,7 +872,7 @@ class AdminUI_general extends Menu
 	 */
 	function get_bloglist_buttons( $title = '' )
 	{
-		global $current_User, $blog, $pagenow;
+		global $blog, $pagenow;
 
 		$max_buttons = 7;
 
@@ -1248,6 +1273,7 @@ class AdminUI_general extends Menu
 					'customstart' => '',
 					'customend' => "\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1278,6 +1304,7 @@ class AdminUI_general extends Menu
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1601,14 +1628,14 @@ class AdminUI_general extends Menu
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $admin_url, $baseurl, $rsc_url;
+		global $app_shortname, $app_version, $admin_url, $baseurl, $rsc_url;
 
 		$r = '
 		<div id="header">
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( true ) ) ).'">'.T_('Log out').'</a>
+					.'<a href="'.get_htsrv_url( 'login' ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( 'login' ) ) ).'">'.T_('Log out').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Log out').'" /></a>
 				</span>
@@ -1679,6 +1706,16 @@ class AdminUI_general extends Menu
 	function get_show_evobar()
 	{
 		return true;
+	}
+
+
+	/**
+	 * Display tabs for customizer mode in left iframe
+	 *
+	 * @param array Params
+	 */
+	function display_customizer_tabs( $params = array() )
+	{
 	}
 }
 

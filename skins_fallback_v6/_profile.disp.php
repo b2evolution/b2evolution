@@ -14,7 +14,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -47,7 +47,7 @@ $params = array_merge( array(
 			'item_selected_end'   => '</div>',
 			'block_end'           => '</div><div class="clear"></div>',
 		),
-	'form_action' => get_htsrv_url( true ).'profile_update.php',
+	'form_action' => get_htsrv_url( 'login' ).'profile_update.php',
 	'form_class_user_avatar'   => 'evo_form',
 	'form_class_user_identity' => 'evo_form',
 	'form_class_user_pass'     => 'evo_form',
@@ -122,6 +122,12 @@ switch( $disp )
 			require $inc_path.'users/views/_user_avatar.form.php';
 			// Load javascript function to open popup window with crop picture tool
 			echo_user_crop_avatar_window();
+		}
+		break;
+	case 'social':
+		if( is_pro() )
+		{
+			require $inc_path.'users/views/_user_social.form.php';
 		}
 		break;
 	case 'pwdchange':

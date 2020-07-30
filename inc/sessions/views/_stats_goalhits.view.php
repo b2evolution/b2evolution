@@ -7,13 +7,13 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 global $Session, $UserSettings;
 
 /**
@@ -115,6 +115,10 @@ $Results = new Results( $sql, 'ghits_', '--D', $UserSettings->get( 'results_per_
 
 $Results->title = T_('Recent goal hits').get_manual_link( 'goal-hits' );
 
+// Initialize params to filter by selected collection and/or group:
+$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
 /**
  * Callback to add filters on top of the result set
  *
@@ -138,11 +142,9 @@ function filter_goal_hits( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog='.$blog ),
-		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params );
+$Results->register_filter_preset( 'all_but_curr', T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' );
 
 $Results->cols[] = array(
 		'th' => T_('Session'),

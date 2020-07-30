@@ -4,24 +4,37 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+// Check permission:
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
+
 load_funcs( 'tools/model/_phpbb.funcs.php' );
 
 param( 'action', 'string' );
 $phpbb_version = param( 'ver', 'integer', 2 );
-$phpbb_tool_title = ( $phpbb_version == 3 ? T_('phpBB 3 Importer') : T_('phpBB Importer') );
+$phpbb_tool_title = ( $phpbb_version == 3 ? 'phpBB 3 Importer' : 'phpBB Importer' );
 
 if( !empty( $action ) )
 {	// Try to obtain some serious time to do some serious processing (15 minutes)
 	set_max_execution_time( 900 );
 	// Turn off the output buffering to do the correct work of the function flush()
 	@ini_set( 'output_buffering', 'off' );
+}
+
+if( param( 'forum_blog_ID', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'forum_blog_ID' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'forum_blog_ID' ), ( $phpbb_version == 3 ? 'phpbb3' : 'phpbb' ) );
 }
 
 /**
@@ -55,13 +68,12 @@ switch( $action )
 		$phpbb_db_prefix = param( 'db_prefix', 'string', '' );
 		$phpbb_path_avatars = param( 'path_avatars', 'string', '' );
 		$phpbb_path_attachments = param( 'path_attachments', 'string', '' );
-		$forum_blog_ID = param( 'forum_blog_ID', 'integer', 0 );
 
-		param_check_not_empty( 'db_host', T_('Please enter a database host!') );
-		param_check_not_empty( 'db_name', T_('Please enter a database name!') );
-		param_check_not_empty( 'db_user', T_('Please enter a username!') );
-		param_check_not_empty( 'db_pass', T_('Please enter a password!') );
-		param_check_not_empty( 'forum_blog_ID', T_('Please select a collection!') );
+		param_check_not_empty( 'db_host', 'Please enter a database host!' );
+		param_check_not_empty( 'db_name', 'Please enter a database name!' );
+		param_check_not_empty( 'db_user', 'Please enter a username!' );
+		param_check_not_empty( 'db_pass', 'Please enter a password!' );
+		param_check_not_empty( 'forum_blog_ID', 'Please select a collection!' );
 
 		if( param_errors_detected() )
 		{
@@ -113,7 +125,7 @@ switch( $action )
 		$phpbb_group_default = param( 'phpbb_group_default', 'integer' );
 		$phpbb_group_invalid = param( 'phpbb_group_invalid', 'integer' );
 
-		param_check_not_empty( 'phpbb_group_default', T_('Please select a default group!') );
+		param_check_not_empty( 'phpbb_group_default', 'Please select a default group!' );
 
 		phpbb_set_var( 'ranks', $phpbb_ranks );
 		phpbb_set_var( 'group_default', $phpbb_group_default );
@@ -126,7 +138,7 @@ switch( $action )
 
 		if( empty( $phpbb_categories ) && empty( $phpbb_forums ) )
 		{
-			$Messages->add( T_('Please select at least one forum to import!') );
+			$Messages->add( 'Please select at least one forum to import!' );
 		}
 
 		if( param_errors_detected() )
@@ -173,10 +185,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('phpBB Importer'), $admin_url.'?ctrl=phpbbimport' );
+$AdminUI->breadcrumbpath_add( 'System', $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( 'Maintenance', $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( 'Import', $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( 'phpBB Importer', $admin_url.'?ctrl=phpbbimport' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'phpbb-import' );

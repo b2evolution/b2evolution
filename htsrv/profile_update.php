@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -41,10 +41,9 @@ if( ! is_logged_in() )
 	bad_request_die( T_( 'You are not logged in.' ) );
 }
 
-if( $demo_mode && ( $current_User->ID <= 3 ) )
-{
-	bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-		. T_('Back to profile') . '</a>]' );
+if( $demo_mode && ( $current_User->ID <= 7 ) )
+{	// Demo mode restrictions: users created by install process cannot be edited:
+	header_redirect( get_user_settings_url( $disp, NULL, $blog, '&' ) );
 }
 
 // Check that this action request is not a CSRF hacked request:
@@ -155,7 +154,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
+		if( ! check_user_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -178,7 +177,7 @@ switch( $action )
 			// add report and block contact ( it will be blocked if was already on this user contact list )
 			add_report_from( $user_ID, $report_status, $report_info );
 			$blocked_message = '';
-			if( $current_User->check_perm( 'perm_messaging', 'reply' ) )
+			if( check_user_perm( 'perm_messaging', 'reply' ) )
 			{ // user has messaging permission, set/add this user as blocked contact
 				$contact_status = check_contact( $user_ID );
 				if( $contact_status == NULL )
@@ -202,7 +201,7 @@ switch( $action )
 		}
 		elseif( ! empty( $Blog ) )
 		{
-			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+			header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ), 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -214,7 +213,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_status( 'can_report_user', $user_ID ) )
+		if( ! check_user_status( 'can_report_user', $user_ID ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can report another user. <b>See below:</b>' ), 'error' );
@@ -239,7 +238,7 @@ switch( $action )
 		}
 		elseif( ! empty( $Blog ) )
 		{
-			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+			header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ), 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -250,8 +249,8 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'user' );
 
-		if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
-		    ! $current_User->check_status( 'can_edit_contacts' ) )
+		if( ! check_user_perm( 'perm_messaging', 'reply' ) ||
+		    ! check_user_status( 'can_edit_contacts' ) )
 		{ // current User status doesn't allow user reporting
 			// Redirect to the account activation page
 			$Messages->add( T_( 'You must activate your account before you can manage your contacts. <b>See below:</b>' ) );
@@ -272,7 +271,7 @@ switch( $action )
 		// Redirect so that a reload doesn't write to the DB twice:
 		if( ! empty( $Blog ) )
 		{
-			header_redirect( url_add_param( $Blog->get( 'userurl' ), 'user_ID='.$user_ID, '&' ), 303 ); // Will EXIT
+			header_redirect( $Blog->get( 'userurl', array( 'user_ID' => $user_ID ) ), 303 ); // Will EXIT
 		}
 		// We have EXITed already at this point!!
 		break;
@@ -295,35 +294,7 @@ elseif( ! param_errors_detected() )
 		case 'update':
 			if( $user_tab == 'register_finish' )
 			{	// After submitting quick data we should redirect user to page like after registration:
-				$after_registration = $Settings->get( 'after_registration' );
-				if( $after_registration == 'return_to_original' )
-				{	// Return to original page ( where user was before the registration process ):
-					if( empty( $redirect_to ) )
-					{	// redirect_to param was not set
-						if( ! empty( $Blog ) )
-						{
-							$redirect_to = $Blog->gen_blogurl();
-						}
-						else
-						{
-							$redirect_to = $baseurl;
-						}
-					}
-				}
-				elseif( $after_registration == 'specific_slug' )
-				{	// Return to the specific slug which is set in the registration settings form:
-					$SlugCache = get_SlugCache();
-					if( ( $Slug = & $SlugCache->get_by_name( $Settings->get( 'after_registration_slug' ), false, false ) ) &&
-							( $slug_Item = & $Slug->get_object() ) &&
-							( $slug_Item instanceof Item ) )
-					{	// Use permanent URL of the slug Item:
-						$redirect_to = $slug_Item->get_permanent_url( '', '', '&' );
-					}
-				}
-				else
-				{	// Return to the specific URL which is set in the registration settings form:
-					$redirect_to = $after_registration;
-				}
+				$redirect_to = get_redirect_after_registration();
 			}
 			elseif( isset( $current_User->previous_pass_driver ) &&
 			    $current_User->previous_pass_driver == 'nopass' &&
@@ -338,7 +309,7 @@ elseif( ! param_errors_detected() )
 
 			if( empty( $redirect_to ) )
 			{	// Redirect to display user page for cases when redirect param cannot be defined above by some reason:
-				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
+				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&', 'user_ID' => $current_User->ID, 'user_login' => $current_User->login ) );
 			}
 			break;
 		case 'upload_avatar':

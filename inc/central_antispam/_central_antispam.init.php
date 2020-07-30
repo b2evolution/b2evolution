@@ -2,14 +2,14 @@
 /**
  * This is the init file for the central antispam module
  *
- * @copyright (c)2003-2018 by Francois PLANQUE - {@link http://fplanque.net/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.net/}
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
 /**
  * Minimum PHP version required for central antispam module to function properly
  */
-$required_php_version[ 'central_antispam' ] = '5.4';
+$required_php_version[ 'central_antispam' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for central antispam module to function properly
@@ -105,10 +105,10 @@ class central_antispam_Module extends Module
 	 */
 	function build_menu_3()
 	{
-		global $AdminUI, $admin_url, $current_User;
+		global $AdminUI, $admin_url;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'centralantispam', 'view' ) )
-		{	// Don't display menu if current user has no acces to central antispam:
+		if( ! check_user_perm( 'centralantispam', 'view' ) )
+		{	// Don't display menu if current user has no access to central antispam:
 			return;
 		}
 
@@ -258,7 +258,7 @@ class central_antispam_Module extends Module
 	 */
 	function handle_htsrv_action()
 	{
-		global $current_User, $DB, $Session, $localtimenow, $debug, $debug_jslog;
+		global $DB, $Session, $localtimenow, $debug, $debug_jslog;
 
 		if( ! is_logged_in() )
 		{	// User must be logged in:
@@ -282,7 +282,7 @@ class central_antispam_Module extends Module
 				$Session->assert_received_crumb( 'cakeyword' );
 
 				// Check permission:
-				$current_User->check_perm( 'centralantispam', 'edit', true );
+				check_user_perm( 'centralantispam', 'edit', true );
 
 				$new_status = param( 'new_status', 'string' );
 				$cakw_ID = param( 'cakw_ID', 'integer', true );
@@ -302,7 +302,7 @@ class central_antispam_Module extends Module
 				$Session->assert_received_crumb( 'casource' );
 
 				// Check permission:
-				$current_User->check_perm( 'centralantispam', 'edit', true );
+				check_user_perm( 'centralantispam', 'edit', true );
 
 				$new_status = param( 'new_status', 'string' );
 				$casrc_ID = param( 'casrc_ID', 'integer', true );

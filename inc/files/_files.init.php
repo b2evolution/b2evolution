@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -13,7 +13,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for files module to function properly
  */
-$required_php_version[ 'files' ] = '5.4';
+$required_php_version[ 'files' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for files module to function properly
@@ -148,30 +148,35 @@ class files_Module extends Module
 				$permshared = 'edit'; // Access to shared root
 				$permimport = 'edit'; // Access to import root
 				$permskins = 'edit'; // Access to skins root
+				$permplugins = 'edit'; // Access to plugins root
 				break;
 			case 2: // Moderators group equals 2
 				$permfiles = 'add';
 				$permshared = 'add';
 				$permimport = 'none';
 				$permskins = 'none';
+				$permplugins = 'none';
 				break;
 			case 3: // Editors (group ID 3) have permission by default:
 				$permfiles = 'edit_allowed';
 				$permshared = 'view';
 				$permimport = 'none';
 				$permskins = 'none';
+				$permplugins = 'none';
 				break;
 			case 4: // Normal Users (group ID 4) have permission by default:
 				$permfiles = 'add';
 				$permshared = 'none';
 				$permimport = 'none';
 				$permskins = 'none';
+				$permplugins = 'none';
 				break;
 			default: // Other groups
 				$permfiles = 'none';
 				$permshared = 'none';
 				$permimport = 'none';
 				$permskins = 'none';
+				$permplugins = 'none';
 				break;
 		}
 
@@ -181,7 +186,8 @@ class files_Module extends Module
 				'perm_files' => $permfiles,
 				'perm_shared_root' => $permshared,
 				'perm_import_root' => $permimport,
-				'perm_skins_root' => $permskins
+				'perm_skins_root' => $permskins,
+				'perm_plugins_root' => $permplugins,
 			);
 	}
 
@@ -192,11 +198,11 @@ class files_Module extends Module
 	 */
 	function get_available_group_permissions()
 	{
-		global $current_User, $admin_url, $Settings;
+		global $admin_url, $Settings;
 
 		$filetypes_allowed_icon = get_icon( 'file_allowed' );
 		$filetypes_not_allowed_icon = get_icon( 'file_not_allowed' );
-		if( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{ // Set the links to icons if current user has a permission to edit the file types:
 			$filetypes_allowed_icon = '<a href="'.$admin_url.'?ctrl=filetypes" title="'.format_to_output( T_('Edit unlocked file types...'), 'htmlattr' ).'">'.$filetypes_allowed_icon.'</a>';
 			$filetypes_not_allowed_icon = '<a href="'.$admin_url.'?ctrl=filetypes" title="'.format_to_output( T_('Edit locked file types...'), 'htmlattr' ).'">'.$filetypes_not_allowed_icon.'</a>';
@@ -219,7 +225,7 @@ class files_Module extends Module
 						array( 'add', T_('Add/Upload files to allowed roots'), sprintf( T_('Only %sunlocked file types can be uploaded.'), $filetypes_allowed_icon ) ),
 						array( 'edit_allowed', T_('Edit files in allowed roots'), sprintf( T_('Only %sunlocked file types can be edited.'), $filetypes_allowed_icon ) ),
 						array( 'edit', sprintf( T_('Edit %sunlocked files in all roots'), $filetypes_allowed_icon ) ),
-						array( 'all', sprintf( T_('Edit all files, including %slocked ones, in all roots'), $filetypes_not_allowed_icon ), T_('Needed for editing PHP files in skins.') ),
+						array( 'all', sprintf( T_('Edit / Unzip all files, including %slocked ones, in all roots'), $filetypes_not_allowed_icon ), T_('Needed for editing PHP files in skins.') ),
 					),
 				'perm_type' => 'radiobox',
 				'field_lines' => true,
@@ -268,6 +274,21 @@ class files_Module extends Module
 						array( 'edit', T_('Edit') ),
 					),
 					'perm_type' => ( $Settings->get( 'fm_enable_roots_skins' ) ? 'radiobox' : 'hidden' ),
+					'field_lines' => false,
+				),
+			'perm_plugins_root' => array(
+				'label' => T_('Access to plugins root'),
+				'user_func' => 'check_pluginsroot_user_perm',
+				'group_func' => 'check_pluginsroot_group_perm',
+				'perm_block' => 'file',
+				'options' => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'view', T_('Read only') ),
+						array( 'add', T_('Add/Upload') ),
+						array( 'edit', T_('Edit') ),
+					),
+					'perm_type' => ( $Settings->get( 'fm_enable_roots_plugins' ) ? 'radiobox' : 'hidden' ),
 					'field_lines' => false,
 				),
 		);
@@ -353,21 +374,28 @@ class files_Module extends Module
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'shared_root', $permlevel );
+					return check_user_perm( 'shared_root', $permlevel );
 				case 'import':
 					if( $permlevel == 'edit_allowed' )
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'import_root', $permlevel );
+					return check_user_perm( 'import_root', $permlevel );
 				case 'skins':
+				case 'siteskins':
 					if( $permlevel == 'edit_allowed' )
 					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
 						$permlevel = 'edit';
 					}
-					return $current_User->check_perm( 'skins_root', $permlevel );
+					return check_user_perm( 'skins_root', $permlevel );
+				case 'plugins':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
+					return check_user_perm( 'plugins_root', $permlevel );
 				case 'user':
-					if( $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+					if( check_user_perm( 'users', 'moderate' ) && check_user_perm( 'files', 'all' ) )
 					{ // Current user can edits all files of other users
 						return true;
 					}
@@ -383,7 +411,7 @@ class files_Module extends Module
 							$perm = true;
 							return $perm;
 						}
-						if( $current_User->check_perm( 'blogs', $permlevel ) )
+						if( check_user_perm( 'blogs', $permlevel ) )
 						{	// If current user has access to view or edit all collections:
 							$perm = true;
 							return $perm;
@@ -519,6 +547,48 @@ class files_Module extends Module
 		return $perm;
 	}
 
+
+	/**
+	 * Callback function to check a group permission for skins root. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Permission level: 'edit', 'add', 'view'
+	 * @param string Permission value: 'edit', 'add', 'view'
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_pluginsroot_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch( $permvalue )
+		{
+			case 'edit':
+				// User can ask for normal edit perm...
+				if( $permlevel == 'edit' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'add':
+				// User can ask for normal add perm...
+				if( $permlevel == 'add' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// User can ask for normal view perm...
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+		return $perm;
+	}
+
+
 	/**
 	 * Build the evobar menu
 	 */
@@ -528,13 +598,12 @@ class files_Module extends Module
 		 * @var Menu
 		 */
 		global $topleft_Menu;
-		global $current_User;
 		global $admin_url;
 		global $Collection, $Blog;
 
-		if( $current_User->check_perm( 'admin', 'standard' ) )
+		if( check_user_perm( 'admin', 'standard' ) )
 		{
-			if( !empty($Blog) && $current_User->check_perm( 'files', 'view', false, $Blog->ID ) )
+			if( !empty($Blog) && check_user_perm( 'files', 'view', false, $Blog->ID ) )
 			{	// Manage blog files:
 
 				// TODO: this is hackish and would require a proper function call
@@ -550,9 +619,9 @@ class files_Module extends Module
 			}
 		}
 
-		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'admin', 'restricted' ) )
 		{
-			if( $current_User->check_perm( 'files', 'view', false, NULL ) )
+			if( check_user_perm( 'files', 'view', false, NULL ) )
 			{	// Manage files generally:
 
 				// FM enabled and permission to view files:
@@ -572,11 +641,7 @@ class files_Module extends Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $dispatcher;
-		/**
-		 * @var User
-		 */
-		global $current_User;
+		global $blog, $admin_url;
 		global $Collection, $Blog;
 		global $Settings;
 		/**
@@ -584,18 +649,18 @@ class files_Module extends Module
 		 */
 		global $AdminUI;
 
-		if( !$current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{
 			return;
 		}
 
-		if( $current_User->check_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
+		if( check_user_perm( 'files', 'view', false, $blog ? $blog : NULL ) )
 		{	// FM enabled and permission to view files:
 			$AdminUI->add_menu_entries( NULL, array(
 						'files' => array(
 							'text' => T_('Files'),
 							'title' => T_('File management'),
-							'href' => $dispatcher.'?ctrl=files',
+							'href' => $admin_url.'?ctrl=files',
 							// Controller may add subtabs
 						),
 					) );

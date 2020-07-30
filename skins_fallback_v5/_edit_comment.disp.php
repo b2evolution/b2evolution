@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -55,7 +55,7 @@ $Form->begin_form( 'bComment' );
 	else
 	{
 		$Form->text_input( 'newcomment_author', $edited_Comment->author, 20, T_('Author'), '', array( 'maxlength' => 100, 'style' => 'width: 100%;' ) );
-		$Form->text_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
+		$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 		$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width: 100%;' ) );
 	}
 
@@ -71,15 +71,16 @@ $Form->begin_form( 'bComment' );
 	$Form->inputstart .= $comment_toolbar;
 	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
 			'cols' => 38,
-			'class' => 'bComment autocomplete_usernames',
-			'id' => $dummy_fields[ 'content' ]
+			'class' => 'bComment'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : '' ),
+			'id' => $dummy_fields[ 'content' ],
+			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->begin_fieldset( '', array( 'id' => 'comment_date_field' ) );
 		echo $Form->begin_field( NULL, T_('Comment date') );
@@ -126,7 +127,7 @@ $Form->begin_form( 'bComment' );
 	$LinkOwner = new LinkComment( $edited_Comment );
 	if( $LinkOwner->count_links() )
 	{ // there are attachments to display
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'files', 'view' ) && check_user_perm( 'admin', 'restricted' ) )
 		{
 			$Form->begin_fieldset( T_('Attachments') );
 			display_attachments( $LinkOwner );
@@ -144,7 +145,7 @@ $Form->begin_form( 'bComment' );
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 	function switch_edit_view()
 	{
 		var form = document.getElementById('comment_edit');

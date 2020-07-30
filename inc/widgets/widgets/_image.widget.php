@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -52,7 +52,7 @@ class image_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Free Image');
+		return T_('Image');
 	}
 
 
@@ -122,14 +122,13 @@ class image_Widget extends ComponentWidget
 				'size_begin_line' => array(
 					'type' => 'begin_line',
 					'label' => T_('Image size'),
+					'note' => T_('Leave blank for auto.'),
 				),
 					'width' => array(
-						'label' => T_('Image width'),
 						'note' => '',
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
-						'hide_label' => true,
 						'valid_pattern' => array(
 								'pattern' => '~^(\d+(px|%)?)?$~i',
 								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
@@ -139,19 +138,45 @@ class image_Widget extends ComponentWidget
 						'type' => 'string',
 					),
 					'height' => array(
-						'label' => T_('Image height'),
-						'note' => '',
+						'note' => T_('Leave blank for auto.'),
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
-						'hide_label' => true,
 						'valid_pattern' => array(
 								'pattern' => '~^(\d+(px|%)?)?$~i',
 								'error'   => sprintf( T_('Invalid image size, it must be specified in px or %%.') ) ),
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
-					'label' => T_('Leave blank for auto.'),
+				),
+				'max_size_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('Max size'),
+				),
+					'max_width' => array(
+						'note' => '',
+						'defaultvalue' => '',
+						'allow_empty' => true,
+						'size' => 4,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid max size, it must be specified in px or %%.') ) ),
+					),
+					'max_size_separator' => array(
+						'label' => ' x ',
+						'type' => 'string',
+					),
+					'max_height' => array(
+						'note' => T_('Leave blank for auto.'),
+						'defaultvalue' => '',
+						'allow_empty' => true,
+						'size' => 4,
+						'valid_pattern' => array(
+								'pattern' => '~^(\d+(px|%)?)?$~i',
+								'error'   => sprintf( T_('Invalid max size, it must be specified in px or %%.') ) ),
+					),
+				'max_size_end_line' => array(
+					'type' => 'end_line',
 				),
 				'alt' => array(
 					'label' => T_('Image Alt text'),
@@ -227,8 +252,9 @@ class image_Widget extends ComponentWidget
 
 
 		if( $this->disp_params['check_file'] && empty( $image_url ) )
-		{ // Logo file doesn't exist, Exit here because of widget setting requires this
-			return true;
+		{	// Logo file doesn't exist, Exit here because of widget setting requires this:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no image to display.' );
+			return false;
 		}
 
 		$this->init_display( $params );
@@ -242,9 +268,18 @@ class image_Widget extends ComponentWidget
 		);
 
 		// Initialize image attributes:
+		// Image width:
 		$image_attrs['style'] = 'width:'.( empty( $this->disp_params['width'] ) ? 'auto' : format_to_output( $this->disp_params['width'], 'htmlattr' ) ).';';
 		// Image height:
 		$image_attrs['style'] .= 'height:'.( empty( $this->disp_params['height'] ) ? 'auto' : format_to_output( $this->disp_params['height'], 'htmlattr' ) ).';';
+		if( ! empty( $this->disp_params['max_width'] ) )
+		{	// Max width:
+			$image_attrs['style'] .= 'max-width:'.format_to_output( $this->disp_params['max_width'], 'htmlattr' ).';';
+		}
+		if( ! empty( $this->disp_params['max_height'] ) )
+		{	// Max height:
+			$image_attrs['style'] .= 'max-height:'.format_to_output( $this->disp_params['max_height'], 'htmlattr' ).';';
+		}
 		// If no unit is specified in a size, consider the unit to be px:
 		$image_attrs['style'] = preg_replace( '/(\d+);/', '$1px;', $image_attrs['style'] );
 
@@ -254,6 +289,22 @@ class image_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $message;
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 

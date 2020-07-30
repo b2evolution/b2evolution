@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -67,13 +67,9 @@ $Form = new Form( $form_action, 'user_checkchanges' );
 
 if( is_admin_page() )
 {
-	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 	$ctrl_param = '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$edited_User->ID;
-
 	$form_title = '';
 	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 }
 else
 {
@@ -90,7 +86,7 @@ if( $display_mode != 'js' && is_admin_page() )
 		echo_user_actions( $Form, $edited_User, $action );
 	}
 
-	$form_text_title = T_( 'Crop profile picture' ); // used for js confirmation message on leave the changed form
+	$form_text_title = TB_( 'Crop profile picture' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
@@ -98,7 +94,7 @@ $cropped_image_tag = $cropped_File->get_tag( '', '', '', '', 'original', '', '',
 
 // Display this error when JS is not enabled
 echo '<noscript>'
-		.'<p class="error text-danger">'.T_('Please activate Javascript in your browser in order to use this feature.').'</p>'
+		.'<p class="error text-danger">'.TB_('Please activate Javascript in your browser in order to use this feature.').'</p>'
 		.'<style type="text/css">form#user_checkchanges { display:none }</style>'
 	.'</noscript>';
 
@@ -126,7 +122,7 @@ if( isset( $Blog ) )
 $close_icon = '';
 if( $display_mode == 'js' )
 { // Display a close link for popup window
-	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+	$close_icon = action_icon( TB_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
 
 // Start displaying content
@@ -134,7 +130,7 @@ if( $display_mode == 'js' )
 if( ! $can_crop )
 {
 	echo '<div style="height: '.$content_height.'px; width: '. $content_width.'px; position=relative; text-align: center;">';
-	echo '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">'.sprintf( T_('Only images larger than %dx%d pixels can be cropped.'), $min_avatar_size, $min_avatar_size ).'</div>';
+	echo '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">'.sprintf( TB_('Only images larger than %dx%d pixels can be cropped.'), $min_avatar_size, $min_avatar_size ).'</div>';
 	echo '</div>';
 }
 else
@@ -142,7 +138,7 @@ else
 	echo '<div id="user_crop_content" style="height: '.$content_height.'px; width: '. $content_width.'px;">';
 	echo '</div>';
 
-	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> T_('Apply'), 'class' => 'SaveButton btn-primary' ) );
+	$Form->button( array( 'type' => 'submit', 'name'=>'actionArray[crop]', 'value'=> TB_('Apply'), 'class' => 'SaveButton btn-primary' ) );
 }
 $Form->end_form();
 if( $can_crop )
@@ -164,7 +160,7 @@ if( $can_crop )
 	}
 </style>
 
-<script type="text/javascript">
+<script>
 	var jcrop_api;
 	var image_url = '<?php echo format_to_js( $cropped_File->get_url() ); ?>';
 	var gutter = 10;
@@ -687,7 +683,7 @@ if( $can_crop )
 	render_content();
 
 	// Initialize jcrop tool only after the image is fully loaded
-	jQuery( '#user_crop_workarea img' ).load( function()
+	jQuery( '#user_crop_workarea img' ).on( 'load', function()
 		{
 			init_jcrop_tool( jQuery( this ) );
 		});

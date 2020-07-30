@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -32,34 +32,55 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 		// Home page settings:
 			'front_disp'             => 'posts',
+			'default_noindex'         => 0, // META NOINDEX on Default/Front collection page
+			'canonical_homepage'      => 1, // Redirect front page to its canonical Url?
+			'self_canonical_homepage' => 1, // Use self-referencing rel="canonical" tag
+			'relcanonical_homepage'   => 1, // If no 301, fall back to rel="canoncial" ?
 
 		// Posts list settings:
 			'what_to_show'           => 'posts',      // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
 			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
-			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
-			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
-			'default_noindex'        => '0',				// META NOINDEX on Default blog page
+			'canonical_posts'        => 1,				// Redirect disp=posts to its canonical Url?
+			'self_canonical_posts'   => 1,				// Use self-referencing rel="canonical" tag
+			'relcanonical_posts'     => 1,				// If no 301, fall back to rel="canoncial" ?
+			'posts_firstpage_noindex'=> 0,				// META NOINDEX on First page on disp=posts
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
 			'permalinks'      => 'single',				// single, archive, subchap
+			'postlist_enable' => 1,
 
 		// Page 2,3,4..; settings:
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
+		// User profile page settings:
+			'user_prefix' => 'user',
+			'user_links' => 'params',
+
 		// Single post settings:
+			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
+			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
-			'slug_limit' => 5,
+			'slug_limit' => 8,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
 			'tags_twitter_card' => 1,
+			'tags_structured_data' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+
+		// Tiny URLs settings:
+			'tinyurl_type'   => 'basic',
+			'tinyurl_domain' => '',
+			'tinyurl_tag_source' => 'utm_source',
+			'tinyurl_tag_slug' => 'utm_campaign',
+			'tinyurl_tag_extra_term' => 'utm_term',
 
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
@@ -76,6 +97,7 @@ class CollectionSettings extends AbstractSettings
 			'require_anon_name' => 1,
 			'require_anon_email' => 1,
 			'allow_anon_url' => 0,
+			'comment_maxlen' => 20000,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -91,12 +113,15 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
+			'meta_comments_frontoffice' => 1, // Display internal comments in front-office
+			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:
 			'arcdir_noindex' => '1',					// META NOINDEX on Archive directory
 			'archive_mode'   => 'monthly',				// monthly, weekly, daily, postbypost
 			'archive_links'  => 'extrapath',			// param, extrapath
 			'canonical_archive_urls' => 1,				// Redirect archives to their canonical URL?
+			'self_canonical_archive_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'relcanonical_archive_urls' => 1,			// If no 301, fall back to rel="canoncial" ?
 			'archive_content'   => 'excerpt',
 			'archive_posts_per_page' => '100',
@@ -108,10 +133,11 @@ class CollectionSettings extends AbstractSettings
 			'catdir_noindex' => '1',					// META NOINDEX on Category directory
 			'chapter_links'  => 'chapters',				// 'param_num', 'subchap', 'chapters'
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
+			'self_canonical_cat_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
-			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
+			'chapter_noindex' => '1',       // META NOINDEX on Category pages without intro
 			'category_prefix'   => '',
 			'categories_meta_description' => 1,
 			'category_ordering' => 'alpha',             // Ordering of categories
@@ -119,12 +145,16 @@ class CollectionSettings extends AbstractSettings
 		// Tag page settings:
 			'tag_links'  => 'colon',					// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
+			'self_canonical_tag_urls' => 1,			// Use self-referencing rel="canonical" tag
 			'relcanonical_tag_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'tag_content'       => 'excerpt',
 			'tag_posts_per_page' => 100,
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',							// fp> fp> we want this changed to prefix only for new blogs only
 			'tag_rel_attrib' => 1,						// rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
+
+		// User profile page settings:
+			'canonical_user_urls' => 1, // Redirect user profile pages to their canonical Url?
 
 		// Other filtered pages:
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
@@ -133,6 +163,7 @@ class CollectionSettings extends AbstractSettings
 		// Other pages:
 			'feedback-popup_noindex' => '1',			// META NOINDEX on Feedback popups
 			'msgform_noindex' => '1',					// META NOINDEX on Message forms
+			'msgform_nofollowto' => '1',
 			'special_noindex' => '1',					// META NOINDEX on other special pages
 			'404_response' => '404',
 			'help_link' => 'slug',
@@ -153,22 +184,28 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment, Contact & Quick registration forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
+			'in_skin_change_proposal' => 1,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
+			'in_skin_editing_category_order' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
-			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
+			'ping_plugins' => 'ping_pingomatic,ping_b2evonet,evo_twitter,webmention', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
+			'allow_anon_subscriptions' => 1,    // Allow email subscriptions for replies to anonymous users comments
+			'default_anon_comment_notify' => 0, // Default option to subscribe anonymous users for replies notification
+			'anon_notification_email_limit' => 3, // Max # of email notifications an anonymous user may receive per day
 			'use_workflow' => 0,						// Don't use workflow by default
+			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',
-			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
+			'blog_footer_text' => 'This collection &copy;$year$ by $publisher$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
@@ -184,6 +221,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			'http_protocol' => 'allow_both', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
@@ -197,7 +235,7 @@ class CollectionSettings extends AbstractSettings
 			'htsrv_assets_absolute_url' => '', // Absolute URL for setting 'htsrv_assets_url_type' with selected option 'absolute'
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
-			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'select_coll', 'select_user'
 			// Cookie settings:
 			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
 			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
@@ -215,6 +253,15 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_enable' => 1,
+			'userdir_filter_restrict_to_members' => 1,
+			'userdir_filter_name' => 1,
+			'userdir_filter_email' => 0,
+			'userdir_filter_country' => 1,
+			'userdir_filter_region' => 1,
+			'userdir_filter_subregion' => 1,
+			'userdir_filter_city' => 1,
+			'userdir_filter_age_group' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -233,12 +280,49 @@ class CollectionSettings extends AbstractSettings
 
 		// Other settings:
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
+			'search_enable'        => 1, // Enable disp=search
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'search_sort_by'       => 'score', // Sort type of results on disp=search ('score', 'date')
 			'search_include_cats'  => 1, // Include categories to results on disp=search
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
+			'search_include_metas' => 1, // Include meta/internal comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
+			'search_include_files' => 1, // Include files to results on disp=search
+			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
+			'search_score_post_content'        => 1, // weight multiplier for keywords found in post content
+			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
+			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
+			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_metakeywords'   => 3, // weight multiplier for keywords found in post <meta> keywords
+			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
+			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
+			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month
+			'search_score_post_date_lastmonth' => 1, // weight multiplier for posts from the last month
+			'search_score_post_date_twoweeks'  => 2, // weight multiplier for posts from the last two weeks
+			'search_score_post_date_lastweek'  => 8, // weight multiplier for posts from the last week
+			'search_score_cmnt_post_title'     => 1, // weight multiplier for keywords found in title of the comment's post
+			'search_score_cmnt_content'        => 1, // weight multiplier for keywords found in comment content
+			'search_score_cmnt_author'         => 5, // weight multiplier for keywords found in comment author name
+			'search_score_cmnt_date_future'    => 0, // weight multiplier for comments from future
+			'search_score_cmnt_date_moremonth' => 0, // weight multiplier for comments older month
+			'search_score_cmnt_date_lastmonth' => 1, // weight multiplier for comments from the last month
+			'search_score_cmnt_date_twoweeks'  => 2, // weight multiplier for comments from the last two weeks
+			'search_score_cmnt_date_lastweek'  => 8, // weight multiplier for comments from the last week
+			'search_score_file_name'           => 3, // weight multiplier for keywords found in file name
+			'search_score_file_path'           => 1, // weight multiplier for keywords found in file path
+			'search_score_file_title'          => 3, // weight multiplier for keywords found in file long title
+			'search_score_file_alt'            => 1, // weight multiplier for keywords found in file alternative text
+			'search_score_file_description'    => 1, // weight multiplier for keywords found in file caption/description
+			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
+			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
+			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
+			'search_result_template_item'      => 'search_result_item',
+			'search_result_template_comment'   => 'search_result_comment',
+			'search_result_template_meta'      => 'search_result_meta',
+			'search_result_template_file'      => 'search_result_file',
+			'search_result_template_category'  => 'search_result_category',
+			'search_result_template_tag'       => 'search_result_tag',
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:
@@ -249,9 +333,22 @@ class CollectionSettings extends AbstractSettings
 			'last_invalidation_timestamp' => 0,
 
 		// Download settings:
+			'download_enable' => 1,
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
+
+		// Popups settings:
+			'marketing_popup_using' => 'never',
+			'marketing_popup_animation' => 'random',
+			'marketing_popup_container_front' => 'marketing_popup',
+			'marketing_popup_container_posts' => 'marketing_popup',
+			'marketing_popup_container_single' => 'marketing_popup',
+			'marketing_popup_container_page' => 'marketing_popup',
+			'marketing_popup_container_catdir' => 'marketing_popup',
+			'marketing_popup_container_other_disps' => 'marketing_popup',
+			'marketing_popup_show_repeat' => 0,
+			'marketing_popup_show_frequency' => 'always',
 		);
 
 	/**
@@ -263,6 +360,7 @@ class CollectionSettings extends AbstractSettings
 	 *  'normal_skin_ID' => NULL,
 	 *  'mobile_skin_ID' => NULL,
 	 *  'tablet_skin_ID' => NULL,
+	 *  'alt_skin_ID' => NULL,
 	 */
 
 
@@ -319,8 +417,18 @@ class CollectionSettings extends AbstractSettings
 	 */
 	function set( $col_key1, $col_key2, $value )
 	{
-		// Limit value with max possible length:
-		$value = utf8_substr( $value, 0, 10000 );
+		if( is_array( $value ) )
+		{	// Don't crop a serialized value if value is an array,
+			// e-g plugin setting with type "checklist":
+			if( strlen( serialize( $value  ) ) > 10000 )
+			{	// Stop here to avoid DB error on inserting of long value:
+				debug_die( 'Impossible to store long data(>10000 chars) of collection setting "'.$col_key2.'"!' );
+			}
+		}
+		else
+		{	// Limit value with max possible length:
+			$value = utf8_substr( $value, 0, 10000 );
+		}
 
 		return parent::setx( $col_key1, $col_key2, $value );
 	}

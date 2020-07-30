@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -43,7 +43,7 @@ else
 
 $ItemList->filter_area = array(
 		'callback' => 'callback_filter_item_list_table',
-		'hide_filter_button' => true,
+		'apply_filters_button' => 'none',
 	);
 
 
@@ -77,8 +77,24 @@ $ItemList->cols[] = array(
 						'th' => T_('Item/Task'),
 						'order' => 'title',
 						'td_class' => 'tskst_$post_pst_ID$',
-						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1, 1 )%</strong>'.
+						'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, 1 )%</strong>'.
 						        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\' )@' : '' ),
+					);
+
+$ItemList->cols[] = array(
+						'th' => T_('Slug'),
+						'order' => 'urltitle',
+						'td' => '%item_row_slug( #post_urltitle# )%',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
+					);
+
+$ItemList->cols[] = array(
+						'th' => T_('Status'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
+						'order' => 'status',
+						'td' => '%item_row_status( {Obj}, {CUR_IDX} )%',
 					);
 
 $ItemList->cols[] = array(
@@ -91,58 +107,53 @@ $ItemList->cols[] = array(
 					);
 
 $ItemList->cols[] = array(
-						'th' => T_('Status'),
+						'th' => T_('Workflow Status'),
 						'order' => 'pst_ID',
-						'th_class' => 'shrinkwrap',
 						'td_class' => '%item_td_task_class( #post_ID#, #post_pst_ID#, "jeditable_cell task_status_edit" )%',
 						'td' => '%item_td_task_cell( "status", {Obj} )%',
 						'extra' => array( 'rel' => '#post_ID#', 'data-post-type' => '#post_ityp_ID#', 'format_to_output' => false )
 					);
 
-
-/**
- * Deadline
- */
-function deadline( $date )
-{
-	$timestamp = mysql2timestamp( $date );
-
-	if( $timestamp <= 0 )
+if( $Blog->get_setting( 'use_deadline' ) )
+{	// Display deadline column only when it is enabled for collection:
+	function deadline( $date )
 	{
-		return '&nbsp;';	// IE needs that crap in order to display cell border :/
-	}
+		$timestamp = mysql2timestamp( $date );
 
-	return mysql2localedate( $date );
-}
-$ItemList->cols[] = array(
+		if( $timestamp <= 0 )
+		{
+			return '&nbsp;';	// IE needs that crap in order to display cell border :/
+		}
+
+		return mysql2localedate( $date );
+	}
+	$ItemList->cols[] = array(
 						'th' => T_('Deadline'),
 						'order' => 'post_datedeadline',
 						'td_class' => 'shrinkwrap tskst_$post_pst_ID$',
 						'td' => '%deadline( #post_datedeadline# )%',
 					);
+}
 
 
 $ItemList->cols[] = array(
 		'th' => /* TRANS: abbrev for info */ T_('i'),
 		'order' => 'datemodified',
 		'default_dir' => 'D',
-		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap',
+		'th_class' => 'shrinkwrap hidden-xs',
+		'td_class' => 'shrinkwrap hidden-xs',
 		'td' => '@history_info_icon()@',
 	);
 
 $ItemList->cols[] = array(
 		'th' => T_('Actions'),
-		'td_class' => 'shrinkwrap',
+		'th_class' => 'shrinkwrap hidden-xs',
+		'td_class' => 'shrinkwrap hidden-xs',
 		'td' => '%item_edit_actions( {Obj} )%',
 	);
 
-if( $ItemList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
-	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
 
-if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+if( check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 {	// We have permission to add a post with at least one status:
 	$ItemList->global_icon( T_('Create a new task...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ) ), T_('New task').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -194,7 +205,7 @@ echo_editable_column_js( array(
 	'ID_name'         => 'post_ID',
 	'field_type'      => $field_type,
 	'field_class'     => 'autocomplete_login only_assignees',
-	'null_text'       => TS_('No user') ) );
+	'null_text'       => T_('No user') ) );
 
 // Print JS to edit a task status
 global $DB;
@@ -212,7 +223,7 @@ foreach( $post_status_types as $post_status_type )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 	var itemStatuses = <?php echo json_encode( $post_statuses );?>;
 
 	function getApplicableStatus( el, selected ) {
@@ -228,7 +239,7 @@ foreach( $post_status_types as $post_status_type )
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',
 	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
-	'options'         => 'getApplicableStatus( jQuery( this ), result[1] );',
+	'options_eval'    => 'getApplicableStatus( jQuery( this ), result[1] );',
 	'new_field_name'  => 'new_status',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'post_ID' ) );

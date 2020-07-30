@@ -43,7 +43,6 @@ class nu_handler
                   'handle' => 'Record ID:'
 		              );
 
-		//while (list($key, $val) = each($data_str['rawdata']))
 		foreach( $data_str['rawdata'] as $key => $val )
 			{
 			$val = trim($val);
@@ -52,7 +51,6 @@ class nu_handler
 				{
 				if ($val == 'Domain servers in listed order:')
 					{
-					//while (list($key, $val) = each($data_str['rawdata']))
 					foreach( $data_str['rawdata'] as $key => $val )
 						{
 						$val = trim($val);
@@ -63,9 +61,6 @@ class nu_handler
 					break;
 					}
 
-				reset($items);
-
-				//while (list($field, $match) = each($items))
 				foreach( $items as $field => $match )
 				if (strstr($val, $match))
 					{

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -22,10 +22,6 @@ global $fm_Filelist;
  * @var string
  */
 global $fm_flatmode;
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var GeneralSettings
  */
@@ -46,6 +42,8 @@ global $edited_User;
 
 global $blog;
 
+global $show_existing_attachments_tab;
+
 if( isset( $edited_User ) )
 {	// Display a help notice for setting a new avatar:
 	printf( '<div>'.T_( 'Click on a link %s icon below to select the image to use as your profile picture.' )
@@ -58,14 +56,9 @@ if( isset( $edited_User ) )
 <?php
 	$Widget = new Widget( 'file_browser' );
 
-	if( ! $ajax_request && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-	{
-		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload').'...', '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
-	}
-
 	$close_link_params = array();
 	if( $ajax_request )
-	{ // Initialize JavaScript functions to work with modal window:
+	{	// Initialize JavaScript functions to work with modal window:
 		echo_modalwindow_js();
 		$close_link_params['onclick'] = 'return closeModalWindow( window.parent.document )';
 	}
@@ -75,26 +68,29 @@ if( isset( $edited_User ) )
 	if( ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
 	{	// Don't display a close icon, because it is already displayed on bootstrap modal window header:
 		if( ! empty( $LinkOwner ) )
-		{ // Get an url to return to owner(post/comment) editing
+		{	// Get an url to return to owner(post/comment) editing
 			$icon_close_url = $LinkOwner->get_edit_url();
 		}
 		elseif( $mode == 'import' )
-		{ // Get an url to return to WordPress Import page
+		{	// Get an url to return to WordPress Import page
 			global $admin_url;
 			$icon_close_url = $admin_url.'?ctrl=wpimportxml';
 		}
 		else
-		{ // Unknown case, leave empty url
+		{	// Unknown case, leave empty url
 			$icon_close_url = '';
 		}
 
 		if( ! empty( $icon_close_url ) || ! empty( $close_link_params ) )
-		{ // Display a link to close file browser
+		{	// Display a link to close file browser
 			$Widget->global_icon( T_('Close file manager'), 'close', $icon_close_url, '', 3, 2, $close_link_params );
 		}
 	}
 
-	$Widget->title = T_('File browser').get_manual_link('file_browser');
+	if( empty( $show_existing_attachments_tab ) )
+	{
+		$Widget->title = T_('File browser').get_manual_link('file-browser');
+	}
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
@@ -160,7 +156,7 @@ if( isset( $edited_User ) )
 					$file_roots = array();
 					foreach( $rootlist as $l_FileRoot )
 					{	// Put all available file roots in grouped array:
-						if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+						if( ! check_user_perm( 'files', 'view', false, $l_FileRoot ) )
 						{	// Skip this file root, because current user has no permissions to view it:
 							continue;
 						}
@@ -198,7 +194,7 @@ if( isset( $edited_User ) )
 								}
 								$file_root_group_key = $file_root['type'];
 							}
-							if( ( $file_root_group_key == 'user' && $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+							if( ( $file_root_group_key == 'user' && check_user_perm( 'users', 'moderate' ) && check_user_perm( 'files', 'all' ) )
 							    || $file_root_group_key == 'collection' )
 							{	// Selector for more collections or users:
 								echo '<li><a href="#" data-type="'.$file_root_group_key.'">'.T_('Other...').'</a></li>'."\n";
@@ -254,9 +250,6 @@ if( isset( $edited_User ) )
 				{
 					echo '<td id="fm_dirtree">';
 
-					// Version with all roots displayed
-					//echo get_directory_tree( NULL, NULL, $ads_list_path );
-
 					// Version with only the current root displayed:
 					echo get_directory_tree( $fm_Filelist->_FileRoot, $fm_Filelist->_FileRoot->ads_path, $ads_list_path );
 
@@ -305,7 +298,7 @@ else
 }
 ?>
 	</div>
-<script type="text/javascript">
+<script>
 if( typeof file_uploader_note_text != 'undefined' )
 {
 	document.write( '<div class="note pull-right">' + file_uploader_note_text + '</div>' );
@@ -331,7 +324,7 @@ if( typeof file_uploader_note_text != 'undefined' )
 	$new_root_selector_html = preg_replace( '/<script.*?<\/script>/is', '', $new_root_selector_html );
 	$new_root_selector_html = format_to_js( $new_root_selector_html );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#new_root_selector a[data-type]' ).click( function()
@@ -359,8 +352,8 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections',
 			{
 				'per_page': 20,
-				'filter'  : 'all',
-				'restrict': 'available_fileroots',
+				'list_in_frontoffice' : 'all',
+				'restrict_to_available_fileroots': 1,
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},
@@ -389,7 +382,7 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'users',
 			{
 				'per_page': 20,
-				'restrict': 'available_fileroots',
+				'restrict_to_available_fileroots': 1,
 				'filter'  : 'new',
 				'list_params': { 'keywords_fields': 'user_login', 'order_by_login_length': 'D' },
 				'keywords': jQuery( '#new_root_selector_field' ).val()

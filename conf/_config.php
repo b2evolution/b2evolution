@@ -27,7 +27,7 @@ elseif( file_exists(dirname(__FILE__).'/umaintenance.html') )
 	$get_ctrl = isset( $_GET['ctrl'] ) ? $_GET['ctrl'] : ( isset( $_POST['ctrl'] ) ? $_POST['ctrl'] : '' );
 	// Check if the request is to the upgrade controller or it is an upgrade action request from the upgrade ctrl
 	$is_upgrade = ( ( $get_ctrl == 'upgrade' ) || ( ( substr( $_SERVER['PHP_SELF'], -17 ) == 'install/index.php' )
-				&& isset( $_GET['action'] ) && ( $_GET['action'] == 'svn_upgrade' || $_GET['action'] == 'auto_upgrade' ) ) ); // The request action is 'svn_upgrade' or 'auto_upgrade'
+				&& isset( $_GET['action'] ) && ( $_GET['action'] == 'auto_upgrade' ) ) ); // The request action is 'auto_upgrade'
 	if( ! $is_upgrade )
 	{ // NOT an upgrade
 		header('HTTP/1.0 503 Service Unavailable');
@@ -69,6 +69,13 @@ require_once  dirname(__FILE__).'/_locales.php';        	// locale settings
 require_once  dirname(__FILE__).'/_formatting.php';     	// formatting settings
 require_once  dirname(__FILE__).'/_stats.php';          	// stats/hitlogging settings
 require_once  dirname(__FILE__).'/_application.php';    	// application settings
+
+global $app_pro;
+if( isset( $app_pro ) && $app_pro === true )
+{	// Load social settings only for PRO version:
+	require_once dirname(__FILE__).'/_social.php';	// social settings
+}
+
 if( file_exists(dirname(__FILE__).'/_local.php') )
 { // Override for local config in there:
 	include_once dirname(__FILE__).'/_local.php';			// Will not be overridden on upgrade.
@@ -77,6 +84,9 @@ elseif( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 { // Legacy file (not recommended):
 	include_once dirname(__FILE__).'/_overrides_TEST.php';	// Will not be overridden on upgrade.
 }
+
+// Load to use evo_setcookie() for proper working with cookies on different domains from $baseurl:
+require_once $inc_path.'sessions/model/_cookie.funcs.php';
 
 // Handle debug cookie:
 if( $debug == 'pwd' )
@@ -92,11 +102,11 @@ if( $debug == 'pwd' )
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
 				$debug = 1;
-				setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
+				evo_setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+				evo_setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 			}
 		}
 		elseif( !empty( $_COOKIE['debug'] ) && $_COOKIE['debug'] == $debug_pwd )
@@ -120,15 +130,15 @@ if( $debug_jslog == 'pwd' )
 			if( $_GET['jslog'] == $debug_pwd )
 			{	// Password matches
 				$debug_jslog = 1;
-				setcookie( 'jslog', $debug_pwd, 0, '/' );
+				evo_setcookie( 'jslog', $debug_pwd, 0, '/' );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				setcookie( 'jslog', '', $cookie_expired, '/' );
+				evo_setcookie( 'jslog', '', $cookie_expired, '/' );
 				if( !empty( $_COOKIE['jslog_style'] ) )
 				{	// Change the saved styles to hide jslog
 					$_COOKIE['jslog_style'] = str_replace( 'display: block', 'display: none', $_COOKIE['jslog_style'] );
-					setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
+					evo_setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
 				}
 			}
 		}
@@ -138,7 +148,7 @@ if( $debug_jslog == 'pwd' )
 			if( !empty( $_COOKIE['jslog_style'] ) )
 			{	// Change the saved styles to show jslog
 				$_COOKIE['jslog_style'] = str_replace( 'display: none', 'display: block', $_COOKIE['jslog_style'] );
-				setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
+				evo_setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
 			}
 		}
 	}

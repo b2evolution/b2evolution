@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Filetype;
 
-global $force_upload_forbiddenext;
+global $force_upload_forbiddenext, $admins_can_manipulate_sensitive_files;
 global $rsc_path;
 
 // Determine if we are creating or updating...
@@ -29,10 +29,10 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'ftyp_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
+$Form->global_icon( TB_('Delete this filetype!'), 'delete', regenerate_url( 'action', 'action=delete' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') );
+$Form->begin_form( 'fform', $creating ?  TB_('New file type') : TB_('File type') );
 
 	$Form->add_crumb( 'filetype' );
 	$Form->hidden_ctrl();
@@ -40,24 +40,24 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 
 	if( ! $creating ) $Form->hidden( 'ftyp_ID', $edited_Filetype->ID );
 
-	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, T_('Extensions'), '', array( 'maxlength'=>30, 'required'=>true, 'note'=>sprintf( T_('E.g. %s'), '<code>html</code>' ).', '.T_('separated by whitespace') ) );
+	$Form->text_input( 'ftyp_extensions', $edited_Filetype->extensions, 40, TB_('Extensions'), '', array( 'maxlength'=>30, 'required'=>true, 'note'=>sprintf( TB_('E.g. %s'), '<code>html</code>' ).', '.TB_('separated by whitespace') ) );
 
-	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, T_('File type name'), sprintf( T_('E.g. %s'), '<code>'.T_('HTML file').'</code>' ), array( 'maxlength'=> 30, 'required'=>true ) );
+	$Form->text_input( 'ftyp_name', $edited_Filetype->name, 40, TB_('File type name'), sprintf( TB_('E.g. %s'), '<code>'.TB_('HTML file').'</code>' ), array( 'maxlength'=> 30, 'required'=>true ) );
 
-	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, T_('Mime type'), sprintf( T_('E.g. %s'), '<code>text/html</code>'), array( 'maxlength'=> 50, 'required'=>true ) );
+	$Form->text_input( 'ftyp_mimetype', $edited_Filetype->mimetype, 40, TB_('Mime type'), sprintf( TB_('E.g. %s'), '<code>text/html</code>'), array( 'maxlength'=> 50, 'required'=>true ) );
 
-	$Form->select_input_array( 'ftyp_icon', $edited_Filetype->icon, get_available_filetype_icons(), T_('Icon') );
+	$Form->select_input_array( 'ftyp_icon', $edited_Filetype->icon, get_available_filetype_icons(), TB_('Icon') );
 
 	$Form->radio( 'ftyp_viewtype',
 								$edited_Filetype->viewtype,
 								 array(
-												array( 'browser', T_( 'Open with browser (popup)' ), T_( 'Let the browser handle the file in a popup.' ) ),
-												array( 'text', T_( 'Open with text viewer (popup)' ), T_( 'Use the online text viewer (recommended for .txt)' ) ),
-												array( 'image', T_( 'Open with image viewer (popup)' ), T_( 'Use the online image viewer (recommended for .gif .png .jpg)' ) ),
-												array( 'external', T_( 'Open with external app (no popup)' ), T_( 'Let the browser handle the file in a popup. Note: if you do not want Word to open inside of IE, you must uncheck "browse in same window" in Windows\' file types.' ) ),
-												array( 'download', T_( 'Download to disk (no popup)' ), T_( 'Tell the browser to save the file to disk instead of displaying it.' ) )
+												array( 'browser', TB_( 'Open with browser (popup)' ), TB_( 'Let the browser handle the file in a popup.' ) ),
+												array( 'text', TB_( 'Open with text viewer (popup)' ), TB_( 'Use the online text viewer (recommended for .txt)' ) ),
+												array( 'image', TB_( 'Open with image viewer (popup)' ), TB_( 'Use the online image viewer (recommended for .gif .png .jpg)' ) ),
+												array( 'external', TB_( 'Open with external app (no popup)' ), TB_( 'Let the browser handle the file in a popup. Note: if you do not want Word to open inside of IE, you must uncheck "browse in same window" in Windows\' file types.' ) ),
+												array( 'download', TB_( 'Download to disk (no popup)' ), TB_( 'Tell the browser to save the file to disk instead of displaying it.' ) )
 											),
-									T_( 'View type' ),
+									TB_( 'View type' ),
 									true // separate lines
 							 );
 
@@ -73,23 +73,35 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 		}
 	}
 
+	if( empty( $admins_can_manipulate_sensitive_files ) )
+	{
+		$admin_allow_text = TB_('Prevent uploading/renaming/editing files of this type');
+		$allow_upload_note = sprintf( TB_('You can unlock this for admins by setting %s in the <a %s>configuration files</a>'),
+				'<code>$admins_can_manipulate_sensitive_files = true</code>', 'target="_blank" href="'.get_manual_url( 'advanced-php').'"' );
+	}
+	else
+	{
+		$admin_allow_text = TB_('Allow only admins to upload/rename/edit files of this type');
+		$allow_upload_note = TB_('The exact users who will be impacted depends on each User Group\'s configuration.');
+	}
+
 	$Form->radio( 'ftyp_allowed',  $edited_Filetype->allowed,
 					array(
-							array( 'any', T_( 'Allow anyone (including anonymous users) to upload/rename/edit files of this type' ) ),
-							array( 'registered', T_( 'Allow only registered users to upload/rename/edit files of this type' ) ),
-							array( 'admin', T_( 'Allow only admins to upload/rename/edit files of this type' ) )
+							array( 'any', TB_( 'Allow anyone (including anonymous users) to upload/rename/edit files of this type' ) ),
+							array( 'registered', TB_( 'Allow only registered users to upload/rename/edit files of this type' ) ),
+							array( 'admin', $admin_allow_text )
 						),
-					T_( 'Allow upload' ), true, T_('The exact users who will be impacted depends on each User Group\'s configuration.') );
+					TB_( 'Allow upload' ), true, $allow_upload_note );
 
 if( $creating )
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Record'), 'SaveButton' ),
-													array( 'submit', 'submit', T_('Record, then Create New'), 'SaveButton' ),
-													array( 'submit', 'submit', T_('Record, then Create Similar'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', TB_('Record'), 'SaveButton' ),
+													array( 'submit', 'submit', TB_('Record, then Create New'), 'SaveButton' ),
+													array( 'submit', 'submit', TB_('Record, then Create Similar'), 'SaveButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

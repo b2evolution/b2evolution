@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -27,7 +27,7 @@ global $Collection, $Blog;
  */
 global $CommentList;
 
-global $current_User, $admin_url, $tab3;
+global $admin_url, $tab3;
 
 /*
  * Display comments:
@@ -40,20 +40,12 @@ display_comment_mass_delete( $CommentList );
 
 $block_item_Widget = new Widget( 'block_item' );
 
-if( $CommentList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
-	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3='.$tab3.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 if( check_comment_mass_delete( $CommentList ) )
 {	// A form for mass deleting is available, Display link
 	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
-$emptytrash_link = '';
-// Display recycle bin placeholder, because users may have rights to recycle particular comments
-$opentrash_link = '<span id="recycle_bin" class="pull-right"></span>';
-if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
+if( $tab3 != 'meta' && check_user_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
@@ -70,11 +62,26 @@ if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 			) );
 	}
 }
-$block_item_Widget->title = $opentrash_link.$emptytrash_link.( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
+$block_item_Widget->title = ( $tab3 == 'meta' ? T_('Internal comments') : T_('Feedback (Comments, Trackbacks...)') );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
-echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+//echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+// --------------------------------- START OF CURRENT FILTERS --------------------------------
+skin_widget( array(
+	// CODE for the widget:
+	'widget' => 'coll_current_comment_filters',
+	// Optional display params
+	'CommentList'             => $CommentList,
+	'block_start'          => '',
+	'block_end'            => '',
+	'block_title_start'    => '<b>',
+	'block_title_end'      => ':</b> ',
+	'show_filters'         => array( 'visibility' => 1 ),
+	'display_button_reset' => false,
+	'display_empty_filter' => true,
+) );
+// ---------------------------------- END OF CURRENT FILTERS ---------------------------------
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 
@@ -85,8 +92,8 @@ global $AdminUI;
 $admin_template = $AdminUI->get_template( 'Results' );
 
 $display_params = array(
-		'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
-		'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+		'header_start' => $admin_template['header_start'],
+		'footer_start' => $admin_template['footer_start'],
 	);
 
 $CommentList->display_if_empty();

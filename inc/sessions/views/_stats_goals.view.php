@@ -7,16 +7,16 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url;
+global $blog, $sec_ID, $admin_url, $rsc_url;
 global $Session;
 
-$perm_options_edit = $current_User->check_perm( 'options', 'edit', false );
+$perm_options_edit = check_user_perm( 'options', 'edit', false );
 
 /**
  * View funcs
@@ -77,6 +77,11 @@ $Results->Cache = & get_GoalCache();
 
 $Results->title = T_('Goals').get_manual_link( 'goal-settings' );
 
+
+// Initialize params to filter by selected collection and/or group:
+$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
+
 /**
  * Callback to add filters on top of the result set
  *
@@ -92,13 +97,12 @@ function filter_goals( & $Form )
 	$Form->select_input_object( 'cat', get_param('cat'), $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_goals',
-	'url_ignore' => 'results_goals_page,final',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;blog='.$blog.'&amp;final=0&amp;s=&amp;cat=0' ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;blog='.$blog.'&amp;final=1' ),
-		)
+		'callback' => 'filter_goals',
+		'url_ignore' => 'results_goals_page,final',
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=goals'.$section_params.'&amp;final=0&amp;s=&amp;cat=0' );
+$Results->register_filter_preset( 'final', T_('Final'), '?ctrl=goals'.$section_params.'&amp;final=1' );
 
 $Results->cols[] = array(
 		'th' => T_('ID'),

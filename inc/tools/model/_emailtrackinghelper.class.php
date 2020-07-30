@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -102,7 +102,8 @@ class EmailTrackingHelper
 		$passthrough_url = $this->get_passthrough_url();
 
 		$unsubscribe_link_re = '/quick_unsubscribe\.php(?:[^\<\>])+type=(newsletter)/';
-		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike)&?/';
+		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike|cta(?:1|2|3))&?/';
+		$activate_link_re = '/login\.php\?action=activateacc_ez/';
 
 		switch( $this->content_type )
 		{
@@ -114,6 +115,9 @@ class EmailTrackingHelper
 				 *  3 - "
 				 */
 				$redirect_url = $matches[2];
+				// Preserve $mail_log_ID$ and $email_key$ markers from rawurlencode()
+				$redirect_url = str_replace( array( '$mail_log_ID$', '$email_key$' ), array( '_____mail_log_ID_____', '_____email_key_____' ), $redirect_url );
+
 				//pre_dump( $matches );
 				if( preg_match( $unsubscribe_link_re, $redirect_url, $match ) )
 				{
@@ -133,10 +137,30 @@ class EmailTrackingHelper
 						case 'dislike':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 4 ) );
 							break;
+
+						case 'cta1':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 5 ) );
+							break;
+
+						case 'cta2':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 6 ) );
+							break;
+
+						case 'cta3':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
+							break;
+
+						case 'unsubscribe':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 9 ) );
+							break;
 					}
 
 					// Remove email function marker in the URL
 					$redirect_url = $this->_cleanup_email_param_marker( $match, $redirect_url );
+				}
+				elseif( preg_match( $activate_link_re, $redirect_url, $match ) )
+				{	// Activate button/link:
+					$passthrough_url = $this->get_passthrough_url( array( 'tag' => 8 ) );
 				}
 
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
@@ -147,6 +171,8 @@ class EmailTrackingHelper
 					}
 
 					$redirect_url = rawurlencode( $redirect_url );
+					// Restore $mail_log_ID$ and $email_key$ markers
+					$redirect_url = str_replace( array( '_____mail_log_ID_____', '_____email_key_____' ), array( '$mail_log_ID$', '$email_key$' ), $redirect_url );
 
 					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
 					{
@@ -157,7 +183,11 @@ class EmailTrackingHelper
 					return $matches[1].$passthrough_url.$redirect_url.$matches[3];
 				}
 
-				return $matches[1].$passthrough_url.rawurlencode( $redirect_url ).$matches[3];
+				$redirect_url = rawurlencode( $redirect_url );
+				// Restore $mail_log_ID$ and $email_key$ markers
+				$redirect_url = str_replace( array( '_____mail_log_ID_____', '_____email_key_____' ), array( '$mail_log_ID$', '$email_key$' ), $redirect_url );
+
+				return $matches[1].$passthrough_url.$redirect_url.$matches[3];
 
 			case 'plain_text':
 				$redirect_url = $matches[0];
@@ -179,10 +209,30 @@ class EmailTrackingHelper
 						case 'dislike':
 							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 4 ) );
 							break;
+
+						case 'cta1':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 5 ) );
+							break;
+
+						case 'cta2':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 6 ) );
+							break;
+
+						case 'cta3':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 7 ) );
+							break;
+
+						case 'unsubscribe':
+							$passthrough_url = $this->get_passthrough_url( array( 'tag' => 9 ) );
+							break;
 					}
 
 					// Remove email function marker in the URL
 					$redirect_url = $this->_cleanup_email_param_marker( $match, $redirect_url );
+				}
+				elseif( preg_match( $activate_link_re, $redirect_url, $match ) )
+				{
+					$passthrough_url = $this->get_passthrough_url( array( 'tag' => 8 ) );
 				}
 
 				if( preg_match_all( '~(\$secret_content_start\$)(.*?)(\$secret_content_end\$)~', $redirect_url, $secret_contents ) )
@@ -193,6 +243,8 @@ class EmailTrackingHelper
 					}
 
 					$redirect_url = rawurlencode( $redirect_url );
+					// Restore $mail_log_ID$ and $email_key$ markers
+					$redirect_url = str_replace( array( '_____mail_log_ID_____', '_____email_key_____' ), array( '$mail_log_ID$', '$email_key$' ), $redirect_url );
 
 					for( $i = 0, $n = count( $secret_contents[2] ); $i < $n; $i++ )
 					{
@@ -203,7 +255,11 @@ class EmailTrackingHelper
 					return $passthrough_url.$redirect_url;
 				}
 
-				return $passthrough_url.rawurlencode( $redirect_url );
+				$redirect_url = rawurlencode( $redirect_url );
+				// Restore $mail_log_ID$ and $email_key$ markers
+				$redirect_url = str_replace( array( '_____mail_log_ID_____', '_____email_key_____' ), array( '$mail_log_ID$', '$email_key$' ), $redirect_url );
+
+				return $passthrough_url.$redirect_url;
 
 			default:
 				debug_die( 'Invalid content type' );

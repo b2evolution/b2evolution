@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -54,11 +54,11 @@ class CommentList2 extends DataObjectList2
 	 * @param string Name to be used when saving the filterset (leave empty to use default for collection)
 	 */
 	function __construct(
-		$Blog,
-		$limit = 1000,
-		$cache_name = 'CommentCache',	// name of cache to be used
-		$param_prefix = '',
-		$filterset_name = ''			// Name to be used when saving the filterset (leave empty to use default for collection)
+			$Blog,
+			$limit = 1000,
+			$cache_name = 'CommentCache', // name of cache to be used
+			$param_prefix = '',
+			$filterset_name = '' // Name to be used when saving the filterset (leave empty to use default for collection)
 		)
 	{
 		global $Settings;
@@ -80,20 +80,21 @@ class CommentList2 extends DataObjectList2
 
 		if( !empty( $filterset_name ) )
 		{	// Set the filterset_name with the filterset_name param
-			$this->filterset_name = 'CommentList_filters_'.$filterset_name;
+			$this->filterset_name = 'CommentList_filters_'.preg_replace( '#[^a-z0-9\-_]#i', '', $filterset_name );
 		}
 		else
 		{	// Set a generic filterset_name
 			$this->filterset_name = 'CommentList_filters_coll'.( !is_null( $this->Blog ) ? $this->Blog->ID : '0' );
 		}
 
-		$this->page_param = $param_prefix.'paged';
+		$this->page_param = $this->param_prefix.'paged';
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
 				'author_IDs' => NULL,
 				'author' => NULL,
+				'authors_login' => NULL,
 				'author_email' => NULL,
 				'author_url' => NULL,
 				'url_match' => '=',
@@ -110,7 +111,7 @@ class CommentList2 extends DataObjectList2
 				'exact' => 0,
 				'statuses' => NULL,
 				'expiry_statuses' => array( 'active' ), // Show active/expired comments
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment','trackback','pingback','webmention' ),
 				'orderby' => 'date',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('comments_orderdir') : 'DESC',
 				//'order' => 'DESC',
@@ -121,6 +122,8 @@ class CommentList2 extends DataObjectList2
 				'timestamp_max' => NULL, // Do not show comments from posts after this timestamp
 				'threaded_comments' => false, // Mode to display the comment replies
 				'user_perm' => NULL,
+				'ymdhms_min' => NULL,
+				'ymdhms_max' => NULL,
 		) );
 	}
 
@@ -185,12 +188,19 @@ class CommentList2 extends DataObjectList2
 			 * Restrict to selected authors attribute:
 			 */
 			memorize_param( $this->param_prefix.'author_IDs', 'string', $this->default_filters['author_IDs'], $this->filters['author_IDs'] );  // List of authors ID to restrict to
+			memorize_param( $this->param_prefix.'authors_login', 'string', $this->default_filters['authors_login'], $this->filters['authors_login'] );  // List of authors login to restrict to
 			memorize_param( $this->param_prefix.'author', 'string', $this->default_filters['author'], $this->filters['author'] );  // List of authors ID to restrict to
 			memorize_param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], $this->filters['author_email'] );  // List of authors email to restrict to
 			memorize_param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], $this->filters['author_url'] );  // List of authors url to restrict to
 			memorize_param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], $this->filters['url_match'] );  // List of authors url to restrict to
 			memorize_param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], $this->filters['include_emptyurl'] );  // List of authors url to restrict to
 			memorize_param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], $this->filters['author_IP'] );  // List of authors ip to restrict to
+
+			/*
+			 * Restrict by dates
+			 */
+			memorize_param( $this->param_prefix.'dstart', 'integer', $this->default_filters['ymdhms_min'], $this->filters['ymdhms_min'] ); // YearMonth(DayHourMinuteSecond) to start at
+			memorize_param( $this->param_prefix.'dstop', 'integer', $this->default_filters['ymdhms_max'], $this->filters['ymdhms_max'] ); // YearMonth(DayHourMinuteSecond) to stop at
 
 			/*
 			 * Restrict to selected rating:
@@ -296,12 +306,19 @@ class CommentList2 extends DataObjectList2
 		 * Restrict to selected author:
 		 */
 		$this->filters['author_IDs'] = param( $this->param_prefix.'author_IDs', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author_IDs'], true );      // List of authors ID to restrict to
+		$this->filters['authors_login'] = param( $this->param_prefix.'authors_login', '/^-?[A-Za-z0-9_\.]+(,[A-Za-z0-9_\.]+)*$/', $this->default_filters['authors_login'], true ); // List of authors login to restrict to
 		$this->filters['author'] = param( $this->param_prefix.'author', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['author'], true );      // List of authors to restrict to
 		$this->filters['author_email'] = param( $this->param_prefix.'author_email', 'string', $this->default_filters['author_email'], true );
 		$this->filters['author_url'] = param( $this->param_prefix.'author_url', 'string', $this->default_filters['author_url'], true );
 		$this->filters['url_match'] = param( $this->param_prefix.'url_match', 'string', $this->default_filters['url_match'], true );
 		$this->filters['include_emptyurl'] = param( $this->param_prefix.'include_emptyurl', 'string', $this->default_filters['include_emptyurl'], true );
 		$this->filters['author_IP'] = param( $this->param_prefix.'author_IP', 'string', $this->default_filters['author_IP'], true );
+
+		/*
+		 * Restrict to selected min and max dates:
+		 */
+		$this->filters['ymdhms_min'] = param_compact_date( $this->param_prefix.'dstart', $this->default_filters['ymdhms_min'], true, T_( 'Invalid date' ) ); // YearMonth(DayHourMinuteSecond) to start at
+		$this->filters['ymdhms_max'] = param_compact_date( $this->param_prefix.'dstop', $this->default_filters['ymdhms_max'], true, T_( 'Invalid date' ) ); // YearMonth(DayHourMinuteSecond) to stop at
 
 		/*
 		 * Restrict to selected statuses:
@@ -406,6 +423,7 @@ class CommentList2 extends DataObjectList2
 		 * filtering stuff:
 		 */
 		$this->CommentQuery->where_author( $this->filters['author_IDs'] );
+		$this->CommentQuery->where_author_logins( $this->filters['authors_login'] );
 		$this->CommentQuery->where_author_email( $this->filters['author_email'] );
 		$this->CommentQuery->where_author_url( $this->filters['author_url'], $this->filters['url_match'], $this->filters['include_emptyurl'] );
 		$this->CommentQuery->where_author_IP( $this->filters['author_IP'] );
@@ -416,6 +434,7 @@ class CommentList2 extends DataObjectList2
 		$this->CommentQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
 		$this->CommentQuery->where_statuses( $this->filters['statuses'] );
 		$this->CommentQuery->where_types( $this->filters['types'] );
+		$this->CommentQuery->where_dates( $this->filters['ymdhms_min'], $this->filters['ymdhms_max'] );
 		$this->ItemQuery->where_datestart( '', '', '', '', $this->filters['timestamp_min'], $this->filters['timestamp_max'] );
 
 		if( !is_null( $this->Blog ) && isset( $this->filters['user_perm'] ) )
@@ -452,6 +471,7 @@ class CommentList2 extends DataObjectList2
 		}
 		// Restrict post filters to available statuses. When blog = 0 we will check visibility statuses for each blog separately ( on the same query ).
 		$this->ItemQuery->where_visibility( $post_show_statuses );
+		$this->ItemQuery->where_locale_visibility();
 		$sql_item_IDs = 'SELECT DISTINCT post_ID'
 						.$this->ItemQuery->get_from();
 		if( strpos( $this->ItemQuery->get_from(), 'T_categories' ) === false &&
@@ -500,10 +520,10 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Run Query: GET DATA ROWS *** HEAVY ***
-	 * 
+	 *
 	 * We need this query() stub in order to call it from restart() and still
 	 * let derivative classes override it
-	 * 
+	 *
 	 * @deprecated Use new function run_query()
 	 */
 	function query( $create_default_cols_if_needed = true, $append_limit = true, $append_order_by = true )
@@ -577,28 +597,309 @@ class CommentList2 extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
+		$params = array_merge( array(
+			'display_author'      => true,
+			'author_text'         => T_('Author').': ',
+			'authors_text'        => T_('Authors').': ',
+			'authors_nor_text'    => T_('All authors except').': ',
+
+			'display_author_url'  => true,
+			'author_url_text'     => T_('Author URL').': ',
+			'author_url_without_text'  => T_('Without this').' ',
+
+			'display_author_IP'   => true,
+			'author_IP_text'      => T_('IP'),
+
+			'display_visibility'  => true,
+			'visibility_text'     => T_('Visibility').': ',
+
+			'display_keyword'     => true,
+			'keyword_text'        => T_('Keyword').': ',
+			'keywords_text'       => T_('Keywords').': ',
+			'keywords_exact_text' => T_('Exact match').' ',
+
+			'display_active'      => true,
+			'active_hide_text'    => T_('Hide active'),
+
+			'display_expired'     => true,
+			'expired_show_text'   => T_('Show expired'),
+
+			'display_rating'      => true,
+			'rating_text'         => T_('Rating').': ',
+			'rating_none_text'    => T_('No rating'),
+			'rating_having_text'  => T_('Have rating'),
+			'rating_above_text'   => T_('Above'),
+			'rating_below_text'   => T_('Below'),
+
+			'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
+			'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
+			'filter_mask_nogroup' => '"$filter_name$"', // $filter_name$, $clear_icon$
+
+			'before_items'        => '',
+			'after_items'         => '',
+
+			'separator_and'       => ' '.T_('and').' ',
+			'separator_or'        => ' '.T_('or').' ',
+			'separator_nor'       => ' '.T_('or').' ',
+			'separator_comma'     => ', ',
+		), $params );
+
 		$title_array = array();
 
-		if( empty ($this->filters) )
+		if( empty( $this->filters ) )
 		{ // Filters have no been set before, we'll use the default filterset
 			$this->set_filters( $this->default_filters );
 		}
 
-		if( isset( $this->filters['statuses'] ) )
-		{
-			$visibility_statuses = get_visibility_statuses( '', array( 'redirected' ) );
+		// Check if the filter mask has an icon to clear the filter item
+		$clear_icon = ( strpos( $params['filter_mask'], '$clear_icon$' ) !== false );
 
-			$visibility_array = array();
-			foreach( $this->filters['statuses'] as $status )
-			{
-				$visibility_array[] = $visibility_statuses[ $status ];
-			}
-			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $visibility_array );
+		$filter_classes = array( 'green' );
+		$filter_class_i = 0;
+		if( strpos( $params['filter_mask'], '$filter_class$' ) !== false )
+		{ // Initialize array with available classes for filter items
+			$filter_classes = array( 'green', 'yellow', 'orange', 'red', 'magenta', 'blue' );
 		}
 
-		if( !empty($this->filters['keywords']) )
+		// COMMENT TO SHOW:
+		if( $params['display_visibility'] && isset( $this->filters['statuses'] ) && !$this->is_trashfilter() )
 		{
-			$title_array['keywords'] = T_('Keywords').': '.$this->filters['keywords'];
+			$exclude_statuses = array_merge( get_restricted_statuses( $this->Blog->ID, 'blog_comment!' ), array( 'redirected' ) );
+			$comment_statuses = get_visibility_statuses( '', $exclude_statuses );
+
+			if( count( $this->filters['statuses'] ) != count( $comment_statuses ) )
+			{
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( $this->filters['statuses'] == '-' )
+				{
+					$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses=-' ) ) : '';
+					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask_nogroup'] );
+				}
+				else
+				{
+					$status_IDs = $this->filters['statuses'];
+
+					$statuses = array();
+					foreach( $status_IDs as $status_ID )
+					{
+						if( ! isset( $comment_statuses[$status_ID] ) )
+						{	// User has no permission:
+							continue;
+						}
+						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses='.$status_ID ) ) : '';
+						$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( $params['visibility_text'], $comment_statuses[$status_ID], $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( ( count( $statuses ) > 1 ) ?
+							array( $params['visibility_text'], $params['before_items'].implode( $params['separator_comma'], $statuses ).$params['after_items'] ):
+							array( $params['visibility_text'], implode( $params['separator_comma'], $statuses ) ) ),
+						$params['group_mask'] );
+				}
+				$filter_class_i++;
+			}
+		}
+
+		// SHOW ACTIVE:
+		if( $params['display_active'] )
+		{
+			if( ! in_array( 'active', $this->filters['expiry_statuses'] ) && ! empty( $this->filters['expiry_statuses'] ) )
+			{	// Display when only "Show expired" comments:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( '', $this->param_prefix.'expiry_statuses[]=active' ) ) : '';
+				$title_array['active'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( $params['active_hide_text'], $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+		// SHOW EXPIRED:
+		if( $params['display_expired'] )
+		{
+			if( in_array( 'expired', $this->filters['expiry_statuses'] ) )
+			{	// Display when only "Show expired" comments:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'expiry_statuses=expired' ) ) : '';
+				$title_array['expired'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( $params['expired_show_text'], $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+		// KEYWORDS:
+		if( $params['display_keyword'] )
+		{
+			if( ! empty( $this->filters['keywords'] ) )
+			{
+				if( $this->filters['phrase'] == 'OR' || $this->filters['phrase'] == 'AND' )
+				{ // Search by each keyword
+					$keywords = trim( preg_replace( '/("|, *)/', ' ', $this->filters['keywords'] ) );
+					$keywords = explode( ' ', $keywords );
+				}
+				else
+				{ // Exact match (Single keyword)
+					$keywords = array( $this->filters['keywords'] );
+				}
+
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$keyword_names = array();
+				foreach( $keywords as $keyword )
+				{
+					$word_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'s='.$keyword ) ) : '';
+					$keyword_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( $params['keyword_text'], $keyword, $word_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+				$filter_class_i++;
+				$keywords = ( $this->filters['exact'] ? $params['keywords_exact_text'] : '' )
+					.implode( ( $this->filters['phrase'] == 'OR' ? $params['separator_or'] : $params['separator_and'] ), $keyword_names );
+
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $keyword_names ) > 1 ?
+						array( $params['keywords_text'], $params['before_items'].$keywords.$params['after_items'] ) :
+						array( $params['keyword_text'], $keywords ) ),
+					$params['group_mask'] );
+			}
+		}
+
+		// RATING:
+		if( $params['display_rating'] && isset( $this->filters['rating_toshow'] ) )
+		{
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			$ratings = array();
+			if( in_array( 'norating', $this->filters['rating_toshow'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'rating_toshow=norating' ) ) : '';
+				$ratings[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $params['rating_none_text'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['rating_text'] ),
+					$params['filter_mask'] );
+			}
+
+			if( in_array( 'haverating', $this->filters['rating_toshow'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'rating_toshow=haverating' ) ) : '';
+				switch( $this->filters['rating_turn'] )
+				{
+					case 'above':
+						$rating_operator = "&ge;";
+						break;
+
+					case 'below':
+						$rating_operator = "&le;";
+						break;
+
+					case 'exact':
+						$rating_operator = "=";
+				}
+				$ratings[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $rating_operator.' '.$this->filters['rating_limit'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['rating_text'] ),
+					$params['filter_mask'] );
+			}
+
+			$ratings = implode( $params['separator_or'], $ratings );
+			$title_array[] = str_replace( array( '$group_title$', '$filter_items$'),
+				array( $params['rating_text'], $params['before_items'].$ratings.$params['after_items'] ), $params['group_mask'] );
+			$filter_class_i++;
+		}
+
+		// AUTHORS:
+		if( $params['display_author'] )
+		{
+			if( ! empty( $this->filters['author_IDs'] ) || ! empty( $this->filters['authors_login'] ) )
+			{
+
+				$authors = trim( $this->filters['author_IDs'].','.get_users_IDs_by_logins( $this->filters['authors_login'] ), ',' );
+				$exclude_authors = false;
+				if( substr( $authors, 0, 1 ) == '-' )
+				{ // Authors are excluded
+					$authors = substr( $authors, 1 );
+					$exclude_authors = true;
+				}
+				$authors = preg_split( '~\s*,\s*~', $authors, -1, PREG_SPLIT_NO_EMPTY );
+				$author_names = array();
+				if( $authors )
+				{
+					$UserCache = & get_UserCache();
+					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+					foreach( $authors as $author_ID )
+					{
+						if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
+						{
+							$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'author_IDs='.$author_ID ) ) : '';
+							$author_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( $params['author_text'], $tmp_User->get( 'login' ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask'] );
+						}
+					}
+					$filter_class_i++;
+				}
+				if( count( $author_names ) > 0 )
+				{ // Display info of filter by authors
+					if( $exclude_authors )
+					{ // Exclude authors
+						$author_names_string = $params['authors_nor_text'].implode( $params['separator_nor'], $author_names );
+					}
+					else
+					{ // Filter by authors
+						$author_names_string = implode( $params['separator_comma'], $author_names );
+					}
+
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $author_names ) > 1 ?
+							array( $params['authors_text'], $params['before_items'].$author_names_string.$params['after_items'] ) :
+							array( $params['author_text'], $author_names_string ) ),
+						$params['group_mask'] );
+				}
+			}
+		}
+
+		// AUTHOR URL:
+		if( $params['display_author_url'] )
+		{
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			$author_url = array();
+			if( ! empty( $this->filters['author_url'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'include_emptyurl' ) ) : '';
+				$author_url[] = ( $this->filters['url_match'] == '!=' ?  $params['author_url_without_text'] : '' )
+					.str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $this->filters['author_url'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['author_url_text'] ),
+					$params['filter_mask'] );
+			}
+
+			if( ! empty( $this->filters['include_emptyurl'] ) )
+			{	// Display when only "include empty url" is checked:
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'include_emptyurl' ) ) : '';
+				$author_url[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( T_('Include comments with no url'), $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['author_url_text'] ),
+					$params['filter_mask_nogroup'] );
+			}
+
+			if( ! empty($author_url ) )
+			{
+				$author_url = implode( $params['separator_or'], $author_url );
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$'),
+					array( $params['author_url_text'], $params['before_items'].$author_url.$params['after_items'] ), $params['group_mask'] );
+				$filter_class_i++;
+			}
+		}
+
+		// IP ADDRESS:
+		if( $params['display_author_IP'] )
+		{
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			if( ! empty( $this->filters['author_IP'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'author_IP' ) ) : '';
+				$title_array['author_IP'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $this->filters['author_IP'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['author_IP_text'] ),
+					$params['filter_mask'] );
+			}
 		}
 
 		return $title_array;
@@ -768,7 +1069,7 @@ class CommentList2 extends DataObjectList2
 		{ // Check if statuses filter contains the 'trash' value
 			return is_array( $this->filters['statuses'] ) && in_array( 'trash', $this->filters['statuses'] );
 		}
-		if( count( $this->filters['statuses'] ) == 1 )
+		if( ! empty( $this->filters['statuses'] ) && count( $this->filters['statuses'] ) == 1 )
 		{ // Check if statuses filter contains only the 'trash' value
 			return $this->filters['statuses'][0] == 'trash';
 		}
@@ -784,7 +1085,8 @@ class CommentList2 extends DataObjectList2
 	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
-	 * @return string Empty, if ok.
+	 * @return string Error message
+	 *         integer Number of the pruned comments
 	 */
 	static function dbprune()
 	{
@@ -803,7 +1105,7 @@ class CommentList2 extends DataObjectList2
 
 		$time_prune_before = $localtimenow - ( $Settings->get('auto_empty_trash') * 86400 ); // 1 day = 86400 seconds
 
-		$rows_affected = Comment::db_delete_where( 'Comment', 'comment_status = "trash"
+		$rows_affected = Comment::db_delete_where( 'comment_status = "trash"
 			AND comment_last_touched_ts < '.$DB->quote( date2mysql( $time_prune_before ) ) );
 		$Debuglog->add( 'CommentList2::dbprune(): autopruned '.$rows_affected.' rows from T_comments.', 'request' );
 
@@ -813,7 +1115,7 @@ class CommentList2 extends DataObjectList2
 		$Settings->set( 'auto_empty_trash_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
-		return ''; /* ok */
+		return $rows_affected; /* ok */
 	}
 
 
@@ -876,7 +1178,7 @@ class CommentList2 extends DataObjectList2
 			$LinkCache = & get_LinkCache();
 			$LinkCache->load_by_comment_list( $page_comment_ids );
 		}
-		
+
 
 		if( $params['load_items_data'] )
 		{	// Load items data:
@@ -982,7 +1284,7 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Initialize comment order numbers for this filtered list
-	 * (Used for meta comments)
+	 * (Used for internal comments)
 	 *
 	 * @param string Order mode:
 	 *               'date' - first created comment has first order,

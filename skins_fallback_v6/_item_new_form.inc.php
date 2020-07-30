@@ -13,11 +13,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+$new_Item = get_session_Item( 0, true );
+
 $params = array_merge( array(
 		'item_new_form_start' => '<div class="evo_item_new_form panel panel-default">'
 															.'<div class="panel-heading">'
 																.'<h3 class="panel-title">'
-																	.sprintf( T_('New [%s]'), $Blog->get_default_item_type_name() )
+																	.sprintf( T_('New [%s]'), $new_Item->get_type_setting( 'name' ) )
 																.'</h3>'
 															.'</div>'
 															.'<div class="panel-body">',

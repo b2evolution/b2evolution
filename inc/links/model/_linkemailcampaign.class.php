@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,7 +28,7 @@ class LinkEmailCampaign extends LinkOwner
 	/**
 	 * Constructor
 	 */
-	function __construct( $EmailCampaign )
+	function __construct( $EmailCampaign  )
 	{
 		// call parent contsructor
 		parent::__construct( $EmailCampaign, 'emailcampaign', 'ecmp_ID' );
@@ -44,19 +44,35 @@ class LinkEmailCampaign extends LinkOwner
 			'Link files to current xxx' => NT_('Link files to current email campaign'),
 			'Selected files have been linked to xxx.' => NT_('Selected files have been linked to email campaign.'),
 			'Link has been deleted from $xxx$.' => NT_('Link has been deleted from email campaign.'),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from email campaign.' ),
 		);
 	}
 
 	/**
-	 * Check current User Email Campaign permission
+	 * Check current User has an access to work with attachments of the link EmailCampaign
 	 *
-	 * @param string permission level
-	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param string Permission level
+	 * @param boolean TRUE to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
-		global $current_User;
-		return $current_User->check_perm( 'emails', $permlevel, $assert );
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $assert )
+			{	// Halt the denied access:
+				debug_die( 'You have no permission for email campaign attachments!' );
+			}
+			return false;
+		}
+
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
+		}
+
+		return check_user_perm( 'emails', $permlevel, $assert );
 	}
 
 	/**
@@ -153,6 +169,8 @@ class LinkEmailCampaign extends LinkOwner
 		{
 			case 'name':
 				return 'emailcampaign';
+			case 'title':
+				return $this->EmailCampaign->get_name();
 		}
 		return parent::get( $parname );
 	}
@@ -160,22 +178,31 @@ class LinkEmailCampaign extends LinkOwner
 
 	/**
 	 * Get Email Campaign edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=compose&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'tab=compose'.$glue.'ecmp_ID='.$this->EmailCampaign->ID;
 	}
+
 
 	/**
 	 * Get Email Campaign view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=send&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'tab=send'.$glue.'ecmp_ID='.$this->EmailCampaign->ID;
 	}
 
 

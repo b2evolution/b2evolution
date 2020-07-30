@@ -26,9 +26,11 @@ $Form->begin_form( 'fform', '' );
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'tab', get_param( 'tab' ) );
 
-$Form->begin_fieldset( T_( 'Welcome message after account activation' ).get_manual_link('messages-welcome-after-account-activation') );
+$Form->begin_fieldset( TB_( 'Welcome message after account activation' ).get_manual_link('messages-welcome-after-account-activation') );
 
-	$Form->checkbox_input( 'welcomepm_enabled', $Settings->get( 'welcomepm_enabled' ), T_('Send Welcome PM'), array( 'note' => T_('Check to automatically send a welcome message to users when they activate their account.' ) ) );
+	$Form->checkbox_input( 'welcomepm_enabled', $Settings->get( 'welcomepm_enabled' ), TB_('Send Welcome PM'), array( 'note' => TB_('Check to automatically send a welcome message to users when they activate their account.' ) ) );
+
+	$Form->checkbox_input( 'welcomepm_notag', $Settings->get( 'welcomepm_notag' ), TB_('Only if no User Tag'), array( 'note' => TB_('Don\'t send the welcome message if the User Account already has any User Tag.' ) ) );
 
 	$UserCache = & get_UserCache();
 	$User = $UserCache->get_by_login( $Settings->get( 'welcomepm_from' ) );
@@ -36,32 +38,32 @@ $Form->begin_fieldset( T_( 'Welcome message after account activation' ).get_manu
 	{	// Use login of the current user if user login is incorrect:
 		$User = $current_User;
 	}
-	$Form->username( 'welcomepm_from', $User, T_('From'), T_('User login').'.' );
+	$Form->username( 'welcomepm_from', $User, TB_('From'), TB_('User login').'.' );
 
-	$Form->text_input( 'welcomepm_title', $Settings->get( 'welcomepm_title' ), 58, T_('Title'), '', array( 'maxlength' => 5000 ) );
+	$Form->text_input( 'welcomepm_title', $Settings->get( 'welcomepm_title' ), 58, TB_('Title'), '', array( 'maxlength' => 5000 ) );
 
-	$Form->textarea_input( 'welcomepm_message', $Settings->get( 'welcomepm_message' ), 15, T_('Message'), array( 'cols' => 45 ) );
+	$Form->textarea_input( 'welcomepm_message', $Settings->get( 'welcomepm_message' ), 15, TB_('Message'), array( 'cols' => 45 ) );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_( 'Info message to reporters after account deletion' ).get_manual_link('messages-info-reporters-after-deletion') );
+$Form->begin_fieldset( TB_( 'Info message to reporters after account deletion' ).get_manual_link('messages-info-reporters-after-deletion') );
 
-	$Form->checkbox_input( 'reportpm_enabled', $Settings->get( 'reportpm_enabled' ), /* TRANS: Send a Private Message to reporters when an account is deleted by a moderator */ T_('Send delete notification'), array( 'note' => T_('Check to allow sending a message to users who have reported an account whenever that account is deleted by a moderator.' ) ) );
+	$Form->checkbox_input( 'reportpm_enabled', $Settings->get( 'reportpm_enabled' ), /* TRANS: Send a Private Message to reporters when an account is deleted by a moderator */ TB_('Send delete notification'), array( 'note' => TB_('Check to allow sending a message to users who have reported an account whenever that account is deleted by a moderator.' ) ) );
 
 	$User = $UserCache->get_by_login( $Settings->get( 'reportpm_from' ) );
 	if( !$User )
 	{	// Use login of the current user if user login is incorrect:
 		$User = $current_User;
 	}
-	$Form->username( 'reportpm_from', $User, T_('From'), T_('User login').'.' );
+	$Form->username( 'reportpm_from', $User, TB_('From'), TB_('User login').'.' );
 
-	$Form->text_input( 'reportpm_title', $Settings->get( 'reportpm_title' ), 58, T_('Title'), '', array( 'maxlength' => 5000 ) );
+	$Form->text_input( 'reportpm_title', $Settings->get( 'reportpm_title' ), 58, TB_('Title'), '', array( 'maxlength' => 5000 ) );
 
-	$Form->textarea_input( 'reportpm_message', $Settings->get( 'reportpm_message' ), 15, T_('Message'), array( 'cols' => 45 ) );
+	$Form->textarea_input( 'reportpm_message', $Settings->get( 'reportpm_message' ), 15, TB_('Message'), array( 'cols' => 45 ) );
 
 $Form->end_fieldset();
 
-$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->buttons( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 $Form->end_form();
 

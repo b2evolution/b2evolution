@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -52,13 +52,13 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 	init_bubbletip_js(); // Add jQuery bubbletip plugin
 	init_results_js(); // Add functions to work with Results tables
 
-	require_js( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
+	require_js_defer( '#jqueryUI#' ); // Need to animate background, e.g. in function evoFadeBg()
 
 
 	global $UserSettings;
 	if( $UserSettings->get('control_form_abortions') )
 	{	// Activate bozo validator
-		require_js( 'bozo_validator.js' );
+		require_js_defer( 'bozo_validator.js' );
 	}
 
 	if( $UserSettings->get('focus_on_first_input') )
@@ -76,7 +76,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		// gets initialized in _footer.php
 
 		$begin_script = <<<JS
-		<script type="text/javascript">
+		<script>
 		<!--
 		  var allchecked = Array();
 		  var idprefix;

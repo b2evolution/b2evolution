@@ -53,7 +53,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Newsletter/Email list subscription');
+		return T_('Email list subscription');
 	}
 
 
@@ -83,10 +83,13 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		$default_enlt_ID = '';
+
 		// Load all active newsletters or if newsletter is currently used by this widget:
 		$NewsletterCache = & get_NewsletterCache();
+		$current_enlt_ID = intval( $this->get_param( 'enlt_ID', $default_enlt_ID ) );
 		$NewsletterCache->load_where( 'enlt_active = 1'.
-			( empty( $params['infinite_loop'] ) ? ' OR enlt_ID = '.intval( $this->get_param( 'enlt_ID', true ) ) : '' ) );
+			( $current_enlt_ID > 0 ? ' OR enlt_ID = '.$current_enlt_ID : '' ) );
 
 		$r = array_merge( array(
 				'general_layout_start' => array(
@@ -98,16 +101,17 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'note' => '',
 						'type' => 'select',
 						'options' => array( ''  => T_('None') ) + $NewsletterCache->get_option_array(),
-						'defaultvalue' => '',
+						'defaultvalue' => $default_enlt_ID,
 					),
 					'usertags' => array(
 						'label' => T_('On subscription, tag user with'),
+						'type' => 'usertag',
 						'size' => 30,
 						'maxlength' => 255,
 					),
 					'unsubscribed_if_not_tagged' => array(
 						'type' => 'checkbox',
-						'note' => T_('Treat user has not subscribed if he is not tagged yet'),
+						'note' => T_('Treat user as not subscribed if he is not tagged yet'),
 						'defaultvalue' => false,
 					),
 					// Hidden, used by subscribe shorttag
@@ -127,7 +131,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro' => array(
 						'label' => T_('Intro text'),
@@ -164,7 +168,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 						'label' => T_('Block title'),
 						'note' => T_('Title to display in your skin.'),
 						'size' => 40,
-						'defaultvalue' => T_('Get our list!'),
+						'defaultvalue' => T_('Get our newsletter!'),
 					),
 					'intro_subscribed' => array(
 						'label' => T_('Intro text'),
@@ -217,6 +221,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 		if( ! is_logged_in() )
 		{	// Don't display when user is not logged in:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not logged in.' );
 			return false;
 		}
 
@@ -230,18 +235,28 @@ class newsletter_subscription_Widget extends ComponentWidget
 			$this->BlockCache->abort_collect();
 		}
 
+		$NewsletterCache = & get_NewsletterCache();
+		$widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false );
+
+		if( $widget_Newsletter &&
+		    ! $current_User->is_subscribed( $widget_Newsletter->ID ) &&
+		    ! $current_User->is_allowed_newsletter( $widget_Newsletter->ID ) )
+		{	// Don't display the widget block completely when user is not subscribed
+			// and current user has no permission to be subscribed to:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not subscribed or has no permission.' );
+			return false;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
 
-
-		$NewsletterCache = & get_NewsletterCache();
-		if( ! ( $widget_Newsletter = & $NewsletterCache->get_by_ID( $this->disp_params['enlt_ID'], false, false ) ) ||
+		if( ! $widget_Newsletter ||
 		    ! $widget_Newsletter->get( 'active' ) )
 		{	// Display an error when newsletter is not found or not active:
 			$this->disp_title();
 			echo $this->disp_params['block_body_start'];
-			echo '<div class="red">'.T_('List subscription widget references an inactive list.').'</div>';
+			echo '<div class="evo_param_error">'.T_('List subscription widget references an inactive list.').'</div>';
 			echo $this->disp_params['block_body_end'];
 		}
 		else

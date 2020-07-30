@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
 
-global $blog, $admin_url, $rsc_url, $current_User, $UserSettings, $tab3;
+global $blog, $sec_ID, $admin_url, $rsc_url, $UserSettings, $tab3;
 
 global $dname, $dtyp_normal, $dtyp_searcheng, $dtyp_aggregator, $dtyp_email, $dtyp_unknown;
 
@@ -76,11 +76,17 @@ if( ! empty( $dname ) )
 //$where_clause .= ' AND hit_referer_type NOT IN ( "self", "admin" )';
 
 if( ! empty( $blog ) )
-{
+{	// Filter by collection:
 	$SQL->WHERE_and( 'hit_coll_ID = '.$blog.' OR hit_coll_ID IS NULL' );
 }
 
 $SQL->FROM( 'T_basedomains LEFT OUTER JOIN T_hitlog ON dom_ID = hit_referer_dom_ID' );
+
+if( ! empty( $sec_ID ) )
+{	// Filter by section:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+}
 
 if( $tab3 == 'top' )
 { // Calculate the counts only for "top" tab
@@ -95,7 +101,7 @@ else
 }
 
 // Create result set:
-$SQL->SELECT( 'SQL_NO_CACHE dom_ID, dom_name, dom_comment, dom_status, dom_type'.$sql_select );
+$SQL->SELECT( 'SQL_NO_CACHE dom_ID, dom_name, dom_comment, dom_source_tag, dom_status, dom_type'.$sql_select );
 $SQL->GROUP_BY( 'dom_ID' );
 
 $count_SQL = new SQL();
@@ -105,12 +111,7 @@ $count_SQL->WHERE( $SQL->get_where( '' ) );
 
 $Results = new Results( $SQL->get(), 'refdom_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 { // Current user has a permission to create new domain
 	global $tab_from;
 	$tab_from_param = empty( $tab_from ) ? '' : '&amp;tab_from='.$tab_from;
@@ -140,31 +141,38 @@ if( get_param( 'ctrl' ) == 'antispam' )
 }
 else
 { // Default url for stats controller
-	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.'&amp;blog='.$blog;
+
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
+	$current_url = $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.$section_params;
 }
 
 $Results->filter_area = array(
-	'callback' => 'filter_basedomains',
-	'url_ignore' => 'results_refdom_page,dtyp_normal,dtyp_searcheng,dtyp_aggregator,dtyp_unknown',	// ignore page param and checkboxes
-	'presets' => array(
-			'browser' => array( T_('Regular'), $current_url.'&amp;dtyp_normal=1' ),
-			'robot'   => array( T_('Search engines'), $current_url.'&amp;dtyp_searcheng=1' ),
-			'rss'     => array( T_('Aggregators'), $current_url.'&amp;dtyp_aggregator=1' ),
-			'email'   => array( T_('Email'), $current_url.'&amp;dtyp_email=1' ),
-			'unknown' => array( T_('Unknown'), $current_url.'&amp;dtyp_unknown=1' ),
-			'all'     => array( T_('All'), $current_url ),
-		)
+		'callback' => 'filter_basedomains',
+		'url_ignore' => 'results_refdom_page,dtyp_normal,dtyp_searcheng,dtyp_aggregator,dtyp_unknown',	// ignore page param and checkboxes
 	);
 
+$Results->register_filter_preset( 'all', T_('All'), $current_url );
+$Results->register_filter_preset( 'browser', T_('Regular'), $current_url.'&amp;dtyp_normal=1' );
+$Results->register_filter_preset( 'robot', T_('Search engines'), $current_url.'&amp;dtyp_searcheng=1' );
+$Results->register_filter_preset( 'rss', T_('Aggregators'), $current_url.'&amp;dtyp_aggregator=1' );
+$Results->register_filter_preset( 'email', T_('Email'), $current_url.'&amp;dtyp_email=1' );
+$Results->register_filter_preset( 'unknown', T_('Unknown'), $current_url.'&amp;dtyp_unknown=1');
 
 $Results->title = $page_title.get_manual_link('referring-domains-tab');
 
-$Results->cols[] = array(
+$dom_name_col = array(
 						'th' => T_('Domain name'),
 						'order' => 'dom_name',
 						'td' => '$dom_name$',
-						'total' => '<strong>'.T_('Global total').'</strong>',
 					);
+if( $tab3 == 'top' )
+{	// Display the hit counts only for "top" tab:
+	$dom_name_col['total'] = '<strong>'.T_('Global total').'</strong>';
+}
+$Results->cols[] = $dom_name_col;
 
 $Results->cols[] = array(
 		'th' => T_('Comment'),
@@ -175,20 +183,25 @@ $Results->cols[] = array(
 		'th' => T_('Type'),
 		'order' => 'dom_type',
 		'td_class' => 'jeditable_cell dom_type_edit',
-		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_type$">%stats_dom_type_title( #dom_type# )%</a>' :
 			/* No edit */'%stats_dom_type_title( #dom_type# )%',
-		'total' => '',
+	);
+
+$Results->cols[] = array(
+		'th' => TB_('Source Tag'),
+		'td' => '$dom_source_tag$',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Status'),
 		'order' => 'dom_status',
 		'td_class' => 'jeditable_cell dom_status_edit',
-		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_status$">%stats_dom_status_title( #dom_status# )%</a>' :
 			/* No edit */'%stats_dom_status_title( #dom_status# )%',
-		'total' => '',
 		'extra' => array( 'style' => 'background-color: %stats_dom_status_color( "#dom_status#" )%;', 'format_to_output' => false )
 	);
 
@@ -213,7 +226,7 @@ if( $tab3 == 'top' )
 					);
 }
 
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -237,7 +250,7 @@ function dom_row_actions( $dom_ID )
 // Display results:
 $Results->display();
 
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 { // Check permission to edit Domains:
 	// Print JS to edit a domain type
 	echo_editable_column_js( array(

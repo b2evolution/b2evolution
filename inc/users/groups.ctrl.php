@@ -27,14 +27,14 @@ param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " -
 /**
  * @global boolean true, if user is only allowed to view group
  */
-$user_view_group_only = ! $current_User->check_perm( 'users', 'edit' );
+$user_view_group_only = ! check_user_perm( 'users', 'edit' );
 
 if( $user_view_group_only )
 { // User has no permissions to view: he can only edit his profile
 
 	if( isset($grp_ID) )
 	{ // User is trying to edit something he should not: add error message (Should be prevented by UI)
-		$Messages->add( T_('You have no permission to edit groups!'), 'warning' );
+		$Messages->add( TB_('You have no permission to edit groups!'), 'warning' );
 	}
 
 	// Make sure the user only edits himself:
@@ -63,12 +63,12 @@ if( $grp_ID !== NULL )
 	{ // We could not find the Group to edit:
 		unset( $edited_Group );
 		forget_param( 'grp_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Group') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Group') ), 'error' );
 		$action = 'list';
 	}
 	elseif( $action == 'list' )
 	{ // 'list' is default, $grp_ID given
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{
 			$action = 'edit';
 		}
@@ -80,14 +80,14 @@ if( $grp_ID !== NULL )
 
 	if( $action != 'view' && $action != 'list' && $action != 'filter' )
 	{ // check edit permissions
-		if( !$current_User->check_perm( 'users', 'edit' ) )
+		if( ! check_user_perm( 'users', 'edit' ) )
 		{
-			$Messages->add( T_('You have no permission to edit groups!'), 'error' );
+			$Messages->add( TB_('You have no permission to edit groups!'), 'error' );
 			$action = 'view';
 		}
-		elseif( $demo_mode && ( $edited_Group->ID <= 4 ) && ( $edited_Group->ID > 0 ) )
+		elseif( $demo_mode && ( $edited_Group->ID <= 7 ) )
 		{ // Demo mode restrictions: groups created by install process cannot be edited
-			$Messages->add( T_('You cannot edit the default groups in demo mode!'), 'error' );
+			$Messages->add( TB_('You cannot edit the default groups in demo mode!'), 'error' );
 			$action = 'view';
 		}
 	}
@@ -133,7 +133,7 @@ switch ( $action )
 			if( $q = $DB->get_var( $query ) )
 			{
 				param_error( 'edited_grp_name',
-					sprintf( T_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
+					sprintf( TB_('This group name already exists! Do you want to <a %s>edit the existing group</a>?'),
 						'href="?ctrl=groups&amp;action=edit&amp;grp_ID='.$q.'"' ) );
 			}
 		}
@@ -147,20 +147,57 @@ switch ( $action )
 		if( $edited_Group->ID == 0 )
 		{ // Insert into the DB:
 			$edited_Group->dbinsert();
-			$Messages->add( T_('New group created.'), 'success' );
+			$Messages->add( TB_('New group created.'), 'success' );
 		}
 		else
 		{ // Commit update to the DB:
 			$edited_Group->dbupdate();
-			$Messages->add( T_('Group updated.'), 'success' );
+			$Messages->add( TB_('Group updated.'), 'success' );
 		}
 
 		// Commit changes in cache:
 		$GroupCache->add( $edited_Group );
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=groups', 303 ); // Will EXIT
-		// We have EXITed already at this point!!
+		// Update plugin group settings:
+		load_funcs( 'plugins/_plugin.funcs.php' );
+
+		$any_plugin_settings_updated = false;
+		$Plugins->restart();
+		while( $loop_Plugin = & $Plugins->get_next() )
+		{
+			$tmp_params = array( 'for_editing' => true );
+			$plugin_group_settings = $loop_Plugin->GetDefaultGroupSettings( $tmp_params );
+			if( empty( $plugin_group_settings ) )
+			{	// Skip plugin without group settings:
+				continue;
+			}
+
+			// Loop through settings for this plugin:
+			foreach( $plugin_group_settings as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'GroupSettings', $edited_Group );
+			}
+
+			if( $loop_Plugin->GroupSettings->dbupdate() )
+			{
+				$any_plugin_settings_updated = true;
+			}
+		}
+
+		if( $any_plugin_settings_updated )
+		{
+			$Messages->add( TB_('Plugin group settings have been updated.'), 'success' );
+		}
+
+		if( param_errors_detected() )
+		{
+			$action = 'edit';
+		}
+		else
+		{	// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=groups', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
 		break;
 
 
@@ -177,9 +214,9 @@ switch ( $action )
 			break;
 		}
 
-		// Update group permissions for each colleciton:
+		// Update group permissions for each collection:
 		blog_update_perms( $edited_Group->ID, 'coll' );
-		$Messages->add( T_('The blog permissions have been updated'), 'success' );
+		$Messages->add( TB_('The collection permissions have been updated.'), 'success' );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=groups&action=edit&tab=collection&grp_ID='.$edited_Group->ID, 303 ); // Will EXIT
@@ -201,20 +238,20 @@ switch ( $action )
 
 		if( $edited_Group->ID == 1 )
 		{
-			$Messages->add( T_('You can\'t delete Group #1!'), 'error' );
+			$Messages->add( TB_('You can\'t delete Group #1!'), 'error' );
 			$action = 'view';
 			break;
 		}
 		if( $edited_Group->ID == $Settings->get('newusers_grp_ID' ) )
 		{
-			$Messages->add( T_('You can\'t delete the default group for new users!'), 'error' );
+			$Messages->add( TB_('You can\'t delete the default group for new users!'), 'error' );
 			$action = 'view';
 			break;
 		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Group &laquo;%s&raquo; deleted.'), $edited_Group->dget( 'name' ) );
+			$msg = sprintf( TB_('Group &laquo;%s&raquo; deleted.'), $edited_Group->dget( 'name' ) );
 			$edited_Group->dbdelete();
 			unset($edited_Group);
 			forget_param('grp_ID');
@@ -227,7 +264,7 @@ switch ( $action )
 		else
 		{	// not confirmed, Check for restrictions:
 			memorize_param( 'grp_ID', 'integer', true );
-			if( ! $edited_Group->check_delete( sprintf( T_('Cannot delete Group &laquo;%s&raquo;'), $edited_Group->dget( 'name' ) ) ) )
+			if( ! $edited_Group->check_delete( sprintf( TB_('Cannot delete Group &laquo;%s&raquo;'), $edited_Group->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -237,8 +274,8 @@ switch ( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Groups'), '?ctrl=groups' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Groups'), '?ctrl=groups' );
 if( !empty( $edited_Group ) )
 {
 	if( $edited_Group->ID > 0 )
@@ -250,9 +287,9 @@ if( !empty( $edited_Group ) )
 		$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;action=new' );
 	}
 }
-if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
+if( $action == 'list' && check_user_perm( 'users', 'edit', false ) )
 { // Include to edit group level
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 }
 
 // Set an url for manual page:
@@ -268,10 +305,10 @@ switch( $action )
 		{	// Add menu level 3 entries:
 			$AdminUI->add_menu_entries( array( 'users', 'groups' ), array(
 					'general' => array(
-						'text' => T_('General Permissions'),
+						'text' => TB_('General Permissions'),
 						'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=general&amp;grp_ID='.$edited_Group->ID ),
 					'collection' => array(
-						'text' => T_('Collection Permissions'),
+						'text' => TB_('Collection Permissions'),
 						'href' => $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID ),
 				) );
 		}
@@ -287,7 +324,7 @@ switch( $action )
 				// Memorize action to filter permissions table:
 				memorize_param( 'action', 'string', true );
 				// Load JavaScript to toggle checkboxes:
-				require_js( 'collectionperms.js', 'rsc_url' );
+				require_js_defer( 'collectionperms.js', 'rsc_url' );
 				break;
 			default:
 				// General Permissions:
@@ -337,7 +374,7 @@ switch( $action )
 	case 'delete':
 			// We need to ask for confirmation:
 			$edited_Group->confirm_delete(
-					sprintf( T_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
+					sprintf( TB_('Delete group &laquo;%s&raquo;?'), $edited_Group->dget( 'name' ) ),
 					'group', $action, get_memorized( 'action' ) );
 	default:
 		$AdminUI->disp_view( 'users/views/_group.view.php' );

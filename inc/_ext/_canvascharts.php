@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -21,14 +21,8 @@ if( ! defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directl
  * @param array Chart bars data
  * @param string Javascript callback function to execute after rendering
  */
-function CanvasBarsChart( $chart, $init_js_callback = NULL )
+function CanvasBarsChart( $chart, $init_js_callback = NULL, $canvas_id = 'canvasbarschart' )
 {
-?>
-<div id="canvasbarschart" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;width:<?php echo $chart['canvas_bg']['width']; ?>px;margin:auto auto 35px;"></div>
-<script type="text/javascript">
-jQuery( window ).load( function()
-{
-	<?php
 	// Init data for jqPlot format:
 	$jqplot_data = array();
 	$jqplot_legend = array();
@@ -40,7 +34,7 @@ jQuery( window ).load( function()
 			$jqplot_legend[] = $data[0];
 			// Data
 			array_shift( $data );
-			$jqplot_data[] = '['.implode( ',', $data ).']';
+			$jqplot_data[] = $data;
 		}
 	}
 
@@ -67,166 +61,49 @@ jQuery( window ).load( function()
 		}
 	}
 
-	?>
-	jQuery.jqplot.postDrawHooks.push( function()
-	{
-		jQuery( '.jqplot-overlayCanvas-canvas' ).css( 'z-index', '0' ); //send overlay canvas to back
-		jQuery( '.jqplot-series-canvas' ).css( 'z-index', '1' ); //send series canvas to front
-		jQuery( '.jqplot-highlighter-tooltip' ).css( 'z-index', '2' ); //make sure the tooltip is over the series
-		jQuery( '.jqplot-event-canvas' ).css( 'z-index', '5' ); //must be on the very top since it is responsible for event catching and propagation
-	} );
-
-	var data = [<?php echo implode( ',', $jqplot_data ); ?>];
-	var plot = jQuery.jqplot( 'canvasbarschart', data, {
-		seriesColors: [ '#<?php echo implode( '\', \'#', $chart[ 'series_color' ] ); ?>' ],
-		stackSeries: true,
-		animate: !$.jqplot.use_excanvas,
-		seriesDefaults:{
-			renderer:$.jqplot.BarRenderer,
-			rendererOptions: {
-				highlightMouseOver: true,
-				shadow: false,
-				barMargin: 2,
-				animation: { speed: 900 },
-			}
-		},
-		<?php
-		if( isset( $chart['draw_last_line'] ) && $chart['draw_last_line'] )
-		{ // Draw a line from last data
-		?>
-		series: [<?php echo str_repeat( '{},', count( $jqplot_data ) - 1 ); ?>
-		{
-			disableStack : true,//otherwise it wil be added to values of previous series
-			renderer: $.jqplot.LineRenderer,
-			lineWidth: 3,
-			pointLabels: { show: true },
-			markerOptions: { size: 10 }
-		}],
-		<?php } ?>
-		grid: {
-			shadow: false,
-			borderWidth: 1,
-			borderColor: '#e5e5e5',
-			gridLineColor: '#e5e5e5',
-			background: '#fff'
-		},
-		axes: {
-			xaxis: {
-				renderer: $.jqplot.CategoryAxisRenderer,
-				rendererOptions: {
-					tickRenderer: $.jqplot.CanvasAxisTickRenderer
-				},
-				ticks: ['<?php echo implode( "','", $jqplot_ticks ); ?>'],
-				tickOptions: {
-					showGridline: false,
-					angle: -45,
-					fontFamily: 'Arial, Helvetica, sans-serif',
-					fontSize: '13px',
-				},
-			},
-			yaxis: { min: 0 }
-		},
-		legend: {
-			renderer: $.jqplot.EnhancedLegendRenderer,
-			rendererOptions: {
-				numberRows: <?php echo ( isset( $chart['legend_numrows'] ) ? $chart['legend_numrows'] : '1' ); ?>
-			},
-			labels: ['<?php echo implode( "','", $jqplot_legend ); ?>'],
-			show: true,
-			location: 's',
-			placement: 'outside',
-			yoffset: 80
-		},
-		highlighter: {
-			show: true,
-			showMarker: false,
-			tooltipAxes: 'y',
-		},
-		<?php
-		if( ! empty( $jqplot_canvas_objects ) )
-		{ // Draw overlay boxes for weekends
-		?>
-		canvasOverlay: {
-			show: true,
-			objects: [ <?php echo implode( ',', $jqplot_canvas_objects ); ?> ]
-		}
-		<?php } ?>
-	} );
-
-	jQuery( '#canvasbarschart' ).data( 'plot', plot );
-
-	<?php
-	if( ! empty( $init_js_callback ) )
-	{
-		echo 'window["'.$init_js_callback.'"]();';
-	}
-	?>
-
-	// Highlight legend
-	jQuery( '#canvasbarschart' ).bind( 'jqplotDataHighlight', function( ev, seriesIndex, pointIndex, data )
-	{
-		jQuery( '#canvasbarschart td.jqplot-table-legend' ).removeClass( 'legend-text-highlighted' );
-		jQuery( '#canvasbarschart td.jqplot-table-legend' ).eq( seriesIndex * 2 + 1 ).addClass( 'legend-text-highlighted' )
-			.prev().addClass( 'legend-text-highlighted' );
-		<?php if( isset( $chart['link_data'] ) ) { ?>
-		jQuery( '#canvasbarschart .jqplot-event-canvas' ).css( 'cursor', 'pointer' );
-		<?php } ?>
-	} );
-	jQuery( '#canvasbarschart' ).bind( 'jqplotDataUnhighlight', function( ev, seriesIndex, pointIndex, data )
-	{
-		jQuery( '#canvasbarschart td.jqplot-table-legend' ).removeClass( 'legend-text-highlighted' );
-		<?php if( isset( $chart['link_data'] ) ) { ?>
-		jQuery( '#canvasbarschart .jqplot-event-canvas' ).css( 'cursor', 'auto' );
-		<?php } ?>
-		jQuery( '#canvasbarschart .jqplot-highlighter-tooltip' ).hide();
-	} );
-	var canvas_offset = jQuery( '#canvasbarschart' ).offset();
-	jQuery( '#canvasbarschart' ).mousemove( function( ev )
-	{
-		jQuery( '#canvasbarschart .jqplot-highlighter-tooltip' ).css( {
-			top: ev.pageY - canvas_offset.top - 16,
-			left: ev.pageX - canvas_offset.left - 16
-		} );
-	} );
-
-	<?php
+	$jqplot_link_dates = array();
 	if( isset( $chart['link_data'] ) )
 	{
-		$chart_link_dates = array();
 		foreach( $chart['dates'] as $date )
 		{
-			$chart_link_dates[] = urlencode( date( locale_datefmt(), $date ) );
+			$jqplot_link_dates[] = urlencode( date( locale_datefmt(), $date ) );
 		}
-	?>
-	// Open an url on click
-	var jqplot_link_url = '<?php echo $chart['link_data']['url']; ?>';
-	var jqplot_link_dates = ['<?php echo implode( "','", $chart_link_dates ); ?>'];
-	var jqplot_link_params = [<?php
-		$params = array();
+	}
+
+	$jqplot_link_params = array();
+	if( isset( $chart['link_data'] ) )
+	{
 		foreach( $chart['link_data']['params'] as $types )
 		{
-			$params[] = "['".implode( "','", $types )."']";
+			$jqplot_link_params[] = "['".implode( "','", $types )."']";
 		}
-		echo implode( ',', $params );
-		?>];
-	jQuery( '#canvasbarschart' ).bind( 'jqplotDataClick', function ( ev, seriesIndex, pointIndex, data )
-	{
-		if( typeof( jqplot_link_params[ seriesIndex ] ) == 'undefined' )
+	}
+
+	// Series color:
+	$series_colors = array_map( function( $color )
 		{
-			return false;
-		}
+			return '#'.$color;
+		}, $chart['series_color'] );
 
-		var url = jqplot_link_url.replace( /\$date\$/g, jqplot_link_dates[ pointIndex ] );
-		url = url.replace( '$param1$', jqplot_link_params[ seriesIndex ][0] );
-		url = url.replace( '$param2$', jqplot_link_params[ seriesIndex ][1] );
+	$js_config = array(
+			'canvas_id'             => $canvas_id,
+			'jqplot_data'           => $jqplot_data,
+			'jqplot_labels'         => $jqplot_legend,
+			'jqplot_ticks'          => $jqplot_ticks,
+			'jqplot_canvas_objects' => $jqplot_canvas_objects,
+			'jqplot_link_url'       => isset( $chart['link_data']['url'] ) ? $chart['link_data']['url'] : NULL,
+			'jqplot_link_dates'     => $jqplot_link_dates,
+			'jqplot_link_params'    => $jqplot_link_params,
+			'series_colors'         => $series_colors,
+			'number_rows'           => isset( $chart['legend_numrows'] ) ? (int) $chart['legend_numrows'] : 1,
+			'draw_last_line'        => isset( $chart['draw_last_line'] ) && $chart['draw_last_line'],
+			'init_js_callback'      => $init_js_callback,
+			'link_data'             => isset( $chart['link_data'] ),
+		);
 
-		//console.log( url );
-		location.href = url;
-	} );
-	<?php } ?>
-} );
-</script>
-<?php
+	expose_var_to_js( $canvas_id, $js_config, 'evo_init_canvas_charts_config' );
+
+	echo '<div id="'.$canvas_id.'" style="height: '.$chart['canvas_bg']['height'].'px; width: '.$chart['canvas_bg']['width'].'px; margin: auto 35px;"></div>';
 }
 
 
@@ -239,8 +116,8 @@ function CanvasDonutChart( $chart )
 {
 ?>
 <div id="canvasdonutchart" style="height:<?php echo $chart['height']; ?>px;width:<?php echo $chart['width']; ?>px;"></div>
-<script type="text/javascript">
-jQuery( window ).load( function()
+<script>
+jQuery( window ).on( 'load', function()
 {
 <?php
 	$data_vars = array();

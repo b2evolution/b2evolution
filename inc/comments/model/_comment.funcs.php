@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'comments/model/_comment.class.php', 'Comment' );
 
 /**
- * Generic comments/trackbacks/pingbacks counting
+ * Generic comments/trackbacks/pingbacks/webmentions counting
  *
  * @todo check this in a multiblog page...
  * @todo This should support visibility: at least in the default front office (_feedback.php), there should only the number of visible comments/trackbacks get used ({@link Item::feedback_link()}).
@@ -79,7 +79,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 						'trackbacks' => $statuses_array,
 						'pingbacks'  => $statuses_array,
 						'feedbacks'  => $statuses_array,
-						'metas'      => $statuses_array
+						'metas'      => $statuses_array,
+						'webmentions'=> $statuses_array,
 					);
 			}
 
@@ -95,7 +96,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 				if( $row->comment_type != 'meta' )
-				{ // Exclude meta comments from feedbacks
+				{ // Exclude internal comments from feedbacks
 					// Total for status on post:
 					$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
@@ -121,7 +122,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				'trackbacks' => $statuses_array,
 				'pingbacks'  => $statuses_array,
 				'feedbacks'  => $statuses_array,
-				'metas'      => $statuses_array
+				'metas'      => $statuses_array,
+				'webmentions'=> $statuses_array,
 			);
 
 		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
@@ -135,7 +137,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 			$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 			if( $row->comment_type != 'meta' )
-			{ // Exclude meta comments from feedbacks
+			{ // Exclude internal comments from feedbacks
 				// Total for status on post:
 				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
@@ -145,7 +147,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		}
 	}
 
-	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas' ) ) )
+	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas', 'webmentions' ) ) )
 	{
 		$mode = 'feedbacks';
 	}
@@ -244,20 +246,19 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
  */
 function get_allowed_statuses( $blog )
 {
-	global $current_User;
 	$statuses = array();
 
-	if( $current_User->check_perm( 'blog_draft_comments', 'edit', false, $blog ) )
+	if( check_user_perm( 'blog_draft_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'draft';
 	}
 
-	if( $current_User->check_perm( 'blog_published_comments', 'edit', false, $blog ) )
+	if( check_user_perm( 'blog_published_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'published';
 	}
 
-	if( $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $blog ) )
+	if( check_user_perm( 'blog_deprecated_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'deprecated';
 	}
@@ -280,7 +281,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
-	{ // Meta comments don't have a status, Display only one button to update
+	{ // Internal comments don't have a status, Display only one button to update
 		$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 	}
 	else
@@ -291,7 +292,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
 			// Get those statuses which are not allowed for the current User to create comments in this blog
 			if( $edited_Comment->is_meta() )
-			{	// Don't restrict statuses for meta comments:
+			{	// Don't restrict statuses for internal comments:
 				$restricted_statuses = array();
 			}
 			else
@@ -353,7 +354,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
  * @param object Form
  * @param object edited Comment
  * @param string Max allowed status
- * @param string Action: 'update' - for button titles like 'Save as Public!', 'set_visibility' - for button titles like 'Set visibility to Public'
+ * @param string Action: 'update' - for button titles like 'Save as Public!', 'comments_visibility' - for button titles like 'Set visibility to Public'
  */
 function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowed_status = '', $action = 'update' )
 {
@@ -362,7 +363,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowe
 	if( $edited_Comment !== NULL )
 	{	// If the edited comment is defined, e-g on edit form:
 		if( $edited_Comment->is_meta() )
-		{	// Don't suggest to change a status of meta comment:
+		{	// Don't suggest to change a status of internal comment:
 			$Form->submit( array( 'actionArray['.$action.']', T_('Save Changes!'), 'SaveButton', '' ) );
 			return;
 		}
@@ -382,7 +383,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowe
 	// Get those statuses which are not allowed for the current User to create posts in this blog
 	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $comment_status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
 	// Get allowed visibility statuses:
-	if( $action == 'set_visibility' )
+	if( $action == 'comments_visibility' )
 	{
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 		foreach( $status_options as $status_key => $status_title )
@@ -455,9 +456,7 @@ function add_jsban( $url )
  */
 function add_ban_icons( $content )
 {
-	global $current_User;
-
-	if( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+	if( ! check_user_perm( 'spamblacklist', 'edit' ) )
 	{ // Current user has no permission to edit the spam contents
 		return $content;
 	}
@@ -579,7 +578,7 @@ function add_ban_icons_callback( $content )
  */
 function get_opentrash_link( $check_perm = true, $force_show = false, $params = array() )
 {
-	global $admin_url, $current_User, $DB, $blog;
+	global $admin_url, $DB, $blog;
 
 	$params = array_merge( array(
 			'before' => '<div id="recycle_bin" class="pull-right">',
@@ -587,7 +586,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 			'class'  => 'action_icon btn btn-default btn-sm',
 		), $params );
 
-	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
+	$show_recycle_bin = ( !$check_perm || check_user_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
 	{ // get number of trash comments:
 		$SQL = new SQL( 'Get number of trash comments for open trash link' );
@@ -628,7 +627,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
  */
 function echo_disabled_comments( $allow_comments_value, $item_url, $params = array() )
 {
-	global $Settings, $current_User;
+	global $Settings;
 
 	$params = array_merge( array(
 			'comments_disabled_text_member'     => T_( 'You must be a member of this blog to comment.' ),
@@ -652,9 +651,9 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 			'fieldset_end'   => '</fieldset>',
 			'fieldstart'     => '',
 			'fieldend'       => '',
-			'labelstart'     => '<div class="label"><label for="p">',
+			'labelstart'     => '<div class="evo_label"><label for="p">',
 			'labelend'       => '</label></div>',
-			'inputstart'     => '<div class="input">',
+			'inputstart'     => '<div class="evo_input">',
 			'inputend'       => '</div>',
 		), $params['form_params'] );
 
@@ -682,7 +681,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	{ // user is not logged in
 		$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot comment', $item_url ).'">'.T_( 'Log in now!' ).'</a>';
 	}
-	elseif( $current_User->check_status( 'can_be_validated' ) )
+	elseif( check_user_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated
 		$disabled_text = $params['comments_disabled_text_validated'];
 		$form_disabled_text = $disabled_text;
@@ -915,53 +914,20 @@ function echo_comment_reply_js( $Item )
 {
 	global $Collection, $Blog;
 
-	if( !isset( $Blog ) )
-	{
+	if( ! isset( $Blog ) || ! $Blog->get_setting( 'threaded_comments' ) )
+	{	// If threaded comments are not enabled for current Collection:
 		return false;
 	}
 
-	if( !$Blog->get_setting( 'threaded_comments' ) )
-	{
-		return false;
-	}
+	$js_config = array(
+			'item_ID' => $Item->ID,
+			'reply_button_msg' => TS_('Reply to this comment'),
+			'link_back_url' => url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ),
+			'link_back_specific_comment_msg' => TS_('You are currently replying to a specific comment'),
+			'link_back_current_comment_msg' => TS_('You are currently replying to this comment'),
+		);
 
-?>
-<script type="text/javascript">
-jQuery( 'a.comment_reply' ).click( function()
-{	// The click action for the links "Reply to this comment"
-	var comment_ID = jQuery( this ).attr( 'rel' );
-
-	// Remove data of a previous comment
-	jQuery( 'a.comment_reply_current' ).remove();
-	jQuery( 'input[name=reply_ID]' ).remove();
-	jQuery( 'a.comment_reply' ).removeClass( 'active' )
-		.html( '<?php echo TS_('Reply to this comment') ?>' );
-
-	// Add data for a current comment
-	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no' ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
-	var hidden_reply_ID = '<input type="hidden" name="reply_ID" value="' + comment_ID + '" />';
-	jQuery( '#bComment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
-
-	jQuery( this ).addClass( 'active' )
-		.html( '<?php echo TS_('You are currently replying to this comment') ?>' );
-	// Scroll to the comment form
-	jQuery( window ).scrollTop( jQuery( '#bComment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
-
-	return false;
-} );
-
-jQuery( document ).on( 'click', 'a.comment_reply_current', function()
-{	// The click action for a link "You are currently replying to a specific comment"
-	var comment_ID = jQuery( this ).attr( 'rel' );
-
-	// Scroll to the comment
-	jQuery( window ).scrollTop( jQuery( 'a#c' + comment_ID ).offset().top - 10 );
-
-	return false;
-} );
-</script>
-<?php
-
+	expose_var_to_js( 'evo_init_comment_reply_config', $js_config );
 }
 
 
@@ -996,8 +962,7 @@ function echo_comment_moderate_js()
  */
 function check_comment_mass_delete( $CommentList )
 {
-	global $current_User;
-	if( !$current_User->check_perm( 'blogs', 'all' ) )
+	if( ! check_user_perm( 'blogs', 'all' ) )
 	{	// Check permission
 		return false;
 	}
@@ -1009,6 +974,35 @@ function check_comment_mass_delete( $CommentList )
 
 	// Form is available to mass delete the comments
 	return true;
+}
+
+
+/**
+ * Check if autocomplete username is enabled
+ * 
+ * @param object Comment object
+ * @return boolean TRUE - if autocomplete username is enabled
+ */
+function check_autocomplete_usernames( $Comment )
+{
+	global $Settings, $Collection, $Blog;
+
+	if( $Comment->is_meta() )
+	{	// Always enable autocomplete username for internal comments
+		return true;
+	}
+	elseif( is_admin_page() && ! empty( $Blog ) )
+	{	// Check setting in the Back office or when Blog is not defined
+		return $Blog->get_setting( 'autocomplete_usernames' );
+	}
+	else
+	{	// Check setting in the Front office for current blog & skin
+		$SkinCache = & get_SkinCache();
+		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
+		return $skin->get_setting( 'autocomplete_usernames' );
+	}
+
+	return false;
 }
 
 
@@ -1163,6 +1157,7 @@ function comments_results_block( $params = array() )
 			'results_param_prefix' => 'actv_comment_',
 			'results_title'        => T_('Comments posted by the user'),
 			'results_no_text'      => T_('User has not posted any comment yet'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1170,8 +1165,7 @@ function comments_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -1208,7 +1202,7 @@ function comments_results_block( $params = array() )
 	$comments_Results->title = $params['results_title'];
 	$comments_Results->no_results_text = $params['results_no_text'];
 
-	if( $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
+	if( $params['action'] != 'view' && $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one comment posted by user
 		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'recycle', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -1400,6 +1394,112 @@ function comments_results( & $comments_Results, $params = array() )
 
 
 /**
+ * JS Behaviour: Output JavaScript code to change Item of the Comment
+ */
+function echo_comment_change_item_js()
+{
+	global $Blog, $admin_url, $evo_comment_change_item_js_initialized;
+
+	if( ! empty( $evo_comment_change_item_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_comment_change_item_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize JavaScript for item selector window:
+	echo_item_selector_js();
+?>
+<script>
+function evo_comment_change_item_load_window( item_ID )
+{
+	return evo_item_selector_load_window( item_ID,
+		[ '<?php echo TS_('Link to Another Post'); ?>', '<?php echo T_('Link to Another Post'); ?>' ],
+		false,
+		[ { 'text': '<?php echo TS_('Link comment to this post'); ?>', 'id': 'evo_comment_change_item_btn', 'class': 'btn btn-primary' } ],
+		<?php echo empty( $Blog ) ? 0 : $Blog->ID; // Default collection ?>,
+		'collections', { list_in_frontoffice: 'all', per_page: -1 }
+	);
+}
+
+// Submit form to link the Comment to another Item:
+jQuery( document ).on( 'click', '#evo_comment_change_item_btn', function()
+{
+	var post = jQuery( '#evo_item_selector_dest_post_ID' ).data( 'post' )
+
+	// Update info field link:
+	var item_link = jQuery('.comment_item_title')[0];
+	item_link.innerHTML = post.title;
+	item_link.href = '<?php echo $admin_url; ?>?ctrl=items&blog=' + jQuery( '#evo_item_selector_colls_list' ).find( ':selected' ).data( 'coll-id' ) + '&p=' + jQuery( '#evo_item_selector_dest_post_ID').val();
+
+	// Update moveto_post field:
+	jQuery( 'input[name="moveto_post"]' ).val( jQuery('#evo_item_selector_dest_post_ID').val() );
+
+	// Close main modal window:
+	closeModalWindow();
+} );
+</script>
+<?php
+}
+
+
+/**
+ * Handles anonymous comment cookies
+ * 
+ * @param boolean True to set cookie, false otherwise
+ * @param string Value of anonymous comment author
+ * @param string Value of anonymous comment author's email
+ * @param string Value of anonymous comment author's URL
+ * @param boolean True if anonymous URLs are allowed
+ */
+function handle_comment_cookies( $set_cookies, $author, $email = '', $url = '', $allow_anon_url = false )
+{
+	global $cookie_name, $cookie_email, $cookie_url, $cookie_expires, $cookie_expired;
+
+	if( !is_logged_in() )
+	{
+		if( $set_cookies )
+		{	// Set cookies:
+			if ($email == '')
+				$email = ' '; // this to make sure a cookie is set for 'no email'
+			if ($url == '')
+				$url = ' '; // this to make sure a cookie is set for 'no url'
+
+			// fplanque: made cookies available for whole site
+			evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
+			evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
+			if( $allow_anon_url )
+			{
+				evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
+			}
+		}
+		else
+		{	// Erase cookies:
+			if( !empty( $_COOKIE[$cookie_name] ) )
+			{
+				evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
+			}
+			if( !empty( $_COOKIE[$cookie_email] ) )
+			{
+				evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
+			}
+			if( !empty( $_COOKIE[$cookie_url] ) )
+			{
+				evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
+			}
+		}
+	}
+
+	// Send the predefined cookies:
+	evo_sendcookies();
+}
+
+
+/**
  * Helper functions to display Comments results.
  * New ( not display helper ) functions must be created above comments_results function
  */
@@ -1412,9 +1512,7 @@ function comments_results( & $comments_Results, $params = array() )
  */
 function get_type( $Comment )
 {
-	global $current_User;
-
-	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'type' );
 	}
@@ -1433,9 +1531,7 @@ function get_type( $Comment )
  */
 function get_author( $Comment )
 {
-	global $current_User;
-
-	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		$author_User = $Comment->get_author_User();
 		if( $author_User != NULL )
@@ -1460,9 +1556,7 @@ function get_author( $Comment )
  */
 function get_url( $Comment )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->author_url_with_actions( NULL, false );
 	}
@@ -1481,9 +1575,7 @@ function get_url( $Comment )
  */
 function get_author_email( $Comment )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get_author_email();
 	}
@@ -1502,9 +1594,7 @@ function get_author_email( $Comment )
  */
 function get_author_ip( $Comment, $param_prefix = '' )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		if( empty( $Comment->author_IP ) )
 		{
@@ -1536,9 +1626,7 @@ function get_author_ip( $Comment, $param_prefix = '' )
  */
 function get_spam_karma( $Comment )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'spam_karma' );
 	}
@@ -1588,7 +1676,7 @@ function get_styled_status( $status_value, $status_title, $status_class = '' )
  */
 function comment_edit_actions( $Comment )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$r = '';
 	if( !is_logged_in() )
@@ -1596,8 +1684,8 @@ function comment_edit_actions( $Comment )
 		return $r;
 	}
 
-	$user_has_edit_perm = $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $Comment );
-	$user_has_delete_perm = $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+	$user_has_edit_perm = check_user_perm( 'comment!CURSTATUS', 'edit', false, $Comment );
+	$user_has_delete_perm = check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 
 	if( $user_has_edit_perm || $user_has_delete_perm )
 	{ // Display edit and delete button if current user has the rights:

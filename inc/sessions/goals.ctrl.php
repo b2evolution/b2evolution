@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -17,18 +17,21 @@ load_class( 'sessions/model/_goal.class.php', 'Goal' );
 load_class( 'sessions/model/_goalcat.class.php', 'GoalCategory' );
 load_funcs( 'sessions/model/_hitlog.funcs.php' );
 
-/**
- * @var User
- */
-global $current_User;
-
 global $collections_Module;
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
 // Do we have permission to view all stats (aggregated stats) ?
-$perm_view_all = $current_User->check_perm( 'stats', 'view' );
+$perm_view_all = check_user_perm( 'stats', 'view' );
+
+// Section ID:
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! check_user_perm( 'section', 'view', false, $sec_ID ) )
+{
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
+}
 
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
@@ -37,12 +40,13 @@ if( isset( $collections_Module ) )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), TB_('All'),
+						$admin_url.'?ctrl=goals&amp;blog=0', NULL, false, true );
 	}
 	else
 	{ // No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), NULL,
+						'', NULL, false, true );
 	}
 }
 
@@ -54,7 +58,7 @@ if( $blog == 0 )
 	{ // Find a blog we can view stats for:
 		if( ! $selected = autoselect_blog( 'stats', 'view' ) )
 		{ // No blog could be selected
-			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
+			$Messages->add( TB_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
 			$action = 'nil';
 		}
 		elseif( set_working_blog( $selected ) ) // set $blog & memorize in user prefs
@@ -66,7 +70,7 @@ if( $blog == 0 )
 }
 
 // Check permission to view current blog
-$current_User->check_perm( 'stats', 'list', true, $blog );
+check_user_perm( 'stats', 'list', true, $blog );
 
 if( param( 'goal_ID', 'integer', '', true) )
 { // Load goal:
@@ -75,7 +79,7 @@ if( param( 'goal_ID', 'integer', '', true) )
 	{ // We could not find the goal to edit:
 		unset( $edited_Goal );
 		forget_param( 'goal_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Goal') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Goal') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -87,7 +91,7 @@ if( param( 'gcat_ID', 'integer', '', true) )
 	{ // We could not find the goal category to edit:
 		unset( $edited_GoalCategory );
 		forget_param( 'gcat_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Goal Category') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Goal Category') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -98,7 +102,7 @@ switch( $action )
 	case 'new':
 	case 'copy':
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		if( ! isset( $edited_Goal ) )
 		{	// We don't have a model to use, start with blank object:
@@ -115,7 +119,7 @@ switch( $action )
 		// Edit goal form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -131,7 +135,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// load data from request
 		if( $edited_Goal->load_from_Request() )
@@ -139,7 +143,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Goal->dbinsert();
-			$Messages->add( T_('New goal created.'), 'success' );
+			$Messages->add( TB_('New goal created.'), 'success' );
 
 			// What next?
 			switch( $action )
@@ -170,7 +174,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
@@ -181,7 +185,7 @@ switch( $action )
 
 			// Update in DB:
 			$edited_Goal->dbupdate();
-			$Messages->add( T_('Goal updated.'), 'success' );
+			$Messages->add( TB_('Goal updated.'), 'success' );
 
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -199,14 +203,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'goal' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'goal_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget( 'name' ) );
+			$msg = sprintf( TB_('Goal &laquo;%s&raquo; deleted.'), $edited_Goal->dget( 'name' ) );
 			$edited_Goal->dbdelete();
 			unset( $edited_Goal );
 			forget_param( 'goal_ID' );
@@ -217,7 +221,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Goal->check_delete( sprintf( T_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget( 'name' ) ) ) )
+			if( ! $edited_Goal->check_delete( sprintf( TB_('Cannot delete goal &laquo;%s&raquo;'), $edited_Goal->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -230,7 +234,7 @@ switch( $action )
 		// New goal category form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		if( ! isset( $edited_GoalCategory ) )
 		{ // We don't have a model to use, start with blank object:
@@ -247,7 +251,7 @@ switch( $action )
 		// Edit goal category form...:
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'gcat_ID', 'integer', true );
@@ -263,7 +267,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goalcat' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// load data from request
 		if( $edited_GoalCategory->load_from_Request() )
@@ -272,7 +276,7 @@ switch( $action )
 			// Insert in DB:
 			$DB->begin();
 			$edited_GoalCategory->dbinsert();
-			$Messages->add( T_('New goal category created.'), 'success' );
+			$Messages->add( TB_('New goal category created.'), 'success' );
 			$DB->commit();
 
 			// What next?
@@ -304,7 +308,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'goalcat' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'gcat_ID', 'integer', true );
@@ -316,7 +320,7 @@ switch( $action )
 			// Update in DB:
 			$DB->begin();
 			$edited_GoalCategory->dbupdate();
-			$Messages->add( T_('Goal category updated.'), 'success' );
+			$Messages->add( TB_('Goal category updated.'), 'success' );
 			$DB->commit();
 
 			// Redirect so that a reload doesn't write to the DB twice:
@@ -334,21 +338,21 @@ switch( $action )
 		$Session->assert_received_crumb( 'goalcat' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Make sure we got an ftyp_ID:
 		param( 'gcat_ID', 'integer', true );
 
 		if( $gcat_ID == 1 )
 		{ // Deny to delete "Default" category
-			$Messages->add( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ), 'error' );
+			$Messages->add( sprintf( TB_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ), 'error' );
 			$action = 'view';
 			break;
 		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget( 'name' ) );
+			$msg = sprintf( TB_('Goal category &laquo;%s&raquo; deleted.'), $edited_GoalCategory->dget( 'name' ) );
 			$edited_GoalCategory->dbdelete();
 			unset( $edited_GoalCategory );
 			forget_param( 'gcat_ID' );
@@ -359,35 +363,83 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_GoalCategory->check_delete( sprintf( T_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ) ) )
+			if( ! $edited_GoalCategory->check_delete( sprintf( TB_('Cannot delete goal category &laquo;%s&raquo;'), $edited_GoalCategory->dget( 'name' ) ) ) )
 			{ // There are restrictions:
 				$action = 'view';
 			}
 		}
 		break;
 
+	case 'aggregate':
+		// Aggregate the goal hits:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'aggregate' );
+
+		// Check permission:
+		check_user_perm( 'stats', 'edit', true );
+
+		load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
+
+		// Do the aggregations:
+		Hitlist::aggregate_goal_hits();
+
+		$Messages->add( TB_('The goal hits have been aggregated.'), 'success' );
+
+		// Redirect to referer page:
+		header_redirect( $admin_url.'?ctrl=goals&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'prune': // PRUNE goal hits for a certain date
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'goals' );
+
+		// Check permission:
+		check_user_perm( 'stats', 'edit', true );
+
+		param( 'date', 'integer', true ); // Required!
+		if( $r = Hitlist::prune_goal_hits( $date ) )
+		{
+			$Messages->add( sprintf( /* TRANS: %s is a date */ TB_('Deleted %d goal hits for %s.'), $r, date( locale_datefmt(), $date ) ), 'success' );
+		}
+		else
+		{
+			$Messages->add( sprintf( /* TRANS: %s is a date */ TB_('No goal hits deleted for %s.'), date( locale_datefmt(), $date ) ), 'note' );
+		}
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=stats&blog='.$blog, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
 }
 
 $AdminUI->breadcrumbpath_init();
-$AdminUI->breadcrumbpath_add( T_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
-$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Analytics'), '?ctrl=stats&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Goal tracking'), '?ctrl=goals&amp;blog=$blog$' );
 
 $AdminUI->set_page_manual_link( 'analytics-tab' );
 
 switch( $tab3 )
 {
 	case 'goals':
-		$AdminUI->breadcrumbpath_add( T_('Goal definitions'), '?ctrl=goals&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Goal definitions'), '?ctrl=goals&amp;blog=$blog$' );
 		$AdminUI->set_page_manual_link( 'goal-settings' );
 		break;
 	case 'stats':
-		$AdminUI->breadcrumbpath_add( T_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats&amp;blog=$blog$' );
+		param( 'hits_summary_mode', 'string' );
+		if( ! empty( $hits_summary_mode ) )
+		{	// Save a selected mode of hits summary data in session variable:
+			$Session->set( 'hits_summary_mode', $hits_summary_mode );
+		}
+
+		$AdminUI->breadcrumbpath_add( TB_('Goal hit stats'), '?ctrl=goals&amp;tab3=stats&amp;blog=$blog$' );
 		$AdminUI->set_page_manual_link( 'goal-stats' );
 		// Init jqPlot charts
 		init_jqplot_js();
 		break;
 	case 'cats':
-		$AdminUI->breadcrumbpath_add( T_('Goal categories'), '?ctrl=goals&amp;tab3=cats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Goal categories'), '?ctrl=goals&amp;tab3=cats&amp;blog=$blog$' );
 		$AdminUI->set_page_manual_link( 'goal-category-settings' );
 		init_colorpicker_js();
 		break;
@@ -419,7 +471,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Goal->confirm_delete(
-				sprintf( T_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget( 'name' ) ),
+				sprintf( TB_('Delete goal &laquo;%s&raquo;?'), $edited_Goal->dget( 'name' ) ),
 				'goal', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':
@@ -435,7 +487,7 @@ switch( $action )
 	case 'cat_delete':
 		// We need to ask for confirmation:
 		$edited_GoalCategory->confirm_delete(
-				sprintf( T_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget( 'name' ) ),
+				sprintf( TB_('Delete goal category &laquo;%s&raquo;?'), $edited_GoalCategory->dget( 'name' ) ),
 				'goalcat', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'cat_new':
@@ -464,6 +516,7 @@ switch( $action )
 				break;
 
 			case 'stats':
+				load_funcs( 'sessions/views/_stats_view.funcs.php' );
 				$AdminUI->disp_view( 'sessions/views/_goal_hitsummary.view.php' );
 				break;
 		}

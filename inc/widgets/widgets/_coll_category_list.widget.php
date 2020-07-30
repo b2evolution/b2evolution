@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -232,6 +232,9 @@ class coll_category_list_Widget extends ComponentWidget
 			$callbacks['posts'] = $params['callback_posts'];
 		}
 
+		// Get IDs of categories that must be exluded:
+		$this->excluded_cat_IDs = sanitize_id_list( $this->disp_params['exclude_cats'], true );
+
 		// START DISPLAY:
 		echo $this->disp_params['block_start'];
 
@@ -275,7 +278,11 @@ class coll_category_list_Widget extends ComponentWidget
 			}
 
 			// Load current collection categories (if needed) and recurse through them:
-			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, /* subset ID */ $Blog->ID, NULL, 0, $depth_level, array( 'sorted' => true ) );
+			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, /* subset ID */ $Blog->ID, NULL, 0, $depth_level, array(
+					'sorted' => true,
+					// Don't expand all categories by default for this widget, because it has a separate parameter "Recurse X levels":
+					'expand_all' => false,
+				) );
 
 			if( ! empty($r) )
 			{
@@ -342,7 +349,11 @@ class coll_category_list_Widget extends ComponentWidget
 				}
 
 				// Load current collection categories (if needed) and recurse through them:
-				$r = $ChapterCache->recurse( $callbacks, /* subset ID */ $curr_blog_ID, NULL, 0, $depth_level, array( 'sorted' => true ) );
+				$r = $ChapterCache->recurse( $callbacks, /* subset ID */ $curr_blog_ID, NULL, 0, $depth_level, array(
+						'sorted' => true,
+						// Don't expand all categories by default for this widget, because it has a separate parameter "Recurse X levels":
+						'expand_all' => false,
+					) );
 
 				if( ! empty($r) )
 				{
@@ -424,9 +435,13 @@ class coll_category_list_Widget extends ComponentWidget
 			$cat_array = array();
 		}
 
-		$exclude_cats = sanitize_id_list( $this->disp_params['exclude_cats'], true );
-		if( in_array( $Chapter->ID, $exclude_cats ) )
-		{ // Cat ID is excluded, skip it
+		if( in_array( $Chapter->get( 'parent_ID' ), $this->excluded_cat_IDs ) )
+		{	// Exclude also all child categories if parent category is excluded:
+			$this->excluded_cat_IDs[] = $Chapter->ID;
+		}
+
+		if( in_array( $Chapter->ID, $this->excluded_cat_IDs ) )
+		{	// Category is excluded, Skip it:
 			return;
 		}
 
@@ -550,11 +565,14 @@ class coll_category_list_Widget extends ComponentWidget
 			$r .= '</label>';
 		}
 
-		// End the line even if it has children, since this is the end of one single item
+		// End the line only if it has no children, since this is the end of one single item
 		// To close the whole group of categories with all of it's children see @cat_before_level and @cat_after_level
 		// Note: If this solution will not work, and we can't add the 'item_end' here, then create new after_line callback,
 		// which then must be called from a the ChapterCache recurse method
-		$r .= $end_tag;
+		if( empty( $Chapter->children ) )
+		{
+			$r .= $end_tag;
+		}
 
 		return $r;
 	}

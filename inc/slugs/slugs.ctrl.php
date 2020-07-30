@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -15,13 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'slugs/model/_slug.class.php', 'Slug' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'slugs', 'view', true );
+check_user_perm( 'slugs', 'view', true );
 
 $AdminUI->set_path( 'site', 'slugs' );
 
@@ -38,7 +33,7 @@ if( param( 'slug_ID', 'integer', '', true) )
 	{	// We could not find the goal to edit:
 		unset( $edited_Slug );
 		forget_param( 'slug_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Slug') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Slug') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -66,14 +61,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'slug' );
 
 		// Check that current user has permission to create slugs:
-		$current_User->check_perm( 'slugs', 'edit', true );
+		check_user_perm( 'slugs', 'edit', true );
 
 		// load data from request
 		if( $edited_Slug->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_Slug->dbinsert();
-			$Messages->add( T_('New slug created.'), 'success' );
+			$Messages->add( TB_('New slug created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=slugs', 303 ); // Will EXIT
@@ -89,7 +84,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'slug' );
 
 		// Check that current user has permission to edit slugs:
-		$current_User->check_perm( 'slugs', 'edit', true );
+		check_user_perm( 'slugs', 'edit', true );
 
 		// Make sure we got an slug_ID:
 		param( 'slug_ID', 'integer', true );
@@ -99,7 +94,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update slug in DB:
 			$edited_Slug->dbupdate();
-			$Messages->add( T_('Slug updated.'), 'success' );
+			$Messages->add( TB_('Slug updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=slugs', 303 ); // Will EXIT
@@ -115,14 +110,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'slug' );
 
 		// Check that current user has permission to edit slugs:
-		$current_User->check_perm( 'slugs', 'edit', true );
+		check_user_perm( 'slugs', 'edit', true );
 
 		// Make sure we got an slug_ID:
 		param( 'slug_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Slug &laquo;%s&raquo; deleted.'), $edited_Slug->dget('title') );
+			$msg = sprintf( TB_('Slug &laquo;%s&raquo; deleted.'), $edited_Slug->dget('title') );
 			$edited_Slug->dbdelete();
 			unset( $edited_Slug );
 			forget_param( 'slug_ID' );
@@ -133,7 +128,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Slug->check_delete( sprintf( T_('Cannot delete slug &laquo;%s&raquo;'), $edited_Slug->dget('title') ), array(), true ) )
+			if( ! $edited_Slug->check_delete( sprintf( TB_('Cannot delete slug &laquo;%s&raquo;'), $edited_Slug->dget('title') ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'list';
 			}
@@ -143,8 +138,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Slugs'), $admin_url.'?ctrl=slugs' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Slugs'), $admin_url.'?ctrl=slugs' );
 
 // Set an url for manual page:
 if( $action == 'new' || $action == 'edit' )
@@ -182,7 +177,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Slug->confirm_delete(
-				sprintf( T_('Delete slug &laquo;%s&raquo;?'), $edited_Slug->dget('title') ),
+				sprintf( TB_('Delete slug &laquo;%s&raquo;?'), $edited_Slug->dget('title') ),
 				'slug', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'list':

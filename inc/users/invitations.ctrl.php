@@ -15,13 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load Invitation class:
 load_class( 'users/model/_invitation.class.php', 'Invitation' );
 
-/**
- * @var User
- */
-global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 // Set options path:
 $AdminUI->set_path( 'users', 'usersettings', 'invitations' );
@@ -36,7 +32,7 @@ if( param( 'ivc_ID', 'integer', '', true ) )
 	{ // We could not find the invitation code to edit:
 		unset( $edited_Invitation );
 		forget_param( 'ivc_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Invitation') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Invitation') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -46,7 +42,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		if( ! isset( $edited_Invitation ) )
 		{ // We don't have a model to use, start with blank object:
@@ -61,7 +57,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ivc_ID:
 		param( 'ivc_ID', 'integer', true );
@@ -77,7 +73,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'invitation' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// load data from request
 		if( $edited_Invitation->load_from_Request() )
@@ -95,13 +91,13 @@ switch( $action )
 			if( $duplicated_invitation_ID )
 			{	// Display error if we have a duplicate entry:
 				param_error( 'ivc_ID',
-					sprintf( T_('This invitation code already exists. Do you want to <a %s>edit the existing invitation code</a>?'),
+					sprintf( TB_('This invitation code already exists. Do you want to <a %s>edit the existing invitation code</a>?'),
 						'href="?ctrl=invitations&amp;action=edit&amp;ivc_ID='.$duplicated_invitation_ID.'"' ) );
 			}
 			else
 			{
 				$edited_Invitation->dbinsert();
-				$Messages->add( T_('New invitation code created.'), 'success' );
+				$Messages->add( TB_('New invitation code created.'), 'success' );
 			}
 			$DB->commit();
 
@@ -136,7 +132,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'invitation' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ivc_ID:
 		param( 'ivc_ID', 'integer', true );
@@ -149,7 +145,7 @@ switch( $action )
 			$DB->begin();
 
 			$edited_Invitation->dbupdate();
-			$Messages->add( T_('Invitation code updated.'), 'success' );
+			$Messages->add( TB_('Invitation code updated.'), 'success' );
 
 			$DB->commit();
 
@@ -165,14 +161,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'invitation' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ivc_ID:
 		param( 'ivc_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Invitation code &laquo;%s&raquo; deleted.'), $edited_Invitation->dget( 'code' ) );
+			$msg = sprintf( TB_('Invitation code &laquo;%s&raquo; deleted.'), $edited_Invitation->dget( 'code' ) );
 			$edited_Invitation->dbdelete();
 			unset( $edited_Invitation );
 			forget_param( 'ivc_ID' );
@@ -184,7 +180,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Invitation->check_delete( sprintf( T_('Cannot delete invitation code &laquo;%s&raquo;'), $edited_Invitation->dget( 'code' ) ) ) )
+			if( ! $edited_Invitation->check_delete( sprintf( TB_('Cannot delete invitation code &laquo;%s&raquo;'), $edited_Invitation->dget( 'code' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -198,9 +194,9 @@ if( in_array( $action, array( 'delete', 'new', 'create', 'create_new', 'create_c
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Invitations'), '?ctrl=invitations' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Invitations'), '?ctrl=invitations' );
 
 // Set an url for manual page:
 switch( $action )
@@ -212,10 +208,10 @@ switch( $action )
 	case 'create_copy':
 	case 'edit':
 	case 'update':
-		$AdminUI->set_page_manual_link( 'user-settings-invitations-editing' );
+		$AdminUI->set_page_manual_link( 'invitation-code-form' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'user-settings-invitations-tab' );
+		$AdminUI->set_page_manual_link( 'invitation-codes-tab' );
 		break;
 }
 
@@ -240,7 +236,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Invitation->confirm_delete(
-				sprintf( T_('Delete invitation code &laquo;%s&raquo;?'), $edited_Invitation->dget( 'code' ) ),
+				sprintf( TB_('Delete invitation code &laquo;%s&raquo;?'), $edited_Invitation->dget( 'code' ) ),
 				'invitation', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

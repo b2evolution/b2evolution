@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -55,15 +55,23 @@ class User extends DataObject
 	var $gender;
 	var $email_dom_ID;
 	var $profileupdate_date;
+	var $birthday_year;
+	var $birthday_month;
+	var $birthday_day;
 
 	/**
 	 * User account status
 	 *
-	 * 'new', 'activated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete', 'closed'
 	 *
 	 * @var string
 	 */
 	var $status;
+	/**
+	 * User previous status. It will be set only if the user status was changed.
+	 * @var string
+	 */
+	var $previous_status;
 
 	/**
 	 * Number of posts by this user. Use get_num_posts() to access this (lazy filled).
@@ -177,6 +185,15 @@ class User extends DataObject
 	var $newsletter_subscriptions_updated = false;
 
 	/**
+	 * Array of newsletter subscription changes with the following elements:
+	 *   - string, 'subscribe' | 'unsubscribe'
+	 *   - array of newsletter IDs
+	 *   - array of email template params
+	 * @var array
+	 */
+	var $newsletter_subscription_changed_values = array();
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -257,6 +274,9 @@ class User extends DataObject
 			$this->city_ID = $db_row->user_city_ID;
 			$this->source = $db_row->user_source;
 			$this->profileupdate_date = $db_row->user_profileupdate_date;
+			$this->birthday_year = $db_row->user_birthday_year;
+			$this->birthday_month = $db_row->user_birthday_month;
+			$this->birthday_day = $db_row->user_birthday_day;
 
 			// Group for this user:
 			$this->grp_ID = $db_row->user_grp_ID;
@@ -305,7 +325,7 @@ class User extends DataObject
 				//array( 'table'=>'T_items__item', 'fk'=>'post_lastedit_user_ID', 'msg'=>T_('%d posts last edited by this user') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_assigned_user_ID', 'msg'=>T_('%d posts assigned to this user') ),
 				array( 'table'=>'T_users__organization', 'fk'=>'org_owner_user_ID', 'msg'=>T_('%d organizations') ),
-				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d poll questions') ),
+				array( 'table'=>'T_polls__question', 'fk'=>'pqst_owner_user_ID', 'msg'=>T_('%d polls owned by this user') ),
 				array( 'table'=>'T_automation__automation', 'fk'=>'autm_owner_user_ID', 'msg'=>T_('%d automations') ),
 				// Do not delete user private messages
 				//array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('The user has authored %d message(s)') ),
@@ -329,7 +349,7 @@ class User extends DataObject
 				array( 'table'=>'T_comments__votes', 'fk'=>'cmvt_user_ID', 'msg'=>T_('%d user votes on comments') ),
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_user_ID', 'msg'=>T_('%d blog subscriptions') ),
 				array( 'table'=>'T_items__item', 'fk'=>'post_creator_user_ID', 'msg'=>T_('%d posts created by this user'),
-						'class'=>'Item', 'class_path'=>'items/model/_item.class.php' ),
+						'class'=>'Item', 'class_path'=>'items/model/_item.class.php', 'style' => 'bold' ),
 				array( 'table'=>'T_items__subscriptions', 'fk'=>'isub_user_ID', 'msg'=>T_('%d post subscriptions') ),
 				array( 'table'=>'T_messaging__contact', 'fk'=>'mct_to_user_ID', 'msg'=>T_('%d contacts from other users contact list') ),
 				array( 'table'=>'T_messaging__contact', 'fk'=>'mct_from_user_ID', 'msg'=>T_('%d contacts from this user contact list') ),
@@ -340,8 +360,7 @@ class User extends DataObject
 				array( 'table'=>'T_items__user_data', 'fk'=>'itud_user_ID', 'msg'=>T_('%d recordings of user data for a specific post') ),
 				array( 'table'=>'T_links', 'fk'=>'link_usr_ID', 'msg'=>T_('%d links to this user'),
 						'class'=>'Link', 'class_path'=>'links/model/_link.class.php' ),
-				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root') ),
-				array( 'table' => 'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') ),
+				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "user"', 'msg'=>T_('%d files from this user file root'), 'style' => 'bold' ),
 				array( 'table'=>'T_email__campaign_send', 'fk'=>'csnd_user_ID', 'msg'=>T_('%d list emails for this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_target_user_ID', 'msg'=>T_('%d reports about this user') ),
 				array( 'table'=>'T_users__reports', 'fk'=>'urep_reporter_ID', 'msg'=>T_('%d reports created by this user') ),
@@ -350,6 +369,8 @@ class User extends DataObject
 				array( 'table'=>'T_polls__answer', 'fk'=>'pans_user_ID', 'msg'=>T_('%d poll answers') ),
 				array( 'table'=>'T_users__secondary_user_groups', 'fk'=>'sug_user_ID', 'msg'=>T_('%d secondary groups') ),
 				array( 'table'=>'T_users__profile_visits', 'fk'=>'upv_visited_user_ID', 'msg'=>T_('%d profile visits') ),
+				array( 'table'=>'T_users__profile_visit_counters', 'fk'=>'upvc_user_ID', 'msg'=>T_('%d profile visit counter' ) ),
+				array( 'table'=>'T_users__social_network', 'fk'=>'usn_user_ID', 'msg'=>T_('%d connected social networks') ),
 				array( 'table'=>'T_email__newsletter_subscription', 'fk'=>'enls_user_ID', 'msg'=>T_('%d list subscriptions') ),
 				array( 'table'=>'T_automation__user_state', 'fk'=>'aust_user_ID', 'msg'=>T_('%d states of User in Automation') ),
 			);
@@ -362,24 +383,37 @@ class User extends DataObject
 	 *
 	 * @param boolean Is this user spammer
 	 */
-	function init_relations( $is_spammer = false )
+	function init_relations( $params = array() )
 	{
 		if( ! is_null( $this->delete_cascades ) || ! is_null( $this->delete_restrictions ) )
 		{ // Initialize the relations only once
 			return;
 		}
 
+		$params = array_merge( array(
+				'delete_messages' => false,
+				'delete_comments' => false,
+				'delete_files'    => false,
+			), $params );
+
 		parent::init_relations();
 
-		if( $is_spammer )
-		{
+		if( $params['delete_messages'] )
+		{	// Delete messages:
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__message', 'fk'=>'msg_author_user_ID', 'msg'=>T_('%d messages from this user'),
-					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php' );
+					'class'=>'Message', 'class_path'=>'messaging/model/_message.class.php', 'style' => 'bold' );
 			$this->delete_cascades[] = array( 'table'=>'T_messaging__threadstatus', 'fk'=>'tsta_user_ID', 'msg'=>T_('%d message read statuses from this user') );
+		}
+		if( $params['delete_comments'] )
+		{	// Delete comments:
 			$this->delete_cascades[] = array( 'table'=>'T_comments', 'fk'=>'comment_author_user_ID', 'msg'=>T_('%d comments by this user'),
-					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php' );
+					'class'=>'Comment', 'class_path'=>'comments/model/_comment.class.php', 'style' => 'bold' );
+		}
+		if( $params['delete_files'] )
+		{	// Delete files and links:
 			$this->delete_cascades[] = array( 'table'=>'T_links', 'fk'=>'link_creator_user_ID', 'msg'=>T_('%d links created by this user'),
 					'class'=>'Link', 'class_path'=>'links/model/_link.class.php' );
+			$this->delete_cascades[] = array( 'table'=>'T_files', 'fk'=>'file_creator_user_ID', 'and_condition'=>'file_root_type != "user"', 'msg'=>T_('%d files will lose their creator ID.') );
 		}
 	}
 
@@ -398,7 +432,7 @@ class User extends DataObject
 	{
 		if( $restriction['table'] == 'T_polls__question' )
 		{	// Check restriction for poll questions:
-			global $DB, $current_User, $admin_url;
+			global $DB, $admin_url;
 
 			// Get a count of poll questions
 			$polls_count_SQL = new SQL();
@@ -410,7 +444,7 @@ class User extends DataObject
 			if( $polls_count > 0 )
 			{	// Display this restriction as link to polls list with filter by this user login:
 				$msg = sprintf( $restriction['msg'], $polls_count );
-				if( is_logged_in() && $current_User->check_perm( 'polls', 'view' ) )
+				if( check_user_perm( 'polls', 'view' ) )
 				{	// Set a link to poll questions list with filter by this user if current user has a perm to view all polls:
 					$msg = '<a href="'.$admin_url.'?ctrl=polls&amp;owner='.$this->login.'">'.$msg.'</a>';
 				}
@@ -424,6 +458,25 @@ class User extends DataObject
 
 		// No rule for current table:
 		return false;
+	}
+
+
+	/**
+	 * Check relations for restrictions before deleting
+	 *
+	 * @param string
+	 * @param array list of foreign keys to ignore
+	 * @param boolean TRUE to display restriction as link to edit the record
+	 * @return boolean true if no restriction prevents deletion
+	 */
+	function check_delete( $restrict_title, $ignore = array(), $addlink = false )
+	{
+		// Prepend user login before restriction messages to know what user is deleting:
+		$user_login_link = $this->get_identity_link( array(
+				'link_text' => 'login',
+			) );
+
+		return parent::check_delete( $user_login_link.': '.$restrict_title, $ignore, true );
 	}
 
 
@@ -445,54 +498,10 @@ class User extends DataObject
 		// (Don't request it when we create new user from REST API)
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
-		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
+		$has_full_access = check_user_perm( 'users', 'edit' );
 
 		// ---- Login checking / START ----
-		// TODO: Must be factorized with code from $this->load_from_Request()!
-		$edited_user_login = param( 'edited_user_login', 'string', NULL );
-		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
-		{ // login specifically included in API request
-			if( empty( $edited_user_login ) )
-			{	// Empty login
-				param_error( 'edited_user_login', T_('Please enter your login.') );
-			}
-			if( param_check_valid_login( 'edited_user_login' ) )
-			{	// If login is valid
-				global $reserved_logins;
-				if( $edited_user_login != $this->get( 'login' ) &&
-				    ! empty( $reserved_logins ) &&
-				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
-				{	// If login has been changed and new entered login is reserved and current User cannot use this:
-					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
-				}
-			}
-		}
-		else
-		{
-			set_param( 'edited_user_login', $this->login );
-			$edited_user_login = $this->login;
-		}
-
-		$UserCache = & get_UserCache();
-		$UserLogin = $UserCache->get_by_login( $edited_user_login );
-		if( $UserLogin && $UserLogin->ID != $this->ID )
-		{	// The login is already registered
-			$login_error_message = T_( 'This login already exists.' );
-			if( $current_User->check_perm( 'users', 'edit' ) )
-			{
-				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
-					$edited_user_login,
-					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
-			}
-			param_error( 'edited_user_login', $login_error_message );
-		}
-
-		if( !param_has_error( 'edited_user_login' ) )
-		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
-		}
+		$edited_user_login = $this->check_login();
 		// ---- Login checking / END ----
 
 		// ---- Password checking / START ----
@@ -597,30 +606,35 @@ class User extends DataObject
 		// Other fields:
 		$country = param( 'country', 'integer', '' );
 		$firstname = param( 'firstname', 'string', '' );
+		$lastname = param( 'lastname', 'string', NULL );
 		$gender = param( 'gender', 'string', NULL );
 		$locale = param( 'locale', 'string', '' );
 
 		// Set params:
+		$required_fields = get_registration_template_required_fields();
+
 		$paramsList = array();
-		if( $Settings->get( 'registration_require_country' ) )
+		if( in_array( 'country', $required_fields ) )
 		{	// Set and check country:
 			$this->set( 'ctry_ID', $country );
 			$paramsList['country'] = $country;
 		}
-		if( $Settings->get( 'registration_require_firstname' ) )
+		if( in_array( 'firstname', $required_fields ) )
 		{	// Set and check first name:
 			$this->set( 'firstname', $firstname );
 			$paramsList['firstname'] = $firstname;
 		}
-		if( $Settings->get( 'registration_require_gender' ) == 'required' || $Settings->get( 'registration_require_gender' ) == 'optional' )
+		if( in_array( 'lastname', $required_fields ) )
+		{	// Set last name:
+			$this->set( 'lastname', $lastname );
+			$paramsList['lastname'] = $lastname;
+		}
+		if( in_array( 'gender', $required_fields ) )
 		{	// Set or check gender:
 			$this->set( 'gender', $gender );
-			if( $Settings->get( 'registration_require_gender' ) == 'required' )
-			{	// Check gender because it is mandatory:
-				$paramsList['gender'] = $gender;
-			}
+			$paramsList['gender'] = $gender;
 		}
-		if( $Settings->get( 'registration_ask_locale' ) )
+		if( in_array( 'country', $required_fields ) )
 		{	// Only update locale without checking:
 			$this->set( 'locale', $locale );
 		}
@@ -642,6 +656,9 @@ class User extends DataObject
 		global $current_User, $Session, $localtimenow;
 		global $is_api_request;
 
+		$has_full_access = check_user_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
+
 		// TRUE when we create new user:
 		$is_new_user = ( $this->ID == 0 );
 
@@ -650,55 +667,11 @@ class User extends DataObject
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		// ---- Login checking / START ----
-		$edited_user_login = param( 'edited_user_login', 'string', NULL );
-		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
-		{ // login specifically included in API request
-			if( empty( $edited_user_login ) )
-			{	// Empty login
-				param_error( 'edited_user_login', T_('Please enter your login.') );
-			}
-			if( param_check_valid_login( 'edited_user_login' ) )
-			{	// If login is valid
-				global $reserved_logins;
-				if( $edited_user_login != $this->get( 'login' ) &&
-				    ! empty( $reserved_logins ) &&
-				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $current_User->check_perm( 'users', 'edit', false ) ) )
-				{	// If login has been changed and new entered login is reserved and current User cannot use this:
-					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
-				}
-			}
-		}
-		else
-		{
-			set_param( 'edited_user_login', $this->login );
-			$edited_user_login = $this->login;
-		}
-
-		$UserCache = & get_UserCache();
-		$UserLogin = $UserCache->get_by_login( $edited_user_login );
-		if( $UserLogin && $UserLogin->ID != $this->ID )
-		{	// The login is already registered
-			$login_error_message = T_( 'This login already exists.' );
-			if( $current_User->check_perm( 'users', 'edit' ) )
-			{
-				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
-					$edited_user_login,
-					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
-			}
-			param_error( 'edited_user_login', $login_error_message );
-		}
-
-		if( !param_has_error( 'edited_user_login' ) )
-		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
-		}
+		$edited_user_login = $this->check_login();
 		// ---- Login checking / END ----
 
 		$is_identity_form = param( 'identity_form', 'boolean', false );
 		$is_admin_form = param( 'admin_form', 'boolean', false );
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
-		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
 
 		// ******* Admin form or new user create ******* //
 		// In both cases current user must have users edit permission!
@@ -724,10 +697,15 @@ class User extends DataObject
 				}
 			}
 
-			if( $is_admin_form )
+			$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', NULL );
+			if( $edited_user_secondary_grp_IDs !== NULL )
 			{	// Save secondary groups for this user:
-				$edited_user_secondary_grp_IDs = param( 'edited_user_secondary_grp_ID', 'array:integer', array() );
-				$this->update_secondary_groups( $edited_user_secondary_grp_IDs );
+				// Store old groups in order to delete them before insert new selected groups:
+				$this->old_secondary_groups = $this->get_secondary_groups();
+				$GroupCache = & get_GroupCache();
+				$GroupCache->clear();
+				// Set new groups which should be stored in DB:
+				$this->secondary_groups = $GroupCache->load_list( $edited_user_secondary_grp_IDs );
 			}
 
 			$edited_user_source = param( 'edited_user_source', 'string', ! $is_api_request ? true : NULL );
@@ -794,7 +772,7 @@ class User extends DataObject
 					}
 				}
 
-				if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+				if( check_user_perm( 'spamblacklist', 'edit' ) )
 				{ // User can edit IP ranges
 					// Update status of IP range in DB
 					$edited_iprange_status = param( 'edited_iprange_status', 'string' );
@@ -824,7 +802,7 @@ class User extends DataObject
 					}
 				}
 
-				if( $current_User->check_perm( 'stats', 'edit' ) )
+				if( check_user_perm( 'stats', 'edit' ) )
 				{ // User can edit Domains
 					$DomainCache = & get_DomainCache();
 
@@ -879,8 +857,8 @@ class User extends DataObject
 			}
 		}
 
-		if( $has_full_access )
-		{	// If current user has full access to edit other users:
+		if( $has_moderate_access )
+		{	// If current user can moderate other users:
 			if( param( 'edited_user_tags', 'string', NULL ) !== NULL )
 			{	// Update user tags if they has been submitted:
 				$this->set_usertags_from_string( get_param( 'edited_user_tags' ) );
@@ -890,27 +868,133 @@ class User extends DataObject
 		// ******* Identity form ******* //
 		if( $is_identity_form || ( $is_api_request && $is_new_user ) )
 		{
-			$can_edit_users = $current_User->check_perm( 'users', 'edit' );
 			$edited_user_perms = array( 'edited-user', 'edited-user-required' );
 
-			global $edited_user_age_min, $edited_user_age_max;
-			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
-			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
-
-			if( isset( $age_min ) && isset( $age_max ) || $is_identity_form )
+			if( $Settings->get( 'self_selected_age_group') != 'hidden' )
 			{
-				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
-				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
-						!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
-				{	// Limit user by minimum age
-					param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+				global $edited_user_age_min, $edited_user_age_max;
+				$age_group_is_required = $Settings->get( 'self_selected_age_group' ) == 'required';
+				$age_min = param( 'edited_user_age_min', 'integer', ! $is_api_request || $age_group_is_required ? true : NULL );
+				$age_max = param( 'edited_user_age_max', 'integer', ! $is_api_request || $age_group_is_required ? true : NULL );
+				if( isset( $age_min ) || isset( $age_max ) || $is_identity_form )
+				{
+					param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.'), $age_group_is_required );
+					if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
+							!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
+					{	// Limit user by minimum age
+						param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+					}
+					$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
+					$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
 				}
-				$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
-				$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
+			}
+
+			$birthdate = array();
+			if( $Settings->get( 'birthday_month' ) != 'hidden' )
+			{	// Save Birthday Month
+				$birthday_month_is_required = $Settings->get( 'birthday_month' ) == 'required';
+				$edited_user_birthday_month = param( 'edited_user_birthday_month', 'integer', ! $is_api_request || $birthday_month_is_required ? true : NULL );
+				if( isset( $edited_user_birthday_month ) || $is_identity_form )
+				{
+					if( $birthday_month_is_required && $has_moderate_access && empty( $edited_user_birthday_month ) )
+					{
+						param_add_message_to_Log( 'edited_user_birthday_month', T_('Please select a birthday month').'.', 'warning', T_('Validation errors:') );
+					}
+					else
+					{
+						param_check_number( 'edited_user_birthday_month', T_('Please select a birthday month').'.', $birthday_month_is_required );
+					}
+					// Check for valid values:
+					if( isset( $edited_user_birthday_month ) )
+					{
+						param_integer_range( 'edited_user_birthday_month', 1, 12,
+								sprintf( T_('The birthday month must be between %d and %d.'), 1, 12 ),
+								! $is_api_request || $birthday_month_is_required ? true : NULL );
+
+						$birthdate['month'] = $edited_user_birthday_month;
+					}
+					$this->set_from_Request( 'birthday_month', 'edited_user_birthday_month', true );
+				}
+			}
+
+			if( $Settings->get( 'birthday_day' ) != 'hidden' )
+			{	// Save Birthday Day
+				$birthday_day_is_required = $Settings->get( 'birthday_day' ) == 'required';
+				$edited_user_birthday_day = param( 'edited_user_birthday_day', 'integer', ! $is_api_request || $birthday_day_is_required ? true : NULL );
+				if( isset( $edited_user_birthday_day ) || $is_identity_form )
+				{
+					if( $birthday_day_is_required && $has_moderate_access && empty( $edited_user_birthday_day ) )
+					{
+						param_add_message_to_Log( 'edited_user_birthday_day', T_('Please select a birthday day').'.', 'warning', T_('Validation errors:') );
+					}
+					else
+					{
+						param_check_number( 'edited_user_birthday_day', T_('Please select a birthday day').'.', $birthday_day_is_required );
+					}
+					// Chehck for valid values:
+					if( isset( $edited_user_birthday_day ) )
+					{
+						param_integer_range( 'edited_user_birthday_day', 1, 31,
+								sprintf( T_('The birthday day must be between %d and %d.'), 1, 31 ),
+								! $is_api_request || $birthday_day_is_required ? true : NULL );
+
+						$birthdate['day'] = $edited_user_birthday_day;
+					}
+					$this->set_from_Request( 'birthday_day', 'edited_user_birthday_day', true );
+				}
+			}
+
+			if( $Settings->get( 'birthday_year' ) != 'hidden' )
+			{	// Save Birthday Year
+				$birthday_year_is_required = $Settings->get( 'birthday_year' ) == 'required';
+				$edited_user_birthday_year = param( 'edited_user_birthday_year', 'integer', ! $is_api_request || $birthday_year_is_required ? true : NULL );
+				if( isset( $edited_user_birthday_year ) || $is_identity_form )
+				{
+					if( $birthday_year_is_required && $has_moderate_access && empty( $edited_user_birthday_year ) )
+					{
+						param_add_message_to_Log( 'edited_user_birthday_year', T_('Please select a birthday year').'.', 'warning', T_('Validation errors:') );
+					}
+					else
+					{
+						param_check_number( 'edited_user_birthday_year', T_('Please select a birthday year').'.', $birthday_year_is_required );
+					}
+					// Check for valid values:
+					if( isset( $edited_user_birthday_year ) )
+					{
+						param_integer_range( 'edited_user_birthday_year', 1900, (int) date( 'Y' ),
+								sprintf( T_('The birthday year must be between %d and %d.'), 1900, (int) date( 'Y' ) ),
+								! $is_api_request || $birthday_year_is_required ? true : NULL );
+
+						$birthdate['year'] = $edited_user_birthday_year;
+						if( $Settings->get( 'minimum_age' ) > 0 && ! empty( $edited_user_birthday_year ) )
+						{ 	// We can only assume age if year is provided:
+							if( empty( $birthdate['month']) )
+							{	// Assume latest month:
+								$birthdate['month'] = 12;
+							}
+							if( empty( $birthdate['day']) )
+							{	// Assume latest day of the month-year:
+								$temp_date = strtotime( $birthdate['year'].'-'.$birthdate['month'].'-01' );
+								$birthdate['day'] = (int) date( 't', $temp_date );
+							}
+
+							$birth_date = new DateTime();
+							$today     = new DateTime();
+							$birth_date->setDate( $birthdate['year'], $birthdate['month'], $birthdate['day'] );
+							$interval = date_diff( $today, $birth_date );
+							$age = (int) $interval->format( '%y' );
+							if( $age < $Settings->get( 'minimum_age' ) )
+							{
+								param_error( 'edited_user_birthday_year', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+							}
+						}
+					}
+					$this->set_from_Request( 'birthday_year', 'edited_user_birthday_year', true );
+				}
 			}
 
 			$firstname_editing = $Settings->get( 'firstname_editing' );
-			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $can_edit_users ) )
+			if( ( in_array( $firstname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_moderate_access ) )
 			{	// User has a permissions to save Firstname
 				$edited_user_firstname = param( 'edited_user_firstname', 'string', ! $is_api_request || $firstname_editing == 'edited-user-required' ? true : NULL );
 				if( isset( $edited_user_firstname ) || $is_identity_form )
@@ -924,7 +1008,7 @@ class User extends DataObject
 			}
 
 			$lastname_editing = $Settings->get( 'lastname_editing' );
-			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $can_edit_users ) )
+			if( ( in_array( $lastname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $has_moderate_access ) )
 			{	// User has a permissions to save Lastname
 				$edited_user_lastname = param( 'edited_user_lastname', 'string', ! $is_api_request || $lastname_editing == 'edited-user-required' ? true : NULL );
 				if( isset( $edited_user_lastname ) || $is_identity_form )
@@ -938,7 +1022,7 @@ class User extends DataObject
 			}
 
 			$nickname_editing = $Settings->get( 'nickname_editing' );
-			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $can_edit_users ) )
+			if( ( in_array( $nickname_editing, $edited_user_perms ) && $this->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_moderate_access ) )
 			{	// User has a permissions to save Nickname
 				$edited_user_nickname = param( 'edited_user_nickname', 'string', ! $is_api_request || $nickname_editing == 'edited-user-required' ? true : NULL );
 				if( isset( $edited_user_nickname ) || $is_identity_form )
@@ -951,13 +1035,11 @@ class User extends DataObject
 				}
 			}
 
-			$gender_editing = $Settings->get( 'registration_require_gender' );
-			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $can_edit_users ) )
-			{
+			if( $this->ID == $current_User->ID || $has_moderate_access )
+			{	// No user latitude setting:
 				$edited_user_gender = param( 'edited_user_gender', 'string' );
 				if( isset( $edited_user_gender ) || $is_identity_form )
 				{
-					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
 					$this->set_from_Request('gender', 'edited_user_gender', true);
 				}
 			}
@@ -971,7 +1053,7 @@ class User extends DataObject
 				$edited_user_ctry_ID = param( 'edited_user_ctry_ID', 'integer', ! $is_api_request || $country_is_required ? true : NULL );
 				if( isset( $edited_user_ctry_ID ) || $is_identity_form )
 				{
-					if( $country_is_required && $can_edit_users && $edited_user_ctry_ID == 0 )
+					if( $country_is_required && $has_moderate_access && $edited_user_ctry_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_ctry_ID', T_('Please select a country').'.', 'note' );
 					}
@@ -989,7 +1071,7 @@ class User extends DataObject
 				$edited_user_rgn_ID = param( 'edited_user_rgn_ID', 'integer', ! $is_api_request || $region_is_required ? true : NULL );
 				if( isset( $edited_user_rgn_ID ) || $is_identity_form  )
 				{
-					if( $region_is_required && $can_edit_users && $edited_user_rgn_ID == 0 )
+					if( $region_is_required && $has_moderate_access && $edited_user_rgn_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_rgn_ID', T_('Please select a region').'.', 'note' );
 					}
@@ -1007,7 +1089,7 @@ class User extends DataObject
 				$edited_user_subrg_ID = param( 'edited_user_subrg_ID', 'integer', ! $is_api_request || $subregion_is_required ? true : NULL );
 				if( isset( $edited_user_subrg_ID ) || $is_identity_form  )
 				{
-					if( $subregion_is_required && $can_edit_users && $edited_user_subrg_ID == 0 )
+					if( $subregion_is_required && $has_moderate_access && $edited_user_subrg_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_subrg_ID', T_('Please select a sub-region').'.', 'note' );
 					}
@@ -1025,7 +1107,7 @@ class User extends DataObject
 				$edited_user_city_ID = param( 'edited_user_city_ID', 'integer', ! $is_api_request || $city_is_required ? true : NULL );
 				if( isset( $edited_user_city_ID ) || $is_identity_form )
 				{
-					if( $city_is_required && $can_edit_users && $edited_user_city_ID == 0 )
+					if( $city_is_required && $has_moderate_access && $edited_user_city_ID == 0 )
 					{ // Display a note message if user can edit all users
 						param_add_message_to_Log( 'edited_user_city_ID', T_('Please select a city').'.', 'note' );
 					}
@@ -1042,7 +1124,8 @@ class User extends DataObject
 			// ---- Organizations / START ----
 			$organizations = param( 'organizations', 'array:string' );
 			$org_roles = param( 'org_roles', 'array:string' );
-			$this->update_organizations( $organizations, $org_roles );
+			$org_priorities = param( 'org_priorities', 'array:string' );
+			$this->update_organizations( $organizations, $org_roles, $org_priorities );
 			// ---- Organizations / END ----
 
 
@@ -1066,6 +1149,11 @@ class User extends DataObject
 					continue;
 				}
 
+				if( ! userfield_is_viewable( $this->ID, $this->userfield_defs[$userfield->uf_ufdf_ID][5], $this->userfield_defs[$userfield->uf_ufdf_ID][0] ) )
+				{	// Current user cannot update the user field:
+					continue;
+				}
+
 				$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw' );
 				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
 				if( $field_type == 'number' )
@@ -1085,7 +1173,7 @@ class User extends DataObject
 
 				if( empty( $uf_val ) && $this->userfield_defs[$userfield->uf_ufdf_ID][2] == 'require' )
 				{	// Display error for empty required field
-					if( $current_User->check_perm( 'users', 'edit' ) )
+					if( $has_full_access )
 					{	// Display a note message if user can edit all users
 						param_add_message_to_Log( 'uf_'.$userfield->uf_ID, sprintf( T_('Please enter a value for the field "%s".'), $this->userfield_defs[$userfield->uf_ufdf_ID][1] ), 'note' );
 					}
@@ -1235,6 +1323,11 @@ class User extends DataObject
 					}
 					foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
 					{
+						if( ! userfield_is_viewable( $this->ID, $this->userfield_defs[$uf_new_id][5], $this->userfield_defs[$uf_new_id][0] ) )
+						{	// Current user cannot add the user field:
+							continue;
+						}
+
 						foreach( $uf_new_vals as $uf_new_val )
 						{
 							if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
@@ -1291,7 +1384,7 @@ class User extends DataObject
 							}
 							elseif( empty( $uf_new_val ) && $this->userfield_defs[$uf_new_id][2] == 'require' )
 							{	// Display error for empty required field & new adding field
-								if( $current_User->check_perm( 'users', 'edit' ) )
+								if( $has_full_access )
 								{	// Display a note message if user can edit all users
 									param_add_message_to_Log( 'uf_'.$uf_type.'['.$uf_new_id.'][]', sprintf( T_('Please enter a value for the field "%s".'), $this->userfield_defs[$uf_new_id][1] ), 'note' );
 								}
@@ -1343,7 +1436,13 @@ class User extends DataObject
 				//   - password change requested by email
 				//   - password has not been set yet(email capture/quick registration)
 
-				if( $request_password_confirmation )
+				if( $is_new_user && param( 'init_pass', 'string' ) == 'user' )
+				{	// Allow to create new user without password from back-office by admin:
+					$this->set( 'pass_driver', 'nopass' );
+					$this->set( 'pass', '' );
+					$this->set( 'salt', '' );
+				}
+				elseif( $request_password_confirmation )
 				{	// Request a password confirmation:
 					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 					{ // We can set password
@@ -1430,7 +1529,7 @@ class User extends DataObject
 
 			// Session timeout
 			$edited_user_timeout_sessions = param( 'edited_user_timeout_sessions', 'string', NULL );
-			if( isset( $edited_user_timeout_sessions ) && ( $current_User->ID == $this->ID  || $current_User->check_perm( 'users', 'edit' ) ) )
+			if( isset( $edited_user_timeout_sessions ) && ( $current_User->ID == $this->ID  || $has_full_access ) )
 			{
 				switch( $edited_user_timeout_sessions )
 				{
@@ -1466,6 +1565,7 @@ class User extends DataObject
 					$subscribe_blog_ID = param( 'subscribe_blog', 'integer', 0 );
 
 					$sub_items    = 1;
+					$sub_items_mod = 0;
 					$sub_comments = 0; // We normally subscribe to new posts only
 
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
@@ -1483,8 +1583,8 @@ class User extends DataObject
 								$sub_comments = 1;
 							}
 
-							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_comments ).' )' );
+							$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+								VALUES ( '.$DB->quote( $subscribe_blog_ID ).', '.$DB->quote( $this->ID ).', '.$DB->quote( $sub_items ).', '.$DB->quote( $sub_items_mod ).', '.$DB->quote( $sub_comments ).' )' );
 
 							$Messages->add( T_('Subscriptions have been changed.'), 'success' );
 						}
@@ -1519,7 +1619,7 @@ class User extends DataObject
 					$UserSettings->set( 'enable_PM', $enable_PM, $this->ID );
 				}
 				$emails_msgform = $Settings->get( 'emails_msgform' );
-				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+				if( ( $emails_msgform == 'userset' ) || ( ( $emails_msgform == 'adminset' ) && $has_full_access ) )
 				{ // enable email option is displayed only if user can set or if admin can set and current User is an administrator
 					$UserSettings->set( 'enable_email', param( 'enable_email', 'integer', 0 ), $this->ID );
 				}
@@ -1533,6 +1633,7 @@ class User extends DataObject
 					$UserSettings->set( 'notify_messages', param( 'edited_user_notify_messages', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_unread_messages', param( 'edited_user_notify_unread_messages', 'integer', 0 ), $this->ID );
 				}
+				$UserSettings->set( 'notify_comment_mentioned', param( 'edited_user_notify_comment_mentioned', 'integer', 0 ), $this->ID );
 				if( $this->check_role( 'post_owner' ) )
 				{ // update 'notify_published_comments' only if user has at least one post or user has right to create new post
 					$UserSettings->set( 'notify_published_comments', param( 'edited_user_notify_publ_comments', 'integer', 0 ), $this->ID );
@@ -1545,23 +1646,34 @@ class User extends DataObject
 					$UserSettings->set( 'notify_spam_cmt_moderation', param( 'edited_user_notify_spam_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
-				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
+				{	// update 'notify_meta_comment_mentioned' ans 'notify_meta_comments' only if edited user has a permission to back-office:
+					$UserSettings->set( 'notify_meta_comment_mentioned', param( 'edited_user_notify_meta_comment_mentioned', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_meta_comments', param( 'edited_user_notify_meta_comments', 'integer', 0 ), $this->ID );
 				}
 				if( $is_comment_moderator )
 				{ // update 'send_cmt_moderation_reminder' only if user is comment moderator at least in one blog
 					$UserSettings->set( 'send_cmt_moderation_reminder', param( 'edited_user_send_cmt_moderation_reminder', 'integer', 0 ), $this->ID );
 				}
+				$UserSettings->set( 'notify_post_mentioned', param( 'edited_user_notify_post_mentioned', 'integer', 0 ), $this->ID );
 				if( $this->check_role( 'post_moderator' ) )
 				{	// update 'notify_post_moderation', 'notify_edit_pst_moderation' and 'send_cmt_moderation_reminder' only if user is post moderator at least in one collection:
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_pst_moderation', param( 'edited_user_notify_edit_pst_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_post_proposed', param( 'edited_user_notify_post_proposed', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
-				if( $current_User->check_perm( 'users', 'edit' ) )
+				if( $this->check_role( 'member' ) )
+				{
+					$UserSettings->set( 'notify_post_assignment', param( 'edited_user_notify_post_assignment', 'integer', 0 ), $this->ID );
+				}
+				if( $has_full_access )
 				{
 					$UserSettings->set( 'send_activation_reminder', param( 'edited_user_send_activation_reminder', 'integer', 0 ), $this->ID );
+				}
+				if( $Settings->get( 'inactive_account_reminder_threshold' ) > 0 )
+				{	// If setting "Trigger after" of cron job "Send reminders about inactive accounts" is selected at least to 1 second:
+					$UserSettings->set( 'send_inactive_reminder', param( 'edited_user_send_inactive_reminder', 'integer', 0 ), $this->ID );
 				}
 
 				if( $this->check_perm( 'users', 'edit' ) )
@@ -1578,14 +1690,16 @@ class User extends DataObject
 					$UserSettings->set( 'notify_cronjob_error', param( 'edited_user_notify_cronjob_error', 'integer', 0 ), $this->ID );
 				}
 
-				if( $current_User->check_perm( 'users', 'edit' ) )
-				{
+				if( $has_full_access && $this->check_perm( 'options', 'view' ) )
+				{	// current User is an administrator and the edited user has a permission to automations:
 					$UserSettings->set( 'notify_automation_owner', param( 'edited_user_notify_automation_owner', 'integer', 0 ), $this->ID );
 				}
 
 				// Newsletters:
 				$newsletter_subscriptions = param( 'edited_user_newsletters', 'array:integer', NULL );
 				$this->set_newsletter_subscriptions( $newsletter_subscriptions );
+				$UserSettings->set( 'notify_list_new_subscriber', param( 'edited_user_notify_list_new_subscriber', 'integer', 0 ), $this->ID );
+				$UserSettings->set( 'notify_list_lost_subscriber', param( 'edited_user_notify_list_lost_subscriber', 'integer', 0 ), $this->ID );
 
 				// Emails limit per day
 				param_integer_range( 'edited_user_notification_email_limit', 0, 999, T_('Notificaiton email limit must be between %d and %d.'), ! $is_api_request );
@@ -1620,10 +1734,11 @@ class User extends DataObject
 							// Get checkbox values:
 							$sub_items    = param( 'sub_items_'.$loop_blog_ID,    'integer', 0 );
 							$sub_comments = param( 'sub_comments_'.$loop_blog_ID, 'integer', 0 );
+							$sub_items_mod = param( 'sub_items_mod_'.$loop_blog_ID, 'integer', 0 );
 
-							if( $sub_items || $sub_comments )
+							if( $sub_items || $sub_comments || $sub_items_mod )
 							{	// We have a subscription for this blog
-								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_comments )";
+								$subscription_values[] = "( $loop_blog_ID, $this->ID, $sub_items, $sub_items_mod, $sub_comments )";
 							}
 							else
 							{	// No subscription here:
@@ -1632,12 +1747,15 @@ class User extends DataObject
 								$Blog = & $BlogCache->get_by_ID( $loop_blog_ID );
 
 								if( $Blog->get( 'advanced_perms' )
-										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) || ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
-										&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
+										     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
+										     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
+										&& $this->check_perm( 'blog_ismember', 'view', false, $loop_blog_ID ) )
 								{
 									$opt_item = $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ? $sub_items : 0;
+									$opt_item_mod = $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ? $sub_items : 0;
 									$opt_comment = $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ? $sub_comments : 0;
-									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_comment )";
+									$opt_out_values[] = "( $loop_blog_ID, $this->ID, $opt_item, $opt_item_mod, $opt_comment )";
 								}
 								else
 								{
@@ -1650,13 +1768,13 @@ class User extends DataObject
 					// Note: we do not check if subscriptions are allowed here, but we check at the time we're about to send something
 					if( count( $subscription_values ) )
 					{	// We need to record values:
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
 													VALUES '.implode( ', ', $subscription_values ) );
 					}
 
 					if( count( $opt_out_values ) )
 					{
-						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
+						$DB->query( 'REPLACE INTO T_subscriptions( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
 													VALUES '.implode( ', ', $opt_out_values ) );
 					}
 
@@ -1674,11 +1792,17 @@ class User extends DataObject
 						$subs_item_IDs = explode( ',', $subs_item_IDs );
 						$opt_out_values = array();
 						$unsubscribed = array();
+
+						// get list of aggregated items:
+						$sub_group_IDs = param( 'item_grp_sub', 'array:string' );
+						$sub_group_IDs = implode( ',', $sub_group_IDs );
+						$sub_group_IDs = explode( ',', $sub_group_IDs );
+
 						foreach( $subs_item_IDs as $loop_item_ID )
 						{
 							$isub_comments = param( 'items_subs_'.$loop_item_ID, 'integer', 0 );
 
-							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
+							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) && !in_array( $loop_item_ID, $sub_group_IDs ) )
 							{ // user wants to unsubscribe from this post notifications
 								$Item = $ItemCache->get_by_ID( $loop_item_ID );
 								$blog_ID = $Item->get_blog_ID();
@@ -1687,7 +1811,7 @@ class User extends DataObject
 								if( $Blog->get( 'advanced_perms' )
 										&& $Blog->get_setting( 'allow_item_subscriptions' )
 										&& $Blog->get_setting( 'opt_out_item_subscription' )
-										&& $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+										&& $this->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
 								{
 									$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
 								}
@@ -1751,7 +1875,7 @@ class User extends DataObject
 		if( $is_preferences_form || ( $is_identity_form && $is_new_user ) )
 		{	// Multiple session
 			$multiple_sessions = $Settings->get( 'multiple_sessions' );
-			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $current_User->check_perm( 'users', 'edit' ) )
+			if( ( $multiple_sessions != 'adminset_default_no' && $multiple_sessions != 'adminset_default_yes' ) || $has_full_access )
 			{
 				$login_multiple_sessions = param( 'edited_user_set_login_multiple_sessions', 'integer' );
 				if( ! $is_api_request || ( $is_api_request && isset( $login_multiple_sessions ) ) )
@@ -1762,6 +1886,70 @@ class User extends DataObject
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Perform various checks on user login
+	 * 
+	 * @return string User login
+	 */
+	function check_login()
+	{
+		global $current_User;
+		global $is_api_request;
+
+		$has_full_access = check_user_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
+
+		// TRUE when we create new user:
+		$is_new_user = ( $this->ID == 0 );
+
+		$edited_user_login = param( 'edited_user_login', 'string', NULL );
+		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
+		{ // login specifically included in API request
+			if( empty( $edited_user_login ) )
+			{	// Empty login
+				param_error( 'edited_user_login', T_('Please enter your login.') );
+			}
+			if( param_check_valid_login( 'edited_user_login' ) )
+			{	// If login is valid
+				global $reserved_logins;
+				if( $edited_user_login != $this->get( 'login' ) &&
+				    ! empty( $reserved_logins ) &&
+				    in_array( $edited_user_login, $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $has_full_access ) )
+				{	// If login has been changed and new entered login is reserved and current User cannot use this:
+					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
+				}
+			}
+		}
+		else
+		{
+			set_param( 'edited_user_login', $this->login );
+			$edited_user_login = $this->login;
+		}
+
+		$UserCache = & get_UserCache();
+		$UserLogin = $UserCache->get_by_login( $edited_user_login );
+		if( $UserLogin && $UserLogin->ID != $this->ID )
+		{	// The login is already registered
+			$login_error_message = T_( 'This login already exists.' );
+			if( $has_full_access )
+			{
+				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
+					$edited_user_login,
+					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
+			}
+			param_error( 'edited_user_login', $login_error_message );
+		}
+
+		if( !param_has_error( 'edited_user_login' ) )
+		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
+		}
+
+		return $edited_user_login;
 	}
 
 
@@ -1830,11 +2018,14 @@ class User extends DataObject
 				'link_class'   => '',
 				'thumb_size'   => 'crop-top-32x32',
 				'thumb_class'  => '',
+				'thumb_zoom'   => false,
+				'thumb_overlay'=> '',
+				'tag_size'     => NULL,
 			), $params );
 
 		if( $params['link_text'] == 'avatar' )
 		{
-			$r = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'] );
+			$r = $this->get_avatar_imgtag( $params['thumb_size'], $params['thumb_class'], '', $params['thumb_zoom'], $params['thumb_overlay'], '', $params['tag_size'] );
 		}
 		else
 		{
@@ -1925,6 +2116,7 @@ class User extends DataObject
 				'avatar_size'  => 'crop-top-15x15',
 				'login_text'   => 'login', // name | login
 				'use_style'    => false, // true - to use attr "style", e.g. on email templates
+				'extra_class'  => '',
 				'protocol'     => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 			), $params );
 
@@ -1956,13 +2148,22 @@ class User extends DataObject
 		$data = array( $login, $avatar );
 
 		$gender_class = $this->get_gender_class();
+		$extra_class = '';
+		if( !empty( $params['extra_class'] ) )
+		{
+			if( !is_array( $params['extra_class']))
+			{
+				$params['extra_class'] = array($params['extra_class']);
+			}
+			$extra_class = ' '.implode( ' ', $params['extra_class'] );
+		}
 		$attr_style = '';
 		if( $params['use_style'] )
 		{ // Use "style"
-			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ) );
+			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ).str_replace( ' ', '+.user.', $extra_class ) );
 		}
 
-		return '<span class="'.trim( $class.' '.$gender_class ).'"'.$attr_style.'>'.str_replace( $mask, $data, $params['mask'] ).'</span>';
+		return '<span class="'.trim( $class.' '.$gender_class.$extra_class ).'"'.$attr_style.'>'.str_replace( $mask, $data, $params['mask'] ).'</span>';
 	}
 
 
@@ -1975,12 +2176,13 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'link_text'      => 'avatar_name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'      => 'avatar_name', // auto| avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_class'     => '', // Class for <a href=""
 				'thumb_size'     => 'crop-top-15x15',
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
-				'login_mask'     => '', // example: 'text $login$ text'
-				'login_class'    => 'identity_link_username',  // No used if login_mask is used
+				'login_mask'     => '', // example: 'text $login$ text'  TODO: replace with template
+				'login_class'    => 'identity_link_username',  // Not used if login_mask is used
 				'display_bubbletip' => true,
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
@@ -2009,68 +2211,73 @@ class User extends DataObject
 			}
 		}
 
-		$link_login = '';
-		$class = empty( $params['link_class'] ) ? '' : $params['link_class'];
+		$linktext = '';
+		$class = $params['link_class'];
+
 		if( $params['link_text'] != 'only_avatar' )
 		{ // Display a login, nickname, firstname, lastname, fullname or preferredname
 			switch( $params['link_text'] )
 			{
+				case 'auto':		// TODO this should be the real auto
 				case 'login':
-				case 'avatar_login':
-					$link_login = $this->login;
+				case 'avatar_login': 
+					$linktext = $this->get_username();  // TODO: auto has been hardcoded into this ! :(
+					break;
+				case 'force_login':		// TODO: we should NOT need a "force" if we correctly use auto the rest of the time!
+				case 'avatar_force_login':
+					$linktext = $this->get( 'login' );
 					break;
 				case 'nickname':
-					$link_login = $this->nickname;
+					$linktext = $this->nickname;
 					break;
 				case 'firstname':
-					$link_login = $this->firstname;
+					$linktext = $this->firstname;
 					break;
 				case 'lastname':
-					$link_login = $this->lastname;
+					$linktext = $this->lastname;
 					break;
 				case 'fullname':
-					$link_login = $this->firstname.' '.$this->lastname;
+					$linktext = $this->firstname.' '.$this->lastname;
 					break;
 				case 'preferredname':
-					$link_login = $this->get_preferred_name();
-					break;
-				case 'auto':
-					$link_login = $this->get_username();
+					$linktext = $this->get_preferred_name();
 					break;
 				// default: 'avatar_name' | 'avatar' | 'name'
 			}
-			$link_login = trim( $link_login );
-			if( empty( $link_login ) )
+			$linktext = trim( $linktext );
+			if( empty( $linktext ) )
 			{ // Use a login or preferred name by default
-				$link_login = $this->get_username();
+				$linktext = $this->get_username();
 			}
+
 			// Add class "login" to detect logins by js plugins
-			$class .= ( $link_login == $this->login ? ' login' : '' );
+			$class .= ( $linktext == $this->login ? ' login' : '' );
+			
 			if( !empty($params['login_mask']) )
 			{ // Apply login mask
-				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
+				$linktext = str_replace( '$login$', $linktext, $params['login_mask'] );
 			}
 			elseif( !empty($params['login_class']) )
 			{
-				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</span>';
+				$linktext = '<span class="'.$params['login_class'].'">'.$linktext.'</span>';
 			}
-		}
+		} // END Not for "only avatar"
 
 		$gender_class = $this->get_gender_class();
 		$attr_style = '';
 		if( $params['use_style'] )
-		{ // Use "style"
+		{ // Use "style" (e-g email template)
 			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ) );
 		}
 		$attr_style = ' class="'.trim( $class.' '.$gender_class.( $params['nowrap'] ? ' nowrap' : '' ) ).'"'.$attr_style;
 
 		if( empty( $identity_url ) )
 		{
-			return '<span'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</span>';
+			return '<span'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$linktext.'</span>';
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</a>';
+		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$linktext.'</a>';
 	}
 
 
@@ -2085,7 +2292,8 @@ class User extends DataObject
 	{
 		if( $this->check_status( 'is_closed' ) && ( !is_admin_page() ) )
 		{ // don't return closed accounts regional information to front office
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		if( is_null($this->$Object) && !empty($this->$ID ) )
@@ -2256,7 +2464,7 @@ class User extends DataObject
 			$SQL->SELECT( 'comment_status, COUNT(*)' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
-			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
+			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback", "webmentions" )' );
 			$SQL->GROUP_BY( 'comment_status' );
 			$this->_num_comments = $DB->get_assoc( $SQL );
 
@@ -2395,13 +2603,111 @@ class User extends DataObject
 	function get_num_edited_posts()
 	{
 		global $DB;
-		global $collections_Module;
 
 		return $DB->get_var( 'SELECT COUNT( DISTINCT( post_ID ) )
 									FROM T_items__item
 									INNER JOIN T_items__version ON post_ID = iver_itm_ID
 									WHERE post_creator_user_ID <> '.$this->ID.' AND
 										( iver_edit_user_ID = '.$this->ID.' OR post_lastedit_user_ID = '.$this->ID.' )' );
+	}
+
+
+	/**
+	 * Get the number of polls owned by this user
+	 *
+	 * @return integer the number of owned polls
+	 */
+	function get_num_polls()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get polls owned by user #'.$this->ID );
+		$SQL->SELECT( 'COUNT( pqst_ID )' );
+		$SQL->FROM( 'T_polls__question' );
+		$SQL->WHERE( 'pqst_owner_user_ID = '.$this->ID );
+
+		return $DB->get_var( $SQL );
+	}
+
+
+	/**
+	 * Get a number of emails sent to this User
+	 *
+	 * @return integer
+	 */
+	function get_num_sent_emails()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of emails sent to the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emlog_ID )' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_user_ID = '.$this->ID );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all emails sent to the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_sent_emails()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__log
+			WHERE emlog_user_ID = '.$this->ID );
+	}
+
+
+	/**
+	 * Get a number of email returns from this User's email address
+	 *
+	 * @return integer
+	 */
+	function get_num_email_returns()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		$SQL = new SQL( 'Get a number of email returns from email address of the User #'.$this->ID );
+		$SQL->SELECT( 'COUNT( emret_ID )' );
+		$SQL->FROM( 'T_email__returns' );
+		$SQL->WHERE( 'emret_address = '.$DB->quote( $this->get( 'email' ) ) );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Delete all email returns from the user's email address
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_email_returns()
+	{
+		global $DB;
+
+		return $DB->query( 'DELETE
+			 FROM T_email__returns
+			WHERE emret_address = '.$DB->quote( $this->get( 'email' ) ) );
 	}
 
 
@@ -2434,7 +2740,7 @@ class User extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) )
-							.get_manual_link('directory_creation_error'), 'error' );
+							.get_manual_link('directory-creation-error'), 'error' );
 				}
 				return false;
 			}
@@ -2443,7 +2749,7 @@ class User extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) )
-							.get_manual_link('directory_creation_error'), 'error' );
+							.get_manual_link('directory-creation-error'), 'error' );
 				}
 				return false;
 			}
@@ -2492,7 +2798,7 @@ class User extends DataObject
 	 */
 	function get_media_subpath()
 	{
-		if( is_valid_login( $this->login, true ) )
+		if( is_valid_login( $this->login, true ) === true )
 		{	// Valid ASCII login, use it as is
 			return 'users/'.$this->login.'/';
 		}
@@ -2560,7 +2866,7 @@ class User extends DataObject
 			}
 			else
 			{ // Use an user page if url is not defined
-				return url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+				return $current_Blog->get( 'userurl', array( 'user_ID' => $this->ID, 'user_login' => $this->login ) );
 			}
 		}
 		else
@@ -2575,7 +2881,7 @@ class User extends DataObject
 				}
 				elseif( $Settings->get( 'allow_anonymous_user_profiles' ) )
 				{ // Use an user page if url is not defined and this is enabled by setting for anonymous users
-					return url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$this->ID );
+					return $current_Blog->get( 'userurl', array( 'user_ID' => $this->ID, 'user_login' => $this->login ) );
 				}
 			}
 		}
@@ -2587,30 +2893,29 @@ class User extends DataObject
 	/**
 	 * Get url visits url
 	 *
+	 * @param integer Collection ID
 	 * @return string
 	 */
-	function get_visits_url( )
+	function get_visits_url( $blog_ID = NULL )
 	{
-		global $Settings;
-
 		if( ! empty( $blog_ID ) )
-		{ // Use blog from param by ID
+		{	// Use collection from param by ID:
 			$BlogCache = & get_BlogCache();
-			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$url_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 
-		if( empty( $current_Blog ) )
-		{ // Use current blog
+		if( empty( $url_Blog ) )
+		{	// Use current collection:
 			global $Collection, $Blog;
-			$current_Blog = & $Blog;
+			$url_Blog = & $Blog;
 		}
 
-		if( empty( $current_Blog ) || empty( $Settings ) )
-		{ // Wrong request
+		if( empty( $url_Blog ) )
+		{	// Wrong request:
 			return NULL;
 		}
 
-		return url_add_param( $current_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
+		return url_add_param( $url_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
 	}
 
 
@@ -2661,8 +2966,12 @@ class User extends DataObject
 	{
 		$params = array_merge( array(
 				'target' => '_blank',
-				'rel'    => 'nofollow'
+				'rel'    => 'nofollow',
+				'class'  => '',
 			), $params );
+
+		// Add style class to break long urls:
+		$params['class'] = trim( $params['class'].' linebreak' );
 
 		$link = '<a href="'.$this->get_field_url().'"'.get_field_attribs_as_string( $params, false ).'>'.$this->get_field_url().'</a>';
 
@@ -2694,6 +3003,13 @@ class User extends DataObject
 			case 'source':
 				// Limit source with 30 char because of this DB field max length:
 				return $this->set_param( $parname, 'string', utf8_substr( $parvalue, 0, 30 ), $make_null );
+
+			case 'status':
+				// We need to set a reminder here to later check if the new status is allowed at dbinsert or dbupdate time ( $this->restrict_status( true ) )
+				// We cannot check immediately because we may be setting the status before having set a main cat_ID -> a collection ID to check the status possibilities
+				// Save previous status as a reminder (it can be useful to compare later. The Comment class uses this).
+				$this->previous_status = $this->get( 'status' );
+				return parent::set( 'status', $parvalue, $make_null );
 
 			case 'ctry_ID':
 			default:
@@ -2983,7 +3299,10 @@ class User extends DataObject
 			// Permissions on a collection:
 			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
-			case 'blog_can_be_assignee':
+			case 'blog_workflow_status':
+			case 'blog_workflow_user':
+			case 'blog_workflow_priority':
+			case 'blog_item_propose':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
 			case 'blog_post!community':
@@ -3035,6 +3354,10 @@ class User extends DataObject
 					break;
 				}
 
+			case 'blog_can_be_assignee':
+				// Apply next rules below for above collection permissions if current User is not admin or not owner of the Collection:
+				// NOTE: The permission "Workflow Member (Items can be assigned to this User/Group)" may be disabled even for admin!
+
 				if( $perm_target_ID > 0 )
 				{	// Check the permissions below only for requested target collection:
 
@@ -3049,6 +3372,24 @@ class User extends DataObject
 					if( $this->check_perm_blogusers( $permname, $permlevel, $perm_target_ID ) )
 					{	// Advanced user permissions on the target collection grant the requested permission:
 						$perm = true;
+						// Stop checking other perms:
+						break;
+					}
+
+					if( $permname == 'blog_properties' && $permlevel == 'copy' )
+					{	// Check if user can copy the selected collection:
+						$BlogCache = & get_BlogCache();
+						if( $perm_Blog = & $BlogCache->get_by_ID( $perm_target_ID, false, false ) )
+						{
+							if( $this->check_perm( 'blogs', 'create', $assert, $perm_Blog->get( 'sec_ID' ) ) )
+							{	// If user can create new collection in section of the duplicating collection:
+								if( $perm_Blog->get_setting( 'allow_duplicate' ) ||
+								    $this->check_perm( 'blog_properties', 'edit', false, $perm_Blog->ID ) )
+								{	// If the collection is allowed to duplicate by anyone OR user can edit the duplicating collection:
+									$perm = true;
+								}
+							}
+						}
 					}
 				}
 
@@ -3078,7 +3419,7 @@ class User extends DataObject
 				$check_status = substr( $permname, 8 );
 
 				if( $Comment->is_meta() && in_array( $permlevel, array( 'edit', 'moderate', 'delete' ) ) )
-				{ // Check the permissions for meta comment with special function
+				{ // Check the permissions for internal comment with special function
 					$perm = $this->check_perm( 'meta_comment', $permlevel, false, $Comment );
 					break;
 				}
@@ -3127,7 +3468,7 @@ class User extends DataObject
 				break;
 
 			case 'meta_comment':
-				// Check permission for meta comment:
+				// Check permission for internal comment:
 
 				if( $permlevel == 'edit' || $permlevel == 'delete' )
 				{	// Set Comment from target object:
@@ -3145,7 +3486,7 @@ class User extends DataObject
 					$blog_ID = $perm_target_ID;
 				}
 				else
-				{	// Permission level is not allowed for all meta comments (For example 'moderate')
+				{	// Permission level is not allowed for all internal comments (For example 'moderate')
 					$perm = false;
 					break;
 				}
@@ -3166,7 +3507,7 @@ class User extends DataObject
 				{
 					case 'view':
 					case 'blog': // deprecated perm level
-						// Check perms to View meta comments of the collection:
+						// Check perms to View internal comments of the collection:
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'view', $blog_ID )
 								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
@@ -3174,26 +3515,24 @@ class User extends DataObject
 						break;
 
 					case 'add':
-						// Check perms to Add meta comments to the collection items:
-						$perm = // If User can access to back-office
-								$this->check_perm( 'admin', 'restricted' )
-								// AND if user can view meta comment of the collection
-								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
+						// Check perms to Add internal comments to the collection items:
+						$perm = // If User can view internal comment of the collection
+								$this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 
 					case 'edit':
-						// Check perms to Edit meta comment:
+						// Check perms to Edit internal comment:
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
 								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
-								|| $this->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment );
+								|| $this->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment, $this );
 						break;
 
 					case 'delete':
-						// Check perms to Delete meta comments:
+						// Check perms to Delete internal comments:
 						$perm = // If it is allowed to delete comments on the collection
 								$this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID )
-								// AND if user can view meta comment of the collection
+								// AND if user can view internal comment of the collection
 								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 				}
@@ -3265,7 +3604,7 @@ class User extends DataObject
 				// Blog permission to edit its properties...
 				$this->get_Group();
 
-				// Group may grant VIEW acces, FULL access:
+				// Group may grant VIEW access, FULL access:
 				if( $this->Group->check_perm( $permname, $permlevel, $perm_target ) )
 				{ // If group grants a global permission:
 					$perm = true;
@@ -3409,7 +3748,7 @@ class User extends DataObject
 
 					// Other global permissions (see if the group can handle them).
 					// Forward request to group:
-					$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target );
+					$perm = $this->Group->check_perm( $permname, $permlevel, $perm_target, $this );
 				}
 		}
 
@@ -3522,6 +3861,9 @@ class User extends DataObject
 	 * @param string Permission name, can be one of the following:
 	 *                  - blog_ismember
 	 *                  - blog_can_be_assignee
+	 *                  - blog_workflow_status
+	 *                  - blog_workflow_user
+	 *                  - blog_workflow_priority
 	 *                  - blog_post_statuses
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts
@@ -3635,13 +3977,13 @@ class User extends DataObject
 				{ // even anonymous users can see users profile, or user wants to check his own profile
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_users':
 				if( $Settings->get( 'allow_anonymous_user_list' ) )
 				{ // even anonymous users can see users list
 					return true;
 				}
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_view_comments':
 			case 'can_view_contacts':
 			case 'can_view_messages':
@@ -3651,18 +3993,18 @@ class User extends DataObject
 			case 'can_edit_post':
 			case 'can_edit_comment':
 			case 'can_edit_contacts':
-				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) );
+				return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) );
 			case 'can_report_user':
 				if( ! empty( $target ) )
 				{
 					$UserCache = & get_UserCache();
 					$target_User = & $UserCache->get_by_ID( $target );
-					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) )
+					return ( ( $this->status == 'activated' ) || ( $this->status == 'autoactivated' ) || ( $this->status == 'manualactivated' ) )
 							&& ( ! empty( $target_User ) && ( $target_User->get( 'level' ) <= $this->get( 'level' ) ) );
 				}
 				return false;
 			case 'can_be_validated':
-				return ( ( $this->status == 'new' ) || ( $this->status == 'emailchanged' ) || ( $this->status == 'deactivated' ) || ( $this->status == 'failedactivation' ) );
+				return in_array( $this->status, array( 'new', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete' ) );
 			case 'can_view_msgform':
 			case 'can_receive_any_message': // can this user receive emails or private messages
 			case 'can_receive_pm':
@@ -3957,6 +4299,9 @@ class User extends DataObject
 		if( $result = parent::dbinsert() )
 		{ // We could insert the user object..
 
+			// Save secondary groups:
+			$this->update_secondary_groups();
+
 			// Add new fields:
 			if( !empty($this->new_fields) )
 			{
@@ -4000,6 +4345,7 @@ class User extends DataObject
 				// TODO: sam2kb> Create a blog only when this user is validated!
 				$new_Blog = new Blog( NULL );
 				$shortname = $this->get( 'login' );
+				$new_Blog->set( 'sec_ID', $Group->get_setting( 'perm_default_sec_ID' ) );
 				$new_Blog->set( 'owner_user_ID', $this->ID );
 				$new_Blog->set( 'shortname', $shortname );
 				$new_Blog->set( 'name', $shortname.'\'s blog' );
@@ -4036,11 +4382,14 @@ class User extends DataObject
 	 */
 	function dbupdate()
 	{
-		global $DB, $Plugins, $current_User, $localtimenow;
+		global $DB, $Plugins, $localtimenow;
 
 		$DB->begin();
 
 		$result = parent::dbupdate();
+
+		// Save secondary groups:
+		$this->update_secondary_groups();
 
 		// Update existing fields:
 		if( !empty($this->updated_fields) )
@@ -4093,6 +4442,13 @@ class User extends DataObject
 		// Example: An authentication plugin could synchronize/update the password of the user.
 		$Plugins->trigger_event( 'AfterUserUpdate', $params = array( 'User' => & $this ) );
 
+		if( isset( $this->previous_status ) &&
+		    ! in_array( $this->previous_status, array( 'activated', 'manualactivated', 'autoactivated' ) ) &&
+		    in_array( $this->get( 'status' ), array( 'activated', 'manualactivated', 'autoactivated' ) ) )
+		{	// Complete activation if user has been activated:
+			$this->complete_activation();
+		}
+
 		$DB->commit();
 
 		// BLOCK CACHE INVALIDATION:
@@ -4107,13 +4463,12 @@ class User extends DataObject
 	 * Delete those users from the database which corresponds to the given condition or to the given ids array
 	 * Note: the delete cascade arrays are handled!
 	 *
-	 * @param string the name of this class
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
+	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB;
 
@@ -4150,7 +4505,7 @@ class User extends DataObject
 		if( $result )
 		{ // Delete the user(s) with all of the cascade objects
 			$params['use_transaction'] = false; // no need to start a new transaction
-			$result = parent::db_delete_where( $class_name, $sql_where, $object_ids, $params );
+			$result = parent::db_delete_where( $sql_where, $object_ids, $params );
 		}
 
 		if( $result !== false )
@@ -4180,20 +4535,33 @@ class User extends DataObject
 	 */
 	function dbdelete( & $Log = array() )
 	{
-		global $DB, $Plugins;
+		global $DB, $Plugins, $current_User;
 
 		if( $this->ID == 0 ) debug_die( 'Non persistant object cannot be deleted!' );
 
+		if( $this->ID == 1 ||
+		    ( is_logged_in() && $this->ID == $current_User->ID ) )
+		{	// Don't allow to delete first admin user and current logged in user:
+			return false;
+		}
+
 		$deltype = param( 'deltype', 'string', '' ); // spammer
+
+		// Check to delete additional data if we are deleting user as spammer or it is checked on the submitted form:
+		$delete_messages = ( $deltype == 'spammer' || param( 'force_delete_messages', 'integer', 0 ) );
+		$delete_comments = ( $deltype == 'spammer' || param( 'force_delete_comments', 'integer', 0 ) );
+		$delete_files    = ( $deltype == 'spammer' || param( 'force_delete_files', 'integer', 0 ) );
 
 		$DB->begin();
 
-		if( $deltype == 'spammer' )
-		{ // If we delete user as spammer we should delete private messaged of this user
-			$this->init_relations( true );
-		}
-		else
-		{ // If we delete user as not spammer we keep his comments as from anonymous user
+		$this->init_relations( array(
+				'delete_messages' => $delete_messages,
+				'delete_comments' => $delete_comments,
+				'delete_files'    => $delete_files,
+			) );
+
+		if( ! $delete_comments )
+		{	// Keep user's comments as from anonymous user,
 			// Transform registered user comments to unregistered:
 			$ret = $DB->query( 'UPDATE T_comments
 													SET comment_author_user_ID = NULL,
@@ -4207,11 +4575,14 @@ class User extends DataObject
 			}
 		}
 
-		if( $deltype != 'spammer' )
-		{
+		if( ! $delete_files )
+		{	// Keep user's files as from anonymous user:
 			$ret = $DB->query( 'UPDATE T_files
-			                    SET file_creator_user_ID = NULL
-								WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+				  SET file_creator_user_ID = NULL
+				WHERE file_creator_user_ID = '.$this->ID. ' AND file_root_type != "user"' );
+			$ret = $DB->query( 'UPDATE T_links
+				  SET link_creator_user_ID = NULL
+				WHERE link_creator_user_ID = '.$this->ID );
 			if( $Log instanceof log )
 			{
 				$Log->add( 'Setting user\'s uploaded files creator ID to NULL...'.sprintf( '(%d rows)', $ret ), 'note' );
@@ -4282,6 +4653,15 @@ class User extends DataObject
 		global $app_name, $Session, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
 
+		if( ! empty( $this->welcome_activate_email_campaign_sent ) )
+		{	// This flag means we don't need to send a separate activation email
+			// because at least one special(Welcome-Activate) email campaign was sent
+			// on auto newsletter subscribing before calling this function.
+			// Return TRUE in order to display the same info messages what user sees on normal activation,
+			// because Welcome-Activate email campaign may contains button/link to activate user account:
+			return true;
+		}
+
 		// Display messages depending on user email status
 		display_user_email_status_message( $this->ID );
 
@@ -4324,7 +4704,7 @@ class User extends DataObject
 				'blog_param' => $blog_param,
 				'request_id' => $request_id,
 			);
-		$r = send_mail_to_User( $this->ID, T_('Activate your account: $login$'), 'account_activate', $email_template_params, true );
+		$r = send_mail_to_User( $this->ID, sprintf( T_( 'Activate your account: %s' ), '$login$' ), 'account_activate', $email_template_params, true );
 		locale_restore_previous();
 
 		if( $r )
@@ -4354,13 +4734,26 @@ class User extends DataObject
 	 */
 	function activate_from_Request()
 	{
-		global $DB, $Settings, $UserSettings;
-
 		// Activate current user account:
 		$this->set( 'status', 'activated' );
 		$this->dbupdate();
+	}
 
-		// clear last reminder key and last activation email date because the user was activated
+
+	/**
+	 * Do actions to complete activation for this user account
+	 */
+	function complete_activation()
+	{
+		global $DB, $Settings, $UserSettings, $current_User;
+
+		if( empty( $UserSettings ) )
+		{	// initialize UserSettings:
+			load_class( 'users/model/_usersettings.class.php', 'UserSettings' );
+			$UserSettings = new UserSettings();
+		}
+
+		// Clear last reminder key and last activation email date because the user was activated:
 		$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
 		$UserSettings->delete( 'last_activation_email', $this->ID );
 		$UserSettings->delete( 'activation_reminder_count', $this->ID );
@@ -4368,23 +4761,32 @@ class User extends DataObject
 		$UserSettings->dbupdate();
 
 		if( $Settings->get( 'newusers_findcomments' ) )
-		{	// We have to assign the all old comments from current user by email
-			$DB->query( '
-				UPDATE T_comments
-				   SET comment_author_user_ID = "'.$this->ID.'"
+		{	// We have to assign the all old comments from current user by email:
+			$DB->query( 'UPDATE T_comments
+				   SET comment_author_user_ID = '.$DB->quote( $this->ID ).'
 				 WHERE comment_author_email = '.$DB->quote( $this->email ).'
-				   AND comment_author_user_ID IS NULL' );
+				   AND comment_author_user_ID IS NULL',
+				'Assign anonymous comments to register user after activation' );
+			// Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments:
+			$SQL = new SQL();
+			$SQL->SELECT( 'DISTINCT comment_item_ID, comment_author_user_ID, 1' );
+			$SQL->FROM( 'T_comments' );
+			$SQL->WHERE( 'comment_author_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'comment_anon_notify = 1' );
+			$DB->query( 'REPLACE INTO T_items__subscriptions ( isub_item_ID, isub_user_ID, isub_comments ) '.$SQL->get(),
+				'Subscribe user to posts where he selected "Notify me of replies" on creating those anonymous comments' );
 		}
 
-		// Create a welcome private message when user's status was changed to Active
+		// Create a welcome private message when user's status was changed to Active:
 		$this->send_welcome_message();
 
-		// Send notification email about activated account to users with edit users permission
-		$email_template_params = array(
-			'User' => $this,
-			'login' => $this->login, // this is required in the send_admin_notification
-		);
-		send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
+		// Send notification email about activated account to users with edit users permission:
+		send_admin_notification( NT_('New user account activated'), 'account_activated', array(
+				'User' => $this,
+				'login' => $this->login, // this is required in the send_admin_notification
+				// If admin activated some other user account:
+				'activated_by_admin' => ( is_logged_in() && $current_User->ID != $this->ID ? $current_User->get_username() : '' ),
+			) );
 	}
 
 
@@ -4439,7 +4841,16 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
+		if( param( 'redirect_to', 'url', NULL ) !== NULL )
+		{	// Use current redirect URL:
+			$redirect_to = get_param( 'redirect_to' );
+		}
+		else
+		{	// Generate new redirect URL:
+			$redirect_to = regenerate_url( '', '', '', '&' );
+		}
+
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $form_url ) ) );
 
 		if( $title == '#' )
 		{
@@ -4762,8 +5173,6 @@ class User extends DataObject
 	 */
 	function get_avatar_imgtag( $size = 'crop-top-64x64', $class = 'avatar', $align = '', $zoomable = false, $avatar_overlay_text = '', $lightbox_group = '', $tag_size = NULL, $protocol = '' )
 	{
-		global $current_User;
-
 		/**
 		 * @var Link
 		 */
@@ -4782,7 +5191,7 @@ class User extends DataObject
 				) );
 		}
 
-		if( ( !$this->check_status( 'can_display_avatar' ) ) && !( is_admin_page() && is_logged_in( false ) && ( $current_User->check_perm( 'users', 'edit' ) ) ) )
+		if( ! $this->check_status( 'can_display_avatar' ) && ! ( is_admin_page() && check_user_perm( 'users', 'edit', false, NULL, false ) ) )
 		{ // if the user status doesn't allow to display avatar and current User is not an admin in admin interface, then show default avatar
 			return get_avatar_imgtag_default( $size, $class, $align, array(
 					'email'    => $this->get( 'email' ),
@@ -4812,7 +5221,7 @@ class User extends DataObject
 						'after_image_legend'  => '',
 						'after_image'         => '',
 						'image_size'          => $size,
-						'image_link_title'    => $this->login,
+						'image_link_title'    => $this->get_username(),
 						'image_link_rel'      => $link_rel,
 						'image_class'         => $class,
 						'image_align'         => $align,
@@ -4825,7 +5234,7 @@ class User extends DataObject
 				$redirect_to = '';
 				if( isset( $Blog ) )
 				{ // Redirect user after login
-					$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&', 'url_suffix' => 'user_ID='.$this->ID ) );
+					$redirect_to = $Blog->get( 'userurl', array( 'user_ID' => $this->ID, 'user_login' => $this->login ) );
 				}
 				$r = '<a href="'.get_login_url( 'cannot see avatar', $redirect_to ) .'">'.$File->get_thumb_imgtag( $size, $class, $align, '', $tag_size ).'</a>';
 			}
@@ -5016,7 +5425,7 @@ class User extends DataObject
 	{
 		global $DB;
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get values of user fields by type "'.$field_type.'" for User #'.$this->ID );
 		$SQL->SELECT( 'uf_varchar, ufdf_ID, ufdf_icon_name, ufdf_code' );
 		$SQL->FROM( 'T_users__fields' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
@@ -5028,7 +5437,7 @@ class User extends DataObject
 		}
 		$SQL->ORDER_BY( 'ufdf_order' );
 
-		return $DB->get_results( $SQL->get() );
+		return $DB->get_results( $SQL );
 	}
 
 
@@ -5134,18 +5543,25 @@ class User extends DataObject
 
 		global $DB;
 
-		$userfields = $DB->get_results( '
-			SELECT uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name
-				FROM T_users__fields
-					INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
-					INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
-			WHERE uf_user_ID = '.$this->ID.'
-				AND ufdf_required != "hidden"
-			ORDER BY ufgp_order, ufdf_order, uf_ID' );
+		$SQL = new SQL( 'Load values of user fields for User #'.$this->ID );
+		$SQL->SELECT( 'uf_ID, uf_varchar, ufgp_ID, ufgp_name, T_users__fielddefs.*' );
+		$SQL->FROM( 'T_users__fields' );
+		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID' );
+		$SQL->WHERE( 'uf_user_ID = '.$this->ID );
+		$SQL->WHERE_and( 'ufdf_required != "hidden"' );
+		$SQL->ORDER_BY( 'ufgp_order, ufdf_order, uf_ID' );
+		$userfields = $DB->get_results( $SQL );
 
 		$userfield_lists = array();
-		foreach( $userfields as $userfield )
+		foreach( $userfields as $u => $userfield )
 		{
+			if( ! userfield_is_viewable( $this->ID, $userfield->ufdf_visibility, $userfield->ufdf_type ) )
+			{	// Current user cannot view this user field:
+				unset( $userfields[ $u ] );
+				continue;
+			}
+
 			if( $userfield->ufdf_duplicated == 'list' )
 			{ // Prepare a values of list into one array
 				if( !isset( $userfield_lists[$userfield->ufdf_ID] ) )
@@ -5194,11 +5610,12 @@ class User extends DataObject
 	{
 		global $DB;
 
-		if( !isset($this->userfield_defs) )
+		if( ! isset( $this->userfield_defs ) )
 		{
-			$userfield_defs = $DB->get_results( '
-				SELECT ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated
-					FROM T_users__fielddefs' );
+			$SQL = new SQL( 'Load user field definitions' );
+			$SQL->SELECT( 'ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated, ufdf_visibility' );
+			$SQL->FROM( 'T_users__fielddefs' );
+			$userfield_defs = $DB->get_results( $SQL );
 
 			foreach( $userfield_defs as $userfield_def )
 			{
@@ -5207,7 +5624,8 @@ class User extends DataObject
 					$userfield_def->ufdf_name,
 					$userfield_def->ufdf_required,
 					$userfield_def->ufdf_options,
-					$userfield_def->ufdf_duplicated
+					$userfield_def->ufdf_duplicated,
+					$userfield_def->ufdf_visibility,
 				); //jamesz
 			}
 		}
@@ -5311,6 +5729,22 @@ class User extends DataObject
 			$update_success = true;
 			if( $is_new_user )
 			{
+				// Find and inform administrator about other users with same email address on creating new user from back-office:
+				$SQL = new SQL( 'Find other users with same email as new created user' );
+				$SQL->SELECT( 'user_login' );
+				$SQL->FROM( 'T_users' );
+				$SQL->WHERE( 'user_email = '.$DB->quote( $this->get( 'email' ) ) );
+				$SQL->WHERE_and( 'user_ID != '.$DB->quote( $this->ID ) );
+				$same_email_logins = $DB->get_col( $SQL );
+				if( ! empty( $same_email_logins ) )
+				{	// If at least one user exists with same email address:
+					foreach( $same_email_logins as $l => $same_email_login )
+					{	// Display a login as link to account profile page:
+						$same_email_logins[ $l ] = get_user_identity_link( $same_email_login );
+					}
+					$Messages->add( sprintf( T_('WARNING: the user was created but it shares the same email address as: %s.'), implode( ', ', $same_email_logins ) ), 'warning' );
+				}
+
 				$Messages->add( T_('New user has been created.'), 'success' );
 				report_user_create( $this );
 			}
@@ -5366,6 +5800,9 @@ class User extends DataObject
 			{ // Send notification email about the changes of user account
 				$this->send_account_changed_notification();
 			}
+
+			// Send notification to owners of lists where user is subscribed/unsubscribed:
+			$this->send_list_owner_notifications();
 		}
 		elseif( $is_new_user )
 		{	// Some error on inserting new user in DB:
@@ -5395,7 +5832,7 @@ class User extends DataObject
 			}
 			else
 			{ // validation process is easy, send email with permanent activation link
-				if( $this->send_validate_email( NULL, $blog, ( $user_old_email != $this->email ) ) )
+				if( $this->send_validate_email( NULL, $blog, !$is_new_user && ( $user_old_email != $this->email ) ) ) // $is_new_user check added to prevent regeneration of $reminder_key when creating new user accounts with welcome campaign email
 				{
 					if( $current_User->ID == $this->ID )
 					{
@@ -5486,6 +5923,10 @@ class User extends DataObject
 				$clear_sessions_query = 'UPDATE T_sessions
 									SET sess_key = NULL
 									WHERE sess_user_ID = '.$DB->quote( $this->ID );
+				// unsubscribe user from all lists:
+				$subscribed_newletter_IDs = $this->get_newsletter_subscriptions( 'subscribed' );
+				$this->unsubscribe( $subscribed_newletter_IDs, array( 'user_account_closed' => true ) );
+
 				if( $dbsave && $this->dbupdate() && $UserSettings->dbupdate() && ( $DB->query( $clear_sessions_query ) !== false ) )
 				{ // all db modification was successful
 					$DB->commit();
@@ -5502,24 +5943,15 @@ class User extends DataObject
 							);
 						send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 					}
+
+					// Send notification to owners of list where user was automatically unsubscribed:
+					$this->send_list_owner_notifications( 'unsubscribe' );
+
 					return true;
 				}
 			}
 			else
 			{
-				$new_status_is_active = ( $new_status == 'activated' || $new_status == 'autoactivated' );
-				$old_status_is_not_active = false;
-				if( $this->check_status( 'can_be_validated' ) && $new_status_is_active )
-				{ // User was activated
-					$old_status_is_not_active = true;
-					// clear activation specific settings
-					$UserSettings->delete( 'last_activation_reminder_key', $this->ID );
-					$UserSettings->delete( 'last_activation_email', $this->ID );
-					$UserSettings->delete( 'activation_reminder_count', $this->ID );
-					$UserSettings->delete( 'send_activation_reminder', $this->ID );
-				}
-				$old_status_is_not_active = ( $old_status_is_not_active || $this->check_status( 'is_closed' ) );
-
 				// set status
 				$this->set( 'status', $new_status );
 				$UserSettings->set( 'account_close_reason', $account_close_reason, $this->ID );
@@ -5527,21 +5959,6 @@ class User extends DataObject
 				{ // db update
 					$UserSettings->dbupdate();
 					$DB->commit();
-					if( $old_status_is_not_active && $new_status_is_active )
-					{ // User was activated, create a welcome private message
-						$this->send_welcome_message();
-
-						if( $current_User->ID != $this->ID )
-						{	// If admin activated some user account
-							// Send notification email about activated account to users with edit users permission
-							$email_template_params = array(
-								'User' => $this,
-								'login' => $this->login, // this is required in the send_admin_notification
-								'activated_by_admin' => $current_User->get_username(),
-							);
-							send_admin_notification( NT_('New user account activated'), 'account_activated', $email_template_params );
-						}
-					}
 					return true;
 				}
 			}
@@ -6062,17 +6479,26 @@ class User extends DataObject
 		global $Settings, $UserSettings;
 
 		if( !$Settings->get( 'welcomepm_enabled' ) )
-		{ // Sending of welcome PM is disabled
+		{	// Sending of welcome PM is disabled
 			return false;
 		}
 
+		if( $Settings->get( 'welcomepm_notag' ) )
+		{	// Don't send welcome PM if user account already has an user tag:
+			$user_tags = $this->get_usertags();
+			if( ! empty( $user_tags ) )
+			{
+				return false;
+			}
+		}
+
 		if( $UserSettings->get( 'welcome_message_sent', $this->ID ) )
-		{ // User already received the welcome message
+		{	// User already received the welcome message
 			return false;
 		}
 
 		if( !$this->accepts_pm() )
-		{ // user can't read private messages, or doesn't want to receive private messages
+		{	// user can't read private messages, or doesn't want to receive private messages
 			return false;
 		}
 
@@ -6080,7 +6506,7 @@ class User extends DataObject
 		$UserCache = & get_UserCache();
 		$User = $UserCache->get_by_login( $Settings->get( 'welcomepm_from' ) );
 		if( !$User )
-		{ // Don't send an welcome email if sender login is incorrect
+		{	// Don't send an welcome email if sender login is incorrect
 			return false;
 		}
 
@@ -6097,7 +6523,7 @@ class User extends DataObject
 		$edited_Message->creator_user_ID = $User->ID;
 		$edited_Message->set( 'text', $Settings->get( 'welcomepm_message' ) );
 		if( $edited_Message->dbinsert_individual( $User ) )
-		{ // The welcome message was sent/created successfully
+		{	// The welcome message was sent/created successfully
 			// Change user setting to TRUE in order to don't send it twice
 			$UserSettings->set( 'welcome_message_sent', 1, $this->ID );
 			$UserSettings->dbupdate();
@@ -6134,7 +6560,7 @@ class User extends DataObject
 	 */
 	function get_deleted_blogs()
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		// Get all own blogs of the edited user
 		$BlogCache = & get_BlogCache();
@@ -6144,7 +6570,7 @@ class User extends DataObject
 		$deleted_Blogs = array();
 		foreach( $user_Blogs as $user_Blog )
 		{
-			if( $current_User->check_perm( 'blog_properties', 'edit', false, $user_Blog->ID ) )
+			if( check_user_perm( 'blog_properties', 'edit', false, $user_Blog->ID ) )
 			{	// Current user has a permission to delete this blog
 				$deleted_Blogs[] = $user_Blog;
 			}
@@ -6161,7 +6587,7 @@ class User extends DataObject
 	 */
 	function delete_blogs()
 	{
-		global $DB, $UserSettings, $current_User;
+		global $DB, $UserSettings;
 
 		$DB->begin();
 
@@ -6195,7 +6621,7 @@ class User extends DataObject
 	 */
 	function get_deleted_posts( $type, $check_perm = true )
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		$ItemCache = & get_ItemCache();
 		$ItemCache->ID_array = array();
@@ -6217,7 +6643,7 @@ class User extends DataObject
 		$deleted_Items = array();
 		foreach( $user_Items as $user_Item )
 		{
-			if( ( ! $check_perm ) || $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $user_Item ) )
+			if( ( ! $check_perm ) || check_user_perm( 'item_post!CURSTATUS', 'delete', false, $user_Item ) )
 			{	// Current user has a permission to delete this item
 				$deleted_Items[] = $user_Item;
 			}
@@ -6428,7 +6854,7 @@ class User extends DataObject
 		foreach( $comments_IDs as $comment_ID )
 		{
 			if( ( $user_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false ) ) &&
-				  $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $user_Comment ) )
+				  check_user_perm( 'comment!CURSTATUS', 'delete', false, $user_Comment ) )
 			{ // Current user has a permission to delete this comment
 				return true;
 			}
@@ -6474,7 +6900,7 @@ class User extends DataObject
 			$deleted_Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
 			if( $deleted_Comment &&
 			    ( $current_user_can_moderate ||
-			      $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $deleted_Comment ) ) )
+			      check_user_perm( 'comment!CURSTATUS', 'delete', false, $deleted_Comment ) ) )
 			{ // Current user has a permission to delete this comment
 				// Delete from DB
 				$result = $deleted_Comment->dbdelete( true, false );
@@ -6504,9 +6930,10 @@ class User extends DataObject
 	/**
 	 * Delete private messaged of the user
 	 *
+	 * @param string Type ( sent | received )
 	 * @return boolean True on success
 	 */
-	function delete_messages()
+	function delete_messages( $type = 'sent' )
 	{
 		global $DB, $Plugins, $current_User;
 
@@ -6514,33 +6941,93 @@ class User extends DataObject
 		// Note: If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise
 		if( ! $current_User->can_moderate_user( $this->ID ) )
 		{ // Note: if users have delete messaging perms then they can delete any user messages ( Of course only if the delete action is available/displayed for them )
-			$current_User->check_perm( 'perm_messaging', 'delete', true );
+			check_user_perm( 'perm_messaging', 'delete', true );
 		}
 
 		$DB->begin();
 
 		$MessageCache = & get_MessageCache();
 		$MessageCache->clear();
-		$MessageCache->load_where( 'msg_author_user_ID = '.$this->ID );
-		$message_was_deleted = false;
+		if( $type == 'received' )
+		{	// Received messages:
+			$SQL = $MessageCache->get_SQL_object();
+			$SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus ON tsta_thread_ID = msg_thread_ID' );
+			$SQL->WHERE( 'tsta_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'msg_author_user_ID != '.$DB->quote( $this->ID ) );
+			$MessageCache->load_by_sql( $SQL );
+		}
+		else
+		{	// Sent messages:
+			$MessageCache->load_where( 'msg_author_user_ID = '.$this->ID );
+		}
 
+		$thread_IDs = array();
 		while( ( $iterator_Message = & $MessageCache->get_next() ) != NULL )
 		{ // Iterate through MessageCache
 			// Delete a message from DB:
-			$iterator_Message->dbdelete();
-			$message_was_deleted = true;
+			$msg_thread_ID = $iterator_Message->get( 'thread_ID' );
+			if( $iterator_Message->dbdelete() )
+			{
+				$thread_IDs[ $msg_thread_ID ] = NULL;
+			}
 		}
 
-		if( $message_was_deleted )
-		{ // at least one message was deleted
-			// Delete statuses
+		if( ! empty( $thread_IDs ) )
+		{	// Delete read statuses of the threads where message was deleted:
 			$DB->query( 'DELETE FROM T_messaging__threadstatus
-							WHERE tsta_user_ID = '.$DB->quote( $this->ID ) );
+				WHERE tsta_user_ID = '.$DB->quote( $this->ID ).'
+				  AND tsta_thread_ID IN ( '.$DB->quote( array_keys( $thread_IDs ) ).' )' );
 		}
 
 		$DB->commit();
 
 		return true;
+	}
+
+
+	/**
+	 * Delete polls of the user
+	 *
+	 * @return boolean True on success
+	 */
+	function delete_polls()
+	{
+		global $DB, $current_User;
+
+		// If current user can moderate this user then it is allowed to delete all user data even if it wouldn't be allowed otherwise.
+		$current_user_can_moderate = $current_User->can_moderate_user( $this->ID );
+
+		$DB->begin();
+
+		$PollCache = & get_PollCache();
+		$PollCache->clear();
+		$PollCache->load_where( 'pqst_owner_user_ID = '.$this->ID );
+
+		$result = false;
+		while( ( $iterator_Poll = & $PollCache->get_next() ) != NULL )
+		{	// Iterate through PollCache:
+			if( $current_user_can_moderate ||
+			    check_user_perm( 'polls', 'edit', false, $iterator_Poll ) )
+			{ // Current user has a permission to delete this poll
+				// Delete the poll from DB:
+				$result = $iterator_Poll->dbdelete();
+				if( ! $result )
+				{
+					break;
+				}
+			}
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
 	}
 
 
@@ -6572,7 +7059,7 @@ class User extends DataObject
 		{	// Make a link to page with user's posts:
 			global $current_User;
 			if( is_admin_page() && is_logged_in() &&
-			    ( $this->ID == $current_User->ID || $current_User->check_perm( 'users', 'view' ) ) )
+			    ( $this->ID == $current_User->ID || check_user_perm( 'users', 'view' ) ) )
 			{	// For back-office
 				global $admin_url;
 				$total_num_posts_url = $admin_url.'?ctrl=user&amp;user_tab=activity&amp;user_ID='.$this->ID;
@@ -6669,7 +7156,7 @@ class User extends DataObject
 			}
 
 			return sprintf( $params['text_simple'],
-				$this->login, $total_num_comments, $public_percent,
+				$this->get_username(), $total_num_comments, $public_percent,
 				'<b class="green">'.$votes_count_useful.'</b>', '<b>'.$users_count_useful.'</b>' );
 		}
 		else
@@ -6709,7 +7196,7 @@ class User extends DataObject
 			}
 
 			return sprintf( $params['text_extended'],
-				$this->login, $total_num_comments, $public_percent,
+				$this->get_username(), $total_num_comments, $public_percent,
 				'<b class="green">'.$votes_count_useful.'</b>', '<b>'.count( $users_count_useful ).'</b>',
 				'<b class="red">'.$votes_count_not.'</b>', '<b>'.count( $users_count_not ).'</b>',
 				'<b class="green">'.$votes_count_ok.'</b>', '<b>'.count( $users_count_ok ).'</b>',
@@ -6776,7 +7263,7 @@ class User extends DataObject
 						$votes_count_up += $user_votes;
 					}
 					return sprintf( $params['text_image_simple'],
-						$this->login, '<b>'.$this->get_num_files( 'image' ).'</b>',
+						$this->get_username(), '<b>'.$this->get_num_files( 'image' ).'</b>',
 						'<b class="green">'.$votes_count_up.'</b>', '<b>'.$users_count_up.'</b>' );
 				}
 				else
@@ -6816,7 +7303,7 @@ class User extends DataObject
 					}
 
 					return sprintf( $params['text_image_extended'],
-						$this->login, '<b>'.$this->get_num_files( 'image' ).'</b>',
+						$this->get_username(), '<b>'.$this->get_num_files( 'image' ).'</b>',
 						'<b class="green">'.$votes_count_up.'</b>', '<b>'.count( $users_count_up ).'</b>',
 						'<b class="red">'.$votes_count_down.'</b>', '<b>'.count( $users_count_down ).'</b>',
 						'<b class="red">'.$votes_count_inappropriate.'</b>', '<b>'.count( $users_count_inappropriate ).'</b>',
@@ -6826,15 +7313,15 @@ class User extends DataObject
 
 			case 'audio':
 				// Number of audio files
-				return sprintf( $params['text_audio'], $this->login, '<b>'.$this->get_num_files( 'audio' ).'</b>' );
+				return sprintf( $params['text_audio'], $this->get_username(), '<b>'.$this->get_num_files( 'audio' ).'</b>' );
 
 			case 'video':
 				// Number of video files
-				return sprintf( $params['text_video'], $this->login, '<b>'.$this->get_num_files( 'video' ).'</b>' );
+				return sprintf( $params['text_video'], $this->get_username(), '<b>'.$this->get_num_files( 'video' ).'</b>' );
 
 			case 'other':
 				// Number of other files
-				return sprintf( $params['text_other'], $this->login, '<b>'.$this->get_num_files( 'other' ).'</b>' );
+				return sprintf( $params['text_other'], $this->get_username(), '<b>'.$this->get_num_files( 'other' ).'</b>' );
 		}
 	}
 
@@ -6861,7 +7348,7 @@ class User extends DataObject
 			$total_upload = bytesreadable( $total_upload );
 		}
 
-		return sprintf( $params['text'], $this->login, '<b>'.$total_upload.'</b>' );
+		return sprintf( $params['text'], $this->get_username(), '<b>'.$total_upload.'</b>' );
 	}
 
 
@@ -6898,14 +7385,14 @@ class User extends DataObject
 		// Get spam fighter score for the users that were reported and deleted
 		$votes += intval( $UserSettings->get( 'spam_fighter_score', $this->ID ) );
 
-		return sprintf( $params['text'], $this->login, '<b>'.$votes.'</b>' );
+		return sprintf( $params['text'], $this->get_username(), '<b>'.$votes.'</b>' );
 	}
 
 
 	/**
 	 * Get status of user email
 	 *
-	 * @return string Status: 'unknown', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer', 'redemption'
+	 * @return string Status: 'unknown', 'working', 'unattended', 'redemption', 'warning', 'suspicious1', 'suspicious2', 'suspicious3', 'prmerror', 'spammer'
 	 */
 	function get_email_status()
 	{
@@ -7059,10 +7546,10 @@ class User extends DataObject
 	function get_organizations_data()
 	{
 		if( ! isset( $this->organizations ) )
-		{ // Get the organizations from DB
+		{	// Get the organizations from DB
 			global $DB;
 			$SQL = new SQL();
-			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role' );
+			$SQL->SELECT( 'org_ID, org_name, uorg_accepted, uorg_role, uorg_priority' );
 			$SQL->FROM( 'T_users__user_org' );
 			$SQL->FROM_add( 'INNER JOIN T_users__organization ON org_ID = uorg_org_ID' );
 			$SQL->WHERE( 'uorg_user_ID = '.$DB->quote( $this->ID ) );
@@ -7075,6 +7562,7 @@ class User extends DataObject
 						'name'     => $organization->org_name,
 						'accepted' => $organization->uorg_accepted,
 						'role'     => $organization->uorg_role,
+						'priority' => $organization->uorg_priority,
 					);
 			}
 		}
@@ -7110,9 +7598,10 @@ class User extends DataObject
 	 *
 	 * @param array Organization IDs
 	 * @param array Organization roles
+	 * @param array Organization priorities
 	 * @param boolean TRUE to auto accept user to organization (Used on install demo users)
 	 */
-	function update_organizations( $organization_IDs, $organization_roles = array(), $force_accept = false )
+	function update_organizations( $organization_IDs, $organization_roles = array(), $organization_priorities = array(), $force_accept = false )
 	{
 		global $DB, $current_User, $Messages;
 
@@ -7121,18 +7610,15 @@ class User extends DataObject
 		$curr_orgs = $this->get_organizations_data();
 		$curr_org_IDs = array_keys( $curr_orgs );
 		$insert_orgs = array();
-		$n = 0;
 		foreach( $organization_IDs as $o => $organization_ID )
 		{
-			$organization_ID = intval( $organization_ID );
-			if( empty( $organization_ID ) )
-			{ // Organization is not selected, Skip it
+			if( ! ( $user_Organization = & $OrganizationCache->get_by_ID( $organization_ID, false, false ) ) )
+			{ // Organization is not selected or doesn't exist in DB, Skip it
 				continue;
 			}
 
-			// Get organization ang perm if current user can edit it:
-			$user_Organization = & $OrganizationCache->get_by_ID( $organization_ID );
-			$perm_edit_orgs = ( is_logged_in() && $current_User->check_perm( 'orgs', 'edit', false, $user_Organization ) );
+			// Check permission if current user can edit the organization:
+			$perm_edit_orgs = check_user_perm( 'orgs', 'edit', false, $user_Organization );
 			if( ! $perm_edit_orgs && $user_Organization->get( 'accept' ) == 'no' )
 			{	// Skip this if current user cannot edit the organization and it has a setting to deny a member joining:
 				continue;
@@ -7144,28 +7630,40 @@ class User extends DataObject
 			}
 			elseif( in_array( $organization_ID, $curr_org_IDs ) )
 			{ // User is already in this organization
-				if( $perm_edit_orgs || ! $curr_orgs[ $organization_ID ]['accepted'] )
-				{ // Update if current user has permission or it is not accepted yet by admin
-					$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
-					$n++;
+				if( $user_Organization->perm_role == 'owner and member' ||
+				    ( is_logged_in() && $user_Organization->owner_user_ID == $current_User->ID ) ||
+				    ! $curr_orgs[ $organization_ID ]['accepted'] )
+				{	// Update role if current user has permission or it is not accepted yet by admin
+					$insert_orgs[ $organization_ID ]['role'] = ( empty( $organization_roles[ $o ] ) ? NULL : $organization_roles[ $o ] );
 				}
 				else
-				{ // Don't updated by current user
-					$insert_orgs[ $organization_ID ] = $curr_orgs[ $organization_ID ]['role'];
+				{	// Don't updated role by current user:
+					$insert_orgs[ $organization_ID ]['role'] = $curr_orgs[ $organization_ID ]['role'];
+				}
+
+				if( $perm_edit_orgs ||
+				    ( is_logged_in() && $user_Organization->owner_user_ID == $current_User->ID ) ||
+				    ! $curr_orgs[ $organization_ID ]['accepted'] )
+				{	// Update priority if current user has permission or it is not accepted yet by admin
+					$insert_orgs[ $organization_ID ]['priority'] = ( empty( $organization_priorities[ $o ] ) ? NULL : $organization_priorities[ $o ] );
+				}
+				else
+				{	// Don't updated priority by current user
+					$insert_orgs[ $organization_ID ]['priority'] = $curr_orgs[ $organization_ID ]['priority'];
 				}
 			}
 			else
 			{ // Insert user in new organization
-				$insert_orgs[ $organization_ID ] = ( empty( $organization_roles[ $n ] ) ? NULL : $organization_roles[ $n ] );
-				$n++;
+				$insert_orgs[ $organization_ID ]['role'] = ( empty( $organization_roles[ $o ] ) ? NULL : $organization_roles[ $o ] );
+				$insert_orgs[ $organization_ID ]['priority'] = ( empty( $organization_priorities[ $o ] ) ? NULL : $organization_priorities[ $o ] );
 			}
 		}
 
 		if( count( $insert_orgs ) > 0 )
 		{ // Insert new records with user-org relations
-			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role ) VALUES ';
+			$insert_org_SQL = 'REPLACE INTO T_users__user_org ( uorg_user_ID, uorg_org_ID, uorg_accepted, uorg_role, uorg_priority ) VALUES ';
 			$o = 0;
-			foreach( $insert_orgs as $insert_org_ID => $insert_org_role )
+			foreach( $insert_orgs as $insert_org_ID => $insert_org_data )
 			{
 				if( isset( $curr_orgs[ $insert_org_ID ] ) )
 				{ // If we are updating - Don't change the accept status
@@ -7191,7 +7689,7 @@ class User extends DataObject
 				{ // separator
 					$insert_org_SQL .= ', ';
 				}
-				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_role ).' )';
+				$insert_org_SQL .= '( '.$this->ID.', '.$DB->quote( $insert_org_ID ).', '.$insert_orgs_accepted.', '.$DB->quote( $insert_org_data['role'] ).', '.$DB->quote( $insert_org_data['priority'] ).' )';
 				$o++;
 			}
 			$DB->query( $insert_org_SQL );
@@ -7212,7 +7710,7 @@ class User extends DataObject
 	 *
 	 * @param array Secondary group IDs
 	 */
-	function update_secondary_groups( $secondary_group_IDs )
+	function update_secondary_groups()
 	{
 		global $DB, $current_User;
 
@@ -7221,51 +7719,45 @@ class User extends DataObject
 			return;
 		}
 
-		$has_full_access = $current_User->check_perm( 'users', 'edit' );
-		$has_moderate_access = $current_User->check_perm( 'users', 'moderate' );
-
-		if( ! $has_full_access && ! $has_moderate_access )
-		{	// Use has no permission to edit users:
+		if( ! $current_User->can_moderate_user( $this->ID ) )
+		{	// Current User has no permission to moderate this User:
 			return;
 		}
 
-		$old_secondary_groups = $this->get_secondary_groups();
-		if( ! empty( $old_secondary_groups ) )
-		{	// Check each old secondary group if it can be deleted by current user:
-			$delete_old_secondary_groups = array();
-			foreach( $old_secondary_groups as $o => $old_secondary_Group )
-			{
-				if( $old_secondary_Group->can_be_assigned() )
-				{	// Current user can delete only this group:
-					$delete_old_secondary_group_IDs[] = $old_secondary_Group->ID;
-				}
-			}
-			if( ! empty( $delete_old_secondary_group_IDs ) )
-			{	// Clear secondary groups only which can be touched by currrent user:
-				$DB->query( 'DELETE FROM T_users__secondary_user_groups
-					WHERE sug_user_ID = '.$this->ID.'
-					  AND sug_grp_ID IN ( '.$DB->quote( $delete_old_secondary_group_IDs ).' )' );
-			}
+		if( ! isset( $this->old_secondary_groups ) || $this->old_secondary_groups === false )
+		{	// Skip a request without updating secondary groups:
+			return;
 		}
 
-		$GroupCache = & get_GroupCache();
+		// Check each old secondary group if it can be deleted by current user:
+		$delete_old_secondary_groups = array();
+		foreach( $this->old_secondary_groups as $old_secondary_Group )
+		{
+			if( $old_secondary_Group->can_be_assigned() )
+			{	// Current user can delete only this group:
+				$delete_old_secondary_group_IDs[] = $old_secondary_Group->ID;
+			}
+		}
+		if( ! empty( $delete_old_secondary_group_IDs ) )
+		{	// Clear secondary groups only which can be touched by currrent user:
+			$DB->query( 'DELETE FROM T_users__secondary_user_groups
+				WHERE sug_user_ID = '.$this->ID.'
+					AND sug_grp_ID IN ( '.$DB->quote( $delete_old_secondary_group_IDs ).' )' );
+		}
+		// Set this var in order to don't update secondary group twice:
+		$this->old_secondary_groups = false;
 
-		if( count( $secondary_group_IDs ) )
+		if( ! empty( $this->secondary_groups ) )
 		{	// Update new secondary groups:
 			$new_secondary_grp_IDs = array();
-
-			foreach( $secondary_group_IDs as $secondary_group_ID )
+			foreach( $this->secondary_groups as $secondary_Group )
 			{
-				if( ! empty( $secondary_group_ID ) )
-				{
-					if( $edited_user_secondary_Group = & $GroupCache->get_by_ID( $secondary_group_ID, false, false ) &&
-					    $edited_user_secondary_Group->can_be_assigned() )
-					{	// We can add this secondary group because current user has a permission:
-						if( $secondary_group_ID != $this->get( 'grp_ID' ) &&
-						    ! in_array( $secondary_group_ID, $new_secondary_grp_IDs ) )
-						{	// Add except of primary user group and the duplicates:
-							$new_secondary_grp_IDs[] = $secondary_group_ID;
-						}
+				if( $secondary_Group->can_be_assigned() )
+				{	// We can add this secondary group because current user has a permission:
+					if( $secondary_Group->ID != $this->get( 'grp_ID' ) &&
+							! in_array( $secondary_Group->ID, $new_secondary_grp_IDs ) )
+					{	// Add except of primary user group and the duplicates:
+						$new_secondary_grp_IDs[] = $secondary_Group->ID;
 					}
 				}
 			}
@@ -7288,19 +7780,26 @@ class User extends DataObject
 	{
 		if( ! is_array( $this->secondary_groups ) )
 		{	// Initialize the secondary groups:
-			global $DB;
+			if( $this->ID > 0 )
+			{	// For existing user:
+				global $DB;
 
-			// Initialize SQL for secondary groups of this user:
-			$secondary_groups_SQL = new SQL();
-			$secondary_groups_SQL->SELECT( '*' );
-			$secondary_groups_SQL->FROM( 'T_groups' );
-			$secondary_groups_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON grp_ID = sug_grp_ID' );
-			$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
+				// Initialize SQL for secondary groups of this user:
+				$secondary_groups_SQL = new SQL( 'Get secondary groups of the User #'.$this->ID );
+				$secondary_groups_SQL->SELECT( '*' );
+				$secondary_groups_SQL->FROM( 'T_groups' );
+				$secondary_groups_SQL->FROM_add( 'INNER JOIN T_users__secondary_user_groups ON grp_ID = sug_grp_ID' );
+				$secondary_groups_SQL->WHERE( 'sug_user_ID = '.$this->ID );
 
-			// Load all secondary group objects of this user in cache:
-			$GroupCache = & get_GroupCache();
-			$GroupCache->clear();
-			$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
+				// Load all secondary group objects of this user in cache:
+				$GroupCache = & get_GroupCache();
+				$GroupCache->clear();
+				$this->secondary_groups = $GroupCache->load_by_sql( $secondary_groups_SQL );
+			}
+			else
+			{	// For new creating user:
+				$this->secondary_groups = array();
+			}
 		}
 
 		return $this->secondary_groups;
@@ -7440,9 +7939,7 @@ class User extends DataObject
 
 		if( ! isset( $this->flagged_items_count ) )
 		{	// Get it from DB only first time and then cache in var:
-			global $current_User;
-
-			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'flagged' );
 
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
 			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
@@ -7475,6 +7972,79 @@ class User extends DataObject
 		}
 
 		return $this->PasswordDriver;
+	}
+
+
+	/**
+	 * Get IDs List/Newsletters which are allowed for this User
+	 *
+	 * @return array Newsletter IDs
+	 */
+	function get_allowed_newsletter_IDs()
+	{
+		if( ! isset( $this->allowed_newsletter_IDs ) )
+		{	// Load allowed newsletters from cache:
+			global $DB, $current_User;
+			$SQL = new SQL( 'Get allowed newsletters for User #'.$this->ID );
+			$SQL->SELECT( 'enlt_ID' );
+			$SQL->FROM( 'T_email__newsletter' );
+			$SQL->WHERE( 'enlt_active = 1' );
+			$perm_conditions = array( 'enlt_perm_subscribe = "anyone"' );
+			$check_groups = array();
+			if( check_user_perm( 'users', 'edit' ) )
+			{	// Allow to subscribe to forbidden newsletters by user admins:
+				$perm_conditions[] = 'enlt_perm_subscribe = "admin"';
+				$check_groups[] = $current_User->get( 'grp_ID' );
+			}
+			$check_groups[] = $this->get( 'grp_ID' );
+			$check_groups = count( $check_groups ) > 1 ? '('.implode( '|', $check_groups ).')' : $check_groups[0];
+			$perm_conditions[] = 'enlt_perm_subscribe = "group" AND enlt_perm_groups REGEXP( "(^|,)'.$check_groups.'(,|$)" )';
+			$SQL->WHERE_and( implode( ' OR ', $perm_conditions ) );
+			$this->allowed_newsletter_IDs = $DB->get_col( $SQL );
+		}
+
+		return $this->allowed_newsletter_IDs;
+	}
+
+
+	/**
+	 * Get List/Newsletters which are allowed for this User
+	 *
+	 * @return array Newsletter objects
+	 */
+	function get_allowed_newsletters()
+	{
+		if( ! isset( $this->allowed_newsletters ) )
+		{	// Load allowed newsletters from cache:
+			$newsletter_IDs = $this->get_allowed_newsletter_IDs();
+			$this->allowed_newsletters = array();
+			if( count( $newsletter_IDs ) > 0 )
+			{
+				$NewsletterCache = & get_NewsletterCache();
+				$NewsletterCache->load_list( $newsletter_IDs );
+				foreach( $newsletter_IDs as $newsletter_ID )
+				{
+					if( $Newsletter = & $NewsletterCache->get_by_ID( $newsletter_ID, false, false ) )
+					{
+						$this->allowed_newsletters[ $Newsletter->ID ] = $Newsletter;
+					}
+				}
+			}
+		}
+
+		return $this->allowed_newsletters;
+	}
+
+
+	/**
+	 * Check if the newsletter is allowed for this User
+	 *
+	 * @param integer Newsletter ID
+	 * @return boolean
+	 */
+	function is_allowed_newsletter( $newsletter_ID )
+	{
+		return in_array( $newsletter_ID, $this->get_allowed_newsletter_IDs() );
 	}
 
 
@@ -7545,8 +8115,11 @@ class User extends DataObject
 	 * Set newsletter subscriptions for this user
 	 *
 	 * @param array
+	 * @param array Optional subscription params. This will be applied to the next call to User::subscribe() and cleared thereafter.
+	 *              This will also be overridden by params passed to User::subscribe().
+	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 */
-	function set_newsletter_subscriptions( $new_subscriptions )
+	function set_newsletter_subscriptions( $new_subscriptions, $params = array() )
 	{
 		$prev_subscriptions = $this->get_newsletter_subscriptions();
 
@@ -7555,17 +8128,24 @@ class User extends DataObject
 			$new_subscriptions = array();
 		}
 
-		foreach( $new_subscriptions as $n => $new_subscription_ID )
+		if( count( $new_subscriptions ) > 0 )
 		{
-			// Format each value to integer:
-			$new_subscription_ID = intval( $new_subscription_ID );
-			if( empty( $new_subscription_ID ) )
-			{	// Unset wrong value:
-				unset( $new_subscriptions[ $n ] );
-			}
-			else
-			{	// Keep integer values only:
-				$new_subscriptions[ $n ] = $new_subscription_ID;
+			foreach( $new_subscriptions as $n => $new_subscription_ID )
+			{
+				// Format each value to integer:
+				$new_subscription_ID = intval( $new_subscription_ID );
+				if( empty( $new_subscription_ID ) ||
+				    ( ! $this->is_allowed_newsletter( $new_subscription_ID ) &&
+				      ! in_array( $new_subscription_ID, $prev_subscriptions ) ) )
+				{	// Unset wrong value or
+					//   if current User cannot subscribe this User to the new newsletter
+					//   but keep if it was subscribed before:
+					unset( $new_subscriptions[ $n ] );
+				}
+				else
+				{	// Keep integer values only:
+					$new_subscriptions[ $n ] = $new_subscription_ID;
+				}
 			}
 		}
 
@@ -7586,6 +8166,9 @@ class User extends DataObject
 
 		// Set new subscriptions:
 		$this->new_newsletter_subscriptions = $new_subscriptions;
+
+		// Set newsletter subscription params:
+		$this->newsletter_subscription_params = $params;
 	}
 
 
@@ -7593,11 +8176,13 @@ class User extends DataObject
 	 * Subscribe to newsletter
 	 *
 	 * @param array|integer Newsletter IDs
+	 * @param array Optional subscription params
+	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function subscribe( $newsletter_IDs )
+	function subscribe( $newsletter_IDs, $params = array() )
 	{
-		global $DB, $localtimenow, $servertimenow;
+		global $DB, $localtimenow, $servertimenow, $current_User;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7620,6 +8205,9 @@ class User extends DataObject
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$insert_newsletter_IDs = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
+
+		// Make sure we get a list newletters IDs for resubscriptions:
+		$resubscribe_newsletter_IDs = array_intersect( $newsletter_IDs, $this->get_newsletter_subscriptions( 'unsubscribed' ) );
 
 		$r = 0;
 
@@ -7649,6 +8237,17 @@ class User extends DataObject
 			'Subscribe(update unsubscriptions) user #'.$this->ID.' to lists #'.implode( ',', $update_newsletter_IDs ) );
 		}
 
+		if( count( $insert_newsletter_IDs ) || count( $resubscribe_newsletter_IDs ) )
+		{	// Notify list owner of new subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User'     => $this,
+				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
+			), empty( $this->newsletter_subscription_params ) ? array() : $this->newsletter_subscription_params, $params );
+
+			// Add to changes in subscription values:
+			$this->newsletter_subscription_changed_values[] = array( 'subscribe', array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), $email_template_params );
+		}
+
 		// Insert user states for newsletters with automations:
 		$first_step_SQL = new SQL( 'Get first step of automation' );
 		$first_step_SQL->SELECT( 'step_ID' );
@@ -7672,8 +8271,12 @@ class User extends DataObject
 		// Unset flag in order not to run this twice:
 		$this->newsletter_subscriptions_updated = false;
 
+		// Unset newsletter subscription params for subsequent calls to this function:
+		unset( $this->newsletter_subscription_params );
+
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_merge( $this->newsletter_subscriptions['subscribed'], $newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_diff( $this->newsletter_subscriptions['unsubscribed'], $newsletter_IDs );
 
 		return $r;
 	}
@@ -7683,11 +8286,13 @@ class User extends DataObject
 	 * Unsubscribe from newsletter
 	 *
 	 * @param array|integer Newsletter IDs
+	 * @param array Optional subscription params
+	 *              - 'usertags': Comma-delimited user tags applied as part of unsubscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
-	function unsubscribe( $newsletter_IDs )
+	function unsubscribe( $newsletter_IDs, $params = array() )
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $current_User;
 
 		if( empty( $this->ID ) )
 		{	// Only created user can has the newsletter subscriptions:
@@ -7703,6 +8308,10 @@ class User extends DataObject
 		{	// Convert single newsletter ID to array:
 			$newsletter_IDs = array( $newsletter_IDs );
 		}
+
+		// Get list of newsletter IDs that will be updated:
+		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'subscribed' );
+		$update_newsletter_IDs = array_intersect( $newsletter_IDs, $newsletter_subscriptions );
 
 		$r = $DB->query( 'UPDATE T_email__newsletter_subscription
 			SET enls_subscribed = 0,
@@ -7723,6 +8332,24 @@ class User extends DataObject
 				'Exit user automatically from all automations tied to lists #'.implode( ',', $newsletter_IDs ) );
 		}
 
+		if( count( $update_newsletter_IDs ) )
+		{	// Notify list owner of lost subscriber:
+			$email_template_params = array_merge( array(
+				'subscribed_User'       => $this,
+				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
+			), empty( $this->newsletter_unsubscription_params ) ? array() : $this->newsletter_unsubscription_params, $params );
+
+			// Add to changes in subscription values:
+			$this->newsletter_subscription_changed_values[] = array( 'unsubscribe', $update_newsletter_IDs, $email_template_params );
+		}
+
+		// Unset newsletter unsubscription params for subsequent calls to this function:
+		unset( $this->newsletter_unsubscription_params );
+
+		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
+		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );
+		$this->newsletter_subscriptions['unsubscribed'] = array_unique( array_merge( $this->newsletter_subscriptions['unsubscribed'], $update_newsletter_IDs ) );
+
 		return $r;
 	}
 
@@ -7736,24 +8363,62 @@ class User extends DataObject
 	{
 		global $DB;
 
-		// Additional check to know what newsletter is really new, in order to exclude the updating subscritptions:
+		// Additional check to know what newsletter is really new, in order to exclude the updating subscriptions:
 		$newsletter_subscriptions = $this->get_newsletter_subscriptions( 'all' );
 		$new_subscriptions = array_diff( $newsletter_IDs, $newsletter_subscriptions );
 
 		if( count( $new_subscriptions ) )
 		{	// User is really subscribing to new newsletters:
-			$SQL = new SQL( 'Get email campaigns(of lists #'.implode( ',', $new_subscriptions ).') which must be sent at subscription' );
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_email__campaign' );
-			$SQL->WHERE( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' )' );
-			$SQL->WHERE_and( 'ecmp_auto_send = "subscription"' );
 			$EmailCampaignCache = & get_EmailCampaignCache();
 			$EmailCampaignCache->clear();
-			$EmailCampaignCache->load_by_sql( $SQL );
+			$EmailCampaignCache->load_where( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' ) AND ecmp_welcome = 1' );
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
-			{	// Send an email of the campaign at subscription:
-				$EmailCampaign->send_all_emails( false, array( $this->ID ), 'auto' );
+			{	// Send a "Welcome" email of the campaign at subscription:
+				$r = $EmailCampaign->send_all_emails( false, array( $this->ID ), 'welcome' );
+				if( $r && $EmailCampaign->get( 'activate' ) )
+				{	// Set a flag to know email campaign which is used as "Activate" message has been sent now for this User:
+					$this->welcome_activate_email_campaign_sent = true;
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Send email notification to owners of lists where user subscribed/unsubscribed
+	 *
+	 * @param string subscribed | unsubscribed | all
+	 */
+	function send_list_owner_notifications( $filter = 'all' )
+	{
+		if( ! empty( $this->newsletter_subscription_changed_values ) )
+		{
+			foreach( $this->newsletter_subscription_changed_values as $key => $value )
+			{
+				list( $action, $newsletter_IDs, $email_template_params ) = $value;
+				if( $filter == 'all' || $filter == $action )
+				{
+					switch( $action )
+					{
+						case 'subscribe':
+							$template_name = 'list_new_subscriber';
+							break;
+
+						case 'unsubscribe':
+							$template_name = 'list_lost_subscriber';
+							break;
+
+						default:
+							debug_die( 'Invalid type of subscription action' );
+					}
+
+					// Send an email to the list owner:
+					send_list_owner_notification( $newsletter_IDs, $template_name, $email_template_params );
+
+					// Unset subscription change:
+					unset( $this->newsletter_subscription_changed_values[$key] );
+				}
 			}
 		}
 	}
@@ -7780,6 +8445,27 @@ class User extends DataObject
 		}
 
 		return $this->user_tags;
+	}
+
+
+	/**
+	 * Get count of user's profile visitors
+	 *
+	 * @param boolean True to only count new unique profile visitors since the user viewed the list, False if total unique profile visitors
+	 * @return integer Visitor count
+	 */
+	function get_profile_visitors_count( $new_only = true )
+	{
+		global $DB;
+
+		$count = $DB->get_var( 'SELECT '.( $new_only ? 'upvc_new_unique_visitors' : 'upvc_total_unique_visitors' ).' FROM T_users__profile_visit_counters WHERE upvc_user_ID = '.$this->ID );
+
+		if( is_null( $count ) )
+		{
+			return 0;
+		}
+
+		return $count;
 	}
 
 

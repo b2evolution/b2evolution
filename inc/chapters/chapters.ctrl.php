@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -19,7 +19,7 @@ $activate_collection_toolbar = true;
 
 if( valid_blog_requested() )
 {
-	$current_User->check_perm( 'blog_cats', 'edit', true, $blog );
+	check_user_perm( 'blog_cats', 'edit', true, $blog );
 	$edited_Blog = & $Blog;
 }
 else
@@ -34,7 +34,7 @@ $ChapterCache = new ChapterCache();
 // Restrict to chapters of the specific blog:
 $subset_ID = $blog;
 
-$permission_to_edit = $current_User->check_perm( 'blog_cats', '', false, $blog );
+$permission_to_edit = check_user_perm( 'blog_cats', '', false, $blog );
 
 
 // ---- Below is a modified generic category list editor: -----
@@ -63,7 +63,7 @@ if( param( $ChapterCache->dbIDname, 'integer', NULL, true, false, false ) )
 	if( ($edited_Chapter = & $ChapterCache->get_by_ID( ${$ChapterCache->dbIDname}, false, true, $subset_ID )) === false )
 	{	// We could not find the element to edit:
 		unset( $edited_Chapter );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Category') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Category') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -74,7 +74,7 @@ if( !is_null( param( $ChapterCache->dbprefix.'parent_ID', 'integer', NULL ) ) )
 	if( $edited_parent_Chapter === false )
 	{ // Parent chapter doesn't exist any longer.
 		unset( $ChapterCache->dbIDname );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Category') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Category') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -89,7 +89,7 @@ if( !empty( $locked_IDs )
 		&& in_array( $action, array( 'edit', 'update', 'delete' ) )
 		&& in_array( $$ChapterCache->dbIDname, $locked_IDs ) )
 {
-	$Messages->add( T_('This element is locked and cannot be edited!') );
+	$Messages->add( TB_('This element is locked and cannot be edited!') );
 	$action = 'list';
 }
 
@@ -200,7 +200,7 @@ switch( $action )
 		}
 		else
 		{
-			$edited_Chapter->parent_name = T_('Root');
+			$edited_Chapter->parent_name = TB_('Root');
 		}
 
 		break;
@@ -234,7 +234,7 @@ switch( $action )
 			// Insert in DB:
 			if( $edited_Chapter->dbinsert() !== false )
 			{
-				$Messages->add( T_('New chapter created.'), 'success' );
+				$Messages->add( TB_('New chapter created.'), 'success' );
 				// Add the ID of the new element to the result fadeout
 				$result_fadeout[$edited_Chapter->dbIDname][] = $edited_Chapter->ID;
 				$action = 'list';
@@ -261,7 +261,7 @@ switch( $action )
 			// Update in DB:
 			if( $edited_Chapter->dbupdate() !== false )
 			{
-				$Messages->add( T_('Chapter updated.'), 'success' ); //ToDO change htis
+				$Messages->add( TB_('Chapter updated.'), 'success' ); //ToDO change htis
 			}
 			// Add the ID of the updated element to the result fadeout
 			$result_fadeout[$edited_Chapter->dbIDname][] = $edited_Chapter->ID;
@@ -297,7 +297,7 @@ switch( $action )
 
 		// Control permission to edit source blog:
 		$edited_Blog = & $edited_Chapter->get_Blog();
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
+		if( ! check_user_perm( 'blog_cats', '', false, $edited_Blog->ID ) )
 		{
 			debug_die( 'No permission to edit source collection.' );
 			/* die */
@@ -305,7 +305,7 @@ switch( $action )
 
 		// Control permission to edit destination blog:
 		param( 'cat_coll_ID', 'integer', true );
-		if( ! $current_User->check_perm( 'blog_cats', '', false, $cat_coll_ID ) )
+		if( ! check_user_perm( 'blog_cats', '', false, $cat_coll_ID ) )
 		{
 			// fp> TODO: prevent move in UI.
 			$Messages->add( 'No permission to edit destination blog.', 'error' );	// NO TRANS b/c temporary
@@ -314,7 +314,7 @@ switch( $action )
 
 		if( $cat_coll_ID == $edited_Blog->ID )
 		{
-			$Messages->add( T_('Category has not been moved.'), 'note' );
+			$Messages->add( TB_('Category has not been moved.'), 'note' );
 			break;
 		}
 
@@ -322,7 +322,7 @@ switch( $action )
 		$ChapterCache->move_Chapter_subtree( $edited_Chapter->ID, $subset_ID, $cat_coll_ID );
 
 		$dest_Blog = & $BlogCache->get_by_ID( $cat_coll_ID );
-		$Messages->add( /* TRANS: first %s is the moved category's name, the second one the new parent category */ sprintf( T_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_Chapter->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
+		$Messages->add( /* TRANS: first %s is the moved category's name, the second one the new parent category */ sprintf( TB_('The category &laquo;%s&raquo; has been moved (with children) to &laquo;%s&raquo;\'s root. You may want to nest it in another parent category below...'), $edited_Chapter->dget('name'), $dest_Blog->dget( 'shortname' )  ), 'success' );
 
 		header_redirect( url_add_param( $admin_url, 'ctrl=chapters&action=edit&blog='.$cat_coll_ID.'&cat_ID='.$cat_ID, '&' ) );	// will save $Messages
 		/* EXIT */
@@ -342,7 +342,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
 			$parent_ID = $edited_Chapter->parent_ID;
-			$msg = sprintf( T_('Chapter &laquo;%s&raquo; deleted.'), $edited_Chapter->dget( 'name' ) );
+			$msg = sprintf( TB_('Chapter &laquo;%s&raquo; deleted.'), $edited_Chapter->dget( 'name' ) );
 			$ChapterCache->dbdelete_by_ID( $edited_Chapter->ID );
 			unset($edited_Chapter);
 			forget_param( $ChapterCache->dbIDname );
@@ -358,7 +358,7 @@ switch( $action )
 			// TODO: dh> allow to delete a category which has links (and unbreak those after confirmation).
 			// Get the page number we come from:
 			$previous_page = param( 'results_'.$ChapterCache->dbprefix.'page', 'integer', 1, true );
-			if( ! $edited_Chapter->check_delete( sprintf( T_('Cannot delete element &laquo;%s&raquo;'), $edited_Chapter->dget( 'name' ) ) ) )
+			if( ! $edited_Chapter->check_delete( sprintf( TB_('Cannot delete element &laquo;%s&raquo;'), $edited_Chapter->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'edit';
 			}
@@ -369,12 +369,49 @@ switch( $action )
 		// Make category as default:
 		if( $edited_Chapter->get( 'meta' ) )
 		{	// If category is meta:
-			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
+			$Messages->add( TB_('Meta category cannot be used as default!'), 'error' );
 			break;
+		}
+
+		if( $edited_Chapter->get( 'ityp_ID' ) === '0' )
+		{	// Force "No default type" of default category to "Same as collection default":
+			$edited_Chapter->set( 'ityp_ID', NULL, true );
+			if( $edited_Chapter->dbupdate() )
+			{	// Inform user about this modification:
+				$Messages->add( sprintf( TB_('The default Item Type of the default category must be defined. Therefore it has been set to "%s".'), TB_('Same as collection default') ), 'note' );
+			}
+		}
+
+		if( $edited_Blog->get_setting( 'default_cat_ID' ) != $edited_Chapter->ID )
+		{	// Move all "content-block" items from previous main Category to new:
+			// (we need to do this because impossible delete a category with items,
+			// but "content-block" items have no possibility to change category from edit form)
+			$moved_items_num = $DB->query( 'UPDATE T_items__item
+				INNER JOIN T_items__type ON post_ityp_ID = ityp_ID
+				  SET post_main_cat_ID = '.$DB->quote( $edited_Chapter->ID ).'
+				WHERE post_main_cat_ID = '.$DB->quote( $edited_Blog->get_setting( 'default_cat_ID' ) ).'
+				  AND ityp_usage = "content-block"' );
+			$DB->query( 'UPDATE T_postcats
+				INNER JOIN T_items__item ON post_ID = postcat_post_ID
+				INNER JOIN T_items__type ON post_ityp_ID = ityp_ID
+				  SET postcat_cat_ID = '.$DB->quote( $edited_Chapter->ID ).'
+				WHERE postcat_cat_ID = '.$DB->quote( $edited_Blog->get_setting( 'default_cat_ID' ) ).'
+				  AND ityp_usage = "content-block"' );
 		}
 
 		$edited_Blog->set_setting( 'default_cat_ID', $edited_Chapter->ID );
 		$edited_Blog->dbsave();
+
+		$Messages->add( sprintf( TB_('Default category of this collection has been updated to "%s".'), $edited_Chapter->get( 'name' ) ), 'success' );
+		if( ! empty( $moved_items_num ) )
+		{	// Inform about moved items:
+			$Messages->add( sprintf( TB_('Please note %d "content-block" items have been moved to new default category.'), $moved_items_num ), 'note' );
+		}
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( $edited_Chapter->ID ) );
+
+		header_redirect( $admin_url.'?ctrl=chapters&blog='.$blog );
 		break;
 
 	case 'set_meta':
@@ -382,7 +419,7 @@ switch( $action )
 
 		if( $edited_Blog->get_default_cat_ID() == $edited_Chapter->ID )
 		{	// If category is default:
-			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
+			$Messages->add( TB_('Meta category cannot be used as default!'), 'error' );
 			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -397,12 +434,12 @@ switch( $action )
 		// Save category
 		if( $result && $edited_Chapter->dbsave() )
 		{ // Category has no posts and it was saved successful
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was made as meta category.'), $edited_Chapter->dget('name') ), 'success' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; was made as meta category.'), $edited_Chapter->dget('name') ), 'success' );
 			$DB->commit();
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; cannot be set as meta category. You must remove the posts it contains first.'), $edited_Chapter->dget('name') ) );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; cannot be set as meta category. You must remove the posts it contains first.'), $edited_Chapter->dget('name') ) );
 			$DB->rollback();
 		}
 
@@ -417,11 +454,11 @@ switch( $action )
 		$edited_Chapter->set( 'meta', '0' );
 		if( $edited_Chapter->dbsave() )
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was reverted from meta category.'), $edited_Chapter->dget('name') ), 'success' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; was reverted from meta category.'), $edited_Chapter->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\'t be reverted from meta category.'), $edited_Chapter->dget('name') ), 'error' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; couldn\'t be reverted from meta category.'), $edited_Chapter->dget('name') ), 'error' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -435,11 +472,11 @@ switch( $action )
 		$edited_Chapter->set( 'lock', '1' );
 		if( $edited_Chapter->dbsave() )
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was locked.'), $edited_Chapter->dget('name') ), 'success' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; was locked.'), $edited_Chapter->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\'t be locked.'), $edited_Chapter->dget('name') ), 'error' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; couldn\'t be locked.'), $edited_Chapter->dget('name') ), 'error' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -453,11 +490,11 @@ switch( $action )
 		$edited_Chapter->set( 'lock', '0' );
 		if( $edited_Chapter->dbsave() )
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; was unlocked.'), $edited_Chapter->dget('name') ), 'success' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; was unlocked.'), $edited_Chapter->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_('The category &laquo;%s&raquo; couldn\'t be unlocked.'), $edited_Chapter->dget('name') ), 'error' );
+			$Messages->add( sprintf( TB_('The category &laquo;%s&raquo; couldn\'t be unlocked.'), $edited_Chapter->dget('name') ), 'error' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -468,7 +505,12 @@ switch( $action )
 
 if( $action == 'list' )
 { // Load JS to edit chapter order inline
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
+}
+
+if( in_array( $action, array( 'list', 'edit', 'move' ) ) )
+{	// Initialize Hotkeys:
+	init_hotkeys_js();
 }
 
 /**
@@ -478,10 +520,17 @@ $AdminUI->set_coll_list_params( 'blog_cats', 'edit', array( 'ctrl' => $ctrl ) );
 
 $AdminUI->set_path( 'collections', 'categories' );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=colls_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
-$AdminUI->breadcrumbpath_add( T_('Categories'), $admin_url.'?ctrl=chapters&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=colls_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_add( TB_('Categories'), $admin_url.'?ctrl=chapters&amp;blog=$blog$' );
 
-$AdminUI->set_page_manual_link( 'categories-tab' );
+if( in_array( $action, array( 'new', 'edit', 'copy', 'create', 'update' ) ) )
+{
+	$AdminUI->set_page_manual_link( 'category-edit-form' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'categories-tab' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -525,7 +574,7 @@ switch( $action )
 		if( $action == 'delete' )
 		{	// We need to ask for confirmation:
 			$edited_Chapter->confirm_delete(
-					sprintf( T_('Delete element &laquo;%s&raquo;?'),  $edited_Chapter->dget( 'name' ) ),
+					sprintf( TB_('Delete element &laquo;%s&raquo;?'),  $edited_Chapter->dget( 'name' ) ),
 					'element', $action, get_memorized( 'action' ) );
 		}
 

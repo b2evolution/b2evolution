@@ -36,7 +36,7 @@
 
 // Mark the nofollow links with pink background color on mouseover event
 // fp> I actually want to keep this on all skins. It's an attempt to dissuade spammers to spam by showing visually them that the links are nofollow.
-a[rel~=nofollow]:not([class~=btn]):hover {
+a[rel~=nofollow]:not([class~=btn]):not([class~=badge]):hover {
 	background: #f8e0e0;
 	-moz-border-radius: 2px;
 	-webkit-border-radius: 2px;
@@ -63,15 +63,15 @@ figure {
 
 // Definitions for [thumbnail:123] tag:
 .evo_thumbnail {
-  max-width: 100%;
+	max-width: 100%;
 }
 .evo_thumbnail__left {
-  float: left;
-  margin: 0 4px 4px 0;
+	float: left;
+	margin: 0 4px 4px 0;
 }
 .evo_thumbnail__right {
-  float: right;
-  margin: 0 0 4px 4px;
+	float: right;
+	margin: 0 0 4px 4px;
 }
 
 // Used to limit max width of the replied comments,
@@ -116,6 +116,13 @@ img.avatar_above_login {
 .shrinkwrap.left {
 	text-align: left;
 }
+.col-narrow {
+	width: 1px;
+	white-space: nowrap;
+	text-align: center;
+	padding-left: 1px !important;
+	padding-right: 1px !important;
+}
 
 .block {
 	margin: 1ex;
@@ -138,16 +145,19 @@ a.selected {
 	border-radius: 4px;
 	text-align: center;
 	box-sizing: content-box;
-}
-.avatar_rounded:hover {
-	text-decoration: none;
-}
-.avatar_rounded img {
-	-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
-	-webkit-border-radius: 2px 2px 0 0;
-	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
-	border-radius: 2px 2px 0 0;
-	margin-bottom: 2px;
+	&:hover {
+		text-decoration: none;
+	}
+	img {
+		-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
+		-webkit-border-radius: 2px 2px 0 0;
+		-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
+		border-radius: 2px 2px 0 0;
+		margin-bottom: 2px;
+	}
+	&.no_avatar_actions img {
+		margin-bottom: 0;
+	}
 }
 // ---------------- //
 
@@ -336,6 +346,12 @@ select.field_error,
 textarea.field_error {
 	background:#fbf2ee;
 	border: 1px solid #d99;
+	+ span::before, + div + span::before {
+		content: '\f06a';
+		font: 16px FontAwesome;
+		color: #F00;
+		margin-right: 5px;
+	}
 }
 span.checkbox_error {
 	background: #fbf2ee;
@@ -352,11 +368,7 @@ span.checkbox_error {
 span.checkbox_surround {
 	background: #fbf2ee;
 	border: 1px solid #F825F1;
-}
-span.checkbox_surround input.checkbox {
-	background: #fbf2ee;
-}
-span.checkbox_surround_init {
+	border-radius: 2px;
 	padding : 1px;
 }
 // Large inputs and textareas (with full width)
@@ -369,6 +381,22 @@ textarea.form_textarea_input {
 // Space between radio option lable and note text
 label.radiooption {
 	margin-right: 1em;
+	cursor: pointer;
+}
+
+// Support for multiline inline forms
+.filters .form-inline {
+	margin: 0 -10px -5px;
+
+	.filter-inputs {
+		min-height: 40px;
+	}
+	.form-group {
+	 	margin: 5px 10px;
+	}
+	.checkbox {
+		margin-left: 10px;
+	}
 }
 // ---------------- //
 
@@ -629,6 +657,16 @@ div.evo_highlight, li.evo_highlight, tr.evo_highlight td {
 		background-color: #FF6600;
 	}
 	to {
-		background-color: auto;
+		background-color: transparent;
+	}
+}
+
+// Counter for max and recommended length of input/textarea elements:
+.evo_input_counter {
+	position: absolute;
+	color: #999;
+	font-size: 80%;
+	&.label {
+		color: #FFF;
 	}
 }

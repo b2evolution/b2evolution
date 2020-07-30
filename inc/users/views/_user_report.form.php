@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -32,10 +32,6 @@ global $user_profile_only;
  * @var the action destination of the form (NULL for pagenow)
  */
 global $form_action;
-/**
- * @var instance of User class
- */
-global $current_User;
 
 if( $display_mode != 'js' )
 {
@@ -50,7 +46,6 @@ $Form = new Form( $form_action, 'user_checkchanges' );
 
 $form_title = '';
 $form_class = 'fform user_report_form';
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 
 if( $display_mode != 'js' )
 {
@@ -59,7 +54,7 @@ if( $display_mode != 'js' )
 		echo_user_actions( $Form, $edited_User, $action );
 	}
 
-	$form_text_title = T_( 'Report User' ); // used for js confirmation message on leave the changed form
+	$form_text_title = TB_( 'Report User' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, '', $form_text_title );
 }
 
@@ -80,9 +75,9 @@ else
 $close_icon = '';
 if( $display_mode == 'js' )
 { // Display a close link for popup window
-	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+	$close_icon = action_icon( TB_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
-$Form->begin_fieldset( T_('Report User').$close_icon, array( 'class' => 'fieldset clear' ) );
+$Form->begin_fieldset( TB_('Report User').$close_icon, array( 'class' => 'fieldset clear' ) );
 
 user_report_form( array(
 		'Form'       => $Form,

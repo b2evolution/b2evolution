@@ -6,12 +6,12 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $Messages, $UserSettings;
+global $Settings, $UserSettings;
 
 // Get the ID of the comment we are supposed notify:
 if( empty( $job_params['comment_ID'] ) )
 {
-	$result_message = 'No comment_ID parameter received.'; // No trans.
+	cron_log_append( 'No comment_ID parameter received.', 'error' ); // No trans.
 	return 3;
 }
 
@@ -34,7 +34,7 @@ $DB->query( 'UPDATE T_comments
 
 if( $DB->rows_affected != 1 )
 {	// We would not "lock" the requested post
-	$result_message = sprintf( T_('Could not lock comment #%d. It is probably being processed or has already been processed by another scheduled task.'), $comment_ID );
+	cron_log_append( sprintf( T_('Could not lock comment #%d. It is probably being processed or has already been processed by another scheduled task.'), $comment_ID ), 'error' );
 	return 4;
 }
 
@@ -59,7 +59,7 @@ $previous_comment_visibility_status = '';
 while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 {
 	// Send email notifications to users who want to receive them for the collection of this comment: (will be different recipients depending on visibility)
-	$notified_flags = $edited_Comment->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_comment'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
+	$notified_flags = $edited_Comment->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_comment'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'], 'cron_job' );
 
 	// Record that we have just notified the members and/or community:
 	$edited_Comment->set( 'notif_flags', $notified_flags );
@@ -77,10 +77,9 @@ while( $edited_Comment->get( 'status' ) != $previous_comment_visibility_status )
 	$edited_Comment = & $CommentCache->get_by_ID( $comment_ID );
 }
 
-$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done').'.';
+	cron_log_append( T_('Done').'.' );
 }
 
 return 1; /* ok */

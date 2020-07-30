@@ -13,26 +13,29 @@ img {
 
 // Aligning small img with text:
 .top {
-	vertical-align: top;
+	vertical-align: top !important;
 }
 .middle {
-	vertical-align: middle;
+	vertical-align: middle !important;
 }
-.bottom,
-img.icon {
-	vertical-align: bottom;
+.bottom {
+	vertical-align: bottom !important;
 }
 .baseline {
-	vertical-align: baseline;
+	vertical-align: baseline !important;
 }
 .text-bottom {
-	vertical-align: text-bottom;
+	vertical-align: text-bottom !important;
+}
+
+img.icon {
+	vertical-align: bottom;
 }
 
 
 // Classes for adding borders to images, or images added into a wrapper div through [image:] short tag:
 
-// Add a diffuse box box-shadow:
+// Add a diffuse box-shadow:
 img.raised,
 .image_block.raised img,
 .evo_image_block.raised img {
@@ -70,9 +73,23 @@ img.rounded,
 .evo_image_block.rounded img {
 	border-radius: 4px;
 }
-// Make image round/oval:
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-	border-radius: 50%;
+
+// Make image contained in its wrapper:
+.evo_image_block.contain img {
+	object-fit: contain !important;
+}
+// Make image cover in its wrapper:
+.evo_image_block.cover img {
+	object-fit: cover !important;
+}
+
+
+
+
+// Image with wrong item slug like [image:123:caption:((non-existing-slug))]
+img.imgerror,
+.image_block.imgerror img,
+.evo_image_block.imgerror img {
+	border: 1px solid red;
+	box-shadow: 0 0 10px red;
 }

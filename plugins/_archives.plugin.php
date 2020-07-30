@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -35,7 +35,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '6.10.0';
+	var $version = '7.2.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -47,7 +47,7 @@ class archives_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_( 'Archives Widget' );
+		$this->name = T_( 'Date Archives' );
 		$this->short_desc = T_('This skin tag displays a list of post archives.');
 		$this->long_desc = T_('Archives can be grouped monthly, daily, weekly or post by post.');
 
@@ -465,6 +465,8 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_itemtype_usage( 'post' );
 		}
 
+		// Restrict with locale visibility by current navigation locale:
+		$this->ItemQuery->where_locale_visibility();
 
 		$this->from = $this->ItemQuery->get_from();
 		$this->where = $this->ItemQuery->get_where();

@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -62,7 +62,7 @@ class item_info_line_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Info Line');
+		return T_('Info Line');
 	}
 
 
@@ -92,7 +92,12 @@ class item_info_line_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $Blog;
+		global $admin_url;
+
+		// Get available templates:
+		$context = 'item_details';
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_by_context( $context );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -101,90 +106,17 @@ class item_info_line_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
 				),
-				'flag_icon' => array(
-					'label' => T_( 'Flag icon' ),
-					'note' => T_( 'Display flag icon' ),
-					'type' => 'checkbox',
-					'defaultvalue' => true
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $TemplateCache->get_code_option_array(),
+					'defaultvalue' => 'item_details_infoline_standard',
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
-				'permalink_icon' => array(
-					'label' => T_( 'Permalink icon' ),
-					'note' => T_( 'Display permalink icon' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false
-				),
-				'before_author' => array(
-					'label' => T_( 'Before author' ),
-					'note' => T_( 'Display author information' ),
-					'type' => 'radio',
-					'options' => array(
-						array( 'posted_by', T_( 'Posted by' ) ),
-						array( 'started_by', T_( 'Started by' ) ),
-						array( 'none', T_( 'None' ) )
-					),
-					'defaultvalue' => 'posted_by',
-					'field_lines' => true
-				),
-				'date_format' => array(
-					'label' => T_( 'Date format' ),
-					'note' => T_( 'Item/post date display format' ),
-					'type' => 'radio',
-					'options' => array(
-						array( 'extended', sprintf( T_('Extended format %s'), '<code>'.locale_extdatefmt().'</code>' ) ),
-						array( 'long', sprintf( T_('Long format %s'), '<code>'.locale_longdatefmt().'</code>' ) ),
-						array( 'short', sprintf( T_('Short format %s'), '<code>'.locale_datefmt().'</code>' ) ),
-						array( 'none', T_('None') )
-					),
-					'defaultvalue' => 'extended',
-					'field_lines' => true
-				),
-				'time_format' => array(
-					'label' => T_( 'Time format' ),
-					'note' => T_( 'Item/post time display format' ),
-					'type' => 'radio',
-					'options' => array(
-						array( 'long', sprintf( T_('Long format %s'), '<code>'.locale_timefmt().'</code>' ) ),
-						array( 'short', sprintf( T_('Short format %s'), '<code>'.locale_shorttimefmt().'</code>' ) ),
-						array( 'none', T_('None') )
-					),
-					'defaultvalue' => 'none',
-					'field_lines' => true
-				),
-				'display_date' => array(
-					'label' => T_('Date and time to use'),
-					'note' => '',
-					'type' => 'radio',
-					'options' => array(
-						array( 'issue_date', T_('Issue date') ),
-						array( 'date_created', T_('Date created') )
-					),
-					'defaultvalue' => in_array( $Blog->type, array( 'forum', 'group' ) ) ? 'date_created' : 'issue_date',
-					'field_lines' => true
-				),
-				'last_touched' => array(
-					'label' => T_( 'Last touched' ),
-					'note' => T_( 'Display date and time when item/post was last touched' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false
-				),
-				'contents_updated' => array(
-					'label' => T_( 'Contents last updated' ),
-					'note' => T_( 'Display date and time when item/post contents (title, content, URL or attachments) were last updated' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false
-				),
-				'category' => array(
-					'label' => T_( 'Category' ),
-					'note' => T_( 'Display item/post category' ),
-					'type' => 'checkbox',
-					'defaultvalue' => true
-				),
-				'edit_link' => array(
-					'label' => T_( 'Edit link' ),
-					'note' => T_( 'Display link to edit the item/post' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false
-				)
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -207,154 +139,49 @@ class item_info_line_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		if( empty( $Item ) )
+		{	// Don't display this widget when there is no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
+		}
+
 		$params = array_merge( array(
-			'author_link_text' => 'preferredname'
+			'author_link_text' => 'preferredname',
+			'block_body_start' => '<div>',
+			'block_body_end'   => '</div>',
 		), $params );
 
 		$this->init_display( $params );
 
-		echo $this->disp_params['block_start'];
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-
-		// Flag:
-		if( $this->disp_params['flag_icon'] )
+		$TemplateCache = & get_TemplateCache();
+		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
 		{
-			$Item->flag();
+			$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+			return false;
 		}
 
-		// Permalink:
-		if( $this->disp_params['permalink_icon'] )
+		$template_code = $this->disp_params['template'];
+
+		$info_line = render_template_code( $template_code, $this->disp_params );
+
+		if( ! empty( $info_line ) )
 		{
-			$Item->permanent_link( array(
-					'text' => '#icon#',
-					'after' => ' ',
-				) );
+			echo $this->disp_params['block_start'];
+
+			$this->disp_title();
+
+			echo $this->disp_params['block_body_start'];
+
+			echo $info_line;
+
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
 		}
 
-		// Author
-		if( $this->disp_params['before_author'] != 'none' )
-		{
-			switch( $this->disp_params['before_author'] )
-			{
-				case 'posted_by':
-					$before_author = T_('Posted by').' ';
-					break;
-
-				case 'started_by':
-					$before_author = T_('Started by').' ';
-					break;
-
-				default:
-					$before_author = '';
-			}
-			$Item->author( array(
-				'before'    => /* TRANS: author name */ $before_author,
-				'after'     => ' ',
-				'link_text' => $params['author_link_text'],
-			) );
-		}
-
-		// We want to display the post time:
-		$date_format = '';
-		if( $this->disp_params['date_format'] != 'none' )
-		{
-			switch( $this->disp_params['date_format'] )
-			{
-				case 'extended':
-					$date_format = locale_extdatefmt();
-					break;
-
-				case 'long':
-					$date_format = locale_longdatefmt();
-					break;
-
-				case 'short':
-					$date_format = locale_datefmt();
-					break;
-			}
-		}
-
-		$time_format = '';
-		if( $this->disp_params['time_format'] != 'none' )
-		{
-			switch( $this->disp_params['time_format'] )
-			{
-				case 'long':
-					$time_format = locale_timefmt();
-					break;
-
-				case 'short':
-					$time_format = locale_shorttimefmt();
-					break;
-			}
-		}
-
-		if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
-		{
-			switch( $this->disp_params['display_date'] )
-			{
-				case 'issue_date':
-					$Item->issue_time( array(
-							'before'      => $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ',
-							'after'       => ' ',
-							'time_format' => $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format
-						) );
-					break;
-
-				case 'date_created':
-					echo $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
-					echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->datecreated ).' ';
-					break;
-			}
-		}
-
-
-		// Categories
-		if( $this->disp_params['category'] )
-		{
-			$Item->categories( array(
-				'before'          => /* TRANS: category name(s) */ T_('in').' ',
-				'after'           => ' ',
-				'include_main'    => true,
-				'include_other'   => true,
-				'include_external'=> true,
-				'link_categories' => true,
-			) );
-		}
-
-		// Last touched
-		if( $this->disp_params['last_touched'] )
-		{
-			echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched').': '
-				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
-				.'</span>';
-		}
-
-		// Contents last updated:
-		if( $this->disp_params['contents_updated'] )
-		{
-			echo '<span class="text-muted"> &ndash; '
-				.T_('Contents updated').': '
-				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) )
-				.$Item->get_refresh_contents_last_updated_link()
-				.'</span>';
-		}
-
-		// Link for editing
-		if( $this->disp_params['edit_link'] )
-		{
-			$Item->edit_link( array(
-				'before'    => ' &bull; ',
-				'after'     => '',
-			) );
-		}
-
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
-
-		return true;
+		$this->display_debug_message();
+		return false;
 	}
 }
 

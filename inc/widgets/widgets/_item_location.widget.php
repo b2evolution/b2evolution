@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -118,6 +118,16 @@ class item_location_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
+		}
+
+		// Get item locations:
+		$item_location = $Item->get_location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
+
+		if( empty( $item_location ) )
+		{	// Don't display this widget when Item has no locations:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no locations.' );
 			return false;
 		}
 
@@ -127,7 +137,8 @@ class item_location_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
+		// Display item locations:
+		echo $item_location;
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -149,7 +160,7 @@ class item_location_Widget extends ComponentWidget
 				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Cache each item separately + Has the Item changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Cache each item separately + Has the Item changed?
 			);
 	}
 }

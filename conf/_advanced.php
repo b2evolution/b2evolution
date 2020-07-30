@@ -94,39 +94,62 @@ $date_default_timezone = '';
  * @global array
  */
 $thumbnail_sizes = array(
-			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
-			'fit-720x500' => array( 'fit', 720, 500, 90 ),
-			'fit-640x480' => array( 'fit', 640, 480, 90 ),
-			'fit-520x390' => array( 'fit', 520, 390, 90 ),
-			'fit-400x320' => array( 'fit', 400, 320, 85 ),
-			'fit-320x320' => array( 'fit', 320, 320, 85 ),
-			'fit-256x256' => array( 'fit', 256, 256, 85 ),
-			'fit-192x192' => array( 'fit', 192, 192, 85 ),
-			'fit-160x160' => array( 'fit', 160, 160, 80 ),
-			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
-			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
-			'fit-160x120' => array( 'fit', 160, 120, 80 ),
-			'fit-128x128' => array( 'fit', 128, 128, 80 ),
-			'fit-80x80' => array( 'fit', 80, 80, 80 ),
-			'crop-480x320' => array( 'crop', 480, 320, 90 ),
-			'crop-256x256' => array( 'crop', 256, 256, 85 ),
-			'crop-192x192' => array( 'crop', 192, 192, 85 ),
-			'crop-128x128' => array( 'crop', 128, 128, 85 ),
-			'crop-80x80' => array( 'crop', 80, 80, 85 ),
-			'crop-64x64' => array( 'crop', 64, 64, 85 ),
-			'crop-48x48' => array( 'crop', 48, 48, 85 ),
-			'crop-32x32' => array( 'crop', 32, 32, 85 ),
-			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+	// FIT: Typical images that will be shrunk to max width and/or max height but keep original aspect ratio (the ratios below are only for reference)
+		// 16:9 ratio 1.77
+			'fit-2880x1620'			=> array( 'fit', 2880, 1620, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-2560x1440'			=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1920x1080'			=> array( 'fit', 1920, 1080, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1600x900'			=> array( 'fit', 1600, 900, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1280x720'			=> array( 'fit', 1280, 720, 85 ),		// 16:9 ratio 1.77
+			'fit-960x540'			=> array( 'fit', 960, 540, 85 ),			// 16:9 ratio 1.77	EXPERIMENTAL
+			'fit-720x500'			=> array( 'fit', 720, 500, 90 ),			// ratio 1.44
+			'fit-640x480'			=> array( 'fit', 640, 480, 90 ),			// 4:3 ratio 1.33
+			'fit-520x390'			=> array( 'fit', 520, 390, 90 ),			// 4:3 ratio 1.33
+			'fit-400x320'			=> array( 'fit', 400, 320, 85 ),			// 5:4 ratio 1.25
+			'fit-320x320'			=> array( 'fit', 320, 320, 85 ),			// 1:1 square ratio 1
+			'fit-256x256'			=> array( 'fit', 256, 256, 85 ),			// 1:1 square ratio 1
+			'fit-192x192'			=> array( 'fit', 192, 192, 85 ),			// 1:1 square ratio 1
+			'fit-160x160'			=> array( 'fit', 160, 160, 85 ),			// 1:1 square ratio 1
+			'fit-160x120'			=> array( 'fit', 160, 120, 85 ),			// 1:1 square ratio 1
+			'fit-128x128'			=> array( 'fit', 128, 128, 85 ),			// 1:1 square ratio 1
+			'fit-128x16'			=> array( 'fit', 128, 16, 85 ),				// 8:1 square ratio 8
+			'fit-80x80'				=> array( 'fit', 80, 80, 85 ),				// 1:1 square ratio 1
+	// FIT+BLUR: Blurred images (probably no need for Retina support, because the intended effect is to be blurred)
+			'fit-160x160-blur-13'		=> array( 'fit', 160, 160, 80, 13 ),
+			'fit-160x160-blur-18'		=> array( 'fit', 160, 160, 80, 18 ),
+	// CROPPED: Images that will be shrunk AND cropped to completely FILL the request aspect ratio
+		// 3:2 ratio 1.5
+			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
+		// 1:1 square ratio 1
+			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina
+			'crop-320x320'			=> array( 'crop', 320, 320, 85 ),
+			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
+			'crop-192x192'			=> array( 'crop', 192, 192, 85 ),
+			'crop-128x128'			=> array( 'crop', 128, 128, 85 ),
+			'crop-80x80'			=> array( 'crop', 80, 80, 85 ),
+			'crop-64x64'			=> array( 'crop', 64, 64, 85 ),
+			'crop-48x48'			=> array( 'crop', 48, 48, 85 ),
+			'crop-32x32'			=> array( 'crop', 32, 32, 85 ),
+			'crop-15x15'			=> array( 'crop', 15, 15, 85 ),
+	// CROPPED near TOP: Images that will be shrunk with preference towards the top AND cropped to completely FILL the request aspect ratio (typically used for profile pictures)
+			'crop-top-640x640'		=> array( 'crop-top', 640, 640, 85 ),		// EXPERIMENTAL For Retina
+			'crop-top-320x320'		=> array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200'		=> array( 'crop-top', 200, 200, 85 ),
+			'crop-top-160x160'		=> array( 'crop-top', 160, 160, 85 ),
+			'crop-top-80x80'		=> array( 'crop-top', 80, 80, 85 ),
+			'crop-top-64x64'		=> array( 'crop-top', 64, 64, 85 ),
+			'crop-top-48x48'		=> array( 'crop-top', 48, 48, 85 ),
+			'crop-top-32x32'		=> array( 'crop-top', 32, 32, 85 ),
+			'crop-top-15x15'		=> array( 'crop-top', 15, 15, 85 ),
+	// CROPPED near TOP + BLUR  (typically used to obfuscate profile pictures) (probably no need for Retina support, because the intended effect is to be blurred)
 			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
-			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
-			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
-			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
-			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
-			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
-			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),
-			'crop-top-32x32' => array( 'crop-top', 32, 32, 85 ),
-			'crop-top-15x15' => array( 'crop-top', 15, 15, 85 ),
 	);
+
+
+/**
+ * Generate additional attribute "srcset" for images
+ */
+$generate_srcset_sizes = true;
 
 
 /**
@@ -404,7 +427,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  * @global string Path of the base.
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
-$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
+$basepath = preg_replace( '#/'.preg_quote( $conf_subdir, '#' ).'$#i', '', $conf_path ).'/';
 // echo '<br/>basepath='.$basepath;
 
 /**
@@ -430,17 +453,6 @@ $misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
 $htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
 $htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
 $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
-
-/**
- * Sensitive URL to the htsrv folder.
- *
- * Set this separately (based on {@link $htsrv_url}), if you want to use
- * SSL for login, registration and profile updates (where passwords are
- * involved), but not for the whole htsrv scripts.
- *
- * @global string $htsrv_url_sensitive This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_htsrv_url( true )
- */
-$htsrv_url_sensitive = $htsrv_url;
 
 /**
  * Location of the XML SeRVices folder.
@@ -471,7 +483,7 @@ $restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
 $rsc_url = $assets_baseurl.$rsc_subdir;  // You should not need to change this
-$rsc_uri = $basesubpath.$rsc_subdir;
+$rsc_uri = $basesubpath.$rsc_subdir;     // You should not need to change this
 
 /**
  * Location of the skins folder.
@@ -482,20 +494,9 @@ $rsc_uri = $basesubpath.$rsc_subdir;
  * @global string $skins_path
  * @global string $skins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_skins_url()
  */
-$skins_subdir = 'skins/';                // Subdirectory relative to base
-$skins_path = $basepath.$skins_subdir;   // You should not need to change this
-$skins_url = $assets_baseurl.$skins_subdir;     // You should not need to change this
-
-/**
- * Location of the site skins folder.
- *
- * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
- *
- * @global string $siteskins_subdir
- */
-$siteskins_subdir = 'skins_site/';       		    // Subdirectory relative to base
-$siteskins_path = $basepath.$siteskins_subdir;  // You should not need to change this
-$siteskins_url = $assets_baseurl.$siteskins_subdir;    // You should not need to change this
+$skins_subdir = 'skins/';                   // Subdirectory relative to base
+$skins_path = $basepath.$skins_subdir;      // You should not need to change this
+$skins_url = $assets_baseurl.$skins_subdir; // You should not need to change this
 
 /**
  * Location of the email skins folder.
@@ -509,9 +510,14 @@ $emailskins_path = $basepath.$emailskins_subdir;   // You should not need to cha
 $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need to change this
 
 /**
+ * Location of the customizer mode interface
+ */
+$customizer_relative_url = $basesubpath.'customize.php';
+
+/**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php'; // DEPRECATED
+$dispatcher = 'evoadm.php';
 $admin_url = $baseurl.$dispatcher;
 
 /**
@@ -619,6 +625,49 @@ $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change thi
 
 
 /**
+ * Change to true if you want to be able to install arbitrary ZIP files on the server.
+ * ATTENTION: this poses a security risk if the admin password is compromised.
+ *
+ * @global boolean $auto_upgrade_from_any_url
+ */
+$auto_upgrade_from_any_url = false;
+
+
+/**
+ * Location of the logs folder.
+ *
+ * Note: This folder does SHOULD NOT be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $upgrade_subdir
+ */
+$logs_subdir = '_logs/';              // Subdirectory relative to base
+$logs_path = $basepath.$logs_subdir;  // You should not need to change this
+
+
+/**
+ * Location of the external library folder.
+ *
+ * Note: This folder does NOT NEED to be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $ext_subdir
+ */
+$ext_subdir = 'ext/';               // Subdirectory relative to base
+$ext_path = $basepath.$ext_subdir;  // You should not need to change this
+
+
+/**
+ * Allow to use scripts from /cli folder
+ *
+ * Note: most scripts are available only in b2evolution PRO
+ *
+ * @global boolean
+ */
+$allow_cli_folder = false;
+
+
+/**
  * Do you want to allow public access to the media dir?
  *
  * WARNING: If you set this to false, evocore will use /htsrv/getfile.php as a stub
@@ -633,18 +682,15 @@ $public_access_to_media = true;
 
 
 /**
- * Do you want to stay in the current blog when you click on a post title or permalink,
- * even if the post main cat belongs to another blog?
- *
- * @global boolean
- */
-$cross_post_nav_in_same_blog = true;
-
-
-/**
- * File extensions that the admin will not be able to enable in the Settings
+ * File extensions that can never be made "NOT sensitive"
+ * Admins will NOT be able to enable these for non-admin users in the FileType Settings.
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
+
+/**
+ * Should Admins be able to upload/rename/edit sensitive files?
+ */
+$admins_can_manipulate_sensitive_files = false;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface
@@ -685,12 +731,6 @@ $debug_xmlrpc_logging = 0;
 
 
 /**
- * Seconds after which a scheduled task is considered to be timed out.
- */
-$cron_timeout_delay = 1800; // 30 minutes
-
-
-/**
  * Password change request delay in seconds. Only one email can be requested for one login or email address in each x seconds defined below.
  */
 $pwdchange_request_delay = 300; // 5 minutes
@@ -717,73 +757,6 @@ $enabled_password_drivers = array(
 		'phpass',
 		'evo_md5', // Use this driver as last choice only.
 	);
-
-
-/**
- * Account activation reminder settings.
- * Each element of the array is given in seconds
- * Assume that the number of element in the array below is n then the following must be followed:
- * n must be greater then 1; n - 1 will be the max number of account activation reminder emails.
- * The first element of the array ( in position 0 ) shows the time in seconds when the firs reminder email must be sent after the new user was registered, or the user status was changed to new, deactivated or emailchanged status
- * Each element between the postion [1 -> (n - 1)) shows the time in seconds when the next reminder email must be sent after the previous one
- * The last element of the array shows when an account status will be set to 'failedactivation' if it was not activated after the last reminder email. This value must be the highest value of the array!
- *
- * E.g. $activate_account_reminder_config = array( 86400, 129600, 388800, 604800 ); = array( 1 day, 1.5 days, 4.5 days, 7 days )
- * At most 3 reminder will be sent, the first 1 day after the registration or deactivation, the seond in 1.5 days after the first one, and the third one after 2.5 days after the second one.
- * 7 days after the last reminder email the account status will be set to 'failedactivation' and no more reminder will be sent.
- */
-$activate_account_reminder_config = array( 86400/* one day */, 129600/* 1.5 days */, 388800/* 4.5 days */, 604800/* 7 days */ );
-
-
-/**
- * Account activation reminder threshold given in seconds.
- * A user may receive Account activation reminder if the account was created at least x ( = threshold value defined below ) seconds ago.
- */
-$activate_account_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Comment moderation reminder threshold given in seconds.
- * A moderator user may receive Comment moderation reminder if there are comments awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
- */
-$comment_moderation_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Post moderation reminder threshold given in seconds.
- * A moderator user may receive Post moderation reminder if there are posts awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
- */
-$post_moderation_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Unread private messages reminder threshold given in seconds.
- * A user may receive unread message reminder if it has unread private messages at least as old as this threshold value.
- */
-$unread_messsage_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
- * The array below is in x => y format.
- * The values of this array must be ascendant.
- */
-$unread_message_reminder_delay = array(
-	10  => 3,  // less than 10 days -> 3 days spacing
-	30  => 6,  // 10 to 30 days -> 6 days spacing
-	90  => 15, // 30 to 90 days -> 15 days spacing
-	180 => 30, // 90 to 180 days -> 30 days spacing
-	365 => 60, // 180 to 365 days -> 60 days spacing
-	730 => 120 // 365 to 730 days -> 120 days spacing
-	// more => "The user has not logged in for x days, so we will not send him notifications any more".
-);
-
-
-/**
- * Cleanup scheduled jobs threshold given in days.
- * The scheduled jobs older than x ( = threshold value ) days will be removed
- */
-$cleanup_jobs_threshold = 45;
 
 
 /**
@@ -821,9 +794,13 @@ $use_hacks = false;
 
 
 /**
- * If user tries to login 10 times during X seconds we refuse login (even if password is correct)
- * If set to 0, then there is never a lockout
+ * If user tries to log in {$failed_logins_before_lockout} times
+ * during the last {$failed_logins_lockout} seconds,
+ * we refuse login (even if password is correct) and display that
+ * the account is locked out until the above condition is no longer true.
+ * If {$failed_logins_lockout} is set to 0, there will never be a lockout.
  */
+$failed_logins_before_lockout = 10; // 10 times, Max is 197
 $failed_logins_lockout = 600; // 10 minutes
 
 
@@ -850,12 +827,47 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
+ * Allow parameters in canonical URLs
+ * These params will NOT trigger a "301 redirect to canonical" even if the checkboxes for such redirects are enabled
+ * This applies to ANY canonical URLs (Items but ALSO: Collection, Category, disp=posts, Archive, Tag, User profile) canonical URLs
+ *
+ * NOTE: For Item URL we automatically include enabled switchable params of the Item (see "Switchable content" on https://b2evolution.net/man/post-advanced-properties-panel)
+ */
+$accepted_in_canonicals__params = array(
+	'page',          // For showing a different page in a multipage post
+	'quote_post',    // For quoting a post in the forums
+	'quote_comment', // For quoting a comment in the forums
+	'get_redirected_debuginfo_from_sess_ID', // For display debug info of redirected page from different domain
+);
+
+
+/**
+ * Pass through the following params in ANY redirect.
+ * If these params exist, we include them in ANY redirect we make.
+ * We also do NOT overwrite them (e-g: in case of tiny slugs)
+ */
+$passthru_in_all_redirs__params = array(
+	'utm_source',
+	'utm_campaign',
+	'utm_medium',
+);
+
+
+/**
  * Turn this on to simulate email sends instead of really sending them through SMTP.
  * This is useful if you are debugging a production database on a development machine.
  * It will prevent from sending test notifications to real user accounts.
  * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
  */
 $email_send_simulate_only = false;
+
+
+/**
+ * Turn this off to prevent sending emails if no external SMTP gateway is configured.
+ * If true and no SMTP gateway is configured, b2evolution will behave the same as with $email_send_simulate_only = true;
+ * This is useful to avoid sending email (especially campaigns) through a bad IP by mistake.
+ */
+$email_send_allow_php_mail = true;
 
 
 /**
@@ -907,6 +919,7 @@ $library_cdn_urls = array(
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
 		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
+		//'#clipboardjs#' => array( '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js', '//cdn.rawgit.com/zenorocha/clipboard.js/v2.0.4/dist/clipboard.min.js' ),
 		'#fontawesome#' => array( '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' ),
 	);
 
@@ -917,41 +930,67 @@ $library_cdn_urls = array(
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_local_urls = array(
-		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
-		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
-		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
+		'#jquery#' => array( 'ext:jquery/jquery.min.js', 'ext:jquery/jquery.js' ),
+		'#jquery_migrate#' => array( 'ext:jquery/jquery-migrate.min.js', 'ext:jquery/jquery-migrate.js' ),
+		'#jqueryUI#' => array( 'ext:jquery/ui/js/jquery.ui.b2evo.min.js', 'ext:jquery/ui/js/jquery.ui.b2evo.js' ),
+		'#jqueryUI_css#' => array( 'ext:jquery/ui/css/smoothness/jquery-ui.b2evo.min.css', 'ext:jquery/ui/css/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
-#		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
-#		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.min.css', 'jquery/smoothness/jquery-ui.css' ),
-		'#bootstrap#' => array( 'bootstrap/bootstrap.min.js', 'bootstrap/bootstrap.js' ),
-		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
-		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
-		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
-		'#easypiechart#' => array( 'jquery/jquery.easy-pie-chart.min.js', 'jquery/jquery.easy-pie-chart.js' ),
-		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
-		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
-		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js', 'jquery/jqplot/jquery.jqplot.js' ),
-		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js', 'jquery/jqplot/jqplot.barRenderer.js' ),
-		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js', 'jquery/jqplot/jqplot.canvasAxisTickRenderer.js' ),
-		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js', 'jquery/jqplot/jqplot.canvasTextRenderer.js' ),
-		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js', 'jquery/jqplot/jqplot.categoryAxisRenderer.js' ),
-		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js', 'jquery/jqplot/jqplot.enhancedLegendRenderer.js' ),
-		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js', 'jquery/jqplot/jqplot.highlighter.js' ),
-		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js', 'jquery/jqplot/jqplot.canvasOverlay.js' ),
-		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js', 'jquery/jqplot/jqplot.donutRenderer.js' ),
-		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
-		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
-		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
-		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
-		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
-		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
-		'#videojs#' => array( 'videojs/video.min.js', 'videojs/video.js' ),
-		'#videojs_css#' => array( 'videojs/video-js.min.css', 'videojs/video-js.css' ),
-		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
-		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
-		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
+#		'#jqueryUI#' => array( 'ext:jquery/ui/js/jquery.ui.all.min.js', 'ext:jquery/ui/js/jquery.ui.all.js' ),
+#		'#jqueryUI_css#' => array( 'ext:jquery/ui/css/smoothness/jquery-ui.min.css', 'ext:jquery/ui/css/smoothness/jquery-ui.css' ),
+		'#bootstrap#' => array( 'ext:bootstrap/js/bootstrap.min.js', 'ext:bootstrap/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( 'ext:bootstrap/css/bootstrap.min.css', 'ext:bootstrap/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( 'ext:bootstrap/css/bootstrap-theme.min.css', 'ext:bootstrap/css/bootstrap-theme.css' ),
+		'#bootstrap_typeahead#' => array( 'ext:bootstrap/js/typeahead.bundle.min.js', 'ext:bootstrap/js/typeahead.bundle.js' ),
+		'#easypiechart#' => array( 'ext:jquery/easy-pie-chart/js/jquery.easy-pie-chart.min.js', 'ext:jquery/easy-pie-chart/js/jquery.easy-pie-chart.js' ),
+		'#scrollto#' => array( 'customized:jquery/scrollto/jquery.scrollto.min.js', 'customized:jquery/scrollto/jquery.scrollto.js' ),
+		'#touchswipe#' => array( 'ext:jquery/touchswipe/jquery.touchswipe.min.js', 'ext:jquery/touchswipe/jquery.touchswipe.js' ),
+		'#jqplot#' => array( 'ext:jquery/jqplot/js/jquery.jqplot.min.js' ),
+		'#jqplot_barRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.barRenderer.min.js' ),
+		'#jqplot_canvasAxisTickRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.canvasAxisTickRenderer.min.js' ),
+		'#jqplot_canvasTextRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.canvasTextRenderer.min.js' ),
+		'#jqplot_categoryAxisRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.categoryAxisRenderer.min.js' ),
+		'#jqplot_enhancedLegendRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.enhancedLegendRenderer.min.js' ),
+		'#jqplot_highlighter#' => array( 'ext:jquery/jqplot/js/jqplot.highlighter.min.js' ),
+		'#jqplot_canvasOverlay#' => array( 'ext:jquery/jqplot/js/jqplot.canvasOverlay.min.js' ),
+		'#jqplot_donutRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.donutRenderer.min.js' ),
+		'#jqplot_css#' => array( 'ext:jquery/jqplot/css/jquery.jqplot.min.css', 'ext:jquery/jqplot/css/jquery.jqplot.css' ),
+		'#tinymce#' => array( 'ext:tiny_mce/tinymce.min.js' ),
+		'#tinymce_jquery#' => array( 'ext:tiny_mce/jquery.tinymce.min.js' ),
+		'#flowplayer#' => array( 'ext:flowplayer/flowplayer.min.js', 'ext:flowplayer/flowplayer.js' ),
+		'#mediaelement#' => array( 'ext:mediaelement/js/mediaelement-and-player.min.js', 'ext:mediaelement/js/mediaelement-and-player.js' ),
+		'#mediaelement_css#' => array( 'ext:mediaelement/css/mediaelementplayer.min.css', 'ext:mediaelement/css/mediaelementplayer.css' ),
+		'#videojs#' => array( 'ext:videojs/js/video.min.js', 'ext:videojs/js/video.js' ),
+		'#videojs_css#' => array( 'ext:videojs/css/video-js.min.css', 'ext:videojs/css/video-js.css' ),
+		'#jcrop#' => array( 'ext:jquery/jcrop/js/jquery.jcrop.min.js', 'ext:jquery/jcrop/js/jquery.jcrop.js' ),
+		'#jcrop_css#' => array( 'ext:jquery/jcrop/css/jquery.jcrop.min.css', 'ext:jquery/jcrop/css/jquery.jcrop.css' ),
+		'#fontawesome#' => array( 'ext:font-awesome/css/font-awesome.min.css', 'ext:font-awesome/css/font-awesome.css' ),
+		'#clipboardjs#' => array( 'ext:clipboardjs/clipboard.min.js' ),
+		'#hotkeys#' => array( 'ext:hotkeys/hotkeys.min.js' ),
 	);
 
+/**
+ * JS/CSS files which contain other JS/CSS files in order to don't required them twice when main file is required on current page
+ *
+ * Key - Alias or relative path of main JS/CSS file, Value - array of bundled files inside the main JS/CSS file
+ */
+$bundled_files = array(
+	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
+		'#jquery#',
+		'#jquery_migrate#',
+		'#jqueryUI#',
+		'#bootstrap#',
+	),
+	'bootstrap-b2evo_base-superbundle.bundle.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bundle.css',
+	),
+	'bootstrap-b2evo_base-superbundle.bmin.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bmin.css',
+	),
+);
 
 /**
  * Allow to send outbound pings on localhost
@@ -978,11 +1017,61 @@ $outgoing_proxy_password = '';
 $check_browser_version = false;
 
 
+/**
+ * Maximum skin API version which is supported by current version of b2evolution.
+ * Skin API version is defined in the method Skin::get_api_version() of each skin.
+ */
+$max_skin_api_version = 7;
+
+
+/**
+ * Header "Access-Control-Allow-Origin"
+ * Used to enable using of evo helpdesk widget from other sites
+ */
+$access_control_allow_origin = false; // set to '*' or to specific URL to enable CORS requests
+
+
+/**
+ * Allow to use a "defer" way for loading of JavaScript files
+ * 
+ * TODO: Implement new value 'front' in order to allow this only on front-office
+ */
+$use_defer = true;
+
+$use_defer_for_backoffice = false;
+$use_defer_for_loggedin_users = true;
+$use_defer_for_anonymous_users = true;
+
+$use_defer_for_default_register_form = true;
+
+$use_defer_for_anonymous_disp_register = true;
+$use_defer_for_anonymous_disp_register_finish = true;
+$use_defer_for_anonymous_disp_users = true;
+$use_defer_for_anonymous_disp_anonpost = true;
+
+$use_defer_for_loggedin_disp_single_page = true;
+$use_defer_for_loggedin_disp_front = true;
+$use_defer_for_loggedin_disp_messages = true;
+$use_defer_for_loggedin_disp_threads = true;
+$use_defer_for_loggedin_disp_profile = true;
+$use_defer_for_loggedin_disp_pwdchange = true;
+$use_defer_for_loggedin_disp_edit = true;
+$use_defer_for_loggedin_disp_proposechange = true;
+$use_defer_for_loggedin_disp_edit_comment = true;
+$use_defer_for_loggedin_disp_comments = true;
+$use_defer_for_loggedin_disp_visits = true;
+$use_defer_for_loggedin_disp_contacts = true;
+
+$disable_tinymce_for_frontoffice_comment_form = false; // Disables TinyMCE plugin in the front-office for comment forms
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
+$evonetsrv_verifypeer = false;
+$evonetsrv_retry_delay = 90;
 
 $antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';

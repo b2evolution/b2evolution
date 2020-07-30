@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -43,7 +43,7 @@ $wrap_width = '380px';
   fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
 	dh>
 	// include jquery JS:
-	require_js( '#jquery#' );
+	require_js_defer( '#jquery#' );
 
 	jQuery(function(){
 	 alert("Document is ready");
@@ -52,11 +52,14 @@ $wrap_width = '380px';
  */
 
 
-require_js( 'functions.js' );
+require_js_defer( 'functions.js' );
 
 if( can_use_hashed_password() )
 { // Include JS for client-side password hashing:
-	require_js( 'build/sha1_md5.bmin.js' );
+	add_js_headline( "var htsrv_url = '".get_htsrv_url()."';" );
+	require_js_defer( 'build/sha1_md5.bmin.js' );
+	require_js_defer( '#jquery#' );
+	require_js_defer( 'src/evo_init_display_login_js_handler.js', 'blog' );
 }
 
 // Use the links in the form title
@@ -73,7 +76,7 @@ $params = array(
 	'login_page_class'         => 'evo_panel__login',
 	'login_page_before'        => '',
 	'login_page_after'         => '',
-	'login_form_action'        => get_htsrv_url( true ).'login.php',
+	'login_form_action'        => get_htsrv_url( 'login' ).'login.php',
 	'login_form_name'          => 'login_form',
 	'login_form_title'         => '',
 	'login_form_layout'        => 'fieldset',

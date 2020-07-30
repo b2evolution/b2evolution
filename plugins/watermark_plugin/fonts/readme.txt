@@ -1,1 +1,0 @@
-Upload your fonts here, then enter font's file name in plugin settings.

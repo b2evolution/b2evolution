@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -22,7 +22,7 @@ $email_status_colors = array(
 		'simulated'     => 'BBBBBB',
 	);
 
-echo '<h2 class="page-title">'.T_('Email statistics').get_manual_link('email_summary').'</h2>';
+echo '<h2 class="page-title">'.T_('Email statistics').get_manual_link('email-summary').'</h2>';
 
 $start_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) - 29 ) ); // Date of 30 days ago
 $end_date = date( 'Y-m-d', mktime( 0, 0, 0, date( 'm' ), date( 'd' ) ) ); // Today

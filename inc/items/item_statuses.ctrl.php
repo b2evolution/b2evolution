@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -19,7 +19,7 @@ load_class( 'items/model/_itemstatus.class.php', 'ItemStatus' );
 
 
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
@@ -40,7 +40,7 @@ if( param( 'pst_ID', 'integer', '', true ) )
 	{	// We could not find the post status to edit:
 		unset( $edited_ItemStatus );
 		forget_param( 'pst_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Post status') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Post status') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -50,7 +50,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset( $edited_ItemStatus ) )
 		{	// We don't have a model to use, start with blank object:
@@ -66,7 +66,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an pst_ID:
 		param( 'pst_ID', 'integer', true );
@@ -83,7 +83,7 @@ switch( $action )
 		$edited_ItemStatus = new ItemStatus();
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_ItemStatus->load_from_Request() )
@@ -95,7 +95,7 @@ switch( $action )
 			// Update allowed item types
 			$edited_ItemStatus->update_item_types_from_Request();
 
-			$Messages->add( T_('New Post Status has been created.'), 'success' );
+			$Messages->add( TB_('New Post Status has been created.'), 'success' );
 
 			switch( $action )
 			{
@@ -125,7 +125,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemstatus' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an pst_ID:
 		param( 'pst_ID', 'integer', true );
@@ -135,7 +135,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			$edited_ItemStatus->update_item_types_from_Request();
 			$edited_ItemStatus->dbupdate();
-			$Messages->add( T_('Post status has been updated.'), 'success' );
+			$Messages->add( TB_('Post status has been updated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=itemstatuses&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -149,14 +149,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemstatus' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an pst_ID:
 		param( 'pst_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Post Status &laquo;%s&raquo; has been deleted.'), $edited_ItemStatus->dget( 'name' ) );
+			$msg = sprintf( TB_('Post Status &laquo;%s&raquo; has been deleted.'), $edited_ItemStatus->dget( 'name' ) );
 			$edited_ItemStatus->dbdelete();
 			unset( $edited_ItemStatus );
 			forget_param( 'pst_ID' );
@@ -167,7 +167,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_ItemStatus->check_delete( sprintf( T_('Cannot delete Post Status &laquo;%s&raquo;'), $edited_ItemStatus->dget( 'name' ) ) ) )
+			if( ! $edited_ItemStatus->check_delete( sprintf( TB_('Cannot delete Post Status &laquo;%s&raquo;'), $edited_ItemStatus->dget( 'name' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -178,9 +178,9 @@ switch( $action )
 // Generate available blogs list:
 $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'itemstatuses', 'tab' => $tab, 'tab3' => 'statuses' ) );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
-$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
-$AdminUI->breadcrumbpath_add( T_('Post Statuses'), $admin_url.'?ctrl=itemstatuses&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
+$AdminUI->breadcrumbpath_add( TB_('Post Statuses'), $admin_url.'?ctrl=itemstatuses&amp;blog=$blog$&amp;tab=settings&amp;tab3=statuses' );
 
 // Set an url for manual page:
 switch( $action )
@@ -195,6 +195,7 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'managing-item-statuses-form' );
 		break;
 	default:
+		require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 		$AdminUI->set_page_manual_link( 'managing-item-statuses' );
 		break;
 }
@@ -220,7 +221,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_ItemStatus->confirm_delete(
-				sprintf( T_('Delete Post Status &laquo;%s&raquo;?'),  $edited_ItemStatus->dget( 'name' ) ),
+				sprintf( TB_('Delete Post Status &laquo;%s&raquo;?'),  $edited_ItemStatus->dget( 'name' ) ),
 				'itemstatus', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

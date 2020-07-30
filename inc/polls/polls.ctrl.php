@@ -7,18 +7,19 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs( 'polls/model/_poll.funcs.php' );
 load_class( 'polls/model/_poll.class.php', 'Poll' );
 load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
 
 
 // Check minimum permission:
-$current_User->check_perm( 'polls', 'create', true );
+check_user_perm( 'polls', 'create', true );
 
 $AdminUI->set_path( 'site', 'polls' );
 
@@ -31,7 +32,7 @@ if( param( 'pqst_ID', 'integer', '', true ) )
 	{	// We could not find the poll to edit:
 		unset( $edited_Poll );
 		forget_param( 'pqst_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Poll') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Poll') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -43,7 +44,7 @@ if( param( 'popt_ID', 'integer', '', true ) )
 	{	// We could not find the poll option to edit:
 		unset( $edited_PollOption );
 		forget_param( 'popt_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Poll option') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Poll option') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -52,14 +53,14 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'create', true );
+		check_user_perm( 'polls', 'create', true );
 
 		$edited_Poll = new Poll();
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'view', true, $edited_Poll );
+		check_user_perm( 'polls', 'view', true, $edited_Poll );
 		break;
  
 	case 'create':
@@ -70,14 +71,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to create polls:
-		$current_User->check_perm( 'polls', 'create', true );
+		check_user_perm( 'polls', 'create', true );
 
 		// load data from request
 		if( $edited_Poll->load_from_Request() )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_Poll->dbinsert();
-			$Messages->add( T_('New poll has been created.'), 'success' );
+			$Messages->add( TB_('New poll has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=polls', 303 ); // Will EXIT
@@ -93,7 +94,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit the poll:
-		$current_User->check_perm( 'polls', 'edit', true );
+		check_user_perm( 'polls', 'edit', true );
 
 		// Make sure we got an pqst_ID:
 		param( 'pqst_ID', 'integer', true );
@@ -103,7 +104,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update poll in DB:
 			$edited_Poll->dbupdate();
-			$Messages->add( T_('Poll has been updated.'), 'success' );
+			$Messages->add( TB_('Poll has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=polls', 303 ); // Will EXIT
@@ -119,14 +120,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit polls:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'pqst_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// confirmed, Delete from DB:
-			$msg = sprintf( T_('Poll "%s" has been deleted.'), '<b>'.$edited_Poll->get_name().'</b>' );
+			$msg = sprintf( TB_('Poll "%s" has been deleted.'), '<b>'.$edited_Poll->get_name().'</b>' );
 			$edited_Poll->dbdelete();
 			unset( $edited_Poll );
 			forget_param( 'pqst_ID' );
@@ -141,14 +142,14 @@ switch( $action )
 
 	case 'new_option':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		$edited_PollOption = new PollOption();
 		break;
 
 	case 'edit_option':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 		break;
  
 	case 'create_option':
@@ -159,14 +160,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to create polls:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// load data from request
 		if( $edited_PollOption->load_from_Request( $edited_Poll->ID ) )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_PollOption->dbinsert();
-			$Messages->add( T_('New poll option has been created.'), 'success' );
+			$Messages->add( TB_('New poll option has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=polls&action=edit&pqst_ID='.$edited_Poll->ID, 303 ); // Will EXIT
@@ -182,7 +183,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit the poll:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'popt_ID', 'integer', true );
@@ -192,7 +193,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update poll in DB:
 			$edited_PollOption->dbupdate();
-			$Messages->add( T_('Poll option has been updated.'), 'success' );
+			$Messages->add( TB_('Poll option has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=polls&action=edit&pqst_ID='.$edited_Poll->ID, 303 ); // Will EXIT
@@ -208,14 +209,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit polls:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'popt_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// confirmed, Delete from DB:
-			$msg = sprintf( T_('Poll option "%s" has been deleted.'), '<b>'.$edited_PollOption->get_name().'</b>' );
+			$msg = sprintf( TB_('Poll option "%s" has been deleted.'), '<b>'.$edited_PollOption->get_name().'</b>' );
 			$edited_PollOption->dbdelete();
 			unset( $edited_PollOption );
 			forget_param( 'popt_ID' );
@@ -229,8 +230,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Polls'), $admin_url.'?ctrl=polls' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Polls'), $admin_url.'?ctrl=polls' );
 
 if( $action == 'new' || $action == 'edit' )
 {
@@ -285,7 +286,7 @@ switch( $action )
 	case 'delete_option':
 		// We need to ask for confirmation:
 		$edited_PollOption->confirm_delete(
-				sprintf( T_('Delete poll option "%s"?'), '<b>'.$edited_PollOption->get_name().'</b>' ),
+				sprintf( TB_('Delete poll option "%s"?'), '<b>'.$edited_PollOption->get_name().'</b>' ),
 				'poll', $action, array_merge( get_memorized( 'action' ), array( 'action' => 'edit' ) ) );
 		// NO BREAK
 	case 'new':
@@ -297,7 +298,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Poll->confirm_delete(
-				sprintf( T_('Delete poll "%s"?'), '<b>'.$edited_Poll->get_name().'</b>' ),
+				sprintf( TB_('Delete poll "%s"?'), '<b>'.$edited_Poll->get_name().'</b>' ),
 				'poll', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'list':

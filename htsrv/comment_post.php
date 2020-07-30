@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -19,6 +19,8 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
+
+load_funcs( 'comments/model/_comment.funcs.php' );
 
 // Stop a request from the blocked IP addresses or Domains
 antispam_block_request();
@@ -32,7 +34,7 @@ param( 'comment_type', 'string', 'feedback' );
 param( 'redirect_to', 'url', '' );
 param( 'reply_ID', 'integer', 0 );
 
-// Only logged in users can post the meta comments
+// Only logged in users can post the internal comments
 $comment_type = is_logged_in() ? $comment_type : 'feedback';
 
 $action = param_arrayindex( 'submit_comment_post_'.$comment_item_ID, 'save' );
@@ -44,6 +46,8 @@ $commented_Item->load_Blog();
 $blog = $commented_Item->Blog->ID;
 // Initialize global $Collection, $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
 $Collection = $Blog = $commented_Item->Blog;
+
+$allow_anon_url = $commented_Item->Blog->get_setting( 'allow_anon_url' );
 
 // Re-Init charset handling, in case current_charset has changed:
 locale_activate( $commented_Item->Blog->get('locale') );
@@ -64,10 +68,10 @@ if( $Settings->get('system_lock') )
 
 // Check user permissions to post this comment:
 if( $comment_type == 'meta' )
-{ // Meta comment
+{ // Internal comment
 	if( ! $commented_Item->can_meta_comment() )
-	{ // Current user has no permission to post a meta comment
-		$Messages->add( T_('You cannot leave meta comments on this post!'), 'error' );
+	{ // Current user has no permission to post an internal comment
+		$Messages->add( T_('You cannot leave internal comments on this post!'), 'error' );
 		header_redirect(); // Will save $Messages into Session
 	}
 }
@@ -105,6 +109,7 @@ if( is_logged_in( false ) )
 	$url = null;
 	$comment_cookies = null;
 	$comment_allow_msgform = null;
+	param( 'comment_user_notify', 'integer', 0 );
 }
 else
 {	// User is not logged in (registered users), we need some id info from him:
@@ -120,6 +125,7 @@ else
 	}
 	param( 'comment_cookies', 'integer', 0 );
 	param( 'comment_allow_msgform', 'integer', 0 ); // checkbox
+	param( 'comment_anon_notify', 'integer', 0 );
 }
 
 param( 'comment_rating', 'integer', NULL );
@@ -134,6 +140,16 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 // VALIDATION:
 
 $original_comment = $comment;
+
+// CHECK and FORMAT content
+$perm_comment_edit = $User && $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
+$saved_comment = $comment;
+// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
+if( $comment === false )
+{	// ERROR! Restore original comment for further editing:
+	$comment = $saved_comment;
+}
 
 $comment_renderers = param( 'renderers', 'array:string', array() );
 
@@ -151,6 +167,7 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 		'rating' => & $comment_rating,
 		'anon_allow_msgform' => & $comment_allow_msgform,
 		'anon_cookies' => & $comment_cookies,
+		'anon_notify' => & $comment_anon_notify,
 		'User' => & $User,
 		'redirect_to' => & $redirect_to,
 		'crumb_comment' => & $crumb_comment,
@@ -160,17 +177,24 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
 
+// Load workflow properties:
+$load_workflow_result = $commented_Item->load_workflow_from_Request();
+// Load meta custom fields:
+$load_custom_fields_result = ( $comment_type == 'meta' && $commented_Item->load_custom_fields_from_Request( true ) );
+
+$workflow_is_updated = false;
+if( $action != 'preview' &&
+    ( ! empty( $load_workflow_result ) || ! empty( $load_custom_fields_result ) ) &&
+    $commented_Item->dbupdate() )
+{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
+	$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+	$workflow_is_updated = true;
+}
+
 $comments_email_is_detected = false;
 
-if( $User )
-{	// User is logged in (or provided, e.g. via OpenID plugin)
-	// Does user have permission to edit?
-	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
-}
-else
+if( ! $User )
 {	// User is still not logged in
-	// NO permission to edit!
-	$perm_comment_edit = false;
 
 	// We need some id info from the anonymous user:
 	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
@@ -227,15 +251,6 @@ else
 	}
 }
 
-// CHECK and FORMAT content
-$saved_comment = $comment;
-// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
-if( $comment === false )
-{	// ERROR! Restore original comment for further editing:
-	$comment = $saved_comment;
-}
-
 // Flood protection was here and SHOULD NOT have moved down!
 
 /**
@@ -251,6 +266,7 @@ $Comment->set_Item( $commented_Item );
 if( $User )
 { // User is logged in, we'll use his ID
 	$Comment->set_author_User( $User );
+	$Comment->user_notify = $comment_user_notify;
 }
 else
 {	// User is not logged in:
@@ -258,7 +274,10 @@ else
 	$Comment->set( 'author_email', $email );
 	$Comment->set( 'author_url', $url );
 	$Comment->set( 'allow_msgform', $comment_allow_msgform );
+	$Comment->set( 'anon_notify', $comment_anon_notify );
 }
+// Set temporary ID to keep the attached files after redirect to preview comment or to correct some form errors:
+$Comment->temp_link_owner_ID = param( 'temp_link_owner_ID', 'integer', NULL );
 
 if( ! $Comment->is_meta() && $commented_Item->can_rate() )
 {	// Comment rating:
@@ -303,7 +322,7 @@ if( !empty( $preview_attachments ) )
 	}
 }
 
-if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
+if( $commented_Item->can_attach( $Comment->temp_link_owner_ID, $Comment->type ) && !empty( $_FILES['uploadfile'] ) && !empty( $_FILES['uploadfile']['size'] ) && !empty( $_FILES['uploadfile']['size'][0] ) )
 { // attaching files is permitted
 	$FileRootCache = & get_FileRootCache();
 	if( is_logged_in() )
@@ -355,8 +374,10 @@ if( $commented_Item->can_attach() && !empty( $_FILES['uploadfile'] ) && !empty( 
 	}
 }
 
-if( empty( $comment ) && $checked_attachments_count == 0 )
-{ // comment should not be empty!
+$is_empty_comment = ( empty( $comment ) && $checked_attachments_count == 0 );
+if( $is_empty_comment && ! $workflow_is_updated )
+{	// Comment text should not be empty!
+	// (exception if at least one file has been attached or if at least one workflow properties has been updated)
 	$Messages->add_to_group( T_('Please do not send empty comments.'), 'error', T_('Validation errors:') );
 }
 
@@ -368,20 +389,62 @@ $Plugins->trigger_event('BeforeCommentFormInsert', array(
 	'is_preview' => ($action == 'preview'),
 	'action' => & $action ) );
 
+// Validate first enabled captcha plugin:
+$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+	'form_type'  => 'comment',
+	'Comment'    => & $Comment,
+	'is_preview' => ( $action == 'preview' ),
+) );
 
-/*
- * Display error messages:
- */
-if( $Messages->has_errors() && $action != 'preview' )
+if( $load_workflow_result )
+{	// Store changed Item workflow properties in session Comment in order to display them after redirect:
+	$Comment->item_workflow = array(
+		'assigned_user_ID' => $commented_Item->get( 'assigned_user_ID' ),
+		'priority' => $commented_Item->get( 'priority' ),
+		'pst_ID' => $commented_Item->get( 'pst_ID' ),
+		'datedeadline' => $commented_Item->get( 'datedeadline' ),
+	);
+}
+
+if( $load_custom_fields_result )
+{	// Store changed Item custom fields in session Comment in order to display them after redirect:
+	$custom_fields = $commented_Item->get_custom_fields_defs();
+	$Comment->item_custom_fields = array();
+	foreach( $custom_fields as $custom_field )
+	{
+		if( $custom_field['meta'] )
+		{
+			$Comment->item_custom_fields[ $custom_field['name'] ] = $custom_field['value'];
+		}
+	}
+}
+
+// Redirect and:
+// Display error messages for the comment form OR
+// Display success message when workflow has been updated but comment text has not been filled:
+if( ( $Messages->has_errors() && $action != 'preview' ) ||
+    ( $workflow_is_updated && $is_empty_comment ) )
 {
+	global $Session;
+
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );
 	save_comment_to_session( $Comment, 'unsaved', $comment_type );
+	$Session->set( 'core.comment_cookies', $comment_cookies );
 
 	if( !empty( $reply_ID ) )
 	{
 		$redirect_to = url_add_param( $redirect_to, 'reply_ID='.$reply_ID.'&redir=no', '&' );
 	}
+
+	if( $workflow_is_updated &&
+	    $commented_Item->assigned_to_new_user &&
+	    ! empty( $commented_Item->assigned_user_ID ) )
+	{	// Send post assignment notification when only workflow assigned User was changed without posting new comment:
+		$commented_Item->send_assignment_notification();
+	}
+
+	handle_comment_cookies( $comment_cookies, $author, $email, $url, $allow_anon_url );
 
 	header_redirect(); // 303 redirect
 	// exited here
@@ -419,12 +482,15 @@ if( $action == 'preview' )
 	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
 	$Comment->Item = NULL;
 	save_comment_to_session( $Comment, 'preview', $comment_type );
+	$Session->set( 'core.comment_cookies_preview', $comment_cookies );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
 	// This message serves the purpose that the next page will not even try to retrieve preview from cache... (and won't collect data to be cached)
 	// This is session based, so it's not 100% safe to prevent caching. We are also using explicit caching prevention whenever personal data is displayed
-	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', T_('Preview:') );
+	$Messages->add_to_group( T_('This is a preview only! Do not forget to send your comment!'), 'error', /* TRANS: Noun */ T_('Preview:') );
+	// Set affixed variable to float the Messages:
+	$Messages->affixed = true;
 
 	if( $comments_email_is_detected )
 	{ // Comment contains an email address, We should show an error about this
@@ -436,7 +502,7 @@ if( $action == 'preview' )
 			}
 			$link_log_in = 'href="'.get_login_url( 'blocked comment email', $commented_Item->get_url( 'public_view' ) ).'"';
 			$link_register = 'href="'.get_user_register_url( $commented_Item->get_url( 'public_view' ), 'blocked comment email' ).'"';
-			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', T_('Preview:') );
+			$Messages->add_to_group( sprintf( T_('Your comment contains an email address. Please <a %s>log in</a> or <a %s>create an account now</a> instead. This will allow people to send you private messages without revealing your email address to SPAM robots.'), $link_log_in, $link_register ), 'error', /* TRANS: Noun */ T_('Preview:') );
 
 			// Save the user data if he will go to register form after this action
 			$register_user = array(
@@ -447,7 +513,7 @@ if( $action == 'preview' )
 		}
 		else
 		{	// No registration
-			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', T_('Preview:') );
+			$Messages->add_to_group( T_('Your comment contains an email address. We recommend you check the box "Allow message form." below instead. This will allow people to contact you without revealing your email address to SPAM robots.'), 'error', /* TRANS: Noun */ T_('Preview:') );
 		}
 	}
 
@@ -463,6 +529,8 @@ if( $action == 'preview' )
 	}
 
 	$redirect_to .= '#comment_preview';
+
+	handle_comment_cookies( $comment_cookies, $author, $email, $url, $allow_anon_url );
 
 	header_redirect();
 	exit(0);
@@ -521,42 +589,8 @@ if( $result && ( !empty( $preview_attachments ) ) )
 	}
 }
 
-
-/*
- * ---------------
- * Handle cookies:
- * ---------------
- */
-if( !is_logged_in() )
-{
-	if( $comment_cookies )
-	{	// Set cookies:
-		if ($email == '')
-			$email = ' '; // this to make sure a cookie is set for 'no email'
-		if ($url == '')
-			$url = ' '; // this to make sure a cookie is set for 'no url'
-
-		// fplanque: made cookies available for whole site
-		evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
-		evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
-		evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
-	}
-	else
-	{	// Erase cookies:
-		if( !empty($_COOKIE[$cookie_name]) )
-		{
-			evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
-		}
-		if( !empty($_COOKIE[$cookie_email]) )
-		{
-			evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
-		}
-		if( !empty($_COOKIE[$cookie_url]) )
-		{
-			evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
-		}
-	}
-}
+// Handle cookies:
+handle_comment_cookies( $comment_cookies, $author, $email, $url, $allow_anon_url );
 
 // Note: we don't give any clue that we have automatically deleted a comment. It would only give spammers the perfect tool to find out how to pass the filter.
 
@@ -590,10 +624,10 @@ if( $Comment->ID )
 			$success_message = T_('Your comment is now visible by the community.');
 			break;
 		case 'protected':
-			$success_message = T_('Your comment is now visible by the blog members.');
+			$success_message = T_('Your comment is now visible by the members of this section (this collection).');
 			break;
 		case 'review':
-			if( is_logged_in() && $current_User->check_perm( 'blog_comment!review', 'create', false, $blog ) )
+			if( check_user_perm( 'blog_comment!review', 'create', false, $blog ) )
 			{
 				$success_message = T_('Your comment is now visible by moderators only (+You).');
 				break;
@@ -603,6 +637,9 @@ if( $Comment->ID )
 			break;
 	}
 	$Messages->add( $success_message, 'success' );
+
+	// Set affixed variable to float the Messages:
+	$Messages->affixed = true;
 
 	if( !is_logged_in() )
 	{

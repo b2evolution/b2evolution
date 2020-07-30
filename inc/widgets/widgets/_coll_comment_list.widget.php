@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -178,7 +178,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_' );
 
 		$filters = array(
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 				'statuses' => explode( ',', $listBlog->get_setting( 'comment_inskin_statuses' ) ),
 				'order' => $order,
 				'comments' => $limit,
@@ -190,7 +190,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		}
 
 		// Filter list:
-		$CommentList->set_filters( $filters );
+		$CommentList->set_filters( $filters, false ); // we don't want to memorize these params
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
@@ -200,7 +200,7 @@ class coll_comment_list_Widget extends ComponentWidget
 
 		if( $count )
 		{
-			echo $this->disp_params[ 'block_start'];
+			echo $this->disp_params['block_start'];
 
 			// Display title if requested
 			$this->disp_title();
@@ -253,13 +253,36 @@ class coll_comment_list_Widget extends ComponentWidget
 
 			echo $this->disp_params['block_body_end'];
 
-			echo $this->disp_params[ 'block_end' ];
+			echo $this->disp_params['block_end'];
 
 			return true;
 		}
 		else
-		{ // there are no comments to display
+		{	// If there are no comments to display:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no comments to display.' );
 			return false;
+		}
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['list_start'];
+			echo $this->disp_params['item_start'];
+			echo $message;
+			echo $this->disp_params['item_end'];
+			echo $this->disp_params['list_end'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
 		}
 	}
 }

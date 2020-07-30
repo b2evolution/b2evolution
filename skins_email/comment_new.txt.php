@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url;
+global $admin_url, $Session;
 
 // Default params:
 $params = array_merge( array(
@@ -32,21 +32,32 @@ $params = array_merge( array(
 $Comment = $params['Comment'];
 $Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
+$recipient_User = & $params['recipient_User'];
 
-if( $params['notify_type'] == 'meta_comment' )
-{ // Meta comment
-	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
+if( $params['notify_type'] == 'meta_comment' || $params['notify_type'] == 'meta_comment_mentioned' )
+{ // Internal comment
+	$info_text = T_( '%s posted a new internal comment on %s in %s.' );
 }
 else
 { // Normal comment
 	$info_text = T_( '%s posted a new comment on %s in %s.' );
 }
-$notify_message = sprintf( $info_text, $params['author_name'], '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+$author_type = empty( $params['author_ID'] ) ? ' ['.T_('Visitor').']' : ' ['.T_('Member').']';
+$notify_message = sprintf( $info_text, $params['author_name'].$author_type, '"'.$Item->get('title').'"', '"'.$Blog->get('shortname').'"' )."\n\n";
+
+if( $params['notify_type'] == 'comment_mentioned' )
+{	// Add this info line if user was mentioned in the comment content:
+	$notify_message .= T_( 'You were mentioned in this comment.' )."\n\n";
+}
+elseif( $params['notify_type'] == 'meta_comment_mentioned' )
+{	// Add this info line if user was mentioned in the internal comment content:
+	$notify_message .= T_( 'You were mentioned in this internal comment.' )."\n\n";
+}
 
 if( $params['notify_full'] )
 { // Long format notification:
 	$notify_message .=
-		( $params['notify_type'] == 'meta_comment' ? T_('New meta comment') : T_('New comment') ).': '
+		( $params['notify_type'] == 'meta_comment' ? T_('New internal comment') : T_('New comment') ).': '
 		.$Comment->get_permanent_url( '&', '#comments' )."\n"
 		// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 		.T_('Collection').': '.$Blog->get('shortname')."\n"
@@ -55,16 +66,18 @@ if( $params['notify_full'] )
 		// Mail bloat: .' ( '.str_replace('&amp;', '&', $Item->get_permanent_url( '', '', '&' ))." )\n";
 		// TODO: fp> We MAY want to force short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 
-	$ip_list = $Comment->author_IP;
-	$user_domain = gethostbyaddr( $Comment->author_IP );
-	if( $user_domain != $Comment->author_IP )
-	{ // Add host name after author IP address
-		$ip_list .= ', '.$user_domain;
+	if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+	{
+		$session_ID = $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID;
+	}
+	else
+	{
+		$session_ID = $Session->ID;
 	}
 	switch( $Comment->type )
 	{
 		case 'trackback':
-			$notify_message .= T_('Website').": $Comment->author (IP: $ip_list)\n";
+			$notify_message .= T_('Website').": $Comment->author (".T_('Session ID').": $session_ID)\n";
 			$notify_message .= T_('Url').": $Comment->author_url\n";
 			break;
 
@@ -75,7 +88,7 @@ if( $params['notify_full'] )
 			}
 			else
 			{ // Comment from visitor:
-				$notify_message .= T_('Author').": $Comment->author (IP: $ip_list)\n";
+				$notify_message .= T_('Author').": $Comment->author (".T_('Session ID').": $session_ID)\n";
 				$notify_message .= T_('Email').": $Comment->author_email\n";
 				$notify_message .= T_('Url').": $Comment->author_url\n";
 			}
@@ -119,7 +132,7 @@ else
 	{
 		$notify_message .= "\n"
 						.T_('Status').': '.$Comment->get( 't_status' )."\n"
-						.T_( 'This is a short form moderation message. To make these emails more useful for quick moderation, ask the administrator to send you long form moderation messages instead.' )
+						.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' )
 						."\n";
 	}
 }
@@ -158,6 +171,20 @@ switch( $params['notify_type'] )
 			.get_htsrv_url().'quick_unsubscribe.php?type='.$unsubscribe_type.'&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
+	case 'comment_mentioned':
+		// user is mentioned in the comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mentions your name in a comment.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
+	case 'meta_comment_mentioned':
+		// user is mentioned in the internal comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this internal comment, and you are receiving notifications when anyone mentions your name in an internal comment.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in an internal comment, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
 	case 'blog_subscription':
 		// blog subscription
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on any post.' )."\n"
@@ -167,10 +194,18 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'item_subscription':
-		// item subscription
+		// item subscription for registered user:
 		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&user_ID=$user_ID$&key=$unsubscribe_key$';
+		// subscribers are not allowed to see comment author email
+		break;
+
+	case 'anon_subscription':
+		// item subscription for anonymous user:
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when anyone comments on this post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications on this post, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=post&post_ID='.$Item->ID.'&comment_ID='.$params['comment_ID'].'&key=$unsubscribe_key$';
 		// subscribers are not allowed to see comment author email
 		break;
 
@@ -182,9 +217,9 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'meta_comment':
-		// meta comment subscription
-		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' )."\n"
-			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
+		// internal comment subscription
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when internal comment is added on this post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications about internal comments, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 }

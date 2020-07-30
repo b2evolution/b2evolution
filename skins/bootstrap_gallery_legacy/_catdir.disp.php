@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_gallery_skin
@@ -24,6 +24,7 @@ $params = array_merge( array(
 		'item_class'        => 'evo_post evo_content_block',
 		'item_type_class'   => 'evo_post__ptyp_',
 		'item_status_class' => 'evo_post__',
+		'intro_mode'        => 'normal', // Intro posts will be displayed in normal mode
 	), $params );
 
 // ------------------------------- START OF INTRO POST -------------------------------
@@ -121,7 +122,7 @@ if( ! empty( $chapters ) )
 						'image_desc'          => '',
 						'gallery_image_limit'        => 0, // Don't use images from attached folders.
 						'limit'                      => 1, // Get only first attached image depending on position priority, see param below:
-						'restrict_to_image_position' => 'cover,teaser,aftermore,inline',
+						'restrict_to_image_position' => 'cover,background,teaser,aftermore,inline',
 						'get_rendered_attachments'   => false,
 						// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 						'links_sql_select'           => ', CASE '
@@ -143,7 +144,9 @@ if( ! empty( $chapters ) )
 				}
 				// Flag:
 				$item_flag = $Item->get_flag( array(
-						'only_flagged' => true
+						'after'        => ' ',
+						'only_flagged' => true,
+						'allow_toggle' => false,
 					) );
 				// Display a title
 				echo $Item->get_title( array(

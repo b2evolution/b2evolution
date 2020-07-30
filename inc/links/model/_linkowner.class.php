@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -66,14 +66,19 @@ class LinkOwner
 	 */
 	var $ID_field_name;
 
+	/**
+	 * @var integer Last order
+	 */
+	var $last_order = NULL;
+
 
 	/**
 	 * Abstract methods that needs to be overriden in every subclass
 	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
 	 * function get_positions( $file_ID = NULL ); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
-	 * function get_edit_url(); // get link owner edit url
-	 * function get_view_url(); // get link owner view url
+	 * function get_edit_url( $glue = '&amp;', $url_type = NULL ); // get link owner edit url
+	 * function get_view_url( $glue = '&amp;', $url_type = NULL ); // get link owner view url
 	 * function load_Links(); // load link owner all links
 	 * function add_link( $file_ID, $position, $order, $update_owner = true ); // add a new link to link owner
 	 * function load_Blog(); // set Link Owner Blog
@@ -116,20 +121,65 @@ class LinkOwner
 			}
 			else
 			{	// Create new temporary object:
-				global $blog;
 				$tmp_link_Object = new TemporaryID();
-				$tmp_link_Object->set( 'type', $this->type );
-				if( ! empty( $blog ) )
+				if( $this->type == 'comment' && $link_Object->type == 'meta' )
+				{	// Special case for internal (meta) comment so we can determine between internal and regular comments:
+					$tmp_link_Object_type = 'metacomment';
+				}
+				else
 				{
-					$tmp_link_Object->set( 'coll_ID', $blog );
+					$tmp_link_Object_type = $this->type;
+				}
+				$tmp_link_Object->set( 'type', $tmp_link_Object_type );
+				if( ! empty( $this->link_Object->blog_ID ) )
+				{	// Set parent collection ID of Item:
+					$tmp_link_Object->set( 'coll_ID', $this->link_Object->blog_ID );
+				}
+				if( ! empty( $this->link_Object->item_ID ) )
+				{	// Set parent item ID of Comment:
+					$tmp_link_Object->set( 'item_ID', $this->link_Object->item_ID );
 				}
 				$tmp_link_Object->dbinsert();
+				// Update global param in order to don't create temp object twice:
+				set_param( 'temp_link_owner_ID', $tmp_link_Object->ID );
 			}
 
-			// Mark this link owner is using a temporary object:
-			$this->link_Object->tmp_ID = $tmp_link_Object->ID;
-			$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
-			$this->link_Object->type = $tmp_link_Object->get( 'type' );
+			if( ! is_object( $this->link_Object ) || empty( $this->link_Object ) )
+			{	// Try to create object if it is empty by some unknown reason:
+				switch( $this->type )
+				{
+					case 'user':
+						load_class( 'users/model/_user.class.php', 'User' );
+						$this->link_Object = new User();
+						break;
+					case 'item':
+						load_class( 'items/model/_item.class.php', 'Item' );
+						$this->link_Object = new Item();
+						break;
+					case 'comment':
+						load_class( 'comments/model/_comment.class.php', 'Comment' );
+						$this->link_Object = new Comment();
+						break;
+					case 'message':
+						load_class( 'messaging/model/_message.class.php', 'Message' );
+						$this->link_Object = new Message();
+						break;
+					case 'emailcampaign':
+						load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
+						$this->link_Object = new EmailCampaign();
+						break;
+					default:
+						debug_die( 'Unknow LinkOwner type "'.$this->type.'"' );
+				}
+			}
+
+			if( $tmp_link_Object->ID > 0 )
+			{	// Mark this link owner is using a temporary object:
+				$this->link_Object->tmp_ID = $tmp_link_Object->ID;
+				$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
+				$this->link_Object->tmp_item_ID = $tmp_link_Object->get( 'item_ID' );
+				$this->link_Object->tmp_type = $tmp_link_Object->get( 'type' );
+			}
 		}
 	}
 
@@ -214,14 +264,30 @@ class LinkOwner
 		return count( $this->Links );
 	}
 
+
 	/**
-	 * Get Blog
+	 * Get collection object
+	 *
+	 * @return object
 	 */
 	function & get_Blog()
 	{
 		$this->load_Blog();
 
 		return $this->Blog;
+	}
+
+
+	/**
+	 * Get collection ID
+	 *
+	 * @return integer
+	 */
+	function get_blog_ID()
+	{
+		$Blog = & $this->get_Blog();
+
+		return $Blog ? $Blog->ID : 0;
 	}
 
 
@@ -259,7 +325,7 @@ class LinkOwner
 		}
 
 		// Set links query. Note: Use inner join to make sure that result contains only existing files!
-		$SQL->SELECT( 'link_ID, link_ltype_ID, link_position, link_order, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
+		$SQL->SELECT( 'link_ID, link_position, link_order, link_cmt_ID, link_itm_ID, file_ID, file_creator_user_ID, file_type, file_title, file_root_type, file_root_ID, file_path, file_alt, file_desc, file_path_hash' );
 		$SQL->FROM( 'T_links INNER JOIN T_files ON link_file_ID = file_ID' );
 		$SQL->WHERE( $this->get_where_condition() );
 		$SQL->ORDER_BY( $order_by );
@@ -520,12 +586,16 @@ class LinkOwner
 			return 0;
 		}
 
-		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
-		$SQL->SELECT( 'MAX( link_order )' );
-		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
+		if( $this->last_order === NULL )
+		{	// Get last order frin DB:
+			$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
+			$SQL->SELECT( 'MAX( link_order )' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
+			$this->last_order = intval( $DB->get_var( $SQL ) );
+		}
 
-		return intval( $DB->get_var( $SQL ) );
+		return $this->last_order;
 	}
 }
 

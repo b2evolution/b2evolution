@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -21,7 +21,7 @@ class prism_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '6.10.0';
+	var $version = '7.2.0';
 	var $number_of_installs = 1;
 
 
@@ -32,6 +32,30 @@ class prism_plugin extends Plugin
 	{
 		$this->short_desc = T_( 'Display computer code.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
 		$this->long_desc = T_( 'Display computer code rendered by JavaScript plugin Prism.' ).' '.T_( '(Plugin not available in WYSIWYG mode)' );
+	}
+
+
+	/**
+	 * Define here default custom settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_custom_setting_definitions()}.
+	 */
+	function get_custom_setting_definitions( & $params )
+	{
+		return array(
+			'force_load_assets' => array(
+				'label' => T_('Force loading plugin JS/CSS on'),
+				'type' => 'checklist',
+				'options' => array(
+					array( 'single', 'disp=single, disp=page', 0 ),
+					array( 'posts', 'disp=posts', 0 ),
+					array( 'comments', 'disp=comments', 0 ),
+					array( 'front', 'disp=front', 0 ),
+					array( 'other_disps', T_('other disps'), 0 ),
+				)
+			),
+		);
 	}
 
 
@@ -71,14 +95,14 @@ class prism_plugin extends Plugin
 		$ItemCache = & get_ItemCache();
 		$comment_Item = & $ItemCache->get_by_ID( $params['comment_item_ID'], false );
 		if( !$comment_Item )
-		{ // Incorrect item
+		{	// Incorrect item
 			return false;
 		}
 
 		$item_Blog = & $comment_Item->get_Blog();
 		$apply_rendering = $this->get_coll_setting( 'coll_apply_comment_rendering', $item_Blog );
 		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
-		{ // render code blocks in comment
+		{	// render code blocks in comment
 			$params['content' ] = & $params['comment'];
 			$this->FilterItemContents( $params );
 		}
@@ -92,7 +116,7 @@ class prism_plugin extends Plugin
 	{
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( $this->is_renderer_enabled( $apply_rendering, $params['renderers'] ) )
-		{ // render code blocks in message
+		{	// render code blocks in message
 			$this->FilterItemContents( $params );
 		}
 	}
@@ -118,7 +142,39 @@ class prism_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		/* Required a declaration of this method to identify this plugin as renderer */
+		$content = & $params['data'];
+
+		// Add style classes "line-numbers" for <pre> and "language-XXXX" for <code>
+		// for proper rendering prism by JavaScript.
+		// Used for rendering after markdown plugin.
+		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code[^>]*>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
+			array( $this, 'render_codeblock_callback' ), $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Callback to render code block
+	 *
+	 * @param array Matches
+	 *     2 - attribs : lang &| line
+	 *     4 - codeblock content
+	 * @return string Formatted code block
+	 */
+	function render_codeblock_callback( $block )
+	{
+		// set the offset if present - default : 0
+		preg_match( '#line=([^\s]+)#', $block[2], $match );
+		$line = isset( $match[1] ) ? intval( trim( $match[1], '"\'' ) ) : 0;
+		$line = ( $line > 1 ? ' data-start="'.$line.'"' : '' );
+
+		// set the language if present - default : code
+		preg_match( '#lang=([^\s]+)#', $block[2], $match );
+		$language = isset( $match[1] ) ? trim( $match[1], '"\'' ) : '';
+		$language = ( empty( $language ) ? 'code' : strtolower( $language ) );
+
+		return '<pre class="line-numbers"'.$line.'><code class="language-'.$language.'">'.$block[4].'</code></pre>';
 	}
 
 
@@ -164,7 +220,7 @@ class prism_plugin extends Plugin
 		$content = isset( $block[3] ) ? trim( $block[3] ) : '';
 
 		if( empty( $content ) )
-		{ // Don't render if no code content
+		{	// Don't render if no code content
 			return '';
 		}
 
@@ -173,8 +229,8 @@ class prism_plugin extends Plugin
 
 		// Language:
 		$lang = strtolower( preg_replace( '/.*lang="?([a-z]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
-		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
-		{ // Use Markup for unknown language
+		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'html', 'markup', 'apacheconf' ) ) )
+		{	// Use Markup for unknown language
 			$lang = '';
 		}
 
@@ -198,7 +254,7 @@ class prism_plugin extends Plugin
 		$r = '<code'.( empty( $code_class ) ? '' : ' class="'.trim( $code_class ).'"' ).'>'.$content.'</code>';
 
 		if( $type == 'codeblock' )
-		{ // Set special template and attributes only for codeblock
+		{	// Set special template and attributes only for codeblock
 
 			// Detect number of start line:
 			$line = intval( preg_replace( '/.*line="?(-?[0-9]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
@@ -238,13 +294,13 @@ class prism_plugin extends Plugin
 		$content = $block[6];
 
 		if( empty( $block[1] ) )
-		{ // [codespan]
+		{	// [codespan]
 			$code_tag = 'codespan';
 			// codespan doesn't provide line numbers
 			$line = '';
 		}
 		else
-		{ // [codeblock]
+		{	// [codeblock]
 			$code_tag = 'codeblock';
 			// Detect number of start line:
 			preg_match( '/.*data-start="(-?[0-9]+)".*/i', html_entity_decode( $block[1] ), $line );
@@ -259,7 +315,11 @@ class prism_plugin extends Plugin
 		{	// Add lang attribute only if it is defined:
 			preg_match( '/language-([a-z]+)/', $lang, $lang_match );
 			$lang = empty( $lang_match[1] ) ? '' : trim( $lang_match[1] );
-			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
+			if( $lang == 'mermaid' )
+			{	// Don't touch marmaid language because we have a separate special plugin "Mermaid Diagrams" for it:
+				return $block[0];
+			}
+			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'html', 'markup', 'apacheconf' ) ) )
 			{	// Don't allow unknown language:
 				$lang = '';
 			}
@@ -279,42 +339,80 @@ class prism_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 * Check if plugin JS or CSS should be loaded based on the current $disp
+	 */
+	function load_assets()
+	{
+		global $Collection, $Blog, $disp, $evo_renderers_used_in_current_page;
+
+		if( is_array( $evo_renderers_used_in_current_page ) &&
+		    in_array( $this->code, $evo_renderers_used_in_current_page ) )
+		{	// Load load CSS/JS files if this plugin is used on the current page by any Item, Comment, etc.:
+			return true;
+		}
+
+		// Force to load CSS/JS files even if this plugin is NOT used on the current page:
+		$force_load_assets = $this->get_coll_setting( 'force_load_assets', $Blog );
+		switch( $disp )
+		{
+			case 'single':
+			case 'page':
+				$asset_disp = 'single';
+				break;
+
+			case 'posts':
+			case 'comments':
+			case 'front':
+				$asset_disp = $disp;
+				break;
+
+			default:
+				$asset_disp = 'other_disps';
+		}
+		return ! empty( $force_load_assets[ $asset_disp ] );
+	}
+
+
+	/**
+	 * Event handler: Called right after displaying the admin page footer.
 	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterPageFooter( & $params )
+	{
+		global $ctrl;
+
+		if( ( $ctrl == 'campaigns' ) && ( get_param( 'tab' ) == 'send' ) && $this->get_email_setting( 'email_apply_rendering' ) )
+		{	// Load this only on form to preview email campaign:
+			$this->require_js_defer( 'js/prism.min.js', false, 'footerlines' );
+			$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
+		}
+	}
+
+
+	/**
+	 * Event handler: Called at the end of the skin's HTML BODY section.
+	 *
+	 * Use this to add any HTML snippet at the end of the generated page.
 	 *
 	 * @param array Associative array of parameters
 	 */
-	function SkinBeginHtmlHead( & $params )
+	function SkinEndHtmlBody( & $params )
 	{
 		global $Collection, $Blog;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
 		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
+		{	// Don't load css/js files when plugin is not enabled
 			return;
 		}
 
-		$this->require_js( 'js/prism.min.js' );
-		$this->require_css( 'css/prism.min.css' );
-	}
-
-
-	/**
-	 * Event handler: Called when ending the admin html head section.
-	 *
-	 * @param array Associative array of parameters
-	 * @return boolean did we do something?
-	 */
-	function AdminEndHtmlHead( & $params )
-	{
-		global $ctrl;
-
-		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
-		{	// Load this only on form to preview email campaign:
-			$this->require_js( 'js/prism.min.js' );
-			$this->require_css( 'css/prism.min.css' );
+		if( $this->load_assets() )
+		{
+			$this->require_js_defer( 'js/prism.min.js', false, 'footerlines' );
+			$this->require_css_async( 'css/prism.min.css', false, 'footerlines' );
 		}
 	}
 
@@ -328,7 +426,7 @@ class prism_plugin extends Plugin
 	function DisplayCommentToolbar( & $params )
 	{
 		if( !empty( $params['Comment'] ) )
-		{ // Comment is set, get Blog from comment
+		{	// Comment is set, get Blog from comment
 			$Comment = & $params['Comment'];
 			if( !empty( $Comment->item_ID ) )
 			{
@@ -338,10 +436,10 @@ class prism_plugin extends Plugin
 		}
 
 		if( empty( $Blog ) )
-		{ // Comment is not set, try global Blog
+		{	// Comment is not set, try global Blog
 			global $Collection, $Blog;
 			if( empty( $Blog ) )
-			{ // We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
+			{	// We can't get a Blog, this way "apply_comment_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
@@ -400,16 +498,16 @@ class prism_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		if( !empty( $params['Item'] ) )
-		{ // Item is set, get Blog from post
+		{	// Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
 			$Collection = $Blog = & $edited_Item->get_Blog();
 		}
 
 		if( empty( $Blog ) )
-		{ // Item is not set, try global Blog
+		{	// Item is not set, try global Blog
 			global $Collection, $Blog;
 			if( empty( $Blog ) )
-			{ // We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
+			{	// We can't get a Blog, this way "apply_rendering" plugin collection setting is not available
 				return false;
 			}
 		}
@@ -440,6 +538,7 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codespan').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" title="'.T_('Insert HTML codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|html|span" value="HTML" />';
 		echo '<input type="button" title="'.T_('Insert Markup codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|markup|span" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
 		echo '<input type="button" title="'.T_('Insert CSS codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|css|span" value="CSS" />';
 		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|javascript|span" value="JS" />';
@@ -453,6 +552,7 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codeblock').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|html" value="HTML" />';
 		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|markup" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
 		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|css" value="CSS" />';
 		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|javascript" value="JS" />';
@@ -463,9 +563,9 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
-		?><script type="text/javascript">
+		?><script>
 			//<![CDATA[
 			function <?php echo $params['js_prefix']; ?>prism_tag( lang, type )
 			{

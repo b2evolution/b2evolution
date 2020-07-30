@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -19,10 +19,10 @@ load_funcs('skins/_skin.funcs.php');
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
-require_js( '#jquery#', 'rsc_url' );
+require_js_defer( '#jquery#', 'rsc_url' );
 
 // Bootstrap
-require_js( '#bootstrap#', 'rsc_url' );
+require_js_defer( '#bootstrap#', 'rsc_url' );
 require_css( '#bootstrap_css#', 'rsc_url' );
 // require_css( '#bootstrap_theme_css#', 'rsc_url' );
 
@@ -73,6 +73,7 @@ $login_form_params = array(
 	'customstart'    => '<div class="custom_content">',
 	'customend'      => "</div>\n",
 	'note_format'    => ' <span class="help-inline">%s</span>',
+	'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 	// Additional params depending on field type:
 	// - checkbox
 	'inputclass_checkbox'    => '',

@@ -1,4 +1,4 @@
-/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution, including BACK-OFFICE */
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -8,19 +8,184 @@
 	border-radius: @radius;
 }
 
+
+@media (min-width: 1785px) {
+	.container-xxl {
+		width: 1755px;
+	}
+	.col-xxl-1, .col-xxl-2, .col-xxl-3, .col-xxl-4, .col-xxl-5, .col-xxl-6, .col-xxl-7, .col-xxl-8, .col-xxl-9, .col-xxl-10, .col-xxl-11, .col-xxl-12 {
+		float: left;
+	}
+	.col-xxl-12 {
+		width: 100%;
+	}
+	.col-xxl-11 {
+		width: 91.66666667%;
+	}
+	.col-xxl-10 {
+		width: 83.33333333%;
+	}
+	.col-xxl-9 {
+		width: 75%;
+	}
+	.col-xxl-8 {
+		width: 66.66666667%;
+	}
+	.col-xxl-7 {
+		width: 58.33333333%;
+	}
+	.col-xxl-6 {
+		width: 50%;
+	}
+	.col-xxl-5 {
+		width: 41.66666667%;
+	}
+	.col-xxl-4 {
+		width: 33.33333333%;
+	}
+	.col-xxl-3 {
+		width: 25%;
+	}
+	.col-xxl-2 {
+		width: 16.66666667%;
+	}
+	.col-xxl-1 {
+		width: 8.33333333%;
+	}
+	.col-xxl-pull-12 {
+		right: 100%;
+	}
+	.col-xxl-pull-11 {
+		right: 91.66666667%;
+	}
+	.col-xxl-pull-10 {
+		right: 83.33333333%;
+	}
+	.col-xxl-pull-9 {
+		right: 75%;
+	}
+	.col-xxl-pull-8 {
+		right: 66.66666667%;
+	}
+	.col-xxl-pull-7 {
+		right: 58.33333333%;
+	}
+	.col-xxl-pull-6 {
+		right: 50%;
+	}
+	.col-xxl-pull-5 {
+		right: 41.66666667%;
+	}
+	.col-xxl-pull-4 {
+		right: 33.33333333%;
+	}
+	.col-xxl-pull-3 {
+		right: 25%;
+	}
+	.col-xxl-pull-2 {
+		right: 16.66666667%;
+	}
+	.col-xxl-pull-1 {
+		right: 8.33333333%;
+	}
+	.col-xxl-pull-0 {
+		right: auto;
+	}
+	.col-xxl-push-12 {
+		left: 100%;
+	}
+	.col-xxl-push-11 {
+		left: 91.66666667%;
+	}
+	.col-xxl-push-10 {
+		left: 83.33333333%;
+	}
+	.col-xxl-push-9 {
+		left: 75%;
+	}
+	.col-xxl-push-8 {
+		left: 66.66666667%;
+	}
+	.col-xxl-push-7 {
+		left: 58.33333333%;
+	}
+	.col-xxl-push-6 {
+		left: 50%;
+	}
+	.col-xxl-push-5 {
+		left: 41.66666667%;
+	}
+	.col-xxl-push-4 {
+		left: 33.33333333%;
+	}
+	.col-xxl-push-3 {
+		left: 25%;
+	}
+	.col-xxl-push-2 {
+		left: 16.66666667%;
+	}
+	.col-xxl-push-1 {
+		left: 8.33333333%;
+	}
+	.col-xxl-push-0 {
+		left: auto;
+	}
+	.col-xxl-offset-12 {
+		margin-left: 100%;
+	}
+	.col-xxl-offset-11 {
+		margin-left: 91.66666667%;
+	}
+	.col-xxl-offset-10 {
+		margin-left: 83.33333333%;
+	}
+	.col-xxl-offset-9 {
+		margin-left: 75%;
+	}
+	.col-xxl-offset-8 {
+		margin-left: 66.66666667%;
+	}
+	.col-xxl-offset-7 {
+		margin-left: 58.33333333%;
+	}
+	.col-xxl-offset-6 {
+		margin-left: 50%;
+	}
+	.col-xxl-offset-5 {
+		margin-left: 41.66666667%;
+	}
+	.col-xxl-offset-4 {
+		margin-left: 33.33333333%;
+	}
+	.col-xxl-offset-3 {
+		margin-left: 25%;
+	}
+	.col-xxl-offset-2 {
+		margin-left: 16.66666667%;
+	}
+	.col-xxl-offset-1 {
+		margin-left: 8.33333333%;
+	}
+	.col-xxl-offset-0 {
+		margin-left: 0;
+	}
+}
+
 // Fix for forms
 // We want this only on Small devices and up(tablets, 768px and up)
 // We DON'T want this when labels are stacked
 @media (min-width: 768px) {
-	div.radio:last-of-type,
-	div.checkbox:last-of-type {
-		padding-bottom: 7px;
-	}
 	.text-left-sm {
 		text-align: left;
 	}
 	.text-right-sm {
 		text-align: right;
+	}
+	.pull-left-sm {
+		float: left;
+	}
+	.pull-right-sm {
+		float: right;
 	}
 }
 
@@ -32,6 +197,12 @@
 	.text-right-md {
 		text-align: right;
 	}
+	.pull-left-md {
+		float: left;
+	}
+	.pull-right-md {
+		float: right;
+	}
 }
 
 /* Large devices (large desktops, 1200px and up) */
@@ -41,6 +212,12 @@
 	}
 	.text-right-lg {
 		text-align: right;
+	}
+	.pull-left-lg {
+		float: left;
+	}
+	.pull-right-lg {
+		float: right;
 	}
 }
 
@@ -62,6 +239,13 @@ p.margin-top {
 	margin: 10px 0 0 0;
 }
 
+// Remove unwanted space at the bottom of table cell:
+th, td, caption {
+	> p:last-child {
+		margin-bottom: 0;
+	}
+}
+
 // Use yellow color on hover table rows intead of grey standard color:
 .table-hover > tbody > tr:hover {
 	background-color: #ffc;
@@ -76,6 +260,11 @@ p.margin-top {
 			// Use only white icons in color buttons
 			color: #FFF !important;
 		}
+	}
+	&.btn-danger-hover:hover {
+		color: #fff;
+		background-color: #c9302c;
+		border-color: #ac2925;
 	}
 }
 .evo_widget{
@@ -92,6 +281,14 @@ p.margin-top {
 .input-group .btn {
 	margin-top: 0;
 	margin-bottom: 0;
+}
+
+// Style to make space between inline buttons:
+.btn-margin-right {
+	margin-right: 5px;
+	.btn-group & {
+		margin-right: 0;
+	}
 }
 
 // Keep almost same style for active disabled buttons (used by TinyMCE plugin)
@@ -151,6 +348,9 @@ a.btn.action_icon {
 		.help-inline {
 			color: #999;
 			font-size: 84%;
+			label {
+				font-weight: normal;
+			}
 		}
 		.form-control {
 			display: inline-block;
@@ -200,7 +400,7 @@ a.btn.action_icon {
 		padding-left: 0;
 	}
 	// Don't use bold for radio/checkbox text
-	label.radio-inline {
+	label.radio-inline, label.radiooption {
 		font-weight: normal;
 	}
 	div.radio, div.checkbox {
@@ -208,32 +408,23 @@ a.btn.action_icon {
 			font-weight: normal;
 		}
 	}
+	.checkbox_with_input {
+		input[type=checkbox] {
+			position: relative;
+			margin-right: 5px;
+		}
+	}
 	// Fix for text input elements that go after radio inputs on one line
 	div.radio label .form_text_input {
 		vertical-align: top;
 		margin-left: 7px;
 	}
-	// Table on the edit post form where Title/Language  & Advanced Properties are located
-	.compose_layout {
-		td {
-			padding: 0 2px 15px 0;
-			vertical-align: middle;
-		}
-		th.label, td.label {
-			display: table-cell;
-			color: #333;
-			font-size: 100%;
-			label {
-				margin: 0;
-			}
-		}
-		td.input div.tile label.control-label {
-			display: none;
-		}
-	}
 	#itemform_custom_fields {
 		.panel-body .form-group:last-child {
 			margin-bottom: 0;
+		}
+		.help-inline label {
+			font-weight: normal;
 		}
 	}
 	// Select category table on edit post form
@@ -247,14 +438,7 @@ a.btn.action_icon {
 		}
 	}
 	// Properties block on edit post form
-	#itemform_edit_timestamp > input[type=text] {
-		display: inline-block;
-		width: auto;
-	}
-	#itemform_extra, #itemform_edit_timestamp {
-		#itemform_edit_timestamp {
-			padding: 10px 0;
-		}
+	#itemform_extra {
 		label {
 			padding-left: 20px;
 			margin-right: 5px;
@@ -277,11 +461,32 @@ a.btn.action_icon {
 			padding-right: 5px;
 		}
 	}
+	// Location:
+	#item_locations {
+		th, td {
+			white-space: nowrap;
+			padding: 2px 0;
+		}
+		label {
+			width: auto;
+			float: right;
+		}
+		select {
+			display: inline-block;
+		}
+	}
 	// Text Renderers block on edit post form
-	#itemform_renderers {
+	#itemform_renderers, #commentform_renderers {
+		.dropdown-menu {
+			padding: 10px 10px 5px 10px;
+		}
+		.popover {
+			max-width: initial;
+		}
 		div[id^="block_renderer_"] {
 			padding-left: 20px;
 			position: relative;
+			white-space: nowrap;
 			input[type=checkbox] {
 				margin: 4px 0 0;
 				position: absolute;
@@ -303,13 +508,75 @@ a.btn.action_icon {
 			width: 97%;
 		}
 	}
-	.form-group, #criteria_type_A2 {
+	.form-group {
 		margin-top: 2px;
 		&.large {
 			width: 100%;
 		}
 	}
 }
+// Responsive table for form fields:
+.evo_fields_table {
+	display: table;
+	width: 100%;
+	// Style to keep all fields in single row:
+	&.evo_fields_table__single_row {
+		.evo_fields_table__field {
+			display: table-cell;
+			& + .evo_fields_table__field .evo_fields_table__label {
+				padding-left: 10px;
+			}
+		}
+	}
+}
+.evo_fields_table__field {
+	display: table-row;
+	width: 100%;
+	.evo_fields_table__label {
+		display: table-cell;
+		color: #333;
+		font-weight: bold;
+		white-space: nowrap;
+		padding: 5px 10px 15px 0;
+		vertical-align: top;
+		text-align: right;
+	}
+	.evo_fields_table__input {
+		display: table-cell;
+		width: 100%;
+		padding-bottom: 15px;
+		.help-inline {
+			color: #999;
+			font-size: 84%;
+		}
+		input {
+			display: inline-block;
+		}
+	}
+}
+@media (max-width: 767px) {
+	.evo_fields_table.evo_fields_table__single_row .evo_fields_table__field {
+		display: table;
+		& + .evo_fields_table__field .evo_fields_table__label {
+			padding-left: 0;
+		}
+	}
+}
+@media (max-width: 413px) {
+	.evo_fields_table__field {
+		.evo_fields_table__input {
+			display: block;
+		}
+		.evo_fields_table__label {
+			display: block;
+			padding: 0 0 5px 0;
+			margin: 0;
+			white-space: normal;
+			text-align: left;
+		}
+	}
+}
+
 // Vertical alignment for recipient field on contact form:
 .evo_msgform_recipient {
 	label.control-label, div.controls {
@@ -390,6 +657,10 @@ form ul.token-input-list-facebook {
 					transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 	.border-radius;
 	padding: 4px 4px 0 4px;
+	&.token-input-list-process {
+		background: #fcf8e3;
+		border: 1px solid #f5e79e;
+	}
 	&.token-input-list-error {
 		background: #fbf2ee;
 		border: 1px solid #d99;
@@ -408,6 +679,45 @@ form ul.token-input-list-facebook {
 			margin: 0 4px 4px 0;
 		}
 	}
+}
+// Fix z-index to make it visible inside bootstrap modal window:
+body.modal-open div.token-input-dropdown-facebook {
+	z-index: 10002;
+}
+// Fix style for form of editing tags from widget:
+.evo_widget.widget_core_item_tags {
+	form {
+		display: inline-block;
+		vertical-align: middle;
+		ul.token-input-list-facebook {
+			width: 100%;
+			max-width: 100%;
+		}
+		#item_tags {
+			display: inline-block;
+			width: auto;
+			vertical-align: middle;
+			width: 100%;
+		}
+		input[type=submit] {
+			margin: 0;
+		}
+	}
+	.panel-body {
+		.post_tags {
+			margin: 0;
+			display: inline;
+		}
+		form, #item_tags {
+			width: 100%;
+		}
+	}
+}
+// Fix style for author input field in search form
+.extended_search_form  ul.token-input-list-facebook {
+	max-width: 100%;
+	padding-top: 5px;
+	padding-left: 12px;
 }
 
 // Results table
@@ -430,6 +740,21 @@ div.results {
 			border-bottom: none;
 		}
 	}
+
+	.results_header {
+		padding: 5px 10px;
+		background-color: #f9f9f9;
+	}
+	.results_footer {
+		// Pager in footer + select "lines per page"
+		padding: 5px;
+		background-color: #f9f9f9;
+	}
+
+	.pagination {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	}
 	.page_size_selector {
 		margin-bottom: 5px;
 		display: block;
@@ -438,13 +763,10 @@ div.results {
 			width: auto;
 		}
 	}
-	.pagination {
-		margin-top: 5px;
-		margin-bottom: 5px;
-	}
+
 	tr.placeholder {
 		position: relative;
-		&:before {
+		&::before {
 			content: "";
 			position: absolute;
 			width: 0;
@@ -455,7 +777,7 @@ div.results {
 			margin-top: -5px;
 			left: 0;
 		}
-		&:after {
+		&::after {
 			content: "";
 			position: absolute;
 			width: 100%;
@@ -480,35 +802,74 @@ div.results {
 		max-width: none;
 	}
 }
-// Filters in results table
+
+// Filters at the top of the Results table:
 div.filters {
-	margin-bottom: 0;
-	background: none;
+	background-color: #f9f9f9;
 	border: none;
-	> div {
-		margin-left: 0;
-	}
-	// Align a filter button to the right
-	button.filter {
-		float: right;
-		padding: 4px 12px;
-	}
-	// Set vertical spaces between the filter inputs
-	.block {
-		display: inline-block;
-		margin: 2px;
-	}
 	&.panel-body {
-		padding: 15px;
+		padding: 6px 10px;
 	}
-	// Fix style for fields with autocomplete usernames:
-	.twitter-typeahead {
-		vertical-align: middle;
-		.tt-dropdown-menu div {
-			margin-left: 0;
+
+	// For the whole filter form:
+	.form-inline{
+		margin: 5px -10px 0;
+		// For each  label:input :
+		.form-group {
+			margin: 5px 10px 2px;
 		}
 	}
+	// Styles for button on the right:
+	.evo_btn_apply_filters {
+		margin: 0;
+	}
+
+	// Advanced filters area:
+	.evo_results_filters__advanced {
+		position: relative;
+		.evo_results_filters__defaults_btn {
+			position: absolute;
+			top: 10px;
+			right: 0;
+		}
+	}
+
+	// Fix style for Username fields with autocomplete:
+	.twitter-typeahead {
+		vertical-align: middle; // otherwise "Username:" label is misaligned
+	}
+
+	// Fix style for Query Builder (e-g Users filtering)
+	.query-builder {
+		margin: -15px 0 -12px -4px; 
+		> .rules-group-container {
+			// First group:
+			border: none;
+			background: transparent;
+		}
+	}
+
+	// In BackOffice > Contents > Posts we display the "cuurrent filters" widget in the form:
+	.filters_item_list_table {
+		margin: 0 8px;
+	}
 }
+
+// Navigation used in normal Results abut also post browsing
+.results_summary {
+	float: left;
+	font-weight: bold;
+	// padding: 6px 0;
+	margin-top: 5px;
+	// margin-top: 10px;
+}
+.evo_pager {
+	text-align: center;
+}
+
+
+
+
 .table_scroll .table {
 	margin-bottom: 0;
 }
@@ -521,7 +882,7 @@ div.messages{
 	max-width: 100%;
 	color: #333;
 	&.right {
-		text-align: left;
+		text-align: left !important;
 		&.popover-userfield {
 			// Shift a popover window to the right on 35px to don't hide a plus icon
 			margin-left: 35px !important;
@@ -541,7 +902,7 @@ div.messages{
 a:hover .glyphicon {
 	color: #2A6496;
 }
-.glyphicon:before {
+.glyphicon::before {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -564,7 +925,7 @@ a:hover .glyphicon {
 }
 
 // Make a label inline
-#itemform_renderers, #itemform_edit_timestamp, table.catselect {
+table.catselect {
 	label {
 		display: inline-block;
 		margin-right: 5px;
@@ -623,30 +984,34 @@ select:focus:invalid:focus {
 
 // Panels
 .panel-heading {
+	padding-top: 0;
+	padding-bottom: 0;
+	line-height: 36px;
+	.panel-title {
+		line-height: 36px;
+	}
 	h4 {
 		margin: 0;
 	}
 	.close {
-		position: relative;
-		top: -4px;
+		float: none;
 	}
 	.btn-group {
 		margin-left: 6px;
 	}
 	.panel_heading_action_icons {
-		margin-top: -6px;
 		.btn {
-			margin: 0 3px 3px 0;
+			margin: 0 3px 2px 0;
 		}
-		.btn:last-child {
-			margin: 0 0 3px 0;
+		.btn:last-child, .btn-group .btn {
+			margin-right: 0;
 		}
 		.btn-group {
 			margin: 0 6px 0 0;
-			.btn {
-				margin: 0 0 3px 0;
-			}
 		}
+	}
+	img.avatar_before_login {
+		vertical-align: middle;
 	}
 }
 legend.panel-heading {
@@ -731,6 +1096,9 @@ legend.panel-heading {
 	.form-control.form_textarea_input {
 		display: block;
 	}
+	.form-control.evo_template_select {
+		width: calc( 100% - 24px );
+	}
 }
 
 // Plugin toolbars
@@ -769,14 +1137,29 @@ div.edit_toolbars, div.message_toolbars {
 		}
 	}
 }
+
+// Text editor controls
+.text_editor_controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: normal;
+}
+.comment_text_renderers {
+	margin-top: -12px;
+}
+
 // Plugin buttons
 .edit_plugin_actions {
-	padding-top: 7px;
+	margin-top: 4px;
 }
 
 // Badge
 .badge-important {
 	background-color: #F00 !important;
+	color: #FFF !important;
+}
+.badge-primary {
+	background-color: #337ab7 !important;
 	color: #FFF !important;
 }
 .badge-info {
@@ -812,8 +1195,8 @@ div.edit_toolbars, div.message_toolbars {
 // Fix colorbox sizes
 #colorbox,
 #colorbox *,
-#colorbox *:before,
-#colorbox *:after {
+#colorbox *::before,
+#colorbox *::after {
 	-webkit-box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	box-sizing: content-box;
@@ -835,18 +1218,34 @@ div.edit_toolbars, div.message_toolbars {
 		margin-bottom: 3px;
 	}
 }
+// Modal window with percent height:
+#modal_window.evo_modal_window__percent_height {
+	.modal-content {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+	}
+	.modal-body {
+		height: 100%;
+		overflow: hidden;
+		padding-top: 0;
+	}
+	.modal-footer {
+		flex-shrink: 0;
+	}
+}
 
-// Typeahead plugin
+// Typeahead plugin FOR username autosuggest
 .tt-dropdown-menu {
 	background-color: #FFFFFF;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	.border-radius(8px);
+	border-radius: 3px;
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	padding: 8px 0;
+	padding: 0;
 	.tt-suggestion {
-		font-size: 18px;
-		line-height: 24px;
-		padding: 3px 20px;
+		font-size: 14px;
+		// line-height: px;
+		padding: 4px 10px;
 		&.tt-cursor {
 			background-color: #0097CF;
 			color: #FFFFFF;
@@ -934,7 +1333,7 @@ div.edit_toolbars, div.message_toolbars {
 		a {
 			display: inline-block;
 			&:last-child {
-				margin-bottom: 0;
+				// margin-bottom: 0;
 			}
 		}
 	}
@@ -989,11 +1388,8 @@ div.edit_toolbars, div.message_toolbars {
 }
 
 // Widgets containers "Sidebar" and "Sidebar 2":
-.evo_container__sidebar, .evo_container__sidebar2 {
+.evo_container__sidebar, .evo_container__sidebar_2 {
 	// .widget_core_menu_link
-	// .widget_core_msg_menu_link
-	// .widget_core_profile_menu_link
-	// .widget_core_flag_menu_link
 	.evo_widget[class$=_menu_link] a.btn {
 		width: 100%;
 	}
@@ -1011,16 +1407,200 @@ div.edit_toolbars, div.message_toolbars {
 // Grouped form fieldsets with bootstrap js accordion toggle behavior:
 .accordion-caret {
 	.accordion-toggler {
-		&:before {
-			padding-right: 3px;
+		&::before {
 			font-size: 14px;
 			font-family: FontAwesome;
 		}
-		&:not(.collapsed):before {
+		&:not(.collapsed)::before {
+			padding-right: 3px;
 			content: '\f0d7';
 		}
-		&.collapsed:before {
+		&.collapsed::before {
+			padding-right: 6px;
 			content: '\f0da';
 		}
+	}
+}
+
+// Widgets of container "Login Required" on disp=access_requires_login:
+.disp_access_requires_login, .disp_content_requires_login {
+	.evo_widget {
+		&.widget_core_content_block.panel {
+			background: none;
+			border: none;
+			box-shadow: none;
+			margin: 0;
+			.panel-body {
+				padding: 0;
+			}
+			.panel-body, .evo_post__full_text.clearfix {
+				&::before, &::after {
+					// Change this from default bootstrap value "table", in order to
+					// avoid double space of 10px margin between <p> and login form:
+					display: block;
+				}
+			}
+		}
+		&.widget_core_user_login {
+			max-width: 400px;
+			margin: 10px auto;
+		}
+	}
+}
+
+// Fix group button border radius for screens > xs size:
+@media (min-width: 768px) {
+	.panel_heading_action_icons .btn-group.dropdown.single-group-xs a.btn.btn-sm {
+		border-radius: 3px;
+	}
+}
+
+
+// Widget "Item Workflow Properties":
+.evo_widget.widget_core_item_workflow {
+	.panel-body {
+		img.avatar_before_login {
+			vertical-align: middle;
+		}
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+
+// Fieldset folding:
+div.fieldset_wrapper.folded .panel-body {
+	display: none;
+}
+span[id^=title_folding_] {
+	cursor: default;
+}
+
+// Widget "Language/Locale/Version switch":
+.evo_widget.widget_core_coll_locale_switch {
+	ul {
+		list-style: none;
+	}
+}
+
+// Comment status badge
+.evo_comment_title {
+	position: relative;
+	>.evo_status.pull-right {
+		position: absolute;
+		top: 50%;
+		right: 0;
+		transform: translateY(-50%);
+	}
+}
+.evo_comment_subtitle.pull-right {
+	.evo_status.pull-right {
+		position: relative;
+		float: none !important;
+		display: inline-block;
+		margin-left: 6px;
+	}
+}
+
+// Comment footer
+.evo_content_block {
+	.evo_comment_info {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
+	}
+}
+
+// Align post images left or right automatically inside widget "Content Block":
+@media (min-width: 768px) {
+	.alternate-left-right {
+		> div {
+			.evo_content_block_images {
+				width: 40%;
+			}
+			&:nth-child( even ) {
+				.evo_content_block_images {
+					float: left;
+					margin-right: 1em;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_content_block_images {
+					float: right;
+					margin-left: 1em;
+				}
+			}
+		}
+	}
+}
+@media (min-width: 1785px) {
+	.alternate-left-right {
+		> div {
+			.evo_content_block_images {
+				position: relative;
+				width: 60%;
+			}
+			.evo_content_block_text {
+				position: relative;
+				width: 125%;
+			}
+			&:nth-child( even ) {
+				.evo_content_block_images, .evo_content_block_text {
+					left: -295px;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_content_block_images {
+					left: 295px;
+					margin-left: -285px;
+				}
+			}
+		}
+	}
+}
+
+
+// Comment Workflow
+.comment-workflow-form {
+	display: flex !important;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	.controls {
+		display: flex !important;
+		flex-direction: row;
+		align-items: center;
+		> * {
+			margin-left: 6px;
+		}
+	}
+}
+
+// Affix sidebars:
+#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
+	&.evo_affixed {
+		position: fixed;
+		z-index: 100;
+	}
+}
+// Don't fix a position of ALL sidebars when window height <= 800px OR width <= 992px:
+@media (max-height:800px),(max-width:992px) {
+	#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
+		&.evo_affixed {
+			position: static;
+		}
+	}
+	.evo_affixed_spacer {
+		display: none;
 	}
 }

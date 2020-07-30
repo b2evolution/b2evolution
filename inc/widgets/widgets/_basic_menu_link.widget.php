@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -40,37 +40,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		// Call parent constructor:
 		parent::__construct( $db_row, 'core', 'basic_menu_link' );
 
-		$this->link_types = array(
-			'home' => T_('Front Page'),
-			'recentposts' => T_('Recent posts'),
-			'search' => T_('Search page'),
-			'arcdir' => T_('Archive directory'),
-			'catdir' => T_('Category directory'),
-			'tags' => T_('Tags'),
-			'postidx' => T_('Post index'),
-			'mediaidx' => T_('Photo index'),
-			'sitemap' => T_('Site Map'),
-			'latestcomments' => T_('Latest comments'),
-
-			'ownercontact' => T_('Blog owner contact form'),
-			'owneruserinfo' => T_('Blog owner profile'),
-
-			'users' => T_('User directory'),
-
-			'login' => T_('Log in form'),
-			'logout' => T_('Logout link'),
-			'register' => T_('Registration form'),
-			'myprofile' => T_('My profile'),
-			'profile' => T_('Edit profile'),
-			'avatar' => T_('Edit profile picture'),
-			'visits' => T_('My visits'),
-
-			'item' => T_('Any item (post, page, etc...)'),
-			'postnew' => T_('New Item'),
-
-			'admin' => T_('Admin / Back-Office link'),
-			'url' => T_('Any URL'),
-		);
+		$this->link_types = get_menu_types();
 	}
 
 
@@ -109,7 +79,13 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 
 		if( !empty($this->param_array['link_type']) )
 		{	// TRANS: %s is the link type, e. g. "Blog home" or "Log in form"
-			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
+			foreach( $this->link_types as $link_types )
+			{
+				if( isset( $link_types[ $this->param_array['link_type'] ] ) )
+				{
+					return sprintf( T_('Link to: %s'), $link_types[ $this->param_array['link_type'] ] );
+				}
+			}
 		}
 
 		return $this->get_name();
@@ -135,10 +111,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 	{
 		global $admin_url;
 
+		$default_link_type = 'home';
+		$current_link_type = $this->get_param( 'link_type', $default_link_type );
+
 		// Check if field "Collection ID" is disabled because of link type and site uses only one fixed collection for profile pages:
-		$coll_id_is_disabled = ( empty( $params['infinite_loop'] )
-			&& in_array( $this->get_param( 'link_type', true ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
-			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
+		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
+		$coll_id_is_disabled = in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar', 'messages', 'contacts' ) );
+
+		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
 				'link_type' => array(
@@ -146,7 +126,22 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $this->link_types,
-					'defaultvalue' => 'home',
+					'defaultvalue' => $default_link_type,
+				),
+				'coll_logo_size' => array(
+					'type' => 'select',
+					'label' => T_('Collection logo before link text'),
+					'options' => get_available_thumb_sizes( T_('No logo') ),
+					'defaultvalue' => '',
+					'hide' => in_array( $current_link_type, array( 'item', 'admin', 'url' ) ),
+				),
+				'profile_picture_size' => array(
+					'label' => T_('Profile picture before text'),
+					'note' => '',
+					'type' => 'select',
+					'options' => get_available_thumb_sizes( T_('No picture') ),
+					'defaultvalue' => '',
+					'hide' => ! in_array( $current_link_type, array( 'logout', 'myprofile', 'visits', 'profile', 'avatar', 'useritems', 'usercomments' ) ),
 				),
 				'link_text' => array(
 					'label' => T_('Link text'),
@@ -155,36 +150,45 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'size' => 20,
 					'defaultvalue' => '',
 				),
+				'show_badge' => array(
+					'label' => T_('Show Badge'),
+					'note' => T_('Show a badge with count.'),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+					'hide' => ! in_array( $current_link_type, array( 'messages', 'flagged' ) ),
+				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
 					'note' => T_( 'Leave empty for current collection.' )
-						.( $coll_id_is_disabled ? ' <span class="red">'.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+						.( $msg_Blog ? ' <span class="evo_setting_coll_disabled red"'.( $coll_id_is_disabled ? '' : ' style="display:none"' ).'>'
+							.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
 								'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
 								'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
-					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
+					'disabled' => $coll_id_is_disabled && $msg_Blog ? 'disabled' : false,
+					'hide' => in_array( $current_link_type, array( 'item', 'admin', 'url' ) ),
 				),
-				'visibility' => array(
-					'label' => T_( 'Visibility' ),
-					'note' => '',
-					'type' => 'radio',
-					'options' => array(
-							array( 'always', T_( 'Always show (cacheable)') ),
-							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
-					'defaultvalue' => 'always',
-					'field_lines' => true,
-				),
-				// fp> TODO: ideally we would have a link icon to go click on the destination...
-				'item_ID' => array(
-					'label' => T_('Item ID'),
-					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ),
+				'cat_ID' => array(
+					'label' => T_('Category ID'),
+					'note' => T_('Leave empty for default category.'),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
 					'defaultvalue' => '',
+					'hide' => ! in_array( $current_link_type, array( 'recentposts', 'postnew' ) ),
+				),
+				// fp> TODO: ideally we would have a link icon to go click on the destination...
+				'item_ID' => array(
+					'label' => T_('Item ID'),
+					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ).' '.$this->get_param_item_info( 'item_ID' ),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'size' => 5,
+					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'item' ),
 				),
 				'link_href' => array(
 					'label' => T_('URL'),
@@ -192,6 +196,18 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'type' => 'text',
 					'size' => 30,
 					'defaultvalue' => '',
+					'hide' => ( $current_link_type != 'url' ),
+				),
+				'show_to' => array(
+					'label' => T_('Show to'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array( array( 'any', T_('All users') ),
+										array( 'loggedin', T_('Logged in users') ),
+										array( 'perms', T_('Users with permissions only') ) ),
+					'defaultvalue' => 'perms',
+					'field_lines' => true,
+					'hide' => ! in_array( $current_link_type, array( 'messages', 'contacts' ) ),
 				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current'),
@@ -204,9 +220,78 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'defaultvalue' => 'yes',
 					'field_lines' => true,
 				),
+				'hide_empty' => array(
+					'label' => T_('Hide if empty'),
+					'note' => T_('Check to hide this menu if the list is empty.'),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
+					'hide' => ( $current_link_type != 'flagged' ),
+				),
+				'visibility' => array(
+					'label' => T_( 'Visibility' ),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'always', T_( 'Always show (cacheable)') ),
+							array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) ) ),
+					'defaultvalue' => 'always',
+					'field_lines' => true,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return 'jQuery( "#'.$this->get_param_prefix().'link_type" ).change( function()
+		{
+			var link_type_value = jQuery( this ).val();
+			// Hide/Show Profile picture size:
+			jQuery( "#ffield_'.$this->get_param_prefix().'profile_picture_size" ).toggle( link_type_value == "logout" ||
+				link_type_value == "myprofile" ||
+				link_type_value == "visits" ||
+				link_type_value == "profile" ||
+				link_type_value == "avatar" ||
+				link_type_value == "useritems" ||
+				link_type_value == "usercomments" );
+			if( link_type_value == "myprofile" && jQuery( "#'.$this->get_param_prefix().'profile_picture_size" ).val() == "" )
+			{	// Set default picture size for "View my profile":
+				jQuery( "#'.$this->get_param_prefix().'profile_picture_size" ).val( "crop-top-15x15" );
+			}
+			// Hide/Show collection ID:
+			jQuery( "#ffield_'.$this->get_param_prefix().'blog_ID, #ffield_'.$this->get_param_prefix().'coll_logo_size" ).toggle( link_type_value != "item" && link_type_value != "admin" && link_type_value != "url" );
+			if( jQuery( ".evo_setting_coll_disabled" ).length )
+			{	// Hide/Show info for disabled collection:
+				var coll_disabled = link_type_value == "ownercontact" ||
+					link_type_value == "owneruserinfo" ||
+					link_type_value == "myprofile" ||
+					link_type_value == "profile" ||
+					link_type_value == "avatar" ||
+					link_type_value == "messages" ||
+					link_type_value == "contacts";
+				jQuery( ".evo_setting_coll_disabled" ).toggle( coll_disabled );
+				jQuery( "#'.$this->get_param_prefix().'blog_ID" ).prop( "disabled", coll_disabled );
+			}
+			// Hide/Show category ID:
+			jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).toggle( link_type_value == "recentposts" || link_type_value == "postnew" );
+			// Hide/Show item ID:
+			jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).toggle( link_type_value == "item" );
+			// Hide/Show URL:
+			jQuery( "#ffield_'.$this->get_param_prefix().'url" ).toggle( link_type_value == "url" );
+			// Hide/Show setting "Show to":
+			jQuery( "#ffield_'.$this->get_param_prefix().'show_to" ).toggle( link_type_value == "messages" || link_type_value == "contacts" );
+			// Hide/Show setting "Show Badge":
+			jQuery( "#ffield_'.$this->get_param_prefix().'show_badge" ).toggle( link_type_value == "messages" || link_type_value == "flagged" );
+			// Hide/Show setting "Hide if empty":
+			jQuery( "#ffield_'.$this->get_param_prefix().'hide_empty" ).toggle( link_type_value == "flagged" );
+		} );';
 	}
 
 
@@ -238,176 +323,83 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		* @var Blog
 		*/
 		global $Collection, $Blog;
-		global $disp;
+		global $disp, $cat, $thumbnail_sizes;
 
 		$this->init_display( $params );
 
-		$blog_ID = intval( $this->disp_params['blog_ID'] );
-		if( $blog_ID > 0 )
-		{ // Try to use blog from widget setting
-			$BlogCache = & get_BlogCache();
-			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		if( isset( $this->disp_params['link_text_'.$this->disp_params['link_type']] ) )
+		{	// Use custom link text per type from skin side:
+			// (used by site skins with param like 'link_text_myprofile' => '$login$' where we need to force friendly username to login)
+			$link_text = $this->disp_params['link_text_'.$this->disp_params['link_type']];
+		}
+		else
+		{	// Use normal link text:
+			$link_text = $this->disp_params['link_text'];
 		}
 
-		if( empty( $current_Blog ) )
-		{ // Blog is not defined in setting or it doesn't exist in DB
-			// Use current blog
-			$current_Blog = & $Blog;
-		}
+		// Initialize Menu Entry object to build a menu link/button:
+		load_class( 'menus/model/_sitemenuentry.class.php', 'SiteMenuEntry' );
+		$SiteMenuEntry = new SiteMenuEntry();
+		$SiteMenuEntry->set( 'coll_ID', $this->disp_params['blog_ID'] );
+		$SiteMenuEntry->set( 'cat_ID', $this->disp_params['cat_ID'] );
+		$SiteMenuEntry->set( 'item_ID', $this->disp_params['item_ID'] );
+		$SiteMenuEntry->set( 'coll_logo_size', $this->disp_params['coll_logo_size'] );
+		$SiteMenuEntry->set( 'user_pic_size', $this->disp_params['profile_picture_size'] );
+		$SiteMenuEntry->set( 'type', $this->disp_params['link_type'] );
+		$SiteMenuEntry->set( 'text', $link_text );
+		$SiteMenuEntry->set( 'url', $this->disp_params['link_href'] );
+		$SiteMenuEntry->set( 'visibility', $this->disp_params['visibility'] );
+		$SiteMenuEntry->set( 'access', $this->disp_params['show_to'] );
+		$SiteMenuEntry->set( 'show_badge', $this->disp_params['show_badge'] );
+		$SiteMenuEntry->set( 'highlight', ( $this->disp_params['highlight_current'] == 'yes' ) );
+		$SiteMenuEntry->set( 'hide_empty', $this->disp_params['hide_empty'] );
 
-		if( empty( $current_Blog ) )
-		{ // We cannot use this widget without a current collection:
+		if( ! ( $entry_Blog = & $SiteMenuEntry->get_Blog() ) )
+		{	// We cannot use this widget without a current collection:
+			$this->display_debug_message();
 			return false;
 		}
 
-		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
-		{	// Don't use this widget because current user has no access to the collection:
+		if( ! ( $url = $SiteMenuEntry->get_url() ) )
+		{	// Don't display this menu entry because of some restriction for current User or by general settings:
+			$this->display_debug_message( empty( $SiteMenuEntry->url_error ) ? '' : 'Hidden('.$SiteMenuEntry->url_error.')' );
 			return false;
 		}
 
-		// Allow to higlight current menu item only when it is enabled by widget setting and it is linked to current collection:
-		$highlight_current = ( $this->disp_params['highlight_current'] == 'yes' && $current_Blog->ID == $Blog->ID );
+		// Default link template:
+		$link_template = NULL;
 
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
-				$url = $current_Blog->get( 'recentpostsurl' );
 				if( is_same_url( $url, $Blog->get( 'url' ) ) )
 				{ // This menu item has the same url as front page of blog
 					$EnabledWidgetCache = & get_EnabledWidgetCache();
-					$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $current_Blog->ID, NT_('Menu') );
+					$Widget_array = & $EnabledWidgetCache->get_by_coll_container( $entry_Blog->ID, NT_('Menu') );
 					if( !empty( $Widget_array ) )
 					{
 						foreach( $Widget_array as $Widget )
 						{
 							$Widget->init_display( $params );
 							if( isset( $Widget->param_array, $Widget->param_array['link_type'] ) && $Widget->param_array['link_type'] == 'home' )
-							{ // Don't display this menu if 'Blog home' menu item exists with the same url
+							{	// Don't display this menu if 'Blog home' menu item exists with the same url:
+								$this->display_debug_message();
 								return false;
 							}
 						}
 					}
 				}
-
-				$text = T_('Recently');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'posts' );
-				break;
-
-			case 'search':
-				$url = $current_Blog->get( 'searchurl' );
-				$text = T_('Search');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'search' );
-				break;
-
-			case 'arcdir':
-				$url = $current_Blog->get( 'arcdirurl' );
-				$text = T_('Archives');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'arcdir' );
-				break;
-
-			case 'catdir':
-				$url = $current_Blog->get( 'catdirurl' );
-				$text = T_('Categories');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'catdir' );
-				break;
-
-			case 'tags':
-				$url = $current_Blog->get( 'tagsurl' );
-				$text = T_('Tags');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'tags' );
-				break;
-
-			case 'postidx':
-				$url = $current_Blog->get( 'postidxurl' );
-				$text = T_('Post index');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'postidx' );
-				break;
-
-			case 'mediaidx':
-				$url = $current_Blog->get( 'mediaidxurl' );
-				$text = T_('Photo index');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'mediaidx' );
-				break;
-
-			case 'sitemap':
-				$url = $current_Blog->get( 'sitemapurl' );
-				$text = T_('Site map');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'sitemap' );
-				break;
-
-			case 'latestcomments':
-				if( !$current_Blog->get_setting( 'comments_latest' ) )
-				{ // This page is disabled
-					return false;
-				}
-				$url = $current_Blog->get( 'lastcommentsurl' );
-				$text = T_('Latest comments');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'comments' );
-				break;
-
-			case 'owneruserinfo':
-				global $User;
-				$url = url_add_param( $current_Blog->get( 'userurl' ), 'user_ID='.$current_Blog->owner_user_ID );
-				$text = T_('Owner details');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'user' && ! empty( $User ) && $User->ID == $current_Blog->owner_user_ID );
 				break;
 
 			case 'ownercontact':
-				if( ! $url = $current_Blog->get_contact_url( true ) )
-				{ // user does not allow contact form:
-					return;
+				if( $entry_Blog->get_setting( 'msgform_nofollowto' ) )
+				{	// Use nofollow attribute:
+					$link_template = '<a href="$link_url$" class="$link_class$" rel="nofollow">$link_text$</a>';
 				}
-				$text = T_('Contact');
-				// Check if current menu item must be highlighted:
-				// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
-				// odds are there is no other link to highlight in this case
-				$highlight_current = ( $highlight_current && ( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) ) );
 				break;
 
 			case 'login':
-				if( is_logged_in() )
-				{ // Don't display this link for already logged in users
-					return false;
-				}
-				global $Settings;
-				$url = get_login_url( 'menu link', $Settings->get( 'redirect_to_after_login' ), false, $current_Blog->ID );
-				if( isset( $this->BlockCache ) )
-				{ // Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
-					// so this will be cached by the PageCache; there is no added benefit to cache it in the BlockCache
-					// (which could have been shared between several pages):
-					$this->BlockCache->abort_collect();
-				}
-				$text = T_('Log in');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'login' );
-				break;
-
-			case 'logout':
-				if( ! is_logged_in() )
-				{
-					return false;
-				}
-				$url = get_user_logout_url( $current_Blog->ID );
-				$text = T_('Log out');
-				// This is never highlighted:
-				$highlight_current = false;
-				break;
-
 			case 'register':
-				if( ! $url = get_user_register_url( NULL, 'menu link', false, '&amp;', $current_Blog->ID ) )
-				{
-					return false;
-				}
 				if( isset( $this->BlockCache ) )
 				{ // Do NOT cache because some of these links are using a redirect_to param, which makes it page dependent.
 					// Note: also beware of the source param.
@@ -415,136 +407,19 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					// (which could have been shared between several pages):
 					$this->BlockCache->abort_collect();
 				}
-				$text = T_('Register');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'register' );
 				break;
 
-			case 'profile':
-				if( ! is_logged_in() ) return false;
-				$url = get_user_profile_url( $current_Blog->ID );
-				$text = T_('Edit profile');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && in_array( $disp, array( 'profile', 'avatar', 'pwdchange', 'userprefs', 'subs' ) ) );
-				break;
-
-			case 'avatar':
-				if( ! is_logged_in() ) return false;
-				$url = get_user_avatar_url( $current_Blog->ID );
-				$text = T_('Profile picture');
-				// Note: we never highlight this, it will always highlight 'profile' instead:
-				$highlight_current = false;
-				break;
-
-			case 'visits':
-				global $Settings, $current_User;
-				if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
-				{
-					return false;
+			case 'messages':
+			case 'flagged':
+				if( $SiteMenuEntry->get( 'show_badge' ) && isset( $this->BlockCache ) )
+				{	// Do not cache if bage is displayed because the number of unread messages are always changing:
+					$this->BlockCache->abort_collect();
 				}
-
-				$url = $current_User->get_visits_url();
-				$text = T_('My visits');
-				$highlight_current = ( $highlight_current && $disp == 'visits' );
 				break;
-
-			case 'users':
-				global $Settings, $user_ID;
-				if( ! is_logged_in() && ! $Settings->get( 'allow_anonymous_user_list' ) )
-				{	// Don't allow anonymous users to see users list
-					return false;
-				}
-				$url = $current_Blog->get( 'usersurl' );
-				$text = T_('User directory');
-				// Check if current menu item must be highlighted:
-				// Note: If $user_ID is not set, it means we are viewing "My Profile" instead
-				$highlight_current = ( $highlight_current && ( $disp == 'users' || ( $disp == 'user' && ! empty( $user_ID ) ) ) );
-				break;
-
-			case 'item':
-				global $Item;
-				$ItemCache = & get_ItemCache();
-				/**
-				* @var Item
-				*/
-				$item_ID = intval( $this->disp_params['item_ID'] );
-				$disp_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-				if( empty( $disp_Item ) )
-				{ // Item not found
-					return false;
-				}
-				$url = $disp_Item->get_permanent_url();
-				$text = $disp_Item->title;
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && ! empty( $Item ) && $disp_Item->ID == $Item->ID );
-				break;
-
-			case 'url':
-				if( empty( $this->disp_params['link_href'] ) )
-				{ // Don't display a link if url is empty
-					return false;
-				}
-				$url = $this->disp_params['link_href'];
-				$text = '[URL]';	// should normally be overriden below...
-				// Note: we never highlight this link
-				$highlight_current = false;
-				break;
-
-			case 'postnew':
-				if( ! check_item_perm_create( $current_Blog ) )
-				{	// Don't allow users to create a new post:
-					return false;
-				}
-				$url = url_add_param( $current_Blog->get( 'url' ), 'disp=edit' );
-				$text = T_('Write a new post');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && $disp == 'edit' );
-				break;
-
-			case 'myprofile':
-				global $user_ID;
-				if( ! is_logged_in() )
-				{	// Don't show this link for not logged in users
-					return false;
-				}
-				$url = $current_Blog->get( 'userurl' );
-				$text = T_('My profile');
-				// Check if current menu item must be highlighted:
-				// If $user_ID is not set, it means we will fall back to the current user, so it's ok
-				// If $user_ID is set, it means we are browsing the directory instead
-				$highlight_current = ( $highlight_current && $disp == 'user' && empty( $user_ID ) );
-				break;
-
-			case 'admin':
-				global $current_User;
-				if( ! ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) ) )
-				{ // Don't allow admin url for users who have no access to backoffice
-					return false;
-				}
-				global $admin_url;
-				$url = $admin_url;
-				$text = T_('Admin').' &raquo;';
-				// This is never highlighted:
-				$highlight_current = false;
-				break;
-
-			case 'home':
-			default:
-				global $is_front;
-				$url = $current_Blog->get( 'url' );
-				$text = T_('Front Page');
-				// Check if current menu item must be highlighted:
-				$highlight_current = ( $highlight_current && ( $disp == 'front' || ! empty( $is_front ) ) );
-		}
-
-		// Override default link text?
-		if( ! empty( $this->disp_params['link_text'] ) )
-		{ // We have a custom link text:
-			$text = $this->disp_params['link_text'];
 		}
 
 		// Display a layout with menu link:
-		echo $this->get_layout_menu_link( $url, $text, $highlight_current );
+		echo $this->get_layout_standalone_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active(), $link_template );
 
 		return true;
 	}
@@ -572,7 +447,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 			case 'avatar':
 				// This link also depends on whether or not someone is logged in:
 				$keys['loggedin'] = (is_logged_in() ? 1 : 0);
+				break;
 
+			case 'item':
+				// Visibility of the Item menu depends on permission of current User:
+				$keys['user_ID'] = ( is_logged_in() ? $current_User->ID : 0 ); // Has the current User changed?
+				// Item title may be changed so we should update it in the menu as well:
+				$keys['item_ID'] = $this->disp_params['item_ID']; // Has the Item page changed?
+				break;
 		}
 
 		return $keys;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -27,6 +27,7 @@ class CommentQuery extends SQL
 	var $cl;
 	var $post;
 	var $author;
+	var $author_login;
 	var $author_email;
 	var $author_url;
 	var $url_match;
@@ -70,7 +71,7 @@ class CommentQuery extends SQL
 
 		$this->c = $c;
 		if( empty( $this->author ) )
-		{ // Change $this->author only if it is empty, because possible that it was set previously 
+		{ // Change $this->author only if it is empty, because possible that it was set previously
 			$this->author = $author;
 		}
 
@@ -98,35 +99,23 @@ class CommentQuery extends SQL
 	 */
 	function where_ID_list( $cl = '' )
 	{
-		$r = false;
+		$this->cl = clear_ids_list( $cl );
 
-		$this->cl = $cl;
+		if( empty( $this->cl ) )
+		{	// Nothing to filter:
+			return;
+		}
 
-		if( empty( $cl ) ) return $r; // nothing to do
-
-		if( substr( $this->cl, 0, 1 ) == '-' )
+		if( substr( $cl, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
-			$this->cl = substr( $this->cl, 1 );
 		}
 		else
 		{
 			$eq = 'IN';
 		}
 
-		$c_ID_array = array();
-		$c_id_list = explode( ',', $this->cl );
-		foreach( $c_id_list as $c_id )
-		{
-			$c_ID_array[] = intval( $c_id );// make sure they're all numbers
-		}
-
-		$this->cl = implode( ',', $c_ID_array );
-
 		$this->WHERE_and( $this->dbIDname.' '.$eq.'( '.$this->cl.' )' );
-		$r = true;
-
-		return $r;
 	}
 
 
@@ -167,8 +156,33 @@ class CommentQuery extends SQL
 
 
 	/**
+	 * Restrict to a specific comment date
+	 */
+	function where_comment_date( $timestamp_min, $timestamp_max )
+	{
+		global $time_difference, $DB;
+
+		if( empty( $timestamp_min ) && empty ( $timestamp_max ) )
+		{	// Don't restrict
+			return;
+		}
+
+		if( $timestamp_min )
+		{
+			$date_min = date( 'Y-m-d H:i:s', $timestamp_min + $time_difference );
+			$this->WHERE_and( $this->dbprefix.'date >= '.$DB->quote( $date_min ) );
+		}
+		if( $timestamp_max )
+		{
+			$date_max = date( 'Y-m-d H:i:s', $timestamp_max + $time_difference );
+			$this->WHERE_and( $this->dbprefix.'date <= '.$DB->quote( $date_max ) );
+		}
+	}
+
+
+	/**
 	 * Restrict to a specific post comments by post_datestart
-	 * 
+	 *
 	 * @param timestamp min - Do not show comments from posts before this timestamp
 	 * @param timestamp max - Do not show comments from posts after this timestamp
 	 */
@@ -197,9 +211,9 @@ class CommentQuery extends SQL
 	 */
 	function where_author( $author )
 	{
-		$this->author = $author;
+		$this->author = clear_ids_list( $author );
 
-		if( empty( $author ) )
+		if( empty( $this->author ) )
 		{
 			return;
 		}
@@ -207,20 +221,46 @@ class CommentQuery extends SQL
 		if( substr( $author, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
-			$author_list = substr( $author, 1 );
 		}
 		else
 		{
 			$eq = 'IN';
-			$author_list = $author;
 		}
 
-		if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $author_list ) === false )
+		$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ('.$this->author.')' );
+	}
+
+
+	/**
+	 * Restrict to specific authors by users logins
+	 *
+	 * @param string List of authors logins to restrict to (must have been previously validated)
+	 */
+	function where_author_logins( $author_logins )
+	{
+		$this->author_login = $author_logins;
+		if( empty( $this->author_login ) )
 		{
-			debug_die( 'Invalid comment author filter request' );
+			return;
 		}
-
-		$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ('.$author_list.')' );
+		if( substr( $this->author_login, 0, 1 ) == '-' )
+		{	// Exclude the users IF a list starts with MINUS sign:
+			$eq = 'NOT IN';
+			$users_IDs = get_users_IDs_by_logins( substr( $this->author_login, 1 ) );
+		}
+		else
+		{	// Include the users:
+			$eq = 'IN';
+			$users_IDs = get_users_IDs_by_logins( $this->author_login );
+			if( empty( $users_IDs ) )
+			{	// If users are not found with login, we should not allow selection with all users:
+				$users_IDs = '-1';
+			}
+		}
+		if( ! empty( $users_IDs ) )
+		{
+			$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ( '.$users_IDs.' )' );
+		}
 	}
 
 
@@ -264,6 +304,8 @@ class CommentQuery extends SQL
 	 */
 	function where_author_url( $author_url, $url_match, $include_emptyurl )
 	{
+		global $DB;
+
 		$this->author_url = $author_url;
 		$this->url_match = $url_match;
 		$this->include_emptyurl = $include_emptyurl;
@@ -294,7 +336,7 @@ class CommentQuery extends SQL
 			$include_empty = ' OR '.$this->dbprefix.'author_url IS NULL';
 		}
 
-		$this->WHERE_and( $this->dbprefix.'author_url '.$url_match.' ("'.$author_url.'")'.$include_empty );
+		$this->WHERE_and( $this->dbprefix.'author_url '.$url_match.' ('.$DB->quote( $author_url ).')'.$include_empty );
 	}
 
 
@@ -522,7 +564,7 @@ class CommentQuery extends SQL
 	/**
 	 * Restrict to show or hide active/expired comments ( ecpired comments are older then the post expiry delay value )
 	 * By default only active comments will be allowed
-	 * 
+	 *
 	 * @param array expiry statuses to show
 	 */
 	function expiry_restrict( $expiry_statuses )
@@ -547,7 +589,7 @@ class CommentQuery extends SQL
 
 	/**
 	 * Restrict to show only those comments where user has some specific permission
-	 * 
+	 *
 	 * @param string the required permission to check
 	 * @param integer the blog ID
 	 */
@@ -565,7 +607,7 @@ class CommentQuery extends SQL
 			return;
 		}
 
-		if( $current_User->check_perm( 'blogs', 'editall' ) )
+		if( check_user_perm( 'blogs', 'editall' ) )
 		{ // User has global permission one ach blog
 			return;
 		}
@@ -578,7 +620,7 @@ class CommentQuery extends SQL
 		}
 
 		if( ! $Blog->get( 'advanced_perms' ) )
-		{ // Blog advanced perm settings is not enabled, user has no permission to edit/moderate comments 
+		{ // Blog advanced perm settings is not enabled, user has no permission to edit/moderate comments
 			$this->WHERE_and( 'FALSE' );
 			return;
 		}
@@ -623,6 +665,36 @@ class CommentQuery extends SQL
 		}
 
 		$this->WHERE_and( $condition );
+	}
+
+
+	/**
+	 * Restrict by min and max dates
+	 *
+	 * @param string Date in format YYYYMMDDHHMMSS to start at
+	 * @param string Date in format YYYYMMDDHHMMSS to stop at
+	 */
+	function where_dates( $ymdhms_min, $ymdhms_max )
+	{
+		global $DB;
+		$this->ymdhms_min = $ymdhms_min;
+		$this->ymdhms_max = $ymdhms_max;
+		if( ! empty( $this->ymdhms_min ) )
+		{	// Restrict by min date:
+			$dstart0 = $this->ymdhms_min.substr( '00000101000000', strlen( $this->ymdhms_min ) );
+			// Start date in MySQL format: seconds get omitted (rounded to lower to minute for caching purposes):
+			$dstart_mysql = substr( $dstart0, 0, 4 ).'-'.substr( $dstart0, 4, 2 ).'-'.substr( $dstart0, 6, 2 ).' '
+											.substr( $dstart0, 8, 2 ).':'.substr( $dstart0, 10, 2 );
+			$this->WHERE_and( $this->dbprefix.'date >= '.$DB->quote( $dstart_mysql ) );
+		}
+		if( ! empty( $this->ymdhms_max ) )
+		{	// Restrict by max date:
+			$dstart0 = $this->ymdhms_max.substr( '00001231235959', strlen( $this->ymdhms_max ) );
+			// Start date in MySQL format: seconds get omitted (rounded to lower to minute for caching purposes):
+			$dstart_mysql = substr( $dstart0, 0, 4 ).'-'.substr( $dstart0, 4, 2 ).'-'.substr( $dstart0, 6, 2 ).' '
+											.substr( $dstart0, 8, 2 ).':'.substr( $dstart0, 10, 2 );
+			$this->WHERE_and( $this->dbprefix.'date <= '.$DB->quote( $dstart_mysql ) );
+		}
 	}
 }
 

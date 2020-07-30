@@ -19,13 +19,13 @@ var modal_window_js_initialized = false;
  * @param string ID of iframe where all contents
  * @param function Event handler when dialog is shown
  */
-function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id, on_shown_handler )
+function openModalWindow( body_html, width, height, transparent, title, buttons, is_new_window, keep_panels, iframe_id, on_shown_handler, on_hide_handler )
 {
 	var style_width = ( typeof( width ) == 'undefined' || width == 'auto' ) ? '' : 'width:' + width + ';';
 	var style_height = ( typeof( height ) == 'undefined' || height == 0 || height == '' ) ? '': 'height:' + height;
-	var style_height_fixed = style_height.match( /%$/i ) ? ' style="height:100%;overflow:hidden;"' : '';
-	var style_body_height = height.match( /px/i ) ? ' style="min-height:' + ( height.replace( 'px', '' ) - 157 ) + 'px"' : '';
-	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons != false );
+	var modal_window_class = style_height.match( /%$/i ) ? ' evo_modal_window__percent_height' : '';
+	var use_buttons = ( typeof( buttons ) == 'undefined' || buttons !== false );
+	var button_form = 'form';
 
 	if( typeof( buttons ) != 'undefined' && buttons != '' )
 	{
@@ -39,7 +39,6 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		{ // Standard button to submit a single form
 			var button_title = buttons;
 			var button_class = 'btn-primary';
-			var button_form = 'form';
 		}
 	}
 
@@ -50,7 +49,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 
 	if( jQuery( '#modal_window' ).length == 0 )
 	{ // Build modal window
-		var modal_html = '<div id="modal_window" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content"' + style_height_fixed + '>';
+		var modal_html = '<div id="modal_window" class="modal fade' + modal_window_class + '" tabindex="-1" role="dialog" aria-hidden="true"><div class="modal-dialog" style="' + style_width + style_height +'"><div class="modal-content">';
 		if( typeof title != 'undefined' && title != '' )
 		{
 			modal_html += '<div class="modal-header">' +
@@ -58,7 +57,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 					'<h4 class="modal-title">' + title + '</h4>' +
 				'</div>';
 		}
-		modal_html += '<div class="modal-body"' + style_height_fixed + style_body_height + '>' + body_html;
+		modal_html += '<div class="modal-body">' + body_html;
 
 		if( iframe_id )
 		{
@@ -95,7 +94,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 
 	if( typeof( iframe_id ) != 'undefined' )
 	{
-		jQuery( '#' + iframe_id ).load( function()
+		jQuery( '#' + iframe_id ).on( 'load', function()
 		{	// Prepare modal window only after loading full content:
 			prepareModalWindow( jQuery( this ).contents(), button_form, use_buttons, keep_panels );
 			jQuery( '#modal_window .loader_img' ).remove();
@@ -107,7 +106,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		prepareModalWindow( '#modal_window', button_form, use_buttons, keep_panels );
 	}
 
-	if( on_shown_handler && typeof( on_shown_handler ) == 'function' )
+	if( typeof( on_shown_handler ) == 'function' )
 	{
 		jQuery( '#modal_window' ).on( 'shown.bs.modal', on_shown_handler );
 	}
@@ -125,9 +124,13 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 		jQuery( '#modal_window .modal-dialog .modal-content' ).css( { 'display': 'table-cell' } );
 	}
 
-	jQuery( '#modal_window').on( 'hidden', function ()
+	jQuery( '#modal_window').on( 'hidden.bs.modal', function ()
 	{ // Remove modal window on hide event to draw new window in next time with new title and button
 		jQuery( this ).remove();
+		if( typeof( on_hide_handler ) == 'function' )
+		{
+			on_hide_handler();
+		}
 	} );
 
 	modal_window_js_initialized = true;
@@ -168,20 +171,30 @@ function prepareModalWindow( modal_document, button_form, use_buttons, keep_pane
 			}
 		} );
 
-		jQuery( '#modal_window .modal-footer button[type=submit]' ).click( function()
+		// The following clears all existing click events before binding it to a new one
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).off( 'click' );
+		jQuery( '#modal_window .modal-footer button[type=submit]' ).on( 'click', function()
 		{ // Copy a click event from real submit input to button of footer
+			if( jQuery( this ).data( 'click_init' ) === 1 )
+			{	// Don't initialize same event twice:
+				return;
+			}
 			jQuery( button_form + ' input[type=submit]', modal_document ).click();
+			jQuery( this ).data( 'click_init', 1 );
 		} );
 	}
 
+	// Move all buttons to the footer:
+	var link_buttons = '';
 	jQuery( button_form + ' a.btn', modal_document ).each( function()
-	{ // Move all buttons to the footer
-		jQuery( '#modal_window .modal-footer' ).prepend( '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
+	{
+		link_buttons += '<a href=' + jQuery( this ).attr( 'href' ) + '>' +
 			'<button type="button" class="' + jQuery( this ).attr( 'class' ) + '">' +
 			jQuery( this ).html() +
-			'</button></a>' );
+			'</button></a> ';
 		jQuery( this ).remove();
 	} );
+	jQuery( '#modal_window .modal-footer' ).prepend( link_buttons );
 
 	if( jQuery( button_form + ' #current_modal_title', modal_document ).length > 0 )
 	{ // Change window title
@@ -194,13 +207,17 @@ function prepareModalWindow( modal_document, button_form, use_buttons, keep_pane
  *
  * @param object Document object
  */
-function closeModalWindow( document_obj )
+function closeModalWindow( document_obj, on_hide_handler )
 {
 	if( typeof( document_obj ) == 'undefined' )
 	{
 		document_obj = window.document;
 	}
 
+	if( typeof( on_hide_handler ) == 'function' )
+	{
+		jQuery( '#modal_window' ).on( 'hidden.bs.modal', on_hide_handler );
+	}
 	jQuery( '#modal_window', document_obj ).modal( 'hide' );
 
 	return false;

@@ -16,8 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'users/model/_userfield.class.php', 'Userfield' );
 
-global $dispatcher;
-
 // query which groups have user field definitions (in order to prevent deletion of groups which have user field definitions)
 global $usedgroups;	// We need this in a callback below
 $usedgroups = $DB->get_col( 'SELECT ufgp_ID
@@ -110,10 +108,8 @@ function filter_userfields( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_userfields',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=userfields' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=userfields' );
 
 
 /*
@@ -126,8 +122,8 @@ $Results->ID_col = 'ufdf_ID';
 /*
  * Group columns:
  */
-$group_td_colspan = $current_User->check_perm( 'users', 'edit', false ) ? -2 : 0;
-if( $current_User->check_perm( 'users', 'edit' ) )
+$group_td_colspan = check_user_perm( 'users', 'edit', false ) ? -2 : 0;
+if( check_user_perm( 'users', 'edit' ) )
 { // We have permission to modify:
 	$td_group_name = '<a href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID=$ufgp_ID$">$ufgp_name$</a>';
 }
@@ -139,7 +135,7 @@ $Results->grp_cols[] = array(
 						'td_colspan' => $group_td_colspan,
 						'td' => '<b>'.$td_group_name.'</b>',
 					);
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( check_user_perm( 'users', 'edit', false ) )
 {	// We have permission to modify:
 	$Results->grp_cols[] = array(
 							'td' => '$ufgp_order$',
@@ -148,10 +144,10 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 	function grp_actions( & $row )
 	{
-		global $usedgroups, $current_User;
+		global $usedgroups;
 
 		$r = '';
-		if( $current_User->check_perm( 'users', 'edit', false ) )
+		if( check_user_perm( 'users', 'edit', false ) )
 		{
 			$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID='.$row->ufgp_ID ) )
 					.action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=new&amp;ufgp_ID='.$row->ufgp_ID ) );
@@ -177,46 +173,35 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 /*
  * Data columns:
  */
-function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
-{
-	global $current_User;
-
-	$field_icon = '<span class="uf_icon_block ufld_'.$ufdf_code.' ufld__textcolor">'
-			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
-		.'</span>';
-
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{ // We have permission to modify:
-		return $field_icon.'<a href="'.regenerate_url( 'action', 'ufdf_ID='.$ufdf_ID.'&amp;action=edit' ).'"><strong>'.T_( $ufdf_name ).'</strong></a>';
-	}
-	else
-	{
-		return $field_icon.'<strong>'.T_( $ufdf_name ).'</strong>';
-	}
-}
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '%ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name#, #ufdf_code# )%',
+		'td' => '%userfield_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name#, #ufdf_code# )%',
 	);
 
 $Results->cols[] = array(
 	'th' => T_('Type'),
-	'td' => '%T_(#ufdf_type#)%',
+	'td' => '%userfield_td_type( #ufdf_type# )%',
 );
 
 $Results->cols[] = array(
 		'th' => T_('Required?'),
-		'td' => '%get_userfield_required( #ufdf_required# )%',
+		'td' => '%userfield_td_required( #ufdf_required# )%',
+		'td_class' => 'center',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Visibility'),
+		'td' => '%userfield_td_visibility( #ufdf_visibility# )%',
 		'td_class' => 'center',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Multiple values'),
-		'td' => '$ufdf_duplicated$',
+		'td' => '%userfield_td_duplicate( #ufdf_duplicated# )%',
 		'td_class' => 'center',
 	);
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 {	// We have permission to modify:
 	function order_actions( & $row )
 	{

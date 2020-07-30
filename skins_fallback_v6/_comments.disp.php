@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -27,7 +27,7 @@ $params = array_merge( array(
 		'comment_post_display'    => true,	// We want to display the title of the post we're referring to
 		'comment_post_before'     => '<div class="panel-heading"><h4 class="evo_comment_title panel-title pull-left">',
 		'comment_post_after'      => '</h4>',
-		'comment_title_before'    => '<h4 class="panel-title pull-right">',
+		'comment_title_before'    => '<h4 class="evo_comment_subtitle panel-title pull-right">',
 		'comment_title_after'     => '</h4><div class="clearfix"></div></div><div class="panel-body">',
 		'comment_avatar_before'   => '<div class="evo_comment_avatar">',
 		'comment_avatar_after'    => '</div>',
@@ -48,7 +48,7 @@ $CommentList = new CommentList2( $Blog );
 
 // Filter list:
 $CommentList->set_filters( array(
-		'types'    => array( 'comment', 'trackback', 'pingback' ),
+		'types'    => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'order'    => 'DESC',
 		'comments' => $Blog->get_setting( 'latest_comments_num' ),
@@ -56,6 +56,20 @@ $CommentList->set_filters( array(
 
 // Get ready for display (runs the query):
 $CommentList->display_init();
+
+// ------------------------- "Comment List" CONTAINER EMBEDDED HERE --------------------------
+// Display container contents:
+widget_container( 'comment_list', array(
+	// The following (optional) params will be used as defaults for widgets included in this container:
+	'container_display_if_empty' => false, // If no widget, don't display container at all
+	// This will enclose each widget in a block:
+	'block_start'           => '<div class="evo_widget $wi_class$">',
+	'block_end'             => '</div>',
+	// This will enclose the title of each widget:
+	'block_title_start'     => '<h3>',
+	'block_title_end'       => '</h3>',
+) );
+// ----------------------------- END OF "Item List" CONTAINER -----------------------------
 
 $CommentList->display_if_empty();
 
@@ -98,4 +112,6 @@ while( $Comment = & $CommentList->get_next() )
 	<?php
 }	// End of comment loop.
 echo '</div>';
+
+echo_comment_moderate_js();
 ?>

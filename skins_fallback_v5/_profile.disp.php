@@ -14,7 +14,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -47,7 +47,7 @@ $params = array_merge( array(
 			'item_selected_end'   => '</div>',
 			'block_end'           => '</div><div class="clear"></div>',
 		),
-	'form_action' => get_htsrv_url( true ).'profile_update.php',
+	'form_action' => get_htsrv_url( 'login' ).'profile_update.php',
 	), $params );
 
 $form_action = $params['form_action'];

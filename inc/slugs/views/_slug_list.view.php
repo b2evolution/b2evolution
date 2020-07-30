@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Slug
  */
-global $Sug, $current_User, $admin_url;
+global $Sug, $admin_url;
 
 $SQL = new SQL();
 
@@ -54,11 +54,6 @@ $Results = new Results( $SQL->get(), 'slug_', 'A' );
 $Results->title = T_('Slugs').' ('.$Results->get_total_rows().')' . get_manual_link('slugs-list');
 $Results->Cache = get_SlugCache();
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=slugs', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 /**
  * Callback to add filters on top of the result set
  *
@@ -81,17 +76,15 @@ function filter_slugs( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_slugs',
 	'url_ignore' => 'slug_filter,results_slug_page',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=slugs' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=slugs' );
 
 function get_slug_link( $Slug )
 {
-	global $current_User;
-	if( $current_User->check_perm( 'slugs', 'edit') )
+	global $admin_url;
+	if( check_user_perm( 'slugs', 'edit') )
 	{
-		return '<strong><a href="admin.php?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit">'.$Slug->get('title').'</a></strong>';
+		return '<strong><a href="'.$admin_url.'?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit">'.$Slug->get('title').'</a></strong>';
 	}
 	else
 	{
@@ -105,6 +98,98 @@ $Results->cols[] = array(
 			'order' => 'slug_title',
 			'td' => '%get_slug_link({Obj})%',
 		);
+
+/** Get TinyURL
+ *
+ * @param Slug Slug object
+ * @return string
+ */
+function get_slug_type( $Slug )
+{
+	switch( $Slug->type )
+	{
+		case 'item':
+		// case other: (add here)
+			$target = & $Slug->get_object();
+			if( empty( $target ) )
+			{	// The Item was not found... (it has probably been deleted):
+				return '<i>'.T_('(missing)').'</i>';
+			}
+
+			if( $target->urltitle == $Slug->title )
+			{
+				return TB_('Canonical');
+			}
+			elseif( $target->tiny_slug_ID == $Slug->ID )
+			{
+				return TB_('Tiny');
+			}
+			else
+			{
+				$slugs = explode(',', $target->get_slugs( ',' ) );
+				if( in_array( $Slug->title, $slugs ) )
+				{
+					return TB_('Extra');
+				}
+			}
+			break;
+
+		default:
+			return /* TRANS: "Not Available" */ T_('N/A');
+	}
+}
+$Results->cols[] = array(
+			'th' => TB_('Slug type'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => '%get_slug_type({Obj})%',
+		);
+
+
+/** Get TinyURL
+ *
+ * @param Slug Slug object
+ * @return string
+ */
+function get_tinyurl( $Slug )
+{
+	switch( $Slug->type )
+	{
+		case 'item':
+		// case other: (add here)
+			$target = & $Slug->get_object();
+			if( empty( $target ) )
+			{	// The Item was not found... (it has probably been deleted):
+				return '<i>'.T_('(missing)').'</i>';
+			}
+
+			$use_tinyslug = $target->tiny_slug_ID == $Slug->ID;
+			$Collection = $Blog = & $target->get_Blog();
+
+			if( $Blog->get_setting( 'tinyurl_type') == 'advanced' )
+			{
+				$tinyurl = url_add_tail( $Blog->get_setting( 'tinyurl_domain' ), '/'.$Slug->title );
+			}
+			else
+			{
+				$tinyurl = url_add_tail( $Blog->get( 'url' ), '/'.$Slug->title );
+			}
+
+			$title = T_( 'This is a tinyurl you can copy/paste into twitter, emails and other places where you need a short link to this post' );
+
+			return sprintf( '<a href="%s" title="%s">%s</a>', $tinyurl, $title, $tinyurl );
+
+		default:
+			return /* TRANS: "Not Available" */ T_('N/A');
+	}
+}
+$Results->cols[] = array(
+			'th' => T_('Tiny URL'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'td' =>  '%get_tinyurl({Obj})%',
+		);
+
 
 $Results->cols[] = array(
 			'th' => T_('Type'),
@@ -130,7 +215,7 @@ function get_target_ID( $Slug )
 			break;
 
 		default:
-			$r = 'n.a.';
+			$r = /* TRANS: "Not Available" */ T_('N/A');
 	}
 
 	if( is_null($r) )
@@ -155,11 +240,6 @@ $Results->cols[] = array(
  */
 function get_target_coll( $Slug )
 {
-	/**
-	* @var User
-	*/
-	global $current_User;
-
 	switch( $Slug->type )
 	{
 		case 'item':
@@ -175,8 +255,8 @@ function get_target_coll( $Slug )
 			switch( $Slug->get( 'type') )
 			{
 				case 'item':
-					$allow_edit = $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $target );
-					$allow_view = $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $target );
+					$allow_edit = check_user_perm( 'item_post!CURSTATUS', 'edit', false, $target );
+					$allow_view = check_user_perm( 'item_post!CURSTATUS', 'view', false, $target );
 					break;
 				// Other types permission check write here
 			}
@@ -197,10 +277,10 @@ function get_target_coll( $Slug )
 			{ // Display just the title (If there is no object title need to change this)
 				$coll .= ' '.$target->get( 'title' );
 			}
-			return $coll;//'<a href="'.$target->get_single_url().'">'.$target->dget('title').'</a>';
+			return $coll;
 
 		default:
-			return 'n.a.';
+			return /* TRANS: "Not Available" */ T_('N/A');
 	}
 }
 $Results->cols[] = array(
@@ -211,14 +291,14 @@ $Results->cols[] = array(
 			'td_class' => 'small left',
 		);
 
-if( $current_User->check_perm( 'slugs', 'edit' ) )
+if( check_user_perm( 'slugs', 'edit' ) )
 {
 	$Results->cols[] = array(
 				'th' => T_('Actions'),
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap',
 				'td' => action_icon( TS_('Edit this slug...'), 'properties',
-		        		'admin.php?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
+		        		$admin_url.'?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
 		                 .action_icon( T_('Delete this slug!'), 'delete',
 		                  regenerate_url( 'slug_ID,action,slug_filter', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
 						);

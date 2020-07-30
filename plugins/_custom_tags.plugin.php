@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -17,11 +17,11 @@ class custom_tags_plugin extends Plugin
 	var $code = 'b2evCTag';
 	var $name = 'Custom Tags';
 	var $author = 'The b2evo Group';
-	var $priority = 40;
+	var $priority = 17;
 	var $group = 'rendering';
 	var $short_desc = 'Custom tags';
 	var $long_desc;
-	var $version = '0.1';
+	var $version = '7.2.0';
 	var $number_of_installs = 1;
 
 	// Internal
@@ -30,6 +30,7 @@ class custom_tags_plugin extends Plugin
 	var $configurable_comment_list = true;
 	var $configurable_message_list = true;
 	var $configurable_email_list = true;
+	var $configurable_shared_list = true;
 
 	var $post_search_list;
 	var $post_replace_list;
@@ -39,6 +40,8 @@ class custom_tags_plugin extends Plugin
 	var $msg_replace_list;
 	var $email_search_list;
 	var $email_replace_list;
+	var $shared_search_list;
+	var $shared_replace_list;
 
 	var $default_search_list = '[warning] #\[warning](.+?)\[/warning]#is
 [info] #\[info](.+?)\[/info]#is
@@ -49,13 +52,13 @@ class custom_tags_plugin extends Plugin
 [justify] #\[justify](.+?)\[/justify]#is
 [note] #\[note](.+?)\[/note]#is';
 
-	var $default_replace_list = '<div class="alert alert-warning">$1</div>
-<div class="alert alert-info">$1</div>
-<div class="clear"></div>
-<div class="left">$1</div>
-<div class="right">$1</div>
-<div class="center">$1</div>
-<div class="justify">$1</div>
+	var $default_replace_list = '<div class="alert alert-warning" markdown="1">$1</div>
+<div class="alert alert-info" markdown="1">$1</div>
+<div class="clear" markdown="1"></div>
+<div class="left" markdown="1">$1</div>
+<div class="right" markdown="1">$1</div>
+<div class="center" markdown="1">$1</div>
+<div class="justify" markdown="1">$1</div>
 <span class="note">$1</span>';
 
 
@@ -141,7 +144,22 @@ class custom_tags_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'never' ) );
+		$default_params = array(
+				'default_comment_rendering' => 'never',
+			);
+
+		if( ! empty( $params['blog_type'] ) && get_class( $this ) == 'custom_tags_plugin' )
+		{	// Set default settings depending on collection type:
+			// (ONLY for current plugin excluding all child plugins like "BB code" or "GM code")
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$default_params = array_merge( $params, $default_params );
 		$plugin_params = array();
 
 		if( $this->configurable_post_list )
@@ -255,6 +273,41 @@ class custom_tags_plugin extends Plugin
 		return array_merge( parent::get_email_setting_definitions( $params ), $plugin_params );
 	}
 
+
+	/**
+	 * Define here the default shared settings that are to be made available in the backoffice
+	 *
+	 * @param array Associative array of parameters
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		$plugin_params = array();
+
+		if( $this->configurable_shared_list )
+		{
+			$plugin_params['shared_search_list'] = array(
+				'label' => $this->T_('Search list for shared container widgets'),
+				'type' => 'html_textarea',
+				'note' => $this->T_('This is the search array for shared container widgets (one per line) ONLY CHANGE THESE IF YOU KNOW WHAT YOU\'RE DOING.'),
+				'rows' => 10,
+				'cols' => 60,
+				'defaultvalue' => $this->default_search_list
+			);
+			$plugin_params['shared_replace_list'] = array(
+				'label' => $this->T_('Replace list for shared container widgets'),
+				'type' => 'html_textarea',
+				'note' => $this->T_('This is the replace array for shared container widgets (one per line) it must match the exact order of the search array'),
+				'rows' => 10,
+				'cols' => 60,
+				'defaultvalue' => $this->default_replace_list
+			);
+		}
+
+		return array_merge( parent::get_shared_setting_definitions( $params ), $plugin_params );
+	}
+
+
 	/**
 	 * Perform rendering of item
 	 *
@@ -264,33 +317,60 @@ class custom_tags_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		// Get collection from given params:
-		$setting_Blog = $this->get_Blog_from_params( $params );
-
-		if( ! isset( $this->post_search_list ) )
-		{
-			$search_list = $this->get_coll_setting( 'coll_post_search_list', $setting_Blog );
-			if( ! $search_list )
-			{
-				$search_list = $this->default_search_list;
-			}
-			$this->post_search_list = $this->prepare_search_list( $search_list );
-		}
-
-		if( ! isset( $this->post_replace_list ) )
-		{
-			$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $setting_Blog );
-			if( ! $replace_list )
-			{
-				$replace_list = $this->default_replace_list;
-			}
-			$this->post_replace_list = $this->prepare_replace_list( $replace_list );
-		}
-
 		$callback = array( $this, 'replace_callback' );
 
-		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-		$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, $callback );
+		if( $this->is_shared_widget( $params ) )
+		{	// Use settings for shared container widgets:
+			if( ! isset( $this->shared_search_list ) )
+			{
+				$search_list = $this->get_shared_setting( 'shared_search_list' );
+				if( ! $search_list )
+				{
+					$search_list = $this->default_search_list;
+				}
+				$this->shared_search_list = $this->prepare_search_list( $search_list );
+			}
+
+			if( ! isset( $this->shared_replace_list ) )
+			{
+				$replace_list = $this->get_shared_setting( 'shared_replace_list' );
+				if( ! $replace_list )
+				{
+					$replace_list = $this->default_replace_list;
+				}
+				$this->shared_replace_list = $this->prepare_replace_list( $replace_list );
+			}
+
+			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+			$content = replace_outside_code_and_short_tags( $this->shared_search_list, $this->shared_replace_list, $content, $callback );
+		}
+		else
+		{	// Use settings for collection:
+			$setting_Blog = $this->get_Blog_from_params( $params );
+
+			if( ! isset( $this->post_search_list ) )
+			{
+				$search_list = $this->get_coll_setting( 'coll_post_search_list', $setting_Blog );
+				if( ! $search_list )
+				{
+					$search_list = $this->default_search_list;
+				}
+				$this->post_search_list = $this->prepare_search_list( $search_list );
+			}
+
+			if( ! isset( $this->post_replace_list ) )
+			{
+				$replace_list = $this->get_coll_setting( 'coll_post_replace_list', $setting_Blog );
+				if( ! $replace_list )
+				{
+					$replace_list = $this->default_replace_list;
+				}
+				$this->post_replace_list = $this->prepare_replace_list( $replace_list );
+			}
+
+			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
+			$content = replace_outside_code_and_short_tags( $this->post_search_list, $this->post_replace_list, $content, $callback );
+		}
 
 		return true;
 	}
@@ -327,7 +407,7 @@ class custom_tags_plugin extends Plugin
 		$callback = array( $this, 'replace_callback' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, $callback );
+		$content = replace_outside_code_and_short_tags( $this->msg_search_list, $this->msg_replace_list, $content, $callback );
 
 		return true;
 	}
@@ -364,7 +444,7 @@ class custom_tags_plugin extends Plugin
 		$callback = array( $this, 'replace_callback' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, $callback );
+		$content = replace_outside_code_and_short_tags( $this->email_search_list, $this->email_replace_list, $content, $callback );
 
 		return true;
 	}
@@ -380,6 +460,18 @@ class custom_tags_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		$params['target_type'] = 'Item';
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$params['target_type'] = 'Comment';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -403,7 +495,7 @@ class custom_tags_plugin extends Plugin
 				'js_prefix'   => '', // Use different prefix if you use several toolbars on one page
 			), $params );
 
-		$js_code_prefix = $params['js_prefix'].$this->code;
+		$js_code_prefix = $params['js_prefix'].$this->code.'_';
 
 		switch( $params['target_type'] )
 		{
@@ -468,170 +560,29 @@ class custom_tags_plugin extends Plugin
 		}
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
-		?><script type="text/javascript">
-		//<![CDATA[
-		<?php echo $js_code_prefix;?>_tagButtons = new Array();
-		<?php echo $js_code_prefix;?>_tagOpenTags = new Array();
+		$js_config = array(
+				'plugin_code' => $this->code,
+				'js_prefix'   => $params['js_prefix'],
+				'tag_buttons' => $tagButtons,
 
+				'toolbar_button_class' => $this->get_template( 'toolbar_button_class'),
+				'toolbar_title_before' => $this->get_template( 'toolbar_title_before' ),
+				'toolbar_title_after'  => $this->get_template( 'toolbar_title_after' ),
+				'toolbar_label'        => $this->toolbar_label,
+				'toolbar_group_before' => $this->get_template( 'toolbar_group_before' ),
+				'toolbar_group_after'  => $this->get_template( 'toolbar_group_after' ),
 
-		<?php echo $js_code_prefix;?>_tagButton = function( id, display, style, tagStart, tagEnd, access, tit, open )
-		{
-			this.id = id;							// used to name the toolbar button
-			this.display = display;		// label on button
-			this.style = style;				// style on button
-			this.tagStart = tagStart; // open tag
-			this.tagEnd = tagEnd;			// close tag
-			this.access = access;			// access key
-			this.tit = tit;						// title
-			this.open = open;					// set to -1 if tag does not need to be closed
-		}
-
-		<?php
-		foreach( $tagButtons as $tagButton )
-		{	// Init each button
-		?>
-		<?php echo $js_code_prefix;?>_tagButtons[<?php echo $js_code_prefix;?>_tagButtons.length] = new <?php echo $js_code_prefix;?>_tagButton(
-				'tag_<?php echo $tagButton['title']; ?>'
-				,'<?php echo $tagButton['name']; ?>', ''
-				,'<?php echo $tagButton['start']; ?>', '<?php echo $tagButton['end']; ?>', ''
-				,'<?php echo $tagButton['title']; ?>'
+				'btn_title_close_all_tags' => T_('Close all tags'),
 			);
-		<?php
-		}
-		?>
 
-		<?php echo $js_code_prefix;?>_tagGetButton = function( button, i )
-		{
-			return '<input type="button" id="' + button.id + '" accesskey="' + button.access + '" title="' + button.tit
-					+ '" style="' + button.style + '" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $js_code_prefix;?>_tagInsertTag|<?php echo $params['js_prefix']; ?>b2evoCanvas|'+i+'" value="' + button.display + '" />';
-		}
+		// Toolbar plugins extending this plugin will also use the same JS var evo_init_custom_tags_toolbar_config.
+		// We prefix the config params with the plugin code to avoid overriding existing params.
+		expose_var_to_js( $this->code.'_'.$params['js_prefix'], $js_config, 'evo_init_custom_tags_toolbar_config' );
 
-		// Memorize a new open tag
-		<?php echo $js_code_prefix;?>_tagAddTag = function( button )
-		{
-			if( <?php echo $js_code_prefix;?>_tagButtons[button].tagEnd != '' )
-			{
-				<?php echo $js_code_prefix;?>_tagOpenTags[<?php echo $js_code_prefix;?>_tagOpenTags.length] = button;
-				document.getElementById(<?php echo $js_code_prefix;?>_tagButtons[button].id).style.fontWeight = 'bold';
-			}
-		}
-
-		// Forget about an open tag
-		<?php echo $js_code_prefix;?>_tagRemoveTag = function( button )
-		{
-			for ( i = 0; i < <?php echo $js_code_prefix;?>_tagOpenTags.length; i++ )
-			{
-				if ( <?php echo $js_code_prefix;?>_tagOpenTags[i] == button)
-				{
-					<?php echo $js_code_prefix;?>_tagOpenTags.splice(i, 1);
-					document.getElementById(<?php echo $js_code_prefix;?>_tagButtons[button].id).style.fontWeight = 'normal';
-				}
-			}
-		}
-
-		<?php echo $js_code_prefix;?>_tagCheckOpenTags = function( button )
-		{
-			var tag = 0;
-			for (i = 0; i < <?php echo $js_code_prefix;?>_tagOpenTags.length; i++)
-			{
-				if (<?php echo $js_code_prefix;?>_tagOpenTags[i] == button)
-				{
-					tag++;
-				}
-			}
-
-			if (tag > 0)
-			{
-				return true; // tag found
-			}
-			else
-			{
-				return false; // tag not found
-			}
-		}
-
-		<?php echo $js_code_prefix;?>_tagCloseAllTags = function()
-		{
-			var count = <?php echo $js_code_prefix;?>_tagOpenTags.length;
-			for (o = 0; o < count; o++)
-			{
-				<?php echo $js_code_prefix;?>_tagInsertTag( <?php echo $params['js_prefix']; ?>b2evoCanvas, <?php echo $js_code_prefix;?>_tagOpenTags[<?php echo $js_code_prefix;?>_tagOpenTags.length - 1] );
-			}
-		}
-
-		<?php echo $js_code_prefix;?>_tagToolbar = function()
-		{
-			var tagcode_toolbar = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ).$this->toolbar_label.' '.$this->get_template( 'toolbar_title_after' ) ); ?>';
-			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
-			for( var i = 0; i < <?php echo $js_code_prefix;?>_tagButtons.length; i++ )
-			{
-				tagcode_toolbar += <?php echo $js_code_prefix;?>_tagGetButton( <?php echo $js_code_prefix;?>_tagButtons[i], i );
-			}
-			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ).$this->get_template( 'toolbar_group_before' ) ); ?>';
-			tagcode_toolbar += '<input type="button" id="tag_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $js_code_prefix;?>_tagCloseAllTags" title="<?php echo TS_('Close all tags') ?>" value="X" />';
-			tagcode_toolbar += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-			jQuery( '.<?php echo $js_code_prefix; ?>_toolbar' ).html( tagcode_toolbar );
-		}
-
-		/**
-		 * insertion code
-		 */
-		<?php echo $js_code_prefix;?>_tagInsertTag = function( myField, i )
-		{
-			// we need to know if something is selected.
-			// First, ask plugins, then try IE and Mozilla.
-			var sel_text = b2evo_Callbacks.trigger_callback("get_selected_text_for_"+myField.id);
-			var focus_when_finished = false; // used for IE
-
-			if( sel_text == null || sel_text == false )
-			{ // detect selection:
-				//IE support
-				if(document.selection)
-				{
-					myField.focus();
-					var sel = document.selection.createRange();
-					sel_text = sel.text;
-					focus_when_finished = true;
-				}
-				//MOZILLA/NETSCAPE support
-				else if(myField.selectionStart || myField.selectionStart == '0')
-				{
-					var startPos = myField.selectionStart;
-					var endPos = myField.selectionEnd;
-					sel_text = (startPos != endPos);
-				}
-			}
-
-			if( sel_text )
-			{ // some text selected
-				textarea_wrap_selection( myField, <?php echo $js_code_prefix;?>_tagButtons[i].tagStart, <?php echo $js_code_prefix;?>_tagButtons[i].tagEnd, 0 );
-			}
-			else
-			{
-				if( !<?php echo $js_code_prefix;?>_tagCheckOpenTags(i) || <?php echo $js_code_prefix;?>_tagButtons[i].tagEnd == '')
-				{
-					textarea_wrap_selection( myField, <?php echo $js_code_prefix;?>_tagButtons[i].tagStart, '', 0 );
-					<?php echo $js_code_prefix;?>_tagAddTag(i);
-				}
-				else
-				{
-					textarea_wrap_selection( myField, '', <?php echo $js_code_prefix;?>_tagButtons[i].tagEnd, 0 );
-					<?php echo $js_code_prefix;?>_tagRemoveTag(i);
-				}
-			}
-			if(focus_when_finished)
-			{
-				myField.focus();
-			}
-		}
-		//]]>
-		</script><?php
-
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $js_code_prefix.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $js_code_prefix.'toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript"><?php echo $js_code_prefix;?>_tagToolbar();</script><?php
 
 		return true;
 	}

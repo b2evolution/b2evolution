@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,13 @@ load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
  */
 class ItemSettings extends AbstractSettings
 {
+	/**
+	 * Changes for params, Key is param name/key, Value is new value by function ItemSettings::set()
+	 *
+	 * @var array
+	 */
+	var $changes = array();
+
 	/**
 	 * The default settings to use, when a setting is not defined in the database.
 	 *
@@ -61,13 +68,13 @@ class ItemSettings extends AbstractSettings
 	 *
 	 * @access protected
 	 * @param string First column key
-	 * @param string Second column key
+	 * @param string Second column key, NULL - to load all settings of the requested Item
 	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
 	function _load( $item_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $item_ID ) || empty( $arg ) )
+		if( empty( $item_ID ) || ( empty( $arg ) && $arg !== NULL ) )
 		{
 			return false;
 		}
@@ -80,30 +87,32 @@ class ItemSettings extends AbstractSettings
 	 * Get a setting from the DB settings table.
 	 *
 	 * @uses get_default()
-	 * @param string First column key
-	 * @param string Second column key
+	 * @param integer Item ID
+	 * @param string Setting name/key
 	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
 	 */
-	function get( $col_key1, $col_key2 )
+	function get( $item_ID, $parname )
 	{
-		return parent::getx( $col_key1, $col_key2 );
+		return parent::getx( $item_ID, $parname );
 	}
 
 
 	/**
 	 * Temporarily sets a setting ({@link dbupdate()} writes it to DB).
 	 *
-	 * @param string First column key
-	 * @param string Second column key
+	 * @param integer Item ID
+	 * @param string Setting name/key
 	 * @param mixed Value
 	 * @return boolean true, if the value has been set, false if it has not changed.
 	 */
-	function set( $col_key1, $col_key2, $value )
+	function set( $item_ID, $parname, $value )
 	{
 		// Limit value with max possible length:
 		$value = utf8_substr( $value, 0, 10000 );
 
-		return parent::setx( $col_key1, $col_key2, $value );
+		$this->changes[ $parname ] = $value;
+
+		return parent::setx( $item_ID, $parname, $value );
 	}
 }
 

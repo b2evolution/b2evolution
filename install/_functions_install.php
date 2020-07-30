@@ -4,11 +4,13 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+load_funcs( 'collections/_demo_content.funcs.php' );
 
 /**
  * Open a block
@@ -112,7 +114,7 @@ function display_locale_selector()
 /**
  * Base config recap
  */
-function display_base_config_recap()
+function display_base_config_recap( $display_system_check = false )
 {
 	global $default_locale, $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_config, $tableprefix, $baseurl, $admin_email;
 
@@ -146,6 +148,20 @@ function display_base_config_recap()
 	'</samp>';
 
 	block_close();
+
+	if( $display_system_check )
+	{	// Dispaly system check table:
+		echo "\n".'<div class="panel panel-default system_check_table">'."\n";
+		load_funcs( 'tools/model/_system.funcs.php' );
+		display_system_check( array(
+				'mode'                => 'install',
+				'section_start'       => '<div class="panel-heading">#section_title#</div>'."\n".'<div class="panel-body">'."\n",
+				'section_end'         => '</div>'."\n",
+				'section_b2evo_title' => T_('System check'),
+				'check_version'       => false,
+			) );
+		echo '</div>'."\n\n";
+	}
 }
 
 
@@ -154,8 +170,8 @@ function display_base_config_recap()
  */
 function install_newdb()
 {
-	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password;
-	global $create_sample_contents, $create_sample_organization, $create_demo_users, $create_demo_messages;
+	global $new_db_version, $admin_url, $baseurl, $install_login, $random_password, $admin_user;
+	global $create_sample_contents, $create_demo_organization, $create_demo_users, $create_demo_messages;
 
 	/*
 	 * -----------------------------------------------------------------------------------
@@ -166,11 +182,11 @@ function install_newdb()
 
 	if( $old_db_version = get_db_version() )
 	{
-		echo get_install_format_text( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
+		echo get_install_format_text_and_log( '<p class="text-warning"><strong><evo:warning>'.T_('OOPS! It seems b2evolution is already installed!').'</evo:warning></strong></p>', 'p' );
 
 		if( $old_db_version < $new_db_version )
 		{
-			echo get_install_format_text( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
+			echo get_install_format_text_and_log( '<p>'.sprintf( T_('Would you like to <a %s>upgrade your existing installation now</a>?'), 'href="?action=evoupgrade"' ).'</p>', 'p' );
 		}
 
 		return;
@@ -182,9 +198,9 @@ function install_newdb()
 	 *
 	 * @var integer
 	 */
-	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'all' ? intval( check_local_installation() ) : 0 ) );
+	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'full' ? intval( check_local_installation() ) : 0 ) );
 
-	echo get_install_format_text( '<h2>'.T_('Creating b2evolution tables...').'</h2>', 'h2' );
+	echo get_install_format_text_and_log( '<h2>'.T_('Creating b2evolution tables...').'</h2>', 'h2' );
 	evo_flush();
 	create_tables();
 
@@ -192,20 +208,38 @@ function install_newdb()
 	update_install_progress_bar();
 
 	// Create default data
-	echo get_install_format_text( '<h2>'.T_('Creating minimum default data...').'</h2>', 'h2' );
+	echo get_install_format_text_and_log( '<h2>'.T_('Creating minimum default data...').'</h2>', 'h2' );
 	evo_flush();
 	create_default_data();
 
+	$user_org_IDs = NULL;
+	$demo_users = array();
 
-	if( $create_sample_organization || $create_demo_users )
+	if( $create_demo_organization || $create_demo_users )
 	{
-		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.T_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
-		// Create sample organization if selected
-		if( $create_sample_organization )
+		// Create demo organization if selected:
+		if( $create_demo_organization )
 		{
-			create_sample_organization();
+			task_begin( 'Creating demo organization...' );
+			if( $new_demo_organization = create_demo_organization( 1 ) )
+			{
+				$user_org_IDs = array( $new_demo_organization->ID );
+				task_end();
+			}
+			else
+			{
+				task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+			}
+
+			if( $user_org_IDs )
+			{
+				task_begin( 'Adding admin user to demo organization...' );
+				$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+				task_end();
+			}
 		}
 
 		// Create demo users if selected
@@ -229,20 +263,36 @@ function install_newdb()
 			// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 			$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-			create_demo_users();
+			$demo_users = create_demo_users();
 
 			if( $create_demo_messages )
 			{
-				create_demo_messages();
+				task_begin( 'Creating demo private messages...' );
+				$demo_messages = create_demo_messages();
+				if( $demo_messages )
+				{
+					task_end();
+				}
+				else
+				{
+					task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+				}
 			}
 		}
 	}
+
+	// We need to have at least one section because it is a required field for collection:
+	global $DB;
+	task_begin( 'Creating default section... ' );
+	$DB->query( 'INSERT INTO T_section ( sec_ID, sec_name, sec_order, sec_owner_user_ID )
+		VALUES ( 1, "No Section", 1, 1 )' );
+	task_end();
 
 	if( $create_sample_contents )
 	{
 		global $Settings, $install_test_features;
 
-		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.T_('Creating demo website...').'</h2>', 'h2' );
 		evo_flush();
 
 		// We're gonna need some environment in order to create the demo contents...
@@ -261,36 +311,51 @@ function install_newdb()
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-		create_demo_contents();
+		// Create the demo/sample contents:
+		create_demo_contents( $demo_users, $create_demo_users, true );
 	}
 
-	evo_flush();
-	create_default_newsletters();
+	// Call the following function even if no demo content will be installed.
+	// We still need to install the shared widgets
+	install_basic_widgets();
 
-	evo_flush();
-	create_default_email_campaigns();
+	// Create demo emails data like lists, campaigns, automations:
+	create_demo_emails();
 
 	// Update the progress bar status
 	update_install_progress_bar();
 
 	track_step( 'install-success' );
 
+	// Display installation data and instructions
 	$install_result_title = T_('Installation successful!');
-	$install_result_body = get_install_format_text(
+	echo get_install_format_text_and_log( '<h2>'.$install_result_title.'</h2>', 'h2' );
+	
+	global $avoid_log_file;
+	
+	$install_result_body = get_install_format_text_and_log(
 		'<p><strong>'
 			.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
 		.'</strong></p>', 'p' )
-		.get_install_format_text(
+		.get_install_format_text_and_log(
 		'<table>'
-			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>', 'br' )
-		.get_install_format_text(
+			.'<tr><td>'.T_( 'Login' ).': &nbsp;</td><td><strong><evo:login>'.( isset( $install_login ) ? $install_login : 'admin' ).'</evo:login></strong></td></tr>', 'br' );
+	
+	// Log password( not readable ) without printing in browser:
+	get_install_format_text_and_log(
+			'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.'**Not saved to the log file**'.'</evo:password></strong></td></tr>'
+		.'</table>', 'br' );
+	
+	// Print password without log:
+	$avoid_log_file = true;
+	$install_result_body .= get_install_format_text_and_log(
 			'<tr><td>'.T_( 'Password' ).': &nbsp;</td><td><strong><evo:password>'.$random_password.'</evo:password></strong></td></tr>'
-		.'</table>', 'br' )
-		.get_install_format_text(
+		.'</table>', 'br' );
+	$avoid_log_file = false;
+	
+	$install_result_body .= get_install_format_text_and_log(
 		'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>', 'p' );
 
-	// Display installation data and instructions
-	echo get_install_format_text( '<h2>'.$install_result_title.'</h2>', 'h2' );
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions
@@ -298,25 +363,7 @@ function install_newdb()
 }
 
 
-/**
- * Begin install task.
- * This will offer other display methods in the future
- */
-function task_begin( $title )
-{
-	echo get_install_format_text( $title."\n" );
-	evo_flush();
-}
 
-
-/**
- * End install task.
- * This will offer other display methods in the future
- */
-function task_end( $message = 'OK.' )
-{
-	echo get_install_format_text( $message."<br />\n", 'br' );
-}
 
 
 function get_db_version()
@@ -471,7 +518,7 @@ function create_default_settings( $override = array() )
 	global $DB, $new_db_version, $default_locale;
 	global $admins_Group, $moderators_Group, $editors_Group, $users_Group, $suspect_Group, $spam_Group;
 	global $install_test_features, $create_sample_contents, $install_site_color, $local_installation;
-	global $create_sample_organization, $create_demo_users;
+	global $create_demo_organization, $create_demo_users;
 
 	$defaults = array(
 		'db_version' => $new_db_version,
@@ -486,8 +533,6 @@ function create_default_settings( $override = array() )
 	{
 		$defaults['gender_colored'] = 1;
 		echo_install_log( 'TEST FEATURE: Enabling colored gender usernames by default' );
-		$defaults['registration_require_country'] = 1;
-		$defaults['registration_require_gender'] = 'required';
 		echo_install_log( 'TEST FEATURE: Making country and gender required on registration' );
 		$defaults['location_country'] = 'required';
 		$defaults['location_region'] = 'required';
@@ -565,32 +610,43 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	// Note: Skin #1 will we used by Blog A and Blog B
 	// Install this skin firstly in order to use it by default for all collections with wrong skin ID on upgrade process:
-	skin_install( 'bootstrap_blog_skin' );
+	skin_install( 'bootstrap_blog_skin', true );
 
 	// Note: Skin #2 will we used by Home
-	skin_install( 'bootstrap_main_skin' );
+	skin_install( 'bootstrap_main_skin', true );
 
 	// Note: Skin #3 will we used by Photos
-	skin_install( 'bootstrap_gallery_skin' );
+	skin_install( 'bootstrap_gallery_skin', true );
 
 	// Note: Skin #4 will we used by Forums
-	skin_install( 'bootstrap_forums_skin' );
+	skin_install( 'bootstrap_forums_skin', true );
 
 	// Note: Skin #5 will we used by Manual
-	skin_install( 'bootstrap_manual_skin' );
+	skin_install( 'bootstrap_manual_skin', true );
 
-	// skin_install( 'asevo' );
-	// skin_install( 'dating_mood' );
-	// skin_install( 'evopress' );
-	// skin_install( 'photoalbums' );
-	// skin_install( 'photoblog' );
-	// skin_install( 'pureforums' );
-	if( $install_mobile_skins )
-	{
-		skin_install( 'touch' );
+	// Note: Skin #6 will be used by Mini-Site
+	skin_install( 'jared_skin', true );
+
+	skin_install( '_atom', true );
+	skin_install( '_rss2', true );
+
+	// Install default site skin:
+	$default_site_Skin = skin_install( 'default_site_skin', true );
+	if( $default_site_Skin && $default_site_Skin->ID > 0 )
+	{	// Use the installed skin as default for site:
+		global $Settings;
+		if( empty( $Settings ) )
+		{	// Initialize general settings:
+			load_class( 'settings/model/_generalsettings.class.php', 'GeneralSettings' );
+			$Settings = new GeneralSettings();
+		}
+		$Settings->set( 'normal_skin_ID', $default_site_Skin->ID );
+		$Settings->dbupdate();
 	}
-	skin_install( '_atom' );
-	skin_install( '_rss2' );
+
+	skin_install( 'bootstrap_site_navbar_skin', true );
+	skin_install( 'bootstrap_site_tabs_skin', true );
+	skin_install( 'bootstrap_site_dropdown_skin', true );
 
 	task_end();
 }
@@ -640,11 +696,6 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9290 )
 	{
-		if( $install_test_features )
-		{
-			echo_install_log( 'TEST FEATURE: Installing plugin "Smilies"' );
-			install_plugin( 'smilies_plugin' );
-		}
 		install_plugin( 'videoplug_plugin' );
 	}
 
@@ -662,17 +713,6 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 9940 )
 	{ // Upgrade to 3.2.0
 		install_plugin( 'twitter_plugin' );
-	}
-
-	if( $old_db_version < 10300 )
-	{ // Upgrade to 5.0.0
-		install_plugin( 'flowplayer_plugin' );
-
-		if( $install_test_features )
-		{
-			echo_install_log( 'TEST FEATURE: Installing plugin "Google Maps"' );
-			install_plugin( 'google_maps_plugin' );
-		}
 	}
 
 	if( $old_db_version < 11000 )
@@ -702,11 +742,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
-		install_plugin( 'watermark_plugin', $install_test_features );
-		if( $install_test_features )
-		{
-			echo_install_log( 'TEST FEATURE: Activating plugin "Watermark"' );
-		}
 		// ping
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
@@ -731,8 +766,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
 		}
-		install_plugin( 'gmcode_plugin' );
-		install_plugin( 'wacko_plugin' );
 		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
@@ -742,9 +775,6 @@ function install_basic_plugins( $old_db_version = 0 )
 			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
 		}
 		install_plugin( 'widescroll_plugin' );
-		// widget
-		install_plugin( 'facebook_plugin' );
-		install_plugin( 'whosonline_plugin' );
 		// Unclassified
 		install_plugin( 'bookmarklet_plugin' );
 	}
@@ -761,7 +791,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
 		}
-		install_plugin( 'cookie_consent_plugin', false );
 	}
 
 	if( $old_db_version < 11730 )
@@ -774,9 +803,49 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'polls_plugin' );
 	}
 
+	if( $old_db_version < 12330 )
+	{
+		install_plugin( 'inlines_plugin' );
+	}
+
 	if( $old_db_version < 12580 )
 	{
 		install_plugin( 'email_elements_plugin' );
+	}
+
+	if( $old_db_version < 13090 )
+	{
+		install_plugin( 'webmention_plugin' );
+	}
+
+	if( $old_db_version < 13210 )
+	{
+		install_plugin( 'auto_anchors_plugin' );
+	}
+
+	if( $old_db_version < 13220 )
+	{
+		install_plugin( 'table_contents_plugin' );
+	}
+
+	if( $old_db_version < 15380 )
+	{
+		install_plugin( 'financial_contribution_plugin' );
+	}
+
+	if( $old_db_version < 15520 )
+	{
+		install_plugin( 'mermaid_plugin' );
+	}
+
+	if( $old_db_version < 15540 )
+	{
+		install_plugin( 'nofollow_plugin' );
+	}
+
+	if( $old_db_version < 15691 )
+	{
+		install_plugin( 'content_blocks_plugin' );
 	}
 }
 
@@ -787,20 +856,26 @@ function install_basic_plugins( $old_db_version = 0 )
  * @param string Plugin name
  * @param boolean TRUE - to activate plugin
  * @param array Plugin settings
+ * @param array Additional params
  * @return true on success
  */
-function install_plugin( $plugin, $activate = true, $settings = array() )
+function install_plugin( $plugin, $activate = true, $settings = array(), $params = array() )
 {
-	/**
-	 * @var Plugins_admin
-	 */
-	global $Plugins_admin;
+	global $Plugins_admin, $plugins_path;
 
-	task_begin( 'Installing plugin: '.$plugin.'... ' );
+	$params = array_merge( array(
+			'single_task' => true,
+		), $params );
+
+	if( $params['single_task'] )
+	{
+		task_begin( 'Installing plugin "'.$plugin.'" from <code>'.substr( $Plugins_admin->get_classfile_path( $plugin ), strlen( $plugins_path ) ).'</code>... ' );
+	}
+
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 	if( ! ( $edit_Plugin instanceof Plugin ) )
 	{ // Broken plugin
-		echo get_install_format_text( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
+		echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.$edit_Plugin.'</evo:error></span><br />'."\n", 'br' );
 		return false;
 	}
 
@@ -821,7 +896,7 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 		$enable_return = $edit_Plugin->BeforeEnable();
 		if( $enable_return !== true )
 		{ // Warning on enable a plugin
-			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n", 'br' );
+			echo get_install_format_text_and_log( '<span class="text-warning"><evo:warning>'.$enable_return.'</evo:warning></span><br />'."\n", 'br' );
 
 			// Set plugin status to "needs_config" to mark the plugin as incomplete for using:
 			$Plugins_admin->set_Plugin_status( $edit_Plugin, 'needs_config' );
@@ -836,41 +911,54 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' );
 	}
 
-	task_end();
+	if( $params['single_task'] )
+	{
+		task_end();
+	}
+
 	return true;
 }
 
 
 /**
- * Install basic widgets.
+ * Installing default widgets for all collections
  */
-function install_basic_widgets( $old_db_version = 0 )
+function install_basic_widgets()
 {
-	/**
-	* @var DB
-	*/
-	global $DB;
+	global $installed_default_shared_widgets, $install_test_features, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID, $demo_poll_ID;
 
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
-	if( $old_db_version < 11010 )
-	{
-		$blog_ids = $DB->get_assoc( 'SELECT blog_ID, "std" FROM T_blogs' );
-	}
-	else
-	{
-		$blog_ids = $DB->get_assoc( 'SELECT blog_ID, blog_type FROM T_blogs' );
-	}
-
-	foreach( $blog_ids as $blog_id => $blog_type )
-	{
-		task_begin( 'Installing default widgets for blog #'.$blog_id.'... ' );
-		insert_basic_widgets( $blog_id, true, $blog_type );
+	if( empty( $installed_default_shared_widgets ) )
+	{	// Install default widgets only when they were not installed before,
+		// (e-g after demo collections creating):
+		task_begin( 'Installing default shared widgets... ' );
+		insert_shared_widgets( 'normal' );
 		task_end();
 	}
 
-}
+	// Load all collections:
+	$BlogCache = & get_BlogCache();
+	$BlogCache->load_all();
 
+	foreach( $BlogCache->cache as $Blog )
+	{
+		task_begin( 'Installing default widgets for collection #'.$Blog->ID.'... ' );
+		$Blog->setup_default_widgets( 'all', array(
+				'coll_home_ID'          => $blog_home_ID,
+				'coll_blog_a_ID'        => $blog_a_ID,
+				'coll_photoblog_ID'     => $blog_photoblog_ID,
+				'poll_ID'               => $demo_poll_ID,
+				'init_as_home'          => ( $blog_home_ID == $Blog->ID ),
+				'init_as_blog_a'        => ( $blog_a_ID == $Blog->ID ),
+				'init_as_blog_b'        => ( $blog_b_ID == $Blog->ID ),
+				'init_as_forums'        => ( $blog_forums_ID == $Blog->ID ),
+				'init_as_events'        => ( $events_blog_ID == $Blog->ID ),
+				'install_test_features' => $install_test_features,
+			) );
+		task_end();
+	}
+}
 
 
 function advanced_properties()
@@ -1072,14 +1160,14 @@ function create_relations()
  */
 function install_htaccess( $upgrade = false, $force_htaccess = false )
 {
-	echo get_install_format_text( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' (Force='.($force_htaccess?'yes':'no').')<br />', 'p-start-br' );
+	echo get_install_format_text_and_log( '<p>'.T_('Preparing to install <code>/.htaccess</code> in the base folder...').' (Force='.($force_htaccess?'yes':'no').')<br />', 'p-start-br' );
 
 	if( ! $force_htaccess )
 	{	// Check if we run apache...
 		$server = isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '';
 		if( ! empty( $server ) && preg_match( '~(Nginx|Lighttpd|Microsoft-IIS)~i', $server ) )
 		{ // Skip installation if this is not an Apache server
-			echo get_install_format_text( '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>', 'p-end' );
+			echo get_install_format_text_and_log( '<br /><b class="text-warning"><evo:warning>'.T_('.htaccess is not needed because your web server is not Apache. WARNING: you will need to configure your web server manually.').'</evo:warning></b></p>', 'p-end' );
 			return true;
 		}
 	}
@@ -1089,7 +1177,7 @@ function install_htaccess( $upgrade = false, $force_htaccess = false )
 	if( $error_message )
 	{
 
-		echo get_install_format_text( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br /><b>'.$error_message.'</b></evo:error></span>' );
+		echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.T_('ERROR!').'<br /><b>'.$error_message.'</b></evo:error></span>' );
 
 		// Do we want to ignore the error?
 		$htignore = param( 'htignore', 'integer', 0 );
@@ -1099,11 +1187,11 @@ function install_htaccess( $upgrade = false, $force_htaccess = false )
 		}
 		else
 		{ // Some errors are existing with .htaccess file, Display a link to ignore the errors and continue instalation
-			echo get_install_format_text( '<ul class="pager"><li><a href="'.( isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' ).'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>', 'li' );
+			echo get_install_format_text_and_log( '<ul class="pager"><li><a href="'.( isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '' ).'&htignore=1" style="font-size:150%;font-weight:bold;">'.T_('Continue installation').' <span aria-hidden="true">&rarr;</span></a></li></ul>', 'li' );
 			return false;
 		}
 	}
-	echo get_install_format_text( '</p>', 'p-end' );
+	echo get_install_format_text_and_log( '</p>', 'p-end' );
 
 	return true;
 }
@@ -1134,27 +1222,32 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 		{
 			if( @file_exists( $basepath.'sample.htaccess' ) )
 			{
-				$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
-				$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
+				$content_sample_htaccess = @file_get_contents( $basepath.'sample.htaccess' );
+				if( $content_sample_htaccess === false )
+				{
+					return get_install_format_text_and_log( '<div class="alert alert-danger"><evo:error>We cannot read the <code>sample.htaccess</code> file. Please check <a href="'.get_manual_url( 'directory-and-file-permissions' ).'">file permissions</a> to make sure PHP can read this file.</evo:error></div>' );
+				}
+				$content_sample_htaccess = trim( $content_sample_htaccess );
+				$content_htaccess = trim( @file_get_contents( $basepath.'.htaccess' ) );
 
 				if( $content_htaccess != $content_sample_htaccess )
 				{ // The .htaccess file has content that different from a sample file
 					if( $upgrade )
 					{
-						echo get_install_format_text( '<span class="text-warning"><evo:warning>'.T_('<code>.htaccess</code> is already installed BUT DOES NOT match <code>sample.htaccess</code>. Please check the differences manually.').'</evo:warning></span>' );
+						echo get_install_format_text_and_log( '<span class="text-warning"><evo:warning>'.T_('<code>.htaccess</code> is already installed BUT DOES NOT match <code>sample.htaccess</code>. Please check the differences manually.').'</evo:warning></span>' );
 						return '';
 					}
 					else
 					{
-						echo get_install_format_text( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
+						echo get_install_format_text_and_log( '<p class="text-danger"><evo:error>'.T_('There is already a file called .htaccess at the blog root. If you don\'t specifically need this file, it is recommended that you delete it or rename it to old.htaccess before you continue. This will allow b2evolution to create a new .htaccess file that is optimized for best results.').'</evo:error></p>', 'p' );
 						echo T_('Here are the contents of the current .htaccess file:');
-						echo get_install_format_text( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
-						return get_install_format_text( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
+						echo get_install_format_text_and_log( '<div style="overflow:auto"><pre>'.htmlspecialchars( $content_htaccess ).'</pre></div><br />', 'code' );
+						return get_install_format_text_and_log( sprintf( T_('Again, we recommend you remove this file before continuing. If you chose to keep it, b2evolution will probably still work, but for optimization you should follow <a %s>these instructions</a>.'), 'href="'.get_manual_url( 'htaccess-file' ).'" target="_blank"' ) );
 					}
 				}
 				else
 				{	// Installed file is the same as recommended:
-					echo get_install_format_text( '<span class="text-info">'.T_('<code>.htaccess</code> is already installed and matches <code>sample.htaccess</code>.').'</span>' );
+					echo get_install_format_text_and_log( '<span class="text-info">'.T_('<code>.htaccess</code> is already installed and matches <code>sample.htaccess</code>.').'</span>' );
 					return '';
 				}
 			}
@@ -1170,7 +1263,7 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 		load_funcs('_core/_url.funcs.php');
 		$fetch_test_url = $baseurl.'install/test/';
 		$info = array();
-		echo get_install_format_text( T_('Verifying .htaccess support works by fetching:').' <code>'.$fetch_test_url.'</code>... ' );
+		echo get_install_format_text_and_log( T_('Verifying .htaccess support works by fetching:').' <code>'.$fetch_test_url.'</code>... ' );
 		if( ! $remote_page = fetch_remote_page( $fetch_test_url, $info ) )
 		{
 			return $info['error'];
@@ -1187,7 +1280,7 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 		return T_('Test was successful, but failed to copy .htaccess into baseurl directory!');
 	}
 
-	echo get_install_format_text( '<span class="text-success"><evo:success>'.T_('.htaccess installation successful!').'</evo:success></span>' );
+	echo get_install_format_text_and_log( '<span class="text-success"><evo:success>'.T_('.htaccess installation successful!').'</evo:success></span>' );
 	return '';
 }
 
@@ -1231,7 +1324,7 @@ function display_install_back_link()
 {
 	global $default_locale;
 
-	echo get_install_format_text( '<ul class="pager">'
+	echo get_install_format_text_and_log( '<ul class="pager">'
 			.'<li class="previous"><a href="index.php?locale='.$default_locale.'"><span aria-hidden="true">&larr;</span> '.T_('Back to install menu').'</a></li>'
 		.'</ul>', 'p' );
 }
@@ -1245,7 +1338,7 @@ function display_install_back_link()
  */
 function start_install_progress_bar( $title, $steps = NULL )
 {
-	global $install_progress_bar_counter, $install_progress_bar_total, $display;
+	global $install_progress_bar_counter, $install_progress_bar_total, $install_progress_bar_status, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
@@ -1263,6 +1356,8 @@ function start_install_progress_bar( $title, $steps = NULL )
 		$bar_width = '100%';
 	}
 
+	$install_progress_bar_status = 'success';
+
 	echo '<div class="progress">'
 			.'<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:'.$bar_width.'">'
 				.'<span class="sr-only">'.$title.'</span>'
@@ -1274,7 +1369,7 @@ function start_install_progress_bar( $title, $steps = NULL )
 				.'<style type="text/css">.progress-bar{width:100% !important}</style>'
 			.'</noscript>';
 		// Don't use the striped animation when we have a real progress indication
-		echo '<script type="text/javascript">'
+		echo '<script>'
 			.'jQuery( ".progress-bar.active.progress-bar-striped" ).removeClass( "active progress-bar-striped" );'
 		.'</script>';
 	}
@@ -1286,16 +1381,16 @@ function start_install_progress_bar( $title, $steps = NULL )
  */
 function stop_install_progress_bar()
 {
-	global $display;
+	global $install_progress_bar_status, $display;
 
 	if( ! empty( $display ) && $display != 'normal' )
 	{ // Exit here, because we can use progress bar on normal mode (Hide on compact mode)
 		return;
 	}
 
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
-		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-success" ); }, 600 );'
+		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-'.$install_progress_bar_status.'" ); }, 600 );'
 	.'</script>';
 }
 
@@ -1326,7 +1421,7 @@ function update_install_progress_bar()
 		$bar_width = 100;
 	}
 
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'jQuery( ".progress-bar" ).css( "width", "'.$bar_width.'%" );'
 	.'</script>';
 }
@@ -1340,7 +1435,7 @@ function update_install_progress_bar()
 function get_install_steps_count()
 {
 	global $allow_install_test_features, $allow_evodb_reset;
-	global $create_sample_organization;
+	global $create_demo_organization;
 
 	$steps = 0;
 
@@ -1367,8 +1462,8 @@ function get_install_steps_count()
 	// Before install default skins:
 	$steps++;
 
-	// Creating sample organization:
-	if( $create_sample_organization )
+	// Creating demo organization:
+	if( $create_demo_organization )
 	{
 		$steps++;
 	}
@@ -1381,7 +1476,7 @@ function get_install_steps_count()
 		// After Creating default sample contents(users, and probably blogs and categories):
 		$steps++;
 
-		if( $create_sample_contents == 'all' )
+		if( $create_sample_contents == 'full' )
 		{ // Array contains which collections should be installed
 			$install_collection_home =   1;
 			$install_collection_bloga =  1;
@@ -1427,7 +1522,6 @@ function get_install_steps_count()
 		{ // After installing of the blog "Manual"
 			$steps++;
 		}
-
 		if( $install_collection_tracker )
 		{ // After installing of the blog "Tracker"
 			$steps++;
@@ -1549,7 +1643,7 @@ function display_install_messages( $messages, $type = 'error' )
 		$r .= '<div class="alert alert-'.$type.'" role="alert">'.$before_message.$message.$after_message.'</div>'."\n";
 	}
 
-	echo get_install_format_text($r);
+	echo get_install_format_text_and_log($r);
 }
 
 
@@ -1560,7 +1654,7 @@ function echo_install_button_js()
 {
 	global $app_name;
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#install_button' ).click( function()
@@ -1684,7 +1778,7 @@ function display_install_result_window( $title, $body )
 	</div>';
 
 	// JavaScript to open modal window with info:
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'setTimeout( function() { jQuery( "#evo_modal__install" ).modal(); }, 1000 );'
 	.'</script>';
 }
@@ -1918,7 +2012,6 @@ function update_basic_config_file( $params = array() )
 
 	if( $DB->error )
 	{ // restart conf
-		display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
 		$action = 'start';
 		if( ! $params['print_messages'] )
 		{	// Return all messages instead of printing on screen:
@@ -2035,17 +2128,5 @@ function update_basic_config_file( $params = array() )
 	}
 
 	return true;
-}
-
-
-/**
- * Print out log text on screen
- *
- * @param string Log text
- * @param string Log type: 'warning', 'note', 'success', 'danger'
- */
-function echo_install_log( $text, $type = 'warning' )
-{
-	echo '<p class="alert alert-'.$type.'">'.$text.'</p>';
 }
 ?>

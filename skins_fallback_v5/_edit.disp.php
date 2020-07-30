@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -18,10 +18,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $Collection, $Blog, $Session, $inc_path;
 global $action, $form_action;
 
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var Plugins
  */
@@ -59,13 +55,6 @@ $required_star = '<span class="label_field_required">*</span>';
 $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
-
-// =================================== INSTRUCTION ====================================
-$ItemType = & $edited_Item->get_ItemType();
-if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
-{
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
-}
 
 // ================================ START OF EDIT FORM ================================
 
@@ -111,8 +100,13 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{
+			$Form->hidden( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ) );
+		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+		$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 		$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
@@ -121,19 +115,37 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-		{	// We want to use workflow properties for this blog:
-			$Form->hidden( 'item_priority', $edited_Item->priority );
-			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		if( $edited_Item->can_edit_workflow( 'status' ) )
+		{	// Allow workflow status if current user can edit this property:
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+		}
+		if( $edited_Item->can_edit_workflow( 'status' ) )
+		{	// Allow workflow user if current user can edit this property:
+			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		}
+		if( $edited_Item->can_edit_workflow( 'priority' ) )
+		{	// Allow workflow priority if current user can edit this property:
+			$Form->hidden( 'item_priority', $edited_Item->priority );
+		}
+		if( $edited_Item->can_edit_workflow( 'deadline' ) )
+		{	// Allow workflow deadline if current user can edit this property:
+			$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
+			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
-		$Form->hidden( 'item_featured', $edited_Item->featured );
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$Form->hidden( 'item_featured', $edited_Item->featured );
+			$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
+			$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
+		}
+		if( is_pro() && $Blog->get_setting( 'track_unread_content' ) )
+		{	// Update setting to mark Item as "must read" only for PRO version and when tracking of unread content is enabled for collection:
+			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
+		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
-		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
-		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-		$Form->hidden( 'item_order', $edited_Item->order );
+		$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
+		$Form->hidden( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -141,22 +153,22 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 	elseif( !isset( $edited_Item->status ) )
 	{
-		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
-	if( $current_User->check_perm( 'admin', 'restricted' ) )
+	if( check_user_perm( 'admin', 'restricted' ) )
 	{ // These fields can be edited only by users which have an access to back-office
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // Time stamp field values
 			$Form->hidden( 'item_dateset', $edited_Item->get( 'dateset' ) );
 			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
 			$Form->hidden( 'item_issue_time', substr( $edited_Item->get( 'issue_date' ), 11 ) );
 		}
-		// Tags
-		$Form->hidden( 'item_tags', $item_tags );
-		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 	}
+	// Tags
+	$Form->hidden( 'item_tags', $item_tags );
+	$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 
 	if( $Blog->get_setting( 'in_skin_editing_category' ) )
 	{	// If categories are allowed to update from front-office:
@@ -211,15 +223,26 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->switch_layout( NULL );
 	}
 
+
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
+	{ // ####################### ATTACHMENTS FIELDSETS #########################
+		$LinkOwner = new LinkItem( $edited_Item );
+	}
+
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
 	{ // Display text
 		// --------------------------- TOOLBARS ------------------------------------
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+		$admin_toolbar_params = array(
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
-			) );
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_toolbar_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------
@@ -229,11 +252,11 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->textarea_input( 'content', $item_content, 16, NULL, array(
 				'cols' => 50 ,
 				'id' => 'itemform_post_content',
-				'class' => 'autocomplete_usernames'
+				'class' => 'autocomplete_usernames link_attachment_dropzone'
 			) );
 		$Form->switch_layout( NULL );
 		?>
-		<script type="text/javascript" language="JavaScript">
+		<script language="JavaScript">
 			<!--
 			// This is for toolbar plugins
 			var b2evoCanvas = document.getElementById('itemform_post_content');
@@ -243,17 +266,28 @@ $Form->begin_form( 'inskin', '', $form_params );
 		<?php
 		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayEditorButton', array(
+		$display_editor_params = array(
 				'target_type'   => 'Item',
 				'target_object' => $edited_Item,
 				'content_id'    => 'itemform_post_content',
-				'edit_layout'   => 'inskin'
-			) );
+				'edit_layout'   => 'inskin',
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$display_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'DisplayEditorButton', $display_editor_params );
 		echo '</div>';
 	}
 	else
 	{ // Hide text
 		$Form->hidden( 'content', $item_content );
+	}
+
+	// =================================== INSTRUCTION ====================================
+	if( $edited_Item->get_type_setting( 'front_order_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<div class="action_messages evo_instruction"><div class="log_note">'.$edited_Item->get_type_setting( 'instruction' ).'</div></div>';
 	}
 
 	global $display_item_settings_is_defined;
@@ -264,7 +298,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{
 		// ################### VISIBILITY / SHARING ###################
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 		if( count( $sharing_options ) == 1 )
@@ -287,8 +321,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ################### TEXT RENDERERS ###################
-	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
-	{	// If text renderers are allowed to update from front-office:
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) && $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// If text renderers are allowed to update from front-office and text content is allowed for the item type:
 		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
 	}
 	else
@@ -317,55 +351,34 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields') );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Properties') );
+	$Form->switch_layout( 'table' );
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
 
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
+	echo $Form->formstart;
 
-		echo $Form->formstart;
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
-			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
-			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
-		}
+	echo $Form->formend;
 
-		echo $Form->formend;
+	$Form->switch_layout( NULL );
 
-		$Form->switch_layout( NULL );
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
 { // ####################### ATTACHMENTS FIELDSETS #########################
-	$LinkOwner = new LinkItem( $edited_Item );
 	if( $LinkOwner->count_links() )
 	{
 		$Form->begin_fieldset( T_('Attachments') );
-		if( $current_User->check_perm( 'files', 'view' ) && $current_User->check_perm( 'admin', 'restricted' ) )
+		if( check_user_perm( 'files', 'view' ) && check_user_perm( 'admin', 'restricted' ) )
 		{
 			display_attachments( $LinkOwner );
 		}
@@ -400,8 +413,7 @@ echo_publishnowbutton_js();
 // New category input box:
 echo_onchange_newcat();
 echo_autocomplete_tags();
+echo_fieldset_folding_js();
 
 $edited_Item->load_Blog();
-// Location
-echo_regional_js( 'item', $edited_Item->region_visible() );
 ?>

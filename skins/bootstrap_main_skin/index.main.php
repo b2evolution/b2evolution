@@ -27,7 +27,7 @@ skin_init( $disp );
 
 
 // Check if current page has a big picture as background
-$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) );
+$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
@@ -62,13 +62,14 @@ if( $is_pictured_page )
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
-		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -79,16 +80,15 @@ if( $is_pictured_page )
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
-		</div>
-	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
-		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
@@ -96,22 +96,18 @@ if( $is_pictured_page )
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
-		</div>
-	</div><!-- .col -->
 
 </header><!-- .row -->
 
-
-<nav class="row">
-
-	<div class="col-md-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -126,10 +122,6 @@ if( $is_pictured_page )
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
-		</ul>
-	</div><!-- .col -->
-
-</nav><!-- .row -->
 
 <div class="row">
 
@@ -140,7 +132,7 @@ if( $is_pictured_page )
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -181,7 +173,16 @@ if( $is_pictured_page )
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
-					'display_edit_links'=> false,
+					'comments_text'     => '',
+					'search_text'       => '',
+					'posts_text'        => '',
+					'display_edit_links'  => ( $disp == 'edit' ),
+					'edit_links_template' => array(
+						'before'              => '<span class="pull-right">',
+						'after'               => '</span>',
+						'advanced_link_class' => 'btn btn-info btn-sm',
+						'close_link_class'    => 'btn btn-default btn-sm',
+					),
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
@@ -190,17 +191,9 @@ if( $is_pictured_page )
 		// Go Grab the featured post:
 		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
 		{	// We have a featured/intro post to display:
-			$intro_item_style = '';
-			$LinkOwner = new LinkItem( $Item );
-			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
-			if( ! empty( $LinkList ) &&
-					$Link = & $LinkList->get_next() &&
-					$File = & $Link->get_File() &&
-					$File->exists() &&
-					$File->is_image() )
-			{	// Use cover image of intro-post as background:
-				$intro_item_style = 'background-image: url("'.$File->get_url().'")';
-			}
+			// Use background position image of intro-post for background URL:
+			$background_image_url = $Item->get_cover_image_url( 'background' );
+			$intro_item_style = $background_image_url ? 'background-image: url("'.$background_image_url.'")' : '';
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
@@ -258,15 +251,6 @@ if( $is_pictured_page )
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -308,16 +292,19 @@ if( $is_pictured_page )
 
 		<footer class="col-md-12">
 
-			<div class="evo_container evo_container__footer clearfix">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Footer'), array(
+				widget_container( 'footer', array(
 						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
-			</div>
 
 			<p class="center">
 			<?php

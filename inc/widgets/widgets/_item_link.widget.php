@@ -153,8 +153,15 @@ class item_link_Widget extends ComponentWidget
 		global $Item;
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
-			return;
+		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
+		}
+
+		if( empty( $Item->url ) )
+		{	// Don't display this widget when Item has no link:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no link.' );
+			return false;
 		}
 
 		$this->init_display( $params );
@@ -196,13 +203,13 @@ class item_link_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $current_User, $Item;
+		global $Collection, $Blog, $Item;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
 			);
 	}
 }

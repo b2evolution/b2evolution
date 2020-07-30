@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -33,7 +33,7 @@ $params = array_merge( array(
 		// Controlling the content:
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
-		'image_size'                 => 'fit-1280x720',
+		'image_size'                 => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		'author_link_text'           => 'auto',
 	), $params );
 ?>
@@ -54,7 +54,7 @@ $params = array_merge( array(
 				'after_image'              => '</figure>',
 				'after_images'             => '</div>',
 				'image_class'              => 'img-responsive',
-				'image_size'               => 'fit-1280x720',
+				'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 				'image_limit'              =>  1000,
 				'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 
@@ -71,7 +71,7 @@ $params = array_merge( array(
 				'gallery_colls'            => 5,
 				'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 				'restrict_to_image_position' => 'teaser',
 			) );
 	?>
@@ -172,14 +172,12 @@ $params = array_merge( array(
 	<?php
 	if( $disp == 'single' )
 	{
-		?>
-		<div class="evo_container evo_container__item_single">
-		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+		widget_container( 'item_single', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -207,20 +205,15 @@ $params = array_merge( array(
 				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
 	}
 	elseif( $disp == 'page' )
 	{
-		?>
-		<div class="evo_container evo_container__item_page">
-		<?php
 		// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Page'), array(
+		widget_container( 'item_page', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -241,9 +234,6 @@ $params = array_merge( array(
 				),
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
 	}
 	else
 	{
@@ -296,34 +286,35 @@ $params = array_merge( array(
 			} ?>
 
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => true,
+				'disp_trackback_url'   => true,
+				'disp_pingbacks'       => true,
+				'disp_webmentions'     => true,
+				'disp_meta_comments'   => false,
 				'before_section_title' => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			), $params ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-	?>
-
-	<?php
-	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-		skin_include( '_item_workflow.inc.php' );
-		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
 	}
 	?>
 
 	<?php
 	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
 	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		// ------------------ INTERNAL COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
 			) );
-		// ---------------------- END OF META COMMENTS ---------------------
+		// ---------------------- END OF INTERNAL COMMENTS ---------------------
 	}
 	?>
 

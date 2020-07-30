@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -102,11 +102,11 @@ else
 
 if( $allow_iframes )
 {
-	$E_block = 'p '.$E_heading.' div '.$E_list.' '.$E_blocktext.' fieldset table iframe';
+	$E_block = 'p '.$E_heading.' div nav '.$E_list.' '.$E_blocktext.' fieldset table iframe';
 }
 else
 {
-	$E_block = 'p '.$E_heading.' div '.$E_list.' '.$E_blocktext.' fieldset table';
+	$E_block = 'p '.$E_heading.' div nav '.$E_list.' '.$E_blocktext.' fieldset table';
 }
 
 if( $use_strict )
@@ -136,7 +136,8 @@ else
 // Allowed Attribute classes
 // TODO: individual checkboxes for class / style / id
 $A_coreattrs = 'class title data-*'.( $allow_css_tweaks ? ' style' : '' )					// 'id' is really nasty
-					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' );
+					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' )
+					.' markdown'; // Allow markdown code inside html tags
 $A_i18n = 'lang xml:lang dir';
 $A_attrs = $A_coreattrs.' '.$A_i18n;
 
@@ -157,6 +158,7 @@ $allowed_tags = array
 (
 	'body' => $E_Flow, // Remember this is not a true body, just a post body
 	'div' => $E_Flow,
+	'nav' => $E_Flow,
 	'p' => $E_Iinline,
 	'h1' => $E_Iinline,
 	'h2' => $E_Iinline,
@@ -292,6 +294,7 @@ if( $use_strict )
 	$allowed_attributes = array
 	(	// Strict
 		'div' => $A_attrs,
+		'nav' => $A_attrs,
 		'p' => $A_attrs,
 		'h1' => $A_attrs,
 		'h2' => $A_attrs,
@@ -321,6 +324,7 @@ else
 	$allowed_attributes = array
 	(	// Transitional
 		'div' => $A_attrs.' '.$A_TextAlign,
+		'nav' => $A_attrs.' '.$A_TextAlign,
 		'p' => $A_attrs.' '.$A_TextAlign,
 		'h1' => $A_attrs.' '.$A_TextAlign,
 		'h2' => $A_attrs.' '.$A_TextAlign,
@@ -449,7 +453,7 @@ $C_E_Iinline = '#PCDATA '.$C_E_inline.' '.$C_E_misc_inline;
 $C_E_heading = '';
 $C_E_list = 'ul ol dl';
 $C_E_blocktext = 'hr blockquote address';
-$C_E_block = 'p '.$C_E_heading.' div '.$C_E_list.' '.$C_E_blocktext.' table';
+$C_E_block = 'p '.$C_E_heading.' div nav '.$C_E_list.' '.$C_E_blocktext.' table';
 $C_E_Bblock = $C_E_block.' '.$C_E_misc;
 $C_E_Flow = '#PCDATA '.$C_E_block.' '.$C_E_inline.' '.$C_E_misc;
 $C_E_a_content = '#PCDATA '.$C_E_special.' '.$C_E_fontstyle.' '.$C_E_phrase.' '.$C_E_misc_inline;
@@ -478,6 +482,7 @@ $comments_allowed_tags = array
 	'dd' => $C_E_Flow,
 	'address' => $C_E_Iinline,
 	'hr' => '',
+	'pre' => $E_pre_content,
 );
 if( $use_strict )
 {

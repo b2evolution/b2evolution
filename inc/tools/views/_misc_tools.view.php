@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -90,8 +90,10 @@ if( !empty( $template_action ) )
 			break;
 
 		case 'delete_orphan_files':
-			// delete orphan File objects with no matching file on disk
-			dbm_delete_orphan_files();
+			// delete orphan File objects with no matching file on disk:
+			$delete_files = param( 'delete_files', 'integer' ); // Should we try to delete the found orphan files?
+			$delete_linked = param( 'delete_linked', 'integer' ); // Should we delete the found orphan files together with links?
+			dbm_delete_orphan_files( $delete_files, $delete_linked );
 			break;
 
 		case 'delete_orphan_file_roots':
@@ -102,8 +104,8 @@ if( !empty( $template_action ) )
 		case 'prune_hits_sessions':
 			// Prune old hits & sessions
 			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
-			$result = Hitlist::dbprune( false ); // will prune once per day, according to Settings
-			print_log( $result['message'], $result['result'] );
+			$result = Hitlist::dbprune( false, false ); // will prune once per day, according to Settings
+			print_log( nl2br( $result['message'] ), $result['result'] );
 			break;
 
 		case 'recreate_itemslugs':
@@ -164,7 +166,7 @@ if( !empty( $template_action ) )
 }
 
 
-if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
+if( check_user_perm( 'users', 'edit' ) && empty( $action ) )
 { // Setting to lock system
 	global $Settings;
 
@@ -181,7 +183,7 @@ if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 				'note' => T_('check this to prevent login (except for admins) and sending comments/messages. This prevents the DB from receiving updates (other than logging)').'<br />'.
 				          T_('Note: for a more complete lock down, rename the file /conf/_maintenance.html to /conf/maintenance.html (complete lock) or /conf/imaintenance.html (gives access to /install)') ) );
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{
 		$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 	}
@@ -192,7 +194,7 @@ if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 }
 
 // TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // default admin actions:
 	global $Settings;
 
@@ -236,7 +238,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<li><a href="'.regenerate_url( 'action', 'action=find_broken_slugs&amp;'.url_crumb( 'tools')).'">'.T_('Find all broken slugs (with no matching Item) + Option to delete - DB only.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_comments&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan comment Uploads - Disk &amp; DB.').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_files&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=show_orphan_files_form&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_file_roots&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=prune_hits_sessions&amp;'.url_crumb( 'tools' ) ).'">'.T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=recreate_itemslugs&amp;'.url_crumb( 'tools' ) ).'">'.T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.').'</a></li>';

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $rsc_url, $dispatcher;
+global $rsc_url, $admin_url;
 
 global $Session;
 
@@ -36,12 +36,12 @@ $Results->cols[] = array(
 						'td' => '% {Obj}->get_icon() %',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Extensions'),
 							'order' => 'ftyp_extensions',
-							'td' => '<strong><a href="'.$dispatcher.'?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
+							'td' => '<strong><a href="'.$admin_url.'?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
 											T_('Edit this file type...').'">$ftyp_extensions$</a></strong>',
 						);
 }
@@ -86,7 +86,15 @@ function display_perm( $perm )
 			$r = get_icon( 'file_allowed_registered' );
 			break;
 		case 'admin':
-			$r = get_icon( 'file_not_allowed' );
+			global $admins_can_manipulate_sensitive_files;
+			if( empty( $admins_can_manipulate_sensitive_files) )
+			{
+				$r = get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('Not allowed') ) );
+			}
+			else
+			{
+				$r = get_icon( 'file_not_allowed' );
+			}
 			break;
 		default:
 			debug_die( 'Wrong filetype allowed value!' );
@@ -102,7 +110,7 @@ $Results->cols[] = array(
 						'td' => '%display_perm( #ftyp_allowed# )%',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 
 	$Results->cols[] = array(

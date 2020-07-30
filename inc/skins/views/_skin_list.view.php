@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -59,8 +59,8 @@ if( ! empty( $template_action ) )
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'T_skins__skin.*, SUM( IF( blog_normal_skin_ID = skin_ID, 1, 0 ) + IF( blog_mobile_skin_ID = skin_ID, 1, 0 ) + IF( blog_tablet_skin_ID = skin_ID, 1, 0 ) ) AS nb_blogs' );
-$SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON (skin_ID = blog_normal_skin_ID OR skin_ID = blog_mobile_skin_ID OR skin_ID = blog_tablet_skin_ID )' );
+$SQL->SELECT( 'T_skins__skin.*, SUM( IF( blog_normal_skin_ID = skin_ID, 1, 0 ) + IF( blog_mobile_skin_ID = skin_ID, 1, 0 ) + IF( blog_tablet_skin_ID = skin_ID, 1, 0 ) + IF( blog_alt_skin_ID = skin_ID, 1, 0 ) ) AS nb_blogs' );
+$SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON (skin_ID = blog_normal_skin_ID OR skin_ID = blog_mobile_skin_ID OR skin_ID = blog_tablet_skin_ID OR skin_ID = blog_alt_skin_ID )' );
 $SQL->GROUP_BY( 'skin_ID, skin_class, skin_name, skin_type, skin_folder' );
 
 $count_SQL = new SQL();
@@ -71,9 +71,9 @@ $Results = new Results( $SQL->get(), 'skin_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_SkinCache();
 
-$Results->title = T_('Installed skins').get_manual_link('installed_skins');
+$Results->title = T_('Installed skins').get_manual_link('installed-skins');
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -96,11 +96,37 @@ $Results->cols[] = array(
 						'td' => '%skin_td_version( #skin_ID# )%'
 					);
 
+function skin_col_provide_type( $Skin, $type )
+{
+	// Check if the Skin is provided for site or collection:
+	$is_type_provided = ( $type == 'site' ) ? $Skin->provides_site_skin() : $Skin->provides_collection_skin();
+
+	// Display black dot icon only when the Skin can be used for the requested type:
+	return $is_type_provided ? get_icon( 'bullet_full', 'imgtag', array( 'title' => '' ) ) : '&nbsp;';
+}
 $Results->cols[] = array(
-						'th' => T_('Skin type'),
+						'th_group' => T_('Skin type'),
+						'th' => T_('Site'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%skin_col_provide_type( {Obj}, "site" )%',
+					);
+
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Coll.'),
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap',
+						'td' => '%skin_col_provide_type( {Obj}, "coll" )%',
+					);
+
+$Results->cols[] = array(
+						'th_group' => T_('Skin type'),
+						'th' => T_('Format'),
+						'th_class' => 'shrinkwrap',
 						'order' => 'skin_type',
-						'td_class' => 'center',
-						'td' => '$skin_type$',
+						'td_class' => 'shrinkwrap',
+						'td' => '%get_skin_type_title( #skin_type# )%',
 					);
 
 $Results->cols[] = array(
@@ -118,8 +144,15 @@ $Results->cols[] = array(
 						'td' => '$skin_folder$',
 					);
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
+	global $Settings;
+	$site_skin_IDs = array(
+		intval( $Settings->get( 'normal_skin_ID' ) ),
+		intval( $Settings->get( 'mobile_skin_ID' ) ),
+		intval( $Settings->get( 'tablet_skin_ID' ) ),
+		intval( $Settings->get( 'alt_skin_ID' ) ),
+	);
 	$Results->cols[] = array(
 							'th' => T_('Actions'),
 							'th_class' => 'shrinkwrap',

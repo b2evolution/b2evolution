@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  *
@@ -24,7 +24,7 @@ if( get_param('display_mode') == 'js' )
 }
 
 echo '<p class="well">'.T_('User generated content containing keywords from the Antispam Blacklist will be rejected.');
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 {
 	global $antispamsrv_tos_url;
 	echo '<br />'.sprintf( T_('You can share your keywords with and retrieve keywords from the Central Antispam Blacklist service <a %s>Terms of service</a>'), 'href="'.$antispamsrv_tos_url.'"' );
@@ -32,7 +32,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 echo '</p>';
 
 // ADD KEYWORD FORM:
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
+if( check_user_perm( 'spamblacklist', 'edit' ) ) // TODO: check for 'add' here once it's mature.
 { // add keyword or domain
 	global $keyword;
 
@@ -77,7 +77,7 @@ $Results = new Results( $SQL->get(), 'antispam_' );
 
 $Results->title = T_('Banned keywords blacklist');
 
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 {	// Allow to request keywords from Central Antispam if current user has a permission:
 	global $admin_url;
 	$Results->global_icon( T_('Request update from Central Antispam Blacklist'), '', $admin_url.'?ctrl=antispam&amp;action=poll&amp;'.url_crumb( 'antispam' ), T_('Request update from Central Antispam Blacklist'), 0, 0, array( 'class' => 'action_icon btn-primary' ) );
@@ -102,11 +102,9 @@ function filter_antispam( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_antispam',
 	'url_ignore' => 'results_antispam_page,keywords',
-	'presets' => array(
-		'all' => array( T_('All keywords'), '?ctrl=antispam' ),
-		)
 	);
 
+$Results->register_filter_preset( 'all', T_('All keywords'), $admin_url.'?ctrl=antispam' );
 
 
 /*
@@ -147,7 +145,7 @@ $Results->cols[] = array(
 					);
 
 // Check if we need to display more:
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 { // User can edit, spamlist: add controls to output columns:
 
 	// Add a column for actions:
@@ -162,7 +160,7 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 			$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=report&amp;keyword='
 				.rawurlencode( $row->askw_string ) ).'&amp;'.url_crumb( 'antispam' ).'" title="'.
 				T_('Report abuse to centralized ban blacklist!').'" class="btn btn-warning btn-xs">'.
-				T_('Report').'</a> ';
+				/* TRANS: Verb */ T_('Report').'</a> ';
 		}
 
 		$output .= '<a href="'.regenerate_url( 'action,keyword', 'action=ban&amp;keyword='

@@ -85,8 +85,7 @@ class UploadHandler {
 
 		while( ! feof( $target ) )
 		{
-			$curr_mem_usage = memory_get_usage( true );
-			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+			if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
 				return array( 'error' => T_('Out of memory.') );
@@ -150,6 +149,13 @@ class UploadHandler {
 			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Not a multipart request. Please set forceMultipart to default value (true).' );
 		}
 
+		// Check for wrong uploading file:
+		if( ! isset( $_FILES[$this->inputName]['tmp_name'] ) ||
+		    ! is_uploaded_file( $_FILES[$this->inputName]['tmp_name'] ) )
+		{	// Deny uploading of wrong file:
+			return array( 'error' => 'Invalid '.$this->inputName.' file!' );
+		}
+
 		// Get size and name
 		$file = $_FILES[$this->inputName];
 		$size = $file['size'];
@@ -193,6 +199,11 @@ class UploadHandler {
 			return array( 'error' => sprintf( T_('File has an invalid extension, it should be one of %s.'), $these ) );
 		}
 
+		if( empty( $_REQUEST['qquuid'] ) )
+		{	// Param qquuid must be passed:
+			return array( 'error' => 'Parameter "qquuid" is required!' );
+		}
+
 		// Save a chunk
 		$totalParts = isset( $_REQUEST['qqtotalparts'] ) ? ( int ) $_REQUEST['qqtotalparts'] : 1;
 		$uuid = $_REQUEST['qquuid'];
@@ -210,7 +221,7 @@ class UploadHandler {
 				mkdir( $targetFolder, 0777, true );
 			}
 			$target = $targetFolder.'/'.$partIndex;
-			$success = move_uploaded_file( $_FILES[$this->inputName]['tmp_name'], $target );
+			$success = move_uploaded_file( $file['tmp_name'], $target );
 
 			return array( "success" => true, "uuid" => $uuid );
 		}
@@ -225,8 +236,7 @@ class UploadHandler {
 
 			while( ! feof( $temp ) )
 			{
-				$curr_mem_usage = memory_get_usage( true );
-				if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+				if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 				{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 					fclose( $temp );
 					return array( 'error' => T_('Out of memory.') );

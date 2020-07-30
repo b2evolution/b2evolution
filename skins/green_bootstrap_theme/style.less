@@ -1,0 +1,544 @@
+body {
+	background: #DFD;
+}
+
+// Header
+.evo_container__header {
+	margin-bottom: 30px;
+}
+.evo_container__page_top {
+	margin-top: 20px;
+	.ufld_icon_links {
+		text-align: right;
+	}
+}
+// div.widget_core_coll_tagline {
+	// margin-bottom: 30px;
+// }
+.evo_container__front_page_main_area {
+	padding-bottom: 30px;
+	.evo_widget {
+		margin-top: 30px;
+		div, h1, h2, p {
+			margin-top: 0;
+		}
+		div > p:last-child, // When it's the last <p> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		//&:last-child > h2,
+		&:last-child > ul, // When it's the last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		& > ul li:last-child {
+			margin-bottom: 0 !important; // When it's the last <li> of last <ul> of the each div, no martgin-bottom, because of regular widget margin-bottom
+		}
+		// .widget_core_menu_link
+		&[class$=_menu_link] {
+			// Align center buttons:
+			text-align: center;
+		}
+	}
+}
+.evo_container__front_page_secondary_area {
+	padding-top: 30px;
+}
+
+// Secondary Area:
+.secondary_area {
+	// Important for hiding "Slide down" arrow behind this div
+	position: relative;
+	z-index: 1;
+
+	width: 100%;
+	p {
+		margin-top: 10px;
+	}
+}
+
+// Footer
+body.pictured .secondary_area footer {
+	color: #666;
+	a {
+		color: #666;
+	}
+}
+
+// Body content
+html {
+	// TODO: this should NOT apply to all pages. It must apply to a certain class only!
+	height: 100%;
+}
+body {
+	overflow-x: visible !important;
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+
+// SPECIAL FRONT PAGE:
+div.front_main_area {
+	width: 450px;
+	max-width: 100%;
+	padding: 0;
+	margin-top: 85px;
+	margin-bottom: 100px;
+	// border: 1px solid white;
+	.front_main_content {
+		border-radius: 6px;
+		padding: 5px 15px;
+	}
+
+	// Widgets need to be spaced
+	div.widget {
+		margin: 30px 0;
+	}
+}
+
+body.pictured {
+	height: 100%;
+	#skin_wrapper {
+		width: 100%;
+		height: 100%;
+		overflow-x: hidden; // Keep this to allow animate page down on webkit browsers
+		&.skin_wrapper_loggedin {
+			// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+			margin-top: 0;
+			padding-top: 27px;
+		}
+	}
+	.container.main_page_wrapper {
+		display: table;
+		height: 100%;
+		min-height: 100%;
+		.panel {
+			a:not([class]) {
+				color: #337ab7;
+				text-decoration: none;
+			}
+			a:not([class]):hover {
+				color: #23527c;
+				text-decoration: underline;
+			}
+			input {
+				-webkit-font-smoothing: subpixel-antialiased;
+			}
+		}
+	}
+	// Fix debug info position after skin wrapper:
+	// @FP > I think we don't need this
+	div#debug_info.debug {
+		position: absolute;
+		top: 100%;
+	}
+	// To avoid issue on scroll page we must disable 100% height for pictured layout on enabled widgets designer mode:
+	&.dev_designer_mode {
+		height: auto;
+		.secondary_area {
+			position: initial;
+		}
+	}
+}
+.evo_pictured_layout {
+	display: table;
+	height: 100%;
+	min-height: 100%;
+	min-width: 100%;
+	position: relative;
+	width: 100%;
+	background-attachment: fixed;
+	background-size: cover;
+	background-position: center center;
+	> .evo_pictured__image {
+		display: none;
+		width: 100%;
+	}
+}
+
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	// body.disp_front .slide-top {
+		// right: 29px;
+	// }
+	
+@media (min-width: 640px) and (min-device-width: 640px) {
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	body.disp_front .slide-top {
+		right: 29px;
+	}
+}
+	
+@media only screen and (max-width: 640px) {
+	// Important for preventing white gap in .main_page_wrapper on this viewport size
+	// Since we break #bg_picture on this size, height: 100% is not needed anymore
+	html {
+		height: auto;
+	}
+	
+	body.disp_front {
+		#evo_site_header {
+			margin-bottom: 0;
+		}
+		.evo_pictured_layout {
+			position: relative;
+			height: auto;
+			min-height: auto;
+			> .evo_pictured__image {
+				display: block;
+			}
+		}
+		div.front_main_area {
+			width: auto;
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+		
+		.slide-top {
+			right: 8px;
+		}
+	}
+}
+
+@media only screen and (min-device-width: 1024px) {
+body.pictured {
+	#skin_wrapper.skin_wrapper_loggedin {
+		// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+		margin-top: 0;
+		padding-top: 27px;
+		}
+	}
+}
+@media (min-width: 640px) and (max-device-width: 1024px) {
+	.btn.slide-top.logged_in_margin_top {
+		top: 35px;
+	}
+}
+
+// Profile tabs on ?disp=profile
+ul.profile_tabs {
+	margin: 0 2ex 2ex;
+	position: relative;
+	top: 1px;
+}
+
+.profile_avatar {
+	float: right;
+	padding: 10px;
+	margin-left: 10px;
+}
+
+// Use full width for all textarea
+.form-horizontal .controls textarea.form-control {
+	width: 100%;
+}
+
+// A search button
+input.search_field {
+	margin-bottom: 0;
+	display: inline-block;
+}
+form.search .search_options {
+	width: 100%;
+	.search_option input {
+		margin-right: 5px;
+	}
+	.search_option label {
+		margin-bottom: 0;
+		margin-top: 5px;
+	}
+}
+div.compact_search_form {
+	input.search_field {
+		width: 100%;
+		margin: 0;
+	}
+}
+div.extended_search_form {
+	text-align: center;
+	margin: 0 auto 2em auto;
+	max-width: 530px;
+	.search_options {
+		text-align: center;
+		.search_option {
+			display: inline-block;
+			margin-right: 10px;
+		}
+	}
+}
+
+// A form to create a new message/thread
+textarea.message_text {
+	width: 95%;
+}
+
+.evo_post {
+	margin-bottom: 2em;
+	.small.text-muted {
+		margin: 4px 0 10px;
+		a, a .glyphicon {
+			color: inherit;
+		}
+	}
+}
+
+.evo_hasbgimg {
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+}
+
+div.bSideItem {
+	background: #F7F5FA;
+	border-radius: 5px;
+	padding: 10px;
+	margin-bottom: 10px;
+	text-shadow: 0 1px 0 #FFFFFF;
+	h4 {
+		margin-top: 0;
+	}
+}
+
+// Login/Register forms:
+.skin-form {
+	.panel-body {
+		.panel {
+			border: none;
+			box-shadow: none;
+		}
+		.panel-body {
+			padding: 0;
+		}
+	}
+	.fieldset {
+		margin: 0;
+		div.input {
+			margin: 0;
+		}
+	}
+	.control-buttons, div.input {
+		padding: 0;
+		width: 100%;
+		text-align: center;
+	}
+}
+.evo_panel__login, .evo_panel__lostpass, .evo_panel__register, .evo_panel__activation {
+	min-width: 290px;
+	margin: 1.5em auto auto;
+	.panel {
+		margin: 5px 0;
+	}
+	.panel-body {
+		padding-top: 20px;
+		padding-bottom: 0;
+	}
+}
+.evo_panel__login {
+	max-width: 400px;
+	min-width: auto;
+}
+.evo_panel__lostpass {
+	max-width: 480px;
+	#ffield_x label {
+		display: none;
+	}
+}
+.evo_panel__activation {
+	max-width: 530px;
+	#activateinfo_form .control-buttons{
+		text-align: left;
+	}
+}
+.evo_panel__register {
+	max-width: 580px;
+	.form-control {
+		&#country, &#u {
+			width: 100%;
+		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
+	}
+}
+.evo_form__login_links {
+	padding: 0 5px;
+	font-size: 92%;
+}
+.evo_form__login {
+	fieldset {
+		margin-bottom: 20px;
+	}
+	.controls {
+		padding: 0;
+		margin: 0;
+		width: 100%;
+	}
+	.control-buttons {
+		margin-left: 0;
+	}
+	input.form-control[type=text], input.form-control[type=password] {
+		width: 100%;
+	}
+	.btn {
+		margin-top: 5px;
+	}
+}
+#login_form {
+	.control-buttons {
+		text-align: left;
+	}
+}
+.standard_login_link {
+	text-align: center;
+	margin: 3em 0 1ex 0;
+}
+.form_footer_notes {
+	margin-top: 0;
+}
+
+// Pagination
+.pagination {
+	margin: 0;
+}
+
+// Current filters
+.filter_item div {
+	height: 22px;
+}
+
+// Messages
+div.action_messages, div.log_container {
+	margin: 0;
+}
+
+// Positions on the action buttons near page titles
+.evo_post_title {
+	display: table;
+	h1 {
+		margin-bottom: 0;
+	}
+	h2 {
+		display: table-cell;
+		margin: 0;
+		padding: 20px 0 0;
+		+ .btn {
+			margin: -10px 0 0 30px;
+		}
+	}
+	.btn-group {
+		display: table-cell;
+		padding: 20px 0 10px 30px;
+		vertical-align: middle;
+	}
+	.evo_post_read_status {
+		display: table-cell;
+		vertical-align: middle;
+		padding: 20px 2px 0 0;
+	}
+}
+
+// User links widget
+body.pictured .front_main_content .ufld_icon_links a {
+	width: 60px;
+	height: 60px;
+	margin: 5px;
+	.fa {
+		font-size: 30px;
+		line-height: 60px;
+	}
+}
+
+// Organization Members widget
+.widget_core_org_members {
+	margin: 5em 0 30px;
+	color: #333;
+	img {
+		width: 200px;
+		height: 200px;
+		display: inline-block;
+	}
+	h2.page-header {
+		margin-top: 0;
+	}
+	p.user_field {
+		margin-bottom: 40px;
+	}
+}
+body.pictured .secondary_area .widget_core_org_members {
+	a.user_link {
+		color: #000;
+		&:hover {
+			color: #23527c;
+		}
+	}
+}
+
+// Responsive layout
+@media (max-width: 640px) {
+	body.pictured .front_main_content .ufld_icon_links a {
+		width: 45px;
+		height: 45px;
+		margin: 5px;
+		.fa {
+			font-size: 20px;
+			line-height: 45px;
+		}
+	}
+	.slide_button_wrap {
+		display: none !important;
+	}
+}
+
+.slide_button_wrap {
+	position: fixed;
+	bottom: 20px;
+	left: 50%;
+	line-height: 1em;
+	#slide_button {
+		display: inline-block;
+		font-size: 55px;
+		color: #ffffff;
+		text-align: center;
+		opacity: 0.5;
+		transition: 0.1s all;
+		position:relative;
+		left:-50%;
+		&:hover {
+			cursor: pointer;
+			opacity: 0.9;
+		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
+	}
+}

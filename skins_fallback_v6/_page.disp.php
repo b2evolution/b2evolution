@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -25,7 +25,7 @@ while( mainlist_get_item() )
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array_merge( array(
 			'content_mode' => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'image_size'   => 'fit-1280x720',
+			'image_size'   => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		), $params ) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 

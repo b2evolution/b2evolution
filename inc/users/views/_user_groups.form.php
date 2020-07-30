@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -38,9 +38,9 @@ $Form->hidden( 'user_ID', $edited_User->ID );
 $close_icon = '';
 if( $display_mode == 'js' )
 { // Display a close link for popup window
-	$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+	$close_icon = action_icon( TB_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 }
-$Form->begin_fieldset( T_('Contact Groups').$close_icon, array( 'class' => 'fieldset clear' ) );
+$Form->begin_fieldset( TB_('Contact Groups').$close_icon, array( 'class' => 'fieldset clear' ) );
 
 // Contact groups:
 $current_user_groups = get_contacts_groups_array();
@@ -52,16 +52,16 @@ foreach( $current_user_groups as $group_ID => $group_title )
 {
 	$group_options[] = array( 'contact_groups[]', $group_ID, $group_title, in_array( $group_ID, $active_groups ) );
 }
-$group_options[] = array( 'contact_groups[]', 'new', T_('new').':<br /><input type="text" name="contact_group_new" class="form-control" />', false, false, '', 'contact_group_new' );
+$group_options[] = array( 'contact_groups[]', 'new', TB_('new').':<br /><input type="text" name="contact_group_new" class="form-control" />', false, false, '', 'contact_group_new' );
 
 $Form->checklist( $group_options, 'contact_groups', '', false, false, array( 'wide' => true ) );
 
 // Block the contact:
-$blocked_options = array( array( 'contact_blocked', 1, T_('Block this contact from contacting you.'), $is_contact === false ) );
+$blocked_options = array( array( 'contact_blocked', 1, TB_('Block this contact from contacting you.'), $is_contact === false ) );
 $Form->checklist( $blocked_options, 'contact_blocked', '', false, false, array( 'wide' => true ) );
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'value' => T_('Save'), 'name' => 'actionArray[contact_group_save]' ) ) );
+$Form->end_form( array( array( 'value' => TB_('Save'), 'name' => 'actionArray[contact_group_save]' ) ) );
 
 ?>

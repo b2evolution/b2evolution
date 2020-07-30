@@ -106,10 +106,10 @@ function filter_syslog_list( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_syslog_list',
 	'url_ignore' => 'results_slg_per_page,results_slg_page',
-	'presets' => array(
-		'all' => array( 'All', '?ctrl=syslog' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=syslog' );
+
 
 $Results->cols[] = array(
 		'th' => 'Date Time',
@@ -117,7 +117,7 @@ $Results->cols[] = array(
 		'default_dir' => 'D',
 		'td' => '%mysql2localedatetime_spans( #slg_timestamp# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap timestamp'
+		'td_class' => 'timestamp'
 	);
 
 $Results->cols[] = array(
@@ -183,7 +183,7 @@ $Results->cols[] = array(
  */
 function syslog_object_link( $object_type, $object_ID )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$link = '';
 
@@ -199,10 +199,10 @@ function syslog_object_link( $object_type, $object_ID )
 			$CommentCache = & get_CommentCache();
 			if( ( $Comment = & $CommentCache->get_by_ID( $object_ID, false, false ) ) !== false )
 			{
-				if( $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $Comment ) )
+				if( check_user_perm( 'comment!CURSTATUS', 'edit', false, $Comment ) )
 				{ // Current user has permission to edit this comment
 					$Item = & $Comment->get_Item();
-					$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID.'">'.$Item->title.' #'.$Comment->ID.'</a>';
+					$link = '<a href="'.$admin_url.'?ctrl=comments&action=edit&comment_ID='.$Comment->ID.'">'.$Item->get( 'title' ).' #'.$Comment->ID.'</a>';
 				}
 			}
 			else
@@ -216,9 +216,9 @@ function syslog_object_link( $object_type, $object_ID )
 			$ItemCache = & get_ItemCache();
 			if( ( $Item = & $ItemCache->get_by_ID( $object_ID, false, false ) ) !== false )
 			{
-				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+				if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 				{ // Current user has permission to edit this item
-					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->title.'</a>';
+					$link = '<a href="'.$Item->get_edit_url().'">'.$Item->get( 'title' ).'</a>';
 				}
 			}
 			else
@@ -229,7 +229,7 @@ function syslog_object_link( $object_type, $object_ID )
 
 		case 'user':
 			// Link to user
-			if( $current_User->check_perm( 'users', 'view' ) )
+			if( check_user_perm( 'users', 'view' ) )
 			{ // Current user has permission to view users
 				$UserCache = get_UserCache();
 				if( ( $User = & $UserCache->get_by_ID( $object_ID, false, false ) ) !== false )
@@ -256,6 +256,11 @@ function syslog_object_link( $object_type, $object_ID )
 				$link = 'No file';
 			}
 			break;
+
+		case 'email_log':
+			// Link to email log
+			$link = get_link_tag( $admin_url.'?ctrl=email&tab=sent&emlog_ID='.$object_ID, sprintf( T_('Mail log ID#%s'), $object_ID ) );
+			break;
 	}
 
 	return $link;
@@ -268,7 +273,7 @@ $Results->cols[] = array(
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 function syslog_origin_ID()
 {
 	if( jQuery( '#origin' ).val() == 'plugin' )

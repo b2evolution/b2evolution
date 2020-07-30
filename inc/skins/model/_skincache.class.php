@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -104,6 +104,16 @@ class SkinCache extends DataObjectCache
 		return $Skin;
 	}
 
+
+	/**
+	 * Get an object from cache by its skin class.
+	 *
+	 * This is used to get a skin for an RSS/Aom type; also to check if a skin is installed.
+	 *
+	 * @param string skin class name of object to load
+	 * @param boolean false if you want to return false on error
+	 * @return Skin A Skin object on success, false on failure (may also halt!)
+	 */
 	function & get_by_class( $req_class, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;
@@ -173,8 +183,12 @@ class SkinCache extends DataObjectCache
 
 	/**
 	 * Instanciate a new object within this cache
+	 *
+	 * @param object Skin row
+	 * @param string Skin folder name
+	 * @param boolean TRUE if function should die on error
 	 */
-	function & new_obj( $row = NULL, $skin_folder = NULL )
+	function & new_obj( $row = NULL, $skin_folder = NULL, $halt_on_error = false )
 	{
 		if( is_null( $skin_folder ) )
 		{	// This happens when using the default skin
@@ -192,8 +206,12 @@ class SkinCache extends DataObjectCache
 			$objtype = $short_skin_folder.'_Skin';
 			if( ! class_exists( $objtype ) )
 			{
-				debug_die( 'There seems to be a _skin.class.php file in the skin directory ['.$skin_folder.'], but it does not contain a properly named class. Expected class name is: '.$objtype );
+				debug_die( 'There seems to be a <code>_skin.class.php</code> file in the skin directory <code>'.$skin_folder.'</code>, but it does not contain a properly named class. Expected class name is: <code>'.$objtype.'</code>' );
 			}
+		}
+		elseif( $halt_on_error )
+		{	// Don't allow to install skin if its class file doesn't exist:
+			debug_die( 'There is no file <code>_skin.class.php</code> in the skin directory <code>'.$skin_folder.'</code>.' );
 		}
 		else
 		{

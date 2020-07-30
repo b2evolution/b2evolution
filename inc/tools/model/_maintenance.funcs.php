@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -115,10 +115,13 @@ function dbm_delete_pagecache( $display_details = true )
 {
 	global $DB, $Messages, $cache_path;
 
-	print_log( T_('Clearing page caches:'), 'normal', array( 'text_style' => 'bold' ) );
-	evo_flush();
+	if( $display_details )
+	{	// Display message only when it is required:
+		print_log( T_('Clearing page caches:'), 'normal', array( 'text_style' => 'bold' ) );
+		evo_flush();
 
-	echo '<ul>';
+		echo '<ul>';
+	}
 
 	// Clear general cache directory:
 	$result = cleardir_r( $cache_path.'general' );
@@ -169,10 +172,13 @@ function dbm_delete_pagecache( $display_details = true )
 		}
 	}
 
-	echo '</ul>';
+	if( $display_details )
+	{	// Display message only when it is required:
+		echo '</ul>';
 
-	echo '<br />';
-	print_log( T_('Page caches deleted.'), 'success' );
+		echo '<br />';
+		print_log( T_('Page caches deleted.'), 'success' );
+	}
 }
 
 
@@ -215,7 +221,7 @@ function dbm_repair_cache()
 /**
  * Optimize DB tables (MyISAM & InnoDB)
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @return array Results of the mysql command 'OPTIMIZE'
  */
@@ -260,7 +266,7 @@ function dbm_optimize_tables( $display_messages = true, $separate_tables = true 
 /**
  * Optimize process DB tables (MyISAM & InnoDB)
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @param array Tables
  * @param string Table type: 'MyISAM' or 'InnoDB'
@@ -276,10 +282,19 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 	$results = array();
 
 	if( $display_messages )
-	{ // Display messages
-		echo '<b>'.sprintf( T_('Optimize %s tables...'), $table_type ).'</b><br />';
-		evo_flush();
+	{	// Display or log messages:
+		$log_message = '<b>'.sprintf( T_('Optimize %s tables...'), $table_type ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message.'<br />';
+			evo_flush();
+		}
 	}
+
 	$timer_name = 'optimize_'.strtolower( $table_type );
 
 	$Timer->start( $timer_name );
@@ -294,11 +309,19 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 				$table_results = $DB->get_results( 'OPTIMIZE NO_WRITE_TO_BINLOG TABLE '.$table );
 				$Timer->stop( $timer_name.'_table' );
 				if( $display_messages )
-				{ // Display messages
-					dbm_display_result_messages( $table_results, 'optimize' );
-					echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( $timer_name.'_table' ) ).'</b><br /><br />';
+				{	// Display or log messages:
+					dbm_display_result_messages( $table_results, 'optimize', $display_messages );
+					$log_message = '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( $timer_name.'_table' ) ).'</b>';
+					if( $display_messages === 'cron_job' )
+					{	// Log a message for cron job:
+						cron_log_append( $log_message."\n" );
+					}
+					else
+					{	// Print out a message:
+						echo $log_message.'<br /><br />';
+						evo_flush();
+					}
 				}
-				evo_flush();
 				$results = array_merge( $results, $table_results );
 			}
 		}
@@ -311,13 +334,21 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 	$Timer->stop( $timer_name );
 
 	if( $display_messages )
-	{ // Display messages
+	{	// Display or log messages:
 		if( !$separate_tables || empty( $tables ) )
 		{ // Display full report log for case when the tables were optimized by one query
-			dbm_display_result_messages( $results, 'optimize' );
+			dbm_display_result_messages( $results, 'optimize', $display_messages );
 		}
-		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( $timer_name ) ).'</b><br /><br />';
-		evo_flush();
+		$log_message = '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( $timer_name ) ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message."\n" );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message.'<br /><br />';
+			evo_flush();
+		}
 	}
 
 	return $results;
@@ -329,8 +360,9 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
  *
  * @param array Results of the mysql commands 'OPTIMIZE', 'CHECK' OR 'ANALYZE'
  * @param string mysql command type: optimize, check, analyze
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  */
-function dbm_display_result_messages( $results, $command_type )
+function dbm_display_result_messages( $results, $command_type, $display_messages = true )
 {
 	switch( $command_type )
 	{
@@ -367,24 +399,50 @@ function dbm_display_result_messages( $results, $command_type )
 	{
 		foreach( $results as $result )
 		{
+			$log_type = NULL;
 			if( $result->Msg_type == 'status' && $result->Msg_text == 'OK' )
 			{ // OK
-				echo sprintf( $params['message_ok'], '<b>'.$result->Table.'</b>' ).'<br />';
+				$log_message = sprintf( $params['message_ok'], '<code>'.$result->Table.'</code>' );
 			}
 			elseif( $result->Msg_type == 'note' && $result->Msg_text == 'Table does not support optimize, doing recreate + analyze instead' )
 			{ // This warning is comming for every innodb table, but that is normal, Display for info
-				echo sprintf( T_('Database table %s does not support optimize, doing recreate + analyze instead'), '<b>'.$result->Table.'</b>' ).'<br />';
+				$log_message = sprintf( T_('Database table %s does not support optimize, doing recreate + analyze instead'), '<code>'.$result->Table.'</code>' );
 			}
 			else
 			{ // Some errors
-				$message_class = $result->Msg_type == 'status' ? 'orange' : 'red';
-				echo '<span class="'.$message_class.'">'.sprintf( $params['message_error'], '<b>'.$result->Table.'</b>', '"'.$result->Msg_text.'"' ).'</span><br />';
+				$log_message = sprintf( $params['message_error'], '<code>'.$result->Table.'</code>', '"'.$result->Msg_text.'"' );
+				if( $display_messages === 'cron_job' )
+				{	// Log a message for cron job:
+					$log_type = ( $result->Msg_type == 'status' ? 'warning' : 'error' );
+				}
+				else
+				{	// Print out a message:
+					$log_message = '<span class="'.( $result->Msg_type == 'status' ? 'orange' : 'red' ).'">'.$log_message.'</span>';
+				}
+			}
+
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_action_end( $log_message, $log_type );
+			}
+			else
+			{	// Print out a message:
+				echo $log_message.'<br />';
+				evo_flush();
 			}
 		}
 	}
 	else
 	{ // No tables found to optimize, probably all tables already were optimized
-		echo $params['message_done'].'<br />';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $params['message_done'] );
+		}
+		else
+		{	// Print out a message:
+			echo $params['message_done'].'<br />';
+			evo_flush();
+		}
 	}
 }
 
@@ -394,7 +452,7 @@ function dbm_display_result_messages( $results, $command_type )
  */
 function dbm_delete_broken_posts()
 {
-	global $DB, $Messages, $current_User;
+	global $DB, $Messages;
 
 	$num_deleted = 0;
 
@@ -515,73 +573,134 @@ function dbm_delete_orphan_comment_uploads()
 
 /**
  * Find and delete orphan File objects with no matching file on disk
+ *
+ * @param boolean TRUE - to delete the found orphan files, FALSE - only display ALL found files in DB
+ * @param boolean TRUE - to delete orphan files even if they are linked to other objects
  */
-function dbm_delete_orphan_files()
+function dbm_delete_orphan_files( $delete_orphan_files, $delete_orphan_linked_files = false )
 {
 	global $DB, $admin_url;
 
 	$FileCache = & get_FileCache();
 	$FileCache->clear();
 
-	echo T_('Deleting of the orphan File objects from the database...');
+	echo T_('Finding of the orphan File objects in the database...');
+	echo '<ul>';
 	evo_flush();
 
-	$files_SQL = new SQL();
-	$files_SQL->SELECT( '*' );
+	$files_SQL = new SQL( 'Find orphan files for deleting' );
+	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path, COUNT( link_ID ) AS links_num, GROUP_CONCAT( link_ID ) AS link_IDs' );
 	$files_SQL->FROM( 'T_files' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_links ON file_ID = link_file_ID' );
 	$files_SQL->ORDER_BY( 'file_ID' );
+	$files_SQL->GROUP_BY( 'file_ID' );
+	// Limit the files by 100 recordsto save memory:
+	$files_SQL->LIMIT( '0, 100' );
 
-	$count_files_valid = 0;
-	$count_files_invalid = 0;
-	$count_files_deleted = 0;
+	$num_valid_files = 0;
+	$num_missing_no_linked_files = 0;
+	$num_missing_linked_files = 0;
+	$num_total_links = 0;
+	$num_total_files = 0;
 
-	$page_size = 100;
-	$current_page = 0;
-	// Search the files by page to save memory
-	$files_SQL->LIMIT( '0, '.$page_size );
-	while( $loaded_Files = $FileCache->load_by_sql( $files_SQL ) )
-	{ // Check all loaded files
-		foreach( $loaded_Files as $File )
+	$skip_files = array();
+
+	if( $delete_orphan_files && $delete_orphan_linked_files )
+	{	// Initalize LinkCache once for code below:
+		$LinkCache = & get_LinkCache();
+	}
+
+	while( $loaded_files = $DB->get_results( $files_SQL, ARRAY_A ) )
+	{	// Check the found files:
+		$FileCache->load_list( array_column( $loaded_files, 'file_ID' ) );
+		foreach( $loaded_files as $file_data )
 		{
-			if( is_null( $File ) )
-			{ // The File object couldn't be created because the db entry is invalid
-				$count_files_invalid++;
-				continue;
-			}
+			$File = & $FileCache->get_by_ID( $file_data['file_ID'], false, false );
+			echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code> - ';
 			if( $File->exists() )
-			{ // File exists on the disk
-				$count_files_valid++;
+			{	// File exists on the disk:
+				$num_valid_files++;
+				echo '<span class="label label-success">'.T_('OK').'</span>';
+				// Skip this File on next page searching:
+				$skip_files[] = $File->ID;
 			}
 			else
-			{ // File doesn't exist on the disk, Remove it from DB
-				$File->dbdelete();
-				$count_files_deleted++;
+			{	// File doesn't exist on the disk:
+				echo '<span class="label '.( empty( $file_data['links_num'] ) ? 'label-warning' : 'label-danger' ).'">'.T_('MISSING').'</span>';
+				echo ' - ('.sprintf( T_('linked %s times'), '<b>'.$file_data['links_num'].'</b>' ).')';
+				if( empty( $file_data['links_num'] ) )
+				{	// Count number of missing files without links:
+					$num_missing_no_linked_files++;
+				}
+				else
+				{	// Count number of missing files with links:
+					$num_missing_linked_files++;
+					$num_total_links += $file_data['links_num'];
+				}
+				$file_num_deleted_links = 0;
+				if( $delete_orphan_files )
+				{	// Try to delete File only if it is requested:
+					echo ' - ';
+					if( $delete_orphan_linked_files && ! empty( $file_data['link_IDs'] ) )
+					{	// Try to delete ALL Link objects of the orphan File before deleting it:
+						$deleted_link_IDs = explode( ',', $file_data['link_IDs'] );
+						$LinkCache->load_list( $deleted_link_IDs );
+						foreach( $deleted_link_IDs as $deleted_link_ID )
+						{
+							if( $deleted_Link = & $LinkCache->get_by_ID( $deleted_link_ID, false, false ) )
+							{
+								$deleted_Link->dbdelete();
+								$file_num_deleted_links++;
+							}
+						}
+					}
+					if( $File->dbdelete() )
+					{	// Success deleting:
+						if( $file_num_deleted_links )
+						{	// Inform about deleted with links:
+							echo '<span class="text-danger">'.sprintf( T_('Deleted with %d links'), $file_num_deleted_links ).'.</span>';
+						}
+						else
+						{	// Inform about deleted without links:
+							echo '<span class="text-warning">'.T_('Deleted without links').'.</span>';
+						}
+					}
+					else
+					{	// Some restrictions, see File::get_delete_restrictions():
+						echo '<span class="text-danger">'.T_('Could not be deleted!').'</span>';
+						// Skip this File on next page searching:
+						$skip_files[] = $File->ID;
+					}
+				}
+				else
+				{	// Skip this File on next page searching:
+					$skip_files[] = $File->ID;
+				}
 			}
+			$num_total_files++;
+			echo '</li>';
+			evo_flush();
 		}
-
-		echo ' .';
-		evo_flush();
 
 		// Clear cache after each page to save memory
 		$FileCache->clear();
 
-		$current_page++;
-		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
+		if( ! empty( $skip_files ) )
+		{	// Skip files which have been already processed:
+			$files_SQL->WHERE( 'file_ID NOT IN ( '.implode( ',', $skip_files ).' )' );
+		}
 	}
 
-	echo 'OK<p>';
-	echo sprintf( T_('Number of deleted orphan File objects: %d.'), $count_files_deleted ).'<br />';
-	echo sprintf( T_('Number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
+	echo '</ul>';
 
-	if( $count_files_invalid )
-	{ // There are invalid files in the database
-		// Display warning to show that the 'Remove orphan file roots' tool should be also called
-		$remove_orphan_file_roots = 'href="'.$admin_url.'?ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
-		$invalid_files_note = ( $count_files_invalid == 1 ) ? T_('An invalid File object was found in the database.') : sprintf( T_('%d invalid File objects were found in the database.'), $count_files_invalid );
-		echo '<p class="warning">'.$invalid_files_note."<br/>"
-			.sprintf( T_('It is strongly recommended to also execute the &lt;<a %s>Remove orphan file roots</a>&gt; tool to remove invalid files from the database and from the disk as well!'), $remove_orphan_file_roots )
-			.'</p>';
-	}
+	echo '<p>'.T_('Summary').':';
+		echo '<ul>';
+			echo '<li>'.sprintf( T_('%s valid Files'), '<b class="text-success">'.$num_valid_files.'</b>' ).'</li>';
+			echo '<li>'.( $delete_orphan_files && $num_missing_no_linked_files ? '<b>'.T_('DELETED').': </b>' : '' ).sprintf( T_('%s missing File with no links'), '<b class="text-warning">'.$num_missing_no_linked_files.'</b>' ).'</li>';
+			echo '<li>'.( $delete_orphan_linked_files && $num_missing_linked_files ? '<b>'.T_('DELETED').': </b>' : '' ).sprintf( T_('%s missing File with links (total number of Links: %s)'), '<b class="text-danger">'.$num_missing_linked_files.'</b>', '<b class="text-danger">'.$num_total_links.'</b>' ).'</li>';
+			echo '<li>'.sprintf( T_('Total number of File objects: %s'), '<b>'.$num_total_files.'</b>' ).'</li>';
+		echo '</ul>';
+	echo '</p>';
 }
 
 
@@ -762,7 +881,7 @@ function dbm_recreate_autogenerated_excerpts()
 /**
  * Check DB tables
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @return array Results of the mysql command 'CHECK'
  */
@@ -782,8 +901,12 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 	}
 	$dbm_tables_count = count( $tables_names );
 
-	if( $display_messages )
-	{ // Display messages
+	if( $display_messages === 'cron_job' )
+	{	// Log a message for cron job:
+		cron_log_append( '<b>'.T_('Check tables...').'</b>' );
+	}
+	elseif( $display_messages )
+	{	// Print out a message:
 		echo '<b>'.T_('Check tables...').'</b><br />';
 		evo_flush();
 	}
@@ -798,9 +921,17 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 			$table_results = $DB->get_results( 'CHECK TABLE '.$table.' FAST' );
 			$Timer->stop( 'check_one_table' );
 			if( $display_messages )
-			{ // Display messages
-				dbm_display_result_messages( $table_results, 'check' );
-				echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'check_one_table' ) ).'</b><br /><br />';
+			{	// Display or log messages:
+				dbm_display_result_messages( $table_results, 'check', $display_messages );
+				$log_message = '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'check_one_table' ) ).'</b>';
+				if( $display_messages === 'cron_job' )
+				{	// Log a message for cron job:
+					cron_log_append( $log_message."\n" );
+				}
+				else
+				{	// Print out a message:
+					echo $log_message.'<br /><br />';
+				}
 			}
 			evo_flush();
 			$check_results = array_merge( $check_results, $table_results );
@@ -813,12 +944,20 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 	$Timer->stop( 'check_tables' );
 
 	if( $display_messages )
-	{ // Display messages
+	{	// Display or log messages:
 		if( !$separate_tables )
-		{ // Display full report log for case when the tables were checked by one query
-			dbm_display_result_messages( $check_results, 'check' );
+		{	// Display full report log for case when the tables were checked by one query:
+			dbm_display_result_messages( $check_results, 'check', $display_messages );
 		}
-		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'check_tables' ) ).'</b><br />';
+		$log_message = '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'check_tables' ) ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message."\n" );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message.'<br />';
+		}
 	}
 
 	return $check_results;
@@ -828,7 +967,7 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 /**
  * Analyze DB tables
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @return array Results of the mysql command 'ANALYZE'
  */
@@ -848,8 +987,12 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 	}
 	$dbm_tables_count = count( $tables_names );
 
-	if( $display_messages )
-	{ // Display messages
+	if( $display_messages === 'cron_job' )
+	{	// Log a message for cron job:
+		cron_log_append( '<b>'.T_('Analyze tables...').'</b>' );
+	}
+	elseif( $display_messages )
+	{	// Print out a message:
 		echo '<b>'.T_('Analyze tables...').'</b><br />';
 		evo_flush();
 	}
@@ -865,10 +1008,18 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 			$Timer->stop( 'analyze_one_table' );
 			if( $display_messages )
 			{ // Display messages
-				dbm_display_result_messages( $table_results, 'analyze' );
-				echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'analyze_one_table' ) ).'</b><br /><br />';
+				dbm_display_result_messages( $table_results, 'analyze', $display_messages );
+				$log_message = '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'analyze_one_table' ) ).'</b>';
+				if( $display_messages === 'cron_job' )
+				{	// Log a message for cron job:
+					cron_log_append( $log_message."\n" );
+				}
+				else
+				{	// Print out a message:
+					echo $log_message.'<br /><br />';
+					evo_flush();
+				}
 			}
-			evo_flush();
 			$analyze_results = array_merge( $analyze_results, $table_results );
 		}
 	}
@@ -882,9 +1033,18 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 	{ // Display messages
 		if( !$separate_tables )
 		{ // Display full report log for case when the tables were analyzed by one query
-			dbm_display_result_messages( $analyze_results, 'analyze' );
+			dbm_display_result_messages( $analyze_results, 'analyze', $display_messages );
 		}
-		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'analyze_tables' ) ).'</b>';
+		$log_message = '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'analyze_tables' ) ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message."\n" );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message;
+			evo_flush();
+		}
 	}
 
 	return $analyze_results;
@@ -902,7 +1062,7 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 {
 	echo '<span class="function_echo_progress_log_update">';
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery('.function_echo_progress_log_update').remove();
 		jQuery( '#' + '<?php echo $progress_log_id; ?>' ).html("<?php echo ' '.$done.' / '.$all ?>");
 	</script>

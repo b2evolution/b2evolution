@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $edited_Automation;
+global $edited_Automation, $admin_url;
 
 $finished_SQL = new SQL( 'Get a count of finished users of automation #'.$edited_Automation->ID );
 $finished_SQL->SELECT( 'COUNT( aust_user_ID )' );
@@ -42,12 +42,25 @@ $count_SQL = new SQL( 'Get number of steps of automation #'.$edited_Automation->
 $count_SQL->SELECT( 'COUNT( step_ID )' );
 $count_SQL->FROM( 'T_automation__step' );
 $count_SQL->WHERE( 'step_autm_ID = '.$edited_Automation->ID );
+// Use additional row to display a total row even when automation has no steps:
+$steps_count = $DB->get_var( $count_SQL ) + 1;
 
-$Results = new Results( $SQL->get(), 'step_', 'A', NULL, $count_SQL->get() );
+$Results = new Results( $SQL->get(), 'step_', 'A', NULL, $steps_count );
+
+if( $edited_Automation->get( 'status' ) == 'active' )
+{	// Set status text and button of the Automation for title:
+	$automation_status_title = ' <span class="red">('.T_('RUNNING').')</span>';
+	$Results->global_icon( T_('Pause'), 'pause', regenerate_url( 'action', 'action=status_paused&amp;'.url_crumb( 'automation' ) ), T_('Pause'), 3, 4, array( 'class' => 'action_icon btn-danger' ) );
+}
+else
+{	// Set status text and button of the Automation for title:
+	$automation_status_title = ' <span class="orange">('.T_('PAUSED').')</span>';
+	$Results->global_icon( T_('Play'), 'play', regenerate_url( 'action', 'action=status_active&amp;'.url_crumb( 'automation' ) ), T_('Play'), 3, 4, array( 'class' => 'action_icon btn-success' ) );
+}
 
 $Results->global_icon( T_('New step'), 'new', regenerate_url( 'action', 'action=new_step' ), T_('New step').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
-$Results->title = T_('Steps').get_manual_link( 'automation-steps' );
+$Results->title = T_('Steps').$automation_status_title.get_manual_link( 'automation-steps' );
 
 $Results->cols[] = array(
 		'th'       => T_('Step'),
@@ -65,7 +78,10 @@ $Results->cols[] = array(
 		'td'          => '%step_td_num_users_queued( #step_ID#, #step_autm_ID#, #num_users_queued#, #step_order# )%',
 		'th_class'    => 'shrinkwrap',
 		'td_class'    => 'right',
-		'total'       => $finished_users.( $finished_users > 0 ? ' <a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$edited_Automation->ID.' )">'.T_('Requeue').'</a>' : '' ),
+		'total'       => ( $finished_users > 0
+				? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID.'&amp;step=finished">'.$finished_users.'</a> '.
+				  '<a href="#" class="btn btn-info btn-xs" onclick="return requeue_automation( '.$edited_Automation->ID.' )">'.T_('Requeue').'</a>'
+				: '0' ),
 		'total_class' => 'right',
 	);
 

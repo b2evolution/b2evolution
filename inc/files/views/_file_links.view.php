@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -74,11 +74,11 @@ if( $mode != 'upload' )
 		/**
 		 * @global File
 		 */
-		global $current_File, $current_User;
+		global $current_File;
 		global $LinkOwner;
 
 		$r = T_( 'You don\'t have permission to access this file root' );
-		if( $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+		if( check_user_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			// File relative path & name:
 			$r = $current_File->get_linkedit_link( $LinkOwner->type, $LinkOwner->get_ID() );

@@ -123,7 +123,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Status'),
-		'td' => /* Check permission: */$current_User->check_perm( 'options', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'options', 'edit' ) ?
 			/* Current user can edit Country */'<a href="#" rel="$ctry_status$">%ctry_status_title( #ctry_status# )%</a>' :
 			/* No edit, only view the status */'%ctry_status_title( #ctry_status# )%',
 		'th_class' => 'shrinkwrap',
@@ -159,15 +159,15 @@ function filter_countries( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_countries',
-	'presets' => array(
-		'all'       => array( T_('All'), $admin_url.'?ctrl=countries' ),
-		'unknown'   => array( T_('Unknown'), $admin_url.'?ctrl=countries&amp;status=unknown' ),
-		'trusted'   => array( T_('Trusted'), $admin_url.'?ctrl=countries&amp;status=trusted' ),
-		'suspect'   => array( T_('Suspect'), $admin_url.'?ctrl=countries&amp;status=suspect' ),
-		'blocked'   => array( T_('Blocked'), $admin_url.'?ctrl=countries&amp;status=blocked' ),
-		'preferred' => array( T_('Preferred'), $admin_url.'?ctrl=countries&amp;pref=1' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all'      , T_('All'), $admin_url.'?ctrl=countries' );
+$Results->register_filter_preset( 'unknown'  , T_('Unknown'), $admin_url.'?ctrl=countries&amp;status=unknown' );
+$Results->register_filter_preset( 'trusted'  , T_('Trusted'), $admin_url.'?ctrl=countries&amp;status=trusted' );
+$Results->register_filter_preset( 'suspect'  , T_('Suspect'), $admin_url.'?ctrl=countries&amp;status=suspect' );
+$Results->register_filter_preset( 'blocked'  , T_('Blocked'), $admin_url.'?ctrl=countries&amp;status=blocked' );
+$Results->register_filter_preset( 'preferred', T_('Preferred'), $admin_url.'?ctrl=countries&amp;pref=1' );
+
 
 $Results->cols[] = array(
 						'th' => T_('Code'),
@@ -177,7 +177,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -256,7 +256,7 @@ function ctry_td_actions($ctry_enabled, $ctry_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -270,7 +270,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // Check permission to edit Country:
 	// Print JS to edit a country status
 	echo_editable_column_js( array(

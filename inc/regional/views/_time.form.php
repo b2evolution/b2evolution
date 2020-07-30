@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -15,10 +15,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var GeneralSettings
  */
@@ -29,7 +25,7 @@ global $rsc_subdir, $pagenow, $servertimenow, $localtimenow, $date_default_timez
 
 // JavaScript function to calculate time difference: {{{
 ?>
-<script type="text/javascript">
+<script>
 
 var server_Date = new Date();
 server_Date.setTime( <?php echo $servertimenow.'000' ?> ); // milliseconds
@@ -76,7 +72,7 @@ $Form->add_crumb( 'time' );
 $Form->hidden( 'ctrl', 'time' );
 $Form->hidden( 'action', 'update' );
 
-$Form->begin_fieldset( T_('Time settings').get_manual_link( 'regional-time-tab' ) );
+$Form->begin_fieldset( TB_('Time settings').get_manual_link( 'regional-time-tab' ) );
 
 // Time difference:
 $td_value = $Settings->get('time_difference');
@@ -103,19 +99,19 @@ if($neg)
 	$td_value = '-'.$td_value;
 }
 
-$Form->info( T_('Timezone from php.ini'), ini_get( "date.timezone" ), '(date.timezone)' );
-$Form->info( T_('Timezone from /conf/_advanced.php'), empty( $date_default_timezone ) ? '-' : $date_default_timezone, '($date_default_timezone)' );
-$Form->info( T_('Effective timezone'), date_default_timezone_get() );
-$Form->info( T_('Current server time'), date_i18n( locale_timefmt(), $servertimenow ), date_default_timezone_get() );
-$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, T_('Time difference to apply'), '['. T_('in hours, e.g. "1", "1:30" or "-1.5"'). '] '.T_('If you\'re not on the timezone of your server.').' <a href="#" onclick="calc_TimeDifference(); return false;">'.T_('Calculate time difference').'</a>', array( 'maxlength'=> 8, 'required'=>true ) );
-$Form->info( T_('Local / corrected time'), date_i18n( locale_timefmt(), $localtimenow ) );
+$Form->info( TB_('Timezone from php.ini'), ini_get( "date.timezone" ), '(date.timezone)' );
+$Form->info( TB_('Timezone from /conf/_advanced.php'), empty( $date_default_timezone ) ? '-' : $date_default_timezone, '($date_default_timezone)' );
+$Form->info( TB_('Effective timezone'), date_default_timezone_get() );
+$Form->info( TB_('Current server time'), date_i18n( locale_timefmt(), $servertimenow ), date_default_timezone_get() );
+$Form->text_input( 'newtime_difference', $td_value, 8 /* hh:mm:ss */, TB_('Time difference to apply'), '['. TB_('in hours, e.g. "1", "1:30" or "-1.5"'). '] '.TB_('If you\'re not on the timezone of your server.').' <a href="#" onclick="calc_TimeDifference(); return false;">'.TB_('Calculate time difference').'</a>', array( 'maxlength'=> 8, 'required'=>true ) );
+$Form->info( TB_('Local / corrected time'), date_i18n( locale_timefmt(), $localtimenow ) );
 
 $Form->end_fieldset();
 
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
-	$Form->end_form( array( array( 'submit', '', T_('Save Changes!'), 'SaveButton' ) ) ) ;
+	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) ) ;
 }
 
 ?>

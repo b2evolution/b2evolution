@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -64,15 +64,11 @@ function callback_filter_file_suspicious( & $Form )
 	$Form->text( 'min_dislikes', get_param( 'min_dislikes' ), 5, T_('Minimum dislikes'), '', 6 );
 }
 
-$filter_presets = array(
-		'all' => array( T_('All'), '?ctrl=filemod' ),
-	);
-
 $Results->filter_area = array(
 		'callback' => 'callback_filter_file_suspicious',
 		'url_ignore' => 'results_fsusp_page',
-		'presets' => $filter_presets,
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=filemod' );
 
 $Results->cols[] = array(
 		'th' => T_('Icon/Type'),
@@ -94,8 +90,7 @@ $Results->cols[] = array(
 
 function td_file_properties_link( $File, $link_text )
 {
-	global $current_User;
-	if( is_object( $File ) && $current_User->check_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
+	if( is_object( $File ) && check_user_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
 	{ // Check if File object is correct and current user has an access
 		return '<a href="'.url_add_param( $File->get_linkedit_url(), 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $File->get_rdfp_rel_path() ).'&amp;'.url_crumb( 'file' ) ).'">'.$link_text.'</a>';
 	}

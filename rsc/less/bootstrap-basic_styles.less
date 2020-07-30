@@ -6,6 +6,7 @@
 @import "inc/text_styles.inc.less";
 @import "inc/image_styles.inc.less";
 @import "inc/block_styles.inc.less";
+@import "inc/blockquote.inc.less";
 
 @import "inc/sprite_flags.inc.less";
 @import "inc/sprite_icons.inc.less";
@@ -30,6 +31,12 @@ div.filters .filter_item {
 	}
 }
 
+// Break all long words:
+.linebreak {
+	word-break: break-all;
+	white-space: normal;
+}
+
 // ------
 
 // Meta categories that appears on categories widget:
@@ -51,11 +58,9 @@ div.filters .filter_item {
 		display: inline-block;
 	}
 	.evo_cat_meta {
-		font-weight: bold;
-		color: #000;
 		list-style: square;
 		margin-left: 20px;
-		label, a {
+		> label, > a {
 			font-weight: bold;
 			color: #000;
 		}
@@ -73,7 +78,7 @@ div.filters .filter_item {
 
 // ---------------- //
 
-// Meta comments:
+// Internal comments:
 .evo_comment__meta {
 	border: 2px solid @status_color_meta;
 	&:last-child {
@@ -115,5 +120,102 @@ div.filters .filter_item {
 	.btn-toolbar-title {
 		margin-top: 1px;
 		margin-bottom: 2px;
+	}
+}
+
+// Style for comment quick moderation
+.evo_form__comment_review {
+	.comment_avatar {
+		float: left;
+		margin: 0 10px 10px 0;
+		img.user {
+			border-radius: 50%;
+		}
+	}
+	h3.comment_title {
+		font-size: 16px;
+		margin: 0;
+	}
+}
+
+// Affixed messages
+.msg_wrapper {
+	.affix {
+		div.alert {
+			box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+		}
+	}
+}
+
+// Affixed publish buttons
+div#publish_buttons {
+	border-radius: 4px;
+	padding: 5px;
+	text-align: center;
+	.quick-publish {
+		margin-left: 5px;
+	}
+	.PreviewButton {
+		margin-right: 10px;
+	}
+}
+.publish_buttons_wrapper {
+	div#publish_buttons.affix {
+		background-color: #ffffff;
+		box-shadow: 1px 10px 35px rgba(75, 75, 75, 0.75);
+		z-index: 99999;
+	}
+}
+
+// Fieldset folding for Category selection
+tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
+	display: none;
+}
+
+// Set fixed width for color selector to don't use full width:
+.input-group.colorpicker-component {
+	width: 100px;
+	display: inline-table;
+	vertical-align: middle;
+}
+
+// Tab pane for content form
+.content-form-with-tab {
+	.tab-content {
+		border: 1px solid #ddd;
+		border-width: 0 1px 1px;
+		padding: 1px;
+		.tab_pane_no_pads {
+				.pull-left, .pull-right {
+							line-height: 36px;
+							padding-right: 15px;
+							padding-left: 10px;
+							padding-bottom: 5px;
+				}
+		}
+		
+		.tab_pane_pads {
+				.pull-left, .pull-right {
+							color: #333;
+							line-height: 36px;
+							padding-bottom: 5px;
+				}
+				padding: 0 15px 15px 15px;
+		}
+		
+		.tab_pane_no_pads a, .tab_pane_pads a {
+				color: #333;
+		}
+	}
+	.badge {
+		margin-top: -1px;
+	}
+	.results_summary {
+		margin-top: 0px;
+		margin-right: 5px;
+		font-weight: normal;
+	}
+	.results_header{
+		display: none;
 	}
 }

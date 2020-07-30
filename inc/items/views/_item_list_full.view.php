@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -28,7 +28,7 @@ global $ItemList;
  */
 global $Item;
 
-global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
+global $action, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
 global $Plugins, $DB, $UserSettings, $Session, $Messages;
@@ -43,6 +43,10 @@ global $postIDlist;
 $postIDlist = $ItemList->get_page_ID_list();
 global $postIDarray;
 $postIDarray = $ItemList->get_page_ID_array();
+
+
+// Display a panel to confirm mass action with selected items:
+display_mass_items_confirmation_panel();
 
 
 $block_item_Widget = new Widget( 'block_item' );
@@ -71,10 +75,6 @@ if( $action == 'view' )
 else
 { // We are displaying multiple posts ( Not a single post! )
 	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
-	if( $ItemList->is_filtered() )
-	{ // List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-	}
 
 	// Generate global icons depending on seleted tab with item type
 	item_type_global_icons( $block_item_Widget );
@@ -91,7 +91,7 @@ else
 			'block_end'            => '',
 			'block_title_start'    => '<b>',
 			'block_title_end'      => ':</b> ',
-			'show_filters'         => array( 'time' => 1 ),
+			'show_filters'         => array( 'time' => 1, 'visibility' => 1, 'itemtype' => 1 ),
 			'display_button_reset' => false,
 			'display_empty_filter' => true,
 		) );
@@ -104,8 +104,8 @@ else
 
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
-			'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
-			'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+			'header_start' => $admin_template['header_start'],
+			'footer_start' => $admin_template['footer_start'],
 		);
 }
 
@@ -113,6 +113,21 @@ $ItemList->display_init( $display_params );
 
 // Display navigation:
 $ItemList->display_nav( 'header' );
+
+$allow_items_list_form = ( $action != 'view' && $ItemList->total_rows > 0 && check_user_perm( 'blog_post_statuses', 'edit', false, $blog ) );
+if( $allow_items_list_form )
+{	// Allow to select item for action only on items list if current user can edit at least one item status:
+	global $admin_url;
+
+	$Form = new Form( $admin_url );
+
+	$Form->begin_form();
+	$Form->hidden( 'ctrl', 'items' );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
+	$Form->hidden( 'blog', $blog );
+	$Form->hidden( 'page', $ItemList->page );
+	$Form->add_crumb( 'items' );
+}
 
 /*
  * Display posts:
@@ -126,17 +141,20 @@ while( $Item = & $ItemList->get_item() )
 		// Load item's creator user:
 		$Item->get_creator_User();
 		?>
-		<div class="panel-heading small <?php
-		if( $Item->ID == $highlight )
-		{
-			echo ' evo_highlight';
-		}
-		?>">
+		<div class="panel-heading small<?php echo ( $Item->ID == $highlight ? ' evo_highlight' : '' ); ?>">
+			<h3 class="bTitle"><?php
+				$Item->title( array(
+						'target_blog' => '',
+						'link_type'   => $Item->can_be_displayed() ? 'auto' : 'none',
+					) );
+			?></h3>
 			<?php
-				echo '<div class="pull-right">';
+				echo '<div class="pull-right text-right">';
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
+						'after'  => ' '.action_icon( T_('Copy Item Slug to the clipboard.'), 'clipboard-copy', '#',
+							NULL, NULL, NULL, array( 'class' => 'small clipboard-copy', 'data-clipboard-text' => $Item->urltitle, 'onclick' => 'return false;' ) ),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(
@@ -144,17 +162,34 @@ while( $Item = & $ItemList->get_item() )
 						'after'  => ''
 					) );
 				global $admin_url;
-				if( $current_User->check_perm( 'slugs', 'view' ) )
+				if( check_user_perm( 'slugs', 'view' ) )
 				{ // user has permission to view slugs:
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
-				If( !empty( $Item->order ) )
-				{
-					echo T_('Order').': '.$Item->order;
+				echo '<br>';
+				echo T_('Item ID').': '.$Item->ID;
+				if( $parent_Item = $Item->get_parent_Item() )
+				{	// Display parent ID if the Item has it:
+					echo ' &middot; '.T_('Parent ID').': ';
+					if( check_user_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
+					{	// Display parent ID as link to view the parent post if current user has a permission:
+						echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$parent_Item->get_blog_ID().'&amp;p='.$parent_Item->ID.'" title="'.$parent_Item->dget( 'title', 'htmlattr' ).'">'.$parent_Item->ID.'</a>';
+					}
+					else
+					{	// Display parent ID as text if current user has a permission to view the parent post:
+						echo $parent_Item->ID;
+					}
 				}
+				echo '<br>';
+				echo $Item->get( 'locale' ).' ';
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
+
+				if( $action != 'view' && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+				{	// Display checkbox to select item for action only on items list:
+					echo '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" /> ';
+				}
 
 				$Item->issue_date( array(
 						'before'      => '<span class="bDate">',
@@ -171,6 +206,10 @@ while( $Item = & $ItemList->get_item() )
 				// TRANS: backoffice: each post is prefixed by "date BY author IN categories"
 				echo ' ', T_('by'), ' ', $Item->creator_User->get_identity_link( array( 'link_text' => 'name' ) );
 
+				// Last modified date:
+				echo ' <span class="text-nowrap">&middot; '.T_('Last modified').': '
+					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'datemodified' ) ).'</span>';
+
 				// Last touched date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Last touched').': '
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'last_touched_ts' ) ).'</span>';
@@ -178,7 +217,12 @@ while( $Item = & $ItemList->get_item() )
 				// Contents updated date:
 				echo ' <span class="text-nowrap">&middot; '.T_('Contents updated').': '
 					.mysql2date( locale_datefmt().' @ '.locale_timefmt(), $Item->get( 'contents_last_updated_ts' ) )
-					.$Item->get_refresh_contents_last_updated_link().'</span>';
+					.$Item->get_refresh_contents_last_updated_link()
+					.$Item->get_refresh_contents_last_updated_link( array(
+							'title' => T_('Reset the "contents last updated" date to the date of the latest reply on this thread'),
+							'type'  => 'created',
+						) )
+					.'</span>';
 
 				echo '<br />';
 				$Item->type( T_('Type').': <span class="bType">', '</span> &nbsp; ' );
@@ -188,7 +232,7 @@ while( $Item = & $ItemList->get_item() )
 					$Item->priority( T_('Priority').': <span class="bPriority">', '</span> &nbsp; ' );
 					$Item->assigned_to( T_('Assigned to').': <span class="bAssignee">', '</span> &nbsp; ' );
 					$Item->extra_status( T_('Task Status').': <span class="bExtStatus">', '</span> &nbsp; ' );
-					if( ! empty( $Item->datedeadline ) )
+					if( $Blog->get_setting( 'use_deadline' ) && ! empty( $Item->datedeadline ) )
 					{ // Display deadline date
 						echo T_('Deadline').': <span class="bDate">';
 						$Item->deadline_date();
@@ -209,7 +253,123 @@ while( $Item = & $ItemList->get_item() )
 					'include_external'=> true,
 					'link_categories' => false,
 					'show_locked'     => true,
+					'before_main'     => '<b>',
+					'after_main'      => '</b>',
 				) );
+
+				$order_cat_ID = ( isset( $ItemList->filters['cat_array'] ) && count ( $ItemList->filters['cat_array'] ) == 1 ) ? $ItemList->filters['cat_array'][0] : NULL;
+				$item_order = $Item->get_order( $order_cat_ID );
+				if( $item_order !== NULL )
+				{
+					echo ' &middot; '.T_('Order').': '.$item_order;
+				}
+
+				// Action buttons:
+				echo '<div class="clearfix"></div>';
+
+				// Edit : Propose change | Duplicate... | Merge with...
+				$edit_buttons = array();
+				if( $item_edit_url = $Item->get_edit_url() )
+				{	// Edit
+					$edit_buttons[] = array(
+						'url'  => $item_edit_url,
+						'text' => get_icon( 'edit_button' ).' '.T_('Edit'),
+						'shortcut' => 'f2,ctrl+f2',
+					);
+				}
+				if( $item_propose_change_url = $Item->get_propose_change_url() )
+				{	// Propose change
+					$edit_buttons[] = array(
+						'url'  => $item_propose_change_url,
+						'text' => get_icon( 'edit_button' ).' '.T_('Propose change'),
+					);
+				}
+				if( $item_copy_url = $Item->get_copy_url() )
+				{	// Duplicate...
+					$edit_buttons[] = array(
+						'url'  => $item_copy_url,
+						'text' => get_icon( 'copy' ).' '.T_('Duplicate...'),
+					);
+				}
+				if( $item_merge_click_js = $Item->get_merge_click_js( $params ) )
+				{	// Merge with...
+					$edit_buttons[] = array(
+						'onclick' => $item_merge_click_js,
+						'text'    => get_icon( 'merge' ).' '.T_('Merge with...'),
+					);
+					echo_item_merge_js();
+				}
+				$edit_buttons_num = count( $edit_buttons );
+				if( $edit_buttons_num > 1 )
+				{	// Display buttons in dropdown style:
+					echo '<div class="'.button_class( 'group' ).'">';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'"'
+							.( isset( $edit_buttons[0]['shortcut'] ) ? ' data-shortcut="'.$edit_buttons[0]['shortcut'].'"' : '' ).'>'
+							.$edit_buttons[0]['text'].'</a>';
+					echo '<button type="button" class="'.button_class( 'text' ).' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
+					echo '<ul class="dropdown-menu">';
+					for( $b = 1; $b < $edit_buttons_num; $b++ )
+					{
+						echo '<li><a href="'.( empty( $edit_buttons[ $b ]['url'] ) ? '#' : $edit_buttons[ $b ]['url'] ).'"'
+								.( empty( $edit_buttons[ $b ]['onclick'] ) ? '' : ' onclick="'.$edit_buttons[ $b ]['onclick'].'"' ).'>'
+								.$edit_buttons[ $b ]['text']
+							.'</a></li>';
+					}
+					echo '</ul></div>';
+				}
+				elseif( $edit_buttons_num == 1 )
+				{	// Display single button:
+					echo '<span class="'.button_class( 'group' ).'">';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'"'
+							.( isset( $edit_buttons[0]['shortcut'] ) ? ' data-shortcut="'.$edit_buttons[0]['shortcut'].'"' : '' ).'>'
+							.$edit_buttons[0]['text'].'</a>';
+					echo '</span>';
+				}
+
+				// Details | History | Comments
+				echo '<span class="'.button_class( 'group' ).'">';
+				if( $action != 'view' )
+				{
+					echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
+				}
+
+				echo $Item->get_history_link( array(
+						'class'     => button_class( $Item->has_proposed_change() ? 'text_warning' : 'text' ),
+						'link_text' => '$icon$ '.T_('Changes'),
+					) );
+
+				if( $Blog->get_setting( 'allow_comments' ) != 'never' )
+				{
+					echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
+					$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total', true );
+					echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
+					// TRANS: Link to comments for current post
+					comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
+					load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
+					trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
+					echo '</a>';
+				}
+				echo '</span>';
+
+				// Status | Delete
+				echo '<span class="'.button_class( 'group' ).'"> ';
+				// Display the moderate buttons if current user has the rights:
+				$status_link_params = array(
+						'class'       => button_class( 'text' ),
+						'redirect_to' => regenerate_url( '', '&highlight='.$Item->ID.'#item_'.$Item->ID, '', '&' ),
+					);
+				$Item->next_status_link( $status_link_params, true );
+				$Item->next_status_link( $status_link_params, false );
+
+				$next_status_in_row = $Item->get_next_status( false );
+				if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
+				{ // Display deprecate button if current user has the rights:
+					$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class() );
+				}
+
+				// Display delete button if current user has the rights:
+				$Item->delete_link( '', ' ', '#', '#', button_class( 'text' ), false );
+				echo '</span>';
 			?>
 		</div>
 
@@ -219,8 +379,6 @@ while( $Item = & $ItemList->get_item() )
 						'template' => '<div class="pull-right"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			?>
-			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
-			<h3 class="bTitle"><?php $Item->title( array( 'target_blog' => '' )) ?></h3>
 
 			<?php
 				// Display images that are linked to this post:
@@ -242,8 +400,8 @@ while( $Item = & $ItemList->get_item() )
 						'gallery_cell_end'    => '</div>',
 						'gallery_image_limit' => 1000,
 						'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
+						'restrict_to_image_position' => 'cover,background,background,teaser,teaserperm,teaserlink',
 					) );
 			?>
 
@@ -258,6 +416,16 @@ while( $Item = & $ItemList->get_item() )
 							'after_image_legend'  => '</figcaption>',
 							'after_image'         => '</figure>',
 							'image_size'          => 'fit-320x320',
+							'before_gallery'      => '<div class="evo_post_gallery">',
+							'after_gallery'       => '</div>',
+							'gallery_table_start' => '',
+							'gallery_table_end'   => '',
+							'gallery_row_start'   => '',
+							'gallery_row_end'     => '',
+							'gallery_cell_start'  => '<div class="evo_post_gallery__image">',
+							'gallery_cell_end'    => '</div>',
+							'gallery_image_limit' => 1000,
+							'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
 						) );
 					$Item->more_link();
 					$Item->content_extension( array(
@@ -282,101 +450,16 @@ while( $Item = & $ItemList->get_item() )
 					'after' =>          '</div>',
 					'separator' =>      ', ',
 				) );
-		?>
-
-		<div class="panel-footer">
-			<?php
-
-			echo '<span class="'.button_class( 'group' ).'">';
-			if( $action != 'view' )
-			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
-			}
-
-			echo $Item->get_history_link( array(
-					'class'     => button_class( 'text' ),
-					'link_text' => '$icon$ '.T_('History'),
-				) );
-
-			if( isset( $GLOBALS['files_Module'] )
-			    && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
-			    && $current_User->check_perm( 'files', 'view' ) )
-			{	// Display a button to view the files of the post only if current user has a permissions:
-				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Attachments').'</a>';
-			}
-
-			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
-			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
-				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total' );
-				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
-				// TRANS: Link to comments for current post
-				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
-				load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
-				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
-				echo '</a>';
-			}
-			echo '</span>';
-
-			echo '<span class="'.button_class( 'group' ).'"> ';
-			// Display edit button if current user has the rights:
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => '',
-					'after'  => '',
-					'class'  => button_class( 'text_primary' ),
-					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
-				) );
-
-			// Display copy button if current user has the rights:
-			$Item->copy_link( array( // Link to backoffice for coping
-					'before' => '',
-					'after'  => '',
-					'text'   => '#icon#',
-					'class'  => button_class()
-				) );
-
-			// Display merge button if current user has the rights:
-			$Item->merge_link( array( // Link to backoffice for merging
-					'before' => '',
-					'after'  => '',
-					'class'  => button_class()
-				) );
-			echo '</span>';
-
-			echo '<span class="'.button_class( 'group' ).'"> ';
-			// Display the moderate buttons if current user has the rights:
-			$status_link_params = array(
-					'class'       => button_class( 'text' ),
-					'redirect_to' => regenerate_url( '', '&highlight='.$Item->ID.'#item_'.$Item->ID, '', '&' ),
-				);
-			$Item->next_status_link( $status_link_params, true );
-			$Item->next_status_link( $status_link_params, false );
-
-			$next_status_in_row = $Item->get_next_status( false );
-			if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
-			{ // Display deprecate button if current user has the rights:
-				$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class() );
-			}
-
-			// Display delete button if current user has the rights:
-			$Item->delete_link( '', ' ', '#', '#', button_class( 'text' ), false );
-			echo '</span>';
-
-			?>
-
-			<div class="clearfix"></div>
-		</div>
-
-		<?php
 
 		// _____________________________________ Displayed in SINGLE VIEW mode only _____________________________________
-
+	?>
+	</div>
+	<?php
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
 			if( $comment_type == 'meta' && ! $Item->can_see_meta_comments() )
-			{ // Current user cannot views meta comments
+			{ // Current user cannot views internal comments
 				$comment_type = 'feedback';
 			}
 
@@ -405,7 +488,7 @@ while( $Item = & $ItemList->get_item() )
 						'class'   => 'btn btn-default'
 					) );
 			if( $comment_type != 'meta' )
-			{ // Don't display "Recycle bin" link for meta comments, because they are deleted directly without recycle bin
+			{ // Don't display "Recycle bin" link for internal comments, because they are deleted directly without recycle bin
 				echo get_opentrash_link( true, false, array(
 						'before' => ' <span id="recycle_bin">',
 						'after' => '</span>',
@@ -415,16 +498,16 @@ while( $Item = & $ItemList->get_item() )
 			echo '</div>';
 
 			if( $Item->can_see_meta_comments() )
-			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
+			{ // Display tabs to switch between user and internal comments Only if current user can views internal comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
-				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
+				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total', true );
 				$switch_comment_type_tabs = array(
 						'feedback' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=feedback#comments',
-							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total' ).'</span>' ),
+							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total', true ).'</span>' ),
 						'meta' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
-							'title' => T_('Meta discussion').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
+							'title' => T_('Internal comments').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
 					);
 				?>
 				<div class="feedback-tabs btn-group">
@@ -443,8 +526,8 @@ while( $Item = & $ItemList->get_item() )
 			$comment_moderation_statuses = explode( ',', $Blog->get_setting( 'moderation_statuses' ) );
 
 			$currentpage = param( 'currentpage', 'integer', 1 );
-			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total' );
-			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses );
+			$total_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), 'total', true );
+			$moderation_comments_number = generic_ctp_number( $Item->ID, ( $comment_type == 'meta' ? 'metas' : 'total' ), $comment_moderation_statuses, true );
 			// Decide to show all comments, or only which require moderation:
 			if( ( $comment_type != 'meta' ) && // Display all comments in meta mode by default
 			    ( $total_comments_number > 5 && $moderation_comments_number > 0 ) )
@@ -485,7 +568,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			if( $comment_type != 'meta' )
-			{ // Display this filter only for not meta comments
+			{ // Display this filter only for not internal comments
 				?>
 				<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 				<div class="tile">
@@ -523,7 +606,7 @@ while( $Item = & $ItemList->get_item() )
 			echo_item_comments( $blog, $Item->ID, $statuses, $currentpage, NULL, array(), '', $expiry_statuses, $comment_type );
 			echo '</div>';
 
-			if( ( $comment_type == 'meta' && $Item->can_meta_comment() ) // User can add meta comment on the Item
+			if( ( $comment_type == 'meta' && $Item->can_meta_comment() ) // User can add internal comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
 
@@ -548,7 +631,7 @@ while( $Item = & $ItemList->get_item() )
 
 			?>
 			<!-- ========== FORM to add a comment ========== -->
-			<h4><?php echo $comment_type == 'meta' ? T_('Leave a meta comment') : T_('Leave a comment'); ?>:</h4>
+			<h4><?php echo $comment_type == 'meta' ? T_('Leave an internal comment') : T_('Leave a comment'); ?>:</h4>
 
 			<?php
 
@@ -570,6 +653,8 @@ while( $Item = & $ItemList->get_item() )
 				if( ( $Comment = get_comment_from_session( 'unsaved', $comment_type ) ) === NULL )
 				{	// There is no saved Comment in Session
 					$Comment = new Comment();
+					$Comment->set( 'type', $comment_type );
+					$Comment->set( 'item_ID', $Item->ID );
 					$comment_attachments = '';
 					$checked_attachments = '';
 				}
@@ -625,12 +710,17 @@ while( $Item = & $ItemList->get_item() )
 			$Form->inputstart .= $comment_toolbar;
 			$Form->textarea_input( $dummy_fields['content'], $comment_content, 12, T_('Comment text'), array(
 					'cols'  => 40,
-					'class' => 'autocomplete_usernames'
+					'class' => ( check_autocomplete_usernames( $Comment ) ? 'autocomplete_usernames ' : '' ).'link_attachment_dropzone'
 				) );
 			$Form->inputstart = $form_inputstart;
 
 			// Set b2evoCanvas for plugins:
-			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+			echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering'
+				) ) );
 
 			// Attach files:
 			if( !empty( $comment_attachments ) )
@@ -657,31 +747,12 @@ while( $Item = & $ItemList->get_item() )
 				// memorize all attachments ids
 				$Form->hidden( 'preview_attachments', $comment_attachments );
 			}
-			if( $Item->can_attach() )
-			{	// Display attach file input field:
-				$Form->input_field( array(
-						'label' => T_('Attach files'),
-						'note'  => get_icon( 'help', 'imgtag', array(
-								'data-toggle'    => 'tooltip',
-								'data-placement' => 'top',
-								'data-html'      => 'true',
-								'title'          => htmlspecialchars( get_upload_restriction( array(
-										'block_after'     => '',
-										'block_separator' => '<br /><br />' ) ) )
-							) ),
-						'name'  => 'uploadfile[]',
-						'type'  => 'file'
-					) );
-			}
 
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
-					'Blog'         => & $Blog,
-					'setting_name' => 'coll_apply_comment_rendering'
-				) ) );
+			// Display attachments fieldset:
+			$Form->attachments_fieldset( $Comment );
 
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : T_('Preview');
 			$Form->buttons_input( array(
-					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => /* TRANS: Verb */ T_('Preview') ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
 				) );
 
@@ -739,11 +810,8 @@ while( $Item = & $ItemList->get_item() )
 			} // / can comment
 
 			// ========== START of item workflow properties ========== //
-			if( is_logged_in() &&
-					$Blog->get_setting( 'use_workflow' ) &&
-					$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
-					$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
-			{	// Display workflow properties if current user can edit this post:
+			if( $Item->can_edit_workflow() )
+			{	// Display workflow properties if current user can edit at least one workflow property:
 				$Form = new Form( get_htsrv_url().'item_edit.php' );
 
 				$Form->add_crumb( 'item' );
@@ -757,29 +825,13 @@ while( $Item = & $ItemList->get_item() )
 
 				echo '<div class="evo_item_workflow_form__fields">';
 
-				$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+				$Item->display_workflow_field( 'status', $Form );
 
-				// Load current blog members into cache:
-				$UserCache = & get_UserCache();
-				// Load only first 21 users to know when we should display an input box instead of full users list
-				$UserCache->load_blogmembers( $Blog->ID, 21, false );
+				$Item->display_workflow_field( 'user', $Form );
 
-				if( count( $UserCache->cache ) > 20 )
-				{
-					$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
-				}
-				else
-				{
-					$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'),
-															'', true, '', 'get_assigned_user_options' );
-				}
+				$Item->display_workflow_field( 'priority', $Form );
 
-				$ItemStatusCache = & get_ItemStatusCache();
-				$ItemStatusCache->load_all();
-				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
-
-				$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+				$Item->display_workflow_field( 'deadline', $Form );
 
 				$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
 
@@ -794,17 +846,49 @@ while( $Item = & $ItemList->get_item() )
 		</div>
 		<?php
 	} // / comments requested
-?>
-</div>
-<?php
 }
 
+// Instantiate ClipboardJS:
+expose_var_to_js( 'evo_init_item_list_clipboard_js', true );
+
 if( $action == 'view' )
-{ // Load JS functions to work with comments
+{	// Load JS functions to work with comments
 	load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 	// Handle show_comments radioboxes
 	echo_show_comments_changed( $comment_type );
+}
+elseif( $allow_items_list_form )
+{	// Allow to select item for action only on items list if current user can edit at least one item status:
+
+	// Buttons to check/uncheck/invert all Items:
+	$Form->checkbox_controls( 'selected_items', array(
+		'before_buttons' => '<span class="btn-group">',
+		'after_buttons'  => '</span> ',
+		'button_class'   => 'btn btn-default',
+		'icon_class'     => '',
+	) );
+
+	echo T_('With checked posts').': ';
+
+	// Display a button to change visibility of selected comments:
+	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
+	echo_status_dropdown_button_js( 'post' );
+
+	echo ' <span class="btn-group">';
+	$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
+	$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
+	echo '</span> ';
+	if( is_pro() && check_user_perm( 'options', 'edit' ) )
+	{	// Export Items only for PRO version:
+		$Form->button( array( 'submit', 'actionArray[mass_export]', T_('Export to XML') ) );
+	}
+	$Form->button( array( 'submit', 'actionArray[mass_delete]', T_('Delete'), 'btn-danger' ) );
+
+	$Form->end_form();
+
+	// JavaScript code to mass change category of Items:
+	echo_item_mass_change_cat_js();
 }
 
 // Display navigation:

@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -97,7 +97,7 @@ class ItemList2 extends ItemListLight
 		$Item->status = param( 'post_status', 'string', NULL ); // 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$Item->status = $Blog->get_allowed_item_status( $Item->status );
+		$Item->status = $Blog->get_allowed_item_status( $Item->status, $Item );
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $Item );
@@ -110,6 +110,15 @@ class ItemList2 extends ItemListLight
 
 		// Set Item params from request:
 		$Item->load_from_Request();
+
+		// Use only first slug on PREVIEW mode in order to initialize correct permanent URL:
+		$urltitles = $Item->get( 'urltitle' );
+		if( $urltitles === '' )
+		{	// If slugs are empty on preview form, try to get previous of from title:
+			$urltitles = ( empty( $this->previous_urltitle ) ? $Item->get( 'title' ) : $this->previous_urltitle );
+		}
+		$urltitles = explode( ',', $urltitles );
+		$Item->set( 'urltitle', get_urltitle( $urltitles[0] ) );
 
 		if( isset( $Item->previous_status ) )
 		{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
@@ -204,10 +213,13 @@ class ItemList2 extends ItemListLight
 
 		// asimo> This must be removed if the option to 'always move the null values in the end of the result' will be implemented
 		$select_temp_order = '';
-		if( !empty( $this->ItemQuery->order_by ) && strpos( $this->ItemQuery->order_by, 'post_order' ) !== false )
+		if( !empty( $this->ItemQuery->order_by ) && preg_match( '/'.preg_quote( 'postcatsorders.postcat_order' ).' (DESC|ASC)/i', $this->ItemQuery->order_by, $order_dir_match ) )
 		{	// Move the items with NULL order to the end of the list
-			$select_temp_order = ', IF( post_order IS NULL, 999999999, post_order ) AS temp_order';
-			$this->ItemQuery->ORDER_BY( str_replace( 'post_order', 'temp_order', $this->ItemQuery->get_order_by( '' ) ) );
+			$null_orders = ( $order_dir_match[1] == 'DESC' ? '-' : '' ).'999999999'; // Always keep the not ordered posts at the end
+			$select_temp_order = ', IF( postmaincat.cat_blog_ID != T_categories.cat_blog_ID, '
+				.'( SELECT SUM( subpostcatorder.postcat_order ) FROM T_postcats AS subpostcatorder INNER JOIN T_categories AS subpostmaincat ON subpostcatorder.postcat_cat_ID = subpostmaincat.cat_ID WHERE subpostmaincat.cat_blog_ID = T_categories.cat_blog_ID AND subpostcatorder.postcat_post_ID = post_ID ), '
+				.'IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) ) AS temp_order';
+			$this->ItemQuery->ORDER_BY( str_replace( 'postcatsorders.postcat_order', 'temp_order', $this->ItemQuery->get_order_by( '' ) ) );
 		}
 
 		// Results style orders:
@@ -226,6 +238,7 @@ class ItemList2 extends ItemListLight
 		// fp> That can dramatically fatten the returned data. You must handle this in the postgres class (check that order fields are in select)
 		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
 									.$select_temp_order
+									.$this->ItemQuery->get_orderby_select()
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_orderby_from( ' ' )
 									.$this->ItemQuery->get_where()
@@ -239,8 +252,7 @@ class ItemList2 extends ItemListLight
 		$ID_list = implode( ',', $DB->get_col( $step1_sql, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).'ItemList2::Query() Step 1: Get ID list' ) );
 
 		// *** STEP 2 ***
-		$this->sql = 'SELECT *'.$select_temp_order.'
-			              FROM '.$this->Cache->dbtablename.$this->ItemQuery->get_orderby_from( ' ' );
+		$this->sql = 'SELECT * FROM '.$this->Cache->dbtablename.$this->ItemQuery->get_orderby_from( ' ' );
 
 		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
 		{ // special case for order by number of views
@@ -250,8 +262,8 @@ class ItemList2 extends ItemListLight
 
 		if( !empty($ID_list) )
 		{
-			$this->sql .= ' WHERE '.$this->Cache->dbIDname.' IN ('.$ID_list.') '
-										.$this->ItemQuery->get_order_by();
+			$this->sql .= ' WHERE '.$this->Cache->dbIDname.' IN ('.$ID_list.')
+				ORDER BY FIND_IN_SET( post_ID, "'.$ID_list.'" )';
 		}
 		else
 		{
@@ -628,8 +640,11 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_assignees( $this->filters['assignees'] );
 		$next_Query->where_assignees_logins( $this->filters['assignees_login'] );
 		$next_Query->where_author_assignee( $this->filters['author_assignee'] );
+		$next_Query->where_involves( $this->filters['involves'] );
+		$next_Query->where_involves_logins( $this->filters['involves_login'] );
 		$next_Query->where_locale( $this->filters['lc'] );
 		$next_Query->where_statuses( $this->filters['statuses'] );
+		$next_Query->where_statuses_array( $this->filters['statuses_array'] );
 		// itemtype_usage param is kept only for the case when some custom types should be displayed
 		$next_Query->where_itemtype_usage( ! empty( $itemtype_usage ) ? $itemtype_usage : $this->filters['itemtype_usage'] );
 		$next_Query->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'] );
@@ -641,6 +656,9 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
 		$next_Query->where_flagged( $this->filters['flagged'] );
+		$next_Query->where_locale_visibility();
+		$next_Query->where_mustread( $this->filters['mustread'] );
+		$next_Query->where_renderers( $this->filters['renderers'] );
 
 		/*
 		 * ORDER BY stuff:
@@ -673,6 +691,8 @@ class ItemList2 extends ItemListLight
 		 * WARNING: you cannot combine criterias with AND here; you need stuf like a>a0 OR (a=a0 AND b>b0)
 		 */
 
+		$select_temp_order = '';
+
 		$orderby_fields = explode( ',', $order_clause );
 		$where_condition = '';
 		$condition_separator = '';
@@ -697,7 +717,11 @@ class ItemList2 extends ItemListLight
 				$compare_field = substr( $orderby, 0, -4 );
 			}
 			$compare_field = trim( $compare_field );
-			if( ( $table_separator = strpos( $compare_field, '.' ) ) )
+			if( strpos( $compare_field, 'postcatsorders.postcat_order' ) !== false )
+			{	// This is an order field per category:
+				$post_field_name = 'postcat_order';
+			}
+			elseif( ( $table_separator = strpos( $compare_field, '.' ) ) )
 			{ // This is a custom field from the item settings table
 				// The field name must be get from a string like 'custom_[varchar | double]_fieldname_table.iset_value'
 				$field_name_position = $table_separator - 6 /* the length of '_table' */ - strlen( $compare_field );
@@ -757,33 +781,51 @@ class ItemList2 extends ItemListLight
 					$equal_condition .= $compare_field.' = '.$DB->quote( $current_Item->{$post_field_name} );
 					break;
 
-				case 'order':
+				case 'postcat_order3':
+					$order_cat_ID = ( isset( $this->filters['cat_array'] ) && count ( $this->filters['cat_array'] ) == 1 ) ? $this->filters['cat_array'][0] : NULL;
+					$order_field_value = $current_Item->get_order( $order_cat_ID );
+
+					if( $operator == ' > ' )
+					{
+						$where_condition .= '( '.$compare_field.$operator.$DB->quote( $order_field_value ).' OR '.$compare_field.' IS NULL )';
+					}
+					else
+					{
+						$where_condition .= $compare_field.$operator.$DB->quote( $order_field_value );
+					}
+					$equal_condition .= $compare_field.' = '.$DB->quote( $order_field_value );
+					break;
+
+				case 'postcat_order':
 					// We have to integrate a rounding error margin
-					$order_field_value = $current_Item->order;
+					$order_cat_ID = ( isset( $this->filters['cat_array'] ) && count ( $this->filters['cat_array'] ) == 1 ) ? $this->filters['cat_array'][0] : NULL;
+					$order_field_value = $current_Item->get_order( $order_cat_ID );
+					if( $order_field_value === NULL )
+					{	// NULL is ordered in the end:
+						$order_field_value = '999999999';
+					}
+
+					// Decide the items with NULL order in the end of the list:
+					preg_match( '/'.preg_quote( 'postcatsorders.postcat_order' ).' (DESC|ASC)/i', $next_Query->order_by, $order_dir_match );
+					$null_orders = ( isset( $order_dir_match[1] ) && $order_dir_match[1] == 'DESC' ? '-' : '' ).'999999999'; // Always keep the not ordered posts at the end
+					$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) AS temp_order';
+					$next_Query->order_by = str_replace( 'postcatsorders.postcat_order', 'temp_order', $next_Query->order_by );
 
 					// asimo> If we would like to order the null values into the end of the result, then we must check the current direction
 					// asimo> In that case NULL values should be allowed only if the direction is 'NEXT' no matter what is the current $operator value
 
-					if( is_null( $order_field_value ) )
-					{ // current Item has NULL order
-						$where_condition .= ( $operator == ' > ' ? $compare_field.' IS NOT NULL' : 'FALSE' );
-						$equal_condition .= $compare_field.' IS NULL';
-					}
-					else
-					{
 						if( $operator == ' > ' )
 						{
-							$where_condition .= '( '.$compare_field.' IS NOT NULL AND '
+							$where_condition .= '( ( '.$compare_field.' IS NULL AND post_ID != '.$current_Item->ID.' ) OR '
 												.$compare_field.$operator.( $order_field_value + 0.000000001 ).' )';
 						}
 						else
 						{
-							$where_condition .= '( ( '.$compare_field.' IS NULL ) OR '
+							$where_condition .= '('
 												.$compare_field.$operator.( $order_field_value - 0.000000001 ).' )';
 						}
 						$equal_condition .= '( ( '.$compare_field.' <= '.( $order_field_value + 0.000000001 ).' )
 											 AND ( '.$compare_field.' >= '.( $order_field_value - 0.000000001 ).' ) )';
-					}
 					break;
 
 				case 'RAND':
@@ -841,7 +883,7 @@ class ItemList2 extends ItemListLight
 		// This is more efficient than manipulating all fields at once.
 
 		// Step 1:
-		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname
+		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname.$select_temp_order
 									.$next_Query->get_from()
 									.$next_Query->get_where()
 									.$next_Query->get_group_by()

@@ -1,0 +1,366 @@
+Region code;Sub-region code;Sub-region name
+ni;ohz;Osterholz
+ni;wst;Ammerland
+ni;aur;Aurich
+ni;ce;Celle
+ni;clp;Cloppenburg
+ni;cux;Cuxhaven
+ni;dh;Diepholz
+ni;el;Emsland
+ni;fri;Friesland
+ni;gf;Gifhorn
+ni;gs;Goslar
+ni;goe;Göttingen
+ni;noh;Grafschaft Bentheim
+ni;hm;Hameln-Pyrmont
+ni;h;Hannover
+ni;wl;Harburg
+ni;hk;Heidekreis
+ni;he;Helmstedt
+ni;hi;Hildesheim
+ni;hol;Holzminden
+ni;ler;Leer
+ni;dan;Lüchow-Dannenberg
+ni;lg;Lüneburg
+ni;ni;Nienburg/Weser
+ni;nom;Northeim
+ni;ol;Oldenburg
+ni;emd;Emden
+ni;del;Delmenhorst
+ni;bs;Braunschweig
+ni;os;Osnabrück
+ni;pe;Peine
+ni;row;Rotenburg (Wümme)
+ni;sz;Salzgitter
+ni;shg;Schaumburg
+ni;std;Stade
+ni;ue;Uelzen
+ni;vec;Vechta
+ni;ver;Verden
+ni;bra;Wesermarsch
+ni;whv;Wilhelmshaven
+ni;wtm;Wittmund
+ni;wf;Wolfenbüttel
+ni;wob;Wolfsburg
+sh;hei;Dithmarschen
+sh;fl;Flensburg
+sh;rz;Herzogtum Lauenburg
+sh;ki;Kiel
+sh;hl;Lübeck
+sh;nms;Neumünster
+sh;nf;Nordfriesland
+sh;oh;Ostholstein
+sh;pi;Pinneberg
+sh;ploe;Plön
+sh;rd;Rendsburg-Eckernförde
+sh;sl;Schleswig-Flensburg
+sh;se;Segeberg
+sh;iz;Steinburg
+sh;od;Stormarn
+mv;lup;Ludwigslust-Parchim
+mv;mse;Mecklenburgische Seenplatte
+mv;nwm;Nordwestmecklenburg
+mv;ros;Rostock
+mv;sn;Schwerin
+mv;vg;Vorpommern-Greifswald
+mv;vr;Vorpommern-Rügen
+nw;ac;Aachen
+nw;bi;Bielefeld
+nw;bo;Bochum
+nw;bn;Bonn
+nw;bor;Borken
+nw;bot;Bottrop
+nw;coe;Coesfeld
+nw;do;Dortmund
+nw;du;Duisburg
+nw;dn;Düren
+nw;d;Düsseldorf
+nw;en;Ennepe-Ruhr-Kreis
+nw;e;Essen
+nw;eu;Euskirchen
+nw;ge;Gelsenkirchen
+nw;gt;Gütersloh
+nw;ha;Hagen
+nw;ham;Hamm
+nw;hs;Heinsberg
+nw;hf;Herford
+nw;her;Herne
+nw;hsk;Hochsauerlandkreis
+nw;hx;Höxter
+nw;kle;Kleve
+nw;k;Köln
+nw;kr;Krefeld
+nw;lev;Leverkusen
+nw;lip;Lippe
+nw;mk;Märkischer Kreis
+nw;me;Mettmann
+nw;mi;Minden-Lübbecke
+nw;mg;Mönchengladbach
+nw;mh;Mülheim an der Ruhr
+nw;ms;Münster
+nw;gm;Oberbergischer Kreis
+nw;ob;Oberhausen
+nw;oe;Olpe
+nw;pb;Paderborn
+nw;re;Recklinghausen
+nw;rs;Remscheid
+nw;bm;Rhein-Erft-Kreis
+nw;gl;Rheinisch-Bergischer Kreis
+nw;ne;Rhein-Kreis Neuss
+nw;su;Rhein-Sieg-Kreis
+nw;si;Siegen-Wittgenstein
+nw;so;Soest
+nw;sg;Solingen
+nw;st;Steinfurt
+nw;un;Unna
+nw;vie;Viersen
+nw;waf;Warendorf
+nw;wes;Wesel
+nw;w;Wuppertal
+he;hp;Bergstraße
+he;di;Darmstadt-Dieburg
+he;da;Darmstadt
+he;f;Frankfurt am Main
+he;fd;Fulda
+he;gi;Gießen
+he;gg;Groß-Gerau
+he;hef;Hersfeld-Rotenburg
+he;hg;Hochtaunuskreis
+he;ks;Kassel
+he;ldk;Lahn-Dill-Kreis
+he;lm;Limburg-Weilburg
+he;mkk;Main-Kinzig-Kreis
+he;mtk;Main-Taunus-Kreis
+he;mr;Marburg-Biedenkopf
+he;erb;Odenwaldkreis
+he;of;Offenbach
+he;rued;Rheingau-Taunus-Kreis
+he;hr;Schwalm-Eder-Kreis
+he;vb;Vogelsbergkreis
+he;kb;Waldeck-Frankenberg
+he;esw;Werra-Meißner-Kreis
+he;fb;Wetteraukreis
+he;wi;Wiesbaden
+rp;aw;Ahrweiler
+rp;ak;Altenkirchen (Westerwald)
+rp;az;Alzey-Worms
+rp;duew;Bad Dürkheim
+rp;kh;Bad Kreuznach
+rp;wil;Bernkastel-Wittlich
+rp;bir;Birkenfeld
+rp;coc;Cochem-Zell
+rp;kib;Donnersbergkreis
+rp;bit;Eifelkreis Bitburg-Prüm
+rp;ft;Frankenthal (Pfalz)
+rp;ger;Germersheim
+rp;kl;Kaiserslautern
+rp;ko;Koblenz
+rp;ku;Kusel
+rp;ld;Landau in der Pfalz
+rp;lu;Ludwigshafen am Rhein
+rp;mz;Mainz-Bingen
+rp;myk;Mayen-Koblenz
+rp;nw;Neustadt an der Weinstraße
+rp;nr;Neuwied
+rp;sim;Rhein-Hunsrück-Kreis
+rp;ems;Rhein-Lahn-Kreis
+rp;rp;Rhein-Pfalz-Kreis
+rp;sp;Speyer
+rp;suew;Südliche Weinstraße
+rp;ps;Pirmasens-Südwestpfalz
+rp;tr;Trier-Saarburg
+rp;dau;Vulkaneifel
+rp;ww;Westerwaldkreis
+rp;wo;Worms
+rp;zw;Zweibrücken
+sl;mzg;Merzig-Wadern
+sl;nk;Neunkirchen
+sl;sb;Saarbrücken
+sl;sls;Saarlouis
+sl;hom;Saarpfalz-Kreis
+sl;wnd;St. Wendel
+bw;ul;Ulm und Alb-Donau-Kreis
+bw;bad;Baden-Baden
+bw;bc;Biberach
+bw;bb;Böblingen
+bw;fn;Bodenseekreis
+bw;fr;Freiburg und Breisgau-Hochschwarzwald
+bw;cw;Calw
+bw;em;Emmendingen
+bw;pf;Pforzheim und Enzkreis
+bw;es;Esslingen
+bw;fds;Freudenstadt
+bw;gp;Göppingen
+bw;hd;Heidelberg und Rhein-Neckar-Kreis
+bw;hdh;Heidenheim
+bw;hn;Heilbronn
+bw;kuen;Hohenlohekreis
+bw;ka;Karlsruhe
+bw;kn;Konstanz
+bw;loe;Lörrach
+bw;lb;Ludwigsburg
+bw;tbb;Main-Tauber-Kreis
+bw;ma;Mannheim
+bw;mos;Neckar-Odenwald-Kreis
+bw;og;Ortenaukreis
+bw;aa;Ostalbkreis
+bw;ra;Rastatt
+bw;rv;Ravensburg
+bw;wn;Rems-Murr-Kreis
+bw;rt;Reutlingen
+bw;rw;Rottweil
+bw;sha;Schwäbisch Hall
+bw;vs;Schwarzwald-Baar-Kreis
+bw;sig;Sigmaringen
+bw;s;Stuttgart
+bw;tue;Tübingen
+bw;tut;Tuttlingen
+bw;wt;Waldshut
+bw;bl;Zollernalbkreis
+by;aic;Aichach-Friedberg
+by;aoe;Altötting
+by;am;Amberg
+by;as;Amberg-Sulzbach
+by;an;Ansbach
+by;ab;Aschaffenburg
+by;a;Augsburg
+by;kg;Bad Kissingen
+by;toel;Bad Tölz-Wolfratshausen
+by;ba;Bamberg
+by;bt;Bayreuth
+by;bgl;Berchtesgadener Land
+by;cha;Cham
+by;co;Coburg
+by;dah;Dachau
+by;deg;Deggendorf
+by;dlg;Dillingen an der Donau
+by;dgf;Dingolfing-Landau
+by;don;Donau-Ries
+by;ebe;Ebersberg
+by;ei;Eichstätt
+by;ed;Erding
+by;er;Erlangen
+by;erh;Erlangen-Höchstadt
+by;fo;Forchheim
+by;fs;Freising
+by;frg;Freyung-Grafenau
+by;ffb;Fürstenfeldbruck
+by;fue;Fürth
+by;gap;Garmisch-Partenkirchen
+by;gz;Günzburg
+by;has;Haßberge
+by;ho;Hof
+by;in;Ingolstadt
+by;kf;Kaufbeuren
+by;keh;Kelheim
+by;ke;Kempten
+by;kt;Kitzingen
+by;kc;Kronach
+by;ku;Kulmbach
+by;ll;Landsberg am Lech
+by;la;Landshut
+by;lif;Lichtenfels
+by;li;Lindau (Bodensee)
+by;msp;Main-Spessart
+by;mm;Memmingen
+by;mb;Miesbach
+by;mil;Miltenberg
+by;mue;Mühldorf am Inn
+by;m;München
+by;nd;Neuburg-Schrobenhausen
+by;nm;Neumarkt in der Oberpfalz
+by;nea;Neustadt an der Aisch-Bad Windsheim
+by;new;Neustadt an der Waldnaab
+by;nu;Neu-Ulm
+by;n;Nürnberg
+by;lau;Nürnberger Land
+by;oa;Oberallgäu
+by;oal;Ostallgäu
+by;pa;Passau
+by;paf;Pfaffenhofen an der Ilm
+by;reg;Regen
+by;r;Regensburg
+by;nes;Rhön-Grabfeld
+by;ro;Rosenheim
+by;rh;Roth
+by;pan;Rottal-Inn
+by;sc;Schwabach
+by;sad;Schwandorf
+by;sw;Schweinfurt
+by;sta;Starnberg
+by;sr;Straubing und Straubing-Bogen
+by;tir;Tirschenreuth
+by;ts;Traunstein
+by;mn;Unterallgäu
+by;wen;Weiden
+by;wm;Weilheim-Schongau
+by;wug;Weißenburg-Gunzenhausen
+by;wun;Wunsiedel im Fichtelgebirge
+by;wue;Würzburg
+bb;bar;Barnim
+bb;brb;Brandenburg an der Havel
+bb;cb;Cottbus
+bb;lds;Dahme-Spreewald
+bb;ee;Elbe-Elster
+bb;ff;Frankfurt (Oder)
+bb;hvl;Havelland
+bb;mol;Märkisch-Oderland
+bb;ohv;Oberhavel
+bb;osl;Oberspreewald-Lausitz
+bb;los;Oder-Spree
+bb;opr;Ostprignitz-Ruppin
+bb;p;Potsdam
+bb;pm;Potsdam-Mittelmark
+bb;pr;Prignitz
+bb;spn;Spree-Neiße
+bb;tf;Teltow-Fläming
+bb;um;Uckermark
+st;saw;Altmarkkreis Salzwedel
+st;abi;Anhalt-Bitterfeld
+st;bk;Börde
+st;blk;Burgenlandkreis
+st;de;Dessau-Roßlau
+sn;hal;Halle (Saale)
+st;hz;Harz
+st;jl;Jerichower Land
+st;md;Magdeburg
+st;msh;Mansfeld-Südharz
+st;sk;Saalekreis
+st;slk;Salzlandkreis
+st;sdl;Stendal
+st;wb;Wittenberg
+sn;bz;Bautzen
+sn;c;Chemnitz
+sn;dd;Dresden
+sn;erz;Erzgebirgskreis
+sn;gr;Görlitz
+sn;l;Leipzig
+sn;mei;Meißen
+sn;fg;Mittelsachsen
+sn;tdo;Nordsachsen
+sn;pir;Sächsische Schweiz-Osterzgebirge
+sn;v;Vogtlandkreis
+sn;z;Zwickau
+th;abg;Altenburger Land
+th;eic;Eichsfeld
+th;ea;Eisenach
+th;ef;Erfurt
+th;g;Gera
+th;gth;Gotha
+th;grz;Greiz
+th;hbn;Hildburghausen
+th;ik;Ilm-Kreis
+th;j;Jena
+th;kyf;Kyffhäuserkreis
+th;ndh;Nordhausen
+th;shk;Saale-Holzland-Kreis
+th;sok;Saale-Orla-Kreis
+th;slf;Saalfeld-Rudolstadt
+th;sm;Schmalkalden-Meiningen
+th;soem;Sömmerda
+th;son;Sonneberg
+th;shl;Suhl
+th;uh;Unstrut-Hainich-Kreis
+th;wak;Wartburgkreis
+th;we;Weimar
+th;ap;Weimarer Land

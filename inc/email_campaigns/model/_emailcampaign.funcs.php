@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -40,7 +40,10 @@ function get_filterset_user_IDs( $filterset_name = 'admin' )
  */
 function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 {
-	global $admin_url, $current_User;
+	global $admin_url;
+
+	$EmailCampaignCache = & get_EmailCampaignCache();
+	$EmailCampaign = & $EmailCampaignCache->get_by_ID( $campaign_ID );
 
 	$modes = array();
 
@@ -51,9 +54,9 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Campaign info'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['info']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'info'} );";
+		$modes['info']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'info'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=compose';
@@ -61,9 +64,20 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Compose'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['compose']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'compose'} );";
+		$modes['compose']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'compose'} );";
+	}
+
+	$url = $edit_url.$glue.'tab=plaintext';
+	$modes['plaintext'] = array(
+		'text'  => T_('Plain-text version'),
+		'href'  => $url,
+		'class' => 'ecmp_plaintext_tab'.( $EmailCampaign->get( 'sync_plaintext' ) ? ' hidden' : '' ),
+	);
+	if( check_user_perm( 'emails', 'edit' ) )
+	{ // User must has a permission to edit emails
+		$modes['plaintext']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'plaintext'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=send';
@@ -71,9 +85,9 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Review and send'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['send']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'send'} );";
+		$modes['send']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'send'} );";
 	}
 
 	$url = $edit_url.$glue.'tab=recipient'.$glue.'filter=new';
@@ -81,9 +95,19 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		'text' => T_('Recipient list'),
 		'href' => $url
 	);
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{ // User must has a permission to edit emails
-		$modes['recipient']['onclick'] = "return b2edit_reload( document.getElementById('campaign_form'), '$url', 'undefined', {tab:'recipient'} );";
+		$modes['recipient']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'recipient'} );";
+	}
+
+	$url = $edit_url.$glue.'tab=plugins';
+	$modes['plugins'] = array(
+		'text' => T_('Plugins'),
+		'href' => $url
+	);
+	if( check_user_perm( 'emails', 'edit' ) )
+	{ // User must has a permission to edit emails
+		$modes['plugins']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'plugins'} );";
 	}
 
 	return $modes;
@@ -103,25 +127,35 @@ function get_campaign_tab_url( $current_tab, $campaign_ID, $type = 'current', $g
 {
 	$modes = get_campaign_edit_modes( $campaign_ID, $glue );
 
+	$EmailCampaignCache = & get_EmailCampaignCache();
+	$EmailCampaign = & $EmailCampaignCache->get_by_ID( $campaign_ID );
+
 	switch( $type )
 	{
 		case 'current':
 			// Get URL of current tab
 			if( !empty( $modes[ $current_tab ] ) )
 			{
-				return $modes[ $current_tab ]['href'];
+				if( $current_tab == 'plaintext' && $EmailCampaign->get( 'sync_plaintext' ) )
+				{	// Don't allow tab plaintext when it is not enabled:
+					return $modes['compose']['href'];
+				}
+				else
+				{
+					return $modes[ $current_tab ]['href'];
+				}
 			}
 			break;
 
 		case 'next':
 		default:
-			// Get URL of next tab
+			// Get URL of next tab:
 			$this_tab = false;
 			foreach( $modes as $tab_name => $tab_info )
 			{
 				if( $this_tab )
 				{ // We find URL for next tab
-					return $tab_info['href'];
+					return ( $tab_name == 'plaintext' && $EmailCampaign->get( 'sync_plaintext' ) ) ? $modes['send']['href'] : $tab_info['href'];
 				}
 				if( $tab_name == $current_tab )
 				{ // The next tab will be what we find
@@ -180,6 +214,36 @@ function skip_campaign_user( $campaign_ID, $user_ID )
 
 
 /**
+ * Check if campaign email is opened
+ *
+ * @param integer Email log ID
+ * @param array Associative array of campaign email send data
+ * @return mixed NULL if the email log record does not exist, true if email is considered open, false otherwise
+ */
+function is_unopened_campaign_mail( $email_log_ID, & $send_data = NULL )
+{
+	global $DB;
+
+	$send_data = $DB->get_row( 'SELECT * FROM T_email__campaign_send WHERE csnd_emlog_ID = '.$DB->quote( $email_log_ID ).' LIMIT 1', ARRAY_A );
+
+	if( $send_data )
+	{
+		// Unsubscribe clicks do not "open" emails
+		return empty( $send_data['csnd_last_open_ts'] ) && // image load
+				empty( $send_data['csnd_last_click_ts'] ) &&
+				empty( $send_data['csnd_like'] ) &&
+				empty( $send_data['csnd_cta1'] ) &&
+				empty( $send_data['csnd_cta2'] ) &&
+				empty( $send_data['csnd_cta3'] );
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+
+/**
  * Get EmailCampaign object from object which is used to select recipients
  *
  * @return object EmailCampaign
@@ -196,60 +260,148 @@ function & get_session_EmailCampaign()
 
 
 /**
+ * Display link to filtered userlist
+ *
+ * @param Object EmailCampaign object
+ * @param String Recipient action on email campaign
+ * @return String <a> tag
+ */
+function campaign_td_recipient_action( $row, $recipient_action )
+{
+	global $admin_url;
+
+	if( empty( $row->ecmp_send_count ) )
+	{
+		return NULL;
+	}
+
+	$url = $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID='.$row->ecmp_ID.'&amp;tab=recipient&amp;filter=new';
+
+	switch( $recipient_action )
+	{
+		case 'img_loaded':
+			$text = $row->ecmp_img_loads;
+			break;
+
+		case 'link_clicked':
+			$text = $row->ecmp_link_clicks;
+			break;
+
+		case 'cta1':
+			$text = $row->ecmp_cta1_clicks;
+			break;
+
+		case 'cta2':
+			$text = $row->ecmp_cta2_clicks;
+			break;
+
+		case 'cta3':
+			$text = $row->ecmp_cta3_clicks;
+			break;
+
+		case 'liked':
+			$text = $row->ecmp_like_count;
+			$class = 'text-success';
+			break;
+
+		case 'disliked':
+			$text = $row->ecmp_dislike_count;
+			$class = 'text-danger';
+			break;
+
+		case 'clicked_unsubscribe':
+			$text = $row->ecmp_unsub_clicks;
+			$class = 'text-danger';
+			break;
+	}
+
+	return '<a href="'.$url.( empty( $recipient_action ) ? '' : '&amp;recipient_action='.$recipient_action ).'"'.
+			( empty( $class ) ? '': ' class="'.$class.'"' ).'>'.$text.'</a>';
+}
+
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_campaign_results_block( & $Form )
+{
+	$Form->text_input( 'username', get_param( 'username' ), 40, T_('Username or email address') );
+}
+
+
+/**
  * Display the campaigns results table
  *
  * @param array Params
  */
 function campaign_results_block( $params = array() )
 {
-	global $admin_url, $UserSettings, $current_User, $DB;
+	global $admin_url, $UserSettings, $DB;
 
 	$params = array_merge( array(
 		'enlt_ID'               => NULL,
-		'results_title'         => T_('Email campaigns').get_manual_link( 'email-campaigns' ),
+		'results_title'         => T_('Email campaigns').get_manual_link( 'email-campaign-list' ),
 		'display_create_button' => true
 	), $params );
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'SQL_NO_CACHE ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, ecmp_user_tag_like, ecmp_user_tag_dislike,
-			enlt_ID, enlt_name,
-			SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS send_count,
-			SUM( IF( emlog_last_open_ts IS NOT NULL OR emlog_last_click_ts IS NOT NULL OR csnd_like IS NOT NULL, 1, 0 ) ) /
-				SUM( IF( ecmp_sent_ts IS NULL AND ecmp_auto_sent_ts IS NULL, 0, 1 ) ) AS open_rate,
-			SUM( IF( emlog_last_open_ts IS NULL, 0, 1 ) ) AS open_count,
-			SUM( IF( emlog_last_click_ts IS NULL, 0, 1 ) ) AS click_count,
-			SUM( IF( csnd_like = 1, 1, 0 ) ) AS like_count,
-			SUM( IF( csnd_like = -1, 1, 0 ) ) AS dislike_count,
-			SUM( COALESCE( csnd_clicked_unsubscribe, 0 ) ) AS unsubscribe_click_count' );
+	$SQL->SELECT( 'DISTINCT ecmp_ID, T_email__campaign.*, enlt_ID, enlt_name, IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
-	$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
-	$SQL->FROM_add( 'LEFT JOIN T_email__log ON emlog_ID = csnd_emlog_ID' );
 	$SQL->WHERE( 1 );
-	$SQL->GROUP_BY( 'ecmp_ID, ecmp_date_ts, ecmp_enlt_ID, ecmp_email_title, ecmp_email_html, ecmp_email_text,
-			ecmp_email_plaintext, ecmp_sent_ts, ecmp_auto_sent_ts, ecmp_renderers, ecmp_use_wysiwyg, ecmp_send_ctsk_ID, ecmp_auto_send, ecmp_user_tag, enlt_ID, enlt_name' );
 
 	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'SQL_NO_CACHE COUNT( ecmp_ID )' );
+	$count_SQL->SELECT( 'COUNT( DISTINCT ecmp_ID )' );
 	$count_SQL->FROM( 'T_email__campaign' );
 	$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
 	if( isset( $params['enlt_ID'] ) )
-	{
+	{	// Filter by Newsletter:
 		$SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
 		$count_SQL->WHERE_and( 'ecmp_enlt_ID = '.$DB->quote( $params['enlt_ID'] ) );
 	}
 
-	$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+	$username = param( 'username', 'string', NULL );
+	if( ! empty( $username ) )
+	{	// Filter by user login, first name, last name, nickname:
+		$sql_where = array();
+		$kw_array = explode( ' ', $username );
+		foreach( $kw_array as $kw )
+		{	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
+			$sql_where[] = 'CONCAT_WS( " ", user_login, user_firstname, user_lastname, user_nickname, user_email ) LIKE '.$DB->quote( '%'.$kw.'%' );
+		}
+		$sql_where = implode( ' OR ', $sql_where );
+		$SQL->WHERE_and( $sql_where );
+		$count_SQL->WHERE_and( $sql_where );
+		// Join additional tables for the user columns:
+		$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
+		$SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
+		$count_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
+		$count_SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
+	}
+
+	$Results = new Results( $SQL->get(), isset( $params['enlt_ID'] ) ? 'lemcmp_' : 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 	$Results->Cache = & get_EmailCampaignCache();
 	$Results->title = $params['results_title'];
 
-	if( $current_User->check_perm( 'emails', 'edit' ) && $params['display_create_button'] )
+	if( check_user_perm( 'emails', 'edit' ) && $params['display_create_button'] )
 	{ // User must has a permission to edit emails
 		$Results->global_icon( T_('Create new campaign').'...', 'new', $admin_url.'?ctrl=campaigns&amp;action=new'.( isset( $params['enlt_ID'] ) ? '&amp;enlt_ID='.$params['enlt_ID'] : '' ), T_('Create new campaign').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 	}
+
+	$Results->filter_area = array( 
+			'callback' => 'filter_campaign_results_block' 
+		);
+
+	$Results->register_filter_preset( 'all', T_('All'),
+		isset( $params['enlt_ID'] )
+		// URL to display campaigns of the edited List:
+		? $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$params['enlt_ID']
+		// URL to display all campaigns:
+		: $admin_url.'?ctrl=campaigns' );
 
 	$Results->cols[] = array(
 			'th' => T_('ID'),
@@ -264,7 +416,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_date_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_date_ts# )%',
 		);
 
@@ -277,17 +429,23 @@ function campaign_results_block( $params = array() )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Email title'),
-			'order' => 'ecmp_email_title',
-			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_email_title$</b></a>',
+			'th' => T_('Campaign name'),
+			'order' => 'ecmp_name',
+			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Sending'),
-			'order' => 'ecmp_auto_send',
+			'th' => T_('Email title'),
+			'order' => 'ecmp_email_title',
+			'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$&amp;tab=compose"><b>$ecmp_email_title$</b></a>',
+		);
+
+	$Results->cols[] = array(
+			'th' => T_('Welcome'),
+			'order' => 'ecmp_welcome',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'nowrap',
-			'td' => '%{Obj}->get_sending_title()%',
+			'td_class' => 'center',
+			'td' => '%campaign_td_welcome( #ecmp_ID#, #ecmp_welcome#, #ecmp_activate# )%',
 		);
 
 	$Results->cols[] = array(
@@ -295,7 +453,7 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_sent_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_sent_ts# )%',
 		);
 
@@ -304,17 +462,17 @@ function campaign_results_block( $params = array() )
 			'order' => 'ecmp_auto_sent_ts',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #ecmp_auto_sent_ts# )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Send count'),
-			'order' => 'send_count',
+			'order' => 'ecmp_send_count',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'$send_count$'
+			'td' =>'$ecmp_send_count$'
 		);
 
 	$Results->cols[] = array(
@@ -323,48 +481,76 @@ function campaign_results_block( $params = array() )
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
+			'td' =>'%empty( #ecmp_send_count# ) ? "" : number_format( #open_rate# * 100, 1 )%%'
 		);
 
 	$Results->cols[] = array(
 			'th' => /* TRANS: Image load count */ T_('Img loads'),
-			'order' => 'open_count',
+			'order' => 'ecmp_img_loads',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #open_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "img_loaded" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Link clicks'),
-			'order' => 'click_count',
+			'order' => 'ecmp_link_clicks',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #click_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "link_clicked" )%',
+		);
+
+	$Results->cols[] = array(
+			'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+			'order' => 'ecmp_cta1_clicks',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'%campaign_td_recipient_action( {row}, "cta1" )%',
+		);
+
+	$Results->cols[] = array(
+			'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+			'order' => 'ecmp_cta2_clicks',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'%campaign_td_recipient_action( {row}, "cta2" )%',
+		);
+
+	$Results->cols[] = array(
+			'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+			'order' => 'ecmp_cta3_clicks',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+			'td' =>'%campaign_td_recipient_action( {row}, "cta3" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Likes'),
+			'order' => 'ecmp_like_count',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #like_count#%'
+			'td_class' => 'center text-success',
+			'td' =>'%campaign_td_recipient_action( {row}, "liked" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Dislikes'),
+			'order' => 'ecmp_dislike_count',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
+			'td_class' => 'center text-danger',
+			//'td' =>'%empty( #send_count# ) ? "" : #dislike_count#%'
+			'td' =>'%campaign_td_recipient_action( {row}, "disliked" )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Unsub clicks'),
-			'order' => 'unsubscribe_click_count',
+			'order' => 'ecmp_unsub_clicks',
 			'default_dir' => 'D',
 			'th_class' => 'shrinkwrap',
-			'td_class' => 'center',
-			'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
+			'td_class' => 'center text-danger',
+			//'td' =>'%empty( #send_count# ) ? "" : #unsubscribe_click_count#%'
+			'td' => '%campaign_td_recipient_action( {row}, "clicked_unsubscribe" )%'
 		);
 
 	$Results->cols[] = array(
@@ -372,12 +558,60 @@ function campaign_results_block( $params = array() )
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'td' => action_icon( T_('Edit this email campaign...'), 'properties', $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$' )
-				.( $current_User->check_perm( 'emails', 'edit' ) ?
+				.( check_user_perm( 'emails', 'edit' ) ?
 				// Display an action icon to delete newsletter if current User has a perm:
-				action_icon( T_('Delete this email address!'), 'delete', regenerate_url( 'ecmp_ID,action', 'ecmp_ID=$ecmp_ID$&amp;action=delete&amp;'.url_crumb('campaign') ) ) : '' )
+				action_icon( T_('Duplicate this email campaign...'), 'copy', $admin_url.'?ctrl=campaigns&amp;action=copy&amp;ecmp_ID=$ecmp_ID$' )
+				.action_icon( T_('Delete this email campaign!'), 'delete', $admin_url.'?ctrl=campaigns&amp;action=delete&amp;ecmp_ID=$ecmp_ID$&amp;'.url_crumb( 'campaign' ) ) : '' )
 		);
 
 	// Display results:
-	$Results->display();
+	$Results->display( NULL, 'session' );
+}
+
+
+/**
+ * Helper function to display a welcome status of email campaign in list
+ *
+ * @param integer Email Campaign ID
+ * @param integer TRUE/1 if this is a welcome Email Campaign
+ * @param integer TRUE/1 if this is an activate Email Campaign
+ * @return string
+ */
+function campaign_td_welcome( $ecmp_ID, $ecmp_welcome, $ecmp_activate )
+{
+	if( $ecmp_welcome )
+	{	// If email campaign is used as welcome message:
+		$welcome_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The email campaign is used as "Welcome" for its list.') ) );
+		if( $ecmp_activate )
+		{	// If email campaign is used as activate message:
+			$activate_icon = get_icon( 'bullet_dark_blue', 'imgtag', array( 'title' => T_('This welcome email doubles as an activation message. No separate activation email will be sent.') ) );
+		}
+		else
+		{	// If email campaign is NOT used as activate message:
+			$activate_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('This welcome email does not act as an activation message.') ) );
+		}
+	}
+	else
+	{	// If email campaign is NOT used as welcome message:
+		$welcome_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The email campaign is not used as "Welcome" for its list.') ) );
+		// Don't use email campaign as activate message when it is not used as welcome message:
+		$activate_icon = '';
+	}
+
+	if( check_user_perm( 'emails', 'edit' ) )
+	{	// Make icon(s) toggle welcome/activate statuses if current User has a perm to edit this:
+		global $admin_url, $ctrl;
+		$icon_url = $admin_url.'?ctrl=campaigns'
+			.'&amp;ecmp_ID='.$ecmp_ID
+			.( $ctrl == 'newsletters' ? '&amp;from='.$ctrl : '' )
+			.'&amp;'.url_crumb( 'campaign' );
+		$welcome_icon = '<a href="'.$icon_url.'&amp;action='.( $ecmp_welcome ? 'disable_welcome' : 'enable_welcome' ).'">'.$welcome_icon.'</a>';
+		if( ! empty( $activate_icon ) )
+		{	// Make activate icon clickable:
+			$activate_icon = '<a href="'.$icon_url.'&amp;action='.( $ecmp_activate ? 'disable_activate' : 'enable_activate' ).'">'.$activate_icon.'</a>';
+		}
+	}
+
+	return $welcome_icon.( empty( $activate_icon ) ? '' : ' '.$activate_icon );
 }
 ?>

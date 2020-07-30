@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -46,7 +46,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	{
 		$ItemTypeCache = & get_ItemTypeCache();
 		$ItemTypeCache->clear();
-		$ItemTypeCache->load_where( 'ityp_usage = "page"' ); // Load only page item types
+		$ItemTypeCache->load_where( 'ityp_usage = "page" OR ityp_usage = "widget-page"' ); // Load only page item types
 		$item_type_cache_load_all = $ItemTypeCache->load_all; // Save original value
 		$ItemTypeCache->load_all = false; // Force to don't load all item types in get_option_array() below
 		$page_item_type_options =
@@ -78,6 +78,15 @@ class coll_page_list_Widget extends coll_item_list_Widget
 		$r['widget_css_class']['no_edit'] = true;
 		$r['widget_ID']['no_edit'] = true;
 
+		// Hide the 2 last orderby fields with order direction:
+		for( $order_index = 1; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
+		{
+			$r['orderby_'.$order_index.'_begin_line']['no_edit'] = true;
+			$r['order_by_'.$order_index]['no_edit'] = true;
+			$r['order_dir_'.$order_index]['no_edit'] = true;
+			$r['orderby_'.$order_index.'_end_line']['no_edit'] = true;
+		}
+
 		// Allow to select what page item type to display:
 		$r['item_type'] = array(
 				'label' => T_('Exact post type'),
@@ -107,7 +116,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Simple Page list');
+		return T_('Page list');
 	}
 
 
@@ -137,7 +146,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	function init_display( $params )
 	{
 		// Force some params (because this is a simplified widget):
-		$params['item_type_usage'] = 'page';	// Use post types usage "page" only
+		$params['item_type_usage'] = 'page,widget-page';	// Use post types usage "page" only
 
 		parent::init_display( $params );
 	}

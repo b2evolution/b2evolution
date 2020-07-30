@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -24,7 +24,7 @@ load_funcs( 'dashboard/model/_dashboard.funcs.php' );
  */
 global $current_User;
 
-global $dispatcher, $blog;
+global $blog;
 
 
 if( empty( $_GET['blog'] ) )
@@ -33,18 +33,20 @@ if( empty( $_GET['blog'] ) )
 	unset( $Blog, $Collection );
 }
 
+param_action();
+
 // Site dashboard
 $AdminUI->set_path( 'site', 'dashboard' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'site-dashboard' );
 
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-require_js( '#jqueryUI#' );
+require_js_defer( '#jqueryUI#' );
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -52,14 +54,11 @@ require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for 
 require_js_helper( 'colorbox' );
 
 // Include files to work with charts
-require_js( '#easypiechart#' );
-require_css( 'jquery/jquery.easy-pie-chart.css' );
+require_js_defer( '#easypiechart#' );
+require_css( 'ext:jquery/easy-pie-chart/css/jquery.easy-pie-chart.css' );
 
-// Init JS to quick edit an order of the blogs in the table cell by AJAX
-init_field_editor_js( array(
-		'field_prefix' => 'order-blog-',
-		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
-	) );
+// Init JS to autcomplete the user logins
+init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();
@@ -69,27 +68,21 @@ $AdminUI->disp_body_top();
 
 // We're on the GLOBAL tab...
 $AdminUI->disp_payload_begin();
-// Display blog list VIEW:
-$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
-load_funcs( 'collections/model/_blog_js.funcs.php' );
-$AdminUI->disp_payload_end();
 
-
-/*
- * DashboardGlobalMain to be added here (anyone?)
- */
-if( $current_User->check_perm( 'blogs', 'create' ) )
+$collection_count = get_table_count( 'T_blogs' );
+if( check_user_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
-	$AdminUI->disp_payload_begin();
-	$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
-	$AdminUI->disp_payload_end();
+	// Display welcome panel:
+	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
 }
+
+$AdminUI->disp_payload_end();
 
 /*
  * Administrative tasks
  */
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // We have some serious admin privilege:
 	/**
 	 * @var AbstractSettings
@@ -106,63 +99,87 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$chart_data = array();
 	// Users
 	$chart_data[] = array(
-			'title' => T_('Users'),
+			'title' => TB_('Users'),
 			'value' => get_table_count( 'T_users' ),
 			'type'  => 'number',
 		);
 
 	// Blogs
 	$chart_data[] = array(
-			'title' => T_('Blogs'),
-			'value' => get_table_count( 'T_blogs' ),
+			'title' => TB_('Collections'),
+			'value' => $collection_count,
 			'type'  => 'number',
 		);
 	$post_all_counter = get_table_count( 'T_items__item' );
 
 	// Posts
 	$chart_data[] = array(
-			'title' => T_('Posts'),
+			'title' => TB_('Posts'),
 			'value' => $post_all_counter,
 			'type'  => 'number',
 		);
 
 	// Slugs
 	$chart_data[] = array(
-			'title' => T_('Slugs'),
+			'title' => TB_('Slugs'),
 			'value' => get_table_count( 'T_slug' ),
 			'type'  => 'number',
 		);
 	// Comments
 	$chart_data[] = array(
-			'title' => T_('Comments'),
+			'title' => TB_('Comments'),
 			'value' => get_table_count( 'T_comments' ),
 			'type'  => 'number',
 		);
 
 	// Files
 	$chart_data[] = array(
-			'title' => T_('Files'),
+			'title' => TB_('Files'),
 			'value' => get_table_count( 'T_files' ),
 			'type'  => 'number',
 		);
 
 	// Conversations
 	$chart_data[] = array(
-			'title' => T_('Conversations'),
+			'title' => TB_('Conversations'),
 			'value' => get_table_count( 'T_messaging__thread' ),
 			'type'  => 'number',
 		);
 
 	// Messages
 	$chart_data[] = array(
-			'title' => T_('Messages'),
+			'title' => TB_('Messages'),
 			'value' => get_table_count( 'T_messaging__message' ),
 			'type'  => 'number',
 		);
 
+	// Email Lists
+	$chart_data[] = array(
+			'title' => TB_('Email Lists'),
+			'value' => get_table_count( 'T_email__newsletter' ),
+			'type'  => 'number',
+			'max'   => 20,
+		);
+
+	// Campaigns
+	$chart_data[] = array(
+			'title' => TB_('Campaigns'),
+			'value' => get_table_count( 'T_email__campaign' ),
+			'type'  => 'number',
+			'max'   => 10000,
+		);
+
+	// Automations
+	$chart_data[] = array(
+			'title' => TB_('Automations'),
+			'value' => get_table_count( 'T_automation__automation' ),
+			'type'  => 'number',
+			'max'   => 20,
+		);
+
 	$stat_item_Widget = new Widget( 'block_item' );
 
-	$stat_item_Widget->title = T_('System metrics');
+	$stat_item_Widget->title = TB_('System metrics');
 	$stat_item_Widget->disp_template_replaced( 'block_start' );
 
 	display_charts( $chart_data );
@@ -174,7 +191,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	$block_item_Widget = new Widget( 'block_item' );
 
-	$block_item_Widget->title = T_('Updates from b2evolution.net');
+	$block_item_Widget->title = TB_('Updates from b2evolution.net');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
 
@@ -237,7 +254,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 if( ! empty( $chart_data ) )
 { // JavaScript to initialize charts
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'document' ).ready( function()
 {
 	var chart_params = {

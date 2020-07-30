@@ -96,7 +96,12 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		load_funcs( 'files/model/_image.funcs.php' );
+		global $admin_url;
+
+		// Get available templates:
+		$context = 'item_details';
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_by_context( $context );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -105,22 +110,16 @@ class item_small_print_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
 				),
-				'format' => array(
-					'label' => T_('Format'),
-					'note' => T_('Select what format should be displayed'),
+				'template' => array(
+					'label' => T_('Template'),
 					'type' => 'select',
-					'options' => array(
-							'standard' => T_('Blog standard'),
-							'revision' => T_('Revisions'),
-						),
-					'defaultvalue' => 'standard',
-				),
-				'avatar_size' => array(
-					'label' => T_('Avatar Size'),
-					'note' => '',
-					'type' => 'select',
-					'options' => get_available_thumb_sizes(),
-					'defaultvalue' => 'crop-top-32x32',
+					'options' => $TemplateCache->get_code_option_array(),
+					'defaultvalue' => 'item_details_smallprint_standard',
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -157,115 +156,46 @@ class item_small_print_Widget extends ComponentWidget
 		global $Item;
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
+		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
 		$this->init_display( $params );
 
-		// We renamed some params; older skin may use the old names; let's convert those params now:
-		$this->convert_legacy_param( 'widget_coll_small_print_before', 'widget_item_small_print_before' );
-		$this->convert_legacy_param( 'widget_coll_small_print_after', 'widget_item_small_print_after' );
-		$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
+		$TemplateCache = & get_TemplateCache();
+		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
+		{
+			$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+			return false;
+		}
 
-		$this->disp_params = array_merge( array(
-				'widget_item_small_print_before'    => '',
-				'widget_item_small_print_after'     => '',
-				'widget_item_small_print_separator' => ' &bull; ',
+		$template = $this->disp_params['template'];
+
+		$template_params = array_merge( array(
+				'author_avatar_class' => 'leftmargin',
 			), $this->disp_params );
+		
+		$small_print = render_template_code( $template, $template_params );
 
-		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['widget_item_small_print_before'];
+		if( ! empty( $small_print ) )
+		{
+			echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
+			
+			$this->disp_title();
+			
+			echo $this->disp_params['block_body_start'];
 
-		if( $this->disp_params['format'] == 'standard' )
-		{ // Blog standard
-			/**
-			 * @global Skin
-			 */
-			global $Skin;
+			echo $small_print;
 
-			$Item->author( array(
-					'link_text'   => 'only_avatar',
-					'link_rel'    => 'nofollow',
-					'thumb_size'  => $this->disp_params['avatar_size'],
-					'thumb_class' => 'leftmargin',
-				) );
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
 
-			$Item->flag();
-
-			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Item->issue_time( array(
-						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
-						'time_format' => locale_extdatefmt(),
-					) );
-				$Item->issue_time( array(
-						'before'      => /* TRANS: time */ T_('at').' ',
-						'time_format' => '#short_time',
-					) );
-				$Item->author( array(
-						'before'    => /* TRANS: author name */ T_('by').' ',
-						'link_text' => 'auto',
-					) );
-			}
-			else
-			{
-				$Item->author( array(
-						'before'    => T_('This entry was posted by').' ',
-						'link_text' => 'auto',
-					) );
-			}
-
-			$Item->categories( array(
-					'before'           => ' '.T_('and is filed under').' ',
-					'after'            => '.',
-					'include_main'     => true,
-					'include_other'    => true,
-					'include_external' => true,
-					'link_categories'  => true,
-				) );
-
-			// List all tags attached to this post:
-			$Item->tags( array(
-					'before'    => ' '.T_('Tags').': ',
-					'after'     => ' ',
-					'separator' => ', ',
-				) );
-
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => '',
-					'after'  => '',
-				) );
-		}
-		else
-		{ // Revisions
-			$Item->flag();
-
-			$Item->author( array(
-					'before'    => T_('Created by').' ',
-					'after'     => $this->disp_params['widget_item_small_print_separator'],
-					'link_text' => 'auto',
-				) );
-
-			$Item->lastedit_user( array(
-					'before'    => T_('Last edit by').' ',
-					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( locale_extdatefmt() ),
-					'link_text' => 'auto',
-				) );
-
-			echo $Item->get_history_link( array(
-					'before'    => $this->disp_params['widget_item_small_print_separator'],
-					'link_text' => T_('View history')
-				) );
+			return true;
 		}
 
-		echo $this->disp_params['widget_item_small_print_after'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
-
-		return true;
+		$this->display_debug_message();
+		return false;
 	}
 
 
@@ -283,8 +213,31 @@ class item_small_print_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'item_ID'      => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
+				'item_user_flag_'.( empty( $Item->ID ) ? 0 : $Item->ID ) => ( is_logged_in() ? $current_User->ID : 0 ), // Has the Item data per current User changed?
+				'template_code'=> $this->get_param( 'template' ), // Has the Template changed?
 			);
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->disp_params['block_start'];
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
+			echo $this->disp_params['widget_item_small_print_before'];
+			echo $message;
+			echo $this->disp_params['widget_item_small_print_after'];
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+		}
 	}
 }
 

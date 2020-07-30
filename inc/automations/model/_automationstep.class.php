@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -37,6 +37,7 @@ class AutomationStep extends DataObject
 	var $no_next_step_delay;
 	var $error_next_step_ID;
 	var $error_next_step_delay;
+	var $diagram;
 
 	var $Automation = NULL;
 
@@ -68,6 +69,7 @@ class AutomationStep extends DataObject
 			$this->no_next_step_delay = $db_row->step_no_next_step_delay;
 			$this->error_next_step_ID = $db_row->step_error_next_step_ID;
 			$this->error_next_step_delay = $db_row->step_error_next_step_delay;
+			$this->diagram = $db_row->step_diagram;
 		}
 	}
 
@@ -80,10 +82,10 @@ class AutomationStep extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d states of User in Automation') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'and_condition' => 'step_yes_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("YES" column)') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'and_condition' => 'step_no_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("NO" column)') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'and_condition' => 'step_error_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("ERROR" column)') ),
+				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => TB_('%d states of User in Automation') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'and_condition' => 'step_yes_next_step_ID != step_ID', 'msg' => TB_('Step is used as Next Step %d times').' '.TB_('("YES" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'and_condition' => 'step_no_next_step_ID != step_ID', 'msg' => TB_('Step is used as Next Step %d times').' '.TB_('("NO" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'and_condition' => 'step_error_next_step_ID != step_ID', 'msg' => TB_('Step is used as Next Step %d times').' '.TB_('("ERROR" column)') ),
 			);
 	}
 
@@ -91,10 +93,16 @@ class AutomationStep extends DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
+	 * @param boolean TRUE to check if step can be inserted e.g. when automation is not paused
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $check_restriction = true )
 	{
+		if( $check_restriction && ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
 		if( $r = parent::dbinsert() )
 		{
 			// Update next steps with selected option "Loop" to ID of this new inserted Step:
@@ -118,6 +126,22 @@ class AutomationStep extends DataObject
 
 
 	/**
+	 * Update the DB based on previously recorded changes
+	 *
+	 * @return boolean true on success, false on failure to update, NULL if no update necessary
+	 */
+	function dbupdate()
+	{
+		if( ! $this->can_be_modified() )
+		{	// If this step cannnot be modified
+			return false;
+		}
+
+		return parent::dbupdate();
+	}
+
+
+	/**
 	 * Get a member param by its name
 	 *
 	 * @param mixed Name of parameter
@@ -128,22 +152,8 @@ class AutomationStep extends DataObject
 		switch( $parname )
 		{
 			case 'if_condition_js_object':
-				if( $this->get( 'type' ) == 'if_condition' && $this->get( 'info' ) != '' )
-				{	// Format values(like dates) of the field "IF Condition" from MySQL DB format to current locale format:
-					$json_object = json_decode( $this->get( 'info' ) );
-
-					if( $json_object === NULL || ! isset( $json_object->valid ) || $json_object->valid !== true )
-					{	// Wrong object, Return null:
-						return 'null';
-					}
-
-					return json_encode( $this->format_condition_object( $json_object, 'from_mysql' ) );
-				}
-				else
-				{	// No stored object, Return null:
-					return 'null';
-				}
-				
+				// Format values(like dates) of the field "IF Condition" from MySQL DB format to current locale format:
+				return param_format_condition( $this->get( 'info' ), 'js' );
 		}
 
 		return parent::get( $parname );
@@ -165,11 +175,19 @@ class AutomationStep extends DataObject
 			$this->set_from_Request( 'autm_ID', 'autm_ID' );
 		}
 
+		if( ! $this->can_be_modified() && ! param( 'confirm_pause', 'integer' ) )
+		{	// Don't allow to edit step of active automation without confirmation:
+			global $Messages;
+			$Messages->add( empty( $this->ID )
+				? TB_('You must pause the automation before creating new step.')
+				: TB_('You must pause the automation before changing step.'), 'error' );
+		}
+
 		// Order:
 		$step_order = param( 'step_order', 'integer', NULL );
 		if( $this->ID > 0 )
 		{	// Order is required for edited step:
-			param_string_not_empty( 'step_order', T_('Please enter a step order number.') );
+			param_string_not_empty( 'step_order', TB_('Please enter a step order number.') );
 		}
 		elseif( $step_order === NULL )
 		{	// Set order for new creating step automatically:
@@ -195,11 +213,11 @@ class AutomationStep extends DataObject
 			{	// Display error because of duplicated order in the same Automation:
 				global $admin_url;
 				param_error( 'step_order',
-					sprintf( T_('Another step with the same order number already exists in the current automation. Do you want to <a %s>edit that step</a>?'),
+					sprintf( TB_('Another step with the same order number already exists in the current automation. Do you want to <a %s>edit that step</a>?'),
 						'href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$existing_step_ID.'"' ) );
 			}
 		}
-		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( T_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
+		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( TB_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
 
 		// Type:
 		param_string_not_empty( 'step_type', 'Please select a step type.' );
@@ -209,31 +227,32 @@ class AutomationStep extends DataObject
 		{
 			case 'if_condition':
 				// IF Condition:
-				param_string_not_empty( 'step_if_condition', T_('Please set a condition.') );
-				$this->set( 'info', $this->format_condition_to_mysql( get_param( 'step_if_condition' ) ) );
+				param_condition( 'step_if_condition' );
+				param_string_not_empty( 'step_if_condition', TB_('Please set a condition.') );
+				$this->set( 'info', get_param( 'step_if_condition' ) );
 				break;
 
 			case 'send_campaign':
 				// Email campaign:
 				param( 'step_email_campaign', 'integer', NULL );
-				param_check_number( 'step_email_campaign', T_('Please select an email campaign.'), true );
+				param_check_number( 'step_email_campaign', TB_('Please select an email campaign.'), true );
 				$this->set( 'info', get_param( 'step_email_campaign' ) );
 				break;
 
 			case 'notify_owner':
 				// Notify owner:
 				param( 'step_notification_message', 'text' );
-				param_check_not_empty( 'step_notification_message', T_('Please enter a notification message.') );
+				param_check_not_empty( 'step_notification_message', TB_('Please enter a notification message.') );
 				$this->set( 'info', get_param( 'step_notification_message' ) );
 				break;
 
 			case 'add_usertag':
 			case 'remove_usertag':
 				// Add/Remove usertag:
-				param_string_not_empty( 'step_usertag', T_('Please enter an user tag.') );
+				param_string_not_empty( 'step_usertag', TB_('Please enter an user tag.') );
 				if( preg_match( '/(^-|[;,])/', get_param( 'step_usertag' ) ) )
 				{	// If usertag has a not allowed char:
-					param_error( 'step_usertag', sprintf( T_('Usertag cannot start with %s and contain chars %s'), '<code>-</code>', '<code>;,</code>' ) );
+					param_error( 'step_usertag', sprintf( TB_('Usertag cannot start with %s and contain chars %s'), '<code>-</code>', '<code>;,</code>' ) );
 				}
 				$this->set( 'info', get_param( 'step_usertag' ) );
 				break;
@@ -242,15 +261,22 @@ class AutomationStep extends DataObject
 			case 'unsubscribe':
 				// Subscribe/Unsubscribe:
 				param( 'step_newsletter', 'integer', true );
-				param_check_not_empty( 'step_newsletter', T_('Please select a list.') );
+				param_check_not_empty( 'step_newsletter', TB_('Please select a list.') );
 				$this->set( 'info', get_param( 'step_newsletter' ) );
 				break;
 
 			case 'start_automation':
 				// Start new automation:
 				param( 'step_automation', 'integer', true );
-				param_check_not_empty( 'step_automation', T_('Please select an automation.') );
+				param_check_not_empty( 'step_automation', TB_('Please select an automation.') );
 				$this->set( 'info', get_param( 'step_automation' ) );
+				break;
+
+			case 'user_status':
+				// Change user account status:
+				param( 'user_status', 'string', true );
+				param_check_not_empty( 'user_status', /* Do NOT translate because this error is impossible for normal form */'Please select an account status.' );
+				$this->set( 'info', get_param( 'user_status' ) );
 				break;
 
 			default:
@@ -305,17 +331,38 @@ class AutomationStep extends DataObject
 	/**
 	 * Get next Step object of this Step by step ID
 	 *
-	 * @param integer Step ID
+	 * @param integer Step type: 'yes', 'no', 'error'
 	 * @return object|boolean Next Automation Step OR
 	 *                        FALSE - if automation should be stopped after this Step
 	 *                                because either it is configured for STOP action
 	 *                                            or it is the latest step of the automation
 	 */
-	function & get_next_AutomationStep_by_ID( $next_step_ID )
+	function & get_next_AutomationStep_by_type( $next_step_type )
 	{
-		$next_step_ID = intval( $next_step_ID );
+		switch( $next_step_type )
+		{
+			case 'YES':
+				$next_step_ID = $this->get( 'yes_next_step_ID' );
+				break;
+			case 'NO':
+				$next_step_ID = $this->get( 'no_next_step_ID' );
+				break;
+			case 'ERROR':
+				$next_step_ID = $this->get( 'error_next_step_ID' );
+				break;
+			default:
+				debug_die( 'Invalid automation next step type "'.$next_step_type.'"' );
+		}
 
 		$next_AutomationStep = false;
+
+		$possible_step_type_results = step_get_result_labels();
+		if( empty( $possible_step_type_results[ $this->get( 'type' ) ][ $next_step_type ] ) )
+		{	// If the requested result(YES, NO or ERROR) is not supported by current step type:
+			return $next_AutomationStep;
+		}
+
+		$next_step_ID = intval( $next_step_ID );
 
 		$AutomationStepCache = & get_AutomationStepCache();
 		if( $next_step_ID > 0 )
@@ -329,16 +376,7 @@ class AutomationStep extends DataObject
 		}
 		elseif( $next_step_ID == 0 || ! $next_AutomationStep )
 		{	// Get next ordered Step when option is selected to "Continue" OR Step cannot be found by ID in DB:
-			global $DB;
-			$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
-			$next_ordered_step_SQL->SELECT( 'step_ID' );
-			$next_ordered_step_SQL->FROM( 'T_automation__step' );
-			$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
-			$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
-			$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
-			$next_ordered_step_SQL->LIMIT( 1 );
-			$next_ordered_step_ID = $DB->get_var( $next_ordered_step_SQL );
-			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $next_ordered_step_ID, false, false );
+			$next_AutomationStep = & $AutomationStepCache->get_by_ID( $this->get_next_ordered_step_ID(), false, false );
 			if( empty( $next_AutomationStep ) )
 			{	// If it is the latest Step of the Automation:
 				$next_AutomationStep = false;
@@ -346,6 +384,32 @@ class AutomationStep extends DataObject
 		}
 
 		return $next_AutomationStep;
+	}
+
+
+	/**
+	 * Get ID of the next ordered Step after this Step
+	 *
+	 * @return integer|NULL Step ID or NULL if this is the latest
+	 */
+	function get_next_ordered_step_ID()
+	{
+		if( empty( $this->ID ) )
+		{	// New creating step is the latest by default:
+			return NULL;
+		}
+
+		global $DB;
+
+		$next_ordered_step_SQL = new SQL( 'Get next ordered Step after current Step #'.$this->ID );
+		$next_ordered_step_SQL->SELECT( 'step_ID' );
+		$next_ordered_step_SQL->FROM( 'T_automation__step' );
+		$next_ordered_step_SQL->WHERE( 'step_autm_ID = '.$DB->quote( $this->get( 'autm_ID' ) ) );
+		$next_ordered_step_SQL->WHERE_and( 'step_order > '.$DB->quote( $this->get( 'order' ) ) );
+		$next_ordered_step_SQL->ORDER_BY( 'step_order ASC' );
+		$next_ordered_step_SQL->LIMIT( 1 );
+
+		return $DB->get_var( $next_ordered_step_SQL );
 	}
 
 
@@ -361,7 +425,7 @@ class AutomationStep extends DataObject
 	{
 		if( $this->yes_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$this->yes_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'yes_next_step_ID' ) );
+			$this->yes_next_AutomationStep = & $this->get_next_AutomationStep_by_type( 'YES' );
 		}
 
 		return $this->yes_next_AutomationStep;
@@ -380,7 +444,7 @@ class AutomationStep extends DataObject
 	{
 		if( $this->no_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$this->no_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'no_next_step_ID' ) );
+			$this->no_next_AutomationStep = & $this->get_next_AutomationStep_by_type( 'NO' );
 		}
 
 		return $this->no_next_AutomationStep;
@@ -399,7 +463,7 @@ class AutomationStep extends DataObject
 	{
 		if( $this->error_next_AutomationStep === NULL )
 		{	// Load next Step into cache object:
-			$this->error_next_AutomationStep = & $this->get_next_AutomationStep_by_ID( $this->get( 'error_next_step_ID' ) );
+			$this->error_next_AutomationStep = & $this->get_next_AutomationStep_by_type( 'ERROR' );
 		}
 
 		return $this->error_next_AutomationStep;
@@ -410,9 +474,9 @@ class AutomationStep extends DataObject
 	 * Execute action for this step
 	 *
 	 * @param integer User ID
-	 * @param string Log process into this param
+	 * @return string A process log
 	 */
-	function execute_action( $user_ID, & $process_log )
+	function execute_action( $user_ID )
 	{
 		global $DB, $servertimenow, $mail_log_message, $executed_automation_steps;
 
@@ -437,7 +501,7 @@ class AutomationStep extends DataObject
 		$step_User = & $UserCache->get_by_ID( $user_ID, false, false );
 
 		// Log:
-		$process_log .= 'Executing '.$log_bold_start.'Step #'.$this->get( 'order' ).$log_bold_end
+		$process_log = 'Executing '.$log_bold_start.'Step #'.$this->get( 'order' ).$log_bold_end
 			.'('.step_get_type_title( $this->get( 'type' ) ).': '.$this->get( 'label' ).')'
 			.' of '.$log_bold_start.'Automation: #'.$Automation->ID.$log_bold_end.'('.$Automation->get( 'name' ).')'
 			.' for '.$log_bold_start.'User #'.$user_ID.$log_bold_end.( $step_User ? '('.$step_User->get( 'login' ).')' : '' ).'...'.$log_nl;
@@ -471,6 +535,17 @@ class AutomationStep extends DataObject
 						if( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_receive' ) ) )
 						{	// If user already received this email:
 							$step_result = 'NO';
+							$additional_result_message = 'Email was ALREADY sent';
+						}
+						elseif( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_skipped' ) ) )
+						{	// If user is marked to be manually skipped:
+							$step_result = 'NO';
+							$additional_result_message = 'Manually skipped';
+						}
+						elseif( in_array( $user_ID, $step_EmailCampaign->get_recipients( 'full_skipped_tag' ) ) )
+						{	// If user has user tag that should be skipped:
+							$step_result = 'NO';
+							$additional_result_message = 'User has skipped user tag';
 						}
 						elseif( ( $user_subscribed_newsletter_ID = $Automation->is_user_subscribed( $user_ID ) ) &&
 						        $step_EmailCampaign->send_email( $user_ID, '', '', 'auto', $user_subscribed_newsletter_ID, $Automation->ID ) )
@@ -530,11 +605,11 @@ class AutomationStep extends DataObject
 						) );
 
 					$email_template_params = array(
-						'message_html' => str_replace( '$login$', $step_user_login_html, $notification_message ),
-						'message_text' => nl2br( str_replace( '$login$', $step_User->get( 'login' ), $notification_message ) ),
+						'message_html' => nl2br( str_replace( '$login$', $step_user_login_html, $notification_message ) ),
+						'message_text' => str_replace( '$login$', $step_User->get( 'login' ), $notification_message ),
 					);
 
-					if( send_mail_to_User( $owner_User->ID, sprintf( T_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
+					if( send_mail_to_User( $owner_User->ID, sprintf( TB_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
 					{	// If email has been sent to user successfully now:
 						$step_result = 'YES';
 					}
@@ -593,10 +668,16 @@ class AutomationStep extends DataObject
 						if( $this->get( 'type' ) == 'subscribe' )
 						{	// Subscribe:
 							$affected_subscriprions_num = $step_User->subscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was subscribed:
+							$step_User->send_list_owner_notifications( 'subscribe' );
 						}
 						else
 						{	// Unsubscribe:
 							$affected_subscriprions_num = $step_User->unsubscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was unsubscribed:
+							$step_User->send_list_owner_notifications( 'unsubscribe' );
 						}
 						$step_result = ( $affected_subscriprions_num ? 'YES' : 'NO' );
 						// Display newsletter name in log:
@@ -627,6 +708,44 @@ class AutomationStep extends DataObject
 					{	// If List/Newsletter does not exist:
 						$step_result = 'ERROR';
 						$additional_result_message = 'Automation #'.$this->get( 'info' ).' is not found in DB.';
+					}
+					break;
+
+				case 'user_status':
+					// Change user account status:
+					$current_status = $step_User->get( 'status' );
+					$new_status = $this->get( 'info' );
+					if( $step_User->ID == 1 )
+					{	// Don't allow to change status of the Admin user:
+						$step_result = 'ERROR';
+						$additional_result_message = 'Status of admin user account cannot be changed';
+					}
+					elseif( $current_status == $new_status )
+					{	// If step User's account is already in the desired status:
+						$step_result = 'NO';
+						// Display status title in log:
+						$user_statuses = get_user_statuses();
+						$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+					}
+					elseif( $current_status == 'closed' )
+					{	// Don't allow to change a closed status:
+						$step_result = 'ERROR';
+						$additional_result_message = 'The closed user account cannot be changed to any other status';
+					}
+					else
+					{	// Change user account to another status:
+						$step_User->set( 'status', $new_status );
+						if( $step_User->dbupdate() )
+						{	// Successful user updating:
+							$step_result = 'YES';
+							// Display status title in log:
+							$user_statuses = get_user_statuses();
+							$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+						}
+						else
+						{	// Unknown error on user updating:
+							$step_result = 'ERROR';
+						}
 					}
 					break;
 
@@ -697,7 +816,7 @@ class AutomationStep extends DataObject
 				? $log_point.'Next step: #'.$next_AutomationStep->get( 'order' )
 					.'('.step_get_type_title( $next_AutomationStep->get( 'type' ) ).( $next_AutomationStep->get( 'label' ) == '' ? '' : ' "'.$next_AutomationStep->get( 'label' ).'"' ).')'
 					.' delay: '.seconds_to_period( $next_delay ).', '.$next_exec_ts
-				: $log_point.'There is no next step configured.' ).$log_nl;
+				: $log_point.'There is no next step configured.' );
 
 		if( $next_delay == 0 && $next_AutomationStep )
 		{	// If delay for next step is 0 seconds then we must execute such step right now:
@@ -708,10 +827,12 @@ class AutomationStep extends DataObject
 			else
 			{	// Run next step because it is not executed yet for the user:
 				$executed_automation_steps[ $user_ID ][] = $this->ID;
-				$process_log .= $log_point.$log_bold_start.'Run next step immediately:'.$log_nl.$log_bold_end;
-				$next_AutomationStep->execute_action( $user_ID, $process_log );
+				$process_log .= $log_nl.$log_point.$log_bold_start.'Run next step immediately:'.$log_nl.$log_bold_end;
+				$process_log .= $next_AutomationStep->execute_action( $user_ID );
 			}
 		}
+
+		return $process_log;
 	}
 
 
@@ -815,6 +936,7 @@ class AutomationStep extends DataObject
 				'time'        => 'Current time',
 				'day'         => 'Current day of the week',
 				'month'       => 'Current month',
+				'days_before_birthday'          => 'Days before birthday',
 				'listsend_last_sent_to_user'    => 'Last sent list to user',
 				'listsend_last_opened_by_user'  => 'Last opened list by user',
 				'listsend_last_clicked_by_user' => 'Last clicked list by user',
@@ -893,7 +1015,7 @@ class AutomationStep extends DataObject
 						.( isset( $value[1] ) ? ' '.$value[1].'s' : '' ).' ago';
 					$rule_newsletter_ID = isset( $value[2] ) ? intval( $value[2] ) : 0;
 					$newsletter = ' for ';
-					if( $rule_newsletter_ID )
+					if( $rule_newsletter_ID > 0 )
 					{	// Specific newsletter is selected:
 						$NewsletterCache = & get_NewsletterCache();
 						if( $rule_Newsletter = & $NewsletterCache->get_by_ID( $rule_newsletter_ID, false, false ) )
@@ -905,8 +1027,12 @@ class AutomationStep extends DataObject
 							$newsletter .= 'List: Error: NOT FOUND IN DB!';
 						}
 					}
-					else
+					elseif( $rule_newsletter_ID == -1 )
 					{	// Any newsletter should be used for this condition rule:
+						$newsletter .= 'any list';
+					}
+					else
+					{	// Any tied newsletter should be used for this condition rule:
 						$newsletter .= 'any list tied to step automation';
 					}
 					$process_log .= ' '.$log_operators[ $rule->operator ].' "'.$period.$newsletter.'"';
@@ -1000,9 +1126,51 @@ class AutomationStep extends DataObject
 				// Check current month:
 				return $this->check_if_condition_rule_date_value( $rule, 'm' );
 
+			case 'days_before_birthday':
+				// Check number of days before birthday:
+				global $localtimenow;
+
+				$localdatenow   = strtotime( date( 'Y-m-d', $localtimenow ) );
+				$birthday_month = $step_User->get( 'birthday_month' );
+				$birthday_day   = $step_User->get( 'birthday_day' );
+
+				if( $birthday_month && $birthday_day )
+				{
+					$birthday = strtotime( date( 'Y', $localtimenow ).'-'.$birthday_month.'-'.$birthday_day );
+					if( $birthday < $localdatenow )
+					{	// Birthday for current year has already passed, use birthday next year:
+						$birthday = strtotime( ( (int) date( 'Y', $localtimenow ) + 1 ).'-'.$birthday_month.'-'.$birthday_day );
+					}
+					$datediff = $birthday - $localdatenow;
+					$days     = (int) round( $datediff / ( 60 * 60 * 24 ) );
+
+					switch( $rule->operator )
+					{
+						case 'equal':
+							return $days == $rule->value;
+						case 'not_equal':
+							return $days != $rule->value;
+						case 'less':
+							return $days < $rule->value;
+						case 'less_or_equal':
+							return $days <= $rule->value;
+						case 'greater':
+							return $days > $rule->value;
+						case 'greater_or_equal':
+							return $days >= $rule->value;
+						case 'between':
+							return $days >= $rule->value[0] && $days <= $rule->value[1];
+						case 'not_between':
+							return $days < $rule->value[0] || $days > $rule->value[1];
+					}
+				}
+				
+				return false;
+
 			case 'listsend_last_sent_to_user':
 				// Check last sent list to user:
-				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' );
+				return $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_manual_ts' ) ||
+							 $this->check_if_condition_rule_listsend_value( $rule, $step_User->ID, 'enls_last_sent_auto_ts' );
 
 			case 'listsend_last_opened_by_user':
 				// Check last opened list by user:
@@ -1092,10 +1260,22 @@ class AutomationStep extends DataObject
 			}
 			$rule_value_time = $servertimenow - $period_value;
 
-			$NewsletterCache = & get_NewsletterCache();
-			if( $rule_Newsletter = & $NewsletterCache->get_by_ID( ( isset( $value[2] ) ? intval( $value[2] ) : 0 ), false, false ) )
-			{	// Check only on selected list:
-				$rule_newsletters = array( $rule_Newsletter->ID );
+			$rule_newsletter_ID = ( isset( $value[2] ) ? intval( $value[2] ) : 0 );
+			if( $rule_newsletter_ID > 0 )
+			{	// Check for a selected list:
+				$NewsletterCache = & get_NewsletterCache();
+				if( $rule_Newsletter = & $NewsletterCache->get_by_ID( $rule_newsletter_ID, false, false ) )
+				{	// Check only for a selected list:
+					$rule_newsletters = $rule_Newsletter->ID;
+				}
+				else
+				{	// If a selected list has been removed from DB:
+					$rule_newsletters = -1;
+				}
+			}
+			elseif( $rule_newsletter_ID == -1 )
+			{	// Check for ALL lists:
+				$rule_newsletters = false;
 			}
 			else
 			{	// Check any list tied to step automation:
@@ -1107,7 +1287,10 @@ class AutomationStep extends DataObject
 			$SQL->SELECT( $check_db_field_name );
 			$SQL->FROM( 'T_email__newsletter_subscription' );
 			$SQL->WHERE( 'enls_user_ID = '.$DB->quote( $step_user_ID ) );
-			$SQL->WHERE_and( 'enls_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+			if( $rule_newsletters !== false )
+			{	// Check only for the selected rule lists:
+				$SQL->WHERE_and( 'enls_enlt_ID IN ( '.$DB->quote( $rule_newsletters ).' )' );
+			}
 			$SQL->ORDER_BY( $check_db_field_name );
 			$SQL->LIMIT( 1 );
 			$last_time = strtotime( $DB->get_var( $SQL ) );
@@ -1132,100 +1315,6 @@ class AutomationStep extends DataObject
 
 
 	/**
-	 * Format values(like dates) of the field "IF Condition" to store in MySQL DB
-	 *
-	 * @param string Source condition
-	 * @return string Condition with formatted values for MySQL DB
-	 */
-	function format_condition_to_mysql( $condition )
-	{
-		if( $this->get( 'type' ) != 'if_condition' )
-		{	// This is allowed only for step type "IF Condition":
-			return '';
-		}
-
-		$json_object = json_decode( $condition );
-
-		if( $json_object === NULL || ! isset( $json_object->valid ) || $json_object->valid !== true )
-		{	// Wrong object:
-			return '';
-		}
-
-		return json_encode( $this->format_condition_object( $json_object, 'to_mysql' ) );
-	}
-
-
-	/**
-	 * Format JSON object to/from DB format
-	 * Used recursively to find all sub grouped conditions
-	 *
-	 * @param object JSON object of step type "IF Condition"
-	 * @param string Format action: 'to_mysql', 'from_mysql'
-	 * @return string
-	 */
-	function format_condition_object( $json_object, $action )
-	{
-		if( empty( $json_object->rules ) )
-		{	// No rules, Skip it:
-			return $json_object;
-		}
-
-		foreach( $json_object->rules as $r => $rule )
-		{
-			if( isset( $rule->rules ) && is_array( $rule->rules ) )
-			{	// This is a group of conditions, Run this function recursively:
-				$json_object->rules[ $r ] = $this->format_condition_object( $rule, $action );
-			}
-			else
-			{	// This is a single field, Format condition only for this field:
-				if( is_array( $rule->value ) )
-				{	// Field with multiple values like 'between'(field BETWEEN value_1 AND value_2):
-					foreach( $rule->value as $v => $rule_value )
-					{
-						$rule->value[ $v ] = $this->format_condition_rule_value( $rule_value, $rule->type, $action );
-					}
-				}
-				else
-				{	// Field with single value like 'equal'(field = value):
-					$rule->value = $this->format_condition_rule_value( $rule->value, $rule->type, $action );
-				}
-				$json_object->rules[ $r ] = $rule;
-			}
-		}
-
-		return $json_object;
-	}
-
-
-	/**
-	 * Format rule value to/from DB format
-	 *
-	 * @param string Rule value
-	 * @param string Rule type
-	 * @param string Format action: 'to_mysql', 'from_mysql'
-	 */
-	function format_condition_rule_value( $rule_value, $rule_type, $action )
-	{
-		switch( $rule_type )
-		{
-			case 'date':
-				switch( $action )
-				{
-					case 'to_mysql':
-						$formatted_date = format_input_date_to_iso( $rule_value );
-						return $formatted_date ? $formatted_date : $rule_value;
-
-					case 'from_mysql':
-						return mysql2date( locale_input_datefmt(), $rule_value );
-				}
-				break;
-		}
-
-		return $rule_value;
-	}
-
-
-	/**
 	 * Set label generated automatically
 	 *
 	 * @param string Label
@@ -1245,7 +1334,7 @@ class AutomationStep extends DataObject
 				$EmailCampaignCache = & get_EmailCampaignCache();
 				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $this->get( 'info' ), false, false ) )
 				{	// Use name of Email Campaign:
-					$label = $EmailCampaign->get( 'email_title' );
+					$label = $EmailCampaign->get( 'name' );
 				}
 				break;
 
@@ -1274,6 +1363,14 @@ class AutomationStep extends DataObject
 				}
 				break;
 
+			case 'user_status':
+				$user_statuses = get_user_statuses();
+				if( isset( $user_statuses[ $this->get( 'info' ) ] ) )
+				{	// Get status title from status key:
+					$label = $user_statuses[ $this->get( 'info' ) ];
+				}
+				break;
+
 			case 'add_usertag':
 			case 'remove_usertag':
 			default:
@@ -1282,6 +1379,57 @@ class AutomationStep extends DataObject
 		}
 
 		$this->set( 'label', utf8_substr( utf8_trim( $label ), 0, 500 ) );
+	}
+
+
+	/**
+	 * Check if this automation step can be modified(added/edited/deleted) currently
+	 *
+	 * @param boolean
+	 */
+	function can_be_modified()
+	{
+		if( ( $step_Automation = & $this->get_Automation() ) &&
+		    $step_Automation->get( 'status' ) == 'paused' )
+		{	// Automation of this step must be paused in order to edit steps:
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Pause automation by confirmation from request
+	 *
+	 * @return boolean
+	 */
+	function pause_automation()
+	{
+		if( $this->can_be_modified() )
+		{	// If step automation is already paused
+			return true;
+		}
+
+		if( ! param( 'confirm_pause', 'integer' ) )
+		{	// If action is not confirmed
+			return false;
+		}
+
+		// Try to pause the step's automation:
+		$step_Automation = & $this->get_Automation();
+		$step_Automation->set( 'status', 'paused' );
+
+		if( $step_Automation->dbupdate() )
+		{	// Display a message if automation has been paused:
+			global $Messages;
+			$Messages->add( TB_('Automation has been paused.'), 'success' );
+			return true;
+		}
+		else
+		{	// If automation could not paused
+			return false;
+		}
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -35,12 +35,7 @@ display_comment_mass_delete( $CommentList );
 // Display title depending on selection params:
 echo $CommentList->get_filter_title( '<h2 class="page-title">', '</h2>', '<br />', NULL, 'htmlbody' );
 
-$CommentList->title = T_('Comment List').get_manual_link( 'comments-tab' );
-
-if( $CommentList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
-	$CommentList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=listview&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
+$CommentList->title = T_('Comment List').get_manual_link( 'comments-list-view' );
 
 if( check_comment_mass_delete( $CommentList ) )
 {	// A form for mass deleting is availabl, Display link

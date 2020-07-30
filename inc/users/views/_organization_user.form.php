@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -31,20 +31,22 @@ $Form->begin_form( 'fform' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
 	$User = NULL;
-	$Form->username( 'user_login', $User, T_('Username'), '', '', array( 'required' => true ) );
+	$Form->username( 'user_login', $User, TB_('Username'), '', '', array( 'required' => true ) );
 
 	$Form->radio( 'accepted', '1',
 				array(
-					array( '1', T_('Accepted') ),
-					array( '0', T_('Not Accepted') ),
-			), T_('Membership'), true );
+					array( '1', TB_('Accepted') ),
+					array( '0', TB_('Not Accepted') ),
+			), TB_('Membership'), true );
 
-	$Form->text_input( 'role', '', 32, T_('Role'), '', array( 'maxlength' => 255 ) );
+	$Form->text_input( 'role', '', 32, TB_('Role'), '', array( 'maxlength' => 255 ) );
+
+	$Form->text_input( 'priority', '', 32, TB_('Order'), '', array( 'maxlength' => 255, 'type' => 'number' ) );
 
 $buttons = array();
-if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+if( check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:
-	$buttons[] = array( 'submit', 'actionArray[link_user]', T_('Add'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[link_user]', TB_('Add'), 'SaveButton' );
 }
 $Form->end_form( $buttons );
 ?>

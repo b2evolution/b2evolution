@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -23,7 +23,7 @@ global $Collection, $Blog, $Skin, $Settings, $current_User, $is_admin_page;
  */
 global $user_profile_only;
 
-global $user_tab, $user_ID;
+global $user_tab, $user_ID, $action;
 
 global $UserSettings;
 
@@ -49,20 +49,16 @@ user_prevnext_links( array(
 
 if( $is_admin_page )
 {
-	echo '<div class="row">';
-}
+	$usertab_header = get_usertab_header( $viewed_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $viewed_User->ID ? T_('Who visited my profile?') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) );
 
-if( ! $user_profile_only )
-{ // echo user edit action icons
-	$Widget = new Widget();
-	echo_user_actions( $Widget, $viewed_User, 'edit' );
-	echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Widget->gen_global_icons().'</span>';
-}
+	if( ! $user_profile_only )
+	{ // echo user edit action icons
+		$Widget = new Widget();
+		echo_user_actions( $Widget, $viewed_User, $action );
+		$usertab_header = str_replace( '$global_icons$', $Widget->gen_global_icons(), $usertab_header );
+	}
 
-if( $is_admin_page )
-{
-	echo '<div class="col-xs-12 col-lg-6'.( $user_profile_only ? '' : ' col-lg-pull-6').'">'.get_usertab_header( $viewed_User, $user_tab, '<span class="nowrap">'.( $current_User->ID == $viewed_User->ID ? T_('Who visited my profile?') : T_('User Profile Visits') ).'</span>'.get_manual_link( 'profile-visits-tab' ) ).'</div>';
-	echo '</div>';
+	echo $usertab_header;
 }
 
 if( ! empty( $Skin ) )

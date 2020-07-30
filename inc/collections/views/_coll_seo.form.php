@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -25,7 +25,7 @@ global $preset;
 global $rsc_url;
 
 ?>
-<script type="text/javascript">
+<script>
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -54,134 +54,158 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main_page_seo') );
-	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
-	$Form->checklist( array(
-		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
-		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
-		), 'canonical_homepage_options', T_('Make canonical') );
+$Form->begin_fieldset( TB_('General').get_manual_link( 'general-seo' ) );
+	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ), TB_('Open Graph'),
+			sprintf( /* TRANS: %s replaced with <code><head></code> */ TB_('Include Open Graph tags in the %s section'), '<code>&lt;head&gt;</code>' ).' (og:title, og:url, og:description, og:type and og:image)' );
 
-	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
-	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
+	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ), TB_('Twitter Card'),
+			sprintf( /* TRANS: %s replaced with <code><head></code> */ TB_('Include Twitter Summary card in the %s section'), '<code>&lt;head&gt;</code>' ) );
+
+	$Form->checkbox( 'tags_structured_data', $edited_Blog->get_setting( 'tags_structured_data' ), TB_('Structured Data'),
+			sprintf( /* TRANS: %s replaced with <code></body></code> */ TB_('Include Structured Data before %s'), '<code>&lt;/body&gt;</code>' ) );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( TB_('Special Front Page').' <span class="text-muted">(disp=front)</span>'.get_manual_link( 'special-front-page-seo' ) );
+	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), TB_('Indexing'), TB_('META NOINDEX') );
+
+	$Form->checklist( array(
+		array( 'canonical_homepage', 1, TB_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
+		array( 'relcanonical_homepage', 1, TB_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
+		array( 'self_canonical_homepage', 1, TB_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_homepage' ) ),
+		), 'canonical_homepage_options', TB_('Make canonical') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( TB_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
+	$Form->checkbox( 'posts_firstpage_noindex', $edited_Blog->get_setting( 'posts_firstpage_noindex' ), TB_('First posts page'), TB_('META NOINDEX') );
+
+	$Form->checklist( array(
+			array( 'paged_noindex', 1, TB_('META NOINDEX').' - '.TB_('Page 2,3,4, etc. without intro'), $edited_Blog->get_setting( 'paged_noindex' ) ),
+			array( 'paged_intro_noindex', 1, TB_('META NOINDEX').' - '.TB_('Page 2,3,4, etc. with an intro'), $edited_Blog->get_setting( 'paged_intro_noindex' ) ),
+			array( 'paged_nofollowto', 1, TB_('NOFOLLOW on links to').' '.TB_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_nofollowto' ) ),
+		), 'paged', TB_('Next posts pages') );
+
+	$Form->checklist( array(
+		array( 'canonical_posts', 1, TB_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_posts' ) ),
+		array( 'relcanonical_posts', 1, TB_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_posts' ) ),
+		array( 'self_canonical_posts', 1, TB_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_posts' ) ),
+		), 'canonical_posts_options', TB_('Make canonical') );
 
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
-			  array( 'permalink', T_('Link to the permanent url of the post') ),
-			  array( 'linkto_url', T_('Link to the "link to URL" specified in the post (if any)') ),
-			  array( 'auto', T_('Link to the "link to URL" if specified, otherwise fall back to permanent url') ),
-			  array( 'none', T_('No links on titles') ),
-			), T_('Post titles'), true );
+			  array( 'permalink', TB_('Link to the permanent url of the post') ),
+			  array( 'linkto_url', TB_('Link to the "link to URL" specified in the post (if any)') ),
+			  array( 'auto', TB_('Link to the "link to URL" if specified, otherwise fall back to permanent url') ),
+			  array( 'none', TB_('No links on titles') ),
+			), TB_('Post titles'), true );
 	// TODO: checkbox display "permalink" separately from the title
 
 	$Form->radio( 'main_content', $edited_Blog->get_setting('main_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
-			), T_('Post contents'), true );
+				array( 'excerpt', TB_('Post excerpts'), '('.TB_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', TB_('Standard post contents (stopping at "[teaserbreak]")'), '('.TB_('Teaser images will be displayed').')' ),
+				array( 'full', TB_('Full post contents (including after "[teaserbreak]")'), '('.TB_('All images will be displayed').')' ),
+			), TB_('Post contents'), true );
 
  	$Form->radio( 'permalinks', $edited_Blog->get_setting('permalinks'), array(
-			  array( 'single', T_('Link to single post') ),
-			  array( 'archive', T_('Link to post in archive') ),
-			  array( 'subchap', T_('Link to post in sub-category') ),
-			), T_('Permalinks'), true );
+			  array( 'single', TB_('Link to single post') ),
+			  array( 'archive', TB_('Link to post in archive') ),
+			  array( 'subchap', TB_('Link to post in sub-category') ),
+			), TB_('Permalinks'), true );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single_post_pages_seo') );
+$Form->begin_fieldset( TB_('Single post pages / "Permalink" pages').get_manual_link('single-post-pages-seo') );
+
+	$Form->checkbox( 'single_noindex', $edited_Blog->get_setting( 'single_noindex' ), TB_('Indexing'), TB_('META NOINDEX') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
-			  array( 'param_num', T_('Use param: post ID'), T_('E-g: ')
+			  array( 'param_num', TB_('Use param: post ID'), TB_('E-g: ')
 			  				.url_add_param( $blogurl, '<strong>p=123&amp;more=1</strong>' ) ),
-			  array( 'param_title', T_('Use param: post title'), T_('E-g: ')
+			  array( 'param_title', TB_('Use param: post title'), TB_('E-g: ')
 			  				.url_add_param( $blogurl, '<strong>title=post-title&amp;more=1</strong>' ) ),
-				array( 'short', T_('Use extra-path: post title'), T_('E-g: ')
+				array( 'short', TB_('Use extra-path: post title'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/post-title</strong>' ) ),
-				array( 'y', T_('Use extra-path: year'), T_('E-g: ')
+				array( 'y', TB_('Use extra-path: year'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/2006/post-title</strong>' ) ),
-				array( 'ym', T_('Use extra-path: year & month'), T_('E-g: ')
+				array( 'ym', TB_('Use extra-path: year & month'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/2006/12/post-title</strong>' ) ),
-				array( 'ymd', T_('Use extra-path: year, month & day'), T_('E-g: ')
+				array( 'ymd', TB_('Use extra-path: year, month & day'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/2006/12/31/post-title</strong>' ) ),
-				array( 'subchap', T_('Use extra-path: sub-category'), T_('E-g: ')
+				array( 'subchap', TB_('Use extra-path: sub-category'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/subcat/post-title</strong>' ) ),
-				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
+				array( 'chapters', TB_('Use extra-path: category path'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/cat/subcat/post-title</strong>' ) ),
-			), T_('Permalink scheme'), true );
+			), TB_('Permalink scheme'), true );
 
-	$Form->text_input( 'slug_limit', $edited_Blog->get_setting('slug_limit'), 3, T_('Limit slug length to'), '', array( 'input_suffix' => ' '.T_('words') ) );
+	$Form->text_input( 'slug_limit', $edited_Blog->get_setting('slug_limit'), 3, TB_('Limit slug length to'), '', array( 'input_suffix' => ' '.TB_('words') ) );
 
 	$Form->checklist( array(
-		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
-		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
-		), 'canonical_item_urls_options', T_('Make canonical') );
+		array( 'canonical_item_urls', 1, sprintf( TB_('301 redirect to canonical URL when possible (but not to <a %s>External canonical URL</a> %s)'), 'href="'.get_manual_url( 'external-canonical-url' ).'"', get_pro_label() ), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'allow_crosspost_urls', 1, TB_('Do not 301 redirect cross-posted Items'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'relcanonical_item_urls', 1, TB_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
+		array( 'self_canonical_item_urls', 1, TB_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_item_urls' ) ),
+		), 'canonical_item_urls_options', TB_('Make canonical') );
 
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
-			T_('Meta description'), T_('When no meta description is provided for an item, use the excerpt instead.') );
+			TB_('Meta description'), TB_('When no meta description is provided for an item, use the excerpt instead.') );
 
 	$Form->checkbox( 'tags_meta_keywords', $edited_Blog->get_setting( 'tags_meta_keywords' ),
-			T_('Meta Keywords'), T_('When no meta keywords are provided for an item, use tags instead.') );
-
-	$Form->checkbox( 'tags_open_graph', $edited_Blog->get_setting( 'tags_open_graph' ),
-			T_('Open Graph'), T_('Open Graph tags').' (og:title, og:url, og:description, og:type and og:image)' );
-
-	$Form->checkbox( 'tags_twitter_card', $edited_Blog->get_setting( 'tags_twitter_card' ),
-			T_('Twitter Card'), T_('Include Twitter Summary card') );
-
+			TB_('Meta Keywords'), TB_('When no meta keywords are provided for an item, use tags instead.') );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive_pages_seo') );
+$Form->begin_fieldset( TB_('"By date" archives').get_manual_link('archive-pages-seo') );
 
 	$Form->radio( 'archive_links', $edited_Blog->get_setting('archive_links'),
 		array(
-				array( 'param', T_('Use param'), T_('E-g: ')
+				array( 'param', TB_('Use param'), TB_('E-g: ')
 								.url_add_param( $blogurl, '<strong>m=20071231</strong>' ) ),
-				array( 'extrapath', T_('Use extra-path'), T_('E-g: ')
+				array( 'extrapath', TB_('Use extra-path'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/2007/12/31/</strong>' ) ),
-			), T_('Date archive URLs'), true );
+			), TB_('Date archive URLs'), true );
 
 	$Form->checklist( array(
-		array( 'canonical_archive_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_archive_urls' ) ),
-		array( 'relcanonical_archive_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_archive_urls' ) ),
-		), 'canonical_archive_urls_options', T_('Make canonical') );
+		array( 'canonical_archive_urls', 1, TB_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_archive_urls' ) ),
+		array( 'relcanonical_archive_urls', 1, TB_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_archive_urls' ) ),
+		array( 'self_canonical_archive_urls', 1, TB_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_archive_urls' ) ),
+		), 'canonical_archive_urls_options', TB_('Make canonical') );
 
-	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Indexing'), T_('META NOINDEX') );
-	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), T_('Follow TO'), T_('NOFOLLOW on links to').' '.T_('date archives') );
+	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), TB_('Indexing'), TB_('META NOINDEX') );
+	$Form->checkbox( 'archive_nofollowto', $edited_Blog->get_setting( 'archive_nofollowto' ), TB_('Follow TO'), TB_('NOFOLLOW on links to').' '.TB_('date archives') );
 
 	$Form->radio( 'archive_content', $edited_Blog->get_setting('archive_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
-			), T_('Post contents'), true );
+				array( 'excerpt', TB_('Post excerpts'), '('.TB_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', TB_('Standard post contents (stopping at "[teaserbreak]")'), '('.TB_('Teaser images will be displayed').')' ),
+				array( 'full', TB_('Full post contents (including after "[teaserbreak]")'), '('.TB_('All images will be displayed').')' ),
+			), TB_('Post contents'), true );
 
-	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, T_('Posts per page'),
-								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+	$Form->text( 'archive_posts_per_page', $edited_Blog->get_setting('archive_posts_per_page'), 4, TB_('Posts per page'),
+								TB_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
-	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), T_('Archive directory'), T_('META NOINDEX') );
+	$Form->checkbox( 'arcdir_noindex', $edited_Blog->get_setting( 'arcdir_noindex' ), TB_('Archive directory'), TB_('META NOINDEX') );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo') );
+$Form->begin_fieldset( TB_('Category pages').get_manual_link('category-pages-seo') );
 
 	$Form->radio( 'chapter_links', $edited_Blog->get_setting('chapter_links'),
 		array(
-				array( 'param_num', T_('Use param: cat ID'), T_('E-g: ')
+				array( 'param_num', TB_('Use param: cat ID'), TB_('E-g: ')
 								.url_add_param( $blogurl, '<strong>cat=123</strong>' ),'', 'onclick="show_hide_chapter_prefix(this);"'),
-				array( 'subchap', T_('Use extra-path: sub-category'), T_('E-g: ')
+				array( 'subchap', TB_('Use extra-path: sub-category'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/subcat/</strong>' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
-				array( 'chapters', T_('Use extra-path: category path'), T_('E-g: ')
+				array( 'chapters', TB_('Use extra-path: category path'), TB_('E-g: ')
 								.url_add_tail( $blogurl, '<strong>/cat/subcat/</strong>' ), '', 'onclick="show_hide_chapter_prefix(this);"' ),
-			), T_('Category URLs'), true );
+			), TB_('Category URLs'), true );
 
 		echo '<div id="category_prefix_container">';
-			$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, T_('Prefix'),
-														T_('An optional prefix to be added to the URLs of the categories'),
+			$Form->text_input( 'category_prefix', $edited_Blog->get_setting( 'category_prefix' ), 30, TB_('Prefix'),
+														TB_('An optional prefix to be added to the URLs of the categories'),
 														array('maxlength' => 120) );
 		echo '</div>';
 		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
 		{ ?>
-		<script type="text/javascript">
+		<script>
 			<!--
 			var fldset = document.getElementById( 'category_prefix_container' );
 			fldset.style.display = 'none';
@@ -191,75 +215,83 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 		}
 
 	$Form->checklist( array(
-		array( 'canonical_cat_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_cat_urls' ) ),
-		array( 'relcanonical_cat_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_cat_urls' ) ),
-		), 'canonical_cat_urls_options', T_('Make canonical') );
+		array( 'canonical_cat_urls', 1, TB_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_cat_urls' ) ),
+		array( 'relcanonical_cat_urls', 1, TB_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_cat_urls' ) ),
+		array( 'self_canonical_cat_urls', 1, TB_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_cat_urls' ) ),
+		), 'canonical_cat_urls_options', TB_('Make canonical') );
 
-	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checklist( array(
+		array( 'chapter_noindex', 1, TB_('META NOINDEX for category pages without intro'), $edited_Blog->get_setting( 'chapter_noindex' ) ),
+		array( 'chapter_intro_noindex', 1, TB_('META NOINDEX for category pages with an intro'), $edited_Blog->get_setting( 'chapter_intro_noindex' ) ),
+		), 'chapter_noindex', TB_('Indexing') );
 
 	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
-			), T_('Post contents'), true );
+				array( 'excerpt', TB_('Post excerpts'), '('.TB_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', TB_('Standard post contents (stopping at "[teaserbreak]")'), '('.TB_('Teaser images will be displayed').')' ),
+				array( 'full', TB_('Full post contents (including after "[teaserbreak]")'), '('.TB_('All images will be displayed').')' ),
+			), TB_('Post contents'), true );
 
-	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, T_('Posts per page'),
-								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+	$Form->text( 'chapter_posts_per_page', $edited_Blog->get_setting('chapter_posts_per_page'), 4, TB_('Posts per page'),
+								TB_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
-	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), T_('Category directory'), T_('META NOINDEX') );
+	$Form->checkbox( 'catdir_noindex', $edited_Blog->get_setting( 'catdir_noindex' ), TB_('Category directory'), TB_('META NOINDEX') );
 	$Form->checkbox( 'categories_meta_description', $edited_Blog->get_setting( 'categories_meta_description' ),
-			T_('Meta description'), T_('Use category description as meta description for category pages') );
+			TB_('Meta description'), TB_('Use category description as meta description for category pages') );
 
 	$Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('id'=>'tag_links_fieldset') );
+$Form->begin_fieldset( TB_('Tag pages').get_manual_link('tag-pages-seo'), array('id'=>'tag_links_fieldset') );
 
 	$Form->radio( 'tag_links', $edited_Blog->get_setting('tag_links'),
 		array(
-			array( 'param', T_('Use param'), T_('E-g: ')
+			array( 'param', TB_('Use param'), TB_('E-g: ')
 				.url_add_param( $blogurl, '<strong>tag=mytag</strong>' ) ),
-			array( 'prefix-only', T_('Use extra-path').': '.'Use URL path prefix only (recommended)', T_('E-g: ')
+			array( 'prefix-only', TB_('Use extra-path').': '.'Use URL path prefix only (recommended)', TB_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag</strong>' ) ),
-			array( 'dash', T_('Use extra-path').': '.'trailing dash', T_('E-g: ')
+			array( 'dash', TB_('Use extra-path').': '.'trailing dash', TB_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag-</strong>' ) ),
-			array( 'colon', T_('Use extra-path').': '.'trailing colon', T_('E-g: ')
+			array( 'colon', TB_('Use extra-path').': '.'trailing colon', TB_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag:</strong>' ) ),
-			array( 'semicolon', T_('Use extra-path').': '.'trailing semi-colon (NOT recommended)', T_('E-g: ')
+			array( 'semicolon', TB_('Use extra-path').': '.'trailing semi-colon (NOT recommended)', TB_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/<span class="tag_links_tag_prefix"></span>mytag;</strong>' ) ),
-		), T_('Tag page URLs'), true );
+		), TB_('Tag page URLs'), true );
 
 
-	$Form->text_input( 'tag_prefix', $edited_Blog->get_setting( 'tag_prefix' ), 30, T_('Prefix'),
-		T_('An optional prefix to be added to the URLs of the tag pages'),
+	$Form->text_input( 'tag_prefix', $edited_Blog->get_setting( 'tag_prefix' ), 30, TB_('Prefix'),
+		TB_('An optional prefix to be added to the URLs of the tag pages'),
 		array('maxlength' => 120) );
 
-	$Form->checkbox( 'tag_rel_attrib', $edited_Blog->get_setting( 'tag_rel_attrib' ), T_('Rel attribute'),
-		sprintf( T_('Add <a %s>rel="tag" attribute</a> to tag links.'), 'href="http://microformats.org/wiki/rel-tag"' ) );
+	$Form->checkbox( 'tag_rel_attrib', $edited_Blog->get_setting( 'tag_rel_attrib' ), TB_('Rel attribute'),
+		sprintf( TB_('Add <a %s>rel="tag" attribute</a> to tag links.'), 'href="http://microformats.org/wiki/rel-tag"' ) );
 
 	$Form->checklist( array(
-		array( 'canonical_tag_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_tag_urls' ) ),
-		array( 'relcanonical_tag_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_tag_urls' ) ),
-		), 'canonical_tag_urls_options', T_('Make canonical') );
+		array( 'canonical_tag_urls', 1, TB_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_tag_urls' ) ),
+		array( 'relcanonical_tag_urls', 1, TB_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_tag_urls' ) ),
+		array( 'self_canonical_tag_urls', 1, TB_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_tag_urls' ) ),
+		), 'canonical_tag_urls_options', TB_('Make canonical') );
 
-	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checklist( array(
+		array( 'tag_noindex', 1, TB_('META NOINDEX for tag pages without intro'), $edited_Blog->get_setting( 'tag_noindex' ) ),
+		array( 'tag_intro_noindex', 1, TB_('META NOINDEX for tag pages with an intro'), $edited_Blog->get_setting( 'tag_intro_noindex' ) ),
+		), 'tag_noindex', TB_('Indexing') );
 
 	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
-			), T_('Post contents'), true );
+				array( 'excerpt', TB_('Post excerpts'), '('.TB_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', TB_('Standard post contents (stopping at "[teaserbreak]")'), '('.TB_('Teaser images will be displayed').')' ),
+				array( 'full', TB_('Full post contents (including after "[teaserbreak]")'), '('.TB_('All images will be displayed').')' ),
+			), TB_('Post contents'), true );
 
-	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, T_('Posts per page'),
-								T_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
+	$Form->text( 'tag_posts_per_page', $edited_Blog->get_setting('tag_posts_per_page'), 4, TB_('Posts per page'),
+								TB_('Leave empty to use blog default').' ('.$edited_Blog->get_setting('posts_per_page').')', 4 );
 
 	$Form->end_fieldset();
 
 // Javascript juice for the tag fields.
 ?>
-<script type="text/javascript">
+<script>
 jQuery("#tag_links_fieldset input[name=tag_links][type=radio]").click( function()
 {
 	// Disable tag_prefix, if "param" is used. fp> TODO: visual feedback that this is disabled
@@ -294,49 +326,74 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
-$Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other_filtered_pages_seo') );
-	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
+$Form->begin_fieldset( TB_('User profile pages').get_manual_link( 'user_pages_seo' ), array( 'id' => 'user_links_fieldset' ) );
+	$Form->checklist( array(
+		array( 'canonical_user_urls', 1, TB_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_user_urls' ) ),
+		), 'canonical_user_urls_options', TB_('Make canonical') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( TB_('Other filtered pages').get_manual_link('other-filtered-pages-seo') );
+	$Form->checklist( array(
+		array( 'filtered_noindex', 1, TB_('META NOINDEX for filtered pages without intro'), $edited_Blog->get_setting( 'filtered_noindex' ) ),
+		array( 'filtered_intro_noindex', 1, TB_('META NOINDEX for filtered pages with an intro'), $edited_Blog->get_setting( 'filtered_intro_noindex' ) ),
+		), 'filtered_noindex', TB_('Indexing'), false, false, array( 'note' => TB_('Filtered by keyword search, by author, etc.') ) );
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
 		array(
-				array( 'excerpt', T_('Post excerpts'), '('.T_('No Teaser images will be displayed on default skins').')' ),
-				array( 'normal', T_('Standard post contents (stopping at "[teaserbreak]")'), '('.T_('Teaser images will be displayed').')' ),
-				array( 'full', T_('Full post contents (including after "[teaserbreak]")'), '('.T_('All images will be displayed').')' ),
-			), T_('Post contents'), true );
+				array( 'excerpt', TB_('Post excerpts'), '('.TB_('No Teaser images will be displayed on default skins').')' ),
+				array( 'normal', TB_('Standard post contents (stopping at "[teaserbreak]")'), '('.TB_('Teaser images will be displayed').')' ),
+				array( 'full', TB_('Full post contents (including after "[teaserbreak]")'), '('.TB_('All images will be displayed').')' ),
+			), TB_('Post contents'), true );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Other pages').get_manual_link('other_pages_seo') );
-	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
-										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
-	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),
-										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
-	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'),
-										T_('META NOINDEX').' - '.T_('Pages with no index setting of their own... yet.') );
+$Form->begin_fieldset( TB_('Download pages').get_manual_link( 'download-display-seo' ) );
+	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), TB_('Indexing'), TB_('META NOINDEX') );
+	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), TB_('No Follow TO'), TB_('NOFOLLOW on links leading to download pages') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( TB_('Contact/Message Form pages').get_manual_link( 'contact-message-form-pages-seo' ) );
+	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), TB_('Indexing'),
+										TB_('META NOINDEX').' - '.TB_('WARNING: Letting search engines index contact forms will attract spam.') );
+	$Form->checkbox( 'msgform_nofollowto', $edited_Blog->get_setting( 'msgform_nofollowto' ), TB_('No Follow TO'), TB_('NOFOLLOW on links leading to contact/message form pages') );
+	$Form->text_input( 'msgform_redirect_slug', $edited_Blog->get_setting( 'msgform_redirect_slug' ), 100, TB_('Default redirect after message send'), TB_('Enter slug or leave empty to redirect to front page of current collection.') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( TB_('Other pages').get_manual_link('other-pages-seo') );
+	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), TB_('Comment popups'),
+										TB_('META NOINDEX').' - '.TB_('For skins with comment popups only.') );
+	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), TB_('Other special pages'),
+										TB_('META NOINDEX').' - '.TB_('Pages with no index setting of their own... yet.') );
 	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
 		array(
-				array( '200', T_('200 "OK" response') ),
-				array( '301', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '301' ) ),
-				array( '302', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '302' ) ),
-				array( '303', sprintf( /* TRANS: 301, 302, 303... */ T_('%s redirect to main page'), '303' ) ),
-				array( '404', T_('404 "Not found" response') ),
-				array( '410', T_('410 "Gone" response') ),
-			), T_('404 "Not Found" response'), true );
+				array( '200', TB_('200 "OK" response') ),
+				array( '301', sprintf( /* TRANS: 301, 302, 303... */ TB_('%s redirect to main page'), '301' ) ),
+				array( '302', sprintf( /* TRANS: 301, 302, 303... */ TB_('%s redirect to main page'), '302' ) ),
+				array( '303', sprintf( /* TRANS: 301, 302, 303... */ TB_('%s redirect to main page'), '303' ) ),
+				array( '404', TB_('404 "Not Found" response') ),
+				array( '410', TB_('410 "Gone" response') ),
+			), TB_('404 "Not Found" response'), true );
 
 	$Form->radio( 'help_link', $edited_Blog->get_setting('help_link'),
 		array(
-			array( 'param', T_('Use param').': ?disp=help', T_('E-g: ')
+			array( 'param', TB_('Use param').': ?disp=help', TB_('E-g: ')
 				.url_add_param( $blogurl, '<strong>disp=help</strong>' ) ),
-			array( 'slug', T_('Use extra-path').': '.'/help', T_('E-g: ')
+			array( 'slug', TB_('Use extra-path').': '.'/help', TB_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/help</strong>' ) ),
-			), T_('Help page'), true );
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-seo' ) );
-	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
-	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
+			), TB_('Help page'), true );
 $Form->end_fieldset();
 
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
+<script>
+jQuery( 'input[name=canonical_item_urls]' ).click( function()
+{
+	var canonical_item_urls_is_unchecked = ! jQuery( this ).prop( 'checked' );
+	jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'disabled', canonical_item_urls_is_unchecked );
+	if( canonical_item_urls_is_unchecked )
+	{	// When "301 redirect to canonical URL" is disabled then we always must NOT do 301 redirect cross-posted Items:
+		jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'checked', true );
+	}
+} );
+</script>

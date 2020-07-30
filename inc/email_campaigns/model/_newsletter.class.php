@@ -33,6 +33,14 @@ class Newsletter extends DataObject
 
 	var $order;
 
+	var $owner_user_ID;
+
+	var $owner_User = NULL;
+
+	var $perm_subscribe = 'anyone';
+
+	var $perm_groups = '';
+
 	/**
 	 * @var array IDs of subscribed users
 	 */
@@ -48,13 +56,24 @@ class Newsletter extends DataObject
 		// Call parent constructor:
 		parent::__construct( 'T_email__newsletter', 'enlt_', 'enlt_ID' );
 
-		if( $db_row !== NULL )
+		if( $db_row === NULL )
+		{
+			if( is_logged_in() )
+			{	// Use current User for new creating Automation:
+				global $current_User;
+				$this->owner_User = $current_User;
+			}
+		}
+		else
 		{
 			$this->ID = $db_row->enlt_ID;
 			$this->name = $db_row->enlt_name;
 			$this->label = $db_row->enlt_label;
 			$this->active = $db_row->enlt_active;
 			$this->order = $db_row->enlt_order;
+			$this->owner_user_ID = $db_row->enlt_owner_user_ID;
+			$this->perm_subscribe = $db_row->enlt_perm_subscribe;
+			$this->perm_groups = $db_row->enlt_perm_groups;
 		}
 	}
 
@@ -112,6 +131,30 @@ class Newsletter extends DataObject
 		param( 'enlt_order', 'integer', NULL );
 		$this->set_from_Request( 'order', 'enlt_order', true );
 
+		// Owner:
+		$enlt_owner_login = param( 'enlt_owner_login', 'string', NULL );
+		$UserCache = & get_UserCache();
+		$owner_User = & $UserCache->get_by_login( $enlt_owner_login );
+		if( empty( $owner_User ) )
+		{
+			param_error( 'owner_login', sprintf( T_('User &laquo;%s&raquo; does not exist!'), $enlt_owner_login ) );
+		}
+		else
+		{
+			$this->set( 'owner_user_ID', $owner_User->ID );
+			$this->owner_User = & $owner_User;
+		}
+
+		// Self-subscribing:
+		param( 'enlt_perm_subscribe', 'string', true );
+		$this->set_from_Request( 'perm_subscribe' );
+
+		if( $this->get( 'perm_subscribe' ) == 'group' )
+		{	// Allowed User Groups:
+			$perm_groups = param( 'enlt_perm_groups', 'array:integer' );
+			$this->set( 'perm_groups', implode( ',', $perm_groups ) );
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -124,6 +167,23 @@ class Newsletter extends DataObject
 	function get_name()
 	{
 		return $this->get( 'name' );
+	}
+
+
+	/**
+	 * Get owner User
+	 *
+	 * @return object|NULL|boolean Reference on cached owner User object, NULL - if request with empty ID, FALSE - if requested owner User does not exist
+	 */
+	function & get_owner_User()
+	{
+		if( $this->owner_User === NULL )
+		{	// Load owner User into cache var:
+			$UserCache = & get_UserCache();
+			$this->owner_User = & $UserCache->get_by_ID( $this->owner_user_ID, false, false );
+		}
+
+		return $this->owner_User;
 	}
 
 

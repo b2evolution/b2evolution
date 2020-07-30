@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -38,6 +38,143 @@ function cron_log( $message, $level = 0 )
 	{
 		echo "\n".$message."\n";
 	}
+}
+
+
+/**
+ * Append cron log and store in DB each 1 second OR 4096 bytes of the log message
+ *
+ * @param string Message text
+ * @param string Message type: 'success', 'warning', 'error', 'note', NULL - to use default text without addition style color
+ * @param string New line
+ */
+function cron_log_append( $message, $type = NULL, $nl = "\n" )
+{
+	global $result_message, $cron_log_last_time, $cron_log_buffer_size, $cron_log_actions_num;
+
+	if( ! isset( $result_message ) )
+	{	// Initialize a var for cron log message:
+		$result_message = '';
+	}
+
+	if( ! isset( $cron_log_buffer_size ) )
+	{	// Initialize a var to count a cron log message length:
+		$cron_log_buffer_size = 0;
+	}
+
+	if( ! isset( $cron_log_actions_num ) )
+	{	// Initialize a var to count cron log actions:
+		$cron_log_actions_num = 0;
+	}
+
+	if( ! empty( $message ) )
+	{
+		// Set style for message depending on type:
+		switch( $type )
+		{
+			case 'success':
+				$message = '<span class="green">'.$message.'</span>';
+				break;
+			case 'error':
+				$message = '<span class="red">'.$message.'</span>';
+				break;
+			case 'warning':
+				$message = '<span class="orange">'.$message.'</span>';
+				break;
+			case 'note':
+				$message = '<span class="grey">'.$message.'</span>';
+				break;
+		}
+
+		// Append new line:
+		$message .= $nl;
+	}
+
+	// Append new message to the cron log:
+	$result_message .= $message;
+
+	// Update buffer size:
+	$cron_log_buffer_size += strlen( $message );
+
+	if( $cron_log_buffer_size >= 4096 ||
+	    ( isset( $cron_log_last_time ) && ( time() - $cron_log_last_time ) >= 1 ) )
+	{	// If log buffer >= 4096 OR last time execution >= 1 second:
+		if( $cron_log_buffer_size >= 4096 )
+		{	// Reset buffer size to count a next portion:
+			$cron_log_buffer_size = 0;
+		}
+
+		// We must update cron log in DB in order to don't lose it on unexpected crash:
+		global $DB, $ctsk_ID, $time_difference;
+		if( ! empty( $ctsk_ID ) )
+		{	// We can update only cron job which is executing right now:
+			$DB->query( 'UPDATE T_cron__log
+				  SET clog_messages = '.$DB->quote( $result_message ).',
+				      clog_actions_num = '.$DB->quote( $cron_log_actions_num ).',
+				      clog_realstop_datetime = '.$DB->quote( date2mysql( time() + $time_difference ) ).'
+				WHERE clog_ctsk_ID = '.$ctsk_ID,
+				'Update a log message of the executing cron job #'.$ctsk_ID );
+		}
+	}
+
+	// Update a time global var to compare with next time:
+	$cron_log_last_time = time();
+}
+
+
+/**
+ * Count a number of cron job actions and append cron log
+ *
+ * @param string Message
+ * @param string Message type: 'success', 'warning', 'error', 'note'
+ * @param string New line
+ */
+function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
+{
+	global $cron_log_actions_num;
+
+	if( ! isset( $cron_log_actions_num ) )
+	{	// Initialize a var to count cron log actions:
+		$cron_log_actions_num = 0;
+	}
+
+	// Mark this as separate action:
+	$cron_log_actions_num++;
+
+	// Append cron log:
+	cron_log_append( $message.get_cron_log_time( $cron_log_actions_num ), $type, $nl );
+}
+
+
+/**
+ * Set a number of cron job actions.
+ *
+ * Used for manual updating the actions number when cron job has no separate
+ * actions, but it does many actions by single code like mysql query.
+ *
+ * @param integer Number of actions
+ */
+function cron_log_report_action_count( $num )
+{
+	global $cron_log_actions_num;
+	$cron_log_actions_num = $num;
+}
+
+
+/**
+ * Get a time of cron log
+ *
+ * @param integer A number of cron log action
+ * @return string Cron log time
+ */
+function get_cron_log_time( $action_num = NULL )
+{
+	global $Timer;
+
+	return '<div class="note">'
+			.( $action_num === NULL ? '' : 'Action #'.$action_num.' Finished. ' )
+			.'Elapsed time since beginning of task: '.$Timer->get_duration( 'cron_exec' ).' seconds'
+		.'</div>';
 }
 
 
@@ -113,8 +250,8 @@ function call_job( $job_key, $job_params = array() )
 
 	if( $error_code != 1 )
 	{	// We got an error
-		$result_status = 'error';
-		$result_message_text = '[Error code: '.$error_code.' ] '.$result_message_text;
+		$result_status = ( $error_code == 20 ? 'imap_error' : 'error' );
+		$result_message_text = '[Error code: '.$error_code.']'."\n".$result_message_text;
 		if( is_array( $result_message ) )
 		{ // If result is array
 			$result_message['message'] = $result_message_text;
@@ -136,8 +273,8 @@ function call_job( $job_key, $job_params = array() )
 	else
 	{	// Is CLI mode?
 		$result_message_text = str_replace(
-			array( '<br>', '<b>', '</b>', '&#8800;', '&#8804;', '&#8805;' ),
-			array( "\n", '*', '*', '!=', '<=', '>=' ),
+			array( '<br>', '<b>', '</b>', '<code>', '</code>', '&#8800;', '&#8804;', '&#8805;' ),
+			array( "\n", '*', '*', '`', '`', '!=', '<=', '>=' ),
 			$result_message_text );
 	}
 
@@ -146,6 +283,39 @@ function call_job( $job_key, $job_params = array() )
 		.( $is_web ? '<br>' : "\n" ).'Message: '.$result_message_text, $cron_log_level );
 
 	return $error_message;
+}
+
+
+/**
+ * Get status titles
+ *
+ * @return array
+ */
+function cron_statuses()
+{
+	return array(
+			'pending'    => T_('Pending'),
+			'started'    => T_('Started'),
+			'warning'    => T_('Warning'),
+			'timeout'    => T_('Timed out'),
+			'error'      => T_('Error'),
+			'imap_error' => T_('IMAP error'),
+			'finished'   => T_('Finished'),
+		);
+}
+
+
+/**
+ * Get status title of sheduled job by status value
+ *
+ * @param string Status
+ * @return string Title
+ */
+function cron_status_title( $status )
+{
+	$titles = cron_statuses();
+
+	return isset( $titles[ $status ] ) ? $titles[ $status ] : $status;
 }
 
 
@@ -163,6 +333,7 @@ function cron_status_color( $status )
 			'warning'  => 'dbdb57',
 			'timeout'  => 'e09952',
 			'error'    => 'cb4d4d',
+			'imap_error' => 'cb4d4d',
 			'finished' => '34b27d',
 		);
 
@@ -226,7 +397,7 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 					$ItemCache = & get_ItemCache();
 					if( $Item = $ItemCache->get_by_ID( $job_params['item_ID'], false, false ) )
 					{
-						$job_name = sprintf( $job_name, $Item->get( 'title' ) );
+						$job_name = sprintf( $job_name, $Item->ID, $Item->get( 'title' ) );
 					}
 				}
 				break;
@@ -255,7 +426,7 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 					$EmailCampaignCache = & get_EmailCampaignCache();
 					if( $EmailCampaign = $EmailCampaignCache->get_by_ID( $job_params['ecmp_ID'], false, false ) )
 					{
-						$email_campaign_title = $EmailCampaign->get( 'email_title' );
+						$email_campaign_title = $EmailCampaign->get( 'name' );
 					}
 				}
 				$job_name = sprintf( $job_name, $Settings->get( 'email_campaign_chunk_size' ), $email_campaign_title );
@@ -276,14 +447,22 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
  */
 function detect_timeout_cron_jobs( $error_task = NULL )
 {
-	global $DB, $time_difference, $cron_timeout_delay, $admin_url;
+	global $DB, $time_difference, $admin_url;
+
+	// Convert time difference to mysql format:
+	$mysql_time_difference = intval( $time_difference );
+	if( $mysql_time_difference >= 0 )
+	{	// Negative value already has a sign "-", but for positive value we must add a sigh "+" for correct mysql operation below:
+		$mysql_time_difference = '+ '.$mysql_time_difference;
+	}
 
 	$SQL = new SQL( 'Find cron timeouts' );
 	$SQL->SELECT( 'ctsk_ID, ctsk_name, ctsk_key' );
 	$SQL->FROM( 'T_cron__log' );
 	$SQL->FROM_add( 'INNER JOIN T_cron__task ON ctsk_ID = clog_ctsk_ID' );
+	$SQL->FROM_add( 'LEFT JOIN T_settings ON set_name = CONCAT( "cjob_timeout_", ctsk_key )' );
 	$SQL->WHERE( 'clog_status = "started"' );
-	$SQL->WHERE_and( 'clog_realstart_datetime < '.$DB->quote( date2mysql( time() + $time_difference - $cron_timeout_delay ) ) );
+	$SQL->WHERE_and( 'UNIX_TIMESTAMP( clog_realstart_datetime ) < UNIX_TIMESTAMP() - IFNULL( set_value, 600 ) - 120 '.$mysql_time_difference );
 	$SQL->GROUP_BY( 'ctsk_ID' );
 	$timeout_tasks = $DB->get_results( $SQL );
 
@@ -302,10 +481,7 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			{ // Try to get default task name by key:
 				$task_name = ( isset( $cron_jobs_names[ $timeout_task->ctsk_key ] ) ? $cron_jobs_names[ $timeout_task->ctsk_key ] : $timeout_task->ctsk_key );
 			}
-			$tasks[ $timeout_task->ctsk_ID ] = array(
-					'name'    => $task_name,
-					'message' => NT_('Cron job has timed out.'),	// Here is not a good place to translate! We don't know the language of the recipient here.
-				);
+			$tasks[ $timeout_task->ctsk_ID ] = $task_name;
 		}
 
 		// Update timed out cron jobs:
@@ -314,17 +490,30 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Mark timeouts in cron jobs.' );
 	}
 
-	if( !is_null( $error_task ) )
-	{ // Send notification with error task
-		$tasks[ $error_task['ID'] ] = $error_task;
-	}
-
-	if( count( $tasks ) > 0 )
-	{ // Send notification email about timed out and error cron jobs to users with edit options permission
+	$timeout_tasks_num = count( $tasks );
+	if( $timeout_tasks_num > 0 || $error_task !== NULL )
+	{	// Send notification email about timed out and error cron jobs to users with edit options permission:
 		$email_template_params = array(
-				'tasks' => $tasks,
+				'timeout_tasks' => $tasks,
+				'error_task'    => $error_task,
 			);
-		send_admin_notification( NT_('Scheduled task error'), 'scheduled_task_error_report', $email_template_params );
+		if( $timeout_tasks_num > 1 || ( $error_task !== NULL && $timeout_tasks_num > 0 ) )
+		{	// Set email subject for multiple cron jobs:
+			$email_subject = NT_('Errors in multiple scheduled tasks');
+		}
+		elseif( $error_task !== NULL )
+		{	// Use name of error task in email subject:
+			$email_subject = array( NT_('Error in task: %s'), $error_task['name'] );
+		}
+		else
+		{	// Use name of first timed out task in email subject:
+			foreach( $tasks as $timeout_task_name )
+			{
+				$email_subject = array( NT_('Error in task: %s'), $timeout_task_name );
+				break;
+			}
+		}
+		send_admin_notification( $email_subject, 'scheduled_task_error_report', $email_template_params );
 	}
 }
 
@@ -451,7 +640,7 @@ function cron_job_sql_query( $fields = 'key,name' )
 	// We need to set the collation explicitly if the current db connection charset is utf-8 in order to avoid "Illegal mix of collation" issue
 	// Basically this is a hack which should be reviewed when the charset issues are fixed generally.
 	// TODO: asimo>Review this temporary solution after the charset issues were fixed.
-	$default_collation = ( $DB->connection_charset == 'utf8' ) ? ' COLLATE utf8_general_ci' : '';
+	$default_collation = ( $DB->connection_charset == 'utf8' ) ? ' COLLATE utf8mb4_unicode_ci' : '';
 
 	$name_query = '';
 	if( !empty( $cron_jobs_config ) )
@@ -535,10 +724,10 @@ function cron_job_error_handler()
  */
 function cron_job_shutdown()
 {
-	global $result_message, $ctsk_ID, $DB;
+	global $result_message, $ctsk_ID, $ctsk_name, $DB;
 
 	if( empty( $ctsk_ID ) )
-	{	// Run rgus function to detect only interrupted corn jobs:
+	{	// Run this function to detect only interrupted cron jobs:
 		return;
 	}
 
@@ -551,5 +740,12 @@ function cron_job_shutdown()
 		      clog_messages = '.$DB->quote( $result_message ).'
 		WHERE clog_ctsk_ID = '.$ctsk_ID,
 		'Record task as finished with error by shutdown function.' );
+
+	// Detect timed out tasks and send notification about timed out and error tasks:
+	detect_timeout_cron_jobs( array(
+			'ID'      => $ctsk_ID,
+			'name'    => $ctsk_name,
+			'message' => $result_message,
+		) );
 }
 ?>

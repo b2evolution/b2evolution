@@ -7,14 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $current_User, $admin_url;
+global $admin_url;
 
 $SQL = new SQL();
 $SQL->SELECT( 'tag_ID, tag_name, COUNT( it.itag_itm_ID ) AS tag_count' );
@@ -55,11 +55,6 @@ $Results = new Results( $SQL->get(), 'tag_', 'A', NULL, $count_SQL->get() );
 $Results->title = T_('Tags').' ('.$Results->get_total_rows().')'.get_manual_link( 'item-tags-list' );
 $Results->Cache = get_ItemTagCache();
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=itemtags', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 /**
  * Callback to add filters on top of the result set
  *
@@ -82,16 +77,16 @@ function filter_tags( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_tags',
 	'url_ignore' => 'tag_filter,results_tag_page',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=itemtags' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=itemtags' );
+
 
 function tag_td_name( $tag_ID, $tag_name )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Display tag name as link to edit form only if current user has a perm:
 		$tag_name = '<a href="'.$admin_url.'?ctrl=itemtags&amp;tag_ID='.$tag_ID
 				.'&amp;action=edit&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'">'
@@ -102,7 +97,7 @@ function tag_td_name( $tag_ID, $tag_name )
 }
 $Results->cols[] = array(
 		'th'       => /* TRANS: noun */ T_('Tag'),
-		'order'    => 'tag_name COLLATE utf8_general_ci',
+		'order'    => 'tag_name COLLATE utf8mb4_bin',
 		'td'       => '%tag_td_name( #tag_ID#, #tag_name# )%',
 	);
 
@@ -116,7 +111,7 @@ $Results->cols[] = array(
 	);
 
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	function tag_td_actions( $tag_ID )
 	{
@@ -131,7 +126,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			'td' => '%tag_td_actions( #tag_ID# )%',
 		);
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Allow to clean up tags only if current user has a permission to edit tags:
 		$Results->global_icon( T_('Cleanup orphans'), 'cleanup', regenerate_url( 'action', 'action=cleanup&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ) ).'&amp;'.url_crumb( 'tag' ), T_('Cleanup orphans'), 3, 4 );
 	}

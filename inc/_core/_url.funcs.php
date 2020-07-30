@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -289,11 +289,18 @@ function _http_wrapper_last_status( & $headers )
  *                       is available)
  * @param integer Timeout (default: 15 seconds)
  * @param integer Maximum size in kB
+ * @param array Additional parameters
  * @return string|false The remote page as a string; false in case of error
  */
-function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL )
+function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL, $params = array() )
 {
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
+	$params = array_merge( array(
+			'method'       => 'GET',
+			'content_type' => '',
+			'fields'       => '', // Array or string of POST/GET fields
+		), $params );
 
 	$info = array(
 		'error' => '',
@@ -314,6 +321,14 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+		if( $params['method'] == 'POST' )
+		{	// Use POST method:
+			curl_setopt( $ch, CURLOPT_POST, true );
+		}
+		if( ! empty( $params['fields'] ) )
+		{	// Add fields for the request:
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $params['fields'] );
+		}
 
 		// Set proxy:
 		if( !empty($outgoing_proxy_hostname) )
@@ -350,23 +365,52 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			return false;
 		}
 
+		if( isset( $url_parsed['scheme'] ) && $url_parsed['scheme'] == 'https' )
+		{	// Special params for https urls:
+			$host_prefix = 'ssl://';
+			$default_port = 443;
+		}
+		else
+		{	// Default params for normal urls:
+			$host_prefix = '';
+			$default_port = 80;
+		}
+
 		$host = $url_parsed['host'];
-		$port = empty( $url_parsed['port'] ) ? 80 : $url_parsed['port'];
+		$port = empty( $url_parsed['port'] ) ? $default_port : $url_parsed['port'];
 		$path = empty( $url_parsed['path'] ) ? '/' : $url_parsed['path'];
 		if( ! empty( $url_parsed['query'] ) )
 		{
 			$path .= '?'.$url_parsed['query'];
 		}
 
-		$out = 'GET '.$path.' HTTP/1.1'."\r\n";
+		if( ! empty( $params['fields'] ) )
+		{	// Convert fields array to string:
+			$url_fields_string = ( is_array( $params['fields'] ) ? http_build_query( $params['fields'] ) : $params['fields'] );
+		}
+
+		$out = $params['method'].' '.$path.' HTTP/1.1'."\r\n";
 		$out .= 'Host: '.$host;
 		if( ! empty( $url_parsed['port'] ) )
 		{	// we don't want to add :80 if not specified. remote end may not resolve it. (e-g b2evo multiblog does not)
 			$out .= ':'.$port;
 		}
-		$out .= "\r\n".'Connection: Close'."\r\n\r\n";
+		$out .= "\r\n";
+		if( ! empty( $params['content_type'] ) )
+		{
+			$out .= 'Content-type: '.$params['content_type']."\r\n";
+		}
+		if( ! empty( $url_fields_string ) )
+		{
+			$out .= 'Content-length: '.strlen( $url_fields_string )."\r\n";
+		}
+		$out .= 'Connection: close'."\r\n\r\n";
+		if( ! empty( $url_fields_string ) )
+		{	// Append fields to the request:
+			$out .= $url_fields_string;
+		}
 
-		$fp = @fsockopen( $host, $port, $errno, $errstr, $timeout );
+		$fp = @fsockopen( $host_prefix.$host, $port, $errno, $errstr, $timeout );
 		if( ! $fp )
 		{
 			$info['error'] = $errstr.' (#'.$errno.')';
@@ -424,7 +468,30 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 	{	// URL FOPEN:
 		$info['used_method'] = 'fopen';
 
-		$fp = @fopen( $url, 'r' );
+		$url_http_params = array();
+		if( ! empty( $params['content_type'] ) )
+		{	// Header of the request:
+			$url_http_params['header'] = 'Content-type: '.$params['content_type']."\r\n";
+		}
+		if( $params['method'] != 'GET' )
+		{	// Method of the request:
+			$url_http_params['method'] = $params['method'];
+		}
+		if( ! empty( $params['fields'] ) )
+		{	// Additional fields of the request:
+			$url_http_params['content'] = http_build_query( $params['fields'] );
+		}
+
+		if( empty( $url_http_params ) )
+		{	// Open simple URL:
+			$fp = @fopen( $url, 'r' );
+		}
+		else
+		{	// Open URL with additional params:
+			$url_context = stream_context_create( array( 'http' => $url_http_params ) );
+			$fp = @fopen( $url, 'r', false, $url_context );
+		}
+
 		if( ! $fp )
 		{
 			if( isset( $http_response_header )
@@ -480,6 +547,13 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			}
 		}
 
+		if( $info['mimetype'] == 'application/json' &&
+		    strpos( $r, '{' ) !== false &&
+		    preg_match( '/^[^\{]*(\{.+\})[^\}]*$/', $r, $match ) )
+		{	// Fix response in JSON format, so it must be started with "{" and ended with "}":
+			$r = $match[1];
+		}
+
 		return $r;
 	}
 
@@ -531,8 +605,10 @@ function url_same_protocol( $url, $other_url = NULL )
  * @param string existing url
  * @param string|array Params to add (string as-is) or array, which gets urlencoded.
  * @param string delimiter to use for more params
+ * @param boolean true by default for extra security checking
+ * @return string URL with added param
  */
-function url_add_param( $url, $param, $glue = '&amp;' )
+function url_add_param( $url, $param, $glue = '&amp;', $prevent_quotes = true )
 {
 	if( empty( $param ) )
 	{
@@ -558,6 +634,12 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 			$param_list[] = get_param_urlencoded( $k, $v, $glue );
 		}
 		$param = implode( $glue, $param_list );
+	}
+
+	if( $prevent_quotes &&
+	    ( strpos( $param, '"' ) !== false || strpos( $param, '\'' ) !== false ) )
+	{	// Don't allow chars " and ' in new set params:
+		debug_die( 'Invalid chars in params <b>'.format_to_output( $param, 'htmlbody' ).'</b> for <code>url_add_param()</code> !' );
 	}
 
 	if( strpos( $url, '?' ) !== false )
@@ -757,6 +839,7 @@ function url_absolute( $url, $base = NULL )
  */
 function make_rel_links_abs( $s, $host = NULL )
 {
+	load_class( '_core/model/_urlhelper.class.php', 'UrlHelper' );
 	$url_helper = new UrlHelper( $host );
 	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', array( $url_helper, 'callback' ), $s );
 	return $s;
@@ -810,6 +893,10 @@ function is_absolute_url( $url )
  * This converts all urlencoded chars (e.g. "%AA") to lowercase.
  * It appears that some webservers use lowercase for the chars (Apache),
  * while others use uppercase (lighttpd).
+ *
+ * @param string First URL
+ * @param string Second URL
+ * @param boolean TRUE to make the compared URLs same even if have a different protocols http or https
  * @return boolean
  */
 function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
@@ -850,16 +937,8 @@ function idna_encode( $url )
 
 	$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
 
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 
 	//echo '['.$url_utf8.'] ';
 	$url = $IDNA->encode( $url_utf8 );
@@ -881,16 +960,8 @@ function idna_encode( $url )
  */
 function idna_decode( $url )
 {
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 	return $IDNA->decode($url);
 }
 
@@ -912,8 +983,7 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 
 	if( is_admin_page() || empty( $Blog ) )
 	{ // Backoffice part
-		global $current_User;
-		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) )
+		if( check_user_perm( 'admin', 'restricted' ) && check_user_status( 'can_access_admin' ) )
 		{ // User must has an access to backoffice
 			global $admin_url;
 			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
@@ -1017,5 +1087,206 @@ function url_check_same_domain( $main_url, $check_url )
 	$same_domain = ( ( $check_url_host == null ) || ( $check_url_host == $main_url_host ) );
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
+}
+
+
+/**
+ * Check redirect URL if it is a part of redirect URLs in email log content
+ *
+ * Used to check redirect_to URLs from email message
+ *
+ * @param string Redirect URL
+ * @param string Email log content, NULL - if we need to get email log message from DB by email log ID and key
+ * @param string Email log ID
+ * @param string Email log key
+ * @return boolean TRUE if the requested URL can be used as redirect URL for the email log
+ */
+function check_redirect_url_by_email_log( $redirect_to, $email_log_message = NULL, $email_log_ID = NULL, $email_log_key = NULL )
+{
+	global $baseurl;
+
+	if( empty( $redirect_to ) )
+	{	// No URL to check:
+		return false;
+	}
+
+	if( stripos( $redirect_to, $baseurl ) === 0 )
+	{	// Allow redirect url if it is started with same domain as base url:
+		return true;
+	}
+
+	if( $email_log_message === NULL &&
+	    ! empty( $email_log_ID ) &&
+	    ! empty( $email_log_key ) )
+	{	// Try to get email log message from DB if it is not provided yet:
+		global $DB;
+		$SQL = new SQL( 'Get message of email log #'.$email_log_ID.' to check redirect url' );
+		$SQL->SELECT( 'emlog_message' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $email_log_ID ) );
+		$SQL->WHERE_and( 'emlog_key = '.$DB->quote( $email_log_key ) );
+		$email_log_message = $DB->get_var( $SQL );
+	}
+
+	if( empty( $email_log_message ) )
+	{	// Email log message is not provided and not found in DB:
+		return false;
+	}
+
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( $redirect_to ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// Additional check for case when URLs are encoded to html entities:
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( str_replace( '&', '&amp;', $redirect_to ) ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// The redirect URL is not allowed:
+	return false;
+}
+
+
+/**
+ * Get current URL
+ *
+ * @param string Exclude params separated by comma
+ * @return string
+ */
+function get_current_url( $exclude_params = NULL )
+{
+	$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' )
+		.$_SERVER['HTTP_HOST']
+		.$_SERVER['REQUEST_URI'];
+
+	if( $exclude_params !== NULL )
+	{	// Exclude params from current url:
+		$current_url = clear_url( $current_url, $exclude_params );
+	}
+
+	return $current_url;
+}
+
+
+/**
+ * Remove parameters from URL
+ *
+ * @param string Original URL
+ * @param string Parameters which should be removed from URL (separated by comma)
+ * @return string Cleared URL
+ */
+function clear_url( $url, $exclude_params )
+{
+	$exclude_params = str_replace( ',', '|', preg_quote( $exclude_params ) );
+	$url = preg_replace( '/((\?)|&(amp;)?)('.$exclude_params.')=[^&]+/i', '$2', $url );
+	return rtrim( preg_replace( '/\?(&(amp;)?)+/', '?', $url ), '?' );
+}
+
+
+/**
+ * Keep allowed params from current URL in the given URL by config
+ *
+ * @param string Given URL
+ * @param string Separator between URL params
+ * @param array Additional params for config params. Used for Item's switchable params
+ * @return string Given URL with allowed params which are found in currently opened URL
+ */
+function url_keep_params( $url, $glue = '&', $custom_keep_params = array() )
+{
+	// By default allow params from this config for all cases:
+	global $passthru_in_all_redirs__params;
+
+	$all_keep_params = is_array( $custom_keep_params ) ? $custom_keep_params : array();
+	if( is_array( $passthru_in_all_redirs__params ) )
+	{	// Merge config and custom params:
+		$all_keep_params = array_merge( $passthru_in_all_redirs__params, $all_keep_params );
+	}
+
+	if( empty( $all_keep_params ) )
+	{	// No allowed params:
+		return $url;
+	}
+
+	// Get all params from the given URL:
+	preg_match_all( '#(&(amp;)?|\?)([^=]+)=[^&]*#', $url, $url_params );
+	$url_params = isset( $url_params[3] ) ? $url_params[3] : array();
+
+	$allowed_params = array();
+	foreach( $_GET as $param => $value )
+	{	// Check each GET param:
+		if( in_array( $param, $all_keep_params ) && // If param is allowed by config and custom params
+		    ! in_array( $param, $url_params ) ) // If param is NOT defined in the given URL yet
+		{
+			$allowed_params[ $param ] = $value;
+		}
+	}
+
+	// Append allowed params from current URL to the given URL:
+	return url_add_param( $url, $allowed_params, $glue );
+}
+
+
+/**
+ * Keep allowed params from current URL in the given Canonical URL
+ *
+ * @param string Canonical URL
+ * @param string Separator between URL params
+ * @param array Additional params for config params. Used for Item's switchable params
+ * @return string Canonical URL with allowed params which are found in currently opened URL
+ */
+function url_keep_canonicals_params( $canonical_url, $glue = '&', $custom_keep_params = array() )
+{
+	global $accepted_in_canonicals__params;
+
+	// For canonical URLs we should keep params from additional config:
+	if( is_array( $accepted_in_canonicals__params ) )
+	{	// Merge config and custom params:
+		$custom_keep_params = array_merge( $accepted_in_canonicals__params, $custom_keep_params );
+	}
+
+	return url_keep_params( $canonical_url, $glue, $custom_keep_params );
+}
+
+
+/**
+ * Get URL with same domain as current URL
+ *
+ * @param string Original URL to check and use with current domain
+ * @return string Fixed URL with domain of current URL
+ */
+function get_same_domain_url( $url )
+{
+	global $ReqHost;
+
+	if( ! isset( $ReqHost ) || strpos( $url, $ReqHost ) === 0 )
+	{	// If domain of original URL is same as current URL domain:
+		return $url;
+	}
+	else
+	{	// Use current domain if domains are different, e.g. when collection URL uses subdomain or different absolute URL:
+		return preg_replace( '#^https?://[^/]+#i', $ReqHost, $url );
+	}
+}
+
+
+/**
+ * Get admin URL
+ *
+ * @param string URL params
+ * @param string Delimiter to use for more params
+ * @return string Admin URL
+ */
+function get_admin_url( $url_params = '', $glue = '&amp;' )
+{
+	global $admin_url, $current_admin_url;
+
+	if( ! isset( $current_admin_url ) )
+	{	// Initialize current admin URL once:
+		$current_admin_url = get_same_domain_url( $admin_url );
+	}
+
+	return url_add_param( $current_admin_url, $url_params, $glue );
 }
 ?>

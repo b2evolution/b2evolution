@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -69,10 +69,6 @@ class FileRoot
 	 */
 	function __construct( $root_type, $root_in_type_ID, $create = true )
 	{
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Messages;
 		global $Settings, $Debuglog;
 		global $Collection, $Blog;
@@ -166,6 +162,20 @@ class FileRoot
 				}
 				return;
 
+			case 'siteskins':
+				if( ! $Settings->get( 'fm_enable_roots_skins' ) )
+				{	// Skins root is disabled:
+					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
+				}
+				else
+				{
+					global $siteskins_path, $siteskins_url;
+					$this->name = T_('Site Skins');
+					$this->ads_path = $siteskins_path;
+					$this->ads_url = $siteskins_url;
+				}
+				return;
+
 			case 'import':
 				// Import dir
 				global $media_path, $media_url;
@@ -203,6 +213,28 @@ class FileRoot
 					$this->name = T_('Email campaigns');
 					$this->ads_path = $media_path.$rds_emailcampaign_subdir;
 					$this->ads_url = $media_url.$rds_emailcampaign_subdir;
+				}
+				return;
+
+			case 'plugins':
+				// Plugins dir
+				if( ! $Settings->get( 'fm_enable_roots_plugins' ) )
+				{	// Plugins root is disabled:
+					$Debuglog->add( 'Attempt to access plugins dir, but this feature is globally disabled', 'files' );
+				}
+				else
+				{
+					global $plugins_path, $plugins_url;
+					$this->name = T_('Plugins');
+					$this->ads_path = $plugins_path;
+					if( isset( $Blog ) && ! is_admin_page() )
+					{
+						$this->ads_url = $Blog->get_local_plugins_url();
+					}
+					else
+					{	// If back-office or current collection is not defined:
+						$this->ads_url = $plugins_url;
+					}
 				}
 				return;
 		}
@@ -246,6 +278,8 @@ class FileRoot
 			case 'shared':
 			case 'collection':
 			case 'skins':
+			case 'siteskins':
+			case 'plugins':
 			case 'import':
 			case 'emailcampaign':
 				return $root_type.'_'.$root_in_type_ID;

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -32,7 +32,7 @@ $Results->title = T_('Invitation codes').get_manual_link( 'invitation-codes-list
 /*
  * Table icons:
  */
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( check_user_perm( 'users', 'edit', false ) )
 { // create new group link
 	$Results->global_icon( T_('Create a new invitation code...'), 'new', '?ctrl=invitations&amp;action=new', T_('Add invitation code').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
@@ -48,7 +48,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Code').' | '.T_('Link'),
 		'order' => 'ivc_code',
-		'td' => $current_User->check_perm( 'users', 'edit', false )
+		'td' => check_user_perm( 'users', 'edit', false )
 			? '<a href="'.$admin_url.'?ctrl=invitations&amp;action=edit&amp;ivc_ID=$ivc_ID$"><b>$ivc_code$</b></a>'
 			: '$ivc_code$',
 	);
@@ -101,7 +101,7 @@ $Results->cols[] = array(
 		'td' => '$ivc_source$',
 	);
 
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( check_user_perm( 'users', 'edit', false ) )
 {
 	function ivc_actions( & $row )
 	{

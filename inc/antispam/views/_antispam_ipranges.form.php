@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -25,10 +25,10 @@ $creating = $action == 'iprange_new';
 
 $Form = new Form( NULL, 'iprange_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this IP range!'), 'delete', regenerate_url( 'iprange_ID,action', 'iprange_ID='.$edited_IPRange->ID.'&amp;action=iprange_delete&amp;'.url_crumb( 'iprange' ) ) );
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,iprange_ID' ) );
+$Form->global_icon( TB_('Delete this IP range!'), 'delete', regenerate_url( 'iprange_ID,action', 'iprange_ID='.$edited_IPRange->ID.'&amp;action=iprange_delete&amp;'.url_crumb( 'iprange' ) ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action,iprange_ID' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') ).get_manual_link( 'ip-range-editing' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New IP Range') : TB_('IP Range') ).get_manual_link( 'ip-range-editing' ) );
 
 	$Form->add_crumb( 'iprange' );
 	$Form->hidden( 'action',  $creating ? 'iprange_create' : 'iprange_update' );
@@ -37,17 +37,17 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New IP Range') : T_('IP Range') )
 	$Form->hidden( 'tab3', get_param( 'tab3' ) );
 	$Form->hidden( 'iprange_ID', param( 'iprange_ID', 'integer', 0 ) );
 
-	$Form->select_input_array( 'aipr_status', $edited_IPRange->get( 'status' ), aipr_status_titles() , T_('Status'), '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors(), 'required' => true ) );
+	$Form->select_input_array( 'aipr_status', $edited_IPRange->get( 'status' ), aipr_status_titles() , TB_('Status'), '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors(), 'required' => true ) );
 
-	$Form->text_input( 'aipr_IPv4start', int2ip( $edited_IPRange->get( 'IPv4start' ) ), 50, T_('IP Range Start'), '', array( 'maxlength' => 15, 'required' => true ) );
+	$Form->text_input( 'aipr_IPv4start', int2ip( $edited_IPRange->get( 'IPv4start' ) ), 50, TB_('IP Range Start'), '', array( 'maxlength' => 15, 'required' => true ) );
 
-	$Form->text_input( 'aipr_IPv4end', int2ip( $edited_IPRange->get( 'IPv4end' ) ), 50, T_('IP Range End'), '', array( 'maxlength' => 15, 'required' => true ) );
+	$Form->text_input( 'aipr_IPv4end', int2ip( $edited_IPRange->get( 'IPv4end' ) ), 50, TB_('IP Range End'), '', array( 'maxlength' => 15, 'required' => true ) );
 
-	$Form->info( T_('User count'), (int)$edited_IPRange->get( 'user_count' ) );
+	$Form->info( TB_('User count'), (int)$edited_IPRange->get( 'user_count' ) );
 
-	$Form->info( T_('Block count'), (int)$edited_IPRange->get( 'block_count' ) );
+	$Form->info( TB_('Block count'), (int)$edited_IPRange->get( 'block_count' ) );
 
-$Form->end_form( array( array( 'submit', 'save', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'save', ( $creating ? /* TRANS: Verb */ TB_('Record') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ) ) );
 
 if( $edited_IPRange->ID > 0 )
 {	// Display Users registered through this IP Range:
@@ -56,7 +56,7 @@ if( $edited_IPRange->ID > 0 )
 			'reg_ip_max'           => int2ip( $edited_IPRange->get( 'IPv4end' ) ),
 			'filterset_name'       => 'iprange_'.$edited_IPRange->ID,
 			'results_param_prefix' => 'ipruser_',
-			'results_title'        => T_('Users registered through this IP Range').get_manual_link( 'ip-range-users' ),
+			'results_title'        => TB_('Users registered through this IP Range').get_manual_link( 'ip-range-users' ),
 			'results_order'        => '/user_created_datetime/D',
 			'page_url'             => get_dispctrl_url( 'antispam', 'tab3=ipranges&action=iprange_edit&amp;iprange_ID='.$edited_IPRange->ID ),
 			'display_ID'           => false,
@@ -95,10 +95,10 @@ if( $edited_IPRange->ID > 0 )
 	$count_SQL->WHERE_and( 'INET_ATON( sess_ipaddress ) <= '.$DB->quote( $edited_IPRange->get( 'IPv4end' ) ) );
 
 	$Results = new Results( $SQL->get(), 'ipsess_', '-D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
-	$Results->title = T_('Sessions connected through this IP Range').get_manual_link( 'ip-range-sessions' );
+	$Results->title = TB_('Sessions connected through this IP Range').get_manual_link( 'ip-range-sessions' );
 
 	$Results->cols[] = array(
-			'th' => T_('ID'),
+			'th' => TB_('ID'),
 			'order' => 'sess_ID',
 			'default_dir' => 'D',
 			'td_class' => 'shrinkwrap',
@@ -106,7 +106,7 @@ if( $edited_IPRange->ID > 0 )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Last seen'),
+			'th' => TB_('Last seen'),
 			'order' => 'sess_lastseen_ts',
 			'default_dir' => 'D',
 			'td_class' => 'timestamp',
@@ -114,13 +114,13 @@ if( $edited_IPRange->ID > 0 )
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('User login'),
+			'th' => TB_('User login'),
 			'order' => 'user_login',
 			'td' => '%stat_session_login( #user_login# )%',
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Remote IP'),
+			'th' => TB_('Remote IP'),
 			'order' => 'sess_ipaddress',
 			'td' => '$sess_ipaddress$',
 		);
@@ -143,7 +143,7 @@ if( $edited_IPRange->ID > 0 )
 
 		if( $day > 0 )
 		{
-			$result = sprintf( ( ( $day > 1 ) ? T_( '%d days' ) : T_( '%d day' ) ), $day ).' ';
+			$result = sprintf( ( ( $day > 1 ) ? TB_( '%d days' ) : TB_( '%d day' ) ), $day ).' ';
 		}
 		if( $hour < 10 )
 		{
@@ -163,7 +163,7 @@ if( $edited_IPRange->ID > 0 )
 	}
 
 	$Results->cols[] = array(
-			'th' => T_('Session length'),
+			'th' => TB_('Session length'),
 			'order' => 'sess_length',
 			'td_class' => 'center',
 			'total_class' => 'right',
@@ -175,7 +175,7 @@ if( $edited_IPRange->ID > 0 )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#delete_iprange_conflicts' ).click( function()

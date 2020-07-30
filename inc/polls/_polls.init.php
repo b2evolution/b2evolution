@@ -17,7 +17,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Minimum PHP version required for messaging module to function properly
  */
-$required_php_version[ 'polls' ] = '5.4';
+$required_php_version[ 'polls' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for messaging module to function properly
@@ -262,32 +262,27 @@ class polls_Module extends Module
 	{
 		global $Session, $Messages;
 
-		// Check that this action request is not a CSRF hacked request:
-		$Session->assert_received_crumb( 'polls' );
+		$action = param_action();
 
-		if( ! is_logged_in() )
-		{	// User must be logged in
-			debug_die( 'User must be logged in to vote!' );
+		if( $action != 'email_vote' )
+		{	// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'polls' );
+
+			if( ! is_logged_in() )
+			{	// User must be logged in
+				debug_die( 'User must be logged in to vote!' );
+			}
 		}
 
 		// Load classes:
 		load_class( 'polls/model/_poll.class.php', 'Poll' );
 		load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
 
-		$action = param_action();
-
 		switch( $action )
 		{
 			case 'vote':
 				// Vote on poll:
 				$poll_ID = param( 'poll_ID', 'integer', true );
-				$poll_option_ID = param( 'poll_answer', 'integer', 0 );
-
-				if( empty( $poll_option_ID ) )
-				{	// The poll option must be selected:
-					$Messages->add( T_('Please select an answer for the poll.'), 'error' );
-					break;
-				}
 
 				// Check if the requested poll is correct:
 				$PollCache = & get_PollCache();
@@ -298,19 +293,78 @@ class polls_Module extends Module
 					break;
 				}
 
-				// Check if the requested poll option is correct:
-				$PollOptionCache = & get_PollOptionCache();
-				$PollOption = & $PollOptionCache->get_by_ID( $poll_option_ID, false, false );
-				if( ! $PollOption || $PollOption->pqst_ID != $Poll->ID )
-				{	// The requested poll option doesn't exist in DB:
-					$Messages->add( 'Wrong poll request!', 'error' );
+				$poll_option_IDs = param( 'poll_answer', 'array:integer', array() );
+
+				if( empty( $poll_option_IDs ) )
+				{	// The poll option must be selected:
+					$Messages->add( T_('Please select an answer for the poll.'), 'error' );
+					break;
+				}
+				elseif( count( $poll_option_IDs ) > $Poll->max_answers )
+				{
+					$Messages->add( sprintf( T_('You are only allowed to choose a maximum of %d answers for the poll.'), $Poll->max_answers ), 'error' );
 					break;
 				}
 
-				// Vote on the poll by current User:
-				if( $PollOption->vote() )
-				{	// Successful voting:
-					$Messages->add( T_('Your vote has been cast.'), 'success' );
+				// Check if the requested poll option is correct:
+				$PollOptionCache = & get_PollOptionCache();
+				if( ! is_array( $poll_option_IDs ) )
+				{
+					$poll_option_IDs = array( $poll_option_IDs );
+				}
+
+				$Poll->clear_user_votes();
+				foreach( $poll_option_IDs as $poll_option_ID )
+				{
+					$PollOption = & $PollOptionCache->get_by_ID( $poll_option_ID, false, false );
+					if( ! $PollOption || $PollOption->pqst_ID != $Poll->ID )
+					{	// The requested poll option doesn't exist in DB:
+						$Messages->add( 'Wrong poll request!', 'error' );
+						break;
+					}
+
+					// Vote on the poll by current User:
+					$PollOption->vote();
+				}
+				$Messages->add( T_('Your vote has been cast.'), 'success' );
+				break;
+
+			case 'email_vote':
+				global $DB, $Messages;
+
+				$email_ID = param( 'email_ID', 'integer', true );
+				$email_key = param( 'email_key', 'string', true );
+				$poll_ID = param( 'poll_ID', 'integer', true );
+				$poll_answer = param( 'poll_answer', 'integer', true );
+				$redirect_to = param( 'redirect_to', 'url', '' );
+
+				$email_log = $DB->get_row( 'SELECT * FROM T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ).' AND emlog_key = '.$DB->quote( $email_key ), ARRAY_A );
+
+				if( $email_log )
+				{
+					$user_ID = $email_log['emlog_user_ID'];
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $user_ID );
+					$PollCache = & get_PollCache();
+					$PollOptionCache = & get_PollOptionCache();
+					$Poll = & $PollCache->get_by_ID( $poll_ID );
+					$PollOption = & $PollOptionCache->get_by_ID( $poll_answer );
+
+					if( $Poll && $PollOption && $User )
+					{
+						$Poll->clear_user_votes( $User->ID );
+						$PollOption->vote( $User->ID );
+
+						$Messages->add( T_('Your vote has been cast.'), 'success' );
+					}
+				}
+
+				if( ! empty( $redirect_to ) )
+				{	// Redirect to provided URL after voting:
+					// Use message of already loaded email log above, otherwise set empty string in order to don't execute SQL query twice:
+					$email_log_message = ( isset( $email_log['emlog_message'] ) ? $email_log['emlog_message'] : '' );
+					header_redirect_from_email( $redirect_to, 303, $email_log_message );
+					// We have EXITed already at this point!!
 				}
 				break;
 		}
@@ -324,14 +378,14 @@ class polls_Module extends Module
 	 */
 	function build_menu_2()
 	{
-		global $admin_url, $current_User, $AdminUI;
+		global $admin_url, $AdminUI;
 
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) )
 		{	// User must has an access to back-office:
 			return;
 		}
 
-		if( $current_User->check_perm( 'polls', 'create' ) )
+		if( check_user_perm( 'polls', 'create' ) )
 		{	// User has an access at least to view and edit own polls:
 			$AdminUI->add_menu_entries( array( 'site' ), array(
 				'polls' => array(

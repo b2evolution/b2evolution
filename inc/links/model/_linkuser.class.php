@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -41,19 +41,37 @@ class LinkUser extends LinkOwner
 			'Edit this xxx...' => NT_( 'Edit this user...' ),
 			'Link files to current xxx' => NT_( 'Link files to current user' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;user&raquo;.' ),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from &laquo;user&raquo;.' ),
 		);
 	}
 
 	/**
-	 * Check current User users permission
+	 * Check current User has an access to work with attachments of the link User
 	 *
-	 * @param string permission level
-	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param string Permission level
+	 * @param boolean TRUE to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
 		global $current_User;
-		return $current_User->ID == $this->User->ID || $current_User->check_perm( 'users', $permlevel, $assert );
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $assert )
+			{	// Halt the denied access:
+				debug_die( 'You have no permission for user attachments!' );
+			}
+			return false;
+		}
+
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
+		}
+
+		return $current_User->ID == $this->User->ID || check_user_perm( 'users', $permlevel, $assert );
 	}
 
 	/**
@@ -159,25 +177,37 @@ class LinkUser extends LinkOwner
 			case 'name':
 				return 'user';
 			case 'title':
-				return $this->User->login;
+				return $this->User->get_username();
 		}
 		return parent::get( $parname );
 	}
 
 	/**
 	 * Get User edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$this->User->ID;
+		global $admin_url;
+
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=avatar'.$glue.'user_ID='.$this->User->ID;
 	}
 
 	/**
 	 * Get User view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return '?ctrl=user&amp;user_tab=profile&amp;user_ID='.$this->User->ID;
+		global $admin_url;
+
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=profile'.$glue.'user_ID='.$this->User->ID;
 	}
 }
 
