@@ -23,7 +23,7 @@ class auto_anchors_plugin extends Plugin
 	var $code = 'auto_anchors';
 	var $name = 'Auto Anchors';
 	var $priority = 33;
-	var $version = '7.2.0';
+	var $version = '7.2.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
