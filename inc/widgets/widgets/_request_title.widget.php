@@ -75,6 +75,27 @@ class request_title_Widget extends ComponentWidget
 
 
 	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = parent::get_param_definitions( $params );
+
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget is used to display title of different pages:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
+		return $r;
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
