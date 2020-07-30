@@ -172,8 +172,7 @@ function skin_td_version( $skin_ID )
 
 function skin_td_actions( $row )
 {
-	$r = action_icon( TS_('Edit skin properties...'), 'properties', regenerate_url( '', 'skin_ID='.$row->skin_ID.'&amp;action=edit' ) )
-			.action_icon( TS_('Reload containers').'!', 'reload', regenerate_url( '', 'skin_ID='.$row->skin_ID.'&amp;action=reload&amp;'.url_crumb( 'skin' ) ) );
+	$r = action_icon( TS_('Edit skin properties...'), 'properties', regenerate_url( '', 'skin_ID='.$row->skin_ID.'&amp;action=edit' ) );
 
 	if( $row->nb_blogs < 1 )
 	{
