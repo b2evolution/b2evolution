@@ -118,19 +118,19 @@ if( empty( $tab ) )
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			$template_log_title = TB_('Clear full page caches (/cache/* directories)');
+			$template_log_title = TB_('Clear full page caches (/_cache/* directories)');
 			$template_action = $action;
 			break;
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			$template_log_title = TB_('Clear thumbnail caches (?evocache directories)');
+			$template_log_title = TB_('Clear thumbnail caches (_evocache directories)');
 			$template_action = $action;
 			break;
 
 		case 'repair_cache':
 			// Repair cache
-			$template_log_title = TB_('Repair /cache/* directory structure');
+			$template_log_title = TB_('Repair /_cache/* directory structure');
 			$template_action = $action;
 			break;
 
