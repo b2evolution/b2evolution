@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -24,13 +24,17 @@ require_once $inc_path.'/_main.inc.php';
 
 if( ! isset($GLOBALS['files_Module']) )
 {
-	debug_die( 'Files module is disabled or missing!' );
+	debug_die( 'Files module is disabled or missing!', array(
+			'status' => '501 Not Implemented',
+		) );
 }
 
 // Check permission (#1):
-if( ! isset($current_User) )
+if( ! is_logged_in() )
 {
-	debug_die( 'No permissions to view file (not logged in)!' );
+	debug_die( 'No permissions to view file (not logged in)!', array(
+			'status' => '403 Forbidden',
+		) );
 }
 
 // We need this param early to check blog perms, if possible
@@ -43,11 +47,12 @@ else
 {	// No blog ID, we will check the global group perm
 	$perm_blog = NULL;
 }
-//pre_dump( $perm_blog );
 
 // Check permission (#2):
-$current_User->check_perm( 'files', 'view', true, $perm_blog );
+check_user_perm( 'files', 'view', true, $perm_blog );
 
+// Initialize Font Awesome
+init_fontawesome_icons();
 
 // Load the other params:
 param( 'viewtype', 'string', true, true );
@@ -90,6 +95,29 @@ switch( $action )
 		}
 		break;
 
+	case 'flip_horizontal':
+	case 'flip_vertical':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'image' );
+
+		load_funcs( 'files/model/_image.funcs.php' );
+
+		switch( $action )
+		{
+			case 'flip_horizontal':
+				$mode = 'horizontal';
+				break;
+			case 'flip_vertical':
+				$mode = 'vertical';
+				break;
+		}
+
+		if( flip_image( $selected_File, $mode ) )
+		{	// Image was rotated successfully
+			header_redirect( regenerate_url( 'action,crumb_image', 'action=reload_parent', '', '&' ) );
+		}
+		break;
+
 	case 'reload_parent':
 		// Reload parent window to update rotated image
 		$JS_additional = 'window.opener.location.reload(true);';
@@ -100,6 +128,7 @@ switch( $action )
 require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
+require_css( '#bootstrap_css#', 'rsc_url' );
 
 // Send the predefined cookies:
 evo_sendcookies();
@@ -110,186 +139,191 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selected_File->dget('name').' ('./* TRANS: Noun */ T_('Preview').')'; ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <?php if( isset( $JS_additional ) ) { ?>
-	<script type="text/javascript"><?php echo $JS_additional; ?></script>
+	<script><?php echo $JS_additional; ?></script>
 <?php } ?>
 </head>
 
 <body>
 	<?php
+	switch( $viewtype )
+	{
+		case 'image':
+			/*
+			* Image file view:
+			*/
+			echo '<div class="img_preview content-type-image">';
 
-switch( $viewtype )
-{
-	case 'image':
-		/*
-		 * Image file view:
-		 */
-		echo '<div class="img_preview content-type-image">';
-
-		if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
-		{
-			echo '<img ';
-			if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
+			if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
 			{
-				echo 'alt="'.$alt.'" ';
-			}
-			if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
-			{
-				echo 'title="'.$title.'" ';
-			}
-			echo 'src="'.$selected_File->get_url().'"'
-						.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
+				echo '<img ';
+				if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
+				{
+					echo 'alt="'.$alt.'" ';
+				}
+				if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
+				{
+					echo 'title="'.$title.'" ';
+				}
+				echo 'src="'.$selected_File->get_url().'"'
+							.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
 
-			$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
-			$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
-			$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
+				$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
+				$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
+				$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
+				$url_flip_horizontal = regenerate_url( '', 'action=flip_horizontal'.'&'.url_crumb('image') );
+				$url_flip_vertical = regenerate_url( '', 'action=flip_vertical'.'&'.url_crumb('image') );
 
-			echo '<div class="center">';
-			echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0 );
-			echo '</div>';
+				echo '<div class="center">';
+				echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0 );
+				echo '</div>';
 
-			echo '<div class="subline">';
-			echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
-			echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
-			echo '<p>'.$selected_File->dget('name').' &middot; ';
-			echo $selected_File->get_image_size().' &middot; ';
-			echo $selected_File->get_size_formatted().'</p>';
-			echo '</div>';
+				echo '<div class="subline">';
+				echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
+				echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
+				echo '<p>'.$selected_File->dget('name').' &middot; ';
+				echo $selected_File->get_image_size().' &middot; ';
+				echo $selected_File->get_size_formatted().'</p>';
+				echo '</div>';
 
-		}
-		else
-		{
-			echo 'error';
-		}
-		echo '&nbsp;</div>';
-		break;
-
-	case 'text':
-		echo '<div class="content-type-text">';
- 		/*
-		 * Text file view:
-		 */
-		if( ($buffer = @file( $selected_File->get_full_path() )) !== false )
-		{ // Display raw file
-			param( 'showlinenrs', 'integer', 0 );
-
-			$buffer_lines = count( $buffer );
-
-			echo '<div class="fileheader">';
-
-			echo '<p>';
-			echo T_('File').': <strong>'.$selected_File->dget('name').'</strong>';
-			echo ' &middot; ';
-			echo T_('Title').': <strong>'.$selected_File->dget( 'title' ).'</strong>';
-			echo '</p>';
-
-	 		echo '<p>';
-			echo T_('Description').': '.$selected_File->dget( 'desc' );
-			echo '</p>';
-
-
-			if( !$buffer_lines )
-			{
-				echo '<p>** '.T_('Empty file').'! ** </p></div>';
 			}
 			else
 			{
+				echo 'error';
+			}
+			echo '&nbsp;</div>';
+			break;
+
+		case 'text':
+			echo '<div class="content-type-text">';
+			/*
+			* Text file view:
+			*/
+			if( ($buffer = @file( $selected_File->get_full_path() )) !== false )
+			{	// Display raw file
+				param( 'showlinenrs', 'integer', 0 );
+
+				$buffer_lines = count( $buffer );
+
+				echo '<div class="fileheader">';
+
 				echo '<p>';
-				printf( T_('%d lines'), $buffer_lines );
+				echo T_('File').': <strong>'.$selected_File->dget('name').'</strong>';
+				echo ' &middot; ';
+				echo T_('Title').': <strong>'.$selected_File->dget( 'title' ).'</strong>';
+				echo '</p>';
 
-				$linenr_width = strlen( $buffer_lines+1 );
+				echo '<p>';
+				echo T_('Description').': '.$selected_File->dget( 'desc' );
+				echo '</p>';
 
-				echo ' [';
-				?>
-				<noscript type="text/javascript">
-					<a href="<?php echo $selected_File->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
 
-					<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
-					?></a>
-				</noscript>
-				<script type="text/javascript">
-					<!--
-					document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
+				if( !$buffer_lines )
+				{
+					echo '<p>** '.T_('Empty file').'! ** </p></div>';
+				}
+				else
+				{
+					echo '<p>';
+					printf( T_('%d lines'), $buffer_lines );
 
-					showlinenrs = <?php var_export( !$showlinenrs ); ?>;
+					$linenr_width = strlen( $buffer_lines+1 );
 
-					toggle_linenrs();
+					echo ' [';
+					?>
+					<noscript>
+						<a href="<?php echo $selected_File->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
 
-					function toggle_linenrs()
-					{
-						if( showlinenrs )
+						<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
+						?></a>
+					</noscript>
+					<script>
+						<!--
+						document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
+
+						showlinenrs = <?php var_export( !$showlinenrs ); ?>;
+
+						toggle_linenrs();
+
+						function toggle_linenrs()
 						{
-							var replace = document.createTextNode('<?php echo TS_('Show line numbers') ?>');
-							showlinenrs = false;
-							var text = document.createTextNode( '' );
-							for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+							if( showlinenrs )
 							{
-								if( document.getElementsByTagName("span")[i].hasChildNodes() )
-									document.getElementsByTagName("span")[i].firstChild.data = '';
-								else
+								var replace = document.createTextNode('<?php echo TS_('Show line numbers') ?>');
+								showlinenrs = false;
+								var text = document.createTextNode( '' );
+								for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
 								{
-									document.getElementsByTagName("span")[i].appendChild( text );
+									if( document.getElementsByTagName("span")[i].hasChildNodes() )
+										document.getElementsByTagName("span")[i].firstChild.data = '';
+									else
+									{
+										document.getElementsByTagName("span")[i].appendChild( text );
+									}
 								}
 							}
-						}
-						else
-						{
-							var replace = document.createTextNode('<?php echo TS_('Hide line numbers') ?>');
-							showlinenrs = true;
-							for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+							else
 							{
-								var text = String(i+1);
-								var upto = <?php echo $linenr_width ?>-text.length;
-								for( var j=0; j<upto; j++ ){ text = ' '+text; }
-								if( document.getElementsByTagName("span")[i].hasChildNodes() )
-									document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
-								else
-									document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
+								var replace = document.createTextNode('<?php echo TS_('Hide line numbers') ?>');
+								showlinenrs = true;
+								for( var i = 0; i<document.getElementsByTagName("span").length; i++ )
+								{
+									var text = String(i+1);
+									var upto = <?php echo $linenr_width ?>-text.length;
+									for( var j=0; j<upto; j++ ){ text = ' '+text; }
+									if( document.getElementsByTagName("span")[i].hasChildNodes() )
+										document.getElementsByTagName("span")[i].firstChild.data = ' '+text+' ';
+									else
+										document.getElementsByTagName("span")[i].appendChild( document.createTextNode( ' '+text+' ' ) );
+								}
 							}
+
+							document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
 						}
+						-->
+					</script>
+					<?php
 
-						document.getElementById('togglelinenrs').replaceChild(replace, document.getElementById( 'togglelinenrs' ).firstChild);
-					}
-					-->
-				</script>
-				<?php
+					echo ']</p>';
+					echo '</div>';
 
-				echo ']</p>';
-				echo '</div>';
+					echo '<pre class="rawcontent">';
 
-				echo '<pre class="rawcontent">';
-
-				for( $i = 0; $i < $buffer_lines; $i++ )
-				{
-					echo '<span name="linenr" class="linenr">';
-					if( $showlinenrs )
+					for( $i = 0; $i < $buffer_lines; $i++ )
 					{
-						echo ' '.str_pad($i+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
+						echo '<span name="linenr" class="linenr">';
+						if( $showlinenrs )
+						{
+							echo ' '.str_pad($i+1, $linenr_width, ' ', STR_PAD_LEFT).' ';
+						}
+						echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
 					}
-					echo '</span>'.htmlspecialchars( str_replace( "\t", '  ', $buffer[$i] ) );  // TODO: customize tab-width
+
+				echo '</pre>';
+
+					echo '<div class="eof">** '.T_('End Of File').' **</div>';
 				}
-
-	  		echo '</pre>';
-
-				echo '<div class="eof">** '.T_('End Of File').' **</div>';
 			}
-		}
-		else
-		{
-			echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ).'</p>';
-		}
-		echo '</div>';
-		break;
+			else
+			{
+				echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->get_rdfs_rel_path( $selected_File ) ).'</p>';
+			}
+			echo '</div>';
+			break;
 
-	default:
-		echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->dget('name') ).'</p>';
-		break;
-}
+		default:
+			echo '<p class="error">'.sprintf( T_('The file &laquo;%s&raquo; could not be accessed!'), $selected_File->dget('name') ).'</p>';
+			break;
+	}
+
+	// Add JavaScript and CSS files included by plugins and skin
+	include_footerlines();
 ?>
-
 </body>
 </html>

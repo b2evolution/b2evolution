@@ -1,0 +1,89 @@
+// Styles for "evo list with tumbnail" templates, used by the Universal Item List Widget(s)
+
+// THUMBLIST: (can be embedded in a bootstrap col-*-*)
+.evo_thumblist {
+	padding: 0;
+	margin-left: 0;
+	li {
+		height: auto;
+		width: 100%;
+		clear: both;
+		margin: 15px 0;
+		padding: 0;
+		vertical-align: middle;
+		list-style: none;
+		display: table;
+	}
+}
+// THUMBLIST > IMAGE:
+.evo_thumblist_image {
+	float: left;
+	margin-right: 6px;
+	text-align: center; 
+	img {
+		border-radius: 3px;
+		// Preventing images to exceed the parent's width
+		max-width: 100%;
+		max-height: 380px;
+		width: auto;
+		height: auto;
+		margin: auto;
+	}
+	figure {
+		margin: 0em;
+	}
+}
+// THUMBLIST > PLACEHOLDER: ( Placeholder when "Display picture" selected, but no picture to show )
+.evo_thumblist_placeholder {
+	display: table;
+	float: left;
+	max-width: 380px;
+	max-height: 380px;
+	background: #f0f0f0;
+	margin-right: 6px;
+	border-radius: 3px;
+	&::before {
+		font-family: FontAwesome;
+		display: table-cell;
+		content: '\f0f6';
+		color: #dcdcdc;
+		font-size: 40px;
+		vertical-align: middle;
+		text-align: center;
+	}
+}
+// THUMBLIST > TITLE:
+.evo_thumblist_title {
+	vertical-align: middle;
+	display: inline;
+	height: auto !important;
+	width: 100%;
+	font-size: 16px;
+	a {
+		text-decoration: underline;
+	}
+}
+// THUMBLIST > BODY:
+.evo_thumblist_body {  
+	> a {
+		color: inherit;
+	}
+	> p:last-of-type {
+		margin: 0 !important;
+		display: inline;
+	}
+}
+// THUMBLIST > BUTTON:
+.evo_thumblist_button {
+	float: right;
+	height: 22px;
+	line-height: 13px;
+	padding: 0 4px 0 4px;
+}
+// Modifiers:
+.evo_thumblist_button__transparent {
+	background-color: transparent;
+	&:hover {
+		background-color: #e6e6e6;
+	}
+}

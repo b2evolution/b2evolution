@@ -41,7 +41,7 @@
 
 	<h2>3. Run the install script</h2>
 	<p>At this point you can call b2evolution's install script through an HTTP GET request (wget, cURL, etc..) of this form:</p>
-	<pre>http://example.com/install/index.php?locale=en-US&amp;action=newdb&amp;create_sample_contents=all</pre>
+	<pre>http://example.com/install/index.php?locale=en-US&amp;action=newdb&amp;create_sample_contents=full</pre>
 
 	<h3>Use this form to generate an automated install test URL:</h3>
 	<form action="index.php" method="get" style="background-color:#ddd">
@@ -123,7 +123,7 @@
 	<ul>
 		<li>&lt;evo:error&gt;ERROR: Impossible to rename <code>/media/users/admin/</code> to <code>/media/users/xyz/</code>.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;ERROR: Impossible to use "xyz" for the admin account. Using "admin" instead.&lt;/evo:error&gt;</li>
-		<li>&lt;evo:error&gt;Logins can only contain letters, digits and the following characters: _ .&lt;/evo:error&gt;</li>
+		<li>&lt;evo:error&gt;Logins can only contain letters, digits and the following characters: _ . -&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;Logins cannot start with "usr_", this prefix is reserved for system use.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;The minimum password length is 5 characters.&lt;/evo:error&gt;</li>
 		<li>&lt;evo:error&gt;Passwords cannot contain the characters &lt;, &gt; and &amp;.&lt;/evo:error&gt;</li>

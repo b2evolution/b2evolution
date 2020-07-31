@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -68,6 +68,16 @@ td.shrinkwrap {
 	margin: 0;
 }
 
+// Fix vertical alignment for radio with text inputs:
+div.radio.radio-input label {
+	input[type=radio] {
+		margin-top: 10px;
+	}
+	input[type=text].form_text_input {
+		vertical-align: middle;
+	}
+}
+
 // A colored status icon before <select>
 div.status_icon {
 	display: inline-block;
@@ -78,6 +88,9 @@ div.status_icon {
 .action_icon, .widget_actions a, .no_icon {
 	font-weight: bold;
 	margin: 2px;
+}
+span.action_icon {
+	cursor: pointer;
 }
 // Remove spaces between the spam voting buttons
 .btn-group .action_icon {
@@ -115,11 +128,11 @@ div.avatartag {
 }
 .avatar_main_frame {
 	>a:first-child {
-		margin-right: 25px;
+		margin-right: 0;
 	}
 	.avatar_actions {
 		text-align: center;
-		padding: 0 25px 0 0;
+		padding: 0 25px;
 		float: none;
 		display: table-cell;
 		vertical-align: middle;
@@ -183,7 +196,7 @@ div.avatartag {
 	.PreviewButton, .pull-left {
 		margin-right: 10px;
 	}
-	.quick-publish {
+	.quick-publish, .evo_propose_change_btn {
 		margin-left: 5px;
 	}
 	.html_status {
@@ -192,25 +205,9 @@ div.avatartag {
 	}
 }
 
-.compose_layout{
-	margin-bottom: 15px;
-	td.label {
-		font-size: 100%;
-		padding-right: 10px;
-		color: #333;
-	}
-	#post_locale {
-		width: 180px !important;
-	}
-	td {
-		white-space: nowrap;
-		vertical-align: middle;
-	}
-}
-#itemform_custom_fields, #itemform_adv_props {
-	.compose_layout {
-		margin-bottom: 0;
-	}
+.edit_actions_visibility {
+	white-space: nowrap;
+	margin-right: 5px;
 }
 
 div.log_container {
@@ -232,6 +229,22 @@ div.delete_messages ul {
 	li {
 		list-style: inherit;
 	}
+	label {
+		font-weight: normal;
+		margin: 0;
+	}
+}
+
+// Post / Comment browsing screen
+.evo_content_block {
+	// This is not the usual results table:
+	.results_header {
+		margin-top: -20px;
+	}
+	.results_footer {
+		// Pager in footer + nb line by default select
+		padding: 5px 0 20px;
+	}
 }
 
 /*
@@ -245,13 +258,25 @@ div.delete_messages ul {
 	.evo_post__tags {
 		border-top: 1px solid #ddd;
 	}
-	.panel-body h3 {
-		margin: 8px 0;
+	.panel-heading {
+		h3 {
+			margin: 0 0 5px 0;
+		}
+		.btn-group {
+			margin-left: 0;
+			margin-right: 6px;
+			&:last-child {
+				margin-right: 0;
+			}
+		}
 	}
 }
 .evo_post, .evo_comment {
 	.panel-heading, .panel-body, .panel-footer {
 		padding: 1ex;
+	}
+	.panel-heading {
+		line-height: 1.42857143;
 	}
 }
 .evo_comments_container {
@@ -272,7 +297,7 @@ div.delete_messages ul {
 	}
 }
 .evo_post__comments {
-	margin: 1ex;
+	margin: 1ex 0;
 	.evo_comments_container {
 		border: none;
 		.evo_comment {
@@ -312,19 +337,24 @@ div.delete_messages ul {
 		}
 	}
 }
-
-// Sidebar form filter
-#comment_filter_form {
-	fieldset {
-		margin-bottom: 20px;
-	}
-	.controls.col-sm-10 {
-		width: 100%;
-		input[type=text] {
-			width: 100%;
+.evo_content_summary {
+	.evo_post {
+		.bTitle {
+			font-weight: bold;
+		}
+		.bText {
+			padding-left: 420px;
 		}
 	}
-	.rating input[name=cmnt_fullview_rating_limit] {
+}
+
+// Sidebar form filters:
+.evo_sidebar_filters {
+	.filter_buttons {
+		margin-bottom: 5px;
+		text-align: right;
+	}
+	.rating input[name$=_rating_limit] {
 		margin-right: 10px;
 		&:first-child {
 			margin-left: 10px;
@@ -388,13 +418,16 @@ div.delete_messages ul {
 	}
 }
 .evo_post__attachments {
-	margin: 1ex;
+	margin: 1ex 0;
+	table {
+		margin: 0;
+	}
 }
 .feedback-tabs {
-	margin: 0 1ex !important;
+	margin: 0 1ex 0 0 !important;
 }
 .feedback-actions {
-	margin: 0 1ex !important;
+	margin: 0 0 0 1ex !important;
 	float: right;
 }
 .vote_spam {
@@ -420,10 +453,16 @@ div.delete_messages ul {
 	margin-left: 10px;
 	line-height: 34px;
 }
-// Status banner
-.evo_content_block span[class*="status_"] {
-	left: 8px;
-	top: -8px;
+.evo_content_block {
+	// Status banner
+	span[class*="status_"] {
+		left: 8px;
+		top: -8px;
+	}
+	// Top-right action icons:
+	.global_actions {
+		top: -12px;
+	}
 }
 // The colored blocks for special post statuses
 .evo_post__status_community {
@@ -645,14 +684,32 @@ fieldset ul {
 	font-weight: normal;
 }
 
+// Wrapper for form input element to enter autocomplete item or user tags:
+.evo_input__tags {
+	width: 100%;
+	max-width: 100%;
+	ul.token-input-list-facebook {
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
 // Form elements on item edit page
 #item_locations {
+	th, td {
+		white-space: nowrap;
+		padding: 2px 0;
+	}
 	label {
 		width: auto;
 		float: right;
 	}
 	select {
 		width: 160px;
+		display: inline-block;
+	}
+	td.input {
+		width: 100%;
 	}
 }
 #itemform_content {
@@ -688,6 +745,11 @@ fieldset ul {
 		display: block;
 	}
 }
+#itemform_custom_fields {
+	.help-inline label {
+		display: inline-block;
+	}
+}
 #itemform_adv_props {
 	ul.token-input-list-facebook {
 		width: 100%;
@@ -708,7 +770,7 @@ fieldset ul {
 		display: inline-block;
 	}
 }
-#itemform_links, #cmntform_links, #ecmpform_links, #msgform_links {
+#itemform_links, #cmntform_links, #meta_cmntform_links, #ecmpform_links, #msgform_links {
 	.panel {
 		overflow: hidden;
 	}
@@ -723,14 +785,31 @@ fieldset ul {
 	padding-bottom: 2px;
 }
 
+// Form elements on item type edit page
+.custom_fields_edit_table {
+	.results {
+		overflow: initial;
+	}
+	.table_scroll {
+		margin-bottom: 20px;
+	}
+	.form-control {
+		width: auto;
+		&.custom_field_label {
+			width: 100%;
+			min-width: 200px;
+		}
+	}
+}
+
 // Attachments / links
-#attachments_fieldset_wrapper {
+.evo_attachments_fieldset__wrapper {
 	width: 100%;
-	height: 160px;
+	height: 97px;
 	position: relative;
 	padding-bottom: 6px;
 	box-sizing: content-box;
-	#attachments_fieldset_block {
+	.evo_attachments_fieldset__block {
 		overflow: auto;
 		height: 100%;
 	}
@@ -763,9 +842,12 @@ fieldset ul {
 		td {
 			cursor: move;
 		}
+		tr.odd td {
+			background-color: #FFF;
+		}
 	}
 }
-#filelist_tbody {
+.filelist_tbody {
 	tr:first-child .action_icon_link_move_up,
 	tr:last-child .action_icon_link_move_down {
 		visibility: hidden;
@@ -799,17 +881,28 @@ table.filelist {
 		}
 	}
 }
-div.qq-upload-button,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button {
 	border: 2px dashed #fff;
 	background: #5bc0de;
 	.border-radius(9px);
 }
-div.qq-upload-button-hover,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-drop-area {
+	padding: 7px 0;
+	text-align: center;
+	color: transparent;
+	background: transparent;
+	font-weight: bold;
+	> div > span {
+		font-weight: normal;
+		font-size: small;
+		margin-top: 2px;
+	}
+}
+div.qq-upload-button-hover {
 	background: #5cb85c;
+}
+div.qq-upload-button-dragover {
+	background: #efbd5b !important;
 }
 ul.qq-upload-list {
 	margin: 0;
@@ -872,23 +965,12 @@ form#FilesForm {
 #fm_bar form {
 	margin-bottom: 0;
 }
-ul#uploadfileinputs {
-	list-style: none;
-	margin-left: 0;
-	label {
-		display: inline;
-	}
-	li {
-		border-bottom: 1px solid #DDD;
-		padding: 10px 0;
-	}
-}
-div#fileuploader_form {
+div.evo_fileuploader_form {
 	padding: 5px;
 	height: 65px;
 	background: #f5f5f5;
 }
-tr#fileuploader_form td {
+tr.evo_fileuploader_form td {
 	background: #f5f5f5;
 }
 .file_browser {
@@ -906,10 +988,6 @@ tr#fileuploader_form td {
 				}
 			}
 		}
-	}
-	.upload_title {
-		font-weight: bold;
-		font-size: 120%;
 	}
 	.form-group {
 		margin-bottom: 10px;
@@ -1009,6 +1087,67 @@ h2.user_title::first-line {
 	}
 }
 
+#itemform_extra {
+	td.flabel_item_owner_login {
+		vertical-align: top;
+		padding-top: 6px;
+	}
+	#ffield_item_owner_login {
+		.help-inline {
+			display: inline-block;
+			vertical-align: middle;
+			margin-top: 10px;
+		}
+		#item_owner_login {
+			vertical-align: middle !important;
+		}
+	}
+	label.ffield_item_create_user {
+		padding: 0;
+		font-weight: normal;
+	}
+	.itemform_extra_radio {
+		padding-top: 10px;
+		> label {
+			padding: 0;
+			margin: 0;
+		}
+		input[type=radio][name=item_dateset][value="1"] {
+			margin-top: 11px;
+		}
+		.form-group {
+			vertical-align: middle;
+			input {
+				margin-left: 0;
+			}
+		}
+	}
+}
+
+#ffield_item_switchable_params {
+	.evo_fields_table__input {
+		display: table;
+		> div {
+			display: table-cell;
+			width: 1%;
+			white-space: nowrap;
+			padding-right: 5px;
+		}
+		> input[type=text] {
+			display: table-cell;
+		}
+	}
+}
+
+#ffield_post_title {
+	.evo_fields_table__label {
+		font-size: 18px;
+	}
+	.form_text_input {
+		font-size: 20px;
+	}
+}
+
 // Loader animation
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1029,6 +1168,12 @@ div#upload_wrapper, div#import_wrapper {
 div.fieldset_wrapper {
 	margin-top: 0;
 }
+
+// Adjacent fieldsets
+div.fieldset_wrapper+div.fieldset_wrapper {
+	margin-top: 10px;
+}
+
 // Fieldset folding
 div.fieldset_wrapper.folded .panel-body {
 	display: none;
@@ -1037,7 +1182,13 @@ span[id^=title_folding_] {
 	cursor: default;
 }
 
+// Fieldset folding for Category selection
+tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
+	display: none;
+}
+
 // Dashboard
+// Collection dashboard ?
 .browse {
 	.evo_content_block {
 		margin-right: 0;
@@ -1065,7 +1216,7 @@ table.table {
 	tbody tr.group td {
 		background: lighten( #e8e8e8, 3%);
 		color: #848484;
-		a:not(.label) {
+		a:not(.label):not(.btn):not(.user) {
 			color: #337ab7;
 		}
 	}
@@ -1095,7 +1246,6 @@ ul.widget_container {
 			background: #f5f5f5;
 		}
 		> span, > a {
-			display: inline-block;
 			padding: 3px 10px;
 			margin: 0;
 			border-color: #ddd;
@@ -1118,13 +1268,20 @@ div.available_widgets {
 		background: #FFF;
 		padding: 10px 15px;
 	}
-	.widget_list {
-		list-style: none;
-		margin: 0;
-	}
 	#available_widgets_inner {
 		top: 87px;
 	}
+}
+.widget_list {
+	list-style: none;
+	margin: 0;
+}
+
+// Widget icon:
+.evo_widget_icon {
+	display: inline-block;
+	min-width: 22px;
+	padding: .2em;
 }
 
 // Table to select a collection type
@@ -1154,6 +1311,7 @@ table.coll_kind {
 	}
 }
 
+/* Fp: UNCLEAR WHAT THIS IS FOR:
 // Support for multiline inline forms
 .filters .form-inline {
 	 margin: 0 -10px -5px;
@@ -1164,6 +1322,7 @@ table.coll_kind {
 		margin-left: 10px;
 	}
 }
+*/
 
 // Navigations
 .navbar {
@@ -1171,10 +1330,14 @@ table.coll_kind {
 }
 div.coll-selector {
 	padding-top: 18px;
+	padding-bottom: 17px;
 	background-color: #ddd;
 	margin-bottom: -3px; // in this case we don't want level 2 to have it's 18 px top padding
 	.btn-group {
 		margin-right: 4px;
+		.dropdown-toggle .caret {
+			margin-left: 6px;
+		}
 	}
 }
 div.level2 {
@@ -1182,6 +1345,9 @@ div.level2 {
 	background-color: #ddd;
 	margin-bottom: 16px;
 	border-bottom: 1px solid #ccc;
+	div.coll-selector + & {
+		padding-top: 0;
+	}
 }
 .nav-tabs {
 	position: relative;
@@ -1223,6 +1389,10 @@ div.level2 {
 }
 .navbar-right {
 	margin-right: -15px;
+	.action_icon {
+		margin-top: 0;
+		margin-bottom: 0;
+	}
 }
 nav.level1 {
 	z-index: 1;
@@ -1252,6 +1422,16 @@ div.level3 nav .nav > li {
 
 div.level3 nav .nav > li + li {
 	margin-left: 0px;
+}
+
+ol.breadcrumb {
+	margin: 20px 0;
+}
+
+// Global icons container:
+.container-global-icons {
+	margin-top: 9px;
+	margin-bottom: -3px;
 }
 
 // Footer
@@ -1295,6 +1475,14 @@ div.level3 nav .nav > li + li {
 	}
 	.col-sm-10 {
 		width: 80%;
+	}
+}
+// Action icon to restore skin setting to default value:
+.fa[data-default-value] {
+	font-size: 80%;
+	color: #999;
+	&:hover {
+		color: #666;
 	}
 }
 @media (max-width: 992px) {
@@ -1361,29 +1549,32 @@ div.level3 nav .nav > li + li {
 			text-overflow: ellipsis;
 		}
 	}
+	&.skinshot_new {
+		text-align: center;
+		font-size: 20px;
+		background: none;
+		border: 3px dashed #CCC;
+		width: 267px;
+		height: 247px;
+		&:hover {
+			background: #F5F5F5;
+			text-decoration: none;
+		}
+		.fa {
+			display: block;
+			font-size: 100px;
+			margin: 20px 0 10px;
+		}
+	}
+	&.skinshot_current {
+		border-color: #D00;
+	}
 }
 .coll_settings_skinshot {
 	.skinshot {
 		padding: 0;
 		float: none;
 		margin: -1ex -1ex 1ex -1ex;
-	}
-}
-.skinshot_new {
-	text-align: center;
-	font-size: 20px;
-	background: none;
-	border: 3px dashed #CCC;
-	width: 267px;
-	height: 247px;
-	&:hover {
-		background: #F5F5F5;
-		text-decoration: none;
-	}
-	.fa {
-		display: block;
-		font-size: 100px;
-		margin: 20px 0 10px;
 	}
 }
 
@@ -1516,6 +1707,8 @@ table.diff {
 	}
 	td.diff-lineno {
 		font-weight: bold;
+		font-size: 0.85em;
+		color: #666;
 	}
 	td.diff-addedline {
 		background: none repeat scroll 0 0 #CCFFCC;
@@ -1540,12 +1733,24 @@ table.diff {
 		font-size: 120%;
 		font-weight: bold;
 	}
+	tr.diff-custom-field {
+		td.diff-title-deletedline, td.diff-title-addedline {
+			text-align: left;
+			font-size: 100%;
+		}
+	}
+	td.diff-section-title {
+		background: none repeat scroll 0 0 #F5F5F5;
+	}
 }
 
-// Fix alignment of radio buttons on post features form:
-.radio input[type="radio"][name^="timestamp_"][value="duration"] {
-	position: relative;
-	margin-right: 4px;
+// Fix alignment of radio buttons with additional input/select elements:
+.radio input[type="radio"] {
+	&[name^="timestamp_"][value="duration"],
+	&[name^="marketing_popup_show_frequency"][value="period"] {
+		position: relative;
+		margin-right: 4px;
+	}
 }
 
 // Attachments table:
@@ -1569,9 +1774,6 @@ table.diff {
 }
 .timestamp .time {
 	font-size: 84%;
-}
-.compact_data {
-	white-space: nowrap;
 }
 
 // Style fixes for email preview from back-office:
@@ -1648,13 +1850,22 @@ table.diff {
 	background-color: @status_color_meta;
 }
 
-// Aggregate filter form:
-.evo_aggregate_filter {
+// Hits diagarm filter form:
+.evo_filter_diagram_hits {
 	white-space: nowrap;
+	float: left;
+	padding-left: 15px;
 	label {
-		padding-top: 5px;
-		padding-right: 5px;
+		float: none;
+		padding: 0 5px 0 0;
 		width: auto;
+		font-weight: normal;
+		&.control-label {
+			font-weight: bold;
+		}
+		input {
+			display: inline;
+		}
 	}
 	select {
 		display: inline;
@@ -1667,5 +1878,218 @@ table.diff {
 	white-space: nowrap;
 	select, input {
 		max-width: 100%;
+	}
+}
+
+// Fix styles for jQuery plugin "QueryBuilder":
+div.query-builder .rule-container .rule-value-container {
+	border: none;
+	padding-left: 0;
+}
+
+// Style for a trasfering object, e-g when a comment is moving to a recycle bin:
+.ui-effects-transfer {
+	border: 1px solid #F00;
+}
+
+// Skin Customizer Mode:
+#customizer_wrapper {
+	padding-top: 140px;
+	.page-content {
+		margin: 0;
+		padding: 0;
+	}
+	form > .panel-group {
+		margin-bottom: 0;
+	}
+	form {
+		> .panel-group > .panel,
+		> fieldset > .panel-group > .panel,
+		> div.fieldset_wrapper > fieldset > .panel {
+			border-top: none;
+			border-left: none;
+			border-right: none;
+			border-radius: 0;
+			margin: 0;
+			box-shadow: none;
+			> .panel-heading {
+				border-radius: 0;
+			}
+			> .panel-body {
+				.form-group:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+		.fieldset > .panel {
+			margin-bottom: 20px;
+		}
+	}
+	.row {
+		margin: 0;
+		.col-md-12 {
+			padding: 0;
+		}
+	}
+	.evo_customizer__available_widgets {
+		.panel:first-child {
+			border-top: 1px solid #ddd;
+		}
+		ul.widget_list {
+			list-style: none;
+			margin: 0 0 0 2px;
+		}
+	}
+	.evo_customizer__other_lists {
+		margin: 0 0 10px 31px;
+		padding-top: 10px;
+	}
+	#fieldset_wrapper_widget_info .control-label {
+		display: none;
+	}
+	.controls .help-inline {
+		display: inline-block;
+	}
+	.form-group.checkbox-group {
+		.controls {
+			display: inline-block;
+			vertical-align: middle;
+			.checkbox {
+				padding-top: 2px;
+			}
+		}
+	}
+	.file_select_item {
+		margin: 0;
+		.item_actions {
+			margin: 0;
+			display: block;
+			width: 100%;
+			text-align: center;
+			.btn {
+				margin-right: 3px;
+			}
+			.btn:last-child {
+				margin-right: 0;
+			}
+		}
+	}
+	#current_widgets {
+		.panel {
+			border-top: none;
+			border-left: none;
+			border-right: none;
+			border-radius: 0;
+			margin-bottom: 0;
+		}
+		h4 + .panel, .panel:first-child {
+			border-top: 1px solid #ddd;
+		}
+		> p {
+			margin: 10px 5px;
+		}
+		.panel_heading_action_icons a.action_icon span.fa {
+			margin: 0;
+		}
+		.panel-group {
+			margin: 0;
+			> h4 {
+				margin: 10px;
+			}
+		}
+	}
+}
+.evo_customizer__tabs {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	border-bottom: 1px solid #CCC;
+	background: #FFF;
+	padding: 15px 15px 0 15px;
+	z-index: 3;
+	.nav {
+		margin-right: 70px;
+	}
+	.evo_customizer__menus, .evo_customizer__actions {
+		padding: 10px 15px;
+		margin: 0 -15px;
+		border-top: 1px solid #CCC;
+	}
+	.evo_customizer__menus {
+		nav .nav > li {
+			margin-right: 3px;
+			a {
+				padding: 4px 10px;
+				font-size: 92%;
+			}
+		}
+	}
+	.evo_customizer__actions {
+		a {
+			margin-right: 10px
+		}
+		a:last-child {
+			margin-right: 0
+		}
+	}
+	.evo_customizer__tab_buttons {
+		position: absolute;
+		top: 13px;
+		right: 12px;
+		.fa-backward {
+			top: 1px;
+			right: 1px;
+			position: relative;
+		}
+	}
+}
+.evo_customizer__buttons {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	padding: 15px;
+	text-align: center;
+	border-top: 1px solid #CCC;
+	background: #FFF;
+	z-index: 3;
+	.form-group, .control-buttons {
+		margin: 0;
+		padding: 0;
+	}
+	&.evo_customizer__buttons_widget_actions {
+		padding: 10px;
+		.btn-group {
+			margin: 0;
+		}
+	}
+}
+.evo_customizer__content {
+	form {
+		.panel-heading {
+			.panel-title {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
+	}
+	div.fieldset_wrapper+div.fieldset_wrapper {
+		margin-top: 0;
+	}
+}
+
+// Locale selector:
+table.evo_locale_selector {
+	width: auto;
+	margin-bottom: 0;
+}
+
+// Widget "Param Switcher" in customizer mode:
+form[data-widget-code="param_switcher"][target="evo_customizer__updater"] {
+	#fieldset_wrapper_buttons {
+		.control-label {
+			float: left;
+			padding-top: 7px;
+		}
 	}
 }

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -21,11 +21,11 @@ global $edited_User, $UserSettings, $Settings, $Plugins;
 
 global $current_User;
 
-global $servertimenow, $admin_url;
+global $servertimenow, $admin_url, $action;
 
 if( !$current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
-	debug_die( T_( 'You have no permission to see this tab!' ) );
+	debug_die( TB_( 'You have no permission to see this tab!' ) );
 }
 
 // Begin payload block:
@@ -41,12 +41,12 @@ $user_status_icons = get_user_status_icons();
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+$Form->title_fmt = '$title$';
 
-echo_user_actions( $Form, $edited_User, 'edit' );
+echo_user_actions( $Form, $edited_User, $action );
 
-$form_text_title = T_( 'User admin settings' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'admin', '<span class="nowrap">'.T_( 'User admin settings' ).'</span>'.get_manual_link( 'user-admin-tab' ) );
+$form_text_title = TB_( 'User admin settings' ); // used for js confirmation message on leave the changed form
+$form_title = get_usertab_header( $edited_User, 'admin', '<span class="nowrap">'.TB_( 'User admin settings' ).'</span>'.get_manual_link( 'user-admin-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -60,105 +60,55 @@ $Form->hidden( 'edited_user_login', $edited_User->login );
 
 /***************  User permissions  **************/
 
-$Form->begin_fieldset( T_('User permissions').get_manual_link('user-admin-permissions'), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( TB_('User permissions').get_manual_link('user-admin-permissions'), array( 'class'=>'fieldset clear' ) );
 
-$edited_User->get_Group();
-$level_fieldnote = '[0 - 10]';
+// Status:
 $status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[ $edited_User->get( 'status' ) ].'</div>';
-
-$GroupCache = & get_GroupCache();
-$group_where_sql = '';
-if( ! $current_User->check_perm( 'users', 'edit' ) )
-{	// Show the limited list for moderators:
-	$group_where_sql = 'grp_level < '.$current_User->get_Group()->get( 'level' );
-}
-
 if( $edited_User->ID == 1 )
-{	// This is Admin user, Don't allow to change status, primary group:
-	echo '<input type="hidden" name="edited_user_grp_ID" value="'.$edited_User->grp_ID.'" />';
-	$Form->info( T_('Account status'), $status_icon.' '.T_( 'Autoactivated' ) );
-	$Form->info( sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ), $edited_User->Group->dget('name') );
+{	// This is Admin user, Don't allow to change status:
+	$Form->info( TB_('Account status'), $status_icon.' '.TB_( 'Autoactivated' ) );
 }
 else
-{	// Allow to change status and primary group for non-admin users:
-	$GroupCache->clear();
-	$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' AND ' )
-		.' ( grp_usage = "primary" OR grp_ID = '.$edited_User->grp_ID.' )' );
-	$GroupCache->all_loaded = true;
-	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
-	$Form->select_object( 'edited_user_grp_ID', $edited_User->grp_ID, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
+{	// Allow to change status for non-admin users:
+	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), TB_( 'Account status' ), '', array( 'input_prefix' => $status_icon ) );
 }
 
-// Reload secondary group cache for the selects below to exclude groups that are not available for current user:
-$GroupCache->clear();
-// Secondary user groups:
-$user_secondary_groups = $edited_User->get_secondary_groups();
-if( empty( $user_secondary_groups ) )
-{	// If user has no secondary groups yet, Add one empty element to display a select box to select first secondary group:
-	$user_secondary_groups[] = 0;
-}
-$GroupCache->load_where( ( empty( $group_where_sql ) ? '' : $group_where_sql.' AND ' ).' grp_usage = "secondary"' );
-$GroupCache->all_loaded = true;
-foreach( $user_secondary_groups as $s => $user_secondary_Group )
-{
-	$field_title = ( $s == 0 ? sprintf( T_('<span %s>Secondary</span> user groups'), 'class="label label-info"' ) : '' );
-	$field_add_icon = get_icon( 'add', 'imgtag', array( 'class' => 'add_secondary_group', 'style' => 'cursor:pointer' ) );
+// Primary and secondary groups:
+display_user_groups_selectors( $edited_User, $Form );
 
-	if( empty( $user_secondary_Group ) || $user_secondary_Group->can_be_assigned() )
-	{	// Current user has a permission to assign this group:
-		$user_secondary_group_ID = empty( $user_secondary_Group ) ? 0 : $user_secondary_Group->ID;
-		$Form->select_input_object( 'edited_user_secondary_grp_ID[]', $user_secondary_group_ID, $GroupCache, $field_title, array(
-				'allow_none' => true,
-				'field_suffix' => $field_add_icon
-			) );
-	}
-	else
-	{	// Current user has no permission to assign this group:
-		$Form->info_field( $field_title, $user_secondary_Group->get_name().' '.$field_add_icon, array(
-				// Use this param to add html attribute "id" for the fieldset in order to add new group by JS:
-				'name' => 'edited_user_secondary_grp_ID_'.$user_secondary_Group->ID
-			) );
-	}
-}
-// Use this hidden select element as template for JS code to add new secondary groups:
-echo '<div id="template_secondary_group_block" style="display:none">';
-$Form->select_input_object( 'template_secondary_group_select', 0, $GroupCache, '', array(
-		'allow_none' => true,
-		'field_suffix' => $field_add_icon
-	) );
-echo '</div>';
-
+// User level:
+$level_fieldnote = '[0 - 10]';
 if( $edited_User->ID == 1 )
 {	// This is Admin user, Don't allow to change level:
-	$Form->info_field( T_('User level'), $edited_User->get('level'), array( 'note' => $level_fieldnote ) );
+	$Form->info_field( TB_('User level'), $edited_User->get('level'), array( 'note' => $level_fieldnote ) );
 }
 else
 {	// Allow to change level for non-admin users:
-	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $level_fieldnote, array( 'required' => true ) );
+	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, TB_('User level'), $level_fieldnote, array( 'required' => true ) );
 }
 
 $Form->end_fieldset(); // user permissions
 
-$Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
+$Form->begin_fieldset( TB_('Email').get_manual_link('user-admin-email') );
 
-	$Form->begin_line( T_('Email') );
-		$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-		$Form->text_input( 'edited_user_email', $edited_User->get( 'email' ), 30, '', $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+	$Form->begin_line( TB_('Email') );
+		$email_fieldnote = '<a href="mailto:'.$edited_User->get( 'email' ).'" class="'.button_class().'">'.get_icon( 'email', 'imgtag', array('title'=>TB_('Send an email')) ).'</a>';
+		$Form->email_input( 'edited_user_email', $edited_User->get( 'email' ), 30, '', array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
 
 		$email_status = $edited_User->get_email_status();
 		$email_status_icon = '<div id="email_status_icon" class="status_icon">'.emadr_get_status_icon( $email_status ).'</div>';
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{
-			$Form->select_input_array( 'edited_email_status', $email_status, emadr_get_status_titles(), '<b class="evo_label_inline">'.T_('Status').': </b>'.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors() ) );
+			$Form->select_input_array( 'edited_email_status', $email_status, emadr_get_status_titles(), '<b class="evo_label_inline">'.TB_('Status').': </b>'.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => emadr_get_status_colors() ) );
 		}
 		else
 		{ // Moderators can only view the email status
 			$email_status_titles = emadr_get_status_titles();
-			$Form->info( '<b class="evo_label_inline">'.T_('Status').': </b>', $email_status_icon.$email_status_titles[ $email_status ] );
+			$Form->info( '<b class="evo_label_inline">'.TB_('Status').': </b>', $email_status_icon.$email_status_titles[ $email_status ] );
 		}
 	$Form->end_line();
 
-	user_domain_info_display( T_('Email domain'), 'email_domain_status', $edited_User->get_email_domain(), $Form );
+	user_domain_info_display( TB_('Email domain'), 'email_domain_status', $edited_User->get_email_domain(), $Form );
 
 	global $UserSettings;
 
@@ -168,13 +118,13 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	$notifcation_sender_email_note = '';
 	if( empty( $notifcation_sender_email ) )
 	{
-		$notifcation_sender_email_note = T_('Will use the default sender address which is:').' '.$default_notification_sender_email;
+		$notifcation_sender_email_note = TB_('Will use the default sender address which is:').' '.$default_notification_sender_email;
 	}
 	elseif( $default_notification_sender_email != $notifcation_sender_email )
 	{
-		$notifcation_sender_email_note = get_icon( 'warning_yellow' ).' '.T_('This is different from the new sender address which is currently:').' '.$default_notification_sender_email;
+		$notifcation_sender_email_note = get_icon( 'warning_yellow' ).' '.TB_('This is different from the new sender address which is currently:').' '.$default_notification_sender_email;
 	}
-	$Form->text_input( 'notification_sender_email', $notifcation_sender_email, 50, T_( 'Sender email address' ), $notifcation_sender_email_note );
+	$Form->email_input( 'notification_sender_email', $notifcation_sender_email, 50, TB_( 'Sender email address' ), array( 'note' => $notifcation_sender_email_note ) );
 
 	// Display notification sender name setting
 	$default_notification_sender_name = $Settings->get( 'notification_sender_name' );
@@ -182,13 +132,13 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 	$notifcation_sender_name_note = '';
 	if( empty( $notification_sender_name ) )
 	{
-		$notifcation_sender_name_note = T_('Will use the default sender name which is:').' '.$default_notification_sender_name;
+		$notifcation_sender_name_note = TB_('Will use the default sender name which is:').' '.$default_notification_sender_name;
 	}
 	elseif( $default_notification_sender_name != $notification_sender_name )
 	{
-		$notifcation_sender_name_note = get_icon( 'warning_yellow' ).' '.T_('This is different from the new sender name which is currently:').' '.$default_notification_sender_name;
+		$notifcation_sender_name_note = get_icon( 'warning_yellow' ).' '.TB_('This is different from the new sender name which is currently:').' '.$default_notification_sender_name;
 	}
-	$Form->text_input( 'notification_sender_name', $notification_sender_name, 50, T_( 'Sender name' ), $notifcation_sender_name_note );
+	$Form->text_input( 'notification_sender_name', $notification_sender_name, 50, TB_( 'Sender name' ), $notifcation_sender_name_note );
 
 	// Display user account activation info ( Last/Next activate account email )
 	$account_activation_info = get_account_activation_info( $edited_User );
@@ -200,154 +150,167 @@ $Form->begin_fieldset( T_('Email').get_manual_link('user-admin-email') );
 
 	// Display last unread messages reminder info
 	$last_unread_messages_reminder = $UserSettings->get( 'last_unread_messages_reminder', $edited_User->ID );
-	$Form->info_field( T_('Latest unread messages reminder'), empty( $last_unread_messages_reminder ) ? T_('None yet') : format_to_output( $last_unread_messages_reminder ), array( 'note' => T_(' Scheduled job responsible for reminders is "Send reminders about unread messages".') ) );
+	$Form->info_field( TB_('Latest unread messages reminder'), empty( $last_unread_messages_reminder ) ? TB_('None yet') : format_to_output( $last_unread_messages_reminder ), array( 'note' => TB_(' Scheduled job responsible for reminders is "Send reminders about unread messages".') ) );
 	// Display next unread message reminder info
 	$reminder_info = get_next_reminder_info( $edited_User->ID );
 	if( is_array( $reminder_info ) )
 	{ // We have field note to display
-		$Form->info_field( T_('Next unread messages reminder'), $reminder_info[0], array( 'note' => $reminder_info[1] ) );
+		$Form->info_field( TB_('Next unread messages reminder'), $reminder_info[0], array( 'note' => $reminder_info[1] ) );
 	}
 	else
 	{ // Display next reminder info, without note
-		$Form->info_field( T_('Next unread messages reminder'), $reminder_info );
+		$Form->info_field( TB_('Next unread messages reminder'), $reminder_info );
 	}
 
 	// Display information about notification emails
 	$last_notification_email = $UserSettings->get( 'last_notification_email', $edited_User->ID );
 	if( empty( $last_notification_email ) )
 	{ // Notification email to the edited User was not sent yet
-		$Form->info_field( T_('Latest notification email'), T_('None yet'), array( 'note' => T_('The latest between all kind of notification emails.') ) );
+		$Form->info_field( TB_('Latest notification email'), TB_('None yet'), array( 'note' => TB_('The latest between all kind of notification emails.') ) );
 	}
 	else
 	{ // At least one notification email was sent
 		// Separator between the last notification email timestamp and counter
 		$counter_separator = strpos( $last_notification_email, '_' );
 		$last_notificaiton_timestamp = substr( $last_notification_email, 0, $counter_separator );
-		$last_notificaiton_date = format_to_output( date2mysql( $last_notificaiton_timestamp ) );
-		$Form->info_field( T_('Latest notification email'), $last_notificaiton_date, array( 'note' => T_('The latest between all kind of notification emails.') ) );
+		$last_notificaiton_date = mysql2localedatetime( date2mysql( $last_notificaiton_timestamp ) );
+		$Form->info_field( TB_('Latest notification email'), $last_notificaiton_date, array( 'note' => TB_('The latest between all kind of notification emails.') ) );
 		$notification_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_notificaiton_timestamp ) ) ? substr( $last_notification_email, $counter_separator + 1 ) : 0;
 		$notification_limit = $UserSettings->get( 'notification_email_limit',  $edited_User->ID );
-		$Form->info_field( T_('Notifications already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $notification_counter, $notification_limit ) );
+		$Form->info_field( TB_('Notifications already sent today'), sprintf( TB_('%d out of a maximum allowed of %d'), $notification_counter, $notification_limit ) );
 	}
 
 	// Display information about newsletters
 	$last_newsletter = $UserSettings->get( 'last_newsletter', $edited_User->ID );
 	if( empty( $last_newsletter ) )
 	{ // Newsletter to the edited User was not sent yet
-		$Form->info_field( T_('Latest newsletter'), T_('None yet') );
+		$Form->info_field( TB_('Latest list'), TB_('None yet') );
 	}
 	else
 	{ // At least one newsletter was sent
 		// Separator between the last newsletter timestamp and counter
 		$counter_separator = strpos( $last_newsletter, '_' );
 		$last_newsletter_timestamp = substr( $last_newsletter, 0, $counter_separator );
-		$last_newsletter_date = format_to_output( date2mysql( $last_newsletter_timestamp ) );
-		$Form->info_field( T_('Latest newsletter'), $last_newsletter_date );
+		$last_newsletter_date = mysql2localedatetime( date2mysql( $last_newsletter_timestamp ) );
+		$Form->info_field( TB_('Latest list'), $last_newsletter_date );
 		$newsletter_counter = ( date( 'Ymd', $servertimenow ) == date( 'Ymd', $last_newsletter_timestamp ) ) ? substr( $last_newsletter, $counter_separator + 1 ) : 0;
 		$newsletter_limit = $UserSettings->get( 'newsletter_limit',  $edited_User->ID );
-		$Form->info_field( T_('Newsletters already sent today'), sprintf( T_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
+		$Form->info_field( TB_('Lists already sent today'), sprintf( TB_('%d out of a maximum allowed of %d'), $newsletter_counter, $newsletter_limit ) );
 	}
+
+	// Display date/time of the latest inactive account email reminder:
+	$last_inactive_status_email = $UserSettings->get( 'last_inactive_status_email', $edited_User->ID );
+	$Form->info_field( TB_('Latest inactive account email'), empty( $last_inactive_status_email ) ? TB_('None yet') : mysql2localedatetime( $last_inactive_status_email ) );
 $Form->end_fieldset(); // Email info
 
-$Form->begin_fieldset( T_('Usage info').get_manual_link('user-admin-usage') );
+$Form->begin_fieldset( TB_('Usage info').get_manual_link('user-admin-usage') );
 
 	$activity_tab_url = '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab=activity';
 
-	$Form->info_field( T_('ID'), $edited_User->ID );
+	$Form->info_field( TB_('ID'), $edited_User->ID );
 
 	// Other users reports from the edited User
-	$Form->info_field( T_('Reports'), count_reports_from( $edited_User->ID ) );
+	$Form->info_field( TB_('Reports'), count_reports_from( $edited_User->ID ) );
 
 	// Number of blogs owned by the edited User
 	$blogs_owned_num = $edited_User->get_num_blogs();
 	$blogs_owned = $blogs_owned_num;
 	if( $blogs_owned > 0 )
 	{
-		$blogs_owned .= ' - <a href="'.$activity_tab_url.'#owned_blogs_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+		$blogs_owned .= ' - <a href="'.$activity_tab_url.'#owned_blogs_result" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to user activity') ) ).'</a>';
 	}
-	$Form->info_field( T_('Blogs owned'), $blogs_owned, array( 'class' => $blogs_owned_num > 0 ? 'info_full_height' : '' ) );
+	$Form->info_field( TB_('Blogs owned'), $blogs_owned, array( 'class' => $blogs_owned_num > 0 ? 'info_full_height' : '' ) );
 
 	// Number of post created and edited by the edited User:
 	$posts_created = $edited_User->get_num_posts();
 	$posts_edited = $edited_User->get_num_edited_posts();
-	$Form->begin_line( T_('Posts created'), NULL, ( $posts_created > 0 || $posts_edited > 0 ) ? '' : 'info' );
+	$Form->begin_line( TB_('Posts created'), NULL, ( $posts_created > 0 || $posts_edited > 0 ) ? '' : 'info' );
 		if( $posts_created > 0 )
 		{
-			$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-			$posts_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-			$posts_created .= get_manual_link( 'delete-user-data' );
+			$posts_created .= ' - <a href="'.$activity_tab_url.'#created_posts_result" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to user activity') ) ).'</a>';
+			if( $action != 'view' )
+			{	// If current user can edit this user:
+				$posts_created .= ' - '.action_icon( TB_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.TB_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+				$posts_created .= get_manual_link( 'delete-user-data' );
+			}
 		}
 		$Form->info_field( '', $posts_created );
 		if( $posts_edited > 0 )
 		{
-			$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
+			$posts_edited .= ' - <a href="'.$activity_tab_url.'#edited_posts_result" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to user activity') ) ).'</a>';
 		}
-		$Form->info_field( '<b class="evo_label_inline">'.T_('Edited').': </b>', $posts_edited );
+		$Form->info_field( '<b class="evo_label_inline">'.TB_('Edited').': </b>', $posts_edited );
 	$Form->end_line( NULL, ( $posts_created > 0 || $posts_edited > 0 ) ? '' : 'info' );
 
 	// Number of comments created by the edited User
 	evo_flush(); // The following might take a while on systems with many comments
 	// Get the number of edited User comments, but count recycled comments only if the user has global editall blogs permission
-	$comments_created_num = $edited_User->get_num_comments( '', $current_User->check_perm( 'blogs', 'editall', false ) );
+	$comments_created_num = $edited_User->get_num_comments( '', check_user_perm( 'blogs', 'editall', false ) );
 	$comments_created = $comments_created_num;
 	if( $comments_created > 0 )
 	{
-		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-		$comments_created .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-		$comments_created .= get_manual_link( 'delete-user-data' );
+		$comments_created .= ' - <a href="'.$activity_tab_url.'#comments_result" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to user activity') ) ).'</a>';
+		if( $action != 'view' )
+		{	// If current user can edit this user:
+			$comments_created .= ' - '.action_icon( TB_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.TB_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+			$comments_created .= get_manual_link( 'delete-user-data' );
+		}
 	}
-	$Form->info_field( T_('Comments'), $comments_created, array( 'class' => $comments_created_num > 0 ? 'info_full_height' : '' ) );
+	$Form->info_field( TB_('Comments'), $comments_created, array( 'class' => $comments_created_num > 0 ? 'info_full_height' : '' ) );
 
 	// Number of edited User's sessions:
 	$num_sessions = $edited_User->get_num_sessions( true );
-	$Form->info_field( T_('# of sessions'), $num_sessions, array( 'class' => $num_sessions > 0 ? 'info_full_height' : '' ) );
+	$Form->info_field( TB_('# of sessions'), $num_sessions, array( 'class' => $num_sessions > 0 ? 'info_full_height' : '' ) );
 
 	// Number of sent and received private messages:
 	$messages_sent = $edited_User->get_num_messages( 'sent' );
 	$messages_received = $edited_User->get_num_messages( 'received' );
-	$Form->begin_line( T_('# of private messages sent'), NULL, ( $messages_sent > 0 || $messages_received > 0 ) ? '' : 'info' );
+	$Form->begin_line( TB_('# of private messages sent'), NULL, ( $messages_sent > 0 || $messages_received > 0 ) ? '' : 'info' );
 		if( $messages_sent > 0 )
 		{
-			$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="'.button_class().' middle" title="'.format_to_output( T_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to user activity') ) ).'</a>';
-			if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+			$messages_sent .= ' - <a href="'.$activity_tab_url.'#threads_result" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to user activity'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to user activity') ) ).'</a>';
+			if( check_user_perm( 'perm_messaging', 'abuse' ) )
 			{
-				$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.T_('Go to abuse management').' &raquo;</a>';
+				$messages_sent .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'">'.TB_('Go to abuse management').' &raquo;</a>';
 			}
-			$messages_sent .= ' - '.action_icon( T_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.T_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
-			$messages_sent .= get_manual_link( 'delete-user-data' );
+			if( $action != 'view' )
+			{	// If current user can edit this user:
+				$messages_sent .= ' - '.action_icon( TB_('Delete All').'...', 'delete', $admin_url.'?ctrl=user&amp;user_tab=deldata&amp;user_ID='.$edited_User->ID, ' '.TB_('Delete All').'...', 3, 4, array( 'onclick' => 'return user_deldata( '.$edited_User->ID.', \''.get_param( 'user_tab' ).'\')' ) );
+				$messages_sent .= get_manual_link( 'delete-user-data' );
+			}
 		}
 		$Form->info_field( '', $messages_sent );
-		if( $messages_received > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+		if( $messages_received > 0 && check_user_perm( 'perm_messaging', 'abuse' ) )
 		{
-			$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="'.button_class().' middle" title="'.format_to_output( T_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Go to abuse management') ) ).'</a>';
+			$messages_received .= ' - <a href="'.$admin_url.'?ctrl=abuse&amp;colselect_submit=Filter+list&amp;u='.$edited_User->login.'" class="'.button_class().' middle" title="'.format_to_output( TB_('Go to abuse management'), 'htmlattr' ).'">'.get_icon( 'magnifier', 'imgtag', array( 'title' => TB_('Go to abuse management') ) ).'</a>';
 		}
-		$Form->info_field( '<b class="evo_label_inline">'.T_('Received').': </b>', $messages_received );
+		$Form->info_field( '<b class="evo_label_inline">'.TB_('Received').': </b>', $messages_received );
 	$Form->end_line( NULL, ( $messages_sent > 0 || $messages_received > 0 ) ? '' : 'info' );
 
-	$Form->begin_line( T_('Last seen on'), NULL, 'info' );
+	$Form->begin_line( TB_('Last seen on'), NULL, 'info' );
 		$edited_user_lastseen = $edited_User->get( 'lastseen_ts' );
 		$Form->info_field( '', ( empty( $edited_user_lastseen ) ? '' : mysql2localedatetime( $edited_user_lastseen ) ) );
-		$Form->info_field( '<b class="evo_label_inline">'.T_('On IP').': </b>', $edited_User->get_last_session_param('ipaddress') );
+		$Form->info_field( '<b class="evo_label_inline">'.TB_('On IP').': </b>', $edited_User->get_last_session_param('ipaddress') );
 	$Form->end_line( NULL, 'info' );
 $Form->end_fieldset(); // Usage info
 
-$Form->begin_fieldset( T_('Reputation').get_manual_link('user-admin-reputaion') );
+$Form->begin_fieldset( TB_('Reputation').get_manual_link('user-admin-reputation') );
 
-	$Form->info( T_('Posts'), $edited_User->get_reputation_posts() );
+	$Form->info( TB_('Posts'), $edited_User->get_reputation_posts() );
 
-	$Form->info( T_('Comments'), '<span class="reputation_message">'.$edited_User->get_reputation_comments( array( 'view_type' => 'extended' ) ).'</span>' );
+	$Form->info( TB_('Comments'), '<span class="reputation_message">'.$edited_User->get_reputation_comments( array( 'view_type' => 'extended' ) ).'</span>' );
 
-	$Form->info( T_('Photos'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'image', 'view_type' => 'extended' ) ).'</span>' );
+	$Form->info( TB_('Photos'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'image', 'view_type' => 'extended' ) ).'</span>' );
 
-	$Form->info( T_('Audio'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
+	$Form->info( TB_('Audio'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
 
-	$Form->info( T_('Video'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'video' ) ).'</span>' );
+	$Form->info( TB_('Video'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'video' ) ).'</span>' );
 
-	$Form->info( T_('Other files'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
+	$Form->info( TB_('Other files'), '<span class="reputation_message">'.$edited_User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
 
-	$Form->info( T_('Upload total'), '<span class="repuration_message">'.$edited_User->get_reputation_total_upload().'</span>' );
+	$Form->info( TB_('Upload total'), '<span class="repuration_message">'.$edited_User->get_reputation_total_upload().'</span>' );
 
-	$Form->info( T_('Spam fighter score'), '<span class="reputation_message">'.$edited_User->get_reputation_spam().'</span>' );
+	$Form->info( TB_('Spam fighter score'), '<span class="reputation_message">'.$edited_User->get_reputation_spam().'</span>' );
 
 $Form->end_fieldset(); // Reputation
 
@@ -370,15 +333,15 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	$user_from_country_suffix .= $loop_Plugin->GetUserFromCountrySuffix( $tmp_params );
 }
 
-$Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-registration') );
+$Form->begin_fieldset( TB_('Registration info').get_manual_link('user-admin-registration') );
 	$user_ip_address = int2ip( $UserSettings->get( 'created_fromIPv4', $edited_User->ID ) );
-	$Form->begin_line( T_('Account registered on'), NULL, 'info' );
+	$Form->begin_line( TB_('Account registered on'), NULL, 'info' );
 		$Form->info_field( '', mysql2localedatetime( $edited_User->dget('datecreated') ), array( 'note' => '('.date_ago( strtotime( $edited_User->get( 'datecreated' ) ) ).')') );
-		$Form->info_field( '<b class="evo_label_inline">'.T_('From IP').': </b>',
-			$user_ip_address.( empty( $user_ip_address ) ? '' : ' <a href="" class="btn btn-default" onclick="return get_whois_info(\''.$user_ip_address.'\');">'.get_icon( 'magnifier' ).'</a>' ) );
+		$Form->info_field( '<b class="evo_label_inline">'.TB_('From IP').': </b>',
+			$user_ip_address.( empty( $user_ip_address ) ? '' : ' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$user_ip_address.'" class="btn btn-info middle" onclick="return get_whois_info(\''.$user_ip_address.'\');">'.get_icon( 'magnifier' ).'</a>' ) );
 	$Form->end_line( NULL, 'info' );
 
-	if( $current_User->check_perm( 'spamblacklist', 'view' ) )
+	if( check_user_perm( 'spamblacklist', 'view' ) )
 	{ // User can view IP ranges
 		// Get status and name of IP range
 		$IPRangeCache = & get_IPRangeCache();
@@ -386,7 +349,7 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 		{ // IP range exists in DB
 			$iprange_status = $IPRange->get( 'status' );
 			$iprange_name = $IPRange->get_name();
-			if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
+			if( check_user_perm( 'spamblacklist', 'view' ) )
 			{	// Display IP range as link to edit form if current user has the permissions:
 				$iprange_name = '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$iprange_name.'</a>';
 			}
@@ -396,47 +359,47 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 			$iprange_status = '';
 			$iprange_name = '';
 		}
-		$perm_spamblacklist = $current_User->check_perm( 'spamblacklist', 'edit' );
-		$Form->begin_line( T_('IP range'), NULL, ( $perm_spamblacklist ? '' : 'info' ) );
+		$perm_spamblacklist = check_user_perm( 'spamblacklist', 'edit' );
+		$Form->begin_line( TB_('IP range'), NULL, ( $perm_spamblacklist ? '' : 'info' ) );
 			$Form->info_field( '', $iprange_name );
 			$email_status_icon = '<div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>';
 			if( $perm_spamblacklist )
 			{ // User can edit IP ranges
-				$Form->select_input_array( 'edited_iprange_status', $iprange_status, aipr_status_titles( true ), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors() ) );
+				$Form->select_input_array( 'edited_iprange_status', $iprange_status, aipr_status_titles( true ), '<b class="evo_label_inline">'.TB_( 'Status' ).': </b>'.$email_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => aipr_status_colors() ) );
 			}
 			else
 			{ // Only view status of IP range
-				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>', $email_status_icon.aipr_status_title( $iprange_status ) );
+				$Form->info( '<b class="evo_label_inline">'.TB_( 'Status' ).': </b>', $email_status_icon.aipr_status_title( $iprange_status ) );
 			}
 		$Form->end_line( NULL, ( $perm_spamblacklist ? '' : 'info' ) );
 	}
 
-	$Form->info_field( T_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
+	$Form->info_field( TB_('From Country'), $from_country, array( 'field_suffix' => $user_from_country_suffix ) );
 
-	user_domain_info_display( T_('From Domain'), 'domain_status', $UserSettings->get( 'user_registered_from_domain', $edited_User->ID ), $Form );
+	user_domain_info_display( TB_('From Domain'), 'domain_status', $UserSettings->get( 'user_registered_from_domain', $edited_User->ID ), $Form );
 
-	$Form->info_field( T_('With Browser'), format_to_output( $UserSettings->get( 'user_browser', $edited_User->ID ) ) );
+	$Form->info_field( TB_('With Browser'), format_to_output( $UserSettings->get( 'user_browser', $edited_User->ID ) ) );
 
-	$Form->text_input( 'edited_user_source', $edited_User->source, 30, T_('Source link/code'), '', array( 'maxlength' => 30 ) );
+	$Form->text_input( 'edited_user_source', $edited_User->source, 30, TB_('Source link/code'), '', array( 'maxlength' => 30 ) );
 
-	$Form->info_field( T_('Registration trigger Page'), $UserSettings->get( 'registration_trigger_url', $edited_User->ID ) );
+	$Form->info_field( TB_('Registration trigger Page'), $UserSettings->get( 'registration_trigger_url', $edited_User->ID ) );
 
-	$Form->begin_line( T_('Initial Blog ID'), NULL, 'info' );
+	$Form->begin_line( TB_('Initial Blog ID'), NULL, 'info' );
 		$Form->info_field( '', $UserSettings->get( 'initial_blog_ID', $edited_User->ID ) );
-		$Form->info_field( '<b class="evo_label_inline">'.T_('Initial URI').': </b>', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
+		$Form->info_field( '<b class="evo_label_inline">'.TB_('Initial URI').': </b>', $UserSettings->get( 'initial_URI', $edited_User->ID ) );
 	$Form->end_line( NULL, 'info' );
 
-	$perm_stat_edit = $current_User->check_perm( 'stats', 'edit' );
+	$perm_stat_edit = check_user_perm( 'stats', 'edit' );
 	$initial_referer = $UserSettings->get( 'initial_referer', $edited_User->ID );
-	$display_initial_referer = ( ! empty( $initial_referer ) && $current_User->check_perm( 'stats', 'list' ) );
-	$Form->begin_line( T_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
+	$display_initial_referer = ( ! empty( $initial_referer ) && check_user_perm( 'stats', 'list' ) );
+	$Form->begin_line( TB_('Initial referer'), NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
 		$Domain = & get_Domain_by_url( $initial_referer );
 		$initial_referer_formatted = format_to_output( $initial_referer );
 		if( $Domain && $perm_stat_edit )
 		{
-			$initial_referer_formatted = preg_replace( '#^(.+)('.preg_quote( trim( $Domain->get( 'name' ), '.' ) ).')(/(.+)?|$)#i',
+			$initial_referer_formatted = preg_replace( '#^(.+)('.preg_quote( trim( $Domain->get( 'name' ), '.' ), '#' ).')(/(.+)?|$)#i',
 				'$1<a href="'.$admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID.'" '
-					.'title="'.format_to_output( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">$2</a>$3',
+					.'title="'.format_to_output( sprintf( TB_('Edit domain %s'), $Domain->get( 'name' ) ), 'htmlattr' ).'">$2</a>$3',
 				$initial_referer_formatted );
 		}
 		$Form->info_field( '', '<a href="'.$initial_referer.'" target="_blank">'.get_icon( 'permalink' ).'</a> '.$initial_referer_formatted );
@@ -451,17 +414,17 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 				$domain_status_action = '';
 				if( !$Domain || $initial_referer_domain != $Domain->get( 'name' ) )
 				{ // Link to create a new domain
-					$domain_status_action .= action_icon( sprintf( T_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked&amp;dom_type=normal' );
+					$domain_status_action .= action_icon( sprintf( TB_('Add domain %s'), $initial_referer_domain ), 'new', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;dom_name='.$initial_referer_domain.'&amp;dom_status=blocked&amp;dom_type=normal' );
 				}
 				if( $Domain )
 				{ // Link to edit existing domain
-					$domain_status_action .= action_icon( sprintf( T_('Edit domain %s'), $Domain->get( 'name' ) ), 'edit', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID );
+					$domain_status_action .= action_icon( sprintf( TB_('Edit domain %s'), $Domain->get( 'name' ) ), 'edit', $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_edit&amp;dom_ID='.$Domain->ID );
 				}
-				$Form->select_input_array( 'edited_initial_referer_status', $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.T_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
+				$Form->select_input_array( 'edited_initial_referer_status', $domain_status, stats_dom_status_titles(), '<b class="evo_label_inline">'.TB_( 'Status' ).': </b>'.$domain_status_icon, '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'field_suffix' => $domain_status_action ) );
 			}
 			else
 			{ // Only view status of Domain
-				$Form->info( '<b class="evo_label_inline">'.T_( 'Status' ).': </b>', $domain_status_icon.stats_dom_status_title( $domain_status ) );
+				$Form->info( '<b class="evo_label_inline">'.TB_( 'Status' ).': </b>', $domain_status_icon.stats_dom_status_title( $domain_status ) );
 			}
 		}
 	$Form->end_line( NULL, ( $display_initial_referer && $perm_stat_edit ? '' : 'info' ) );
@@ -470,36 +433,37 @@ $Form->begin_fieldset( T_('Registration info').get_manual_link('user-admin-regis
 	if( $edited_User->check_status( 'is_closed' ) )
 	{
 		$account_close_ts = $UserSettings->get( 'account_close_ts', $edited_User->ID );
-		$account_close_date =  empty( $account_close_ts ) ? T_( 'Unknown date' ) : format_to_output( date2mysql( $account_close_ts ) );
-		//$days_on_site = empty( $account_close_ts ) ? T_( 'Unknown' ) : ( round( ( $account_close_ts - $registration_ts ) / 86400/* 60*60*24 */) );
+		$account_close_date =  empty( $account_close_ts ) ? TB_( 'Unknown date' ) : format_to_output( date2mysql( $account_close_ts ) );
+		//$days_on_site = empty( $account_close_ts ) ? TB_( 'Unknown' ) : ( round( ( $account_close_ts - $registration_ts ) / 86400/* 60*60*24 */) );
 	}
 	else
 	{
-		$account_close_date = 'n/a';
+		$account_close_date = /* TRANS: "Not Available" */ TB_('N/A');
 		//$days_on_site = ( round( ( $servertimenow - $registration_ts ) / 86400/* 60*60*24 */) );
 	}
 
-	$Form->info_field( T_('Account closed on'), $account_close_date );
+	$Form->info_field( TB_('Account closed on'), $account_close_date );
 	$textarea_params = array( 'cols' => 40, 'maxlength' => 255, 'style' =>'resize: none' );
 	if( $edited_User->ID == 1 )
 	{
 		$textarea_params['disabled'] = "disabled";
 	}
-	$Form->textarea_input( 'account_close_reason', $UserSettings->get( 'account_close_reason', $edited_User->ID ), 4, T_('Account close reason'), $textarea_params );
-	//$Form->info_field( T_('Days on site'), $days_on_site );
+	$Form->textarea_input( 'account_close_reason', $UserSettings->get( 'account_close_reason', $edited_User->ID ), 4, TB_('Account close reason'), $textarea_params );
+	//$Form->info_field( TB_('Days on site'), $days_on_site );
 
 $Form->end_fieldset(); // Registration info
 
-$action_buttons = array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
-
-$Form->buttons( $action_buttons );
+if( $action != 'view' )
+{	// If current user can edit this user:
+	$Form->buttons( array( array( '', 'actionArray[update]', TB_('Save Changes!'), 'SaveButton' ) ) );
+}
 
 $Form->end_form();
 
 // End payload block:
 $this->disp_payload_end();
 ?>
-<script type="text/javascript">
+<script>
 var user_status_icons = new Array;
 <?php
 foreach( $user_status_icons as $status => $icon )
@@ -520,22 +484,8 @@ jQuery( '#edited_user_status' ).change( function()
 	}
 } );
 
-jQuery( document ).on( 'click', '.add_secondary_group', function()
-{	// Add new select element for new secondary group:
-	var current_fieldset = jQuery( this ).closest( '[id^=ffield_]' );
-
-	// Clone template fieldset to add one new:
-	var new_fieldset = jQuery( '#ffield_template_secondary_group_select' ).clone();
-
-	// Set correct field name that is used on form submit:
-	new_fieldset.find( 'select' ).attr( 'name', 'edited_user_secondary_grp_ID[]' );
-
-	// Add new fieldset after current:
-	current_fieldset.after( new_fieldset );
-} );
-
 <?php
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 { // START OF email status change script
 ?>
 var email_status_icons = new Array;
@@ -585,7 +535,7 @@ jQuery( 'input#edited_user_email' ).keyup( function()
 <?php } // END OF email status change script ?>
 
 <?php
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 { // User can edit IP ranges
 ?>
 var iprange_status_icons = new Array;
@@ -611,7 +561,7 @@ jQuery( '#edited_iprange_status' ).change( function()
 <?php } ?>
 
 <?php
-if( $current_User->check_perm( 'stats', 'edit' ) )
+if( check_user_perm( 'stats', 'edit' ) )
 { // User can edit Domain
 ?>
 var domain_status_icons = new Array;
@@ -635,37 +585,4 @@ jQuery( '#edited_domain_status, #edited_initial_referer_status, #edited_email_do
 	}
 } );
 <?php } ?>
-
-function get_whois_info( ip_address )
-{
-	var window_height = jQuery( window ).height();
-	var margin_size_height = 20;
-	var modal_height = window_height - ( margin_size_height * 2 );
-
-	openModalWindow(
-			'<span id="spinner" class="loader_img loader_user_report absolute_center" title="<?php echo T_('Querying WHOIS server...');?>"></span>',
-			'90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true, true );
-
-	jQuery.ajax(
-	{
-		type: 'GET',
-		url: '<?php echo get_htsrv_url().'async.php';?>',
-		data: {
-			action: 'get_whois_info',
-			query: ip_address,
-			window_height: modal_height
-		},
-		success: function( result )
-		{
-			if( ajax_response_is_correct( result ) )
-			{
-				result = ajax_debug_clear( result );
-				openModalWindow( result, '90%', modal_height + 'px', true, 'WHOIS - ' + ip_address, true );
-			}
-		}
-	} );
-
-	return false;
-}
-
 </script>

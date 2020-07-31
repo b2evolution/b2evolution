@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -17,6 +17,11 @@
  * Do the MAIN initializations:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
 
 // Disable log in with HTTP basic authentication because we need some action even for anonymous users,
 // but it is impossible if wrong login was entered on "HTTP Basic Authentication" form.
@@ -56,15 +61,42 @@ $debug_jslog = false;
 $allow_evo_stats = false;
 
 // Init AJAX log
-$Ajaxlog = new Log();
+$ajax_Log = new Log();
 
-$Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
+ajax_log_add( sprintf( 'action: %s', $action ), 'note' );
 
 $params = param( 'params', 'array', array() );
 switch( $action )
 {
+	case 'get_item_form':
+		// Display item form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		$cat_ID = param( 'cat', 'integer' );
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get( 'locale' ) );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{	// Initialize collection skin folder to check if it has a specific new item form:
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		require skin_template_path( '_item_new_form.inc.php' );
+		break;
+
 	case 'get_comment_form':
-		// display comment form
+		// Display comment form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
 		$ItemCache = & get_ItemCache();
 		$Item = $ItemCache->get_by_ID( $item_ID );
 		$BlogCache = & get_BlogCache();
@@ -90,6 +122,8 @@ switch( $action )
 		$recipient_id = param( 'recipient_id', 'integer', 0 );
 		$recipient_name = param( 'recipient_name', 'string', '' );
 		$subject = param( 'subject', 'string', '' );
+		$subject_other = param( 'subject_other', 'string', '' );
+		$contact_method = param( 'contact_method', 'string', '' );
 		$email_author = param( 'email_author', 'string', '' );
 		$email_author_address = param( 'email_author_address', 'string', '' );
 		$redirect_to = param( 'redirect_to', 'url', '' );
@@ -99,22 +133,6 @@ switch( $action )
 		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 		locale_activate( $Blog->get('locale') );
-
-		if( $recipient_id > 0 )
-		{ // Get identity link for existed users
-			$RecipientCache = & get_UserCache();
-			$Recipient = $RecipientCache->get_by_ID( $recipient_id );
-			$recipient_link = $Recipient->get_identity_link( array( 'link_text' => 'nickname' ) );
-		}
-		else if( $comment_id > 0 )
-		{ // Anonymous Users
-			$gender_class = '';
-			if( check_setting( 'gender_colored' ) )
-			{ // Set a gender class if the setting is ON
-				$gender_class = ' nogender';
-			}
-			$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
-		}
 
 		$blog_skin_ID = $Blog->get_skin_ID();
 		if( ! empty( $blog_skin_ID ) )
@@ -128,6 +146,54 @@ switch( $action )
 		break;
 
 
+	case 'get_widget_form':
+		// Display widget form:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		if( param( 'wi_ID', 'integer', 0 ) )
+		{	// Try to get a Widget by ID if it called from DB:
+			$WidgetCache = & get_WidgetCache();
+			$Widget = & $WidgetCache->get_by_ID( $wi_ID );
+			if( ! $Widget || ( $Widget->get( 'coll_ID' ) !== NULL && $Widget->get( 'coll_ID' ) != $blog_ID ) )
+			{
+				debug_die( 'Wrong widget request!' );
+			}
+		}
+		else
+		{	// Try to get a Widget by code if it called from content with inline short tag like [emailcapture]:
+			param( 'wi_code', 'string', true );
+			if( ! file_exists( $inc_path.'widgets/widgets/_'.$wi_code.'.widget.php' ) )
+			{	// For some reason, that widget doesn't seem to exist... (any more?)
+				debug_die( 'Wrong widget request!' );
+			}
+			require_once $inc_path.'widgets/widgets/_'.$wi_code.'.widget.php';
+			// Create new widget by provided code:
+			$widget_classname = $wi_code.'_Widget';
+			$Widget = new $widget_classname();
+		}
+
+		param( 'params', 'array', array() );
+
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
+
+		locale_activate( $Blog->get('locale') );
+
+		$blog_skin_ID = $Blog->get_skin_ID();
+		if( ! empty( $blog_skin_ID ) )
+		{ // check if Blog skin has specific comment form
+			$SkinCache = & get_SkinCache();
+			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+		}
+
+		// Display widget form:
+		$Widget->display_form( $params );
+		break;
+
+
 	case 'get_user_bubbletip':
 		// Get contents of a user bubbletip
 		// Displays avatar & name
@@ -137,7 +203,7 @@ switch( $action )
 		if( strpos( $_SERVER["HTTP_REFERER"], $admin_url ) !== false )
 		{	// If ajax is requested from admin page we should to set a variable $is_admin_page = true if user has permissions
 			// Check global permission:
-			if( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) )
+			if( ! check_user_perm( 'admin', 'restricted' ) )
 			{	// No permission to access admin...
 				require $adminskins_path.'_access_denied.main.php';
 			}
@@ -158,12 +224,11 @@ switch( $action )
 			$UserCache = & get_UserCache();
 			$User = & $UserCache->get_by_ID( $user_ID );
 
-			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
+			ajax_log_add( 'User: #'.$user_ID.' '.$User->login );
 
-			if( is_logged_in() &&
-			    $current_User->can_moderate_user( $User->ID ) &&
-			    $current_User->check_status( 'can_access_admin' ) &&
-			    $current_User->check_perm( 'admin', 'restricted' ) )
+			if( check_user_perm( 'admin', 'restricted' ) &&
+			    ( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
+			    check_user_status( 'can_access_admin' ) )
 			{	// Display the moderation buttons only if current user has a permission:
 				$moderation_buttons = '<p class="bubbletip_user__buttons">';
 				if( ! is_admin_page() )
@@ -171,9 +236,9 @@ switch( $action )
 					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=user&amp;user_ID='.$User->ID ).'" class="btn btn-sm btn-block btn-primary">'
 							.T_('Edit in Back-Office').'</a>';
 				}
-				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+				if( $current_User->ID != $User->ID && check_user_perm( 'users', 'edit' ) )
 				{	// Display a button to delete a spammer only for other users and if current user can edit them:
-					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID )
 								.'" class="btn btn-sm btn-block btn-danger">'
 							.T_('Delete Spammer')
 						.'</a>';
@@ -220,7 +285,7 @@ switch( $action )
 			echo get_avatar_imgtag( $User->login, 'login', true, $avatar_size, 'avatar_above_login', '', $avatar_overlay_text, $link_class, true, '' );
 			echo '</div>';
 
-			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( is_logged_in() && $current_User->check_perm( 'user', 'view', false, $User ) ) ) )
+			if( ! ( $Settings->get( 'allow_anonymous_user_profiles' ) || ( check_user_perm( 'user', 'view', false, $User ) ) ) )
 			{ // User is not logged in and anonymous users may NOT view user profiles, or if current User has no permission to view additional information about the User
 				echo $moderation_buttons;
 				echo '</div>'; /* end of: <div class="bubbletip_user"> */
@@ -309,7 +374,7 @@ switch( $action )
 			$CommentCache = & get_CommentCache();
 			$Comment = $CommentCache->get_by_ID( $comment_ID );
 
-			$Ajaxlog->add( 'Comment: #'.$comment_ID.' '.$Comment->get_author_name() );
+			ajax_log_add( 'Comment: #'.$comment_ID.' '.$Comment->get_author_name() );
 
 			echo '<div class="bubbletip_anon">';
 
@@ -368,7 +433,7 @@ switch( $action )
 		}
 
 		// Check permission for spam voting
-		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $blog_ID );
+		check_user_perm( 'blog_vote_spam_comments', 'edit', true, $blog_ID );
 
 		$type = param( 'type', 'string' );
 		$commentid = param( 'commentid', 'integer' );
@@ -421,9 +486,9 @@ switch( $action )
 		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
-		$Ajaxlog->add( sprintf( 'vote action: %s', $vote_action ), 'note' );
-		$Ajaxlog->add( sprintf( 'vote type: %s', $vote_type ), 'note' );
-		$Ajaxlog->add( sprintf( 'vote ID: %s', $vote_ID ), 'note' );
+		ajax_log_add( sprintf( 'vote action: %s', $vote_action ), 'note' );
+		ajax_log_add( sprintf( 'vote type: %s', $vote_type ), 'note' );
+		ajax_log_add( sprintf( 'vote ID: %s', $vote_ID ), 'note' );
 
 		$voting_form_params = array(
 				'vote_type' => $vote_type,
@@ -550,10 +615,12 @@ switch( $action )
 				if( param( 'skin_ID', 'integer', 0 ) > 0 )
 				{	// If request is from skin:
 					$SkinCache = & get_SkinCache();
+					// Initialize global Collection in order to get Skin settings values from the Collection and not from defaults of the Skin:
+					$Blog = $comment_Item->get_Blog();
 					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
 					if( $request_Skin && method_exists( $request_Skin, 'display_comment_voting_panel' ) )
 					{	// Request skin to display a voting panel for item:
-						$request_Skin->display_comment_voting_panel( $Comment, array( 'display_wrapper' => false ) );
+						$request_Skin->display_comment_voting_panel( $Comment, $request_Skin->get_setting( 'voting_place' ), array( 'display_wrapper' => false ) );
 						break 2;
 					}
 				}
@@ -610,6 +677,8 @@ switch( $action )
 					{ // Update a vote of current user
 						$Item->set_vote( $field_value );
 						$Item->dbupdate();
+						// Invalidate key for the voted Item:
+						BlockCache::invalidate_key( 'item_ID', $Item->ID );
 					}
 				}
 
@@ -632,10 +701,12 @@ switch( $action )
 				elseif( param( 'skin_ID', 'integer', 0 ) > 0 )
 				{	// If request is from skin:
 					$SkinCache = & get_SkinCache();
+					// Initialize global Collection in order to get Skin settings values from the Collection and not from defaults of the Skin:
+					$Blog = $item_Blog;
 					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
 					if( $request_Skin && method_exists( $request_Skin, 'display_item_voting_panel' ) )
 					{	// Request skin to display a voting panel for item:
-						$request_Skin->display_item_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						$request_Skin->display_item_voting_panel( $Item, $request_Skin->get_setting( 'voting_place' ), array( 'display_wrapper' => false ) );
 						break 2;
 					}
 				}
@@ -657,7 +728,7 @@ switch( $action )
 		}
 
 		$userfields = $DB->get_results( '
-			SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+			SELECT T_users__fielddefs.*, "0" AS uf_ID, "" AS uf_varchar, ufgp_ID, ufgp_name
 				FROM T_users__fielddefs
 				LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID
 			WHERE ufdf_ID = "'.$field_ID.'"' );
@@ -692,7 +763,7 @@ switch( $action )
 		$Form->inputstart = '#inputstart#';
 		$Form->inputend = '#inputend#';
 
-		userfields_display( $userfields, $Form, 'add', false );
+		userfields_display( $userfields, $Form, 'add', false, $user_ID );
 
 		break;
 
@@ -741,48 +812,6 @@ switch( $action )
 			 ORDER BY uf_varchar' ) );
 
 		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
-
-		break;
-
-	case 'get_userfields_criteria':
-		// Get fieldset for users filter by Specific criteria
-
-		// Use the glyph or font-awesome icons if requested by skin
-		param( 'b2evo_icons_type', 'string', '' );
-
-		if( param( 'is_backoffice', 'integer', 0 ) )
-		{
-			global $current_User, $UserSettings, $is_admin_page;
-			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
-			$is_admin_page = true;
-			/**
-			 * Load the AdminUI class for the skin.
-			 */
-			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
-			$AdminUI = new AdminUI();
-		}
-		else
-		{
-			$BlogCache = &get_BlogCache();
-			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, true );
-			$skin_ID = $Blog->get_skin_ID();
-			$SkinCache = & get_SkinCache();
-			$Skin = & $SkinCache->get_by_ID( $skin_ID );
-		}
-
-		$Form = new Form();
-		$Form->switch_layout( 'blockspan' );
-
-		echo '<br />';
-		$Form->output = false;
-		$criteria_input = $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
-		$criteria_input .= get_icon( 'add', 'imgtag', array( 'rel' => 'add_criteria' ) );
-		$Form->output = true;
-
-		global $user_fields_empty_name;
-		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-
-		$Form->select( 'criteria_type[]', '', 'callback_options_user_new_fields', T_('Specific criteria'), $criteria_input );
 
 		break;
 
@@ -891,25 +920,6 @@ switch( $action )
 
 		break;
 
-	case 'collapse_filter':
-	case 'expand_filter':
-		// Save a value of state(collapse/expand) of the current filter
-		param( 'target', 'string', '' );
-		if( !empty( $target ) )
-		{	// We want to record a 'collapse'/'expand' value:
-			$target_status = $action == 'collapse_filter' ? 'collapsed' : 'expanded';
-			if( preg_match( '/_(filters|colselect)$/', $target ) )
-			{	// accept all _filters and _colselect open/close requests!
-				// We have a valid value:
-				$Session->set( $target, $target_status );
-			}
-			else
-			{	// Warning: you may not see this on AJAX calls
-				$Ajaxlog->add( 'Cannot ['.$target_status.'] unknown param ['.$target.']', 'error' );
-			}
-		}
-		break;
-
 	case 'validate_login':
 		// Validate if username is available
 		param( 'login', 'string', '' );
@@ -922,7 +932,7 @@ switch( $action )
 				$SQL->SELECT( 'user_ID' );
 				$SQL->FROM( 'T_users' );
 				$SQL->WHERE( 'user_login = "'.$DB->escape( $login ).'"' );
-				if( $DB->get_var( $SQL->get() ) )
+				if( $DB->get_var( $SQL ) )
 				{	// Login already exists
 					echo 'exists';
 				}
@@ -990,15 +1000,18 @@ switch( $action )
 			case 'items_edited_results_block':
 			case 'comments_results_block':
 			case 'threads_results_block':
+			case 'received_threads_results_block':
 			case 'user_reports_results_block':
 			case 'blogs_user_results_block':
 			case 'blogs_all_results_block':
 			case 'items_list_block_by_page':
 			case 'items_manual_results_block':
+			case 'user_sent_emails_results_block':
+			case 'user_email_returns_results_block':
 				break;
 
 			default:
-				$Ajaxlog->add( 'Incorrect callback function name!', 'error' );
+				ajax_log_add( 'Incorrect callback function name!', 'error' );
 				debug_die( 'Incorrect callback function!' );
 		}
 
@@ -1031,7 +1044,7 @@ switch( $action )
 			if( $edited_Comment !== false )
 			{ // The comment still exists
 				// Check permission:
-				$current_User->check_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
+				check_user_perm( 'comment!'.$status, 'moderate', true, $edited_Comment );
 
 				$redirect_to = param( 'redirect_to', 'url', NULL );
 
@@ -1108,6 +1121,7 @@ switch( $action )
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
 		$org_suffix = ' &nbsp; <strong>'.T_('Role').':</strong> '.$Form->text_input( 'org_roles[]', '', 20, '', '', array( 'maxlength' => 255 ) ).' &nbsp; ';
+		$org_suffix .= ' &nbsp; <strong>'.T_('Order').':</strong> '.$Form->text_input( 'org_priorities[]', '', 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
 		$Form->switch_layout( NULL );
 		$Form->output = true;
 
@@ -1158,12 +1172,12 @@ switch( $action )
 
 		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 || ! $user_Organization )
 		{ // Incorrect format of status param
-			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
+			ajax_log_add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
 			break;
 		}
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'edit', true, $user_Organization );
+		check_user_perm( 'orgs', 'edit', true, $user_Organization );
 
 		// Use the glyph or font-awesome icons if it is defined by skin
 		param( 'b2evo_icons_type', 'string', '' );
@@ -1309,7 +1323,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'user' );
 		$user_ID = param( 'user_ID', 'integer', true );
 
-		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! $current_User->check_status( 'can_report_user', $user_ID ) )
+		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) || ! check_user_status( 'can_report_user', $user_ID ) )
 		{ // Only if current user can reports
 			break;
 		}
@@ -1348,8 +1362,8 @@ switch( $action )
 		$Session->assert_received_crumb( 'user' );
 
 		if( ! is_logged_in() || ( isset( $User ) && $current_User->ID == $User->ID ) ||
-		    ! $current_User->check_perm( 'perm_messaging', 'reply' ) ||
-				! $current_User->check_status( 'can_edit_contacts' ) )
+		    ! check_user_perm( 'perm_messaging', 'reply' ) ||
+				! check_user_status( 'can_edit_contacts' ) )
 		{ // Only if current user can reports
 			break;
 		}
@@ -1380,6 +1394,295 @@ switch( $action )
 		$form_action = get_htsrv_url().'profile_update.php';
 
 		require $inc_path.'users/views/_user_groups.form.php';
+		break;
+
+	case 'render_inlines':
+		$target_ID = param( 'id', 'integer', 0 );
+		$target_type = param( 'type', 'string' );
+		$tags = param( 'tags', 'array:string', array() );
+		// 'temp_link_owner_ID' param will be passed for objects with temporary ID
+
+		// Default params from skins/skins_fallback_v6/_item_content.inc.php
+		$params = array(
+			'before_image'             => '<figure'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_block' ) : ' class="evo_image_block"' ).'>',
+			'before_image_legend'      => '<figcaption'.( $target_type == 'EmailCampaign' ? emailskin_style( '.evo_image_legend' ) : ' class="evo_image_legend"' ).'>',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'after_images'             => '</div>',
+			'image_class'              => 'img-responsive',
+			'image_size'               => param( 'image_size', 'string', 'fit-256x256' ),
+			'image_limit'              => 1000,
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+		);
+
+		switch( $target_type )
+		{
+			case 'Item':
+				$ItemCache = & get_ItemCache();
+				$edited_Item = $ItemCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Item )
+				{
+					$edited_Item = new Item();
+				}
+				$rendered_tags = render_inline_tags( $edited_Item, $tags, $params );
+				break;
+
+			case 'Comment':
+				$CommentCache = & get_CommentCache();
+				$edited_Comment = $CommentCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Comment )
+				{
+					$edited_Comment = new Comment();
+				}
+				$rendered_tags = render_inline_tags( $edited_Comment, $tags, $params );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaignCache = & get_EmailCampaignCache();
+				$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $target_ID );
+				$rendered_tags = render_inline_tags( $edited_EmailCampaign, $tags, $params );
+				break;
+
+			case 'Message':
+				$MessageCache = & get_MessageCache();
+				$edited_Message = $MessageCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Message )
+				{
+					$edited_Message = new Message();
+				}
+
+				$rendered_tags = render_inline_tags( $edited_Message, $tags, $params );
+				break;
+		}
+
+		if( $rendered_tags )
+		{
+			echo json_encode( $rendered_tags );
+		}
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
+	case 'get_insert_image_form':
+	case 'get_edit_image_form':
+		$restrict_tag = false;
+		$request_from = param( 'request_from', 'string', NULL );
+
+		global $is_admin_page;
+
+		init_fontawesome_icons();
+
+		$is_admin_page = is_logged_in() && $request_from == 'back';
+
+		if( is_admin_page() )
+		{
+			global $UserSettings, $adminskins_path, $AdminUI;
+
+			$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+			require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+			$AdminUI = new AdminUI();
+		}
+		else
+		{
+			$BlogCache = & get_BlogCache();
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $Blog )
+			{
+				$blog_skin_ID = $Blog->get_skin_ID();
+				if( ! empty( $blog_skin_ID ) )
+				{
+					$SkinCache = & get_SkinCache();
+					$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
+				}
+			}
+		}
+
+		// Default values:
+		$image_caption = NULL;
+		$image_disable_caption = false;
+		$image_alt = NULL;
+		$image_disable_alt = false;
+		$image_href = NULL;
+		$image_class = NULL;
+		$thumbnail_href = NULL;
+		$thumbnail_size = 'medium';
+		$thumbnail_alignment = 'left';
+		$thumbnail_class = NULL;
+		$inline_class = NULL;
+
+		if( $action == 'get_insert_image_form' )
+		{
+			$tag_type = param( 'tag_type', 'string', 'image' );
+			$link_ID = param( 'link_ID', 'integer', true );
+			$replace = 0;
+		}
+		else
+		{
+			// Uncomment line below to hide inline type tabs
+			//$restrict_tag = true;
+			$short_tag = param( 'short_tag', 'string', true );
+			$short_tag = rawurldecode( $short_tag );
+			$replace = 1;
+
+			$parts = trim( $short_tag, '[]' );
+			$parts = explode( ':', $parts );
+			$opt_index = 2;
+
+			$tag_type = $parts[0];
+			$link_ID = $parts[1];
+
+			switch( $tag_type )
+			{
+				case 'image':
+					// Caption:
+					$image_disable_caption = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_caption = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
+					$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+					// Alt text:
+					$image_disable_alt = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) &&
+					    substr( $parts[ $opt_index ], 0, 1 ) != '.' &&
+					    ! preg_match( $href_regexp, $parts[ $opt_index ] ) )
+					{
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_alt = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
+					// HRef:
+					if( ! empty( $parts[ $opt_index ] ) &&
+					    preg_match( $href_regexp, $parts[ $opt_index ], $href_match ) )
+					{
+						if( stripos( $href_match[0], 'http' ) === 0 )
+						{	// Absolute URL:
+							$image_href = $href_match[0].':'.$parts[ $opt_index + 1 ];
+							$opt_index++;
+						}
+						else
+						{	// Item slug:
+							$image_href = $href_match[0];
+						}
+						$opt_index++;
+					}
+					// TODO: Size:
+					// Class:
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						$image_class = $parts[ $opt_index ];
+					}
+					break;
+
+				case 'thumbnail':
+					$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+					// Alt text:
+					$image_disable_alt = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) &&
+					    substr( $parts[ $opt_index ], 0, 1 ) != '.' &&
+					    ! preg_match( $href_regexp, $parts[ $opt_index ] ) &&
+					    ! in_array( $parts[ $opt_index ], array( 'small', 'medium', 'large', 'left', 'right' ) ) )
+					{
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_alt = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
+					// HRef:
+					if( ! empty( $parts[ $opt_index ] ) &&
+					    preg_match( $href_regexp, $parts[ $opt_index ], $href_match ) )
+					{
+						if( stripos( $href_match[0], 'http' ) === 0 )
+						{	// Absolute URL:
+							$thumbnail_href = $href_match[0].':'.$parts[ $opt_index + 1 ];
+							$opt_index++;
+						}
+						else
+						{	// Item slug:
+							$thumbnail_href = $href_match[0];
+						}
+						$opt_index++;
+					}
+					// Size:
+					$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+					if( isset( $parts[ $opt_index ] ) && in_array( $parts[ $opt_index ], $valid_thumbnail_sizes ) )
+					{
+						$thumbnail_size = $parts[ $opt_index ];
+						$opt_index++;
+					}
+					// Alignment:
+					$valid_thumbnail_positions = array( 'left', 'right' );
+					if( isset( $parts[ $opt_index ] ) && in_array( $parts[ $opt_index ], $valid_thumbnail_positions ) )
+					{
+						$thumbnail_alignment = $parts[ $opt_index ];
+						$opt_index++;
+					}
+					// Class:
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						$thumbnail_class = $parts[ $opt_index ];
+						$opt_index++;
+					}
+					break;
+
+				case 'inline':
+					// Alt text:
+					$image_disable_alt = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) &&
+					    substr( $parts[ $opt_index ], 0, 1 ) != '.' &&
+					    ! in_array( $parts[ $opt_index ], array( 'small', 'medium', 'large', 'original' ) ) )
+					{
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_alt = $parts[ $opt_index ];
+						}
+						$opt_index++;
+					}
+					// Class:
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						$inline_class = $parts[ $opt_index ];
+					}
+					break;
+
+				default:
+					// Initialize additional inline tag form from active plugins:
+					$plugin_data = $Plugins->get_trigger_event_first_return( 'InitImageInlineTagForm', array(
+							'source_tag' => $short_tag,
+							'tag_type'   => $tag_type,
+							'link_ID'    => $link_ID,
+						) );
+					if( isset( $plugin_data['tag_type'] ) )
+					{	// Override active tag type from plugins:
+						$tag_type = $plugin_data['tag_type'];
+					}
+					if( isset( $plugin_data['link_ID'] ) )
+					{	// Override link ID from plugins:
+						$link_ID = $plugin_data['link_ID'];
+					}
+			}
+		}
+
+		$LinkCache = & get_LinkCache();
+		if( ! ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) )
+		{ // Bad request with incorrect link ID
+			echo '';
+			exit(0);
+		}
+
+		if( ! ( $File = & $Link->get_File() ) )
+		{ // File no longer available
+			echo '';
+			exit(0);
+		}
+
+		require $inc_path.'items/views/_item_image.form.php';
 		break;
 
 	case 'set_object_link_position':
@@ -1417,14 +1720,15 @@ switch( $action )
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 
-			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
-			{ // Position "Cover" can be used only by one link
-			  // Replace previous position with "Inline"
+			if( $LinkOwner->type == 'item' &&
+			    ( $link_position == 'cover' || $link_position == 'background' ) )
+			{	// Position "Cover" or "Background" can be used only by one link
+				// Replace previous position with "After more":
 				$DB->query( 'UPDATE T_links
 						SET link_position = "aftermore"
 					WHERE link_ID != '.$DB->quote( $link_ID ).'
 						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
-						AND link_position = "cover"' );
+						AND link_position = '.$DB->quote( $link_position ) );
 			}
 		}
 		else
@@ -1434,6 +1738,8 @@ switch( $action )
 		break;
 
 	case 'update_links_order':
+		global $localtimenow;
+
 		// Update the order of all links at one time:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -1479,14 +1785,22 @@ switch( $action )
 			$link_order[$link_ID] = $real_link_order;
 		}
 
+		if( $LinkOwner->type == 'item' && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+		{
+			$LinkOwner->Item->create_revision();
+		}
+
 		// Do firstly fake ordering start with max order, to avoid duplicate entry error:
 		$DB->query( 'UPDATE T_links
 			  SET link_order = CASE '.$fake_sql_update_strings.' ELSE link_order END
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+
 		// Do real ordering start with number 1:
 		$DB->query( 'UPDATE T_links
 			  SET link_order = CASE '.$real_sql_update_strings.' ELSE link_order END
 			WHERE link_ID IN ( '.$DB->quote( $link_IDs ).' )' );
+
+		$LinkOwner->update_last_touched_date();
 
 		$DB->commit();
 		echo json_encode( $link_order );
@@ -1530,22 +1844,252 @@ switch( $action )
 			) );
 		break;
 
+	case "colorpicker":
+		// Save last selected colors in bootstrap colorpicker per User:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'colorpicker' );
+
+		if( ! is_logged_in() )
+		{	// User must be loggedin for this action:
+			break;
+		}
+
+		param( 'colors', 'string' );
+
+		$UserSettings->set( 'colorpicker', $colors, $current_User->ID );
+		$UserSettings->dbupdate();
+		break;
+
+	case 'reorder_widgets':
+		// Reorder widgets in container (Designer Mode):
+
+		if( ! is_logged_in() )
+		{	// Only the logged in users can edit widgets:
+			echo T_('You must be logged in to edit widgets.');
+			break;
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget', true, array(
+				'msg_format'        => 'text',
+			) );
+
+		// Collection ID:
+		param( 'blog', 'integer', true );
+
+		// Get collection by ID:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+
+		// Check permission:
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
+
+		// Container code:
+		param( 'container', 'string' );
+		// Widgets IDs:
+		param( 'widgets', 'array:integer' );
+
+		if( empty( $widgets ) )
+		{	// No widgets to reorder:
+			break;
+		}
+
+		$SQL = new SQL( 'Get widget container by code, first widget ID and current skin type before reordering (Designer Mode)' );
+		$SQL->SELECT( 'wico_ID' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__widget ON wi_wico_ID = wico_ID' );
+		$SQL->WHERE( 'wi_ID = '.$DB->quote( $widgets[0] ) );
+		$SQL->WHERE_and( 'wico_code = '.$DB->quote( $container ) );
+		$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $Blog->get_skin_type() ) );
+		$container_ID = $DB->get_var( $SQL );
+
+		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );
+		$SQL->SELECT( 'wi_ID, wi_order, wi_enabled' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_wico_ID = '.$DB->quote( $container_ID ) );
+		$all_widgets = $DB->get_results( $SQL );
+
+		$container_widgets = array();
+		$enabled_widgets = array();
+		foreach( $all_widgets as $widget )
+		{
+			$container_widgets[ $widget->wi_ID ] = $widget->wi_order;
+			if( $widget->wi_enabled )
+			{	// Store in this array only enabled widgets:
+				$enabled_widgets[] = $widget->wi_ID;
+			}
+		}
+
+		$client_widgets = array_diff( $widgets, $enabled_widgets );
+		$server_widgets = array_diff( $enabled_widgets, $widgets );
+		if( ! empty( $client_widgets ) || ! empty( $server_widgets ) )
+		{	// Display error if at least one widget was added or deleted in the container:
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.');
+			// Additional data for log:
+			$SQL = new SQL( 'Get widgets for more log of reordering (Designer Mode)' );
+			$SQL->SELECT( 'wi_ID, wi_code' );
+			$SQL->FROM( 'T_widget__widget' );
+			$SQL->WHERE( 'wi_ID IN ( '.$DB->quote( array_merge( $client_widgets, $server_widgets ) ).' )' );
+			$code_widgets = $DB->get_assoc( $SQL );
+			if( ! empty( $client_widgets ) )
+			{	// Log what widgets were missed on server side:
+				$client_widgets_data = array();
+				foreach( $client_widgets as $client_widget_ID )
+				{
+					$client_widgets_data[] = '#'.$client_widget_ID.( isset( $code_widgets[ $client_widget_ID ] ) ? '('.$code_widgets[ $client_widget_ID ].')' : '' );
+				}
+				ajax_log_add( 'Widgets: '.implode( ', ', $client_widgets_data ).' are found on the page but not found in DB or they are disabled!', 'error' );
+			}
+			if( ! empty( $server_widgets ) )
+			{	// Log what widgets were missed on client side:
+				$server_widgets_data = array();
+				foreach( $server_widgets as $server_widget_ID )
+				{
+					$server_widgets_data[] = '#'.$server_widget_ID.( isset( $code_widgets[ $server_widget_ID ] ) ? '('.$code_widgets[ $server_widget_ID ].')' : '' );
+				}
+				ajax_log_add( 'Widgets: '.implode( ', ', $server_widgets_data ).' are enabled and found in DB but not found on the page!', 'error' );
+			}
+			break;
+		}
+
+		// Get what widgets are disabled or hidden on current view but exist in DB:
+		$disabled_widgets = array_diff( array_keys( $container_widgets ), $widgets );
+
+		// Append the disabled/hidden widgets at the end of list(so they will be ordered at the end):
+		$widgets = array_merge( $widgets, $disabled_widgets );
+
+		// Run reordering two times:
+		// - first is used to set orders starting with max order of the existing widgets,
+		// - second is starting orders with 1.
+		// Such complex is required to avoid error of duplicate entry of unique index (wi_wico_ID, wi_order).
+		$wi_start_orders = array( max( $container_widgets ) + 1, 1 );
+		foreach( $wi_start_orders as $wi_order )
+		{
+			$update_conditions = array();
+			foreach( $widgets as $widget_ID )
+			{
+				$update_conditions[] = 'WHEN wi_ID = '.$widget_ID.' THEN '.( $wi_order++ );
+			}
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_order = CASE '.implode( ' ', $update_conditions ).' ELSE 0 END
+				WHERE wi_wico_ID = '.$DB->quote( $container_ID ) );
+		}
+		break;
+
+	case 'disable_widget':
+		// Disable widget (Designer Mode):
+
+		if( ! is_logged_in() )
+		{	// Only the logged in users can edit widgets:
+			echo T_('You must be logged in to edit widgets.');
+			break;
+		}
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget', true, array(
+				'msg_format'        => 'text',
+			) );
+
+		param( 'blog', 'integer', 0 );
+		// Colection initialization is required for some widgets:
+		$BlogCache = & get_BlogCache();
+		$Blog = $BlogCache->get_by_ID( $blog );
+
+		// Check permission:
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
+
+		param( 'wi_ID', 'integer' );
+
+		$WidgetCache = & get_WidgetCache();
+		$disabled_Widget = & $WidgetCache->get_by_ID( $wi_ID, false, false );
+		if( ! $disabled_Widget || ! $disabled_Widget->get( 'enabled' ) )
+		{	// Display error if widget doesn't exist or it is already disabled:
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.');
+			break;
+		}
+
+		// Disable widget:
+		$disabled_Widget->set( 'enabled', 0 );
+		$disabled_Widget->dbupdate();
+		break;
+
+	case 'get_url_alias_new_field':
+		param( 'b2evo_icons_type', 'string', '' );
+
+		$Form = new Form();
+		$Form->fieldstart = '#fieldstart#';
+		$Form->fieldend = '#fieldend#';
+		$Form->labelclass = '#labelclass#';
+		$Form->labelstart = '#labelstart#';
+		$Form->labelend = '#labelend#';
+		$Form->inputstart = '#inputstart#';
+		$Form->inputend = '#inputend#';
+
+		$alias_field_note = get_icon( 'add', 'imgtag', array( 'class' => 'url_alias_add', 'style' => 'cursor: pointer; position: relative;' ) );
+		$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'margin-left: 2px; cursor: pointer; position: relative;' ) );
+		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
+		break;
+
+	case 'get_item_selector_info':
+		// Get Item's info after selector from Modal/AJAX window by $Form->item_selector():
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item_selector' );
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
+
+		param( 'item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+
+		$item_selector_info = array();
+		if( $selected_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+		{
+			if( is_logged_in() )
+			{	// Remember what last collection was used for linking in order to display it by default on next linking:
+				global $UserSettings;
+				$UserSettings->set( 'last_selected_item_coll_ID', $selected_Item->get_blog_ID() );
+				$UserSettings->dbupdate();
+			}
+
+			$item_selector_info['item_ID'] = $selected_Item->ID;
+			$item_selector_info['item_info'] = $selected_Item->get_form_selector_info();
+			$item_selector_info['coll_ID'] = $selected_Item->get_blog_ID();
+		}
+
+		echo json_encode( $item_selector_info );
+		break;
+
+	case 'get_user_default_filters_form':
+		// Get form to change default users list filters:
+
+		// Check permission:
+		check_user_perm( 'users', 'edit', true );
+
+		// Load the AdminUI class for the skin:
+		global $current_User, $UserSettings, $is_admin_page;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		$display_mode = 'js';
+
+		require $inc_path.'users/views/_user_list_default_filters.form.php';
+		break;
+
 	default:
-		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
+		ajax_log_add( T_('Incorrect action!'), 'error' );
 		break;
 }
 
 $disp = NULL;
 $ctrl = NULL;
 
-if( $current_debug || $current_debug_jslog )
-{	// debug is ON
-	$Ajaxlog->display( NULL, NULL, true, 'all',
-					array(
-							'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
-							'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
-						), 'ul', 'jslog' );
-}
+// Display AJAX Log:
+ajax_log_display();
 
 // Add ajax response end comment:
 echo '<!-- Ajax response end -->';

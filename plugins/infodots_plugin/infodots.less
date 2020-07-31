@@ -1,0 +1,72 @@
+.infodots_image {
+	position: relative;
+	display: inline-block;
+    
+    .infodots_dot {
+        display: none;
+        position: absolute !important;
+        z-index: 1000;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .infodots_dot:after {
+        -webkit-box-sizing: initial;
+        -moz-box-sizing: initial;
+        // Always show red dots in the middle even with Bootstrap
+        box-sizing: initial;
+        content: "";
+        position: absolute;
+        top: -11px;
+        left: -11px;
+        width: 10px;
+        height: 10px;
+        background: #F00;
+        // Invisible active area around dot
+        padding: 5px;
+        // To make additional area(padding) invisible
+        background-clip: content-box;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        // Fix for IE to correct working of border-radius 
+        border: 1px solid transparent;
+    }
+
+    .infodots_dot:before {
+        box-sizing: content-box;
+        content: "";
+        z-index: 1;
+        position: absolute;
+        top: -20px;
+        left: -20px;
+        width: 30px;
+        height: 30px;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        border-radius: 50%;
+        border: 5px solid #F00;
+        opacity: 0;
+        -webkit-animation: sonar_effect 2s ease-in-out infinite;
+        -moz-animation: sonar_effect 2s ease-in-out infinite;
+        animation: sonar_effect 2s ease-in-out infinite;
+    }
+
+    .infodots_dot.hovered:after, .infodots_dot:hover:after {
+        background-color: #936760;
+    }
+
+    .infodots_dot.hovered:before, .infodots_dot:hover:before {
+        -webkit-animation: none;
+        -moz-animation: none;
+        animation: none;
+    }
+}
+
+@-webkit-keyframes sonar_effect { 0% { -webkit-transform: scale(.1); opacity: .6; } 100% { opacity: 0; -webkit-transform: scale(1); } }
+@-moz-keyframes sonar_effect { 0% { -moz-transform: scale(.1); opacity: .6; } 100% { opacity: 0; -moz-transform: scale(1); } }
+@keyframes sonar_effect { 0% { transform: scale(.1); opacity: .6; } 100% { opacity: 0; transform: scale(1); } }
+
+

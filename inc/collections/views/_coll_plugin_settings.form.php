@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -25,18 +25,18 @@ global $Collection, $Blog;
  */
 global $Plugins;
 
-global $current_User, $admin_url;
+global $admin_url;
 $plugin_group = param( 'plugin_group', 'string', 'rendering' );
 
-$Form = new Form( NULL, 'plugin_settings_checkchanges' );
+$Form = new Form( NULL, 'plugin_settings_checkchanges', 'post', 'accordion' );
 
 // PluginUserSettings
 load_funcs('plugins/_plugin.funcs.php');
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {	// Display this message only if current user has permission to manage the plugins
 	echo '<p class="alert alert-info">'
-			.sprintf( T_('Here you can configure some plugins individually for each blog. To manage your installed plugins go <a %s>here</a>.'),
+			.sprintf( TB_('Here you can configure some plugins individually for each blog. To manage your installed plugins go <a %s>here</a>.'),
 					      'href="'.$admin_url.'?ctrl=plugins"' )
 		.'</p>';
 }
@@ -57,7 +57,7 @@ $Form->switch_template_parts( array(
 		'labelstart' => '<span style="padding-right: 15px;">',
 		'labelend' => '</span>',
 	) );
-$Form->select_input_array( 'plugin_group', $plugin_group, $Plugins->get_plugin_groups(), T_('Show plugins from group'), array( ) );
+$Form->select_input_array( 'plugin_group', $plugin_group, $Plugins->get_plugin_groups(), TB_('Show plugins from group'), array( ) );
 echo '</div>';
 
 $Form->switch_layout( NULL );
@@ -73,6 +73,8 @@ $Form->switch_layout( NULL );
 $have_plugins = false;
 $Plugins->restart();
 
+$Form->begin_group();
+
 while( $loop_Plugin = & $Plugins->get_next() )
 {
 	if( $loop_Plugin->group != $plugin_group )
@@ -84,7 +86,7 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	ob_start();
 
 	$priority_link = '<a href="'.$loop_Plugin->get_edit_settings_url().'#ffield_edited_plugin_code">'.$loop_Plugin->priority.'</a>';
-	$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' ('.T_('Priority').': '.$priority_link.')' );
+	$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link('$help_url').' <span class="text-muted text-normal">('.TB_('Priority').': '.$priority_link.')</span>' );
 
 	ob_start();
 
@@ -92,11 +94,13 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	$plugin_settings = $loop_Plugin->get_coll_setting_definitions( $tmp_params );
 	if( is_array($plugin_settings) )
 	{
+		$Form->switch_layout( 'fieldset' );
 		foreach( $plugin_settings as $l_name => $l_meta )
 		{
 			// Display form field for this setting:
 			autoform_display_field( $l_name, $l_meta, $Form, 'CollSettings', $loop_Plugin, $Blog );
 		}
+		$Form->switch_layout( NULL );
 	}
 
 	$has_contents = strlen( ob_get_contents() );
@@ -117,14 +121,18 @@ while( $loop_Plugin = & $Plugins->get_next() )
 	}
 }
 
+$Form->end_group();
+
 if( $have_plugins )
 {	// End form:
-	$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 else
 {	// Display a message:
-	echo '<p>', T_( 'There are no plugins providing blog-specific settings.' ), '</p>';
+	echo '<p>', TB_( 'There are no plugins providing blog-specific settings.' ), '</p>';
 	$Form->end_form();
 }
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 ?>

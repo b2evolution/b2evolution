@@ -32,12 +32,15 @@ function openModalWindow( body_html, width, height, transparent, title, button )
 		style_height = ' style="height:' + height + '"';
 	}
 	if( jQuery( '#overlay_page' ).length > 0 )
-	{ // placeholder already exist
+	{	// placeholder already exist
 		jQuery( '#overlay_page' ).html( body_html );
 		return;
 	}
 	// add placeholder for form:
-	jQuery( 'body' ).append( '<div id="screen_mask"></div><div id="overlay_wrap" style="width:' + width + '"><div id="overlay_layout"><div id="overlay_page"' + style_height + '></div></div></div>' );
+	jQuery( 'body' ).append( '<div id="screen_mask"></div>'
+			+ '<div id="overlay_wrap" style="width:' + width + '">'
+			+ '<div id="overlay_layout"><div id="overlay_page"' + style_height + '></div>'
+			+ '</div></div>' );
 	jQuery( '#screen_mask' ).fadeTo(1,0.5).fadeIn(200);
 	jQuery( '#overlay_page' ).html( body_html ).addClass( overlay_class );
 	jQuery( document ).on( 'click', '#close_button, #screen_mask, #overlay_page', function( e )

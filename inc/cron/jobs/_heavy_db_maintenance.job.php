@@ -13,8 +13,8 @@ load_funcs('tools/model/_maintenance.funcs.php');
 $simple_keys = array( 0, 1, 2, 3 );
 $failed_results = array();
 
-// Execute query to get results of CHECK command
-$results = dbm_check_tables( false, false );
+// Execute query to get results of CHECK command:
+$results = dbm_check_tables( 'cron_job', false );
 
 foreach( $results as $result )
 {
@@ -26,7 +26,7 @@ foreach( $results as $result )
 }
 
 // Optimize MyISAM & InnoDB tables
-$results = dbm_optimize_tables( false, false );
+$results = dbm_optimize_tables( 'cron_job', false );
 
 foreach( $results as $result )
 {
@@ -38,7 +38,7 @@ foreach( $results as $result )
 }
 
 $result_message = array(
-	'message' => sprintf( T_('The commands CHECK & OPTIMIZE have been executed for all %d tables.'), $dbm_tables_count ),
+	'message' => $result_message.sprintf( T_('The commands CHECK & OPTIMIZE have been executed for all %d tables.'), $dbm_tables_count ),
 	'table_cols' => array(
 		T_('Table'),
 		T_('Operation'),

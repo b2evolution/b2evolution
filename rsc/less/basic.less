@@ -98,6 +98,13 @@ img.avatar_above_login {
 	white-space: nowrap;
 	text-align: center;
 }
+.col-narrow {
+	width: 1px;
+	white-space: nowrap;
+	text-align: center;
+	padding-left: 1px !important;
+	padding-right: 1px !important;
+}
 
 .filename {
 	font-family: monospace;
@@ -124,16 +131,19 @@ a.selected {
 	-khtml-border-radius: 4px;
 	border-radius: 4px;
 	text-align: center;
-}
-.avatar_rounded:hover {
-	text-decoration: none;
-}
-.avatar_rounded img {
-	-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
-	-webkit-border-radius: 2px 2px 0 0;
-	-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
-	border-radius: 2px 2px 0 0;
-	margin-bottom: 2px;
+	&:hover {
+		text-decoration: none;
+	}
+	img {
+		-moz-border-radius-topleft: 2px; -moz-border-radius-topright: 2px;
+		-webkit-border-radius: 2px 2px 0 0;
+		-khtml-border-radius-topleft: 2px; -khtml-border-radius-topright: 2px;
+		border-radius: 2px 2px 0 0;
+		margin-bottom: 2px;
+	}
+	&.no_avatar_actions img {
+		margin-bottom: 0;
+	}
 }
 // ---------------- //
 
@@ -280,16 +290,16 @@ div.avatartag {
 	[class^=evobar-icon-] {
 		display: inline-block;
 		font-size: 10px;
-		&:before {
+		&::before {
 			width: 10px;
 			height: 10px;
 			content: "\25BC"; // arrow down
 		}
 	}
-	.evobar-icon-right:before {
+	.evobar-icon-right::before {
 		content: "\25B6"; // arrow right
 	}
-	.evobar-icon-left:before {
+	.evobar-icon-left::before {
 		content: "\25C0"; // arrow left
 	}
 }
@@ -360,11 +370,7 @@ span.checkbox_error input.checkbox {
 span.checkbox_surround {
 	background: #fbf2ee;
 	border: 1px solid #F825F1;
-}
-span.checkbox_surround input.checkbox {
-	background: #fbf2ee;
-}
-span.checkbox_surround_init {
+	border-radius: 2px;
 	padding : 1px;
 }
 // Large inputs and textareas (with full width)
@@ -556,7 +562,7 @@ div.bText div.log_container li {
 	padding: 0;
 	background: none;
 }
-div.bText div.log_container ul li:before {
+div.bText div.log_container ul li::before {
 	content: none;
 }
 // ---------------- //
@@ -732,5 +738,28 @@ table.widget_grid .note {
 	text-align: center;
 	a {
 		text-align: center;
+	}
+}
+
+// Highlight effect:
+div.evo_highlight, li.evo_highlight, tr.evo_highlight td {
+	animation: evo_highlight 5s ease-out;
+}
+@keyframes evo_highlight {
+	from {
+		background-color: #FF6600;
+	}
+	to {
+		background-color: transparent;
+	}
+}
+
+// Counter for max and recommended length of input/textarea elements:
+.evo_input_counter {
+	position: absolute;
+	color: #999;
+	font-size: 80%;
+	&.label {
+		color: #FFF;
 	}
 }

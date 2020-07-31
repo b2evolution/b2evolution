@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  *
@@ -56,12 +56,10 @@ class ResultSel extends Results
 											$table_objsel, $field_selected, $field_selection, $current_selection_ID,
 											$sql, $count_sql = NULL, $param_prefix = '', $default_order = '', $limit = 20 )
 	{
-		global $current_User;
-
 		// Call parent:
 		parent::__construct( $sql, $param_prefix, $default_order, $limit, $count_sql );
 
-		if( ! $current_User->check_perm( 'selections', 'view' ) )
+		if( ! check_user_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections
 			// Don't do any more then base class:
 			return;
@@ -79,7 +77,7 @@ class ResultSel extends Results
 		$this->cols[] = array(
 						'th' => /* TRANS: abbr. for "Selection" */ T_('Sel'),
 						'td_class' => 'shrinkwrap',
-						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$param_prefix.'\' )%',
+						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$this->param_prefix.'\' )%',
 					);
 	}
 
@@ -89,9 +87,9 @@ class ResultSel extends Results
 	 */
 	function display_list_start()
 	{
-		global $item_ID_array, $current_User;
+		global $item_ID_array;
 
-		if( ! $current_User->check_perm( 'selections', 'view' ) )
+		if( ! check_user_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections
 			// Don't do any more then base class:
 			parent::display_list_start();
@@ -129,9 +127,7 @@ class ResultSel extends Results
 	 */
 	function display_list_end()
 	{
-		global $current_User;
-
-		if( ! $current_User->check_perm( 'selections', 'view' ) )
+		if( ! check_user_perm( 'selections', 'view' ) )
 		{	// User is NOT allowed to view selections
 			// Don't do any more then base class:
 			parent::display_list_end();
@@ -161,16 +157,16 @@ class ResultSel extends Results
 	 */
 	function selection_menu()
 	{
-		global $item_ID_array, $current_User;
+		global $item_ID_array;
 
-		$can_edit = $current_User->check_perm( 'selections', 'edit' );
+		$can_edit = check_user_perm( 'selections', 'edit' );
 
 		if( $can_edit )
 		{ // links to check all and uncheck all
-			echo $this->Form->check_all();
+			echo $this->Form->checkbox_controls( '$all$', array( 'button_class' => 'btn btn-default' ) );
 		}
 
-		if( $current_User->check_perm( 'selections', 'view' ) )
+		if( check_user_perm( 'selections', 'view' ) )
 		{
 			// construction of the select menu :
 			$selection_name = selection_select_tag( $this->param_prefix, $this->table_selections, $this->field_sel_name, $this->field_sel_ID, $this->current_selection_ID );
@@ -229,7 +225,6 @@ function cols_check( $selection_ID, $sel_table, $sel_table_item, $sel_table_sele
  */
 function selection_checkbox( $item_ID, $param_prefix )
 {
-	global $current_User;
 	// List of checkboxes to pre-check:
 	global $cols_check;
 	// List of already displayed checkboxes (can be used outside to get a list of checkboxes which have been displayed)
@@ -244,14 +239,14 @@ function selection_checkbox( $item_ID, $param_prefix )
 
 	$r = '';
 
-	if( $current_User->check_perm( 'selections', 'edit' ) )
+	if( check_user_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
-		$r .= '<span name="surround_check" class="checkbox_surround_init"><input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value="'.$item_ID.'"';
+		$r .= '<input type="checkbox" class="checkbox" name="'.$param_prefix.'items[]" value="'.$item_ID.'"';
 		if( in_array( $item_ID, $cols_check ) )
 		{	// already in selection:
 			$r .= ' checked="checked" ';
 		}
-		$r .= ' /></span>';
+		$r .= ' />';
 	}
 	else
 	{	// User CANNOT edit:
@@ -286,7 +281,7 @@ function selection_select_tag(
 															$selection_ID
 															)
 {
-	global $DB, $selection_name, $current_User;
+	global $DB, $selection_name;
 
 	$r = T_('Selection');
 	$r .= ' <select name="selection_'.$category_prefix.'ID"
@@ -295,7 +290,7 @@ function selection_select_tag(
 						selform.submit()" >'."\n";
 	// in the onchange attribute, option_db is set to -1 to avoid updating the database
 
-	if( $current_User->check_perm( 'selections', 'edit' ) )
+	if( check_user_perm( 'selections', 'edit' ) )
 	{	// User is allowed to edit
 		$r .= '<option value="0">'.T_('New selection')."</option>\n";
 	}
@@ -376,12 +371,12 @@ function handle_selection_actions( $selection_ID, $prefix, $prefix_sel )
 function selection_action( $action, $selection_ID, $selection_name, $prefix, $prefix_sel )
 { // the form has been submitted to act on the database and not only to change the display
 
-	global $DB, $Messages, $confirm, $item_ID_list, $current_User;
+	global $DB, $Messages, $confirm, $item_ID_list;
 
 	$items = param( $prefix.'items', 'array:string', array(), false );	// do NOT memorize // ?????????????
 	param( 'item_ID_list', 'string', '', false );
 
-	$current_User->check_perm( 'selections', 'edit', true );
+	check_user_perm( 'selections', 'edit', true );
 
 
 	// Set global vars, selection_.prefix.ID, selection_.prefix_name

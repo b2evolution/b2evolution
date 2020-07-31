@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -29,10 +29,11 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '6.9.3';
+	var $version = '7.3.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
+	var $widget_icon = 'calendar';
 
 
   /**
@@ -45,7 +46,7 @@ class calendar_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_( 'Calendar Widget' );
+		$this->name = T_( 'Calendar' );
 		$this->short_desc = T_('This skin tag displays a navigable calendar.');
 		$this->long_desc = T_('Days containing posts are highlighted.');
 
@@ -115,7 +116,7 @@ class calendar_plugin extends Plugin
 			),
 			'cat_IDs' => array(
 				'label' => T_('Categories'),
-				'note' => T_('List category IDs separated by ,'),
+				'note' => sprintf( T_('List category IDs separated by %s.'), '<code>,</code>' ),
 				'size' => 15,
 				'type' => 'text',
 				'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
@@ -356,6 +357,9 @@ class calendar_plugin extends Plugin
 		}
 		// * Restrict to the statuses we want to show:
 		$Calendar->ItemQuery->where_visibility( $visibility_array );
+
+		// Restrict with locale visibility by current navigation locale:
+		$Calendar->ItemQuery->where_locale_visibility();
 
 		$item_types = $types;
 		if( isset( $params['item_type'] ) )
@@ -1039,6 +1043,8 @@ class Calendar
 			$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
 			// Exclude pages and intros:
 			$nav_ItemQuery->where_types( $this->ItemQuery->types );
+			// Restrict with locale visibility by current navigation locale:
+			$nav_ItemQuery->where_locale_visibility();
 		}
 
 		switch( $direction )

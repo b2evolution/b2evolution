@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  *
@@ -22,7 +22,7 @@ class html5_videojs_plugin extends Plugin
 	var $code = 'b2evH5VJSP';
 	var $name = 'HTML 5 VideoJS Player';
 	var $priority = 80;
-	var $version = '6.9.3';
+	var $version = '7.3.0';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'm4v', 'f4v', 'mp4', 'ogv', 'webm' );
@@ -51,7 +51,7 @@ class html5_videojs_plugin extends Plugin
 		global $Collection, $Blog;
 
 		require_css( '#videojs_css#', 'blog' );
-		require_js( '#videojs#', 'blog' );
+		require_js_async( '#videojs#', 'blog' );
 		$this->require_skin();
 
 		add_css_headline( '.video-js{ max-width: 100% !important; margin: auto; }
@@ -88,17 +88,13 @@ class html5_videojs_plugin extends Plugin
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
-				'use_for_posts' => array(
-					'label' => T_('Use for'),
-					'note' => T_('videos attached to posts'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-					),
-				'use_for_comments' => array(
-					'label' => '',
-					'note' => T_('videos attached to comments'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
+				'use_for' => array(
+						'label' => T_('Use for'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'posts', T_('videos attached to posts'), 1 ),
+							array( 'comments', T_('videos attached to comments'), 1 ),
+						)
 					),
 				'skin' => array(
 					'label' => T_('Skin'),
@@ -165,8 +161,8 @@ class html5_videojs_plugin extends Plugin
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
 
-		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
-		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		if( ( ! $in_comments && ! $this->get_checklist_setting( 'use_for', 'posts', 'coll', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_checklist_setting( 'use_for', 'comments', 'coll', $item_Blog ) ) )
 		{ // Plugin is disabled for post/comment videos on this Blog
 			return false;
 		}

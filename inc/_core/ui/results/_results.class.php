@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -19,8 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $GLOBALS['debug_results'] = false;
 
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
-load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * Results class
@@ -250,6 +249,14 @@ class Results extends Table
 	 * Useful to detect what widget, plugin and etc. calls the SQL queries
 	 */
 	var $query_title_prefix = '';
+
+	/**
+	 * List of checkbox toggle selectors to display checkbox toggle panel.
+	 * Can be a single selector, e.g., 'input[name^=prefix_]:checkbox',
+	 * or an array of selectors for toggling multiple set of checkboxes,
+	 * e.g., array( 'Checkbox set 1 label' => 'input[^=set1_]:checkbox', 'Checkbox set 2 label' => 'input[^=set2_]:checkbox' )
+	 */
+	var $checkbox_toggle_selectors;
 
 	/**
 	 * Constructor
@@ -551,8 +558,8 @@ class Results extends Table
 		if( $append_order_by && ($orders = $this->get_order_field_list()) )
 		{	// We have orders to append
 
-			if( strpos( $sql, 'ORDER BY') === false )
-			{ // there is no ORDER BY clause in the original SQL query
+			if( ! preg_match( '# \s ORDER \s+ BY \s+ [^\)]+$#xi', $sql ) )
+			{ // there is no ORDER BY clause in the original SQL query at the end(excluding order clause in sub queries)
 				$sql .= ' ORDER BY '.$orders.' ';
 			}
 			else
@@ -868,7 +875,8 @@ class Results extends Table
 				// echo $sql_count;
 			}
 
-			$this->total_rows = $DB->get_var( $sql_count, 0, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ); //count total rows
+			// Calculate the sum of values because the results may be grouped, so we must know a count of rows in all groups and not only in first group:
+			$this->total_rows = array_sum( $DB->get_col( $sql_count, 0, ( empty( $this->query_title_prefix ) ? '' : $this->query_title_prefix.' - ' ).get_class( $this ).'::count_total_rows()' ) ); //count total rows
 		}
 
 		// Calculate total pages depending on total rows and page size:
@@ -978,8 +986,10 @@ class Results extends Table
 			$this->display_filters();
 		}
 
-		// Flush in order to show the filters before slow SQL query will be executed below
-		evo_flush();
+		if( ! isset( $this->params['disable_evo_flush'] ) || ! $this->params['disable_evo_flush'] )
+		{	// Flush in order to show the filters before slow SQL query will be executed below
+			evo_flush();
+		}
 
 		// Initialize the order param
 		$this->init_order_param();
@@ -996,7 +1006,7 @@ class Results extends Table
 		echo $this->replace_vars( $this->params['content_start'] );
 
 			if( $this->total_pages == 0 )
-			{ // There are no results! Nothing to display!
+			{ // There are NO RESULTS! Nothing to display!
 
 				// START OF LIST/TABLE:
 				$this->display_list_start();
@@ -1117,7 +1127,8 @@ class Results extends Table
 						else debug_die( 'Invalid Results-group_by-type: '.var_export( $type, true ) );
 
 
-						if( $this->current_group_ID[$group_depth] != $value )
+						if( ! isset( $this->current_group_ID[$group_depth] ) || // Condition to start first group
+						    $this->current_group_ID[$group_depth] != $value ) // Condition to start all next groups
 						{ // Group changed here:
 							$this->current_group_ID[$group_depth] = $value;
 
@@ -1445,17 +1456,100 @@ class Results extends Table
 		}
 		else
 		{ // Several pages
+			// e-g: 'header_text' or 'footer_text'
 			$navigation = $this->replace_vars( $this->params[$template.'_text'] );
 		}
 
 		$navigation_text = trim( strip_tags( $navigation ) );
 		if( ! empty( $navigation_text ) )
 		{ // Display navigation only when it is really filled with some text
+			// e-g: 'header_start' or 'footer_start'
 			echo $this->params[$template.'_start'];
 
 			echo $navigation;
 
 			echo $this->params[$template.'_end'];
+		}
+	}
+
+
+	/**
+	 * Display list/table end.
+	 *
+	 * Typically outputs </ul> or </table>
+	 */
+	function display_list_end()
+	{
+		if( $this->total_pages == 0 )
+		{ // There are no results! Nothing to display!
+			echo $this->replace_vars( $this->params['no_results_end'] );
+		}
+		else
+		{	// We have rows to display:
+			$r = '';
+			if( ! empty( $this->checkbox_toggle_selectors ) )
+			{
+				$r .= $this->params['footer_start'];
+				$r .= '<div class="form-inline">';
+				if( is_array( $this->checkbox_toggle_selectors ) && count( $this->checkbox_toggle_selectors ) > 1 )
+				{
+					$r .= '<select class="form-control input-sm">';
+					foreach( $this->checkbox_toggle_selectors as $label => $selector )
+					{
+						$r .= '<option value="'.format_to_output( $selector, 'formvalue' ).'">'.$label.'</option>';
+					}
+					$r .= '</select> ';
+					$r .= '<span class="btn-group">';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '</span>';
+				}
+				else
+				{
+					if( is_array( $this->checkbox_toggle_selectors ) )
+					{
+						$selector = current( $this->checkbox_toggle_selectors );
+					}
+					else
+					{
+						$selector = $this->checkbox_toggle_selectors;
+					}
+					$r .= '<span class="btn-group">';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '</span>';
+				}
+
+				if( ! empty( $this->list_mass_actions ) )
+				{	// Additional actions:
+					foreach( $this->list_mass_actions as $toggle_action_key => $toggle_action )
+					{
+						$r .= ' ';
+						switch( $toggle_action['type'] )
+						{
+							case 'text':
+								$r .= $toggle_action['text'];
+								break;
+							case 'button':
+							case 'submit':
+								$r .= '<input type="'.$toggle_action['type'].'" name="actionArray['.$toggle_action_key.']" id="'.$toggle_action_key.'"'
+									.' value="'.format_to_output( $toggle_action['text'] ).'"'
+									.' class="btn btn-xs '.( empty( $toggle_action['class'] ) ? 'btn-default' : ''.$toggle_action['class'] ).'" />';
+								break;
+						}
+					}
+				}
+				$r .= '</div>';
+				$r .= $this->params['footer_end'];
+			}
+			echo $this->params['list_end'].$r;
+
+			if( ! empty( $this->list_mass_actions ) && isset( $this->Form ) )
+			{	// Start form for list with mass actions:
+				$this->Form->end_form();
+			}
 		}
 	}
 
@@ -1806,6 +1900,10 @@ class Results extends Table
 		// echo '['.$matches[1].']';
 		switch( $matches[1] )
 		{
+			case 'nb_results':
+			case 'total_rows':
+				return $this->total_rows;
+
 			case 'start' :
 				return ( ($this->page-1)*$this->limit+1 );
 
@@ -1974,21 +2072,33 @@ class Results extends Table
 	function display_first( $page_url = '' )
 	{
 		$r = '';
-		if( $this->page == 1 )
+		if( $this->page == 1 && isset( $this->params['page_item_current_before'] ) )
 		{
-			if( isset( $this->params['page_item_current_before'] ) )
-			{
-				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
-			}
+			$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_first' );
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
 			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_first' );
 		}
 
-		$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+		if( $this->page == 1 )
+		{	// no link for the current page
+			if( ! isset( $this->params['page_current_template'] ) )
+			{
+				$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
+			}
+			$r .= str_replace( '$page_num$', 1, $this->params['page_current_template'] );
+		}
+		else
+		{	// a link for non-current pages
+			$r .= '<a href="'.regenerate_url( $this->page_param, '', $page_url ).'">1</a>';
+		}
 
-		if( isset( $this->params['page_item_after'] ) )
+		if( $this->page == 1 && isset( $this->params['page_item_current_after'] ) )
+		{
+			$r .= $this->params['page_item_current_after'];
+		}
+		elseif( isset( $this->params['page_item_after'] ) )
 		{
 			$r .= $this->params['page_item_after'];
 		}
@@ -2003,21 +2113,33 @@ class Results extends Table
 	function display_last( $page_url = '' )
 	{
 		$r = '';
-		if( $this->page == $this->total_pages )
+		if( $this->page == $this->total_pages && isset( $this->params['page_item_current_before'] ) )
 		{
-			if( isset( $this->params['page_item_current_before'] ) )
-			{
-				$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
-			}
+			$r .= add_tag_class( $this->params['page_item_current_before'], 'listnav_last' );
 		}
 		elseif( isset( $this->params['page_item_before'] ) )
 		{
 			$r .= add_tag_class( $this->params['page_item_before'], 'listnav_last' );
 		}
 
-		$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+		if( $this->page == $this->total_pages )
+		{	// no link for the current page
+			if( ! isset( $this->params['page_current_template'] ) )
+			{
+				$this->params['page_current_template'] = '<strong class="current_page">$page_num$</strong>';
+			}
+			$r .= str_replace( '$page_num$', $this->total_pages, $this->params['page_current_template'] );
+		}
+		else
+		{	// a link for non-current pages
+			$r .= '<a href="'.regenerate_url( $this->page_param, $this->page_param.'='.$this->total_pages, $page_url ).'">'.$this->total_pages.'</a>';
+		}
 
-		if( isset( $this->params['page_item_after'] ) )
+		if( $this->page == $this->total_pages && isset( $this->params['page_item_current_after'] ) )
+		{
+			$r .= $this->params['page_item_current_after'];
+		}
+		elseif( isset( $this->params['page_item_after'] ) )
 		{
 			$r .= $this->params['page_item_after'];
 		}

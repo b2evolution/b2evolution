@@ -30,72 +30,6 @@ function get_form( object )
 }
 
 
-/**
- * Toggles all checkboxes of the current form
- *
- * @param form the form
- * @param integer force set/unset
- */
-function check( object, action )
-{
-
-	form_obj = get_form( object );
-
-	if( ! form_obj )
-	{
-		alert( 'Could not find form' );
-		return false;
-	}
-
-	//checks or unchecks all checkboxes in the form
-	i = 0;
-	while( i < form_obj.length )
-	{
-		if( form_obj.elements[i].type == 'checkbox' )
-		{
-			form_obj.elements[i].checked = action;
-		}
-		i++;
-	}
-
-	// Cancel default action:
-	return false;
-}
-
-
-/**
- * Event function
- * check all checkboxes of the current form
- */
-function check_all( e )
-{	// Get the event target element
-	target = findTarget(e);
-	// Call check funtion to check all check boxes
-	// Cancel the event click (href..)
-	check( target, true );
-	// For Firefox
-	cancelClick( e );
-	// For IE
-	return false;
-}
-
-/**
- * Event function
- * uncheck all checkboxes of the current form
- */
-function uncheck_all( e )
-{	// Get the event target element
-	target = findTarget(e);
-	// Call check funtion to uncheck all check boxes
-	check( target, false );
-	// Cancel the event click (href..)
-	// For Firefox
-	cancelClick( e );
-	// For IE
-	return false;
-}
-
-
 /*
  * Cancel a click event
  */
@@ -112,89 +46,6 @@ function cancelClick( e )
 	return false;
 }
 
-
-/**
- *	Surround or unsurrond all' surround_check' span restrict to check_val
- *	used to surround all check_all checkboxes
- */
-function surround_check( e, class_name, check_val )
-{	// Get the event target element
-	var el = findTarget(e);
-	// Get the parent form
-	el_form = get_form( el );
-	// Get all form inputs
-	el_inputs = el_form.getElementsByTagName( 'INPUT' );
-
-	// Loop on all inputs
-	for( i = 0 ; i < el_inputs.length ; i++ )
-	{
-		el_input = el_inputs[i];
-
-		if( el_input.type == 'checkbox' )
-		{	// The input is a checkbox
-			if( check_val == null || el_input.checked == check_val )
-			{	// Change the parent (span) class
-				el_input.parentNode.className = class_name;
-			}
-		}
-	}
-}
-
-/**
- *	Suround all not checked checkboxes
- */
-function surround_unchecked( e )
-{
-	surround_check( e, 'checkbox_surround', false );
-}
-/**
- *	Suround all checked checkboxes
- */
-function surround_checked( e )
-{
-	surround_check( e, 'checkbox_surround', true);
-}
-
-/**
- *	Unsuround all checkboxes
- */
-function unsurround_all( e )
-{
-	surround_check( e, 'checkbox_surround_init', null);
-}
-
-/*
- * 	Add links event on all check_all and un_chek_all links
- */
-function init_check_all()
-{	// Get all check_all elements
-
-	//var exx = document.getElementsByName('surround_check');
-	//alert(exx.length);
-
-	var check_links = document.getElementsByName('check_all_nocheckchanges')
-	// Add click event on all check_all links
-	for( var i=0; i < check_links.length ; i++ )
-	{
-		var link = check_links[i];
-		jQuery( link ).bind( {
-			click: check_all,
-			mouseover: surround_unchecked,
-			mouseout: unsurround_all
-		} );
-	}
-	// Add click event on all un_check_all links
-	var uncheck_links = document.getElementsByName('uncheck_all_nocheckchanges')
-	for( var i=0; i < uncheck_links.length ; i++ )
-	{
-		var link = uncheck_links[i];
-		jQuery( link ).bind( {
-			click: uncheck_all,
-			mouseover: surround_checked,
-			mouseout: unsurround_all
-		} );
-	}
-}
 
 /**
  * Clear the form the current object belongs to
@@ -254,35 +105,28 @@ function focus_on_first_input()
 
 /**
  * Handle Combo Boxes
- * Display the input text when value is 'new'
+ * Display the input text when value is 'new'(first option to enter new value)
  * and hide the input text for all other values
  *
- * @param string ID of the select list
- * @param string value selected
- * @param string class name for the input text
+ * @param string|object jQuery selector or JavaScript object of the combo box <select> element
  */
-function check_combo( el_ID, value, class_name )
+function check_combo( selector )
 {
-	if( value == 'new' )
-	{	// Display the input text and focus on
+	var select_obj = jQuery( selector ),
+	input_obj = select_obj.next();
 
-		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );
-
-		// Display the input text
-		input_text.style.display = "inline";
-
- 		// Focus on the new input text
-		input_text.focus();
+	if( select_obj.find( 'option:first' ).is( ':selected' ) )
+	{	// Display the input text and focus on:
+		input_obj.show().focus();
+		if( select_obj.attr( 'required' ) == 'required' )
+		{	// Combo box is required, restore the appropriate attribute for input:
+			input_obj.attr( 'required', 'required' );
+		}
 	}
 	else
-	{ // Hide the input text
-
-		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );
-
-		// Hide the input text
-		input_text.style.display = "none";
+	{	// Hide the input text:
+		input_obj.hide();
+		input_obj.removeAttr( 'required' );
 	}
 }
 
@@ -361,4 +205,23 @@ function addSpinner( button )
 	button = jQuery( button );
 	button.addClass( 'btn-spinner' );
 	button.css( 'width', '+=24px' );
+}
+
+
+/**
+ * Set custom validity of field based on input value length
+ * @param obj Input field
+ * @param integer mininum input value length
+ * @param string message to display if input value does not meet minimum length
+ */
+function checkInputLength( input, minLength, message )
+{
+	if( input.value.length < minLength )
+	{
+		input.setCustomValidity( message );
+	}
+	else
+	{
+		input.setCustomValidity( '' );
+	}
 }

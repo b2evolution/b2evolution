@@ -28,7 +28,7 @@ $locale_lang = locale_lang( false );
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title><?php echo format_to_output( $error_title, 'htmlhead' ); ?></title>
 		<!-- Bootstrap -->
-		<link href="rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+		<link href="rsc/ext/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 		<link href="rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
 	<body>
@@ -72,7 +72,7 @@ echo str_replace(
 			<footer class="footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
 				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>

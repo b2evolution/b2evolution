@@ -85,8 +85,7 @@ class UploadHandler {
 
 		while( ! feof( $target ) )
 		{
-			$curr_mem_usage = memory_get_usage( true );
-			if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+			if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 			{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 				fclose( $temp );
 				return array( 'error' => T_('Out of memory.') );
@@ -132,7 +131,7 @@ class UploadHandler {
 		if( $this->toBytes( ini_get( 'post_max_size' ) ) < $this->sizeLimit || $this->toBytes( ini_get( 'upload_max_filesize') ) < $this->sizeLimit )
 		{
 			$neededRequestSize = max( 1, $this->sizeLimit / 1024 / 1024 ) . 'M';
-			return array( 'error' => sprintf( T_('Server error. Increase post_max_size and upload_max_filesize to %s'), $neededRequestSize ) );
+			return array( 'error' => sprintf( /* NO TRANS for sysadmins */ 'Server error. Increase post_max_size and upload_max_filesize to %s', $neededRequestSize ) );
 		}
 
 		$type = $_SERVER['CONTENT_TYPE'];
@@ -143,11 +142,18 @@ class UploadHandler {
 
 		if( !isset( $type ) )
 		{
-			return array( 'error' => T_('No files were uploaded.') );
+			return array( 'error' => T_('No file was uploaded.') );
 		}
 		elseif ( strpos( strtolower( $type ), 'multipart/' ) !== 0 )
 		{
-			return array( 'error' => T_('Server error. Not a multipart request. Please set forceMultipart to default value (true).') );
+			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Not a multipart request. Please set forceMultipart to default value (true).' );
+		}
+
+		// Check for wrong uploading file:
+		if( ! isset( $_FILES[$this->inputName]['tmp_name'] ) ||
+		    ! is_uploaded_file( $_FILES[$this->inputName]['tmp_name'] ) )
+		{	// Deny uploading of wrong file:
+			return array( 'error' => 'Invalid '.$this->inputName.' file!' );
 		}
 
 		// Get size and name
@@ -193,6 +199,11 @@ class UploadHandler {
 			return array( 'error' => sprintf( T_('File has an invalid extension, it should be one of %s.'), $these ) );
 		}
 
+		if( empty( $_REQUEST['qquuid'] ) )
+		{	// Param qquuid must be passed:
+			return array( 'error' => 'Parameter "qquuid" is required!' );
+		}
+
 		// Save a chunk
 		$totalParts = isset( $_REQUEST['qqtotalparts'] ) ? ( int ) $_REQUEST['qqtotalparts'] : 1;
 		$uuid = $_REQUEST['qquuid'];
@@ -202,7 +213,7 @@ class UploadHandler {
 			$partIndex = ( int ) $_REQUEST['qqpartindex'];
 			if( ! is_writable( $chunksFolder ) )
 			{
-				return array( 'error' => T_('Server error. Chunks directory isn\'t writable or executable.') );
+				return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Chunks directory isn\'t writable or executable.' );
 			}
 			$targetFolder = $this->chunksFolder.DIRECTORY_SEPARATOR.$uuid;
 			if( ! file_exists( $targetFolder ) )
@@ -210,7 +221,7 @@ class UploadHandler {
 				mkdir( $targetFolder, 0777, true );
 			}
 			$target = $targetFolder.'/'.$partIndex;
-			$success = move_uploaded_file( $_FILES[$this->inputName]['tmp_name'], $target );
+			$success = move_uploaded_file( $file['tmp_name'], $target );
 
 			return array( "success" => true, "uuid" => $uuid );
 		}
@@ -225,8 +236,7 @@ class UploadHandler {
 
 			while( ! feof( $temp ) )
 			{
-				$curr_mem_usage = memory_get_usage( true );
-				if( ( $memory_limit - $curr_mem_usage ) < 8192 )
+				if( $memory_limit != -1 && ( $memory_limit - memory_get_usage( true ) ) < 8192 )
 				{ // Don't try to load the next portion of image into the memory because it would cause 'Allowed memory size exhausted' error
 					fclose( $temp );
 					return array( 'error' => T_('Out of memory.') );
@@ -250,7 +260,7 @@ class UploadHandler {
 	{
 		if( $this->isInaccessible( $uploadDirectory ) )
 		{
-			return array( 'error' => T_('Server error. Uploads directory isn\'t writable') . ( ( ! $this->isWindows() ) ? " or executable." : "." ) );
+			return array( 'error' => /* NO TRANS for sysadmins */ 'Server error. Uploads directory isn\'t writable'. ( ( ! $this->isWindows() ) ? ' or executable.' : '.' ) );
 		}
 		$targetFolder = $uploadDirectory;
 		$url = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );

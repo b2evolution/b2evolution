@@ -1,0 +1,1101 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois Planque
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: b2evolution demo contents 7\n"
+"Report-Msgid-Bugs-To: http://fplanque.com/\n"
+"POT-Creation-Date: 2020-03-29 01:00+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../inc/collections/_demo_content.funcs.php:220
+msgid "Global home page"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:221
+msgid "Sample Blog A (Public)"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:222
+msgid "Sample Blog B (Private)"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:223
+#: ../../../inc/collections/_demo_content.funcs.php:3549
+msgid "Photo Albums"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:224
+#: ../../../inc/collections/_demo_content.funcs.php:1636
+#: ../../../inc/collections/_demo_content.funcs.php:3550
+#: ../../../inc/collections/_demo_content.funcs.php:4116
+msgid "Forums"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:225
+msgid "Online Manual"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:226
+#: ../../../inc/collections/_demo_content.funcs.php:1712
+msgid "Tracker"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:421
+msgid "<p>This website is powered by b2evolution.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:422
+#, php-format
+msgid "<p>You are currently looking at an info page about \"%s\".</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:423
+msgid "<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:424
+msgid "<p>Note: If needed, skins may format info pages differently from regular posts.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:428
+#: ../../../inc/collections/_demo_content.funcs.php:1913
+msgid ""
+"Heading\n"
+"=======\n"
+"\n"
+"Sub-heading\n"
+"-----------\n"
+"\n"
+"### H3 header\n"
+"\n"
+"#### H4 header ####\n"
+"\n"
+"> Email-style angle brackets\n"
+"> are used for blockquotes.\n"
+"\n"
+"> > And, they can be nested.\n"
+"\n"
+"> ##### Headers in blockquotes\n"
+">\n"
+"> * You can quote a list.\n"
+"> * Etc.\n"
+"\n"
+"[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings\n"
+"\n"
+"Paragraphs are separated by a blank line.\n"
+"\n"
+"    This is a preformatted\n"
+"    code block.\n"
+"\n"
+"Text attributes *Italic*, **bold**, `monospace`.\n"
+"\n"
+"Shopping list:\n"
+"\n"
+"* apples\n"
+"* oranges\n"
+"* pears\n"
+"\n"
+"The rain---not the reign---in Spain."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1522
+#: ../../../inc/collections/_demo_content.funcs.php:3344
+msgid "Blog A"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1560
+#: ../../../inc/collections/_demo_content.funcs.php:3386
+msgid "Blog B"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1598
+#: ../../../inc/collections/_demo_content.funcs.php:3438
+#: ../../../inc/collections/_demo_content.funcs.php:3524
+msgid "Photos"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1674
+#: ../../../inc/collections/_demo_content.funcs.php:3609
+msgid "Manual"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1750
+#: ../../../inc/collections/_demo_content.funcs.php:2204
+#: ../../../inc/collections/_demo_content.funcs.php:3074
+msgid "Mini-Site"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1912
+msgid "Markdown Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1950
+msgid ""
+"Button examples:\n"
+"[button]This is a button[/button]\n"
+"[like]I like this[/like] [dislike]I don't like this[/dislike]\n"
+"[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]\n"
+"[cta:1:link]Call to action 1 link only[/cta]"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1957
+msgid "Another example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1958
+#: ../../../inc/collections/_demo_content.funcs.php:1963
+#, php-format
+msgid "Hello %s!"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1958
+msgid "Here are some news..."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1961
+msgid "Welcome & Activate"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1962
+#, php-format
+msgid "Activate your account: %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1964
+#, php-format
+msgid "You have recently registered a new account on %s ."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1965
+msgid "You must activate this account by clicking below in order to be able to use all the site features."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1966
+msgid "Your login is: $login$"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1967
+msgid "Your email is: $email$"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:1968
+msgid "Activate NOW"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2007
+msgid "Sample Automation"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2135
+msgid "Anonymous Demo User"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2150
+#: ../../../inc/collections/_demo_content.funcs.php:3948
+msgid ""
+"Hi!\n"
+"\n"
+"This is a sample comment that has been approved by default!\n"
+"Admins and moderators can very quickly approve or reject comments from the collection dashboard."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2157
+msgid ""
+"Hi!\n"
+"\n"
+"This is a sample comment that has **not** been approved by default!\n"
+"Admins and moderators can very quickly approve or reject comments from the collection dashboard."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2193
+#, php-format
+msgid "This is the long description for the collection named '%s'. %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2198
+msgid "This is the collection's tagline."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2207
+msgid "The main purpose for this blog is to be included as a side item to other blogs where it will display your favorite/related links."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2210
+msgid "Mini-Site Title"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2234
+msgid "Home"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2239
+msgid "Homepage Title"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2279
+msgid "Public Blog"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2318
+msgid "Members-Only Blog"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2376
+msgid "Forums Title"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2397
+msgid "Manual Title"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2418
+msgid "Tracker Title"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2491
+msgid "Extended post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2495
+msgid "This is an extended post. This means you only see this small teaser by default and you must click on the link below to see more."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2498
+#: ../../../inc/collections/_demo_content.funcs.php:2696
+msgid "This is the extended text. You only see it when you have clicked the \"more\" link."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2507
+msgid "Post with Images"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2511
+msgid ""
+"<p>This post has several images attached to it. Each one uses a different Attachment Position. Each may be displayed differently depending on the skin they are viewed in.</p>\n"
+"\n"
+"<p>Check out the photoblog (accessible through the links at the top) to see a completely different skin focused more on the photos than on the blog text.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2523
+msgid "Mongolian Beef"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2528
+msgid "A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2529
+msgid "Optional: spice this thing up, with a dose of your favorite chili paste/sauce."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2532
+msgid "Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2533
+msgid "Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don't get the oil too hot."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2534
+msgid "Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2535
+msgid "Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2536
+msgid "Remove from the heat, add beef back in. Toss"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2537
+msgid "Serve with rice, top with green onions"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2540
+#: ../../../inc/collections/_demo_content.funcs.php:2576
+msgid "Main Course"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2541
+msgid "Mongolian"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2546
+msgid ""
+"vegetable oil\n"
+"1/2 teaspoon ginger\n"
+"1 tablespoon garlic\n"
+"1/2 cup soy sauce\n"
+"1/2 cup water\n"
+"3/4 cup dark brown sugar\n"
+"1 lb flank steak\n"
+"1 yellow onion\n"
+"2 large green onions"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2562
+msgid "Stuffed Peppers"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2567
+msgid "We found these during Happy Hour at Chiso's Grill in Bee Cave, Tx. W've since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you're into that)."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2570
+msgid "combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2571
+msgid "if you are feeling spry, beat the mixture to make it fluffy"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2572
+msgid "put filling in a plastic bag, snip of the tip with scissors to make a piping bag"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2573
+msgid "fill peppers, place in bowl, top with chives and hot sauce"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2577
+msgid "South African"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2582
+msgid ""
+"1 jar Peppedew Peppers (or piquante pepper)\n"
+"4oz goat cheese (any flavor)\n"
+"1 tbsp mayonnaise\n"
+"1 tbsp sour cream\n"
+"1 bunch of chives, chopped\n"
+"hearty shot of hot sauce (Franks, Yellowbird)\n"
+"hearty crack of pepper"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2596
+msgid "Custom Fields Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2600
+#: ../../../inc/collections/_demo_content.funcs.php:2630
+msgid "This post has a special post type called \"Post with Custom Fields\"."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2601
+#: ../../../inc/collections/_demo_content.funcs.php:2631
+msgid "This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2604
+#: ../../../inc/collections/_demo_content.funcs.php:2634
+#: ../../../inc/collections/_demo_content.funcs.php:2666
+msgid "It is also possible to selectively display only a couple of these fields:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2606
+#: ../../../inc/collections/_demo_content.funcs.php:2636
+#: ../../../inc/collections/_demo_content.funcs.php:2668
+#, php-format
+msgid "Finally, we can also display just the value of a specific field, like this: %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2607
+#: ../../../inc/collections/_demo_content.funcs.php:2637
+#, php-format
+msgid "It is also possible to create links using a custom field URL: %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2626
+msgid "Another Custom Fields Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2657
+msgid "Child Post Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2662
+#, php-format
+msgid "This post has a special post type called \"Child Post\". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2663
+msgid "This also allows us to access the custom fields of the parent post:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2669
+#, php-format
+msgid "We can also reference fields of any other post like this: %s or like this: %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2670
+#, php-format
+msgid "It is also possible to create links using a custom field URL from the parent post: %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2671
+msgid "Replicated fields"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2672
+msgid "By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively)."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2673
+msgid "This child post has the following fields which automatically replicate from its parent:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2675
+#, php-format
+msgid "Another way to show this, is to use b2evolution's %s short tag:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2689
+msgid "Extended post with no teaser"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2693
+msgid "This is an extended post with no teaser. This means that you won't see this teaser any more when you click the \"more\" link."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2700
+msgid "This is a multipage post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2703
+msgid ""
+"<p>This is page 1 of a multipage post.</p>\n"
+"\n"
+"<blockquote><p>This is a Block Quote.</p></blockquote>\n"
+"\n"
+"<p>You can see the other pages by clicking on the links below the text.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2711
+#: ../../../inc/collections/_demo_content.funcs.php:2715
+#: ../../../inc/collections/_demo_content.funcs.php:2719
+#, php-format
+msgid "This is page %d."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2721
+msgid "It is the last page."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2725
+msgid "Featured post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2729
+msgid ""
+"<p>This is a demo of a featured post.</p>\n"
+"\n"
+"<p>It will be featured whenever we have no specific \"Intro\" post to display for the current request. To see it in action, try displaying the \"Announcements\" category.</p>\n"
+"\n"
+"<p>Also note that when the post is featured, it does not appear in the regular post flow.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2737
+msgid "Markdown examples"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2744
+msgid "Wiki Tables"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2989
+msgid "About widgets..."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2993
+msgid ""
+"<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>\n"
+"\n"
+"<p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>\n"
+"\n"
+"<p>Note: in order to be displayed, widgets are placed in containers. Each container appears in a specific place in an evoskin. If you change your blog skin, the new skin may not use the same containers as the previous one. Make sure you place your widgets in containers that exist in the specific skin you are using.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3001
+msgid "About skins..."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3005
+#, php-format
+msgid ""
+"<p>By default, b2evolution blogs are displayed using an evoskin.</p>\n"
+"\n"
+"<p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>\n"
+"\n"
+"<p>You can download additional skins from the <a href=\"http://skins.b2evolution.net/\" target=\"_blank\">skin site</a>. To install them, unzip them in the /blogs/skins directory, then go to General Settings &gt; Skins in the admin interface and click on \"Install new\".</p>\n"
+"\n"
+"<p>You can also create your own skins by duplicating, renaming and customizing any existing skin folder from the /blogs/skins directory.</p>\n"
+"\n"
+"<p>To start customizing a skin, open its \"<code>index.main.php</code>\" file in an editor and read the comments in there. Note: you can also edit skins in the \"Files\" tab of the admin interface.</p>\n"
+"\n"
+"<p>And, of course, read the <a href=\"%s\" target=\"_blank\">manual on skins</a>!</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3019
+msgid "Apache optimization..."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3022
+#, php-format
+msgid ""
+"<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please see the man page about <a %s>Tricky Stuff</a> for more information.</p>\n"
+"\n"
+"<p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3031
+msgid "Second post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3034
+msgid ""
+"<p>This is the second post in the \"[coll:shortname]\" collection.</p>\n"
+"\n"
+"<p>It appears in multiple categories.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3040
+msgid "First Post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3042
+msgid ""
+"<p>This is the first post in the \"[coll:shortname]\" collection.</p>\n"
+"\n"
+"<p>It appears in multiple categories.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3057
+#: ../../../inc/collections/_demo_content.funcs.php:3099
+msgid "Contributors"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3071
+msgid "About Minisite"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3082
+msgid "More info"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3107
+msgid "Terms & Conditions"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3171
+msgid "About this site"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3174
+msgid "This website is powered by b2evolution."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3175
+msgid "You are currently looking at an info page about this site."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3176
+msgid "Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3178
+#, php-format
+msgid "This extra information is only displayed when detailed view is requested. This is achieved by adding a display condition on a block of content like %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3179
+msgid "Note: If needed, skins may format info pages differently from regular posts."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3197
+msgid "Widget Page"
+msgstr ""
+
+#. TRANS: sample ad content
+#: ../../../inc/collections/_demo_content.funcs.php:3207
+msgid "b2evo: The other blog tool!"
+msgstr ""
+
+#. TRANS: sample ad content
+#: ../../../inc/collections/_demo_content.funcs.php:3212
+msgid "The other blog tool!"
+msgstr ""
+
+#. TRANS: sample ad content
+#: ../../../inc/collections/_demo_content.funcs.php:3219
+msgid "b2evo: Better Blog Software!"
+msgstr ""
+
+#. TRANS: sample ad content
+#: ../../../inc/collections/_demo_content.funcs.php:3224
+msgid "Better Blog Software!"
+msgstr ""
+
+#. TRANS: sample ad content
+#: ../../../inc/collections/_demo_content.funcs.php:3231
+msgid "b2evo: The software for blog pros!"
+msgstr ""
+
+#. TRANS: sample ad content
+#: ../../../inc/collections/_demo_content.funcs.php:3236
+msgid "The software for blog pros!"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3243
+msgid "Register content"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3248
+msgid "The information you provide in this form will be recorded in your user account."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3250
+msgid "You will be able to modify it (or even close your account) at any time after logging in with your username and password."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3252
+msgid "Should you forget your password, you will be able to reset it by receiving a link on your email address."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3254
+msgid "All other info is used to personalize your experience with this website."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3256
+msgid "This site may allow conversation between users."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3257
+msgid "Your email address and password will not be shared with other users."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3258
+msgid "All other information may be shared with other users."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3259
+msgid "Do not provide information you are not willing to share."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3263
+msgid "Help content"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3268
+msgid "Email preferences"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3270
+#, php-format
+msgid "You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3272
+msgid "Managing your personal information"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3274
+#, php-format
+msgid "You can see and correct the personal details we know about you by clicking <a %s>here</a>."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3276
+msgid "Closing your account"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3278
+#, php-format
+msgid "You can close your account yourself by clicking <a %s>here</a>."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3282
+msgid "Access Denied"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3287
+msgid "You are not a member of this collection, therefore you are not allowed to access it."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3291
+msgid "Login Required"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3296
+msgid "You need to log in before you can access this section."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3300
+msgid "This is a Content Block"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3304
+msgid ""
+"<p>This is a Post/Item of type \"Content Block\".</p>\n"
+"\n"
+"<p>A content block can be included in several places.</p>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3318
+#: ../../../inc/collections/_demo_content.funcs.php:3354
+#: ../../../inc/collections/_demo_content.funcs.php:3499
+msgid "Welcome"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3319
+#: ../../../inc/collections/_demo_content.funcs.php:3355
+#: ../../../inc/collections/_demo_content.funcs.php:3505
+msgid "News"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3320
+#: ../../../inc/collections/_demo_content.funcs.php:3356
+#: ../../../inc/collections/_demo_content.funcs.php:3504
+msgid "Background"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3321
+#: ../../../inc/collections/_demo_content.funcs.php:3357
+#: ../../../inc/collections/_demo_content.funcs.php:3506
+msgid "Fun"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3322
+#: ../../../inc/collections/_demo_content.funcs.php:3358
+#: ../../../inc/collections/_demo_content.funcs.php:3507
+msgid "In real life"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3323
+#: ../../../inc/collections/_demo_content.funcs.php:3359
+#: ../../../inc/collections/_demo_content.funcs.php:3552
+#: ../../../inc/collections/_demo_content.funcs.php:3621
+msgid "Recipes"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3324
+#: ../../../inc/collections/_demo_content.funcs.php:3360
+#: ../../../inc/collections/_demo_content.funcs.php:3508
+msgid "Movies"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3325
+#: ../../../inc/collections/_demo_content.funcs.php:3361
+#: ../../../inc/collections/_demo_content.funcs.php:3509
+msgid "Music"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3327
+#: ../../../inc/collections/_demo_content.funcs.php:3363
+#: ../../../inc/collections/_demo_content.funcs.php:3511
+msgid "On the web"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3333
+msgid "Main Intro post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3337
+msgid "This is the main intro post of this collection. It appears on the collection's front page only."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3341
+msgid "About Blog A"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3369
+msgid "b2evo skins repository"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3383
+msgid "About Blog B"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3390
+msgid "Widgets tag &ndash; Sub Intro post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3394
+msgid "This uses post type \"Intro-Tag\" and is tagged with the desired Tag(s)."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3398
+msgid "b2evolution tips category &ndash; Sub Intro post"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3402
+msgid "This uses post type \"Intro-Cat\" and is attached to the desired Category(ies)."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3406
+msgid "Welcome to Blog B"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3410
+#, php-format
+msgid ""
+"<p>This is the intro post for the front page of Blog B.</p>\n"
+"\n"
+"<p>Blog B is currently configured to show a front page like this one instead of directly showing the blog's posts.</p>\n"
+"\n"
+"<ul>\n"
+"<li>To view the blog's posts, click on \"News\" in the menu above.</li>\n"
+"<li>If you don't want to have such a front page, you can disable it in the Blog's settings > Features > <a %s>Front Page</a>. You can also see an example of a blog without a Front Page in Blog A</li>\n"
+"</ul>"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3427
+msgid "Landscapes"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3435
+msgid "About Photos"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3442
+msgid "Bus Stop Ahead"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3445
+msgid "In the middle of nowhere: a school bus stop where you wouldn't really expect it!"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3473
+msgid "Sunset"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3482
+msgid "Food"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3498
+msgid "A forum group"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3499
+msgid "Welcome description"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3500
+msgid "A forum"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3500
+#: ../../../inc/collections/_demo_content.funcs.php:3501
+msgid "Short description of this forum"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3501
+msgid "Another forum"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3503
+msgid "Another group"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3504
+msgid "Background description"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3505
+msgid "News description"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3506
+msgid "Fun description"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3521
+msgid "About Forums"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3543
+msgid "Introduction"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3544
+msgid "Getting Started"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3545
+msgid "User Guide"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3546
+msgid "Reference"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3547
+msgid "Collections"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3548
+msgid "Blogs"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3553
+msgid "Other"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3577
+#: ../../../inc/collections/_demo_content.funcs.php:3586
+msgid "Chapter Intro"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3581
+#: ../../../inc/collections/_demo_content.funcs.php:3590
+msgid "This is an introduction for this chapter. It is a post using the \"intro-cat\" type."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3582
+msgid "Contrary to the other sections which are explictely sorted by default, this section is sorted alphabetically by default."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3594
+msgid "Welcome here!"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3598
+msgid ""
+"This is the main introduction for this demo online manual. It is a post using the type \"Intro-Front\". It will only appear on the front page of the manual.\n"
+"\n"
+"You may delete this post if you don't want such an introduction.\n"
+"\n"
+"Just to be clear: this is a **demo** of a manual. The user manual for b2evolution is here: http://b2evolution.net/man/."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3606
+msgid "About this manual"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3619
+msgid "Bug"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3620
+msgid "Feature Request"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3644
+#, php-format
+msgid "Task %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3647
+#, php-format
+msgid "This is a demo task description for Task %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3728
+msgid "Item Type"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3734
+msgid "Category"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:3867
+msgid "Missing attachment!"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:4097
+msgid "What are your favorite b2evolution feature?"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:4114
+msgid "Multiple blogs"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:4115
+msgid "Photo Galleries"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:4117
+msgid "Online Manuals"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:4118
+msgid "Lists / E-mailing"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:4119
+msgid "Easy Maintenance"
+msgstr ""
+
+#: ../../../install/_functions_create.php:581
+msgid "Numeric Average"
+msgstr ""
+
+#: ../../../install/_functions_create.php:631
+msgid "Course"
+msgstr ""
+
+#: ../../../install/_functions_create.php:635
+msgid "Dessert"
+msgstr ""
+
+#: ../../../install/_functions_create.php:641
+msgid "Cuisine"
+msgstr ""
+
+#: ../../../install/_functions_create.php:645
+msgid "Italian"
+msgstr ""
+
+#: ../../../install/_functions_create.php:651
+msgid "Servings"
+msgstr ""
+
+#: ../../../install/_functions_create.php:654
+msgid "people"
+msgstr ""
+
+#: ../../../install/_functions_create.php:655
+#, php-format
+msgid "%d people"
+msgstr ""
+
+#: ../../../install/_functions_create.php:661
+msgid "Prep Time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:664 ../install/_functions_create.php:674
+#: ../../../install/_functions_create.php:684
+msgid "minutes"
+msgstr ""
+
+#: ../../../install/_functions_create.php:665 ../install/_functions_create.php:675
+#: ../../../install/_functions_create.php:685 ../install/_functions_create.php:695
+#, php-format
+msgid "%s minutes"
+msgstr ""
+
+#: ../../../install/_functions_create.php:671
+msgid "Cook Time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:681
+msgid "Passive Time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:691
+msgid "Total time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:702
+msgid "Ingredients"
+msgstr ""

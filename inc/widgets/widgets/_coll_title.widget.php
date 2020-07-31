@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_title_Widget extends ComponentWidget
 {
+	var $icon = 'header';
+
 	/**
 	 * Constructor
 	 */
@@ -43,6 +45,18 @@ class coll_title_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'add_title_link' => array(
+					'label' => T_('Add link'),
+					'note' => T_('Choose when do you want the title to include a link to the page.'),
+					'type' => 'radio',
+					'defaultvalue' => 'auto',
+						'options' => array(
+								array( 'auto', T_('Automatically (only when not already on the collection frontpage)') ),
+								array( 'always', T_('Always') ),
+								array( 'never', T_('Never') ) ),
+						'defaultvalue' => 'auto',
+						'field_lines' => true,
+				),
 				'add_tagline' => array(
 					'label' => T_('Add tagline'),
 					'note' => T_('check to add the collection tagline after the title.'),
@@ -71,7 +85,7 @@ class coll_title_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Collection title');
+		return T_('Title');
 	}
 
 
@@ -104,16 +118,22 @@ class coll_title_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog;
+		global $Collection, $Blog, $is_front;
 
 		$this->init_display( $params );
 
 		// Collection title:
 		echo $this->disp_params['block_start'];
 
-		$title = '<a href="'.$Blog->get( 'url' ).'">'
-							.$Blog->dget( 'name', 'htmlbody' )
-							.'</a>';
+		$title = $Blog->dget( 'name', 'htmlbody' );
+		
+		// Check whether the title should have a link or not
+		$linked_title = $this->disp_params['add_title_link'];
+		
+		if( $linked_title == 'always' || ($linked_title == 'auto' && !$is_front ) )
+		{ // Add a link to the collection in the title
+			$title = '<a href="'.$Blog->get( 'url' ).'">' .$title .'</a>';
+		}
 		if( $this->disp_params['add_tagline'] )
 		{ // Add a tagline after blog title
 			$title .= ' <small>'.$Blog->dget( 'tagline', 'htmlbody' ).'</small>';

@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '6.9.3';
+	var $version = '7.3.0';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 
@@ -83,57 +83,24 @@ class widescroll_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
-		?><script type="text/javascript">
-		//<![CDATA[
-		var widescroll_buttons = new Array();
-
-		function widescroll_button( id, text, tag_open, tag_close, title, style )
-		{
-			this.id = id;               // used to name the toolbar button
-			this.text = text;           // label on button
-			this.tag_open = tag_open;   // tag code to insert
-			this.tag_close = tag_close; // tag code to insert
-			this.title = title;         // title
-			this.style = style;         // style on button
-		}
-
-		widescroll_buttons[widescroll_buttons.length] = new widescroll_button(
-				'widescroll', 'wide scroll', '<div class="wide_scroll">', '</div>',
-				'<?php echo TS_('Teaser break') ?>', ''
+		$js_config = array(
+				'plugin_code'           => $this->code,
+				'js_prefix'             => $params['js_prefix'],
+				'btn_title_teaserbreak' => T_('Wide scroll'),
+				'toolbar_title'         => T_('Wide scroll'),
+				'toolbar_title_before'  => $this->get_template( 'toolbar_title_before' ),
+				'toolbar_title_after'   => $this->get_template( 'toolbar_title_after' ),
+				'toolbar_group_before'  => $this->get_template( 'toolbar_group_before' ),
+				'toolbar_group_after'   => $this->get_template( 'toolbar_group_after' ),
+				'toolbar_button_class'  => $this->get_template( 'toolbar_button_class' ),
 			);
 
-		function widescroll_toolbar( title, prefix )
-		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
-			for( var i = 0; i < widescroll_buttons.length; i++ )
-			{
-				var button = widescroll_buttons[i];
-				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="widescroll_insert_tag|' + prefix + 'b2evoCanvas|'+i+'" value="' + button.text + '" />';
-			}
-			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-
-			jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
-		}
-
-		function widescroll_insert_tag( canvas_field, i )
-		{
-			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{ // tinyMCE plugin is active now, we should focus cursor to the edit area
-				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
-			}
-			// Insert tag text in area
-			textarea_wrap_selection( canvas_field, widescroll_buttons[i].tag_open, widescroll_buttons[i].tag_close, 0 );
-		}
-		//]]>
-		</script><?php
+		expose_var_to_js( 'widescroll_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_widescroll_toolbar_config' );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script type="text/javascript">widescroll_toolbar( '<?php echo TS_('Wide scroll').':'; ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}
@@ -188,7 +155,7 @@ class widescroll_plugin extends Plugin
 		{ // Initialize first time
 			$tinymce_content_css = array();
 		}
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css', $this->version.'+'.$app_version_long );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', 'absolute', 'css', $this->version.'+'.$app_version_long );
 
 		// Print toolbar on screen
 		return $this->DisplayCodeToolbar( $params );
@@ -301,8 +268,8 @@ class widescroll_plugin extends Plugin
 			return;
 		}
 
-		require_js( '#jquery#', 'blog' );
-		$this->require_js( 'jquery.scrollwide.min.js' );
+		require_js_defer( '#jquery#', 'blog' );
+		$this->require_js_defer( 'jquery.scrollwide.min.js' );
 		$this->require_css( 'jquery.scrollwide.css' );
 	}
 
@@ -319,8 +286,8 @@ class widescroll_plugin extends Plugin
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			require_js( '#jquery#', 'blog' );
-			$this->require_js( 'jquery.scrollwide.min.js' );
+			require_js_defer( '#jquery#', 'blog' );
+			$this->require_js_defer( 'jquery.scrollwide.min.js' );
 			$this->require_css( 'jquery.scrollwide.css' );
 		}
 	}

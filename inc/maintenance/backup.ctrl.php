@@ -17,16 +17,47 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-/**
- * @var instance of User class
- */
-global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'perm_maintenance', 'backup', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'maintenance', 'backup', true );
 
 // Load Backup class (PHP4):
 load_class( 'maintenance/model/_backup.class.php', 'Backup' );
+
+switch( $action )
+{
+	case 'delete':
+		// Delete backup folder:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'backup' );
+
+		$folder = param( 'folder', 'string' );
+
+		if( strpos( $folder, '/' ) !== false || strpos( $folder, '\\' ) !== false )
+		{	// Don't support slash chars in the folder name to avoid a hack:
+			debug_die( 'Wrong folder name "'.$folder.'"!' );
+		}
+
+		$deleting_folder_path = $backup_path.$folder;
+
+		if( ! file_exists( $deleting_folder_path ) || ! is_dir( $deleting_folder_path ) )
+		{	// Display error message if the requested folder doesn't exist:
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; does not exist.'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
+		}
+		elseif( rmdir_r( $deleting_folder_path ) )
+		{	// Display a message after successful deleting:
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; has been deleted.'), '<code>'.$deleting_folder_path.'</code>' ), 'success' );
+		}
+		else
+		{	// Display error message if the requested folder could not be deleted:
+			$Messages->add( sprintf( TB_('Could not delete directory: %s'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
+		}
+
+		header_redirect( $admin_url.'?ctrl=backup' );
+		break;
+}
 
 // Set options path:
 $AdminUI->set_path( 'options', 'misc', 'backup' );
@@ -45,9 +76,9 @@ if( $action == 'backup' && !$current_Backup->load_from_Request() )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Backup'), $admin_url.'?ctrl=backup' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( TB_('Backup'), $admin_url.'?ctrl=backup' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'backup-tab' );
@@ -74,7 +105,7 @@ switch( $action )
 		if( $demo_mode )
 		{
 			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->add( TB_('This feature is disabled on the demo server.'), 'error' );
 			$Messages->display();
 			break;
 		}
@@ -85,7 +116,7 @@ switch( $action )
 		$Form = new Form( NULL, 'backup_progress', 'post' );
 
 		// Interactive / flush() backup should start here
-		$Form->begin_form( 'fform', T_('System backup is in progress...') );
+		$Form->begin_form( 'fform', TB_('System backup is in progress...') );
 
 		evo_flush();
 
@@ -103,7 +134,7 @@ switch( $action )
 
 			case 'maintenance_mode':
 				// Enable maintenance mode
-				$success = switch_maintenance_mode( true, 'all', T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+				$success = switch_maintenance_mode( true, 'all', TB_('System backup is in progress. Please reload this page in a few minutes.') );
 				// Make sure we exit the maintenance mode if PHP dies
 				register_shutdown_function( 'switch_maintenance_mode', false, '', true );
 				break;
