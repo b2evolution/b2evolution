@@ -98,7 +98,9 @@ jQuery( document ).ready(function()
 								link.removeClass( 'hide_popover' )
 							}
 							// Init popover
-							popover_params.content = cache.html();
+							var cache_clone = cache.clone( true );
+							cache_clone.show();
+							popover_params.content = cache_clone; // Need object because Safari has issue when string is passed here
 							link.popover( popover_params );
 							if( show_on_init )
 							{ // Show popover
@@ -118,7 +120,9 @@ jQuery( document ).ready(function()
 					var link_title = link.attr( 'title' );
 					link.removeAttr( 'title' );
 					// Init popover
-					popover_params.content = jQuery( '#' + div_cache_ID ).html();
+					var cache_clone = jQuery( '#' + div_cache_ID ).clone( true );
+					cache_clone.show();
+					popover_params.content = cache_clone; // Need object because Safari has issue when string is passed here
 					link.popover( popover_params );
 					link.popover( 'show' );
 					// Restore a title
