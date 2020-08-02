@@ -4146,6 +4146,8 @@ function resolve_auto_content_mode( $content_mode, $setting_Blog = NULL )
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
+		case 'posts-next-intro':   // next page with intro
+		case 'posts-next-nointro': // next page without intro
 			return $setting_Blog->get_setting('main_content');
 
 		default: // posts-filtered, search, flagged and etc.
