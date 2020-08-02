@@ -50,7 +50,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 
-		if( $disp == 'page' )
+		if( $disp == 'page' || $Item->is_intro() )
 		{
 			// ------- Title -------
 			if( $params['disp_title'] )
