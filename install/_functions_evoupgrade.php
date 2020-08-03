@@ -13039,6 +13039,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	// NOTE!!! FOR 7.3DEV BRANCH START FIRST UPGRADE BLOCK FROM 18000!!!
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
