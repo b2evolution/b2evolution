@@ -268,4 +268,33 @@ class generic_menu_link_Widget extends ComponentWidget
 			echo $this->get_layout_standalone_menu_link( '#', $message, false );
 		}
 	}
+
+
+	/**
+	 * Display an error message
+	 *
+	 * @param string Message
+	 */
+	function display_error_message( $message = NULL )
+	{
+		global $current_User, $Blog;
+
+		if( isset( $this->BlockCache ) )
+		{	// Do NOT cache because this widget has an error which is dispalyed only for collection admin:
+			$this->BlockCache->abort_collect();
+		}
+
+		if( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		{	// Display error only for collection admin:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Error';
+				if( ! empty( $this->disp_params['link_type'] ) && $this->disp_params['link_type'] != 'canonic' )
+				{
+					$message .= '('.$this->disp_params['link_type'].')';
+				}
+			}
+			echo $this->get_layout_standalone_menu_link( '#', '<span class="evo_param_error">'.$message.'</span>', false );
+		}
+	}
 }
