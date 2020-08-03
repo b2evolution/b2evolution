@@ -632,7 +632,7 @@ switch( $action )
 		switch( $display_mode )
 		{
 			case 'js' :	// js call : return success message
-				send_javascript_message( array( 'doDelete' => $edited_widget_ID ) );
+				send_javascript_message();
 				break;
 
 			case 'normal' :
