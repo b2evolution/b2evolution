@@ -735,7 +735,7 @@ switch( $action )
 		else
 		{	// Send error message if widgets cannot be reordered:
 			$DB->rollback();
-			$Messages->add( T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.'), 'error' );
+			$Messages->add( T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.'), 'error' );
 		}
 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
 		break;
