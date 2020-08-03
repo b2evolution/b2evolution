@@ -96,6 +96,8 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New Menu Entry') : TB_('Menu Ent
 			array( 0, TB_('Do not try to highlight') )
 		), TB_('Highlight'), true );
 
+	$Form->text_input( 'ment_class', $edited_SiteMenuEntry->get( 'class' ), 50, TB_('Extra CSS classes'), '', array( 'maxlength' => 128 ) );
+
 	$Form->checkbox_input( 'ment_hide_empty', $edited_SiteMenuEntry->get( 'hide_empty' ), TB_('Hide if empty'), array(
 			'note' => TB_('Check to hide this menu if the list is empty.'),
 			'hide' => $edited_SiteMenuEntry->get( 'type' ) != 'flagged',

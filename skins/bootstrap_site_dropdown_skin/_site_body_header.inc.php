@@ -52,8 +52,7 @@ else
 				{	// Display the grouped header tabs:
 					foreach( $header_tabs as $s => $header_tab )
 					{	// Display level 0 tabs:
-						// Current collection gets class "active"
-						echo '<li'.( $site_Skin->header_tab_active === $s || ! empty( $header_tab['active'] ) ? ' class="active"' : '' ) . '>';
+						echo '<li'.$site_Skin->get_header_tab_attr_class( $header_tab, $s ).'>';
 
 						// If collections grouped in a section exist and have at least one collection:
 						if( isset( $header_tab['items'] ) &&
@@ -76,7 +75,7 @@ else
 								if( is_array( $menu_item ) )
 								{	// Display sub menus:
 								?>
-									<li<?php echo ( $menu_item['active'] ? ' class="active"' : '' ); ?>>
+									<li<?php echo $site_Skin->get_header_tab_attr_class( $menu_item ); ?>>
 										<a href="<?php echo $menu_item['url']; ?>"<?php echo empty( $menu_item['rel'] ) ? '' : ' rel="'.$menu_item['rel'].'"'; ?>><?php echo $menu_item['name']; ?></a>
 									</li>
 								<?php

@@ -191,7 +191,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		{
 			if( $url = $SiteMenuEntry->get_url() )
 			{	// Display a layout with menu link only if it is not restricted by some permission for current User:
-				echo $this->get_layout_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active() );
+				echo $this->get_layout_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active(), NULL, $SiteMenuEntry->get( 'class' ) );
 			}
 		}
 
