@@ -115,9 +115,23 @@ switch( $action )
 		param( 'container_list', 'string', true );
 		$containers_list = explode( ',', trim( $container_list, ',' ) );
 		$containers = array();
+		$passed_widget_IDs = array(); // Store here all passed IDs in order to compare them with current DB
 		foreach( $containers_list as $a_container )
-		{ // add each container and grab its widgets:
-			$containers[substr( $a_container, 10 )] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
+		{	// Add each container and grab its widgets:
+			$a_container_widgets = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
+			foreach( $a_container_widgets as $a => $a_container_widget )
+			{
+				if( $a_container_widget_ID = preg_replace( '~[^0-9]~', '', $a_container_widget ) )
+				{	// Use only correct widget ID for reordering:
+					$a_container_widgets[ $a ] = $a_container_widget_ID;
+					$passed_widget_IDs[] = $a_container_widget_ID;
+				}
+				else
+				{	// Skip wrong passed widget ID:
+					unset( $a_container_widgets[ $a ] );
+				}
+			}
+			$containers[substr( $a_container, 10 )] = $a_container_widgets;
 		}
 		break;
 
@@ -666,7 +680,26 @@ switch( $action )
 			$blog_container_IDs = $DB->get_col( $SQL );
 		}
 
-		if( $blog_container_IDs )
+		// Check if current reordering contains all actual widgets from DB:
+		if( empty( $blog_container_IDs ) )
+		{
+			$server_widget_IDs = array();
+		}
+		else
+		{
+			$SQL = new SQL( 'Get all widget IDs for checking correct re-order request' );
+			$SQL->SELECT( 'wi_ID' );
+			$SQL->FROM( 'T_widget__widget' );
+			$SQL->WHERE( 'wi_wico_ID IN ( '.implode( ',', $blog_container_IDs ).' )' );
+			$server_widget_IDs = $DB->get_col( $SQL );
+		}
+		$checked_new_widgets = array_diff( $server_widget_IDs, $passed_widget_IDs );
+		$checked_old_widgets = array_diff( $passed_widget_IDs, $server_widget_IDs );
+
+		// Don't allow to reorder if at least one widget was added or deleted in DB since after last page refresh:
+		$result = empty( $checked_new_widgets ) && empty( $checked_old_widgets );
+
+		if( $result && $blog_container_IDs )
 		{
 			$blog_container_IDs = $DB->quote( $blog_container_IDs );
 
@@ -685,26 +718,25 @@ switch( $action )
 				$order = 0; // reset counter for this container
 				foreach( $widgets as $widget )
 				{ // loop through each widget
-					if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
-					{ // valid widget id
-						$order++;
-						$DB->query( 'UPDATE T_widget__widget
-							SET wi_order = '.$order.',
-								wi_wico_ID = '.$WidgetContainer->ID.'
-							WHERE wi_ID = '.$widget.' AND wi_wico_ID IN ( '.$blog_container_IDs.' )' );	// Doh! Don't trust the client request!!
-					}
+					$order++;
+					$DB->query( 'UPDATE T_widget__widget
+						SET wi_order = '.$order.',
+							wi_wico_ID = '.$WidgetContainer->ID.'
+						WHERE wi_ID = '.$widget.' AND wi_wico_ID IN ( '.$blog_container_IDs.' )' );	// Doh! Don't trust the client request!!
 				}
 			}
-
-			// Cleanup deleted widgets and empty temp containers
-			$DB->query( 'DELETE FROM T_widget__widget
-				WHERE wi_order < 1
-				AND wi_wico_ID IN ( '.$blog_container_IDs.' )' ); // Doh! Don't touch other blogs!
 		}
 
-		$DB->commit();
-
-		$Messages->add( TB_( 'Widgets updated' ), 'success' );
+		if( $result )
+		{	// Send success message:
+			$DB->commit();
+			$Messages->add( TB_( 'Widgets updated' ), 'success' );
+		}
+		else
+		{	// Send error message if widgets cannot be reordered:
+			$DB->rollback();
+			$Messages->add( T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.'), 'error' );
+		}
 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
 		break;
 
