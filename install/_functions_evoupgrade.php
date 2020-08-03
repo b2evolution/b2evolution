@@ -13033,6 +13033,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16170, 'Upgrading menu entries table...') )
+	{	// part of 7.2.1-beta
+		db_add_col( 'T_menus__entry', 'ment_class', 'VARCHAR(128) COLLATE ascii_general_ci NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

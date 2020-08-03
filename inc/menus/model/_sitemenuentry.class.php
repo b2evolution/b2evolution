@@ -42,6 +42,7 @@ class SiteMenuEntry extends DataObject
 	var $show_badge = 1;
 	var $highlight = 1;
 	var $hide_empty = 0;
+	var $class;
 
 	/**
 	 * Error message if current User has no access to requested URL
@@ -100,6 +101,7 @@ class SiteMenuEntry extends DataObject
 			$this->show_badge = $db_row->ment_show_badge;
 			$this->highlight = $db_row->ment_highlight;
 			$this->hide_empty = $db_row->ment_hide_empty;
+			$this->class = $db_row->ment_class;
 		}
 	}
 
@@ -219,6 +221,9 @@ class SiteMenuEntry extends DataObject
 		param( 'ment_hide_empty', 'integer', 0 );
 		$this->set_from_Request( 'hide_empty' );
 
+		// Extra CSS classes:
+		param( 'ment_class', 'string', NULL );
+		$this->set_from_Request( 'class', NULL, true );
 
 		if( ! empty( $menu_Item_from_ID ) && ! empty( $menu_Item_from_slug ) && ( $menu_Item_from_ID->ID != $menu_Item_from_slug->ID ) )
 		{

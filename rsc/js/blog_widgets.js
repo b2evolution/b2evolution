@@ -350,12 +350,13 @@ function colourWidgets()
  */
 function deleteWidget( widget )
 {
-	jQuery( '#wi_ID_'+widget.substr( 6, widget.length ) ).animate({
+	var widget_ID = widget.substr( 6, widget.length );
+	jQuery( '#wi_ID_' + widget_ID ).animate({
 			backgroundColor: "#f88"
 		},"fast", function(){
-			jQuery( this ).remove(); // remove the widget
+			jQuery( this ).remove(); // remove the widget row from HTML page
 			colourWidgets(); // redo widget colours
-			sendWidgetOrder(); // update the server
+			SendAdminRequest( 'widgets', 'delete', 'wi_ID=' +  widget_ID + '& ' + widget_crumb_url_param, false ); // send a request to delete widget from DB
 		});
 	return false;
 }

@@ -256,7 +256,7 @@ class SiteMenu extends DataObject
 
 		// Copy all menu entries linked to the menu:
 		$menu_entry_fields = array( 'ment_ID', 'ment_menu_ID', 'ment_parent_ID', 'ment_order', 'ment_user_pic_size', 'ment_text', 'ment_type',
-				'ment_coll_logo_size', 'ment_coll_ID', 'ment_item_ID', 'ment_url', 'ment_visibility', 'ment_access', 'ment_show_badge', 'ment_highlight' );
+				'ment_coll_logo_size', 'ment_coll_ID', 'ment_item_ID', 'ment_url', 'ment_visibility', 'ment_access', 'ment_show_badge', 'ment_highlight', 'ment_class' );
 
 		$menu_entries_SQL = 'SELECT '.implode( ', ', $menu_entry_fields ).'
 							 FROM T_menus__entry
