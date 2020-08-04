@@ -71,7 +71,10 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="container">
 
-
+<?php
+if( $Skin->get_checklist_setting( 'display_sections', 'header' ) )
+{	// Display header section:
+?>
 <header class="row">
 
 		<?php
@@ -110,8 +113,13 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 
 </header><!-- .row -->
+<?php
+} // END of header section.
+?>
 
 		<?php
+		if( $Skin->get_checklist_setting( 'display_sections', 'menu' ) )
+		{	// Display menu section:
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
@@ -133,6 +141,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'item_title_after'    => '',
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+		}
 		?>
 
 <div class="row">
@@ -394,6 +403,10 @@ if( $disp == 'front' )
 }
 ?>
 
+<?php
+if( $Skin->get_checklist_setting( 'display_sections', 'footer' ) )
+{	// Display footer section:
+?>
 <footer class="container-fluid">
 
 	<!-- =================================== START OF FOOTER =================================== -->
@@ -470,6 +483,9 @@ if( $disp == 'front' )
 	</div>
 
 </footer><!-- .row -->
+<?php
+} // END of footer section.
+?>
 
 
 </div><!-- .container -->
