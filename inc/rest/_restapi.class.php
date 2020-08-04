@@ -638,6 +638,7 @@ class RestApi
 
 		// Get param to limit number posts per page:
 		$api_per_page = param( 'per_page', 'integer', 10 );
+		$page = param( 'page', 'integer', 1 );
 
 		// Get param to select current page:
 		// (NOTE: if this param is not set then param 'paged' is used as filter of ItemList)
@@ -703,7 +704,7 @@ class RestApi
 
 		if( $ItemList2->filters['types'] == $ItemList2->default_filters['types'] )
 		{	// Allow all post types by default for this request:
-			$ItemList2->set_filters( array( 'itemtype_usage' => NULL ), true, true );
+			$ItemList2->set_filters( array( 'itemtype_usage' => NULL, 'page' => $page ), true, true );
 		}
 
 		if( $page !== NULL )
