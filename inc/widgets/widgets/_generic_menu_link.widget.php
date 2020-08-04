@@ -35,9 +35,10 @@ class generic_menu_link_Widget extends ComponentWidget
 	 * @param string Link text
 	 * @param boolean Is active menu link?
 	 * @param string Link template, possible masks: $link_url$, $link_class$, $link_text$
+	 * @param string Extra link class
 	 * @return string
 	 */
-	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = NULL )
+	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = NULL, $extra_link_class = '' )
 	{
 		if( $link_template === NULL )
 		{	// Use default template:
@@ -63,10 +64,18 @@ class generic_menu_link_Widget extends ComponentWidget
 
 		$r = $this->get_menu_link_item_start( $is_active_link );
 
+		$link_class = $this->get_link_class( $is_active_link );
+
+		if( ! empty( $extra_link_class ) )
+		{	// Append extra CSS class:
+			$r = update_html_tag_attribs( $r, array( 'class' => $extra_link_class ) );
+			$link_class = trim( $link_class.' '.$extra_link_class );
+		}
+
 		// Get a link/button/tab from template:
 		$r .= str_replace(
 			array( '$link_url$', '$link_class$', '$link_text$' ),
-			array( $link_url, $this->get_link_class( $is_active_link ), $link_text ),
+			array( $link_url, $link_class, $link_text ),
 			$link_template );
 
 		$r .= $item_end;
@@ -266,6 +275,35 @@ class generic_menu_link_Widget extends ComponentWidget
 			}
 
 			echo $this->get_layout_standalone_menu_link( '#', $message, false );
+		}
+	}
+
+
+	/**
+	 * Display an error message
+	 *
+	 * @param string Message
+	 */
+	function display_error_message( $message = NULL )
+	{
+		global $current_User, $Blog;
+
+		if( isset( $this->BlockCache ) )
+		{	// Do NOT cache because this widget has an error which is dispalyed only for collection admin:
+			$this->BlockCache->abort_collect();
+		}
+
+		if( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		{	// Display error only for collection admin:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Error';
+				if( ! empty( $this->disp_params['link_type'] ) && $this->disp_params['link_type'] != 'canonic' )
+				{
+					$message .= '('.$this->disp_params['link_type'].')';
+				}
+			}
+			echo $this->get_layout_standalone_menu_link( '#', '<span class="evo_param_error">'.$message.'</span>', false );
 		}
 	}
 }

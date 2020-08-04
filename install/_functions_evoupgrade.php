@@ -13033,7 +13033,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16170, 'Upgrading slugs table...' ) )
+	if( upg_task_start( 16170, 'Upgrading menu entries table...') )
+	{	// part of 7.2.1-beta
+		db_add_col( 'T_menus__entry', 'ment_class', 'VARCHAR(128) COLLATE ascii_general_ci NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 18000, 'Upgrading slugs table...' ) )
 	{	// part of 7.3.0-beta
 		db_add_col( 'T_slug', 'slug_cat_ID', 'INT(11) UNSIGNED AFTER slug_type' );
 		db_add_index( 'T_slug', 'slug_cat_ID', 'slug_cat_ID' );
@@ -13041,7 +13047,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16180, 'Upgrading categories table...' ) )
+	if( upg_task_start( 18010, 'Upgrading categories table...' ) )
 	{	// part of 7.3.0-beta
 		db_add_col( 'T_categories', 'cat_canonical_slug_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER cat_urlname' );
 
@@ -13105,7 +13111,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16180, 'Upgrading collection settings table...' ) )
+	if( upg_task_start( 18020, 'Upgrading collection settings table...' ) )
 	{	// part of 7.3.0-beta
 		$DB->query( 'UPDATE T_coll_settings
 			  SET cset_value = "title"
@@ -13114,7 +13120,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 16190, 'Upgrading items table...' ) )
+	if( upg_task_start( 18030, 'Upgrading items table...' ) )
 	{	// part of 7.3.0-beta
 		db_drop_col( 'T_items__item', 'post_urltitle' );
 		upg_task_end();

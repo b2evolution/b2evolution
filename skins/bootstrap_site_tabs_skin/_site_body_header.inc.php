@@ -81,7 +81,7 @@ else
 				foreach( $header_tabs as $s => $header_tab )
 				{	// Display level 0 tabs:
 ?>
-					<li<?php echo ( $site_Skin->header_tab_active === $s ? ' class="active"' : '' ); ?>>
+					<li<?php echo $site_Skin->get_header_tab_attr_class( $header_tab, $s ); ?>>
 						<a href="<?php echo $header_tab['url']; ?>"<?php echo empty( $header_tab['rel'] ) ? '' : ' rel="'.$header_tab['rel'].'"'; ?>><?php echo $header_tab['name']; ?></a>
 					</li>
 <?php
@@ -176,7 +176,7 @@ if( $site_Skin->has_sub_menus() )
 		if( is_array( $menu_item ) )
 		{	// Display menu item for collection:
 ?>
-			<li<?php echo ( $menu_item['active'] ? ' class="active"' : '' ); ?>>
+			<li<?php echo $site_Skin->get_header_tab_attr_class( $menu_item ); ?>>
 				<a href="<?php echo $menu_item['url']; ?>"<?php echo empty( $menu_item['rel'] ) ? '' : ' rel="'.$menu_item['rel'].'"'; ?>><?php echo $menu_item['name']; ?></a>
 			</li>
 <?php

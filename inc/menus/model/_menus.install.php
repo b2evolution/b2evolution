@@ -54,6 +54,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ment_show_badge     TINYINT(1) NOT NULL DEFAULT 1,
 			ment_highlight      TINYINT(1) NOT NULL DEFAULT 1,
 			ment_hide_empty     TINYINT(1) NOT NULL DEFAULT 0,
+			ment_class          VARCHAR(128) COLLATE ascii_general_ci NULL,
 			PRIMARY KEY          (ment_ID),
 			INDEX ment_menu_ID   (ment_menu_ID),
 			INDEX ment_parent_ID (ment_parent_ID)

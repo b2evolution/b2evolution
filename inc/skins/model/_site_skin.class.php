@@ -202,6 +202,7 @@ class site_Skin extends Skin
 						'name'  => $SiteMenuEntry->get_text(),
 						'url'   => $sub_tabs[0]['url'],
 						'items' => $sub_tabs,
+						'class' => $SiteMenuEntry->get( 'class' ),
 					);
 			}
 		}
@@ -211,6 +212,7 @@ class site_Skin extends Skin
 					'name'   => $SiteMenuEntry->get_text(),
 					'url'    => $menu_entry_url,
 					'active' => $SiteMenuEntry->is_active(),
+					'class'  => $SiteMenuEntry->get( 'class' ),
 				);
 		}
 
@@ -380,6 +382,29 @@ class site_Skin extends Skin
 		}
 
 		return $this->header_tabs;
+	}
+
+
+	/**
+	 * Get attribute for header tab
+	 *
+	 * @param array Tab data
+	 * @param integer Tab index in array of all tabs
+	 * @return string
+	 */
+	function get_header_tab_attr_class( $tab, $index = NULL )
+	{
+		// Append extra CSS classes of Menu Entry:
+		$class = empty( $tab['class'] ) ? '' : $tab['class'];
+
+		if( $this->header_tab_active === $index || ! empty( $tab['active'] ) )
+		{	// This tab is active currently:
+			$class .= ' active';
+		}
+
+		$class = trim( $class );
+
+		return $class === '' ? '' : ' class="'.$class.'"';
 	}
 
 

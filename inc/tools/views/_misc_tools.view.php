@@ -207,9 +207,9 @@ if( check_user_perm( 'options', 'edit' ) )
 		echo '<li><a href="'.regenerate_url( 'action', 'action=del_itemprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered item cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=del_commentprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered comment cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=del_messageprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered message cache (DB)').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=del_filecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=del_pagecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear full page caches (/cache/* directories)').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=repair_cache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Repair /cache/* directory structure').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_filecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear thumbnail caches (_evocache directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_pagecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear full page caches (/_cache/* directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=repair_cache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Repair /_cache/* directory structure').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}

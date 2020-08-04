@@ -141,6 +141,16 @@ class bootstrap_forums_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
+					'display_sections' => array(
+						'label' => T_('Sections to display'),
+						'note' => '',
+						'type' => 'checklist',
+						'options' => array(
+							array( 'header', T_('Skin Header'), 1 ),
+							array( 'menu',   T_('Skin Menu'),   1 ),
+							array( 'footer', T_('Skin Footer'), 1 ),
+						),
+					),
 					'layout_general' => array(
 						'label' => T_('General Layout'),
 						'note' => T_('Select global skin layout.'),
