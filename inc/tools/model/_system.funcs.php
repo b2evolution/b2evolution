@@ -723,6 +723,10 @@ function display_system_check( $params )
 	 */
 	echo str_replace( '#section_title#', $params['section_b2evo_title'], $params['section_start'] );
 
+	// Base URL:
+	init_system_check( '$baseurl', $baseurl );
+	disp_system_check( 'note' );
+
 	// Instance name:
 	init_system_check( T_('Instance name'), $instance_name );
 	disp_system_check( 'note' );
