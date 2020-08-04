@@ -43,7 +43,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				foreach( $Skin->get_front_items() as $i => $Item )
 				{
 					echo '<li'.( $i == 0 ? ' class="active"' : '' ).'>'
-							.'<a href="'.$ReqURL.'#'.$Item->get( 'urltitle' ).'"'
+							.'<a href="'.$ReqURL.'#'.$Item->get_canonical_slug().'"'
 								.'data-slug="'.$Item->dget( 'urltitle', 'htmlattr' ).'">'
 								.$Item->get_title( array(
 									'title_field' => 'short_title,title',
@@ -72,7 +72,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					foreach( $Skin->get_front_items() as $i => $Item )
 					{
 						echo '<li>'
-								.'<a href="'.$ReqURL.'#'.$Item->get( 'urltitle' ).'"'
+								.'<a href="'.$ReqURL.'#'.$Item->get_canonical_slug().'"'
 									.'data-slug="'.$Item->dget( 'urltitle', 'htmlattr' ).'">'
 									.$Item->get_title( array(
 										'title_field' => 'short_title,title',

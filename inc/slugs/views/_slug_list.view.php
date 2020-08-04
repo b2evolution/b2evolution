@@ -109,6 +109,7 @@ function get_slug_type( $Slug )
 {
 	switch( $Slug->type )
 	{
+		case 'cat':
 		case 'item':
 		// case other: (add here)
 			$target = & $Slug->get_object();
@@ -117,17 +118,17 @@ function get_slug_type( $Slug )
 				return '<i>'.T_('(missing)').'</i>';
 			}
 
-			if( $target->urltitle == $Slug->title )
+			if( isset( $target->canonical_slug_ID ) && $target->canonical_slug_ID == $Slug->ID )
 			{
 				return TB_('Canonical');
 			}
-			elseif( $target->tiny_slug_ID == $Slug->ID )
+			elseif( isset( $target->tiny_slug_ID ) && $target->tiny_slug_ID == $Slug->ID )
 			{
 				return TB_('Tiny');
 			}
 			else
 			{
-				$slugs = explode(',', $target->get_slugs( ',' ) );
+				$slugs = ( $Slug->type == 'cat' ? $target->get_slugs() : explode(',', $target->get_slugs( ',' ) ) );
 				if( in_array( $Slug->title, $slugs ) )
 				{
 					return TB_('Extra');

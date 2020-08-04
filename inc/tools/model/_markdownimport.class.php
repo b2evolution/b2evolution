@@ -654,7 +654,7 @@ class MarkdownImport extends AbstractImport
 				$parent_path = substr( $relative_path, 0, $last_index );
 
 				$Chapter->set( 'name', $category_name );
-				$Chapter->set( 'urlname', urltitle_validate( $category_name, $category_name, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
+				$Chapter->set( 'urlname', urltitle_validate( $category_name, $category_name, 0, false, 'slug_title', 'slug_cat_ID', 'T_slug' ) );
 				if( ! empty( $parent_path ) && isset( $categories[ $parent_path ] ) )
 				{	// Set category parent ID:
 					$Chapter->set( 'parent_ID', $categories[ $parent_path ] );
@@ -837,7 +837,7 @@ class MarkdownImport extends AbstractImport
 					{	// Create default category if it doesn't exist yet:
 						$default_Chapter = new Chapter( NULL, $this->coll_ID );
 						$default_Chapter->set( 'name', TB_('Uncategorized') );
-						$default_Chapter->set( 'urlname', urltitle_validate( $default_category_urlname, $default_category_urlname, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
+						$default_Chapter->set( 'urlname', urltitle_validate( $default_category_urlname, $default_category_urlname, 0, false, 'slug_title', 'slug_cat_ID', 'T_slug' ) );
 						$default_Chapter->dbinsert();
 						// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
 						$ChapterCache->add( $default_Chapter );
@@ -869,7 +869,7 @@ class MarkdownImport extends AbstractImport
 				$Item->set( 'status', 'published' );
 				$Item->set( 'ityp_ID', $md_Blog->get_setting( 'default_post_type' ) );
 				$Item->set( 'locale', $md_Blog->get( 'locale' ) );
-				$Item->set( 'urltitle', urltitle_validate( $item_slug, $item_slug, 0, false, 'post_urltitle', 'post_ID', 'T_items__item' ) );
+				$Item->set( 'urltitle', urltitle_validate( $item_slug, $item_slug ) );
 			}
 
 			// Get and update item content hash:
@@ -1070,7 +1070,7 @@ class MarkdownImport extends AbstractImport
 					$file_params = array(
 							'file_root_type' => 'collection',
 							'file_root_ID'   => $this->coll_ID,
-							'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
+							'folder_path'    => 'quick-uploads/'.$Item->get_canonical_slug(),
 						);
 					foreach( $image_matches[3] as $i => $image_relative_path )
 					{
@@ -1475,11 +1475,12 @@ class MarkdownImport extends AbstractImport
 			$cat_full_url_path[ $c ] = get_urltitle( $cat_slug );
 		}
 		// Get base of url name without numbers at the end:
-		$cat_urlname_base = preg_replace( '/-\d+$/', '', $cat_full_url_path[ count( $cat_full_url_path ) - 1 ] );
+		$cat_slug_base = preg_replace( '/-\d+$/', '', $cat_full_url_path[ count( $cat_full_url_path ) - 1 ] );
 
 		$SQL = new SQL( 'Find categories by path "'.implode( '/', $cat_full_url_path ).'/"' );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
+		$SQL->FROM( 'INNER JOIN T_slug ON slug_cat_ID = cat_ID' );
 		if( $Settings->get( 'cross_posting' ) && $item_Type_ID !== NULL )
 		{	// Select categories from all possible collections where cross-posting is allowed between the imported collection:
 			$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_coll_ID = cat_blog_ID' );
@@ -1489,7 +1490,7 @@ class MarkdownImport extends AbstractImport
 		{	// Select categories only from the imported collection because cross-posting is not allowed in system:
 			$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
 		}
-		$SQL->WHERE_and( 'cat_urlname REGEXP '.$DB->quote( '^('.$cat_urlname_base.')(-[0-9]+)?$' ) );
+		$SQL->WHERE_and( 'slug_title REGEXP '.$DB->quote( '^('.$cat_slug_base.')(-[0-9]+)?$' ) );
 		$cat_IDs = $DB->get_col( $SQL );
 
 		$r = NULL;
@@ -1683,11 +1684,11 @@ class MarkdownImport extends AbstractImport
 						$this->log_linked_file( 'recommend', NULL, $version_item_link );
 						if( $this->get_option( 'same_lang_replace_link' ) )
 						{	// Replace the link slug in the post:
-							$item_url = $version_Item->get( 'urltitle' );
+							$item_url = $version_Item->get_canonical_slug();
 							$this->log_linked_file( 'content', $m[0], $version_item_link );
 							if( $this->get_option( 'same_lang_update_file' ) )
 							{	// Update md file with new replaced links:
-								$updated_link = str_replace( $m[7].'.md', $version_Item->get( 'urltitle' ).'.md', $m[0] );
+								$updated_link = str_replace( $m[7].'.md', $version_Item->get_canonical_slug().'.md', $m[0] );
 								$this->set_item_file_content( str_replace( $m[0], $updated_link, $this->item_file_content ) );
 							}
 						}
@@ -1920,7 +1921,7 @@ class MarkdownImport extends AbstractImport
 				$only_db_extra_cat_links[] = $only_db_extra_cat_link;
 				if( $this->get_option( 'extra_cat_only_in_db' ) == 'add_yaml' )
 				{	// We need slugs in order to append them in YAML block:
-					$only_db_extra_cat_slugs[] = $only_db_extra_Chapter->get( 'urlname' );
+					$only_db_extra_cat_slugs[] = $only_db_extra_Chapter->get_canonical_slug();
 				}
 			}
 			else

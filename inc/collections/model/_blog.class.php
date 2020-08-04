@@ -4185,7 +4185,7 @@ class Blog extends DataObject
 					}
 
 					// Get new unique slug:
-					$old_item['post_urltitle'] = urltitle_validate( $old_item['post_urltitle'], $old_item['post_title'], 0, false, 'slug_title', 'slug_itm_ID', 'T_slug', $old_item['post_locale'], 'T_items__item' );
+					$old_item['slug_title'] = urltitle_validate( $old_item['slug_title'], $old_item['post_title'], 0, false, 'slug_title', 'slug_itm_ID', 'T_slug', $old_item['post_locale'] );
 
 					// Duplicate a post:
 					$DB->query( 'INSERT INTO T_items__item ( '.implode( ', ', array_keys( $old_item ) ).' ) VALUES ( '.$DB->quote( $old_item ).' )',
@@ -4195,7 +4195,7 @@ class Blog extends DataObject
 					// Create canonical and tiny slugs:
 					load_funcs( 'slugs/model/_slug.funcs.php' );
 					$new_canonical_Slug = new Slug();
-					$new_canonical_Slug->set( 'title', $old_item['post_urltitle'] );
+					$new_canonical_Slug->set( 'title', $old_item['slug_title'] );
 					$new_canonical_Slug->set( 'type', 'item' );
 					$new_canonical_Slug->set( 'itm_ID', $new_item_ID );
 					$new_canonical_Slug->dbinsert();

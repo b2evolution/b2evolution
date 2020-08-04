@@ -84,7 +84,7 @@ $ItemList->cols[] = array(
 $ItemList->cols[] = array(
 						'th' => T_('Slug'),
 						'order' => 'urltitle',
-						'td' => '%item_row_slug( #post_urltitle# )%',
+						'td' => '%item_row_slug( {Obj} )%',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap left',
 					);

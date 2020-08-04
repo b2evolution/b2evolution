@@ -112,7 +112,7 @@ class ItemList2 extends ItemListLight
 		$Item->load_from_Request();
 
 		// Use only first slug on PREVIEW mode in order to initialize correct permanent URL:
-		$urltitles = $Item->get( 'urltitle' );
+		$urltitles = $Item->get_canonical_slug();
 		if( $urltitles === '' )
 		{	// If slugs are empty on preview form, try to get previous of from title:
 			$urltitles = ( empty( $this->previous_urltitle ) ? $Item->get( 'title' ) : $this->previous_urltitle );

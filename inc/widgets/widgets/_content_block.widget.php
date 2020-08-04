@@ -307,7 +307,7 @@ class content_block_Widget extends ComponentWidget
 		}
 		elseif( ! $widget_Item->can_be_displayed() )
 		{	// Current user has no permission to view item with such status:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get_canonical_slug() ).'</p>';
 		}
 		elseif( ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
 		        ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
@@ -320,7 +320,7 @@ class content_block_Widget extends ComponentWidget
 		}
 		else
 		{	// Display error if the requested content block item cannot be used in this place:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get_canonical_slug() ).'</p>';
 		}
 
 		echo $this->disp_params['block_body_end'];

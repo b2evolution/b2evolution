@@ -406,12 +406,12 @@ class item_fields_compare_Widget extends ComponentWidget
 					$col_class = '';
 					if( ! empty( $this->disp_params['add_css']['col'] ) )
 					{	// Add CSS class to identify columns with "comp_col_" + Item slug:
-						$col_class .= ' comp_col_'.$widget_Item->get( 'urltitle' );
+						$col_class .= ' comp_col_'.$widget_Item->get_canonical_slug();
 					}
 					if( ! empty( $this->disp_params['add_css']['cat'] ) &&
 							( $widget_main_Chapter = & $widget_Item->get_main_Chapter() ) )
 					{	// Add CSS class to identify column category with "comp_cat_" + main Cat slug:
-						$col_class .= ' comp_cat_'.$widget_main_Chapter->get( 'urlname' );
+						$col_class .= ' comp_cat_'.$widget_main_Chapter->get_canonical_slug();
 					}
 					$col_class = trim( $col_class );
 
@@ -962,12 +962,12 @@ class item_fields_compare_Widget extends ComponentWidget
 				}
 				if( ! empty( $this->disp_params['add_css']['col'] ) )
 				{	// Add CSS class to identify columns with "comp_col_" + Item slug:
-					$cell_class .= ' comp_col_'.$widget_Item->get( 'urltitle' );
+					$cell_class .= ' comp_col_'.$widget_Item->get_canonical_slug();
 				}
 				if( ! empty( $this->disp_params['add_css']['cat'] ) &&
 				    ( $widget_main_Chapter = & $widget_Item->get_main_Chapter() ) )
 				{	// Add CSS class to identify column category with "comp_cat_" + main Cat slug:
-					$cell_class .= ' comp_cat_'.$widget_main_Chapter->get( 'urlname' );
+					$cell_class .= ' comp_cat_'.$widget_main_Chapter->get_canonical_slug();
 				}
 				$cell_class = trim( $cell_class );
 

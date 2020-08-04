@@ -460,7 +460,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		while( $row_Item = & $ItemList->get_item() )
 		{	// Initialize tabs from items list:
 			$items_tabs[] = array(
-					'value' => $row_Item->get( 'urltitle' ),
+					'value' => $row_Item->get_canonical_slug(),
 					'text'  => $row_Item->get( 'title' )
 				);
 		}

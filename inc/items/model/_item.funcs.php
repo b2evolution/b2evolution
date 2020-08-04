@@ -236,7 +236,12 @@ function init_inskin_editing()
 		$edited_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
 		// Prefill data from url:
 		$edited_Item->set( 'title', param( 'post_title', 'string' ) );
-		$edited_Item->set( 'urltitle', param( 'post_urltitle', 'string' ) );
+		$post_slugs = param( 'post_slugs', 'string', NULL );
+		if( $post_slugs === NULL )
+		{	// Try to get slugs from deprecated param which still may be used by 3rd party skins from disp=edit:
+			$post_slugs = param( 'post_urltitle', 'string' );
+		}
+		$edited_Item->set( 'urltitle', $post_slugs );
 
 		// Set default locations from current user
 		$edited_Item->set_creator_location( 'country' );
@@ -575,18 +580,17 @@ function get_urltitle( $title, $locale = NULL )
  *
  * @param string url title to validate
  * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
- * @param integer ID of post
+ * @param integer ID of object
  * @param boolean Query the DB, but don't modify the URL title if the title already exists (Useful if you only want to alert the pro user without making changes for him)
  * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
  * @param string The name of the post ID column
  * @param string The name of the DB table to use
  * @param NULL|string The post locale or NULL if there is no specific locale.
- * @param NULL|string The name of the DB table to use in the message
  * @return string validated url title
  */
-function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
+function urltitle_validate( $urltitle, $title, $obj_ID = 0, $query_only = false,
+									$dbSlugFieldName = 'slug_title', $dbIDname = 'slug_itm_ID',
+									$dbtable = 'T_slug', $post_locale = NULL )
 {
 	global $DB, $Messages;
 
@@ -662,27 +666,18 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( !empty($orig_title) && $urltitle != $orig_title )
 	{
-		$msg_table = ! empty( $msg_dbtable ) ? $msg_dbtable : $dbtable;
-		switch( $msg_table )
+		switch( $dbIDname )
 		{
-			case 'T_items__item':
-				// post_urltitle
+			case 'slug_itm_ID':
 				$field_type = T_('Post');
 				break;
 
-			case 'T_categories':
-				// cat_urlname
+			case 'slug_cat_ID':
 				$field_type = T_('Category');
 				break;
 
-			case 'T_blogs':
-				// blog_urlname
+			case 'blog_urlname':
 				$field_type = T_('Collection');
-				break;
-
-			case 'T_slug':
-				// slug_title
-				$field_type = T_('Slug');
 				break;
 		}
 
@@ -5925,8 +5920,8 @@ function items_results( & $items_Results, $params = array() )
 	{	// Display Slug column:
 		$items_Results->cols[] = array(
 				'th' => T_('Slug'),
-				'order' => $params['field_prefix'].'urltitle',
-				'td' => '%item_row_slug( #post_urltitle# )%',
+				'order' => 'urltitle',
+				'td' => '%item_row_slug( {Obj} )%',
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap left',
 			);
@@ -6417,12 +6412,13 @@ function item_row_type( $Item )
 /**
  * Helper function: Get slug to display in items table list
  *
- * @param string Item slug
+ * @param object Item
  * @return string
  */
-function item_row_slug( $item_slug )
+function item_row_slug( $Item )
 {
 	// Item slug:
+	$item_slug = $Item->get_canonical_slug();
 	return '<span id="evo_item_slug_'.$item_slug.'">'.$item_slug.'</span> '
 	// Icon to copy slug in clipboard:
 		.'<span class="fa fa-copy pointer" onclick="evo_copy_to_clipboard( \'evo_item_slug_'.$item_slug.'\' )"></span>';

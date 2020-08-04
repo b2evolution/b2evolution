@@ -154,7 +154,7 @@ while( $Item = & $ItemList->get_item() )
 						'before' => '',
 						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
 						'after'  => ' '.action_icon( T_('Copy Item Slug to the clipboard.'), 'clipboard-copy', '#',
-							NULL, NULL, NULL, array( 'class' => 'small clipboard-copy', 'data-clipboard-text' => $Item->urltitle, 'onclick' => 'return false;' ) ),
+							NULL, NULL, NULL, array( 'class' => 'small clipboard-copy', 'data-clipboard-text' => $Item->get_canonical_slug(), 'onclick' => 'return false;' ) ),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(

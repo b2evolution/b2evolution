@@ -13111,16 +13111,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 18020, 'Upgrading collection settings table...' ) )
-	{	// part of 7.3.0-beta
-		$DB->query( 'UPDATE T_coll_settings
-			  SET cset_value = "title"
-			WHERE cset_name = "orderby"
-			  AND cset_value = "urltitle"' );
-		upg_task_end();
-	}
-
-	if( upg_task_start( 18030, 'Upgrading items table...' ) )
+	if( upg_task_start( 18020, 'Upgrading items table...' ) )
 	{	// part of 7.3.0-beta
 		db_drop_col( 'T_items__item', 'post_urltitle' );
 		upg_task_end();

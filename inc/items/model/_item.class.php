@@ -1475,7 +1475,7 @@ class Item extends ItemLight
 			      link_tmp_ID = NULL
 			WHERE link_tmp_ID = '.$TemporaryID->ID );
 
-		$item_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+		$item_slug_folder_name = 'quick-uploads/'.$this->get_canonical_slug().'/';
 
 		// Move all temporary files to folder of new created message:
 		foreach( $LinkOwner->Links as $item_Link )
@@ -3632,7 +3632,7 @@ class Item extends ItemLight
 							'ask_firstname' => in_array( 'firstname', $fields_to_display ) ? 'required' : 'no',
 							'ask_lastname' => in_array( 'lastname', $fields_to_display ) ? 'required' : 'no',
 							'ask_country' => in_array( 'country', $fields_to_display ) ? 'required' : 'no',
-							'source' => 'Page: '.$this->get( 'urltitle' ),
+							'source' => 'Page: '.$this->get_canonical_slug(),
 							'usertags' => $user_tags,
 							'subscribe' => array( 'post' => 0, 'comment' => 0 ),
 							'button_class' => 'btn-primary',
@@ -4201,7 +4201,7 @@ class Item extends ItemLight
 				// - Review
 				// For example, if content block Item has a status "Public" but current/parent Item has a status "Community",
 				//              then such content block Item cannot be included into the current/parent Item.
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get_canonical_slug() ).'</p>', $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
@@ -4214,7 +4214,7 @@ class Item extends ItemLight
 				//  - Content block Item has same owner as owner of parent Item's collection,
 				//  - Content block Item is in same collection as parent Item,
 				//  - Content block Item from collection for shared content blocks:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get_canonical_slug() ).'</p>', $content );
 				continue;
 			}
 
@@ -4266,7 +4266,7 @@ class Item extends ItemLight
 			if( get_param( 'preview' ) === 1 && get_param( 'preview_block' ) === 1 )
 			{	// Display orange debug wrapper around included content-block Item:
 				// Item debug info with Title + Slug:
-				$title_debug_info = '<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get( 'urltitle' ).')';
+				$title_debug_info = '<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get_canonical_slug().')';
 				if( $item_edit_url = $content_Item->get_edit_url() )
 				{	// Link to edit Item if current User has a permission:
 					$title_debug_info = '<a href="'.$item_edit_url.'">'.$title_debug_info.'</a>';
@@ -8348,7 +8348,7 @@ class Item extends ItemLight
 			case 'urltitle':
 				if( ! isset( $this->previous_urltitle ) )
 				{	// Save previous urltitle, may be used to rename folder of attachments:
-					$this->previous_urltitle = $this->get( 'urltitle' );
+					$this->previous_urltitle = $this->get_canonical_slug();
 				}
 				return parent::set( $parname, $parvalue, $make_null );
 
@@ -14052,7 +14052,7 @@ class Item extends ItemLight
 		}
 
 		// Folder with current/new slug:
-		$item_new_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+		$item_new_slug_folder_name = 'quick-uploads/'.$this->get_canonical_slug().'/';
 		$item_new_slug_folder_path = $item_FileRoot->ads_path.$item_new_slug_folder_name;
 
 		$result = false;

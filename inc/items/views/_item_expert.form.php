@@ -207,7 +207,7 @@ $Form->begin_form( '', '', $params );
 		// Get icon to copy canonical slug to clipboard:
 		$edit_slug_link = action_icon( TB_('Copy slug to clipboard'), 'clipboard-copy', '#', TB_('Copy slug'), 3, 4, array(
 				'id'      => 'item_canonical_slug_clipboard_icon', // ID is used to highlight on coping process
-				'onclick' => 'return evo_copy_to_clipboard( \'item_canonical_slug_clipboard_icon\', \''.format_to_js( $edited_Item->get( 'urltitle' ) ).'\' )',
+				'onclick' => 'return evo_copy_to_clipboard( \'item_canonical_slug_clipboard_icon\', \''.format_to_js( $edited_Item->get_canonical_slug() ).'\' )',
 			) ).' ';
 		// Get link to edit slugs page:
 		$edit_slug_link .= action_icon( TB_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, TB_('Edit slugs'), 3, 4 )

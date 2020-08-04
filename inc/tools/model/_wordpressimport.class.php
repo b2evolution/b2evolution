@@ -1506,7 +1506,7 @@ class WordpressImport extends AbstractImport
 								continue;
 							}
 
-							$evo_short_link = '[['.$link_Item->get( 'urltitle' ).' '.$link_matches[3][ $l ].']]';
+							$evo_short_link = '[['.$link_Item->get_canonical_slug().' '.$link_matches[3][ $l ].']]';
 
 							// Replace a link tag with evo short link:
 							$item_content = replace_outside_code_tags( $link_matches[0][ $l ], $evo_short_link, $item_content, 'replace_content', 'str' );

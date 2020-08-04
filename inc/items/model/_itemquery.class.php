@@ -1384,6 +1384,12 @@ class ItemQuery extends SQL
 			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
 		}
 
+		if( in_array( 'urltitle', $orderby_array ) )
+		{	// If list is ordered by field 'slug_title' from table T_slug:
+			$this->orderby_select .= ( empty( $this->orderby_select ) ? '' : ', ' ).'slug_title AS post_urltitle';
+			$this->FROM_add( 'INNER JOIN T_slug ON slug_ID = post_canonical_slug_ID' );
+		}
+
 		if( in_array( 'matched_tags_num', $orderby_array ) )
 		{	// Special selection to order by highest number of matched tags:
 			$this->orderby_from .= ' LEFT JOIN ( SELECT itag_itm_ID, COUNT(*) AS post_matched_tags_num FROM T_items__itemtag GROUP BY itag_itm_ID ) AS matched_tags_num

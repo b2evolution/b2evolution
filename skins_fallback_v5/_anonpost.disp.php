@@ -15,13 +15,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 if( $Blog->get_ajax_form_enabled() )
 {	// Load form by AJAX if it is allowed by collection setting:
+	$post_slugs = param( 'post_slugs', 'string', NULL );
+	if( $post_slugs === NULL )
+	{	// Try to get slugs from deprecated param which still may be used by 3rd party skins from disp=edit:
+		$post_slugs = param( 'post_urltitle', 'string' );
+	}
 	display_ajax_form( array(
 			'action'        => 'get_item_form',
 			'blog'          => $Blog->ID,
 			'cat'           => get_param( 'cat' ),
 			'item_typ_ID'   => get_param( 'item_typ_ID' ),
 			'post_title'    => param( 'post_title', 'string' ),
-			'post_urltitle' => param( 'post_urltitle', 'string' ),
+			'post_urltitle' => $post_slugs,
 		) );
 }
 else

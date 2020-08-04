@@ -2198,9 +2198,9 @@ class ItemListLight extends DataObjectList2
 			{
 				if( ! empty( $params['switch_param_code'] ) )
 				{	// Start wrapper to make each item block switchable:
-					echo '<div data-display-condition="'.$params['switch_param_code'].'='.$row_Item->get( 'urltitle' ).'"'
+					echo '<div data-display-condition="'.$params['switch_param_code'].'='.$row_Item->get_canonical_slug().'"'
 						// Hide not active item on page loading:
-						.( $params['active_item_slug'] == $row_Item->get( 'urltitle' ) ? '' : ' style="display:none"' ).'>';
+						.( $params['active_item_slug'] == $row_Item->get_canonical_slug() ? '' : ' style="display:none"' ).'>';
 				}
 
 				if( $highlight_current_item &&
