@@ -318,6 +318,7 @@ class item_about_author_Widget extends ComponentWidget
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'     => $creator_user_ID, // Has the creator User changed?
 				'item_ID'     => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
+				'template_code' => $this->get_param( 'template' ), // Has the Template changed?
 			);
 	}
 }
