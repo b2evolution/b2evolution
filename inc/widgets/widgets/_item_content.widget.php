@@ -100,7 +100,11 @@ class item_content_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
-				)
+				),
+				'info' => array(
+					'type' => 'string',
+					'label' => T_('This widget will use the templates associated with the current Item Type.'),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
