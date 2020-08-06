@@ -102,8 +102,9 @@ class item_content_Widget extends ComponentWidget
 					'defaultvalue' => '',
 				),
 				'info' => array(
-					'type' => 'string',
-					'label' => T_('This widget will use the templates associated with the current Item Type.'),
+					'type' => 'info',
+					'label' => '',
+					'info' => T_('This widget will use the templates associated with the current Item Type.'),
 				),
 			), parent::get_param_definitions( $params ) );
 
