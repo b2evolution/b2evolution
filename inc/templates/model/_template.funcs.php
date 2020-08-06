@@ -946,6 +946,15 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
+		case 'Item:location':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'before'    => '<div class="evo_post_location"><strong>'.T_('Location').': </strong>',
+					'after'     => '</div>',
+					'separator' => ', ',
+				), $params );
+			echo $rendered_Item->get_location( $temp_params['before'], $temp_params['after'], $temp_params['separator'] );
+			break;
+
 		case 'Item:mod_date':
 			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
 					'format' => '#short_date_time',		
@@ -1022,6 +1031,10 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item:type':
 			echo $rendered_Item->get_type_setting( 'name' );
+			break;
+
+		case 'Item:url_link':
+			$rendered_Item->url_link( $params );
 			break;
 
 		case 'Item:visibility_status':
