@@ -2454,7 +2454,7 @@ function get_mass_change_cat_buttons( $button_class = '' )
 	$r .= '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_change_main_cat]" id="mass_change_main_cat">'
 				.'<span>'.T_('Change primary category').'</span>'
 			.'</button>';
-	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_cat_dropdown">'
+	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_cat_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_cat_dropdown">'
@@ -2480,7 +2480,7 @@ function get_mass_change_renderer_buttons( $button_class = '' )
 	$r .= '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_add_renderer]" id="mass_add_renderer">'
 				.'<span>'.T_('Add text renderer').'</span>'
 			.'</button>';
-	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_renderer_dropdown">'
+	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_renderer_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_renderer_dropdown">'
@@ -2489,6 +2489,20 @@ function get_mass_change_renderer_buttons( $button_class = '' )
 	$r .= '</div>';
 
 	return $r;
+}
+
+
+/**
+ * Get html code of button to mass update posts' item type
+ *
+ * @param string Button class
+ * @return string
+ */
+function get_mass_change_item_type_button( $button_class = '' )
+{
+	return '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_change_item_type]" id="mass_change_item_type">'
+			.T_('Change Item Type')
+		.'</button>';
 }
 
 
@@ -3323,7 +3337,7 @@ jQuery( document ).ready( function ()
 		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
 
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
-			'600px', 'auto', true, evo_js_lang_mass_change_item_category + ' <?php echo get_manual_link( 'post-language-versions#add-version' ); ?>', evo_js_lang_mass_change_item_category, true );
+			'600px', 'auto', true, evo_js_lang_mass_change_item_category + ' <?php echo get_manual_link( 'mass-change-item-category' ); ?>', evo_js_lang_mass_change_item_category, true );
 		jQuery.ajax(
 		{
 			type: 'POST',
@@ -3381,7 +3395,7 @@ jQuery( document ).ready( function ()
 		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
 
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
-			'600px', 'auto', true, evo_js_lang_mass_change_item_renderer + ' <?php echo get_manual_link( 'post-language-versions#add-version' ); ?>', evo_js_lang_mass_change_item_renderer, true );
+			'600px', 'auto', true, evo_js_lang_mass_change_item_renderer + ' <?php echo get_manual_link( 'mass-change-item-renderers' ); ?>', evo_js_lang_mass_change_item_renderer, true );
 		jQuery.ajax(
 		{
 			type: 'POST',
@@ -3400,6 +3414,73 @@ jQuery( document ).ready( function ()
 				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_renderer, evo_js_lang_mass_change_item_renderer );
 			}
 		} );
+		return false;
+	} );
+} );
+</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to mass change Item Type of Items
+ */
+function echo_item_mass_change_item_type_js()
+{
+	global $evo_item_mass_change_item_type_js_initialized, $blog;
+
+	if( ! empty( $evo_item_mass_change_item_type_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_mass_change_item_type_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script>
+jQuery( document ).ready( function ()
+{
+	jQuery( '#mass_change_item_type' ).click( function()
+	{
+		
+		var selected_items = new Array();
+		jQuery( 'input[name="selected_items\[\]"]:checked' ).each( function()
+		{
+			selected_items.push( jQuery( this ).val() );
+		} );
+
+		if( selected_items.length == 0 )
+		{	// Don't try to load a form to change a category if no selected items:
+			alert( '<?php echo TS_('Please select at least one item.'); ?>' );
+			return false;
+		}
+
+		var evo_js_lang_mass_change_item_type = '<?php echo TS_('Change Item Type'); ?>';
+		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
+			'600px', 'auto', true, evo_js_lang_mass_change_item_type + ' <?php echo get_manual_link( 'mass-change-item-type' ); ?>', evo_js_lang_mass_change_item_type, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>async.php',
+			data:
+			{
+				'action': 'get_item_mass_change_item_type_form',
+				'blog': '<?php echo $blog; ?>',
+				'selected_items': selected_items,
+				'redirect_to': '<?php echo format_to_js( regenerate_url( '', '', '', '&' ) ); ?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_type, evo_js_lang_mass_change_item_type );
+			}
+		} );
+
 		return false;
 	} );
 } );
@@ -5835,6 +5916,10 @@ function items_results( & $items_Results, $params = array() )
 					'type' => 'text',
 					'text' => get_mass_change_renderer_buttons( 'btn-xs' ),
 				),
+			'mass_change_item_type' => array(
+					'type' => 'text',
+					'text' => get_mass_change_item_type_button( 'btn-xs' ),
+				),
 			);
 		if( is_pro() && check_user_perm( 'options', 'edit' ) )
 		{	// Export Items only for PRO version:
@@ -5861,6 +5946,8 @@ function items_results( & $items_Results, $params = array() )
 
 		// JavaScript code to mass change category of Items:
 		echo_item_mass_change_cat_js();
+		// JavaScript code to mass change Item Type of Items:
+		echo_item_mass_change_item_type_js();
 	}
 
 	if( $params['display_date'] )

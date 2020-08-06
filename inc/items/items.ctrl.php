@@ -1121,6 +1121,75 @@ switch( $action )
 		header_redirect( $redirect_to );
 		break;
 
+	case 'mass_change_item_type':
+		// Mass change item types of selected items:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'items' );
+
+		$selected_items = param( 'selected_items', 'array:integer' );
+
+		// Set an URL to redirect to items list after this action:
+		$redirect_to = param( 'redirect_to', 'url', NULL );
+
+		if( empty( $selected_items ) )
+		{	// If no items selected:
+			$Messages->add( TB_('Please select at least one item.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		// Get the selected Item Type:
+		$item_type_ID = param( 'item_type_ID', 'integer' );
+
+		if( empty( $item_type_ID ) )
+		{	// If no Item Type selected:
+			$Messages->add( TB_('Please select an Item Type.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$ItemTypeCache = & get_ItemTypeCache();
+		if( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $item_type_ID, false, false ) ) ||
+		    ! check_user_perm( 'blog_item_type_'.$ItemType->get( 'perm_level' ), 'edit', false, $Blog->ID ) )
+		{	// If wrong Item Type or no permission to use the selected Item Type:
+			$Messages->add( TB_('You don\'t have a permission to use the selected Item Type.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$ItemCache = & get_ItemCache();
+		$items_success = 0;
+		$items_failed = 0;
+		foreach( $selected_items as $selected_item_ID )
+		{
+			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
+			    check_user_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			{	// If current User has a permission to edit the selected Item:
+				$selected_Item->set( 'ityp_ID', $item_type_ID );
+				if( $selected_Item->dbupdate() )
+				{	// If the item has been updated with the requested renderers:
+					$items_success++;
+					continue;
+				}
+			}
+			// Wrong item or current User has no perm to edit the selected item:
+			$items_failed++;
+		}
+
+		if( $items_success )
+		{	// Inform about success updates:
+			$Messages->add( sprintf( TB_('%d items have been changed to Item Type "%s".'), $items_success, $ItemType->get( 'name' ) ), 'success' );
+		}
+		if( $items_failed )
+		{	// Inform about failed updates:
+			$Messages->add( sprintf( TB_('%d items could not be changed to Item Type "%s".'), $items_failed, $ItemType->get( 'name' ) ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
 	default:
 		// Try to handle action by modules:
 		$module_result = modules_call_method( 'handle_backoffice_action', array(

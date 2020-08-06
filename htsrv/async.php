@@ -1121,6 +1121,22 @@ switch( $action )
 		require $inc_path.'items/views/_item_mass_change_renderer.form.php';
 		break;
 
+	case 'get_item_mass_change_item_type_form':
+		// Form to mass change Item Type of Items:
+
+		param( 'blog', 'integer', true );
+		param( 'selected_items', 'array:integer' );
+		param( 'redirect_to', 'url', true );
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_mass_change_item_type.form.php';
+		break;
+
 	case 'clear_itemprecache':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'tools' );
