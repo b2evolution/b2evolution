@@ -610,6 +610,11 @@ function get_default_widgets( $coll_type = '', $context = array() )
 			) ),
 	);
 
+	/* Contact Page Main Area */
+	$default_widgets['contact_page_main_area'] = array(
+		array( 10, 18000, 'contact_form' ),
+	);
+
 	/* Site Map */
 	$default_widgets['sitemap'] = array(
 		array( 10, 16090, 'embed_menu', 'params' => array(

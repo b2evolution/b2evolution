@@ -188,6 +188,7 @@ $core_componentwidget_defs = array(
 			'online_users',            // Online users
 		),
 	'other' => array(
+			'contact_form',         // Contact Form
 			'social_links', // Free Social Links
 			'page_404_not_found',   // 404 Not Found
 			'mobile_skin_switcher', // Mobile Skin Switcher

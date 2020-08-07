@@ -3245,6 +3245,7 @@ function get_skin_default_containers()
 			'photo_index'               => array( NT_('Photo Index'), 190 ),
 			'search_area'               => array( NT_('Search Area'), 200 ),
 			'sitemap'                   => array( NT_('Site Map'), 210 ),
+			'contact_page_main_area'    => array( NT_('Contact Page Main Area'), 220 ),
 		);
 }
 
