@@ -1698,6 +1698,7 @@ switch( $action )
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 			$ads_current_skin_path = $skins_path.$Skin->folder.'/';
+			$Skin->display_init();
 		}
 
 		switch( $action )
@@ -1718,19 +1719,18 @@ switch( $action )
 
 			case 'update_custom_field':
 				// Update item custom field:
-				if( $Item->load_custom_fields_from_Request() )
-				{	// If custom field is loaded:
+				if( $update_result = $Item->load_custom_fields_from_Request( true ) )
+				{	// Custom field is loaded successfully and Item can be updated:
 					$Item->dbupdate();
 				}
-				else
-				{	// Return errors:
-					$Messages->set_params( array( 'before_group_item' => ' ' ) );
-					header_http_response( '400 Bad Request' );
-					echo utf8_strip_tags( $Messages->display( NULL, NULL, false ) );
-					break;;
-				}
-				// Return new value:
-				echo $Item->get_custom_field_formatted( $field );
+				// Set affixed variable to float the Messages:
+				$Messages->affixed = true;
+				// Send result data in JSON format:
+				echo evo_json_encode( array(
+						'value'    => $Item->get_custom_field_formatted( $field ),
+						'success'  => $update_result,
+						'messages' => messages( array( 'display' => false ) ),
+					) );
 				break;
 		}
 		break;

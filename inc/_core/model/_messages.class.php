@@ -338,8 +338,10 @@ class Messages
 	 *
 	 * @param string HTML to display before the log when there is something to display
 	 * @param string HTML to display after the log when there is something to display
+	 * @param boolean TREU to display messages, FALSE to return messages as string
+	 * @return string Messages when $display == false
 	 */
-	function disp( $before = '<div class="action_messages">', $after = '</div>' )
+	function disp( $before = '<div class="action_messages">', $after = '</div>', $display = true )
 	{
 		if( $this->has_open_group() )
 		{
@@ -361,9 +363,16 @@ class Messages
 		{
 			$disp = $this->display( NULL, NULL, false, NULL );
 
-			if( !empty( $disp ) )
+			if( ! empty( $disp ) )
 			{
-				echo $before.$disp.$after;
+				if( $display )
+				{	// Display messages:
+					echo $before.$disp.$after;
+				}
+				else
+				{	// Return messages as string:
+					return $before.$disp.$after;
+				}
 			}
 		}
 	}

@@ -1226,10 +1226,13 @@ class Item extends ItemLight
 	/**
 	 * Load custom fields from Request form
 	 *
+	 * @param boolean TRUE to display messages for successfully updated fields
 	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or no any field has been changed
 	 */
-	function load_custom_fields_from_Request()
+	function load_custom_fields_from_Request( $display_success_message = false )
 	{
+		global $Messages;
+
 		$custom_fields = $this->get_type_custom_fields();
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
@@ -1279,6 +1282,10 @@ class Item extends ItemLight
 				if( ! $param_error )
 				{
 					param( $param_name, $param_type, NULL ); // get par value
+					if( $display_success_message )
+					{	// Display messages for successfully updated field:
+						$Messages->add( sprintf( T_('Custom "%s" field has been updated.'), $custom_field['label'] ), 'success' );
+					}
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 				$this->set_setting( 'custom:'.$custom_field['name'], get_param( $param_name ), $custom_field_make_null );

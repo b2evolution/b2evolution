@@ -2107,11 +2107,13 @@ function messages( $params = array() )
 {
 	global $Messages;
 
-	if( isset( $params['has_errors'] ) )
-	{
-		$params['has_errors'] = $Messages->has_errors();
-	}
-	$Messages->disp( $params['block_start'], $params['block_end'] );
+	$params = array_merge( array(
+			'block_start' => '<div class="action_messages">',
+			'block_end'   => '</div>',
+			'display'     => true,
+		), $params );
+
+	return $Messages->disp( $params['block_start'], $params['block_end'], $params['display'] );
 }
 
 

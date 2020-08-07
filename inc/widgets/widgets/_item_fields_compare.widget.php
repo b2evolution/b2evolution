@@ -1290,9 +1290,9 @@ jQuery( document ).ready( function()
 			'auto', 'auto', true,
 			'<?php echo TS_('Edit custom field'); ?>', [ '<?php echo TS_('Save'); ?>', 'btn-primary' ], true, false, false, false, function()
 				{	// Revert background color of the editing cell to original:
-					if( jQuery( evo_item_custom_fields_widget_cell_selector ).length )
+					if( ! jQuery( evo_item_custom_fields_widget_cell_selector ).data( 'field-updated' ) )
 					{
-						evoFadeBg( jQuery( evo_item_custom_fields_widget_cell_selector ).get( 0 ) );
+						evoFadeBg( evo_item_custom_fields_widget_cell_selector );
 					}
 				} );
 
@@ -1323,7 +1323,7 @@ jQuery( document ).ready( function()
 
 		// Set flag to know what field is editing, in order update it on form submitting:
 		jQuery( 'td[data-item]' ).removeAttr( 'data-editing-field' );
-		jQuery( this ).attr( 'data-editing-field', 1 );
+		jQuery( this ).attr( 'data-editing-field', 1 ).data( 'field-updated', 0 );
 	} )
 	.on( 'click', 'a', function( e )
 	{	// Use default action for children links in order to don't open the modal window before redirect to url from href:
@@ -1332,10 +1332,6 @@ jQuery( document ).ready( function()
 
 	jQuery( document ).on( 'submit', 'form#item_custom_field_ajax_form', function()
 	{	// Execute ajax request to submit a form to update the custom field value:
-
-		// Highlight the updating cell with red color:
-		evoFadeBg( jQuery( evo_item_custom_fields_widget_cell_selector ).get( 0 ), ['#ff0000'], { finish_orig_bg: false } );
-
 		var field = jQuery( this ).find( 'input[name=field]' ).val();
 		var data = {
 			action: 'update_custom_field',
@@ -1346,6 +1342,15 @@ jQuery( document ).ready( function()
 			b2evo_icons_type: '<?php echo $b2evo_icons_type; ?>'
 		};
 		data[ 'item_cf_' + field ] = jQuery( this ).find( '[name=item_cf_' + field + ']' ).val();
+		if( jQuery( '.action_messages' ).length )
+		{	// If messages already exist on the page:
+			var messages_wrapper_obj = jQuery( '.action_messages' ).parent().css( 'min-height', 'auto' );
+			jQuery( '.action_messages' ).remove();
+		}
+		else
+		{	// If messages have no on the page:
+			var messages_wrapper_obj = jQuery( 'main' );
+		}
 		jQuery.ajax(
 		{
 			type: 'POST',
@@ -1353,18 +1358,29 @@ jQuery( document ).ready( function()
 			data: data,
 			success: function( result )
 			{	// Update the cell with new value:
-				jQuery( evo_item_custom_fields_widget_cell_selector ).html( ajax_debug_clear( result ) );
+				result = jQuery.parseJSON( ajax_debug_clear( result ) );
+				jQuery( evo_item_custom_fields_widget_cell_selector ).html( result.value );
+				jQuery( evo_item_custom_fields_widget_cell_selector ).data( 'field-updated', 1 );
 				closeModalWindow();
-				// Highlight the updated cell with green color and back to original:
-				evoFadeBg( jQuery( evo_item_custom_fields_widget_cell_selector ).get( 0 ), ['#ddff00'] );
+				if( result.success )
+				{	// Highlight the updated cell with green color and back to original:
+					evoFadeBg( evo_item_custom_fields_widget_cell_selector, ['#ddff00'] );
+				}
+				else
+				{	// Highlight the editing cell with red color:
+					evoFadeBg( evo_item_custom_fields_widget_cell_selector, ['#ff6666'], { finish_orig_bg: false } );
+				}
+				// Display result messages:
+				messages_wrapper_obj.prepend( result.messages );
 			},
 			error: function( result )
 			{	// Display error:
-				alert( ajax_debug_clear( result.responseText ) );
+				messages_wrapper_obj.prepend( result.responseText );
+				jQuery( evo_item_custom_fields_widget_cell_selector ).data( 'field-updated', 1 );
+				closeModalWindow();
 				// Highlight the editing cell with orange color:
-				evoFadeBg( evo_item_custom_fields_widget_cell_selector, ['#ffbf00'], { finish_orig_bg: false } );
-				// Fix to don't use default disabling for the submit button:
-				jQuery( '#modal_window .modal-footer button[type=submit]' ).data( 'click_init', 0 );
+				evoFadeBg( evo_item_custom_fields_widget_cell_selector, ['#ff6666'], { finish_orig_bg: false } );
+				jQuery( evo_item_custom_fields_widget_cell_selector ).data( 'error-value', 1 );
 			}
 		} );
 
