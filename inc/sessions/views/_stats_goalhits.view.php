@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -70,20 +70,20 @@ else
 	$SQL_count->SELECT( 'COUNT(ghit_ID)' );
 	$SQL_count->FROM( 'T_track__goalhit LEFT JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
 
-	if( !empty($datestart) )
+	if( ! empty( $datestart ) )
 	{
-		$SQL->WHERE_and( 'hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
-		$SQL_count->WHERE_and( 'hit_datetime >= '.$DB->quote($datestart.' 00:00:00') );
+		$SQL->WHERE_and( 'hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
+		$SQL_count->WHERE_and( 'hit_datetime >= '.$DB->quote( $datestart.' 00:00:00' ) );
 	}
-	if( !empty($datestop) )
+	if( ! empty( $datestop ) )
 	{
-		$SQL->WHERE_and( 'hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
-		$SQL_count->WHERE_and( 'hit_datetime <= '.$DB->quote($datestop.' 23:59:59') );
+		$SQL->WHERE_and( 'hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
+		$SQL_count->WHERE_and( 'hit_datetime <= '.$DB->quote( $datestop.' 23:59:59' ) );
 	}
 
-	if( !empty($sess_ID) )
+	if( ! empty( $sess_ID ) )
 	{	// We want to filter on the session ID:
-		$operator = ($exclude ? ' <> ' : ' = ' );
+		$operator = ( $exclude ? ' <> ' : ' = ' );
 		$SQL->WHERE_and( 'hit_sess_ID'.$operator.$sess_ID );
 		$SQL_count->FROM_add( 'LEFT JOIN T_sessions ON hit_sess_ID = sess_ID' );
 		$SQL_count->WHERE_and( 'hit_sess_ID'.$operator.$sess_ID );
@@ -94,14 +94,14 @@ else
 		$SQL_count->FROM_add( 'LEFT JOIN T_track__goal ON ghit_goal_ID = goal_ID' );
 		if( ! empty( $goal_name ) ) // TODO: allow combine
 		{ // We want to filter on the goal name:
-			$operator = ($exclude ? ' NOT LIKE ' : ' LIKE ' );
-			$SQL->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
-			$SQL_count->WHERE_and( 'goal_name'.$operator.$DB->quote($goal_name.'%') );
+			$operator = ( $exclude ? ' NOT LIKE ' : ' LIKE ' );
+			$SQL->WHERE_and( 'goal_name'.$operator.$DB->quote( $goal_name.'%' ) );
+			$SQL_count->WHERE_and( 'goal_name'.$operator.$DB->quote( $goal_name.'%' ) );
 		}
 
 		if( ! empty( $goal_cat ) )
 		{ // We want to filter on the goal category:
-			$operator = ($exclude ? ' != ' : ' = ' );
+			$operator = ( $exclude ? ' != ' : ' = ' );
 			$SQL->WHERE_and( 'goal_gcat_ID'.$operator.$DB->quote( $goal_cat ) );
 			$SQL_count->WHERE_and( 'goal_gcat_ID'.$operator.$DB->quote( $goal_cat ) );
 		}
@@ -142,11 +142,9 @@ function filter_goal_hits( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params ),
-		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params );
+$Results->register_filter_preset( 'all_but_curr', T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' );
 
 $Results->cols[] = array(
 		'th' => T_('Session'),

@@ -1,9 +1,19 @@
 /* Styles for TinyMCE's iframe/editable area */
 
 body.mce-content-body {
-	font: 13px/19px Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+	/* Block of style commented out to make editor look similar to Wordpress editor: */
+	/*
+	font-family: Georgia, "Times New Roman", "Bitstream Charter", Times, serif;
+	font-size: 16px;
+	line-height: 1.5;
+	color: #333;
+	-webkit-font-smoothing: antialiased !important;
 	padding: 0.6em;
 	margin: 0;
+	*/
+	font-size: 16px;
+	line-height: 1.75;
+	-webkit-font-smoothing: antialiased !important;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -36,8 +46,8 @@ pre {
 	height: 10px;
 	border-top: 1px dotted #666;
 	margin-top: 15px;
-	background: url("../../rsc/js/tiny_mce/skins/lightgray/img/pagebreak.gif") no-repeat center;
+	background: url("../../rsc/ext/tiny_mce/skins/lightgray/img/pagebreak.gif") no-repeat center;
 }
 .mce-morebreak {
-	background-image: url("../../rsc/js/tiny_mce/skins/lightgray/img/morebreak.gif");
+	background-image: url("../../rsc/ext/tiny_mce/skins/lightgray/img/morebreak.gif");
 }

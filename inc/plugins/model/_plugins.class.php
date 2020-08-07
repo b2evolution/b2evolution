@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -152,12 +152,12 @@ class Plugins
 		// Set plugin path:
 		$this->plugins_path = $basepath.$plugins_subdir;
 
-		$Timer->resume( 'plugin_init' );
+		$Timer->resume( 'plugins_init' );
 
 		// Load events for enabled plugins:
 		$this->load_events();
 
-		$Timer->pause( 'plugin_init' );
+		$Timer->pause( 'plugins_init' );
 	}
 
 
@@ -330,6 +330,13 @@ class Plugins
 		}
 
 		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', classfile_path: ['.$classfile_path.']', 'plugins' );
+
+		if( ! empty( $this->log_register ) )
+		{	// Display additional log on upgrade page when we reload all plugins:
+			global $plugins_path;
+			echo get_install_format_text_and_log( '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />' );
+			evo_flush();
+		}
 
 		if( ! is_readable( $classfile_path ) )
 		{ // Plugin file not found!
@@ -639,23 +646,15 @@ class Plugins
 	 */
 	function init_settings( & $Plugin )
 	{
-		if( version_compare( PHP_VERSION, '5.1', '>=' ) )
-		{ // we use overloading for PHP5, therefor the member has to be unset:
-			// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
-			//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
-			unset( $Plugin->Settings );
-			unset( $Plugin->UserSettings );
+		// we use overloading for PHP5, therefor the member has to be unset:
+		// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
+		//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
+		unset( $Plugin->Settings );
+		unset( $Plugin->UserSettings );
+		unset( $Plugin->GroupSettings );
 
-			// Nothing to do here, will get called through Plugin::__get() when accessed
-			return;
-		}
-
-		// PHP < 5.1: instantiate now, but only for installed plugins (needs DB).
-		if( $Plugin->ID > 0 )
-		{
-			$this->instantiate_Settings( $Plugin, 'Settings' );
-			$this->instantiate_Settings( $Plugin, 'UserSettings' );
-		}
+		// Nothing to do here, will get called through Plugin::__get() when accessed
+		return;
 	}
 
 
@@ -670,7 +669,7 @@ class Plugins
 	 *           Defaults would need to be handled by Plugin(User)Settings::get_default() then.
 	 *
 	 * @param Plugin
-	 * @param string settings type: "Settings" or "UserSettings"
+	 * @param string settings type: "Settings", "UserSettings" or "GroupSettings"
 	 * @return boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
@@ -685,28 +684,39 @@ class Plugins
 		// when is_installed=true).
 		$method = 'GetDefault'.$set_type;
 		$params = array('for_editing'=>false);
-		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$defaults = $Plugin->$method( $params );
-		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
-		{	// If general settings are requested we should also append messages and emails settings:
-			if( empty( $defaults ) )
-			{
+		{	// If general settings are requested we should also append custom, collection, widgets, messages, emails and shared settings:
+			if( ! is_array( $defaults ) )
+			{	// Initialize array for default settings:
 				$defaults = array();
 			}
+
+			// Initialize object for Settings temporary because it may be used in the functions below to get default values:
+			load_class( 'plugins/model/_pluginsettings.class.php', 'PluginSettings' );
+			$Plugin->Settings = new PluginSettings( $Plugin->ID );
+
+			$defaults = array_merge( $defaults, $Plugin->get_custom_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_shared_setting_definitions( $params ) );
+
+			// Check what other settings are defined for the Plugin,
+			// We should not merge them with $defaults because they are stored in different DB table,
+			// I.e. they are should be initialized in $Plugin->Settings, but we still need this object for a proper settings work:
+			$other_defaults = $Plugin->get_coll_setting_definitions( $params );
+			$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
 		}
 
-		if( empty( $defaults ) )
-		{ // No settings, no need to instantiate.
+		if( empty( $defaults ) && empty( $other_defaults ) )
+		{	// No settings, no need to instantiate:
 			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
-		if( ! is_array($defaults) )
-		{ // invalid data
+		if( ! is_array( $defaults ) )
+		{	// Invalid format of default settings:
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 			return NULL; // fp> correct me if I'm wrong.
 		}
@@ -718,6 +728,14 @@ class Plugins
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
 
 			$set_Obj = & $Plugin->UserSettings;
+		}
+		elseif( $set_type == 'GroupSettings' )
+		{	// Group specific settings:
+			load_class( 'plugins/model/_plugingroupsettings.class.php', 'PluginGroupSettings' );
+
+			$Plugin->GroupSettings = new PluginGroupSettings( $Plugin->ID );
+
+			$set_Obj = & $Plugin->GroupSettings;
 		}
 		else
 		{ // Global settings:
@@ -744,6 +762,20 @@ class Plugins
 			elseif( isset( $l_meta['type'] ) && strpos( $l_meta['type'], 'array' ) === 0 )
 			{
 				$set_Obj->_defaults[$l_name] = array();
+			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'checklist' )
+			{
+				$set_Obj->_defaults[$l_name] = NULL;
+			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
+			{	// Get default values from input group fields:
+				foreach( $l_meta['inputs'] as $l_meta_input_key => $l_meta_input_data )
+				{
+					if( isset( $l_meta_input_data['defaultvalue'] ) )
+					{
+						$set_Obj->_defaults[ $l_name.$l_meta_input_key ] = $l_meta_input_data['defaultvalue'];
+					}
+				}
 			}
 			else
 			{
@@ -1247,6 +1279,11 @@ class Plugins
 			$Debuglog->add( 'Calling '.$Plugin->classname.'(#'.$Plugin->ID.')->'.$method.'( )', 'plugins' );
 		}
 
+		if( $method == 'CacheObjects' )
+		{	// Deny plugins with deprecated event:
+			debug_die( 'The plugin event CacheObjects is deprecated' );
+		}
+
 		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$r = $Plugin->$method( $params );
 		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
@@ -1305,7 +1342,7 @@ class Plugins
 
 
 	/**
-	 * Render the content of an item by calling the relevant renderer plugins.
+	 * Render the content of an item, Comment, Message, Widget by calling the relevant renderer plugins.
 	 *
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
@@ -1313,12 +1350,11 @@ class Plugins
 	 *        'entityencoded', 'xml', 'htmlfeed' and 'text' are supported.
 	 * @param array Additional params to the Render* methods (e.g. "Item" for items).
 	 *              Do not use "data" or "format" here, because it gets used internally.
+	 * @param string Prefix of render function: 'Render' - for rendering at save in DB time, 'Display' - for rendering at display on screen time
 	 * @return string rendered content
 	 */
 	function render( & $content, $renderers, $format, $params, $event_prefix = 'Render' )
 	{
-		// echo implode(',',$renderers);
-
 		$params['data'] = & $content;
 		$params['format'] = $format;
 
@@ -1370,10 +1406,16 @@ class Plugins
 			$setting_Blog = & get_setting_Blog( 'default_blog_ID' );
 		}
 
+		// Collect all renderer plugins used in current page in order to know when we really need to load their JS/CSS files:
+		global $evo_renderers_used_in_current_page;
+		if( ! is_array( $evo_renderers_used_in_current_page ) )
+		{	// Initialize array for curently used renderer plugins once:
+			$evo_renderers_used_in_current_page = array();
+		}
+		$evo_renderers_used_in_current_page += $renderers;
+
 		foreach( $renderer_Plugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code, ':';
-
 			$apply_rendering_value = $loop_RendererPlugin->get_coll_setting( 'coll_apply_rendering', $setting_Blog );
 			if( $loop_RendererPlugin->is_renderer_enabled( $apply_rendering_value, $renderers ) )
 			{ // Plugin is enabled to call method
@@ -1495,11 +1537,11 @@ class Plugins
 
 		$Debuglog->add( sprintf( 'Loading plugin %s by class name.', $classname ), 'plugins' );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Load Plugin data by class name' );
 		$SQL->SELECT( 'plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_status, plug_version, plug_spam_weight' );
 		$SQL->FROM( 'T_plugins' );
 		$SQL->WHERE( 'plug_classname = '.$DB->quote( $classname ) );
-		if( $plugin = $DB->get_row( $SQL->get(), ARRAY_A ) )
+		if( $plugin = $DB->get_row( $SQL, ARRAY_A ) )
 		{
 			if( isset( $this->index_ID_rows[$plugin['plug_ID']] ) )
 			{ // Plugin already was loaded before
@@ -1525,7 +1567,7 @@ class Plugins
 	 *
 	 * @param String setting name ( 'coll_apply_rendering', 'coll_apply_comment_rendering' )
 	 * @param Object the Blog which apply rendering setting should be loaded
-	 * @param string Setting type: 'coll', 'msg', 'email'
+	 * @param string Setting type: 'coll', 'msg', 'email', 'shared'
 	 */
 	function load_index_apply_rendering( $setting_name, & $Blog, $type = 'coll' )
 	{
@@ -1569,6 +1611,11 @@ class Plugins
 				case 'email':
 					// Get plugin email setting value:
 					$rendering_value = $Plugin->get_email_setting( $setting_name );
+					break;
+
+				case 'shared':
+					// Get plugin shared setting value:
+					$rendering_value = 'opt-in';
 					break;
 
 				default:
@@ -1823,7 +1870,7 @@ class Plugins
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -1990,14 +2037,26 @@ class Plugins
 			$setting_name = 'email_apply_rendering';
 			$setting_type = 'email';
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // Validate the given rendering option in the give Blog
-			$Collection = $Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Validate the given rendering option:
 			$setting_name = $params['setting_name'];
-			$setting_type = 'coll';
-			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
-			{
-				debug_die( 'Invalid apply rendering param name received!' );
+			if( isset( $params['Blog'] ) )
+			{	// If Collection is given:
+				$Collection = $Blog = & $params['Blog'];
+				$setting_type = 'coll';
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+				if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering', 'shared_apply_rendering' ) ) )
+				{
+					debug_die( 'Invalid apply rendering param name received!' );
+				}
+			}
+			if( $setting_name == 'shared_apply_rendering' )
+			{	// Set shared type instead of collection for this spec setting name:
+				$Collection = $Blog = NULL;
+				$setting_type = 'shared';
 			}
 		}
 		else
@@ -2005,7 +2064,7 @@ class Plugins
 			return array();
 		}
 
-		$blog_ID = !is_null( $Blog ) ? $Blog->ID : 0;
+		$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
 
 		// Make sure the requested apply_rendering settings are loaded
 		$this->load_index_apply_rendering( $setting_name, $Blog, $setting_type );
@@ -2088,30 +2147,26 @@ class Plugins
 
 
 	/**
-	 * Get checkable list of renderers
+	 * Get renderers options which can be used for form selectors, checkboxes and etc.
 	 *
 	 * @param array If given, assume these renderers to be checked.
 	 * @param array params from where to get 'apply_rendering' setting
 	 */
-	function get_renderer_checkboxes( $current_renderers = NULL, $params )
+	function get_renderer_options( $current_renderers = NULL, $params )
 	{
 		global $inc_path, $admin_url;
 
-		load_funcs('plugins/_plugin.funcs.php');
+		load_funcs( 'plugins/_plugin.funcs.php' );
 
-		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
-
-		// Set different prefix if you use several toolbars on one page:
-		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+		$checkbox_options = array();
 
 		$this->restart(); // make sure iterator is at start position
 
-		if( ! is_array($current_renderers) )
+		if( ! is_array( $current_renderers ) )
 		{
 			$current_renderers = explode( '.', $current_renderers );
 		}
 
-		$atLeastOneRenderer = false;
 		$setting_Blog = NULL;
 		if( isset( $params['setting_name'] ) && $params['setting_name'] == 'msg_apply_rendering' )
 		{ // get Message apply_rendering setting
@@ -2119,6 +2174,10 @@ class Plugins
 		}
 		elseif( isset( $params['setting_name'] ) && $params['setting_name'] == 'email_apply_rendering' )
 		{	// get EmailCampaign apply_rendering setting:
+			$setting_name = $params['setting_name'];
+		}
+		elseif( isset( $params['setting_name'] ) && $params['setting_name'] == 'shared_apply_rendering' )
+		{	// get apply_rendering setting for widget from sharaed container:
 			$setting_name = $params['setting_name'];
 		}
 		elseif( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
@@ -2134,14 +2193,21 @@ class Plugins
 			$Item = & $params['Item'];
 			$setting_Blog = & $Item->get_Blog();
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // get given "apply_rendering" collection setting from the given Blog
-			$setting_Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Get given setting:
 			$setting_name = $params['setting_name'];
+			if( ! empty( $params['Blog'] ) )
+			{	// If Collection is given::
+				$setting_Blog = & $params['Blog'];
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+			}
 		}
 		else
 		{ // Invalid params
-			return '';
+			return $checkbox_options;
 		}
 
 		switch( $setting_name )
@@ -2152,7 +2218,7 @@ class Plugins
 				break;
 
 			case 'email_apply_rendering':
-				// Get Message renderer plugins
+				// Get Email Campaign renderer plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterEmailContent') );
 				break;
 
@@ -2161,14 +2227,13 @@ class Plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
 				break;
 
+			case 'shared_apply_rendering':
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
-				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+				$RendererPlugins = $this->get_list_by_events( array( 'RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText', 'DisplayItemAsHtml', 'DisplayItemAsXml', 'DisplayItemAsText' ) );
 				break;
 		}
-
-		$r = '<input type="hidden" name="renderers_displayed" value="1" />';
 
 		foreach( $RendererPlugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
@@ -2177,7 +2242,7 @@ class Plugins
 			{ // No unique code!
 				continue;
 			}
-			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' )
+			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' && $setting_name != 'shared_apply_rendering' )
 			{ // If $setting_Blog is not set we can't get collection apply_rendering options
 				continue;
 			}
@@ -2190,99 +2255,177 @@ class Plugins
 			{	// get rendering setting from plugin email settings:
 				$apply_rendering = $loop_RendererPlugin->get_email_setting( $setting_name );
 			}
+			elseif( $setting_name == 'shared_apply_rendering' )
+			{	// get rendering setting from plugin shared settings:
+				$apply_rendering = $loop_RendererPlugin->get_shared_setting( $setting_name );
+			}
 			else
 			{ // get rendering setting from plugin coll settings
 				$apply_rendering = $loop_RendererPlugin->get_coll_setting( $setting_name, $setting_Blog );
 			}
 
-			if( $apply_rendering == 'stealth'
-				|| $apply_rendering == 'never'
+			$ignored_apply_rendering = array( 'stealth', 'never' );
+			if( isset( $params['ignored_apply_rendering'] ) )
+			{
+				$ignored_apply_rendering = array_merge( $ignored_apply_rendering, $params['ignored_apply_rendering'] );
+			}
+
+			if( in_array( $apply_rendering, $ignored_apply_rendering )
 				|| empty( $apply_rendering ) )
 			{ // This is not an option.
 				continue;
 			}
-			$atLeastOneRenderer = true;
 
-			$r .= '<div id="block_renderer_'.$loop_RendererPlugin->code.'">';
-
-			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$loop_RendererPlugin->code.'" id="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
+			$checkbox_option = array(
+					'code'       => $loop_RendererPlugin->code,
+					'short_desc' => $loop_RendererPlugin->short_desc,
+					'name'       => $loop_RendererPlugin->name,
+					'checked'    => false,
+					'disabled'   => false,
+					'help_link'  => $loop_RendererPlugin->get_help_link( '$help_url' ),
+				);
 
 			switch( $apply_rendering )
 			{
 				case 'always':
-					$r .= ' checked="checked" disabled="disabled"';
+					//$r .= ' checked="checked" disabled="disabled"';
+					$checkbox_option['checked'] = true;
+					$checkbox_option['disabled'] = true;
 					break;
 
 				case 'opt-out':
 					if( in_array( $loop_RendererPlugin->code, $current_renderers ) // Option is activated
 						|| in_array( 'default', $current_renderers ) ) // OR we're asking for default renderer set
 					{
-						$r .= ' checked="checked"';
+						$checkbox_option['checked'] = true;
 					}
 					break;
 
 				case 'opt-in':
 					if( in_array( $loop_RendererPlugin->code, $current_renderers ) ) // Option is activated
 					{
-						$r .= ' checked="checked"';
+						$checkbox_option['checked'] = true;
 					}
 					break;
 
 				case 'lazy':
 					if( in_array( $loop_RendererPlugin->code, $current_renderers ) ) // Option is activated
 					{
-						$r .= ' checked="checked"';
+						$checkbox_option['checked'] = true;
 					}
-					$r .= ' disabled="disabled"';
+					$checkbox_option['disabled'] = true;
 					break;
 			}
 
-			$r .= ' title="'.format_to_output( $loop_RendererPlugin->short_desc, 'formvalue' ).'"';
+			$checkbox_options[] = $checkbox_option;
+		}
+
+		return $checkbox_options;
+	}
+
+
+	/**
+	 * Get checkable list of renderers
+	 *
+	 * @param array If given, assume these renderers to be checked.
+	 * @param array params from where to get 'apply_rendering' setting
+	 */
+	function get_renderer_checkboxes( $current_renderers = NULL, $params )
+	{
+		if( isset( $params['setting_name'] ) )
+		{	// Use the defined setting name from params:
+			$setting_name = $params['setting_name'];
+		}
+		elseif( ! empty( $params['Comment'] ) )
+		{	// Use setting name for Comment:
+			$setting_name = 'coll_apply_comment_rendering';
+		}
+		elseif( ! empty( $params['Item'] ) )
+		{	// Use setting name for Item:
+			$setting_name = 'coll_apply_rendering';
+		}
+		else
+		{	// Invalid params, Exit here:
+			return '';
+		}
+
+		$name_prefix = isset( $params['name_prefix'] ) ? $params['name_prefix'] : '';
+
+		// Set different prefix if you use several toolbars on one page:
+		$js_prefix = isset( $params['js_prefix'] ) ? $params['js_prefix'] : '';
+
+		$r = '<input type="hidden" name="renderers_displayed" value="1" />';
+
+		$renderer_checkbox_options = $this->get_renderer_options( $current_renderers, $params );
+		foreach( $renderer_checkbox_options as $option )
+		{
+			$r .= '<div id="block_renderer_'.$option['code'].'">';
+
+			// Checkbox:
+			$r .= '<input type="checkbox" class="checkbox" name="'.$name_prefix.'renderers[]" value="'.$option['code'].'" id="'.$js_prefix.'renderer_'.$option['code'].'"';
+			if( $option['checked'] )
+			{	// Is checked:
+				$r .= ' checked="checked"';
+			}
+			if( $option['disabled'] )
+			{	// Is disabled:
+				$r .= ' disabled="disabled"';
+			}
+			$r .= ' title="'.format_to_output( $option['short_desc'], 'formvalue' ).'"';
 			if( ! empty( $js_prefix ) )
 			{	// Set prefix, Used in JS code to disable/enable plugin toolbar:
 				$r .= ' data-prefix="'.format_to_output( $js_prefix, 'formvalue' ).'"';
 			}
 			$r .= ' />';
-			$r .= ' <label for="'.$js_prefix.'renderer_'.$loop_RendererPlugin->code.'"';
-			$r .= ' title="'.format_to_output($loop_RendererPlugin->short_desc, 'formvalue').'">';
-			$r .= format_to_output($loop_RendererPlugin->name).'</label>';
+
+			// Label:
+			$r .= ' <label for="'.$js_prefix.'renderer_'.$option['code'].'"';
+			$r .= ' title="'.format_to_output( $option['short_desc'], 'formvalue' ).'">';
+			$r .= format_to_output( $option['name'] ).'</label>';
 
 			// fp> TODO: the first thing we want here is a TINY javascript popup with the LONG desc. The links to readme and external help should be inside of the tiny popup.
 			// fp> a javascript DHTML onhover help would be even better than the JS popup
 
-			// external help link:
-			$r .= ' '.$loop_RendererPlugin->get_help_link('$help_url');
+			// External help link:
+			$r .= ' '.$option['help_link'];
 
 			$r .= "</div>\n";
 		}
 
-		if( ! $atLeastOneRenderer )
+		if( empty( $renderer_checkbox_options ) )
 		{
 			if( is_admin_page() )
 			{ // Display info about no renderer plugins only in backoffice
-				global $current_User;
-				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
+				if( check_user_perm( 'admin', 'normal' ) )
 				{
+					global $admin_url;
 					switch( $setting_name )
 					{
 						case 'msg_apply_rendering':
-							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'perm_messaging', 'reply' ) && check_user_perm( 'options', 'edit' ) )
 							{ // Check if current user can edit the messaging settings
 								$settings_url = $admin_url.'?ctrl=msgsettings&amp;tab=renderers';
 							}
 							break;
 
 						case 'email_apply_rendering':
-							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
-							{ // Check if current user can edit the messaging settings
+							if( check_user_perm( 'perm_messaging', 'reply' ) && check_user_perm( 'options', 'edit' ) )
+							{ // Check if current user can edit the email settings
 								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
+							}
+							break;
+
+						case 'shared_apply_rendering':
+							if( check_user_perm( 'options', 'edit' ) )
+							{	// Check if current user can edit the plugin settings for shared container:
+								$settings_url = $admin_url.'?ctrl=plugins&amp;tab=shared';
 							}
 							break;
 
 						case 'coll_apply_comment_rendering':
 						case 'coll_apply_rendering':
 						default:
-							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
+							if( ! empty( $setting_Blog ) && check_user_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
 								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$setting_Blog->ID;
 							}
@@ -2307,6 +2450,71 @@ class Plugins
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Display captcha
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':                   Form object
+	 *   - 'form_type':              Form type
+	 *   - 'form_position':          Current form position where this function is called
+	 *   - 'captcha_info':           Info under the captcha field in note style
+	 *   - 'captcha_info_anonymous': Captcha info for not logged in user when the plugin knows it will NOT ask for captcha in case of logged in users
+	 */
+	function display_captcha( $params = array() )
+	{
+		if( ! isset( $params['Form'] ) ||
+		    ! isset( $params['form_type'] ) ||
+		    ! isset( $params['form_position'] ) )
+		{	// Exit here if the mandatory params are not defined:
+			return;
+		}
+
+		$params = array_merge( array(
+				'captcha_template_question' => '<span class="evo_captcha_question">$captcha_question$</span><br>',
+				'captcha_template_answer'   => '<span class="evo_captcha_answer">$captcha_answer$</span><br>',
+				// Default captcha info text(can be customized by plugin):
+				'captcha_info' => T_('We ask for this in order to slow down spammers.')
+													.'<br>'.T_('Sorry for the inconvenience.')
+													.( is_logged_in() ? '' : '<br>'.T_('Please log in to avoid this antispam check.') ),
+			), $params );
+
+		$form_type = $params['form_type'];
+
+		if( ! isset( $this->captcha_data ) )
+		{	// Initialize array to cache captcha data per current page request:
+			$this->captcha_data = array();
+		}
+
+		if( ! isset( $this->captcha_data[ $form_type ] ) )
+		{	// Load once captcha data per form type and use this for all next calls of this function:
+			$plugin_data = $this->trigger_event_first_return( 'RequestCaptcha', $params );
+			$this->captcha_data[ $form_type ] = isset( $plugin_data['plugin_return'] ) ? $plugin_data['plugin_return'] : false;
+		}
+
+		$captcha_data = $this->captcha_data[ $form_type ];
+
+		if( isset( $captcha_data['captcha_position'], $captcha_data['captcha_html'] ) &&
+		    $captcha_data['captcha_position'] == $params['form_position'] )
+		{	// Display captcha html code only for requested form type and position:
+			$Form = & $params['Form'];
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// Begin fieldset if it is required from skin file:
+				$Form->begin_fieldset();
+			}
+
+			$Form->info_field( T_('Antispam'), $captcha_data['captcha_html'], array(
+				'note'     => ( isset( $captcha_data['captcha_info'] ) ? $captcha_data['captcha_info'] : $params['captcha_info'] ),
+				'required' => true,
+			) );
+
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// End fieldset if it is required from skin file:
+				$Form->end_fieldset();
+			}
+		}
 	}
 
 

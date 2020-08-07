@@ -11,7 +11,7 @@ global $dbm_tables_count;
 load_funcs('tools/model/_maintenance.funcs.php');
 
 // Execute query to get results of ANALYZE command
-$results = dbm_analyze_tables( false, false );
+$results = dbm_analyze_tables( 'cron_job', false );
 
 $simple_keys = array( 0, 1, 2, 3 );
 $failed_results = array();
@@ -25,7 +25,7 @@ foreach( $results as $result )
 }
 
 $result_message = array(
-	'message' => sprintf( T_('The command ANALYZE has been executed for all %d tables.'), $dbm_tables_count ),
+	'message' => $result_message.sprintf( T_('The command ANALYZE has been executed for all %d tables.'), $dbm_tables_count ),
 	'table_cols' => array(
 		T_('Table'),
 		T_('Operation'),

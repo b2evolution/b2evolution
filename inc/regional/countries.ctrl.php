@@ -15,13 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load Country class (PHP4):
 load_class( 'regional/model/_country.class.php', 'Country' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
@@ -57,7 +53,7 @@ if( param( 'ctry_ID', 'integer', '', true) )
 	if( ($edited_Country = & $CountryCache->get_by_ID( $ctry_ID, false )) === false )
 	{	unset( $edited_Country );
 		forget_param( 'ctry_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Country') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Country') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -70,7 +66,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'country' );
 
 		// Disable a country only if it is enabled, and user has edit access.
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure the country information was loaded. If not, just exit with error.
 		if( empty($edited_Country) )
@@ -82,12 +78,12 @@ switch( $action )
 		if ( $action == 'disable_country' )
 		{	// Disable this country by setting flag to false.
 			$edited_Country->set( 'enabled', 0 );
-			$Messages->add( sprintf( T_('Disabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Disabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_country' )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'enabled', 1 );
-			$Messages->add( sprintf( T_('Enabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Enabled country (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -105,7 +101,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'country' );
 
 		// Disable a country only if it is enabled, and user has edit access.
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure the country information was loaded. If not, just exit with error.
 		if( empty($edited_Country) )
@@ -117,17 +113,12 @@ switch( $action )
 		if ( $action == 'disable_country_pref' )
 		{	// Disable this country by setting flag to false.
 			$edited_Country->set( 'preferred', 0 );
-			$Messages->add( sprintf( T_('Removed from preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Removed from preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_country_pref' )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'preferred', 1 );
-			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
-
-			if( ! $edited_Country->get( 'status' ) )
-			{ // If the country status is empty ( which means 'unknown' ) and the coutnry was marked as prefrerred, than the status must be changed to 'trusted'
-				$edited_Country->set( 'status', 'trusted' );
-			}
+			$Messages->add( sprintf( TB_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -140,7 +131,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset($edited_Country) )
 		{	// We don't have a model to use, start with blank object:
@@ -155,7 +146,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ctry_ID:
 		param( 'ctry_ID', 'integer', true );
@@ -171,7 +162,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'country' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request
 		if( $edited_Country->load_from_Request() )
@@ -179,7 +170,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Country->dbinsert();
-			$Messages->add( T_('New country created.'), 'success' );
+			$Messages->add( TB_('New country created.'), 'success' );
 
 			// What next?
 			switch( $action )
@@ -210,7 +201,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'country' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ctry_ID:
 		param( 'ctry_ID', 'integer', true );
@@ -221,7 +212,7 @@ switch( $action )
 
 			// Update in DB:
 			$edited_Country->dbupdate();
-			$Messages->add( T_('Country updated.'), 'success' );
+			$Messages->add( TB_('Country updated.'), 'success' );
 
 			// If no error, Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=countries', 303 ); // Will EXIT
@@ -236,14 +227,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'country' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an ctry_ID:
 		param( 'ctry_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Country &laquo;%s&raquo; deleted.'), $edited_Country->dget('name') );
+			$msg = sprintf( TB_('Country &laquo;%s&raquo; deleted.'), $edited_Country->dget('name') );
 			$edited_Country->dbdelete();
 			unset( $edited_Country );
 			forget_param( 'ctry_ID' );
@@ -254,7 +245,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Country->check_delete( sprintf( T_('Cannot delete country &laquo;%s&raquo;'), $edited_Country->dget('name') ) ) )
+			if( ! $edited_Country->check_delete( sprintf( TB_('Cannot delete country &laquo;%s&raquo;'), $edited_Country->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -265,14 +256,14 @@ switch( $action )
 
 if( empty( $action ) )
 { // JS to edit status of countries from list view
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 }
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Countries'), $admin_url.'?ctrl=countries' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('Regional'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( TB_('Countries'), $admin_url.'?ctrl=countries' );
 
 // Set an url for manual page:
 switch( $action )
@@ -311,7 +302,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Country->confirm_delete(
-				sprintf( T_('Delete country &laquo;%s&raquo;?'), $edited_Country->dget('name') ),
+				sprintf( TB_('Delete country &laquo;%s&raquo;?'), $edited_Country->dget('name') ),
 				'country', $action, get_memorized( 'action' ) );
 	case 'new':
 	case 'create':

@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -261,7 +261,7 @@ $Results->ID_col = 'msg_ID';
 
 if( is_admin_page() )
 {
-	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+	$Results->global_icon( T_('Cancel').'!', 'close', '?ctrl=threads' );
 }
 
 /**
@@ -277,10 +277,8 @@ function filter_messages( & $Form )
 $Results->filter_area = array(
 		'submit_title' => T_('Filter messages'),
 		'callback' => 'filter_messages',
-		'presets' => array(
-			'all' => array( T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) ),
-			)
 	);
+$Results->register_filter_preset( 'all', T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) );
 
 // Date row:
 $Results->grp_cols[] = array(
@@ -319,7 +317,7 @@ $Results->cols[] = array(
 /**
  * Actions:
  */
-if( $current_User->check_perm( 'perm_messaging', 'delete' ) && ( $Results->get_total_rows() > 1 ) && ( $action != 'preview' ) )
+if( check_user_perm( 'perm_messaging', 'delete' ) && ( $Results->get_total_rows() > 1 ) && ( $action != 'preview' ) )
 {	// We have permission to modify and there are more than 1 message (otherwise it's better to delete the whole thread):
 	$Results->cols[] = array(
 			'th' => '',
@@ -404,9 +402,22 @@ if( $is_recipient )
 			$Form->info_field( '', T_( 'The other users involved in this conversation have closed their account.' ) );
 		}
 
+		// Display plugin captcha for message form before textarea:
+		$Plugins->display_captcha( array(
+				'Form'              => & $Form,
+				'form_type'         => 'message',
+				'form_position'     => 'before_textarea',
+				'form_use_fieldset' => false,
+			) );
+
 		ob_start();
 		echo '<div class="message_toolbars">';
 		// CALL PLUGINS NOW:
+		$message_toolbar_params = array( 'Message' => & $edited_Message );
+		if( isset( $LinkOwner ) && $LinkOwner->is_temp() )
+		{
+			$message_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+		}
 		$Plugins->trigger_event( 'DisplayMessageToolbar', array() );
 		echo '</div>';
 		$message_toolbar = ob_get_clean();
@@ -418,6 +429,15 @@ if( $is_recipient )
 		// Form buttons:
 		$Form->output = false;
 		$form_buttons = '<div class="evo_private_messages_form__actions col-md-2 col-sm-3">';
+
+		// Display plugin captcha for message form before submit button:
+		$Plugins->display_captcha( array(
+				'Form'              => & $Form,
+				'form_type'         => 'message',
+				'form_position'     => 'before_submit_button',
+				'form_use_fieldset' => false,
+			) );
+
 		if( ! empty( $message_renderer_checkboxes ) )
 		{	// Display the options button only when plugins renderers are displayed for message:
 			$form_buttons .= $Form->button( array( 'button', 'message_options_button', T_('Options'), 'btn-default' ) );
@@ -439,7 +459,7 @@ if( $is_recipient )
 		$Form->inputend = $form_inputend;
 
 		// set b2evoCanvas for plugins
-		echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
+		echo '<script>var b2evoCanvas = document.getElementById( "msg_text" );</script>';
 
 		if( ! empty( $message_renderer_checkboxes ) )
 		{	// Initialize hidden checkboxes of renderer plugins:
@@ -454,15 +474,7 @@ if( $is_recipient )
 		}
 
 		// ####################### ATTACHMENTS/LINKS #########################
-		if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
-		{	// If current user has a permission to view the files AND it is back-office:
-			load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
-			// Initialize this object as global because this is used in many link functions:
-			global $LinkOwner;
-			$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
-			// Display attachments fieldset:
-			display_attachments_fieldset( $Form, $LinkOwner );
-		}
+		$Form->attachments_fieldset( $edited_Message );
 
 		$Form->end_form();
 
@@ -471,6 +483,7 @@ if( $is_recipient )
 }
 // ---------------- Form to send new message - END ---------------- //
 
+echo_image_insert_modal();
 // Initialize JavaScript for AJAX loading of popup window to display message options:
 echo_message_options_window();
 ?>

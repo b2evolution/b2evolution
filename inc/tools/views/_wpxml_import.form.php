@@ -1,13 +1,13 @@
 <?php
 /**
- * This file display the 2nd step of WordPress XML importer
+ * This file display the 3rd step of WordPress XML importer
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -15,26 +15,35 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $wp_blog_ID;
+global $WordpressImport;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
-$Form->begin_form( 'fform', T_('WordPress XML Importer') );
+$Form->begin_form( 'fform', TB_('WordPress XML Importer') );
 
-$Form->begin_fieldset( T_('Report of the import') );
+$Form->begin_fieldset( TB_('Report of the import') );
 
-	$BlogCache = & get_BlogCache();
-	$Collection = $Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
-	$Form->info( T_('Collection'), $Blog->get_name() );
+	// Start to log:
+	$WordpressImport->start_log();
 
-	// Import the data and display a report on the screen
-	wpxml_import();
+	// Display info for the wordpress importer:
+	$WordpressImport->display_info( true );
+
+	$form_buttons = array();
+
+	if( $WordpressImport->info_data['errors'] === false )
+	{	// Import the data and display a report on the screen:
+		$WordpressImport->execute();
+		$import_Blog = & $WordpressImport->get_Blog();
+		$form_buttons[] = array( 'button', 'button', TB_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$import_Blog->get( 'url' ).'\'' );
+	}
+
+	// End log:
+	$WordpressImport->end_log();
 
 $Form->end_fieldset();
 
-$Form->buttons( array(
-		array( 'button', 'button', T_('Go to Blog'), 'SaveButton', 'onclick' => 'location.href=\''.$Blog->get( 'url' ).'\'' ),
-	) );
+$Form->buttons( $form_buttons );
 
 $Form->end_form();
 

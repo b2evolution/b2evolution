@@ -33,14 +33,17 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div class="evo_pictured_layout">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img class="evo_pictured__image" src="'.$media_url.$bg_image.'" />';
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 }
-
+echo '<div class="evo_pictured_layout">';
+if( ! empty( $bg_File ) && $bg_File->exists() )
+{ // If it exists in media folder
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
+}
 ?>
 
 
@@ -55,7 +58,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -99,6 +102,7 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
@@ -164,15 +168,6 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -187,8 +182,10 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 					'front_block_first_title_end'   => '</h1>',
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
+					'intro_class'                   => '',
+					'featured_class'                => 'featurepost',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -220,48 +217,39 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 
 	<div class="row">
 
-		<div class="col-md-12">
-			<div class="evo_container evo_container__front_page_secondary">
 			<?php
 				// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Front Page Secondary Area'), array(
+				widget_container( 'front_page_secondary_area', array(
 						// The following params will be used as defaults for widgets included in this container:
-						'block_start'       => '<div class="widget $wi_class$">',
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start'   => '<div class="col-md-12"><div class="evo_container $wico_class$">',
+						'container_end'     => '</div></div>',
+						'block_start'       => '<div class="evo_widget $wi_class$">',
 						'block_end'         => '</div>',
 						'block_title_start' => '<h2 class="page-header">',
 						'block_title_end'   => '</h2>',
 					) );
 				// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
 			?>
-			</div>
-		</div><!-- .col -->
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
-			<div class="evo_container evo_container__footer">
 			<?php
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				// Display container and contents:
-				skin_container( NT_('Footer'), array(
+				widget_container( 'footer', array(
 						// The following params will be used as defaults for widgets included in this container:
-						'block_start'         => '<span class="evo_widget $wi_class$">',
-						'block_end'           => '</span> ',
-						'block_display_title' => false,
-						'list_start'          => '',
-						'list_end'            => '',
-						'item_start'          => '',
-						'item_end'            => '',
-						'item_selected_start' => '',
-						'item_selected_end'   => '',
-						'link_default_class'  => 'btn btn-default btn-sm',
-						'link_selected_class' => 'btn btn-default btn-sm active',
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
-			</div>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -322,20 +310,10 @@ if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
 
 </section><!-- .secondary_area -->
 
-<script>
-// Scroll Down to content
-// ======================================================================== /	
-$slide_down = $( "#slide_button" );
-// Smooth scroll to top
-$slide_down.on( "click", function(event) {
-	event.preventDefault();
-	$( "body, html, #skin_wrapper" ).animate({
-		scrollTop: $("#slide_destination").offset().top +26
-	}, 1000);
-});
-</script>
-
 <?php
+// Init JS to scroll down to content:
+$Skin->require_js_defer( 'slidedown.init.js', true );
+
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------
 // If site footers are enabled, they will be included here:
 siteskin_include( '_site_body_footer.inc.php' );

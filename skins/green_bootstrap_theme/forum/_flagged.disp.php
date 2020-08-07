@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums_skin
@@ -22,22 +22,28 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'suffix_text'      => T_('Flagged topics'),
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'suffix_text'           => T_('Flagged topics'),
+		'coll_logo_size'        => 'fit-128x16',
 	) );
 
 // ---------------------------------- START OF POSTS ------------------------------------
-?>
-<div class="panel panel-default forums_list">
-	<section class="table table-hover">
-<?php
+display_if_empty( array(
+	'msg_empty' => sprintf( T_("You haven't flagged any topic yet. You can click on the flag icon (%s) on any topic in order to save it here for later review."), get_icon( 'flag_off', 'imgtag' ) )
+) );
 
 if( $MainList->result_num_rows > 0 )
 {
+?>
+<div class="panel panel-default forums_list">
+	<section class="table table-hover">
+	<?php
 	while( mainlist_get_item() )
 	{ // For each blog post, do everything below up to the closing curly brace "}"
 
@@ -48,26 +54,13 @@ if( $MainList->result_num_rows > 0 )
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
-}
-?>
+	?>
 	</section>
 
-	<div class="panel-body comments_link__pagination">
 	<?php
-		// Buttons to post/reply
-		$Skin->display_post_button( 0 );
-		if( check_user_status( 'can_be_validated' ) )
-		{	// Display a warning if current user cannot post a topic because he must activate account:
-			global $Messages;
-			$Messages->clear();
-			$Messages->add( T_( 'You must activate your account before you can post a new topic.' )
-				.' <a href="'.get_activate_info_url( NULL, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>', 'warning' );
-			$Messages->display();
-		}
-
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( array(
-				'block_start'           => '<ul class="pagination">',
+				'block_start'           => '<div class="panel-body comments_link__pagination"><ul class="pagination">',
 				'block_end'             => '</ul></div>',
 				'page_current_template' => '<span>$page_num$</span>',
 				'page_item_before'      => '<li>',
@@ -79,8 +72,8 @@ if( $MainList->result_num_rows > 0 )
 			) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 	?>
-	</div>
 </div>
 <?php
 // ---------------------------------- END OF POSTS ------------------------------------
+}
 ?>

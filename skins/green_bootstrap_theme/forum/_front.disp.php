@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -20,6 +20,7 @@ global $number_of_posts_in_cat, $cat, $legend_icons, $Item;
 
 $params = array(
 		'item_class' => 'jumbotron evo_content_block evo_post',
+		'intro_mode' => 'normal', // Intro posts will be displayed in normal mode
 	);
 
 // Breadcrumbs
@@ -27,17 +28,74 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'coll_logo_size'        => 'fit-128x16',
 	) );
 
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
 	$legend_icons = array();
 }
+
+// ------------------------------- START OF POSTS ASSIGNED TO CURRENT USER -------------------------------
+if( $Blog->get_setting( 'use_workflow' ) &&
+    check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+{	// Only if current User can be assigned to tasks of the current Collection:
+	$assigned_ItemList = new ItemList2( $Blog, NULL, NULL, 15, 'ItemCache', 'assigned_' );
+	$assigned_ItemList->set_filters( array(
+			'assignees' => $current_User->ID,
+			'orderby'   => 'priority,last_touched_ts',
+			'order'     => 'ASC,DESC',
+			'page'      => param( 'assigned_paged', 'integer', 1 ),
+			'statuses'  => param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' ),
+		), false );
+	$assigned_ItemList->query();
+?>
+<div class="panel panel-default forums_list">
+<?php
+	// Display header for list of assigned tasks for current User:
+	$Skin->display_posts_list_header( T_('Assigned to me') );
+
+	if( $assigned_ItemList->result_num_rows > 0 )
+	{	// Display panel with assigned posts if at least one is found:
+		while( $Item = $assigned_ItemList->get_item() )
+		{
+			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+			skin_include( '_item_list.inc.php', array(
+					'content_mode'  => 'auto', // 'auto' will auto select depending on $disp-detail
+					'image_size'    => 'fit-1280x720',
+				) );
+			// ----------------------------END ITEM BLOCK  ----------------------------
+		}
+
+		// Display pagination for assigned posts:
+		$assigned_ItemList->page_links(  array(
+				'block_start'           => '<div class="panel-body comments_link__pagination" style="margin-bottom:0"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				'page_current_template' => '<span>$page_num$</span>',
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+			) );
+	}
+	else
+	{	// No assigned tasks:
+		echo '<div class="ft_no_post">'.T_('No assigned tasks.').'</div>';
+	}
+?>
+</div>
+<?php
+}
+// -------------------------------- END OF POSTS ASSIGNED TO CURRENT USER --------------------------------
 
 // ------------------------------- START OF INTRO-FRONT POST -------------------------------
 if( $Item = & get_featured_Item( 'front' ) )
@@ -57,7 +115,7 @@ if( $Item = & get_featured_Item( 'front' ) )
 	if( $Item->status != 'published' )
 	{
 		$Item->format_status( array(
-				'template' => '<div class="evo_status evo_status__$status$ badge pull-right">$status_title$</div>',
+				'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
 	}
 	$Item->title( array(
@@ -151,7 +209,7 @@ if( count( $chapters ) > 0 )
 				<?php printf( T_('%s topics'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_postcount_in_category( $Chapter->ID ).'</a></div>' ); ?>
 			</div>
 			<div class="ft_count second_of_class col-lg-1 col-md-1 col-sm-1 col-xs-2"><?php printf( T_('%s replies'), '<div><a href="'. $Chapter->get_permanent_url() .'">'.get_commentcount_in_category( $Chapter->ID ).'</a></div>' ); ?></div>
-			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().' '.locale_shorttimefmt() ); ?></div>
+			<div class="ft_date col-lg-2 col-md-3 col-sm-3"><?php echo $Chapter->get_last_touched_date( locale_extdatefmt().'<\b\r>'.locale_shorttimefmt() ); ?></div>
 			<!-- Apply this on XS size -->
 			<div class="ft_date_shrinked col-xs-2"><?php echo $Chapter->get_last_touched_date( locale_datefmt() ); ?></div>
 		</article>

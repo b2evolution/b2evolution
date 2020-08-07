@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_content_Widget extends ComponentWidget
 {
+	var $icon = 'file-text';
+
 	/**
 	 * Constructor
 	 */
@@ -62,7 +64,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Content');
+		return T_('Content');
 	}
 
 
@@ -98,8 +100,20 @@ class item_content_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
-				)
+				),
+				'info' => array(
+					'type' => 'info',
+					'label' => '',
+					'info' => T_('This widget will use the templates associated with the current Item Type.'),
+				),
 			), parent::get_param_definitions( $params ) );
+
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because item content may includes other items by inline tags like [inline:item-slug]:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
 
 		return $r;
 	}
@@ -134,64 +148,71 @@ class item_content_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
 		$this->init_display( $params );
 
+		// Prepare params to be transmitted to template:
 		$this->disp_params = array_merge( array(
 				'widget_item_content_params' => array(),
 			), $this->disp_params );
-
-		// Get the params to be transmitted to this widget:
-		if( isset($this->disp_params['widget_item_content_params']) )
-		{	// We have an array, with the new name:
-			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
-		}
-		else
-		{	// We have none, use an empty array:
-			$widget_item_content_params = array();
-		}
+		$widget_item_content_params = $this->disp_params['widget_item_content_params'];
 
 		// Now, for some skins (2015), merge in the OLD name:
 		if( isset($this->disp_params['widget_coll_item_content_params']) )
 		{	// The new correct stuff gets precedence over the old stuff:
 			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
-		}		
+		}
+
+		// Get content mode from current params or resolved auto content mode depending on current disp and collection settings:
+		$content_mode = ( isset( $widget_item_content_params['content_mode'] ) ? $widget_item_content_params['content_mode'] : 'auto' );
+		$content_mode = resolve_auto_content_mode( $content_mode );
+		switch( $content_mode )
+		{
+			case 'excerpt':
+				$template_code = $Item->get_type_setting( 'template_excerpt' );
+				break;
+			case 'normal':
+				$template_code = $Item->get_type_setting( 'template_normal' );
+				break;
+			case 'full':
+				$template_code = $Item->get_type_setting( 'template_full' );
+				break;
+			default:
+				$template_code = NULL;
+		}
+
+		$TemplateCache = & get_TemplateCache();
+		if( ! empty( $template_code ) &&
+		    ! ( $content_Template = & $TemplateCache->get_by_code( $template_code, false, false ) ) )
+		{	// Display error when no or wrong template for content display:
+			$this->display_error_message( sprintf( 'Template is not found: %s for content display!', '<code>'.$template_code.'</code>' ) );
+			return false;
+		}
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-		skin_include( '_item_content.inc.php', $widget_item_content_params );
-		// Note: You can customize the default item content by copying the generic
-		// /skins/_item_content.inc.php file into the current skin folder.
-		// -------------------------- END OF POST CONTENT -------------------------
+		if( ! empty( $content_Template ) )
+		{	// Render Item content by Easy Template:
+			echo render_template_code( $template_code, $widget_item_content_params );
+		}
+		else
+		{	// Use PHP Template to display content:
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			skin_include( '_item_content.inc.php', $widget_item_content_params );
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
+		}
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 
 		return true;
-	}
-
-
-	/**
-	 * Maybe be overriden by some widgets, depending on what THEY depend on..
-	 *
-	 * @return array of keys this widget depends on
-	 */
-	function get_cache_keys()
-	{
-		global $Collection, $Blog, $Item;
-
-		return array(
-				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
-				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Cache each item separately + Has the Item changed?
-				'item_page'    => isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1, // Cache each Item page separately
-			);
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -69,10 +69,6 @@ class FileRoot
 	 */
 	function __construct( $root_type, $root_in_type_ID, $create = true )
 	{
-		/**
-		 * @var User
-		 */
-		global $current_User;
 		global $Messages;
 		global $Settings, $Debuglog;
 		global $Collection, $Blog;
@@ -99,13 +95,13 @@ class FileRoot
 
 			case 'collection':
 				$BlogCache = & get_BlogCache();
-				if( ! ( $Collection = $Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
-				{	// Blog not found
+				if( ! ( $fileroot_Blog = & $BlogCache->get_by_ID( $root_in_type_ID, false, false ) ) )
+				{	// Collection not found
 					return false;
 				}
-				$this->name = $Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
-				$this->ads_path = $Blog->get_media_dir( $create );
-				$this->ads_url = $Blog->get_media_url();
+				$this->name = $fileroot_Blog->get( 'shortname' ); //.' ('. /* TRANS: short for "blog" */ T_('b').')';
+				$this->ads_path = $fileroot_Blog->get_media_dir( $create );
+				$this->ads_url = $fileroot_Blog->get_media_url();
 				return;
 
 			case 'shared':
@@ -133,13 +129,13 @@ class FileRoot
 				{
 					$this->name = T_('Shared');
 					$this->ads_path = $ads_shared_dir;
-					if( isset($Blog) )
-					{	// (for now) Let's make shared files appear as being part of the currently displayed blog:
-						$this->ads_url = $Blog->get_local_media_url().'shared/global/';
+					if( isset( $Blog ) && ! is_admin_page() )
+					{	// (for now) Let's make shared files appear as being part of the currently displayed collection:
+						$this->ads_url = $Blog->get_local_media_url().$rds_shared_subdir;
 					}
 					else
-					{
-						$this->ads_url = $media_url.'shared/global/';
+					{	// If back-office or current collection is not defined:
+						$this->ads_url = $media_url.$rds_shared_subdir;
 					}
 				}
 				return;
@@ -150,23 +146,33 @@ class FileRoot
 				{ // Skins root is disabled:
 					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
 				}
-				elseif( empty( $current_User ) || ( ! $current_User->check_perm( 'templates' ) ) )
-				{ // No perm to access templates:
-					$Debuglog->add( 'Attempt to access skins dir, but no permission', 'files' );
-				}
 				else
 				{
 					global $skins_path, $skins_url;
 					$this->name = T_('Skins');
 					$this->ads_path = $skins_path;
-					if( isset($Blog) )
-					{ // (for now) Let's make skin files appear as being part of the currently displayed blog:
+					if( isset( $Blog ) && ! is_admin_page() )
+					{	// (for now) Let's make skin files appear as being part of the currently displayed collection:
 						$this->ads_url = $Blog->get_local_skins_url();
 					}
 					else
-					{
+					{	// If back-office or current collection is not defined:
 						$this->ads_url = $skins_url;
 					}
+				}
+				return;
+
+			case 'siteskins':
+				if( ! $Settings->get( 'fm_enable_roots_skins' ) )
+				{	// Skins root is disabled:
+					$Debuglog->add( 'Attempt to access skins dir, but this feature is globally disabled', 'files' );
+				}
+				else
+				{
+					global $siteskins_path, $siteskins_url;
+					$this->name = T_('Site Skins');
+					$this->ads_path = $siteskins_path;
+					$this->ads_url = $siteskins_url;
 				}
 				return;
 
@@ -207,6 +213,28 @@ class FileRoot
 					$this->name = T_('Email campaigns');
 					$this->ads_path = $media_path.$rds_emailcampaign_subdir;
 					$this->ads_url = $media_url.$rds_emailcampaign_subdir;
+				}
+				return;
+
+			case 'plugins':
+				// Plugins dir
+				if( ! $Settings->get( 'fm_enable_roots_plugins' ) )
+				{	// Plugins root is disabled:
+					$Debuglog->add( 'Attempt to access plugins dir, but this feature is globally disabled', 'files' );
+				}
+				else
+				{
+					global $plugins_path, $plugins_url;
+					$this->name = T_('Plugins');
+					$this->ads_path = $plugins_path;
+					if( isset( $Blog ) && ! is_admin_page() )
+					{
+						$this->ads_url = $Blog->get_local_plugins_url();
+					}
+					else
+					{	// If back-office or current collection is not defined:
+						$this->ads_url = $plugins_url;
+					}
 				}
 				return;
 		}
@@ -250,6 +278,8 @@ class FileRoot
 			case 'shared':
 			case 'collection':
 			case 'skins':
+			case 'siteskins':
+			case 'plugins':
 			case 'import':
 			case 'emailcampaign':
 				return $root_type.'_'.$root_in_type_ID;

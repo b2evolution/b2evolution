@@ -1,0 +1,36 @@
+// Styles for jQuery plugin "Autocomplete for Textarea"
+// Note: bootstrap skins don't need these styles, because there is a better class "dropdown-menu" instead of "textcomplete-dropdown".
+
+.textcomplete-dropdown {
+	border: 1px solid #ddd;
+	background-color: #fff;
+	text-align: left;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	mark {
+		background: none;
+	}
+	li {
+		border-top: 1px solid #ddd;
+		padding: 2px 5px;
+		margin: 0;
+		&:first-child {
+			border-top: none;
+		}
+		a {
+			color: #000;
+		}
+		&:hover, &:hover a, &:hover mark,
+		&.active, &.active a, &.active mark {
+			color: #fff;
+			background-color: #3b5998;
+			text-decoration: none;
+			cursor: pointer;
+		}
+	}
+}
+
+.autocomplete_usernames {
+	display: block;
+}

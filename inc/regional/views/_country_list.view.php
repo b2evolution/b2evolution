@@ -13,11 +13,16 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $admin_url;
+
 load_class( 'regional/model/_currency.class.php', 'Currency' );
 load_funcs( 'regional/model/_regional.funcs.php' );
 
-// Get params from request
+// Get params from request:
 $s = param( 's', 'string', '', true );
+$status = param( 'status', 'string', '', true );
+$pref = param( 'pref', 'integer', 0, true );
 
 // Create query
 $SQL = new SQL();
@@ -29,7 +34,24 @@ $SQL->ORDER_BY( '*, ctry_code ASC' );
 if( !empty($s) )
 {	// We want to filter on search keyword:
 	// Note: we use CONCAT_WS (Concat With Separator) because CONCAT returns NULL if any arg is NULL
-	$SQL->WHERE( 'CONCAT_WS( " ", ctry_code, ctry_name, curr_code ) LIKE "%'.$DB->escape($s).'%"' );
+	$SQL->WHERE( 'CONCAT_WS( " ", ctry_code, ctry_name, curr_code ) LIKE '.$DB->quote( '%'.$s.'%' ) );
+}
+
+if( ! empty( $status ) )
+{	// Filter by status:
+	if( $status == 'unknown' )
+	{
+		$SQL->WHERE_and( 'ctry_status IS NULL' );
+	}
+	elseif( $status != -1 )
+	{
+		$SQL->WHERE_and( 'ctry_status = '.$DB->quote( $status ) );
+	}
+}
+
+if( $pref )
+{	// Filter by preferred countries:
+	$SQL->WHERE_and( 'ctry_preferred = 1' );
 }
 
 // Create result set:
@@ -101,13 +123,13 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Status'),
-		'td' => /* Check permission: */$current_User->check_perm( 'options', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'options', 'edit' ) ?
 			/* Current user can edit Country */'<a href="#" rel="$ctry_status$">%ctry_status_title( #ctry_status# )%</a>' :
 			/* No edit, only view the status */'%ctry_status_title( #ctry_status# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'country_status_edit',
+		'td_class' => 'jeditable_cell country_status_edit',
 		'order' => 'ctry_status',
-		'extra' => array ( 'id' => '#ctry_ID#', 'style' => 'background-color: %ctry_status_color( "#ctry_status#" )%;', 'format_to_output' => false )
+		'extra' => array ( 'id' => '#ctry_ID#', 'style' => 'background-color: %ctry_status_color( "#ctry_status#" )%; min-width: 10.5em;', 'format_to_output' => false )
 	);
 
 if( $ctrl == 'antispam' )
@@ -127,15 +149,25 @@ if( $ctrl == 'antispam' )
  */
 function filter_countries( & $Form )
 {
-	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
+	$Form->text( 's', get_param( 's' ), 30, T_('Search'), '', 255 );
+
+	$status_titles = array( '-1' => T_('All') ) + ctry_status_titles( true, 'unknown' );
+	$Form->select_input_array( 'status', get_param( 'status' ), $status_titles, T_('Status'), '', array( 'force_keys_as_values' => true ) );
+
+	$Form->checkbox( 'pref', get_param( 'pref' ), T_('Preferred only') );
 }
 
 $Results->filter_area = array(
 	'callback' => 'filter_countries',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=countries' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all'      , T_('All'), $admin_url.'?ctrl=countries' );
+$Results->register_filter_preset( 'unknown'  , T_('Unknown'), $admin_url.'?ctrl=countries&amp;status=unknown' );
+$Results->register_filter_preset( 'trusted'  , T_('Trusted'), $admin_url.'?ctrl=countries&amp;status=trusted' );
+$Results->register_filter_preset( 'suspect'  , T_('Suspect'), $admin_url.'?ctrl=countries&amp;status=suspect' );
+$Results->register_filter_preset( 'blocked'  , T_('Blocked'), $admin_url.'?ctrl=countries&amp;status=blocked' );
+$Results->register_filter_preset( 'preferred', T_('Preferred'), $admin_url.'?ctrl=countries&amp;pref=1' );
+
 
 $Results->cols[] = array(
 						'th' => T_('Code'),
@@ -145,7 +177,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -224,7 +256,7 @@ function ctry_td_actions($ctry_enabled, $ctry_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -238,7 +270,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 $Results->display();
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // Check permission to edit Country:
 	// Print JS to edit a country status
 	echo_editable_column_js( array(

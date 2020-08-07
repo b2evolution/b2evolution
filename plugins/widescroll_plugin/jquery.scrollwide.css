@@ -7,6 +7,7 @@ div.wide_scroll {
 .wscontrol {
 	border: 1px solid #999;
 	background: #FFFFCC url(arrows.png) repeat-y 5px 10px;
+	box-shadow: -1px 0 3px 0 rgba(0, 0, 0, 0.3);
 	text-align: center;
 	cursor: pointer;
 }
@@ -18,4 +19,5 @@ div.wide_scroll {
 }
 .wscontrol.wsleft {
 	background-position: -12px 10px;
+	box-shadow: 1px 0 3px 0 rgba(0, 0, 0, 0.3);
 }

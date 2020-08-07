@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_longdesc_Widget extends ComponentWidget
 {
+	var $icon = 'file-text-o';
+
 	/**
 	 * Constructor
 	 */
@@ -50,7 +52,7 @@ class coll_longdesc_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Long Description of this Collection');
+		return T_('Long description');
 	}
 
 

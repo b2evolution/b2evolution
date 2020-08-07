@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/license.html}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
@@ -18,7 +18,7 @@ load_class( 'central_antispam/model/_keyword.class.php', 'CaKeyword' );
 load_class( 'central_antispam/model/_source.class.php', 'CaSource' );
 
 // Check permission:
-$current_User->check_perm( 'centralantispam', 'view', true );
+check_user_perm( 'centralantispam', 'view', true );
 
 param_action( '', true );
 param( 'tab', 'string', 'keywords', true );
@@ -33,7 +33,7 @@ switch( $tab )
 			{
 				unset( $edited_CaKeyword );
 				forget_param( 'cakw_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Keyword') ), 'error' );
+				$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Keyword') ), 'error' );
 				$action = 'nil';
 			}
 		}
@@ -47,7 +47,7 @@ switch( $tab )
 			{
 				unset( $edited_CaSource );
 				forget_param( 'casrc_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Reporter') ), 'error' );
+				$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Reporter') ), 'error' );
 				$action = 'nil';
 			}
 		}
@@ -57,6 +57,84 @@ switch( $tab )
 
 switch( $action )
 {
+	case 'keyword_new':
+		// Check permission:
+		check_user_perm( 'centralantispam', 'create', true );
+
+		if( ! isset( $edited_CaKeyword ) )
+		{ // We don't have a model to use, start with blank object:
+			$edited_CaKeyword = new CaKeyword();
+			$edited_CaKeyword->set( 'status', 'published' );
+		}
+		break;
+
+	case 'keyword_create':
+		$edited_CaKeyword = new CaKeyword();
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'cakeyword' );
+
+		// Check permission:
+		check_user_perm( 'centralantispam', 'edit', true );
+
+		// load data from request
+		if( $edited_CaKeyword->load_from_Request() )
+		{	// We could load data from form without errors:
+
+			$DB->begin();
+
+			$duplicated_keyword_ID = $edited_CaKeyword->dbexists( 'cakw_keyword', $edited_CaKeyword->keyword );
+			if( $duplicated_keyword_ID && $duplicated_keyword_ID != $edited_CaKeyword->ID )
+			{ // We have a duplicate entry:
+				param_error( 'cakw_keyword',
+					sprintf( TB_('This keyword already exists. Do you want to <a %s>edit the existing keyword</a>?'),
+						'href="?ctrl=central_antispam&amp;tab=keywords&amp;action=keyword_edit&amp;cakw_ID='.$duplicated_keyword_ID.'"' ) );
+				$action = 'keyword_new';
+			}
+			else
+			{
+				$edited_CaKeyword->set( 'lastreport_ts', $edited_CaKeyword->get( 'statuschange_ts' ) );
+				$edited_CaKeyword->dbinsert();
+
+				// Check if the Reporter/Source already exists in DB
+				$source_SQL = new SQL( 'Get source of current baseurl for central antispam' );
+				$source_SQL->SELECT( 'casrc_ID, casrc_status' );
+				$source_SQL->FROM( 'T_centralantispam__source' );
+				$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
+				$source_row = $DB->get_row( $source_SQL, ARRAY_A );
+				$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
+
+				if( empty( $source_ID ) )
+				{	// Create new reporter if it doesn't exist in DB yet:
+					$DB->query( 'INSERT INTO T_centralantispam__source
+							( casrc_baseurl, casrc_status ) VALUES
+							( '.$DB->quote( $baseurl ).', "trusted" )' );
+					$source_ID = $DB->insert_id;
+				}
+				elseif( $source_row['casrc_status'] != 'trusted' )
+				{	// Make current baseurl as trusted source:
+					$DB->query( 'UPDATE T_centralantispam__source
+						SET   casrc_status = "trusted"
+						WHERE casrc_ID = '.$source_ID );
+				}
+
+				// Insert reports to know from what host new keyword was added:
+				$DB->query( 'INSERT INTO T_centralantispam__report ( carpt_cakw_ID, carpt_casrc_ID, carpt_ts )
+						VALUES ( '.$edited_CaKeyword->ID.', '.$source_ID.', '.$DB->quote( $edited_CaKeyword->get( 'statuschange_ts' ) ).' )' );
+
+				$Messages->add( TB_('New keyword added.'), 'success' );
+			}
+
+			$DB->commit();
+
+			if( ! param_errors_detected() )
+			{
+				header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
+				break;
+			}
+		}
+		break;
+
 	case 'keyword_save':
 		// Update keyword record:
 
@@ -64,14 +142,24 @@ switch( $action )
 		$Session->assert_received_crumb( 'cakeyword' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		// load data from request
 		if( $edited_CaKeyword->load_from_Request() )
 		{	// We could load data from form without errors:
-			$edited_CaKeyword->dbupdate();
-			$Messages->add( T_('The keyword has been saved.'), 'success' );
-			header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
+			$duplicated_keyword_ID = $edited_CaKeyword->dbexists( 'cakw_keyword', $edited_CaKeyword->keyword );
+			if( $duplicated_keyword_ID && $duplicated_keyword_ID != $edited_CaKeyword->ID )
+			{ // We have a duplicate entry:
+				param_error( 'cakw_keyword',
+					sprintf( TB_('This keyword already exists. Do you want to <a %s>edit the existing keyword</a>?'),
+						'href="?ctrl=central_antispam&amp;tab=keywords&amp;action=keyword_edit&amp;cakw_ID='.$duplicated_keyword_ID.'"' ) );
+			}
+			else
+			{
+				$edited_CaKeyword->dbupdate();
+				$Messages->add( TB_('The keyword has been saved.'), 'success' );
+				header_redirect( $admin_url.'?ctrl=central_antispam&tab=keywords', 303 );
+			}
 		}
 		$action = 'keyword_edit';
 		break;
@@ -83,13 +171,13 @@ switch( $action )
 		$Session->assert_received_crumb( 'casource' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		// Load data from request:
 		if( $edited_CaSource->load_from_Request() )
 		{	// We could load data from form without errors:
 			$edited_CaSource->dbupdate();
-			$Messages->add( T_('The source has been saved.'), 'success' );
+			$Messages->add( TB_('The source has been saved.'), 'success' );
 			header_redirect( $admin_url.'?ctrl=central_antispam&tab=reporters', 303 );
 		}
 		$action = 'source_edit';
@@ -105,13 +193,13 @@ switch( $action )
 		$Session->assert_received_crumb( 'cakeywordsimport' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		$import_keywords = param( 'import_keywords', 'array:string' );
 
 		if( empty( $import_keywords ) )
 		{	// No selected keywords to import:
-			$Messages->add( T_('Please select what keywords should be imported.'), 'error' );
+			$Messages->add( TB_('Please select keywords to import.'), 'error' );
 			$action = 'import';
 			break;
 		}
@@ -120,7 +208,7 @@ switch( $action )
 		$keyword_dates = array();
 		foreach( $import_keywords as $keyword_source )
 		{
-			param_date( 'date_start_'.$keyword_source, T_('Invalid date'), true );
+			param_date( 'date_start_'.$keyword_source, TB_('Invalid date'), true );
 			param_time( 'time_start_'.$keyword_source );
 			$keyword_dates[ $keyword_source ] = strtotime( form_date( get_param( 'date_start_'.$keyword_source ), get_param( 'time_start_'.$keyword_source ) ) );
 		}
@@ -137,7 +225,7 @@ switch( $action )
 		$keywords_SQL->FROM( 'T_antispam__keyword' );
 		$keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
 		$keywords_SQL->WHERE_and( 'askw_source IN( '.$DB->quote( $import_keywords ).' )' );
-		$new_keywords = $DB->get_results( $keywords_SQL->get(), ARRAY_A, $keywords_SQL->title );
+		$new_keywords = $DB->get_results( $keywords_SQL, ARRAY_A );
 
 		$keywords_imported_count = array();
 		if( count( $new_keywords ) )
@@ -148,7 +236,7 @@ switch( $action )
 			$source_SQL->SELECT( 'casrc_ID, casrc_status' );
 			$source_SQL->FROM( 'T_centralantispam__source' );
 			$source_SQL->WHERE( 'casrc_baseurl = '.$DB->quote( $baseurl ) );
-			$source_row = $DB->get_row( $source_SQL->get(), ARRAY_A, NULL, $source_SQL->title );
+			$source_row = $DB->get_row( $source_SQL, ARRAY_A );
 			$source_ID = empty( $source_row ) ? 0 : intval( $source_row['casrc_ID'] );
 
 			if( empty( $source_ID ) )
@@ -201,7 +289,7 @@ switch( $action )
 
 		foreach( $keywords_imported_count as $keywords_source => $keywords_count )
 		{
-			$Messages->add( sprintf( T_('%d new keywords have been imported as "%s" reports.'), $keywords_count, $keywords_source ), 'success' );
+			$Messages->add( sprintf( TB_('%d new keywords have been imported as "%s" reports.'), $keywords_count, $keywords_source ), 'success' );
 		}
 
 		$DB->commit();
@@ -213,30 +301,30 @@ switch( $action )
 $AdminUI->set_path( 'central_antispam', $tab );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Central Antispam'), $admin_url.'?ctrl=central_antispam' );
+$AdminUI->breadcrumbpath_add( TB_('Central Antispam'), $admin_url.'?ctrl=central_antispam' );
 switch( $tab )
 {
 	case 'keywords':
-		$AdminUI->breadcrumbpath_add( T_('Keywords'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Keywords'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
 		if( $action == 'import' )
 		{
-			$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
+			$AdminUI->breadcrumbpath_add( TB_('Import'), $admin_url.'?ctrl=central_antispam&amp;action='.$action );
 			// Initialize date picker:
 			init_datepicker_js();
 		}
-		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
+		if( empty( $action ) && check_user_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
-			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( '#jquery#', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 
 	case 'reporters':
-		$AdminUI->breadcrumbpath_add( T_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
-		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
+		$AdminUI->breadcrumbpath_add( TB_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
+		if( empty( $action ) && check_user_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit source status from list:
-			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( '#jquery#', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 }
@@ -251,6 +339,10 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 switch( $action )
 {
+	case 'keyword_new':
+		$AdminUI->disp_view( 'central_antispam/views/_keywords.form.php' );
+		break;
+
 	case 'keyword_edit':
 		$AdminUI->disp_view( 'central_antispam/views/_keywords.form.php' );
 		break;

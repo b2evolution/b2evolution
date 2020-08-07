@@ -17,7 +17,7 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '6.7.9';
+	var $version = '7.3.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -85,6 +85,20 @@ It will also perform the following replacements:
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		// set params to allow rendering for shared container widgets by default:
+		$default_params = array_merge( $params, array( 'default_shared_rendering' => 'stealth' ) );
+		return parent::get_shared_setting_definitions( $default_params );
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @param array Associative array of parameters
@@ -111,9 +125,9 @@ It will also perform the following replacements:
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff
 		for ($i = 0; $i < $stop; $i++) {
-			$curl = $textarr[$i];
+			$curl = strval( $textarr[$i] );
 
-			if (strlen($curl) && '<' != $curl{0} && $next) { // If it's not a tag
+			if (strlen($curl) && '<' != $curl[0] && $next) { // If it's not a tag
 				$curl = str_replace('---', '&#8212;', $curl);
 				$curl = str_replace('--', '&#8211;', $curl);
 				$curl = str_replace("...", '&#8230;', $curl);
@@ -141,7 +155,7 @@ It will also perform the following replacements:
 
 				$curl = preg_replace('/(d+)x(\d+)/', "$1&#215;$2", $curl);
 
-			} elseif (strstr($curl, '<code') || strstr($curl, '<pre') || strstr($curl, '<kbd' || strstr($curl, '<style') || strstr($curl, '<script'))) {
+			} elseif( strstr( $curl, '<code' ) || strstr( $curl, '<pre' ) || strstr( $curl, '<kbd' ) || strstr( $curl, '<style' ) || strstr( $curl, '<script' ) ) {
 				// strstr is fast
 				$next = false;
 			} else {

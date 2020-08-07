@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -22,10 +22,6 @@ global $fm_Filelist;
  * @var string
  */
 global $fm_flatmode;
-/**
- * @var User
- */
-global $current_User;
 /**
  * @var GeneralSettings
  */
@@ -46,6 +42,8 @@ global $edited_User;
 
 global $blog;
 
+global $show_existing_attachments_tab;
+
 if( isset( $edited_User ) )
 {	// Display a help notice for setting a new avatar:
 	printf( '<div>'.T_( 'Click on a link %s icon below to select the image to use as your profile picture.' )
@@ -58,43 +56,41 @@ if( isset( $edited_User ) )
 <?php
 	$Widget = new Widget( 'file_browser' );
 
-	if( ! $ajax_request && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-	{
-		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload...'), '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
-	}
-
 	$close_link_params = array();
 	if( $ajax_request )
-	{ // Initialize JavaScript functions to work with modal window:
+	{	// Initialize JavaScript functions to work with modal window:
 		echo_modalwindow_js();
 		$close_link_params['onclick'] = 'return closeModalWindow( window.parent.document )';
 	}
 
 	global $mode, $AdminUI;
 
-	if( $mode != 'upload' || ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
-	{ // Don't display a close icon, because it is already displayed on bootstrap modal window header
+	if( ! isset( $AdminUI->skin_name ) || $AdminUI->skin_name != 'bootstrap' )
+	{	// Don't display a close icon, because it is already displayed on bootstrap modal window header:
 		if( ! empty( $LinkOwner ) )
-		{ // Get an url to return to owner(post/comment) editing
+		{	// Get an url to return to owner(post/comment) editing
 			$icon_close_url = $LinkOwner->get_edit_url();
 		}
 		elseif( $mode == 'import' )
-		{ // Get an url to return to WordPress Import page
+		{	// Get an url to return to WordPress Import page
 			global $admin_url;
 			$icon_close_url = $admin_url.'?ctrl=wpimportxml';
 		}
 		else
-		{ // Unknown case, leave empty url
+		{	// Unknown case, leave empty url
 			$icon_close_url = '';
 		}
 
 		if( ! empty( $icon_close_url ) || ! empty( $close_link_params ) )
-		{ // Display a link to close file browser
+		{	// Display a link to close file browser
 			$Widget->global_icon( T_('Close file manager'), 'close', $icon_close_url, '', 3, 2, $close_link_params );
 		}
 	}
 
-	$Widget->title = T_('File browser').get_manual_link('file_browser');
+	if( empty( $show_existing_attachments_tab ) )
+	{
+		$Widget->title = T_('File browser').get_manual_link('file-browser');
+	}
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
@@ -108,9 +104,7 @@ if( isset( $edited_User ) )
 					// Title for checkbox and its label
 					$titleRegExp = format_to_output( T_('Filter is a regular expression'), 'formvalue' );
 
-					echo '<div class="toolbaritem">';
-
-					$Form = new Form( NULL, 'fmbar_filter_checkchanges', 'get', 'none' );
+					$Form = new Form( NULL, 'fmbar_filter_checkchanges', 'post', 'none' );
 					$Form->begin_form();
 					$Form->hidden_ctrl();
 					$Form->hiddens_by_key( get_memorized(), array('fm_filter', 'fm_filter_regex') );
@@ -133,21 +127,23 @@ if( isset( $edited_User ) )
 						}
 					?>
 
-					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-info btn-sm"
+					<input type="submit" name="actionArray[filter]" class="SmallButton btn btn-info btn-xs"
 						value="<?php echo format_to_output( T_('Apply'), 'formvalue' ) ?>" />
 
 					<?php
 					if( $fm_Filelist->is_filtering() )
 					{ // "reset filter" form
 						?>
-						<button type="submit" name="actionArray[filter_unset]" value="<?php echo T_('Unset filter'); ?>"
-							title="<?php echo T_('Unset filter'); ?>" class="ActionButton btn btn-warning btn-sm"><?php echo T_('Reset');?></button>
+						<button type="submit" name="actionArray[filter_unset]" value="<?php echo format_to_output( T_('Unset filter'), 'formvalue' ); ?>"
+							title="<?php echo T_('Unset filter'); ?>" class="ActionButton btn btn-warning btn-xs"><?php echo T_('Reset');?></button>
 						<?php
 					}
 				$Form->end_form();
-
-				echo '</div>';
 			}
+
+			// Settings:
+			echo '<a href="'.regenerate_url( '', 'action=edit_settings' ).'" class="file_browser_settings" title="'
+				.T_('Edit display settings').'">'.T_('Display settings').'</a>';
 			?>
 
 			<!-- ROOTS SELECT -->
@@ -160,7 +156,7 @@ if( isset( $edited_User ) )
 					$file_roots = array();
 					foreach( $rootlist as $l_FileRoot )
 					{	// Put all available file roots in grouped array:
-						if( ! $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+						if( ! check_user_perm( 'files', 'view', false, $l_FileRoot ) )
 						{	// Skip this file root, because current user has no permissions to view it:
 							continue;
 						}
@@ -198,7 +194,7 @@ if( isset( $edited_User ) )
 								}
 								$file_root_group_key = $file_root['type'];
 							}
-							if( ( $file_root_group_key == 'user' && $current_User->check_perm( 'users', 'moderate' ) && $current_User->check_perm( 'files', 'all' ) )
+							if( ( $file_root_group_key == 'user' && check_user_perm( 'users', 'moderate' ) && check_user_perm( 'files', 'all' ) )
 							    || $file_root_group_key == 'collection' )
 							{	// Selector for more collections or users:
 								echo '<li><a href="#" data-type="'.$file_root_group_key.'">'.T_('Other...').'</a></li>'."\n";
@@ -209,41 +205,6 @@ if( isset( $edited_User ) )
 					</div>
 					<?php
 				}
-
-				/*
-				 * Display link to display directory tree:
-				 */
-				if( $fm_hide_dirtree )
-				{
-					echo ' <a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=0').'">'.T_('Display directory tree').'</a>';
-				}
-				else
-				{
-					echo ' <a href="'.regenerate_url('fm_hide_dirtree', 'fm_hide_dirtree=1').'">'.T_('Hide directory tree').'</a>';
-				}
-
-				/*
-				 * Flat mode
-				 */
-				echo ' - ';
-				if( $fm_flatmode )
-				{
-					echo ' <a href="'.regenerate_url('fm_flatmode', 'fm_flatmode=0').'" title="'
-								.T_('View one folder per page').'">'.T_('Folder mode').'</a>';
-				}
-				else
-				{
-					echo ' <a href="'.regenerate_url('fm_flatmode', 'fm_flatmode=1').'" title="'
-								.T_('View all files and subfolders on a single page').'">'.T_('Flat mode').'</a>';
-				}
-
-				/*
-				 * Settings:
-				 */
-				echo ' - <a href="'.regenerate_url('', 'action=edit_settings').'" title="'
-								.T_('Edit display settings').'">'.T_('Display settings').'</a>';
-
-				echo '<br />';
 
 
 		// -----------------------------------------------
@@ -273,17 +234,8 @@ if( isset( $edited_User ) )
 			</a>
 		</span>
 
-		<?php
-		// Display number of directories/files:
-		?>
-
-		<div id="fmbar_filecounts" title="<?php printf( T_('%s bytes'), number_format($fm_Filelist->count_bytes()) ); ?>"> (<?php
-			disp_cond( $fm_Filelist->count_dirs(), T_('One directory'), T_('%d directories'), T_('No directories') );
-			echo ', ';
-			disp_cond( $fm_Filelist->count_files(), T_('One file'), T_('%d files'), T_('No files' ) );
-			echo ', '.bytesreadable( $fm_Filelist->count_bytes() );
-			?>
-			)
+		<div id="fmbar_filecounts" title="<?php printf( T_('%s bytes'), number_format( $fm_Filelist->count_bytes() ) ); ?>">
+			(<?php echo bytesreadable( $fm_Filelist->count_bytes() ); ?>)
 		</div>
 
 			</td>
@@ -298,9 +250,6 @@ if( isset( $edited_User ) )
 				{
 					echo '<td id="fm_dirtree">';
 
-					// Version with all roots displayed
-					//echo get_directory_tree( NULL, NULL, $ads_list_path );
-
 					// Version with only the current root displayed:
 					echo get_directory_tree( $fm_Filelist->_FileRoot, $fm_Filelist->_FileRoot->ads_path, $ads_list_path );
 
@@ -314,106 +263,49 @@ if( isset( $edited_User ) )
 				require dirname(__FILE__).'/_file_list.inc.php';
 
 
-				// ______________________________ Toolbar ______________________________
-				echo '<div class="fileman_toolbars_bottom">';
-
-				/*
-				 * CREATE FILE/FOLDER TOOLBAR:
-				 */
-				if( ($Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ))
-							&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-				{ // dir or file creation is enabled and we're allowed to add files:
-					global $create_type;
-
-					echo '<div class="toolbaritem">';
-					$Form = new Form( NULL, '', 'post', 'none' );
-					$Form->begin_form();
-						$Form->hidden( 'action', 'createnew' );
-						$Form->add_crumb( 'file' );
-						$Form->hidden_ctrl();
-						$Form->hiddens_by_key( get_memorized() );
-						if( ! $Settings->get( 'fm_enable_create_dir' ) )
-						{	// We can create files only:
-							echo '<label for="fm_createname" class="tooltitle">'.T_('New file:').'</label>';
-							echo '<input type="hidden" name="create_type" value="file" />';
-						}
-						elseif( ! $Settings->get( 'fm_enable_create_file' ) )
-						{	// We can create directories only:
-							echo '<label for="fm_createname" class="tooltitle">'.T_('New folder:').'</label>';
-							echo '<input type="hidden" name="create_type" value="dir" />';
-						}
-						else
-						{	// We can create both files and directories:
-							echo T_('New').': ';
-							echo '<select name="create_type" class="form-control">';
-							echo '<option value="dir"';
-							if( isset($create_type) &&  $create_type == 'dir' )
-							{
-								echo ' selected="selected"';
-							}
-							echo '>'.T_('folder').'</option>';
-
-							echo '<option value="file"';
-							if( isset($create_type) && $create_type == 'file' )
-							{
-								echo ' selected="selected"';
-							}
-							echo '>'.T_('file').'</option>';
-							echo '</select>:';
-						}
-					?>
-					<input type="text" name="create_name" id="fm_createname" value="<?php
-						if( isset( $create_name ) )
-						{
-							echo $create_name;
-						} ?>" size="15" class="form-control" />
-					<input class="ActionButton btn btn-default" type="submit" value="<?php echo format_to_output( T_('Create!'), 'formvalue' ) ?>" />
-					<?php
-					$Form->end_form();
-					echo '</div>';
-				}
-
-
-				/*
-				 * UPLOAD:
-				 */
-				if( $Settings->get('upload_enabled') && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-				{	// Upload is enabled and we have permission to use it...
-					echo "<!-- QUICK UPLOAD: -->\n";
-					echo '<div class="toolbaritem">';
-					$Form = new Form( NULL, '', 'post', 'none', 'multipart/form-data' );
-					$Form->begin_form();
-						$Form->add_crumb( 'file' );
-						$Form->hidden( 'ctrl', 'upload' );
-						$Form->hidden( 'upload_quickmode', 1 );
-						// The following is mainly a hint to the browser.
-						$Form->hidden( 'MAX_FILE_SIZE', $Settings->get( 'upload_maxkb' )*1024 );
-						$Form->hiddens_by_key( get_memorized('ctrl') );
-						echo '<div>';
-						echo '<span class="btn btn-default btn-file">';
-						echo T_('Choose File').'<input name="uploadfile[]" type="file" size="10" />';
-						echo '</span> ';
-						echo '<span>'.T_('No file selected').'</span> &nbsp; ';
-						echo '<input class="ActionButton btn btn-default" type="submit" value="&gt; '.T_('Quick upload!').'" />';
-						echo '</div>';
-					$Form->end_form();
-					echo '</div>';
-				}
-
-				echo '<div class="clear"></div>';
-				echo '</div>';
-
 				echo '</td>'
 			?>
 		</tr>
 	</tbody>
 </table>
-<script type="text/javascript">
+
+<div class="file_browser_footer">
+	<div class="pull-left">
+<?php
+// Hide/Display directory tree:
+if( $fm_hide_dirtree )
+{
+	echo ' <a href="'.regenerate_url( 'fm_hide_dirtree', 'fm_hide_dirtree=0' ).'">'
+		.T_('Display directory tree').'</a>';
+}
+else
+{
+	echo ' <a href="'.regenerate_url( 'fm_hide_dirtree', 'fm_hide_dirtree=1' ).'">'
+		.T_('Hide directory tree').'</a>';
+}
+
+// Flat/Folder mode:
+echo ' - ';
+if( $fm_flatmode )
+{
+	echo ' <a href="'.regenerate_url( 'fm_flatmode', 'fm_flatmode=0' ).'" title="'
+		.T_('View one folder per page' ).'">'.T_('Folder mode').'</a>';
+}
+else
+{
+	echo ' <a href="'.regenerate_url( 'fm_flatmode', 'fm_flatmode=1' ).'" title="'
+		.T_('View all files and subfolders on a single page').'">'.T_('Flat mode').'</a>';
+}
+?>
+	</div>
+<script>
 if( typeof file_uploader_note_text != 'undefined' )
 {
-	document.write( '<p class="note center">' + file_uploader_note_text + '</p>' );
+	document.write( '<div class="note pull-right">' + file_uploader_note_text + '</div>' );
 }
 </script>
+<div class="clearfix"></div>
+</div>
 <?php
 	$Widget->disp_template_raw( 'block_end' );
 
@@ -432,7 +324,7 @@ if( typeof file_uploader_note_text != 'undefined' )
 	$new_root_selector_html = preg_replace( '/<script.*?<\/script>/is', '', $new_root_selector_html );
 	$new_root_selector_html = format_to_js( $new_root_selector_html );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#new_root_selector a[data-type]' ).click( function()
@@ -441,7 +333,12 @@ jQuery( document ).ready( function()
 		var field_title = ( type == 'collection' ) ? '<?php echo TS_('Collection ID or short name') ?>' : '<?php echo TS_('Username'); ?>';
 		var window_title = ( type == 'collection' ) ? '<?php echo TS_('Select collection') ?>' : '<?php echo TS_('Select user'); ?>';
 
-		openModalWindow( '<?php echo $new_root_selector_html; ?>'.replace( '$field_title$', field_title ).replace( '$selector_type$', type ), 'auto', '', true, window_title, '', true );
+		var modalInputFocus = function()
+			{
+				jQuery( 'input#new_root_selector_field' ).focus();
+			};
+
+		openModalWindow( '<?php echo $new_root_selector_html; ?>'.replace( '$field_title$', field_title ).replace( '$selector_type$', type ), 'auto', '', true, window_title, '', true, undefined, undefined, modalInputFocus );
 
 		return false;
 	} );
@@ -455,8 +352,8 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections',
 			{
 				'per_page': 20,
-				'filter'  : 'all',
-				'restrict': 'available_fileroots',
+				'list_in_frontoffice' : 'all',
+				'restrict_to_available_fileroots': 1,
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},
@@ -485,8 +382,9 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'users',
 			{
 				'per_page': 20,
-				'restrict': 'available_fileroots',
+				'restrict_to_available_fileroots': 1,
 				'filter'  : 'new',
+				'list_params': { 'keywords_fields': 'user_login', 'order_by_login_length': 'D' },
 				'keywords': jQuery( '#new_root_selector_field' ).val()
 			},
 			function( data )

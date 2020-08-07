@@ -12,11 +12,11 @@ pre.codeblock {
   background-color: #F2F1F0;
   border: 1px solid #CCCCCC;
   border-radius: 2px 2px 2px 2px;
-  padding: 0 .5ex;
+  padding: 0 0.5ex;
 }
 pre.codeblock {
   overflow: auto;
-  padding: .5ex 2ex;
+  padding: 0.5ex 2ex;
 }
 pre.codeblock code {
   display: block;
@@ -39,7 +39,7 @@ div.codeblock pre {
 }
 p.codeblock_title,
 .bText p.codeblock_title {
-  font-family: Verdana, sans-serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
   letter-spacing: 0.1em;
   line-height: 95%;
   font-weight: bold;
@@ -52,8 +52,19 @@ div.codeblock > p {
 }
 div.videoblock {
   text-align: center;
-  margin: auto;
+  margin: 1ex auto;
   overflow: auto;
+  position: relative;
+  max-width: 100%;
+  height: 0;
+  padding-bottom: 56.25%;
+}
+div.videoblock iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 div.podplayer {
   margin: 1em 0;
@@ -64,6 +75,6 @@ div.podplayer {
 .bMore a {
   font-weight: bold;
 }
-span.NonExistentWikiWord {
-  border-bottom: 1px dotted #ccc;
+.evo_shortlink_broken {
+  border-bottom: 1px dotted #F00;
 }

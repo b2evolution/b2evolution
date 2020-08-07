@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -229,6 +229,21 @@ class Plugin
 
 
 	/**
+	 * If the plugin provides group settings, this will become the object to access them.
+	 *
+	 * This gets instantianted on Plugin registration for PHP4 and through
+	 * overloading in PHP5+, which means on first access.
+	 *
+	 * NOTE: its methods use {@link $current_User::$grp_ID} by default, but you may call it
+	 *       if there's no {@link $current_User} instantiated (yet).
+	 *
+	 * @see GetDefaultGroupSettings()
+	 * @var PluginGroupSettings
+	 */
+	var $GroupSettings;
+
+
+	/**
 	 * The status of the plugin.
 	 *
 	 * Use {@link set_status()} to change it, if you need to.
@@ -267,6 +282,22 @@ class Plugin
 	 * @var array
 	 */
 	var $template;
+
+	/**
+	 * Plugin actions
+	 * List of actions that the plugin supports
+	 *
+	 * @var array
+	 */
+	var $plugin_actions = array();
+
+	/**
+	 * Widget icon name.
+	 * Use icon name from http://fontawesome.io/icons/
+	 *
+	 * @var string
+	 */
+	var $widget_icon = 'puzzle-piece';
 
 	/**#@-*/
 
@@ -326,6 +357,17 @@ class Plugin
 
 
 	/**
+	 * Get param prefix with is used on edit forms and submit data
+	 *
+	 * @return string
+	 */
+	function get_param_prefix()
+	{
+		return 'edit_plugin_'.( empty( $this->ID ) ? '0' : $this->ID ).'_set_';
+	}
+
+
+	/**
 	 * Load template params from current skin
 	 */
 	function load_template()
@@ -372,6 +414,16 @@ class Plugin
 		else
 		{ // Merge default params with current skin params
 			$this->template = array_merge( $params, $skin_template );
+		}
+
+		if( ! empty( $this->template['toolbar_title_after'] ) )
+		{ // Add toolbar info icon after the title
+			$toolbar_params = array(
+					'tooltip_field' => 'name',
+					'tooltip_placement' => 'top',
+					'info_suffix_text' => '',
+					'icon_color' => 'gray' );
+			$this->template['toolbar_title_after'] = $this->get_help_link( '', 'info', true, $toolbar_params ).$this->template['toolbar_title_after'];
 		}
 	}
 
@@ -485,10 +537,15 @@ class Plugin
 	 *        'min_count': minimum count of sets (optional, default is no restriction)
 	 *	   'fileselect': opens a modal window to select file. The following can be set for this type:
 	 *        'root': default root
-	 *		  'path': default path
+	 *        'path': default path
 	 *        'thumbnail_size': thumbnail size
+	 *        'max_file_num': maximum number of files
+	 *        'initialize_with': initial value
+	 *     'input_group': a subset of settings arranged in a line, you must specify 'inputs' for it:
+	 *        'inputs': an array of setting parameters
 	 *     'info': a form info field with label and info text see {@link Form::info()}; you must set 'info' for text.
 	 *     'color': a form color picker field, use 'defaultvalue' in format '#FFFFFF'
+	 *     'usertag': an input field to enter user tags
 	 * 'note' (gets displayed as a note to the param field),
 	 * 'info': Text for param with type 'info'
 	 * 'size': Size of the HTML input field (applies to types 'text', 'password' and 'integer'; defaults to 15)
@@ -563,6 +620,32 @@ class Plugin
 	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
 	function GetDefaultUserSettings( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each group.
+	 *
+	 * You can access them in the plugin through the member object
+	 * {@link $GroupSettings}, e.g.:
+	 * <code>$this->GroupSettings->get( 'my_param' );</code>
+	 *
+	 * This method behaves exactly like {@link Plugin::GetDefaultSettings()},
+	 * except that it defines group specific settings instead of global settings.
+	 *
+	 * @todo 3.0 fp> 1) This is not an event: RENAME to lowercase (in b2evo 3.0)
+	 * @todo 3.0 fp> 2) This defines more than Default values ::  confusing name
+	 * @todo name tentative get_group_param_definitions()
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$GroupSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
 	{
 		return array();
 	}
@@ -732,6 +815,44 @@ class Plugin
 
 
 	/**
+	 * Define here default shared settings that are to be made available in the backoffice.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$UserSettings}.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_shared_setting_definitions( & $params )
+	{
+		if( $this->group != 'rendering' )
+		{
+			return $this->get_custom_setting_definitions( $params );
+		}
+
+		$render_note = '';
+		if( empty( $this->code ) )
+		{
+			$render_note .= T_('Note: The plugin code is empty, so this plugin will not work as an "opt-out", "opt-in" or "lazy" renderer.');
+		}
+		$admin_Plugins = & get_Plugins_admin();
+		$rendering_options = $admin_Plugins->get_apply_rendering_values( true );
+		$default_shared_rendering = ( isset( $params['default_shared_rendering'] ) && in_array( $params['default_shared_rendering'], $rendering_options ) ) ? $params['default_shared_rendering'] : 'never';
+		$r = array(
+			'shared_apply_rendering' => array(
+					'label' => T_('Apply rendering to shared container widgets'),
+					'type' => 'select',
+					'options' => $rendering_options,
+					'defaultvalue' => $default_shared_rendering,
+					'note' => $render_note,
+				),
+			);
+
+		return array_merge( $r, $this->get_custom_setting_definitions( $params ) );
+	}
+
+
+	/**
 	 * Get definitions for widget specific editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -788,7 +909,7 @@ class Plugin
 	 *
 	 * Each <b>class</b> of dependency can have the following types:
 	 *  - 'events_by_one': A list of eventlists that have to be provided by a single plugin,
-	 *                     e.g., <code>array( array('CaptchaPayload', 'CaptchaValidated') )</code>
+	 *                     e.g., <code>array( array('RequestCaptcha', 'ValidateCaptcha') )</code>
 	 *                     to look for a plugin that provides both events.
 	 *  - 'plugins':
 	 *    A list of plugins, either just the plugin's classname or an array with
@@ -929,11 +1050,12 @@ class Plugin
 
 
 	/**
-	 * Event handler: Gets invoked in /admin.php for every backoffice page after
+	 * Event handler: Gets invoked in /evoadm.php for every backoffice page after
 	 *                the menu structure is built. You could use the {@link $AdminUI} object
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
+	 * Remember to set adminUI_set_path() function to set the correct full selected path.
 	 */
 	function AdminAfterMenuInit()
 	{
@@ -973,6 +1095,8 @@ class Plugin
 	 * and return true, if button(s) have been displayed.
 	 *
 	 * You should provide an unique html ID with each button.
+	 * 
+	 * Be careful, this is used inside an output buffer in some places.
 	 *
 	 * @param array Associative array of parameters.
 	 *   - 'target_type': either 'Comment' or 'Item' or 'EmailCampaign'.
@@ -1554,6 +1678,10 @@ class Plugin
 	 *   - 'data': the data (by reference). You probably want to modify this.
 	 *   - 'format': see {@link format_to_output()}.
 	 *   - 'Item': The {@link Item} that gets displayed (by reference).
+	 *   - 'Comment': The {@link Comment} that gets displayed (by reference).
+	 *   - 'Message': The {@link Message} that gets displayed (by reference).
+	 *   - 'EmailCampaign': The {@link EmailCampaign} that gets displayed (by reference).
+	 *   - 'Widget': The {@link Widget} that gets displayed (by reference).
 	 *   - 'preview': Is this only a preview?
 	 *   - 'dispmore': Does this include the "more" text (if available), which means "full post"?
 	 *   - 'view_type': What part of a post are we displaying: 'teaser', 'extension' or 'full'
@@ -1684,6 +1812,18 @@ class Plugin
 	 *   - 'Item': the related Item (by reference)
 	 */
 	function AppendItemPreviewTransact( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the end of {@link Item::load_from_Request() loading
+	 * item/post fields from request}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function ItemLoadFromRequest( & $params )
 	{
 	}
 
@@ -1975,6 +2115,20 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the beginning of {@link Comment::dbupdate() updating
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentUpdateTransact( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: called at the end of {@link Comment::dbupdate() updating
 	 * a comment in the database}.
 	 *
@@ -1984,6 +2138,20 @@ class Plugin
 	 *                  before they got applied (since 1.9)
 	 */
 	function AfterCommentUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Comment::dbinsert() inserting
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentInsertTransact( & $params )
 	{
 	}
 
@@ -2047,11 +2215,10 @@ class Plugin
 	}
 
 	/**
-	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
+	 * Event handler: called to filter the comment's anonymous author name
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the name of the author/blog (by reference)
-	 *   - 'makelink': true, if the "data" contains a link
 	 *   - 'Comment': the {@link Comment} object
 	 */
 	function FilterCommentAuthor( & $params )
@@ -2213,6 +2380,21 @@ class Plugin
 		}
 	}
 
+
+	/**
+	 * Event handler: called at the beginning of {@link Message::dbinsert_discussion() or Message::dbinsert_message() inserting
+	 * an Message in the database}.
+	 *
+	 * Use this to manipulate the {@link Message}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Message': the related Message (by reference)
+	 */
+	function PrependMessageInsertTransact( & $params )
+	{
+	}
+
+
 	/**
 	 * Event handler: Called when rendering message contents as HTML. (CACHED)
 	 *
@@ -2317,6 +2499,35 @@ class Plugin
 			}
 		}
 	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbinsert() inserting
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailInsertTransact( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbupdate() updating
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailUpdateTransact( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
@@ -2585,6 +2796,27 @@ class Plugin
 
 	// }}}
 
+
+	// PluginGroupSettings {{{
+	/**
+	 * Event handler: Called before displaying or setting a plugin's group setting in the backoffice.
+	 *
+	 * @see GetDefaultGroupSettings()
+	 * @param array Associative array of parameters
+	 *   - 'name': name of the setting
+	 *   - 'value': value of the setting (by reference)
+	 *   - 'meta': meta data of the setting (as given in {@link GetDefaultGroupSettings()})
+	 *   - 'Group': the {@link Group} for which the setting is
+	 *   - 'action': 'display' or 'set'
+	 * @return string|NULL Return a string with an error to prevent the setting from being set
+	 *                     and/or a message added to the settings field.
+	 */
+	function PluginGroupSettingsValidateSet( & $params )
+	{
+	}
+
+	// }}}
+
 	// PluginCollSettings {{{
 	/**
 	 * Event handler: Called as action just before updating plugin's collection/blog settings.
@@ -2616,6 +2848,18 @@ class Plugin
 	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
 	 */
 	function PluginEmailSettingsUpdateAction()
+	{
+	}
+
+	// }}}
+
+	// PluginSharedSettings {{{
+	/**
+	 * Event handler: Called as action just before updating plugin's shared campaign settings.
+	 *
+	 * Use this to add notes/errors through {@link Plugin::msg()} or to process saved settings.
+	 */
+	function PluginSharedSettingsUpdateAction()
 	{
 	}
 
@@ -2952,65 +3196,54 @@ class Plugin
 	{
 	}
 
+
+	/**
+	 * Event handler: Called right after displaying the admin users list.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminAfterUsersList( & $params )
+	{
+		return false;		// Do nothing by default.
+	}
+
 	// }}}
 
 
 	// General events: {{{
 
 	/**
-	 * Event handler: general event to inject payload for a captcha test.
+	 * Event handler: Return data to display captcha html code
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the {@link form} where payload should get added (by reference, OPTIONALLY!)
-	 *     If it's not given as param, you have to create an own form, if you need one.
-	 *   - 'form_use_fieldset': if a "Form" param is given and we use it, should we add
-	 *                          an own fieldset? (boolean, default "true", OPTIONALLY!)
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 * @return boolean True, if you have provided payload for a captcha test
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
-	function CaptchaPayload( & $params )
+	function RequestCaptcha( & $params )
 	{
 	}
 
 
 	/**
 	 * Event handler: general event to validate a captcha which payload was added
-	 * through {@link CaptchaPayload()}.
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 *
-	 * NOTE: if the action is verified/completed in total, you HAVE to call
-	 *       {@link CaptchaValidatedCleanup()}, so that the plugin can cleanup its data
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
 	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
 	 * @param array Associative array of parameters
-	 *   - 'validate_error': you can optionally set this, if you want to give a reason
-	 *     of the failure. This is optionally and meant to be used by other plugins
-	 *     that trigger this event.
 	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
-	{
-	}
-
-
-	/**
-	 * Event handler: general event to be called after an action has been taken, which
-	 * involved {@link CaptchaPayload()} and {@link CaptchaValidated()}.
-	 *
-	 * This is meant to cleanup generated data for the Captcha test.
-	 *
-	 * This does not get called by b2evolution itself, but provides an interface
-	 * to other plugins. E.g., the {@link dnsbl_antispam_plugin DNS blacklist plugin}
-	 * uses this event optionally to whitelist a user.
-	 */
-	function CaptchaValidatedCleanup( & $params )
+	function ValidateCaptcha( & $params )
 	{
 	}
 
@@ -3151,6 +3384,22 @@ class Plugin
 	function AfterFileUpload( & $params )
 	{
 		return array(); // Do nothing by default:
+	}
+
+
+	/**
+	 * Event handler: Called to ask the plugin for authorization links to specified social networks providers.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'providers': array of names of social network providers.
+	 *   - 'links': array that will contain the links (by reference)
+	 *   - 'link_params': array of parameters for displaying the link
+	 *
+	 * @return string link to authorization
+	 */
+	function GetAuthLinksForSocialNetworks( & $params )
+	{
+		return false;
 	}
 
 
@@ -3314,7 +3563,7 @@ class Plugin
 	 * Get the URL to call a plugin method through http. This links to the /htsrv/call_plugin.php
 	 * file.
 	 *
-	 * It uses either {@link $htsrv_url} or {@link $htsrv_url_sensitive} (if {@link $ReqHost} is on https).
+	 * It uses either {@link $htsrv_url} or {@link https version of $htsrv_url} (if {@link $ReqHost} is on https).
 	 *
 	 * NOTE: AJAX callbacks are required to be on the same domain/protocol, so if you're using absolute
 	 *       blog URLs on different domains you must set {@link $htsrv_url} dynamically, to use the same domain!
@@ -3398,7 +3647,7 @@ class Plugin
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -3578,14 +3827,21 @@ class Plugin
 	 * @param boolean TRUE - to add info to display it in tooltip on mouseover
 	 * @return string The html A tag, linking to the help (or empty in case of $readme, if there is none).
 	 */
-	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true )
+	function get_help_link( $target = '', $icon = 'help', $use_tooltip = true, $params = array() )
 	{
 		static $target_counter = 0;
 		$title = '';
 		$word = '';
 		$link_attribs = array( 'target' => '_blank', 'id' => 'anchor_help_plugin_'.$this->ID.'_'.$target_counter++ );
+		$params = array_merge( array(
+				'tooltip_field'    => 'long_desc',
+				'tooltip_placement'=> 'right',
+				'info_suffix_text' => '<p><strong>'
+						.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
+						.'</strong></p>',
+				'icon_color'       => NULL,
+			), $params );
 
-		$info_suffix_text = '';
 		if( empty( $target ) || in_array( $target, array( '$help_url', '$apply_rendering', '$widget_url' ) ) )
 		{
 			if( $target == '$apply_rendering' )
@@ -3600,13 +3856,15 @@ class Plugin
 			if( $use_tooltip )
 			{ // Add these data only for tooltip
 				$link_attribs['class'] = 'action_icon help_plugin_icon';
-				$link_attribs['rel'] = format_to_output( $this->long_desc, 'htmlspecialchars' );
+				$tooltip_text = isset( $this->{$params['tooltip_field']} ) ? $this->{$params['tooltip_field']} : $this->long_desc;
+				$tooltip_text .= $params['info_suffix_text'];
+				$link_attribs['data-popover'] = format_to_output( $tooltip_text, 'htmlspecialchars' );
+				$link_attribs['data-placement'] = $params['tooltip_placement'];
+				if( isset( $params['icon_color'] ) )
+				{
+					$link_attribs['style'] = 'color: '.$params['icon_color'].';';
+				}
 			}
-
-			// Display additional info for help plugin icon only one time. It is used on plugins.js
-			$info_suffix_text = '<div id="help_plugin_info_suffix" style="display:none"><p><strong>'
-					.sprintf( T_('Click %s to access full documentation for this plugin'), get_icon( 'help' ) )
-				.'</strong></p></div>';
 		}
 		elseif( $target == '$readme' )
 		{ // README
@@ -3626,7 +3884,7 @@ class Plugin
 			debug_die( 'Invalid get_help_link() target: '.$target );
 		}
 
-		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs ).$info_suffix_text;
+		return action_icon( $title, $icon, $url, $word, 4, 1, $link_attribs );
 	}
 
 
@@ -3683,9 +3941,9 @@ class Plugin
 	 */
 	function get_help_file()
 	{
-		global $default_locale, $plugins_path, $current_User;
+		global $default_locale, $plugins_path;
 
-		if( empty( $current_User ) || !$current_User->check_perm( 'options', 'view', false ) )
+		if( ! check_user_perm( 'options', 'view' ) )
 		{ // README gets displayed through plugins controller, which requires these perms
 			// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
 			return false;
@@ -3739,9 +3997,9 @@ class Plugin
 	 */
 	function get_edit_settings_url()
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! $current_User->check_perm( 'options', 'edit', false ) )
+		if( ! check_user_perm( 'options', 'edit', false ) )
 		{
 			return false;
 		}
@@ -3751,13 +4009,33 @@ class Plugin
 
 
 	/**
+	 * Initialize Widget params
+	 *
+	 * @param array Custom params
+	 * @param array Default params
+	 */
+	function init_widget_params( $params, $default_params = array() )
+	{
+		if( ! isset( $this->widget_params ) )
+		{	// Don't initialize params twice:
+			$this->widget_params = array_merge( $default_params, $params );
+		}
+	}
+
+
+	/**
 	 * Get Widget setting
 	 * @param string Name of setting
-	 * @param array Array of params (like widget params)
+	 * @param array Array of params (like widget params), NULL - to use the initialized widget params, @see Plugin::init_widget_params()
 	 * @return mixed|null
 	 */
 	function get_widget_setting( $name = NULL, $params = NULL )
 	{
+		if( $params === NULL && isset( $this->widget_params ) )
+		{	// Use the initialized widget params by default:
+			$params = $this->widget_params;
+		}
+
 		if ( empty( $name ) || ! isset ( $params[$name] ) )
 		{
 			return NULL;
@@ -3765,6 +4043,82 @@ class Plugin
 		else
 		{
 			return $params[$name];
+		}
+	}
+
+
+	/**
+	 * Get widget icon
+	 *
+	 * @return string
+	 */
+	function get_widget_icon()
+	{
+		if( empty( $this->widget_icon ) )
+		{
+			return '';
+		}
+
+		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->widget_icon.'"></span></span>';
+	}
+
+
+	/**
+	 * Display widget title
+	 *
+	 * @param string Title, NULL to use title from widget param 'title'
+	 */
+	function display_widget_title( $widget_title = NULL )
+	{
+		if( $widget_title === NULL )
+		{	// Use title from widget param:
+			$widget_title = $this->get_widget_setting( 'title' );
+		}
+
+		if( ! empty( $widget_title ) )
+		{	// We want to display a title for the widget block:
+			echo $this->widget_params['block_title_start'];
+			echo $widget_title;
+			echo $this->widget_params['block_title_end'];
+		}
+	}
+
+
+	/**
+	 * Display widget debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_widget_debug_message( $message = NULL, $params = array() )
+	{
+		$this->init_widget_params( $params, array(
+				// This is what will enclose the block in the skin:
+				'block_start'       => '<div class="evo_widget widget $wi_class$">',
+				'block_end'         => "</div>\n",
+				// Title:
+				'block_title_start' => '<h4>',
+				'title'             => '',
+				'block_title_end'   => '</h4>',
+				// This is what will enclose the body:
+				'block_body_start'  => '',
+				'block_body_end'    => '',
+				// Widget debug mode: 'normal', 'designer'
+				'debug_mode'        => 'normal',
+			) );
+
+		if( isset( $this->widget_params['debug_mode'] ) && $this->widget_params['debug_mode'] == 'designer' )
+		{	// Display message on designer mode:
+			echo $this->widget_params['block_start'];
+			if( ! empty( $this->widget_params['title'] ) )
+			{	// Display title:
+				echo $this->widget_params['block_title_start'];
+				echo $this->widget_params['title'];
+				echo $this->widget_params['block_title_end'];
+			}
+			echo $this->widget_params['block_body_start'];
+			echo $message;
+			echo $this->widget_params['block_body_end'];
+			echo $this->widget_params['block_end'];
 		}
 	}
 
@@ -3807,6 +4161,18 @@ class Plugin
 					return $this->UserSettings;
 				}
 				break;
+
+			case 'GroupSettings':
+				if( $this->ID < 0 )
+				{
+					debug_die( 'Tried to access "GroupSettings" on a non-installed plugin. ('.$this->classname.'/'.$this->ID.')' );
+				}
+				$Plugins->instantiate_Settings( $this, 'GroupSettings' );
+				if( isset( $this->GroupSettings ) )
+				{
+					return $this->GroupSettings;
+				}
+				break;
 		}
 		$r = null;
 		return $r;
@@ -3817,14 +4183,62 @@ class Plugin
 	 */
 
 	/**
+	 * Get collection from given params
+	 *
+	 * @param array Params: 'Item', 'Comment', 'Blog'
+	 * @return object|false Collection object or FALSE with wrong params
+	 */
+	function & get_Blog_from_params( $params )
+	{
+		$setting_Blog = false;
+
+		if( $setting_Item = & $this->get_Item_from_params( $params ) )
+		{	// Get Collection from given Item or Comment:
+			$setting_Blog = & $setting_Item->get_Blog();
+		}
+		elseif( ! empty( $params['Blog'] ) )
+		{	// Get Collection from params:
+			$setting_Blog = & $params['Blog'];
+		}
+
+		return $setting_Blog;
+	}
+
+
+	/**
+	 * Get Item from given params
+	 *
+	 * @param array Params: 'Item', 'Comment'
+	 * @return object|false Item object or FALSE with wrong params
+	 */
+	function & get_Item_from_params( $params )
+	{
+		$setting_Item = false;
+
+		if( ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
+		{	// Use the passed Item:
+			$setting_Item = & $params['Item'];
+		}
+		elseif( ! empty( $params['Comment'] ) && $params['Comment'] instanceof Comment )
+		{	// Get Item from given Comment:
+			$Comment = & $params['Comment'];
+			$setting_Item = & $Comment->get_Item();
+		}
+
+		return $setting_Item;
+	}
+
+
+	/**
 	 * Get a skin specific param value from current Blog
 	 *
 	 * @param string Setting name
 	 * @param object Blog collection
 	 * @param boolean TRUE - to allow empty Blog, it is used to get default value when Blog is not defined, e.g. in case with Messages
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_coll_setting( $parname, & $Blog, $allow_null_blog = false )
+	function get_coll_setting( $parname, & $Blog, $allow_null_blog = false, $group = NULL )
 	{
 		if( empty( $Blog ) )
 		{ // Blog is not defined
@@ -3842,7 +4256,29 @@ class Plugin
 			// Name of the setting in the blog settings:
 			$blog_setting_name = 'plugin'.$this->ID.'_'.$parname;
 
-			$value = $Blog->get_setting( $blog_setting_name );
+			if( strpos( $blog_setting_name, '[' ) !== false )
+			{	// Get value for array setting like "sample_sets[0][group_name_param_name]":
+				$setting_names = explode( '[', $blog_setting_name );
+				$value = $Blog->get_setting( $setting_names[0] );
+				unset( $setting_names[0] );
+				foreach( $setting_names as $setting_name )
+				{
+					$setting_name = trim( $setting_name, ']' );
+					if( isset( $value[ $setting_name ] ) )
+					{
+						$value = $value[ $setting_name ];
+					}
+					else
+					{
+						$value = NULL;
+						break;
+					}
+				}
+			}
+			else
+			{	// Get normal(not array) setting value:
+				$value = $Blog->get_setting( $blog_setting_name );
+			}
 
 			if( ! is_null( $value ) )
 			{ // We have a value for this param:
@@ -3853,7 +4289,47 @@ class Plugin
 		}
 
 		// Try default values:
-		return $this->get_coll_default_setting( $parname, $blog_type );
+		return $this->get_coll_default_setting( $parname, $blog_type, $group );
+	}
+
+
+	/**
+	 * Get default value of plugin setting
+	 *
+	 * @param string Setting name
+	 * @param array Config array of plugin settings
+	 * @param string Input group name
+	 * @return mixed Default value
+	 */
+	function get_default_setting( $parname, $params, $group = NULL )
+	{
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['type'] ) && $params[$parname]['type'] == 'checklist' &&
+			    ! empty( $params[$parname]['options'] ) && is_array( $params[$parname]['options'] ) )
+			{	// Get default values for checklist:
+				$param_defaults = array();
+				foreach( $params[$parname]['options'] as $param_option )
+				{
+					$param_defaults[ $param_option[0] ] = $param_option[2];
+				}
+				return $param_defaults;
+			}
+			elseif( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'];
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
+		}
+
+		return NULL;
 	}
 
 
@@ -3862,18 +4338,15 @@ class Plugin
 	 *
 	 * @param string Setting name
 	 * @param string Blog type
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_coll_default_setting( $parname, $blog_type = 'std' )
+	function get_coll_default_setting( $parname, $blog_type = 'std', $group = NULL )
 	{
 		$tmp_params = array( 'for_editing' => true, 'blog_type' => $blog_type );
 		$params = $this->get_coll_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 
@@ -3932,13 +4405,44 @@ class Plugin
 		$Blog->delete_setting( $blog_setting_name );
 	}
 
+
+	/**
+	 * Get a specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		$value = $this->Settings->get( $parname );
+
+		if( $value !== NULL )
+		{ // We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->GetDefaultSettings( $tmp_params );
+
+		return $this->get_default_setting( $parname, $params, $group );
+	}
+
 	/**
 	 * Get a message specific param value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_msg_setting( $parname )
+	function get_msg_setting( $parname, $group = NULL )
 	{
 		if( empty( $this->Settings ) )
 		{
@@ -3957,26 +4461,32 @@ class Plugin
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
 		$params = $this->get_msg_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
-		}
 
-		return NULL;
+		return $this->get_default_setting( $parname, $params, $group );
 	}
 
 	/**
 	 * Get a email specific param value
 	 *
 	 * @param string Setting name
+	 * @param string Input group name
 	 * @return string Setting value
 	 */
-	function get_email_setting( $parname )
+	function get_email_setting( $parname, $group = NULL )
 	{
 		if( empty( $this->Settings ) )
 		{
 			global $Plugins;
 			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->get_email_setting_definitions( $tmp_params );
+
+		if( $parname == 'email_apply_rendering' && empty( $params ) )
+		{	// Empty params mean this plugin cannot be used for Email Campaign at all:
+			return 'never';
 		}
 
 		// Use prefix 'email_' for all message settings except of "email_apply_rendering":
@@ -3987,15 +4497,74 @@ class Plugin
 			return $value;
 		}
 
+		return $this->get_default_setting( $parname, $params, $group );
+	}
+
+	/**
+	 * Get a shared specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_shared_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		// Use prefix 'shared_' for all message settings except of "shared_apply_rendering":
+		$value = $this->Settings->get( $parname == 'shared_apply_rendering' ? $parname : 'shared_'.$parname );
+
+		if( ! is_null( $value ) )
+		{	// We have a value for this param:
+			return $value;
+		}
+
 		// Try default values:
 		$tmp_params = array( 'for_editing' => true );
-		$params = $this->get_email_setting_definitions( $tmp_params );
-		if( isset( $params[$parname]['defaultvalue'] ) )
-		{ // We have a default value:
-			return $params[$parname]['defaultvalue'] ;
+		$params = $this->get_shared_setting_definitions( $tmp_params );
+		if( $group === NULL )
+		{	// Get default value from sinple field:
+			if( isset( $params[$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$parname]['defaultvalue'] ;
+			}
+		}
+		else
+		{	// Get default value from input group field:
+			$parname = substr( $parname, strlen( $group ) );
+			if( isset( $params[$group]['inputs'][$parname]['defaultvalue'] ) )
+			{	// We have a default value:
+				return $params[$group]['inputs'][$parname]['defaultvalue'] ;
+			}
 		}
 
 		return NULL;
+	}
+
+
+	/**
+	 * Check if plugin is rendering to widget from shared container
+	 *
+	 * @return boolean
+	 */
+	function is_shared_widget( $params )
+	{
+		if( ! is_array( $params ) || ! isset( $params['Widget'] ) )
+		{	// This is a not request for widget rendering:
+			return false;
+		}
+
+		if( ( $plugin_WidgetContainer = & $params['Widget']->get_WidgetContainer() ) &&
+		    ( $plugin_WidgetContainer->get( 'coll_ID' ) == 0 ) )
+		{	// This is a request to render widget from shared container:
+			return true;
+		}
+
+		return false;
 	}
 
 
@@ -4033,6 +4602,18 @@ class Plugin
 
 
 	/**
+	 * This method checks if the plugin can process the requested action
+	 *
+	 * @param string Action
+	 * @return boolean TRUE if the plugin can process the action, otherwise FALSE
+	 */
+	function is_plugin_action( $action )
+	{
+		return in_array( $action, $this->plugin_actions );
+	}
+
+
+	/**
 	 * This method should return a string that used as suffix
 	 *   for the field 'From Country' on the user profile page in the BackOffice
 	 *
@@ -4061,17 +4642,110 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called when rendering inline tags in contents of Item, Comment, Message or Email Campaign.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'inline_tags' - Array of inline tags
+	 *   - 'Object' - Item, Comment, Message, EmailCampaign
+	 * @return array Rendered tags: Key - Original inline tag, Value - The rendered tag html
+	 */
+	function RenderInlineTags( & $params )
+	{
+	}
+
+
+	/**
+	 * This method initializes an array that used as additional tabs/forms
+	 *   for the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of current tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 * @return array Array:
+	 *   key - Index of additional tab/form, NOTE: indexes 'image', 'thumbnail', 'inline' are used by core
+	 *   value - Tab title
+	 */
+	function GetImageInlineTags( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * This method initializes params for form of additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'tag_type' - Active tag type
+	 *   - 'link_ID' - Link ID
+	 *   - 'short_tag' - Full code of short tag
+	 * @return array Array of parameters:
+	 *   - 'tag_type' - Overridden tag type
+	 *   - 'link_ID' - Overridden link ID
+	 */
+	function InitImageInlineTagForm( & $params )
+	{
+	}
+
+
+	/**
+	 * This method displays a form for additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of currently active tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 *   - 'display_tag' - Index of the plugin tag which should be displayed
+	 *   - 'Form' - Form object
+	 * @return boolean Did we display a form?
+	 */
+	function DisplayImageInlineTagForm( & $params )
+	{
+		return false;
+	}
+
+
+	/**
+	 * This method initializes JavaScript before submit/insert inline tag
+	 *   from the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 * @return string JavaScript code
+	 */
+	function GetInsertImageInlineTagJavaScript( & $params )
+	{
+	}
+
+
+	/**
 	 * Memorize that a specific css that file will be required by the current page.
 	 * @see require_css() for full documentation,
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of CSS file relative to current plugin folder
-	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
 	 */
-	function require_css( $css_file, $output = false )
+	function require_css( $css_file, $output = false, $position = 'headlines', $async = false )
 	{
 		global $app_version_long;
-		require_css( $this->get_plugin_url().$css_file, 'relative', NULL, NULL, $this->version.'+'.$app_version_long, $output );
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, $async );
+	}
+
+
+	/**
+	 * Require CSS file to load asynchronously
+	 * 
+	 * @param string Name of CSS file relative to current plugin folder
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_css_async( $css_file, $output = false, $position = 'headlines' )
+	{
+		global $app_version_long;
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, true );
 	}
 
 
@@ -4081,11 +4755,133 @@ class Plugin
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+	 *                'immediate' or FALSE to load javascript immediately
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js( $js_file )
+	function require_js( $js_file, $output = false, $async_defer = false, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'relative', false, false, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'absolute', $async_defer, $output, $this->version.'+'.$app_version_long, $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "async"
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_async( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, $output, 'async', $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, $output, 'defer', $position );
+	}
+
+
+	/**
+	 * Get value of setting with format "checklist" which values are stored as array
+	 *
+	 * @param string Group name
+	 * @param string Setting name
+	 * @param string Setting type: 'default', 'coll', 'msg', 'email', 'shared'
+	 * @return boolean
+	 */
+	function get_checklist_setting( $group_name, $setting_name, $setting_type = 'default', $object = NULL )
+	{
+		switch( $setting_type )
+		{
+			case 'coll':
+				$group_array = $this->get_coll_setting( $group_name, $object );
+				break;
+
+			case 'msg':
+				$group_array = $this->get_msg_setting( $group_name );
+				break;
+
+			case 'email':
+				$group_array = $this->get_email_setting( $group_name );
+				break;
+
+			case 'shared':
+				$group_array = $this->get_shared_setting( $group_name );
+				break;
+
+			default:
+				$group_array = $this->get_setting( $group_name );
+		}
+
+		return isset( $group_array[ $setting_name ] ) ? $group_array[ $setting_name ] : NULL;
+	}
+
+
+	/**
+	 * Event handler: Called for additional initialization of importer classes
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 */
+	function ImporterConstruct( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called to set Item field from Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'field_type' - Field type, e.g. 'yaml',
+	 *   - 'field_name' - Field name
+	 *   - 'field_data' - Field data
+	 */
+	function ImporterSetItemField( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called for additional updating Item after it was imported
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'data'     - Data of the Item from imported file,
+	 */
+	function ImporterAfterItemImport( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after Items were deleted in Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'             - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer'         - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'deleted_item_IDs' - IDs of deleted Items,
+	 */
+	function ImporterAfterItemsDelete( & $params )
+	{
 	}
 }
 

@@ -13,8 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
-
 // Get params from request
 $s = param( 's', 'string', '', true ); // Search keyword
 $c = param( 'c', 'integer', 0, true ); // Country
@@ -58,15 +56,13 @@ if( count( $sql_where ) > 0 )
 //echo $SQL->get();
 $Results = new Results( $SQL->get(), 'city_', '-----A' );
 
-$Results->title = T_('Cities').get_manual_link('countries_list');
+$Results->title = T_('Cities').get_manual_link('countries-list');
 
 /*
  * STATUS TD:
  */
 function city_td_enabled( $city_enabled, $city_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -86,8 +82,6 @@ function city_td_enabled( $city_enabled, $city_ID )
 
 function city_td_preferred( $city_preferred, $city_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -137,7 +131,7 @@ function filter_cities( & $Form )
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache( T_('All') );
 	$Form->select_country( 'c', get_param('c'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-	
+
 	$Form->select_input_options( 'r', get_regions_option_list( get_param('c'), get_param('r') ), T_('Region') );
 
 	$Form->select_input_options( 'sr', get_subregions_option_list( get_param('r'), get_param('sr') ), T_('Sub-region') );
@@ -147,13 +141,11 @@ function filter_cities( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_cities',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=cities' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=cities' );
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Country'),
@@ -201,7 +193,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$Results->cols[] = array(
 							'th' => T_('Name'),
@@ -224,13 +216,11 @@ else
  */
 function city_td_actions($city_enabled, $city_ID )
 {
-	global $dispatcher;
-
 	$r = '';
 
 	if( $city_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the city!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the city!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_city&amp;city_ID='.$city_ID.'&amp;'.url_crumb('city') ) );
 	}
 	else
@@ -247,7 +237,7 @@ function city_td_actions($city_enabled, $city_ID )
 
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -265,7 +255,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#c' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {

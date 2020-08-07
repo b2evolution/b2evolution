@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -127,6 +127,20 @@ class Group extends DataObject
 		return array(
 				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
 				array( 'table'=>'T_users__invitation_code', 'fk'=>'ivc_grp_ID', 'msg'=>T_('%d user invitation codes in this group') ),
+				array( 'table'=>'T_users__fielddefs', 'fk'=>'ufdf_grp_ID', 'msg'=>T_('%d user fields use this group') ),
+			);
+	}
+
+
+	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table' => 'T_plugingroupsettings', 'fk' => 'pgset_grp_ID', 'msg' => T_('%d group settings on plugins') ),
 			);
 	}
 
@@ -222,7 +236,7 @@ class Group extends DataObject
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates' || $name == 'perm_centralantispam'
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_centralantispam'
 				|| $name == 'cross_country_allow_profiles' || $name == 'cross_country_allow_contact' )
 			{ // These permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
@@ -250,7 +264,13 @@ class Group extends DataObject
 		$perm_allowed_sections = explode( ',', $GroupSettings->get( 'perm_allowed_sections', $this->ID ) );
 		if( ! in_array( $GroupSettings->get( 'perm_default_sec_ID', $this->ID ), $perm_allowed_sections ) )
 		{
-			param_error( 'edited_grp_perm_default_sec_ID', T_('Default kind must be in allowed kind of collections.') );
+			param_error( 'edited_grp_perm_default_sec_ID', T_('Default section must be in allowed section for new collections.') );
+		}
+
+		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' &&
+				$GroupSettings->get( 'perm_users', $this->ID ) != 'none' )
+		{	// Display warning when users permissions are not allowed because of not full access to back-office:
+			$Messages->add( T_('Permission to view other users will not work because users of this group have restricted back-office access.'), 'warning' );
 		}
 
 		return !param_errors_detected();
@@ -269,9 +289,6 @@ class Group extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'perm_templates':
-				return $this->set_param( $parname, 'number', $parvalue, $make_null );
-
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -330,7 +347,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'plugins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -440,6 +457,14 @@ class Group extends DataObject
 					$perm = false;
 				}
 
+				if( $perm && // Permission is allowed
+						in_array( $permname, array( 'perm_spamblacklist', 'perm_slugs', 'perm_emails', 'perm_maintenance' ) ) && // These permissions depend on permission "Settings"
+						! Module::check_perm( 'perm_options', 'view', $perm_target, 'group_func', $this ) ) // permission "Settings" == "No Access"
+				{	// Force permission to FALSE when group perm setting "Settings" == "No Access" for
+					// all depending permissions: "Antispam", "Slug manager", "Email management", "Maintenance"
+					$perm = false;
+				}
+
 				break;
 		}
 
@@ -462,6 +487,9 @@ class Group extends DataObject
 	 * @param string Permission name can be any from the blog advanced perm names. A few possible permname:
 	 *                  - blog_ismember
 	 *                  - blog_can_be_assignee
+	 *                  - blog_workflow_status
+	 *                  - blog_workflow_user
+	 *                  - blog_workflow_priority
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts
 	 *                  - blog_post_statuses
@@ -612,12 +640,12 @@ class Group extends DataObject
 			return false;
 		}
 
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{	// Allow to assing any group if current user has full access to edit users:
 			return true;
 		}
 
-		if( ! $current_User->check_perm( 'users', 'moderate' ) )
+		if( ! check_user_perm( 'users', 'moderate' ) )
 		{	// User must has a permission at least to modearate the users:
 			return false;
 		}

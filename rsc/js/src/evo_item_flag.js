@@ -33,7 +33,7 @@ jQuery( document ).on( 'click', 'a.evo_post_flag_btn', function()
 			jQuery( 'span', flag_link ).removeClass( 'fa-x--hover' );
 			// Pause progress status to avoid mouseover event right after updating:
 			setTimeout( function() { flag_link.removeData( 'status' ) }, 500 );
-		} );
+		}, 'PUT' );
 	}
 
 	return false;

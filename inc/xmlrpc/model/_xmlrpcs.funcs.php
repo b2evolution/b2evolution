@@ -104,7 +104,7 @@ function _wp_mw_newmediaobject($m)
 	}
 
 	// CHECK PERMISSION:
-	if( ! $current_User->check_perm( 'files', 'add', false, $Blog->ID ) )
+	if( ! check_user_perm( 'files', 'add', false, $Blog->ID ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -212,7 +212,8 @@ function _wp_mw_newmediaobject($m)
 			if( $correct_Filetype && $correct_Filetype->is_allowed() )
 			{	// A FileType with the given mime type exists in database and it is an allowed file type for current User
 				// The "correct" extension is a plausible one, proceed...
-				$correct_extension = array_shift($correct_Filetype->get_extensions());
+				$extensions = $correct_Filetype->get_extensions();
+				$correct_extension = array_shift( $extensions );
 				$path_info = pathinfo($filename);
 				$current_extension = $path_info['extension'];
 
@@ -364,7 +365,7 @@ function _wp_mw_get_item_struct( & $Item )
 	if( isset($Item->parent_ID) )
 	{
 		$ItemCache = & get_ItemCache();
-		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) );
+		if( $parent_Item = & $ItemCache->get_by_ID( $Item->parent_ID, false, false ) )
 		{
 			$parent_title = $parent_Item->title;
 		}
@@ -395,7 +396,7 @@ function _wp_mw_get_item_struct( & $Item )
 			'wp_author'					=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_page_parent_id'			=> new xmlrpcval( (isset($Item->parent_ID) ? $Item->parent_ID : 0), 'int' ),
 			'wp_page_parent_title'		=> new xmlrpcval( $parent_title ),
-			'wp_page_order'				=> new xmlrpcval( $Item->order ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
+			'wp_page_order'				=> new xmlrpcval( $Item->get_order() ), // We don't use 'int' here because b2evolution "order" is stored as double while WP uses integer values
 			'wp_author_id'				=> new xmlrpcval( $Item->creator_user_ID, 'string' ),
 			'wp_author_display_name'	=> new xmlrpcval( $Item->get('t_author') ),
 			'wp_post_format'			=> new xmlrpcval( $Item->ityp_ID ),
@@ -449,7 +450,7 @@ function _wp_or_blogger_getusersblogs( $type, $m )
 					'blogid' => new xmlrpcval( $l_blog_ID ),
 					'blogName' => new xmlrpcval( $l_Blog->get('shortname') ),
 					'url' => new xmlrpcval( $l_Blog->gen_blogurl() ),
-					'isAdmin' => new xmlrpcval( $current_User->check_perm( 'blog_admin', 'edit', false, $l_Blog->ID ), 'boolean') );
+					'isAdmin' => new xmlrpcval( check_user_perm( 'blog_admin', 'edit', false, $l_Blog->ID ), 'boolean') );
 		if ( $type == 'wp')
 		{
 			$item['xmlrpc'] = new xmlrpcval ( $xmlsrv_url.'xmlrpc.php' );
@@ -1155,6 +1156,13 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
 			'action' => & $action
 		) );
 
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'comment',
+		'Comment'    => & $Comment,
+		'is_preview' => ( $action == 'preview' ),
+	) );
+
 	if( $Messages->has_errors() )
 	{
 		return xmlrpcs_resperror( 5, $Messages->get_string( 'Cannot create comment, please correct these errors:'."\n", '', "  //  \n", 'xmlrpc' ) );
@@ -1218,7 +1226,7 @@ function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
 
 	$edited_Comment_Item = $edited_Comment->get_Item();
 	$edited_Comment_Item->load_Blog();
-	$perm_comment_edit = $current_User->check_perm( 'blog_comment!published', 'edit', false, $edited_Comment_Item->Blog->ID );
+	$perm_comment_edit = check_user_perm( 'blog_comment!published', 'edit', false, $edited_Comment_Item->Blog->ID );
 
 	// CHECK HTML SANITY:
 	// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
@@ -1348,7 +1356,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 	 * CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 	 * NOTE: extra_cat_IDs array now includes main_cat_ID too, so we are actually checking ALL categories below
 	 */
-	if( ! $current_User->check_perm( 'cats_post!'.$params['status'], 'edit', false, $params['extra_cat_IDs'] ) )
+	if( ! check_user_perm( 'cats_post!'.$params['status'], 'edit', false, $params['extra_cat_IDs'] ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}
@@ -1364,7 +1372,7 @@ function xmlrpcs_new_item( $params, & $Blog = NULL )
 		$ItemType = & $ItemTypeCache->get_by_ID( $params['item_typ_ID'], false, false );
 
 		// Check permission for this post type
-		if( $ItemType && ! $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', false, $params['extra_cat_IDs'] ) )
+		if( $ItemType && ! check_user_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', false, $params['extra_cat_IDs'] ) )
 		{ // Permission denied
 			return xmlrpcs_resperror( 3 );	// User error 3
 		}
@@ -1499,7 +1507,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 		 * CHECK PERMISSION: (we need perm on all categories, especially if they are in different blogs)
 		 * NOTE: extra_cat_IDs array now includes main_cat_ID too, so we are actually checking ALL categories below
 		 */
-		if( ! $current_User->check_perm( 'cats_post!'.$params['status'], 'edit', false, $params['extra_cat_IDs'] ) )
+		if( ! check_user_perm( 'cats_post!'.$params['status'], 'edit', false, $params['extra_cat_IDs'] ) )
 		{
 		}
 	}
@@ -1515,7 +1523,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 		$ItemType = & $ItemTypeCache->get_by_ID( $params['item_typ_ID'], false, false );
 
 		// Check permission for this post type
-		if( $ItemType && ! $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', false, $params['extra_cat_IDs'] ) )
+		if( $ItemType && ! check_user_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', false, $params['extra_cat_IDs'] ) )
 		{ // Permission denied
 			return xmlrpcs_resperror( 3 );	// User error 3
 		}
@@ -1561,7 +1569,7 @@ function xmlrpcs_edit_item( & $edited_Item, $params )
 	}
 	if( !is_null($params['order']) )
 	{
-		if( ! (empty($params['order']) && ! $edited_Item->order) )
+		if( ! (empty($params['order']) && ! $edited_Item->get_order()) )
 		{	// Do not allow 0 order if there was no order set before
 			$edited_Item->set('order', $params['order']);
 		}
@@ -1653,7 +1661,7 @@ function xmlrpcs_can_view_item( & $Item, & $current_User )
 		case 'protected':
 		case 'draft':
 		case 'deprecated':
-			$can_view_post = $current_User->check_perm( 'blog_ismember', 'view', false, $Item->get_blog_ID() );
+			$can_view_post = check_user_perm( 'blog_ismember', 'view', false, $Item->get_blog_ID() );
 			break;
 		case 'private':
 			$can_view_post = ( $Item->creator_user_ID == $current_User->ID );
@@ -1745,8 +1753,6 @@ function xmlrpcs_check_cats( & $maincat, & $Blog, & $extracats )
  */
 function xmlrpc_get_items( $params, & $Blog )
 {
-	global $current_User;
-
 	$params = array_merge( array(
 			'limit' => 0,
 			'item_ID' => 0,
@@ -1756,7 +1762,7 @@ function xmlrpc_get_items( $params, & $Blog )
 
 	// Protected and private get checked by statuses_where_clause().
 	$statuses = array( 'published', 'redirected', 'protected', 'private' );
-	if( $current_User->check_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_ismember', 'view', false, $Blog->ID ) )
 	{	// These statuses require member status:
 		$statuses = array_merge( $statuses, array( 'draft', 'deprecated' ) );
 	}
@@ -1820,14 +1826,14 @@ function xmlrpc_get_items( $params, & $Blog )
  */
 function xmlrpc_get_comments( $params, & $Blog )
 {
-	global $DB, $current_User;
+	global $DB;
 
 	$params = array_merge( array(
 			'limit'			=> 0,
 			'comment_ID'	=> 0,
 			'item_ID'		=> 0,
 			'statuses'		=> '',
-			'types'			=> array('comment', 'trackback', 'pingback'),
+			'types'			=> array( 'comment', 'trackback', 'pingback', 'webmention' ),
 		), $params );
 
 	$params['comment_ID'] = abs( intval($params['comment_ID']) );
@@ -1935,10 +1941,10 @@ function xmlrpc_get_comments( $params, & $Blog )
  */
 function xmlrpcs_delete_item( & $edited_Item )
 {
-	global $current_User, $DB;
+	global $DB;
 
 	// CHECK PERMISSION:
-	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+	if( ! check_user_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 	{	// Permission denied
 		return xmlrpcs_resperror( 3 );	// User error 3
 	}

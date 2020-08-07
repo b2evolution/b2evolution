@@ -5,7 +5,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -65,6 +65,29 @@ class Module
 
 
 	/**
+	 * Builds the user menu. This is the one with the configuration features
+	 *
+	 * @param array Parameters: 'user_ID', 'page_url', 'url_params', 'is_admin_page'
+	 * @return array Menus config
+	 */
+	function build_user_menu( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Get allowed user tabs
+	 *
+	 * @return array Array:
+	 *               Key - menu key,
+	 *               Value - 'backoffice' - if user tab can be displayed only on back-office, 'frontoffice' - tab is allowed on front-office as well
+	 */
+	function get_allowed_user_tabs()
+	{
+	}
+
+
+	/**
 	 * Provide translation in the context of this module:
 	 *
 	 * You can override this in specific modules.
@@ -82,6 +105,18 @@ class Module
 
 
 	/**
+	 * Gets called at the top of the skin's HTML BODY section
+	 *
+	 * could be used e.g. for additional content of javascript plugins
+	 */
+	function SkinBeginHtmlBody()
+	{
+	}
+
+
+	/**
+	 * Gets called at the end of the skin's HTML BODY section
+	 *
 	 * could be used e.g. by a google_analytics plugin to add the javascript snippet
 	 */
 	function SkinEndHtmlBody()
@@ -331,6 +366,69 @@ class Module
 
 			die('<h1>Insufficient Requirements</h1><p>'.$error_message.'</p>');
 		}
+	}
+
+
+	/**
+	 * Additional actions with searched results
+	 *
+	 * @param array Search data:
+	 *              - 'keywords' - Requested keywords to search
+	 *              - 'results'  - Searched results, @see perform_scored_search()
+	 */
+	function handle_searched_results( $search_data )
+	{
+	}
+
+
+	/**
+	 * Modify the search result content
+	 *
+	 * @param string Modified content (content is updated by reference)
+	 */
+	function modify_search_result( & $content )
+	{
+	}
+
+
+	/**
+	 * Handle back-office action
+	 *
+	 * @param array Parameters: 'ctrl', 'action'
+	 * @return boolean|NULL TRUE to mark that at least one module handles this action, NULL - this module does NOT handle the requested action
+	 */
+	function handle_backoffice_action( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Initialize back-office UI
+	 *
+	 * @param array Parameters: 'ctrl', 'action', 'tab'
+	 */
+	function init_backoffice_UI( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Display back-office UI
+	 *
+	 * @param array Parameters: 'ctrl', 'action', 'tab'
+	 */
+	function display_backoffice_UI( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Install additional basic plugins
+	 *
+	 * @param array 'old_db_version' - Old DB version to know when plugin can be installed
+	 */
+	function install_basic_plugins( $params )
+	{
 	}
 }
 

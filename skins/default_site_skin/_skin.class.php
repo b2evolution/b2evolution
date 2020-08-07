@@ -21,7 +21,7 @@ class default_site_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.7.0';
+	var $version = '7.3.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -48,7 +48,7 @@ class default_site_Skin extends Skin
 
 
 	/**
-	 * Does this skin providesnormal (collection) skin functionality?
+	 * Does this skin provide normal (collection) skin functionality?
 	 */
 	function provides_collection_skin()
 	{
@@ -73,7 +73,44 @@ class default_site_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
+	}
+
+
+	/**
+	 * Get definitions for editable params
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param local params like 'for_editing' => true
+	 * @return array
+	 */
+	function get_param_definitions( $params )
+	{
+		$r = array_merge( array(
+				'section_header_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Header')
+				),
+					'menu_bar_logo_padding' => array(
+						'label' => T_('Menu bar logo padding'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set the padding around the logo.'),
+						'defaultvalue' => '2',
+						'type' => 'integer',
+						'size' => 1,
+					),
+					'fixed_header' => array(
+						'label' => T_('Fixed position'),
+						'note' => T_('Check to fix header top on scroll down'),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
+				'section_header_end' => array(
+					'layout' => 'end_fieldset',
+				),
+			), parent::get_param_definitions( $params ) );
+
+		return $r;
 	}
 
 
@@ -84,8 +121,38 @@ class default_site_Skin extends Skin
 	 */
 	function siteskin_init()
 	{
+		global $Blog, $Session;
+
 		// Include the default skin style.css relative current SITE skin folder:
-		require_css( 'style.css', 'siteskin' );
+		require_css( 'style.min.css', 'siteskin' );
+
+		// Add custom styles:
+		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
+
+		$css = '#evo_site_header a.evo_widget__site_logo_image img {
+	padding: '.$menu_bar_logo_padding.'px;
+}';
+
+		if( $this->get_setting( 'fixed_header' ) &&
+		    ! $Session->get( 'display_containers_'.$Blog->ID ) &&
+		    ! $Session->get( 'display_includes_'.$Blog->ID ) &&
+		    ! $Session->get( 'customizer_mode_'.$Blog->ID ) )
+		{	// Enable fixed position for header only when no debug blocks:
+			$css .= '#evo_site_header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+}
+body.evo_toolbar_visible #evo_site_header {
+	top: 27px;
+}
+body {
+	padding-top: 43px;
+}';
+		}
+
+		add_css_headline( $css );
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -23,7 +23,7 @@ $SQL->WHERE( 'post_main_cat_ID NOT IN (SELECT cat_ID FROM T_categories )' );
 $Results = new Results( $SQL->get(), 'broken_posts_' );
 
 $Results->title = T_( 'Broken items with no matching category' );
-$Results->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Results->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Results->cols[] = array(
 	'th' => T_('Item ID'),
@@ -43,9 +43,9 @@ $Results->cols[] = array(
  */
 function broken_post_edit_link( $post_ID, $post_title )
 {
-	global $current_User, $blog;
+	global $blog;
 
-	if( ! $current_User->check_perm( 'blogs', 'editall' ) )
+	if( ! check_user_perm( 'blogs', 'editall' ) )
 	{ // User has no permission, Display only post title as text
 		return $post_title;
 	}
@@ -90,7 +90,7 @@ $Results->display( array(
 		'page_url' => regenerate_url( 'blog,ctrl,action,results_'.$Results->param_prefix.'page', 'action='.param_action().'&amp;'.url_crumb( 'tools' ) )
 	) );
 
-if( ( $current_User->check_perm('options', 'edit', true) ) && ( $Results->get_num_rows() ) )
+if( ( check_user_perm('options', 'edit', false) ) && ( $Results->get_num_rows() ) )
 { // display Delete link
 	global $DB;
 	$post_IDs = $DB->get_col( $SQL->get() );

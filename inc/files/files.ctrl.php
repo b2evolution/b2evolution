@@ -14,7 +14,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -34,14 +34,14 @@ load_class( 'files/model/_filelist.class.php', 'FileList' );
  */
 global $current_User;
 
-global $dispatcher;
+global $admin_url;
 
 global $blog;
 
 global $filename_max_length, $dirpath_max_length;
 
 // Check permission:
-$current_User->check_perm( 'files', 'view', true, $blog ? $blog : NULL );
+check_user_perm( 'files', 'view', true, $blog ? $blog : NULL );
 
 $AdminUI->set_path( 'files', 'browse' );
 
@@ -82,10 +82,10 @@ if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_obj
 	{	// Deny to link skin files to objects:
 		debug_die( 'Skin files are not allowed to link to objects!' );
 	}
-	$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+	$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 	if( empty( $LinkOwner ) )
 	{ // We could not find the owner object to link:
-		$Messages->add( T_('Requested object does not exist any longer.'), 'error' );
+		$Messages->add( TB_('Requested object does not exist any longer.'), 'error' );
 		forget_param( 'link_type' );
 		forget_param( 'link_object_ID' );
 		unset( $link_type );
@@ -102,7 +102,7 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 	$UserCache = & get_UserCache();
 	if( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
 	{	// We could not find the contact to link:
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('User') ), 'error' );
 		unset( $edited_User );
 		forget_param( 'user_ID' );
 		unset( $user_ID );
@@ -111,9 +111,9 @@ if( param( 'user_ID', 'integer', NULL, true, false, false ) )
 	{	// Found User, check perm:
 		if( $edited_User->ID != $current_User->ID )
 		{	// if not editing himself, must have user edit permission:
-			if( ! $current_User->check_perm( 'users', 'edit' ) )
+			if( ! check_user_perm( 'users', 'edit' ) )
 			{
-				$Messages->add( T_('No permission to edit this user.'), 'error' );
+				$Messages->add( TB_('No permission to edit this user.'), 'error' );
 				unset( $edited_User );
 				forget_param( 'user_ID' );
 				unset( $user_ID );
@@ -158,6 +158,10 @@ param( 'linkdata', 'string', '', true );
 // Name of the iframe we want some actions to come back to:
 param( 'iframe_name', 'string', '', true );
 param( 'field_name', 'string', '', true );
+param( 'file_type', 'string', '', true );
+
+// Prefix
+param( 'prefix', 'string', '' );
 
 // Get root:
 $ads_list_path = false; // false by default, gets set if we have a valid root
@@ -174,9 +178,9 @@ if( ! empty( $root ) )
 { // We have requested a root folder by string:
 	$fm_FileRoot = & $FileRootCache->get_by_ID( $root, true );
 
-	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) || ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
+	if( ! $fm_FileRoot || ! isset( $available_Roots[$fm_FileRoot->ID] ) || ! check_user_perm( 'files', 'view', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones
-		$Messages->add( T_('You don\'t have access to the requested root directory.'), 'error' );
+		$Messages->add( TB_('You don\'t have access to the requested root directory.'), 'error' );
 		$fm_FileRoot = false;
 	}
 }
@@ -187,7 +191,7 @@ elseif( !empty($edited_User) )
 	/**
 	 * @var File
 	 */
-	if( ( $avatar_File = & $edited_User->get_avatar_File() ) && ( $current_User->check_perm( 'files', 'view', false, $avatar_File->get_FileRoot() ) ) )
+	if( ( $avatar_File = & $edited_User->get_avatar_File() ) && ( check_user_perm( 'files', 'view', false, $avatar_File->get_FileRoot() ) ) )
 	{
 		$fm_FileRoot = & $avatar_File->get_FileRoot();
 		$path = dirname( $avatar_File->get_rdfs_rel_path() ).'/';
@@ -204,7 +208,7 @@ elseif( !empty($LinkOwner) )
 		 * @var File
 		 */
 		$File = & $FileList->get_next();
-		if( !empty( $File ) && $current_User->check_perm( 'files', 'view', false, $File->get_FileRoot() ) )
+		if( !empty( $File ) && check_user_perm( 'files', 'view', false, $File->get_FileRoot() ) )
 		{	// Obtain and use file root of first file:
 			$fm_FileRoot = & $File->get_FileRoot();
 			$path = dirname( $File->get_rdfs_rel_path() ).'/';
@@ -212,7 +216,7 @@ elseif( !empty($LinkOwner) )
 	}
 }
 
-if( $fm_FileRoot && ! $current_User->check_perm( 'files', 'view', false, $fm_FileRoot ) )
+if( $fm_FileRoot && ! check_user_perm( 'files', 'view', false, $fm_FileRoot ) )
 {
 	$fm_FileRoot = false;
 };
@@ -243,7 +247,7 @@ if( ! $fm_FileRoot )
 	{
 		foreach( $available_Roots as $l_FileRoot )
 		{
-			if( $current_User->check_perm( 'files', 'view', false, $l_FileRoot ) )
+			if( check_user_perm( 'files', 'view', false, $l_FileRoot ) )
 			{
 				$fm_FileRoot = $l_FileRoot;
 				break;
@@ -252,7 +256,7 @@ if( ! $fm_FileRoot )
 	}
 	if( ! $fm_FileRoot )
 	{
-		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+		$Messages->add( TB_('You don\'t have access to any root directory.'), 'error' );
 	}
 }
 
@@ -260,7 +264,7 @@ if( $fm_FileRoot )
 { // We have access to a file root:
 	if( empty($fm_FileRoot->ads_path) )
 	{	// Not sure it's possible to get this far, but just in case...
-		$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $fm_FileRoot->ads_path ), 'error' );
+		$Messages->add( sprintf( TB_('The root directory &laquo;%s&raquo; does not exist.'), $fm_FileRoot->ads_path ), 'error' );
 	}
 	else
 	{ // Root exists
@@ -274,26 +278,36 @@ if( $fm_FileRoot )
 		// Dereference any /../ just to make sure, and CHECK if directory exists:
 		$ads_list_path = get_canonical_path( $non_canonical_list_path );
 
-		if( !is_dir( $ads_list_path ) )
-		{ // This should never happen, but just in case the diretory does not exist:
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
-			$path = '';		// fp> added
-			$ads_list_path = NULL;
-		}
-		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
+		if( ! preg_match( '#^'.preg_quote( $fm_FileRoot->ads_path, '#' ).'#', $ads_list_path ) )
 		{ // cwd is OUTSIDE OF root!
-			$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
+			$Messages->add( TB_( 'You are not allowed to go outside your root directory!' ), 'error' );
 			$path = '';		// fp> added
 			$ads_list_path = $fm_FileRoot->ads_path;
+		}
+
+		if( $ajax_request &&
+		    ! is_dir( $ads_list_path ) &&
+		    ! file_exists( $ads_list_path ) &&
+		    check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
+		{	// Try to create the requested directory automatically if current User
+			// has a permission and when this is a request e.g. for an import folder:
+			mkdir_r( $ads_list_path );
+		}
+
+		if( ! is_dir( $ads_list_path ) )
+		{	// This may happens when a requested folder e.g. /media/import/users/ doesn't exist:
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$path = '';		// fp> added
+			$ads_list_path = NULL;
 		}
 		elseif( $ads_list_path != $non_canonical_list_path )
 		{	// We have reduced the absolute path, we should also reduce the relative $path (used in urls params)
 			$path = get_canonical_path( $path );
 		}
 
-		if( ( $Messages->count() == 0 ) && ( strlen( $ads_list_path ) > $dirpath_max_length ) && $current_User->check_perm( 'options', 'edit' ) )
+		if( ( $Messages->count() == 0 ) && ( strlen( $ads_list_path ) > $dirpath_max_length ) && check_user_perm( 'options', 'edit' ) )
 		{ // This folder absolute path exceed the max allowed length, a warning message must be displayed, if there were no other message yet. ( If there are other messages then this one should have been already added )
-			$Messages->add( sprintf( T_( 'This folder has an access path that is too long and cannot be properly handled by b2evolution. Please check and increase the &laquo;%s&raquo; variable.'), '$dirpath_max_length' ), 'warning' );
+			$Messages->add( sprintf( TB_( 'This folder has an access path that is too long and cannot be properly handled by b2evolution. Please check and increase the &laquo;%s&raquo; variable.'), '$dirpath_max_length' ), 'warning' );
 		}
 	}
 }
@@ -359,7 +373,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 	$LinkCache = & get_LinkCache();
 	if( ($edited_Link = & $LinkCache->get_by_ID( $link_ID, false )) === false )
 	{	// We could not find the link to edit:
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Link') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Link') ), 'error' );
 		unset( $edited_Link );
 		forget_param( 'link_ID' );
 		unset( $link_ID );
@@ -372,7 +386,7 @@ if( param( 'link_ID', 'integer', NULL, false, false, false ) )
 if( $action == 'createnew' )
 {
 	// Check permission:
-	$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
+	check_user_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 	// create new file/dir
 	param( 'create_type', 'string', true ); // 'file', 'dir'
@@ -398,17 +412,17 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
+		check_user_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 		if( ! $Settings->get( 'fm_enable_create_dir' ) )
 		{ // Directory creation is gloablly disabled:
-			$Messages->add( T_('Directory creation is disabled.'), 'error' );
+			$Messages->add( TB_('Directory creation is disabled.'), 'error' );
 			break;
 		}
 
 		if( ! param( 'create_name', 'string', '' ) )
 		{ // No name was supplied:
-			$Messages->add( T_('Cannot create a directory without name.'), 'error' );
+			$Messages->add( TB_('Cannot create a directory without name.'), 'error' );
 			break;
 		}
 		if( $error_dirname = validate_dirname( $create_name ) )
@@ -430,24 +444,24 @@ switch( $action )
 
 		if( strlen( $newFile->get_full_path() ) > $dirpath_max_length )
 		{
-			$Messages->add( T_('The new file access path is too long, shorter folder names would be required.'), 'error' );
+			$Messages->add( TB_('The new file access path is too long, shorter folder names would be required.'), 'error' );
 			break;
 		}
 
 		if( $newFile->exists() )
 		{
-			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
+			$Messages->add( sprintf( TB_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
 			break;
 		}
 
 		if( ! $newFile->create( $create_type ) )
 		{
-			$Messages->add( sprintf( T_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $path )
+			$Messages->add( sprintf( TB_('Could not create directory &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $path )
 				.' '.get_file_permissions_message(), 'error' );
 			break;
 		}
 
-		$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+		$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
 
 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		// $action = 'list';
@@ -460,20 +474,20 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true, $blog ? $blog : NULL );
+		check_user_perm( 'files', 'add', true, $blog ? $blog : NULL );
 
 		if( ! $Settings->get( 'fm_enable_create_file' ) )
 		{ // File creation is gloablly disabled:
-			$Messages->add( T_('File creation is disabled.'), 'error' );
+			$Messages->add( TB_('File creation is disabled.'), 'error' );
 			break;
 		}
 
 		if( ! param( 'create_name', 'string', '' ) )
 		{ // No name was supplied:
-			$Messages->add( T_('Cannot create a file without name.'), 'error' );
+			$Messages->add( TB_('Cannot create a file without name.'), 'error' );
 			break;
 		}
-		if( $error_filename = validate_filename( $create_name, $current_User->check_perm( 'files', 'all' ) ) )
+		if( $error_filename = validate_filename( $create_name, check_user_perm( 'files', 'all' ) ) )
 		{ // Not valid filename or extension
 			$Messages->add( $error_filename, 'error' );
 			syslog_insert( sprintf( 'The creating file %s has an unrecognized extension', '[['.$create_name.']]' ), 'warning', 'file' );
@@ -486,18 +500,18 @@ switch( $action )
 
 		if( $newFile->exists() )
 		{
-			$Messages->add( sprintf( T_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
+			$Messages->add( sprintf( TB_('The file &laquo;%s&raquo; already exists.'), $create_name ), 'error' );
 			break;
 		}
 
 		if( ! $newFile->create( $create_type ) )
 		{
-			$Messages->add( sprintf( T_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $newFile->get_dir() )
+			$Messages->add( sprintf( TB_('Could not create file &laquo;%s&raquo; in &laquo;%s&raquo;.'), $create_name, $newFile->get_dir() )
 				.' '.get_file_permissions_message(), 'error' );
 			break;
 		}
 
-		$Messages->add( sprintf( T_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
+		$Messages->add( sprintf( TB_('The file &laquo;%s&raquo; has been created.'), $create_name ), 'success' );
 
 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		// $action = 'list';
@@ -529,7 +543,7 @@ switch( $action )
 
 		if( $UserSettings->dbupdate() )
 		{
-			$Messages->add( T_('Your user settings have been updated.'), 'success' );
+			$Messages->add( TB_('Your user settings have been updated.'), 'success' );
 		}
 
 		header_redirect( regenerate_url( '', '', '', '&' ) );
@@ -551,15 +565,15 @@ switch( $action )
 		}
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+ 		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
  		// Get the file we want to update:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 
 		// Check that the file is editable:
-		if( ! $edited_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		if( ! $edited_File->is_editable( check_user_perm( 'files', 'all' ) ) )
 		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
+			$Messages->add( sprintf( TB_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
 			break;
 		}
 
@@ -574,11 +588,11 @@ switch( $action )
 
 		if( save_to_file( $file_content, $fpath, 'w+' ) )
 		{
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; has been updated.' ), $edited_File->dget('name') ), 'success' );
+			$Messages->add( sprintf( TB_( 'The file &laquo;%s&raquo; has been updated.' ), $edited_File->dget('name') ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'The file &laquo;%s&raquo; could not be updated.' ), $edited_File->dget('name') ), 'error' );
+			$Messages->add( sprintf( TB_( 'The file &laquo;%s&raquo; could not be updated.' ), $edited_File->dget('name') ), 'error' );
 		}
 		header_redirect( regenerate_url( '', '', '', '&' ) );
 		// $action = 'list';
@@ -639,12 +653,12 @@ switch( $action )
 
 		if( $action == 'create_zip' )
 		{	// Check permission for action to create new ZIP archive:
-			$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+			check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 		}
 
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
 		}
@@ -657,10 +671,10 @@ switch( $action )
 		if( $action_invoked )
 		{	// Action was invoked, check felds:
 			// ZIP file name should not be empty:
-			param_check_not_empty( 'zipname', T_('Please provide the name of the archive.') );
+			param_check_not_empty( 'zipname', TB_('Please provide the name of the archive.') );
 			if( ! empty( $zipname ) )
 			{ // Check extenssion of the entered file name:
-				param_check_regexp( 'zipname', '#\.zip$#i', T_('File name must end with .zip') );
+				param_check_regexp( 'zipname', '#\.zip$#i', TB_('File name must end with .zip') );
 			}
 		}
 
@@ -682,42 +696,20 @@ switch( $action )
 			break;
 		}
 
-		// Load class to work with ZIP files:
-		load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-		$arraylist = $selected_Filelist->get_array( 'get_name' );
-
-		$options = array (
-			'basedir' => $fm_Filelist->get_ads_list_path(),
-			// Keep zip archive in memory only ifor download action:
-			'inmemory' => ( $action == 'download' ),
-			'recurse' => (1 - $exclude_sd),
-		);
-
-		// Create ZIP archive:
-		$zipfile = new zip_file( $zipname );
-		$zipfile->set_options( $options );
-		$zipfile->add_files( $arraylist, array( '_evocache' ) );
-		$zipfile->create_archive();
-
-		if( $zipfile->error )
-		{
-			foreach( $zipfile->error as $v )
-			{
-				$Messages->add( $v, 'error' );
-			}
+		if( ! pack_archive( $fm_Filelist->get_ads_list_path().$zipname, $fm_Filelist->get_ads_list_path(), $selected_Filelist->get_array( 'get_name' ), '', ( $exclude_sd ? 'subdirs' : array() ), 'msg_error' ) )
+		{	// Stop on error packing:
 			break;
 		}
 
 		if( $action == 'download' )
 		{	// Download ZIP archive:
-			$zipfile->download_file();
+			download_archive( $fm_Filelist->get_ads_list_path().$zipname );
 			exit(0);
 			/* EXITED! */
 		}
 		else // $action == 'create_zip'
 		{	// Display a message after successful creating of ZIP archive:
-			$Messages->add_to_group( sprintf( T_('ZIP archive "%s" has been created.'), $zipname ), 'success', T_('Creating ZIP file...') );
+			$Messages->add_to_group( sprintf( TB_('ZIP archive "%s" has been created.'), $zipname ), 'success', TB_('Creating ZIP file...') );
 
 			if( $delete_files )
 			{	// We should delete the files after creating ZIP archive:
@@ -733,22 +725,22 @@ switch( $action )
 
 					if( $restriction_Messages->count() )
 					{ // There are restrictions:
-						$Messages->add_to_group( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-							.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', T_('Creating ZIP file...') );
+						$Messages->add_to_group( $l_File->get_prefixed_name().': '.TB_('cannot be deleted because of the following relations')
+							.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', TB_('Creating ZIP file...') );
 						// Skip this file
 						continue;
 					}
 
-					if( $l_File->unlink() )
+					if( $l_File->unlink( true, true ) )
 					{
-						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
-										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Creating ZIP file...') );
+						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? TB_('The directory &laquo;%s&raquo; has been deleted.')
+										: TB_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', TB_('Creating ZIP file...') );
 						$fm_Filelist->remove( $l_File );
 					}
 					else
 					{
-						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-										: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', T_('Creating ZIP file...') );
+						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? TB_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+										: TB_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', TB_('Creating ZIP file...') );
 					}
 				}
 			}
@@ -759,6 +751,19 @@ switch( $action )
 		}
 		break;
 
+	case 'unpack_zip':
+		// Unpack selected ZIP archives:
+
+		// Check permission for action to edit files in the selected File Root:
+		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+
+		if( ! $selected_Filelist->count() )
+		{
+			$Messages->add( TB_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}
+		break;
 
 	case 'rename':
 	case 'move_copy':
@@ -770,14 +775,14 @@ switch( $action )
 		// Rename/Move/Copy a file:
 
 		// This will not allow to overwrite existing files, the same way Windows and MacOS do not allow it. Adding an option will only clutter the interface and satisfy geeks only.
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
-		$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
+		$allow_locked_filetypes = check_user_perm( 'files', 'all' );
 
 		$sources_Root = & $FileRootCache->get_by_ID( $fm_sources_root );
 		if( $sources_Root )
@@ -791,7 +796,7 @@ switch( $action )
 
 		if( ! $selected_Filelist->count() && ( ! $source_Filelist || ! $source_Filelist->count() ) )
 		{ // There is nothing to rename
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
 		}
@@ -800,12 +805,25 @@ switch( $action )
 		param( 'new_names', 'array:filepath', array() );
 
 		// Check params for each file to rename:
+		$index = 0;
 		while( $loop_src_File = & $source_Filelist->get_next() )
 		{
+			if( !$loop_src_File->can_be_manipulated() )
+			{
+				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $loop_src_File->get_name().' - '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+						'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ) );
+				$source_Filelist->remove( $loop_src_File );
+				unset( $fm_selected[$index] );
+				$confirmed = 0;
+				$index++;
+				continue;
+			}
+
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
 				$confirmed = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
+				$index++;
 				continue;
 			}
 
@@ -814,8 +832,14 @@ switch( $action )
 			{
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $check_error );
+				$index++;
 				continue;
 			}
+		}
+
+		if( empty( $new_names ) )
+		{
+			$confirmed = 0;
 		}
 
 		if( $confirmed )
@@ -835,21 +859,28 @@ switch( $action )
 						$old_name = $loop_src_File->get_name();
 						$new_name = $new_names[$loop_src_File->get_md5_ID()];
 
+						if( !$loop_src_File->can_be_manipulated() )
+						{
+							$Messages->add_to_group( $old_name.' - '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+									'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', TB_('Renaming files:') );
+							continue 2;
+						}
+
 						if( $new_name == $old_name )
 						{ // Name has not changed...
-							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note', T_('Renaming files:') );
+							$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; has not been renamed'), $old_name ), 'note', TB_('Renaming files:') );
 							continue 2;
 						}
 						// Perform rename:
 						if( ! $loop_src_File->rename_to( $new_name ) )
 						{
-							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-								$old_name, $new_name ), 'error', T_('Renaming files') );
+							$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'error', TB_('Renaming files:') );
 							continue 2;
 						}
 
-						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'), $old_name, $new_name );
-						$success_title = T_('Renaming files:');
+						$success_message = sprintf( TB_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'), $old_name, $new_name );
+						$success_title = TB_('Renaming files:');
 						break;
 
 					case 'copy':
@@ -857,9 +888,16 @@ switch( $action )
 						$old_path = $loop_src_File->get_rdfp_rel_path();
 						$new_path = $selected_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
 
+						if( !$loop_src_File->can_be_manipulated() )
+						{
+							$Messages->add_to_group( $old_path.' - '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+									'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', TB_('Copying files:') );
+							continue 2;
+						}
+
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
-							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note', T_('Copying files:') );
+							$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note', TB_('Copying files:') );
 							continue 2;
 						}
 
@@ -869,7 +907,7 @@ switch( $action )
 						// Perform copy:
 						if( ! $loop_src_File->copy_to( $dest_File ) )
 						{ // failed
-							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Copying files:') );
+							$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', TB_('Copying files:') );
 							continue 2;
 						}
 
@@ -877,8 +915,8 @@ switch( $action )
 						// (to avoid debug die when file is moved to another root, @see Filelist::add())
 						$loop_src_File = $dest_File;
 
-						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path );
-						$success_title = T_('Copying files:');
+						$success_message = sprintf( TB_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path );
+						$success_title = TB_('Copying files:');
 						break;
 
 					case 'move':
@@ -886,21 +924,28 @@ switch( $action )
 						$old_path = $loop_src_File->get_rdfp_rel_path();
 						$new_path = $selected_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
 
+						if( !$loop_src_File->can_be_manipulated() )
+						{
+							$Messages->add_to_group( $old_path.' - '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+									'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', TB_('Moving files:') );
+							continue 2;
+						}
+
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
-							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note', T_('Moving files:') );
+							$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; has not been moved'), $old_path ), 'note', TB_('Moving files:') );
 							continue 2;
 						}
 
 						// Perform move:
 						if( ! $loop_src_File->move_to( $selected_Filelist->get_root_type(), $selected_Filelist->get_root_ID(), $new_path ) )
 						{ // failed
-							$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', T_('Moving files:') );
+							$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; could not be moved to &laquo;%s&raquo;'), $old_path, $new_path ), 'error', TB_('Moving files:') );
 							continue 2;
 						}
 
-						$success_message = sprintf( T_('&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;'), $old_path, $new_path );
-						$success_title = T_('Moving files:');
+						$success_message = sprintf( TB_('&laquo;%s&raquo; has been successfully moved to &laquo;%s&raquo;'), $old_path, $new_path );
+						$success_title = TB_('Moving files:');
 						break;
 				}
 
@@ -927,6 +972,61 @@ switch( $action )
 		}
 		break;
 
+	case 'resize':
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		{ // We do not have permission to edit files
+			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
+			$action = 'list';
+			break;
+		}
+
+		if( ! $selected_Filelist->count() )
+		{ // There is nothing to resize
+			$Messages->add( TB_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}
+
+		param( 'confirmed', 'integer', 0 );
+
+		// Remove non-image files to resize:
+		while( $loop_sel_File = & $selected_Filelist->get_next() )
+		{
+			if( ! $loop_sel_File->is_image() )
+			{
+				if( ! $selected_Filelist->remove( $loop_sel_File ) )
+				{
+					die( 'Failed to remove file from list' );
+				}
+			}
+		}
+
+		if( $confirmed )
+		{ // Resize is confirmed, let's proceed:
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'file' );
+			$selected_Filelist->restart();
+			$FileCache = & get_FileCache();
+
+			$fit_width = $Settings->get( 'fm_resize_width' );
+			$fit_height = $Settings->get( 'fm_resize_height' );
+
+			load_funcs( 'files/model/_image.funcs.php' );
+
+			while( $loop_sel_File = & $selected_Filelist->get_next() )
+			{
+				$current_dimensions = $loop_sel_File->get_image_size('widthheight_assoc');
+				$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'], $fit_width, $fit_height );
+				resize_image( $loop_sel_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
+			}
+
+			$action = 'list';
+			$redirect_to = param( 'redirect_to', 'url', NULL );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
 
 	case 'delete':
 		// TODO: We don't need the Filelist, move UP!
@@ -935,20 +1035,21 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
 		if( ! $selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
+		param( 'delete_nonempty', 'integer', 0 );
 		param( 'confirmed', 'integer', 0 );
 		// fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB
 
@@ -961,30 +1062,46 @@ switch( $action )
 				// Check if there are delete restrictions on this file:
 				$restriction_Messages = $l_File->check_relations( 'delete_restrictions', array(), true );
 
-				if( $restriction_Messages->count() )
-				{ // There are restrictions:
-					$Messages->add_to_group( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
-						.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', T_('Deleting files...') );
+				// if( !$l_File->can_be_manipulated() )
+				// {
+				// 	$Messages->add_to_group( $l_File->get_name().' - '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+				// 			'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', TB_('Deleting files...') );
+				// 	$selected_Filelist->remove( $l_File );
+				// 	continue 2;
+				// }
+
+				if( !$l_File->can_be_manipulated() )
+				{	// File can not be manipulated:
+					$Messages->add_to_group( $l_File->get_prefixed_name().': '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+							'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', TB_('Deleting files...') );
 					// Skip this file
 					continue;
 				}
 
-				if( $l_File->unlink() )
+				if( $restriction_Messages->count() )
+				{ // There are restrictions:
+					$Messages->add_to_group( $l_File->get_prefixed_name().': '.TB_('cannot be deleted because of the following relations')
+						.$restriction_Messages->display( NULL, NULL, false, false ), 'warning', TB_('Deleting files...') );
+					// Skip this file
+					continue;
+				}
+
+				if( $l_File->unlink( true, $delete_nonempty ) )
 				{
-					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
-									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Deleting files...') );
+					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? TB_('The directory &laquo;%s&raquo; has been deleted.')
+									: TB_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', TB_('Deleting files...') );
 					$fm_Filelist->remove( $l_File );
 				}
 				else
 				{
-					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
-									: T_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', T_('Deleting files...') );
+					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? TB_('Could not delete the directory &laquo;%s&raquo; (not empty?).')
+									: TB_('Could not delete the file &laquo;%s&raquo;.') ), $l_File->dget('name') ), 'error', TB_('Deleting files...') );
 				}
 			}
 			$action = 'list';
 			$redirect_to = param( 'redirect_to', 'url', NULL );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
+			header_redirect( empty( $redirect_to ) ? regenerate_url( 'fm_selected', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -1001,7 +1118,7 @@ switch( $action )
 
 				if( $restriction_Messages->count() )
 				{ // There are restrictions:
-					$Messages->add( $l_File->get_prefixed_name().': '.T_('cannot be deleted because of the following relations')
+					$Messages->add( $l_File->get_prefixed_name().': '.TB_('cannot be deleted because of the following relations')
 						.$restriction_Messages->display( NULL, NULL, false, false ) );
 
 					// remove it from the list of selected files (that will be offered to delete):
@@ -1031,7 +1148,7 @@ switch( $action )
 
 		if( ! $selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
 		}
@@ -1049,7 +1166,7 @@ switch( $action )
 
 		if( empty( $Blog ) )
 		{
-			$Messages->add( T_('No destination blog is selected.'), 'error' );
+			$Messages->add( TB_('No destination blog is selected.'), 'error' );
 			break;
 		}
 		//$Blog->disp('name');
@@ -1058,7 +1175,7 @@ switch( $action )
 		$item_status = $Blog->get_allowed_item_status();
 		if( empty($item_status) )
 		{
-			$Messages->add( T_('Sorry, you have no permission to post into this blog.'), 'error' );
+			$Messages->add( TB_('Sorry, you have no permission to post into this blog.'), 'error' );
 			break;
 		}
 
@@ -1108,7 +1225,7 @@ switch( $action )
 						// Let's make the link!
 						$LinkOwner->add_link( $l_File->ID, ( $order == 1 ? 'teaser' : 'aftermore' ), $order++ );
 
-						$Messages->add_to_group( sprintf( T_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success', T_('Creating post:') );
+						$Messages->add_to_group( sprintf( TB_('&laquo;%s&raquo; has been attached.'), $l_File->dget('name') ), 'success', TB_('Creating post:') );
 
 					} while( $l_File = & $selected_Filelist->get_next() );
 
@@ -1116,11 +1233,11 @@ switch( $action )
 				}
 				else
 				{
-					$Messages->add( T_('Couldn\'t create the new post'), 'error' );
+					$Messages->add( TB_('Couldn\'t create the new post'), 'error' );
 					$DB->rollback();
 				}
 
-				header_redirect( $dispatcher.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
+				header_redirect( $admin_url.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
 				break;
 		}
 
@@ -1141,15 +1258,15 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit_allowed', true, $blog ? $blog : NULL );
+ 		check_user_perm( 'files', 'edit_allowed', true, $blog ? $blog : NULL );
 
  		// Get the file we want to edit:
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 
 		// Check that the file is editable:
-		if( ! $edited_File->is_editable( $current_User->check_perm( 'files', 'all' ) ) )
+		if( ! $edited_File->is_editable( check_user_perm( 'files', 'all' ) ) )
 		{
-			$Messages->add( sprintf( T_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
+			$Messages->add( sprintf( TB_( 'You are not allowed to edit &laquo;%s&raquo;.' ), $edited_File->dget('name') ), 'error' );
 	 		// Leave special display mode:
 			$action = 'list';
 			break;
@@ -1177,10 +1294,14 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
-		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$edited_File->load_meta();
+
+		param( 'link_owner_type', 'string', '', true );
+		param( 'link_owner_ID', 'integer', 0, true );
+		param( 'from', 'string', '', true );
 		break;
 
 
@@ -1192,64 +1313,104 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		check_user_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+
+		param( 'link_owner_type', 'string', '' );
+		param( 'link_owner_ID', 'integer', 0 );
+		param( 'from', 'string', '' );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
-		// Load meta data:
-		$edited_File->load_meta();
+		$error_occured = false;
 
-		$edited_File->set( 'title', param( 'title', 'string', '' ) );
-		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
-		$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
-
-		// Store File object into DB:
-		if( $edited_File->dbsave() )
+		if( !$edited_File->can_be_manipulated() )
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edited_File->dget('name') ), 'success' );
+			$error_occurred = true;
+			$Messages->add( sprintf( $edited_File->get_name().' - '.TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+					'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error' );
+			break;
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
-		}
+			// Load meta data:
+			$edited_File->load_meta();
 
-		$old_name = $edited_File->get_name();
-		$new_name = param( 'name', 'string', '' );
-		$error_occured = false;
+			$edited_File->set( 'title', param( 'title', 'string', '' ) );
+			$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
+			$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
 
-		if( $new_name != $old_name)
-		{ // Name has changed...
-			$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
-			if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $edited_File->get_dir(), $allow_locked_filetypes ) )
+			$resize_image = param( 'resize_image', 'boolean', false );
+			if( $resize_image )
 			{
-				$error_occured = true;
-				param_error( 'new_name', $check_error );
+				load_funcs( 'files/model/_image.funcs.php' );
+
+				$current_dimensions = $edited_File->get_image_size('widthheight_assoc');
+				$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'],
+						$Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ));
+				resize_image( $edited_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
+			}
+
+			// Store File object into DB:
+			if( $edited_File->dbsave() )
+			{
+				$Messages->add( sprintf( TB_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edited_File->dget('name') ), 'success' );
 			}
 			else
-			{ // Perform rename:
-				if( $edited_File->rename_to( $new_name ) )
-				{
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
-							$old_name, $new_name ), 'success' );
+			{
+				$Messages->add( sprintf( TB_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
+			}
 
-					// We have renamed teh file, update caches:
-					$fm_Filelist->update_caches();
-				}
-				else
+			$old_name = $edited_File->get_name();
+			$new_name = param( 'name', 'string', '' );
+
+			if( $new_name != $old_name)
+			{ // Name has changed...
+				$allow_locked_filetypes = check_user_perm( 'files', 'all' );
+				if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $edited_File->get_dir(), $allow_locked_filetypes ) )
 				{
 					$error_occured = true;
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-							$old_name, $new_name ), 'error' );
+					param_error( 'new_name', $check_error );
+				}
+				else
+				{ // Perform rename:
+					if( $edited_File->rename_to( $new_name ) )
+					{
+						$Messages->add( sprintf( TB_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'success' );
+
+						// We have renamed teh file, update caches:
+						$fm_Filelist->update_caches();
+					}
+					else
+					{
+						$error_occured = true;
+						$Messages->add( sprintf( TB_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'error' );
+					}
 				}
 			}
+		}
+
+		if( $mode == 'link' )
+		{	// Don't redirect when we updated a linked File:
+			exit;
+		}
+
+		if( $LinkOwner = & get_LinkOwner( $link_owner_type, $link_owner_ID ) )
+		{	// Redirect back to link owner object edit form where the File was edited:
+			$redirect_to = $LinkOwner->get_edit_url( '&', ( $from == 'backoffice' ) );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
-		if( $error_occured )
+		if( empty( $redirect_to ) )
 		{
-			header_redirect( regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($edited_File->get_rdfp_rel_path() ).'&amp;'.url_crumb('file'), '', '&' ), 303 );
-			// We have EXITed already, no need else.
+			if( $error_occured )
+			{
+				$redirect_to = regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($edited_File->get_rdfp_rel_path() ).'&amp;'.url_crumb('file'), '', '&' );
+				// We have EXITed already, no need else.
+			}
+			$redirect_to = regenerate_url( '', '', '', '&' );
 		}
-		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -1273,7 +1434,7 @@ switch( $action )
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			break;
 		}
 		$edited_File = & $selected_Filelist->get_by_idx(0);
@@ -1290,7 +1451,7 @@ switch( $action )
 
 			if( $old_path == $new_path && $edited_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 			{	// File path has not changed:
-				$Messages->add( sprintf( T_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note' );
+				$Messages->add( sprintf( TB_('&laquo;%s&raquo; has not been copied'), $old_path ), 'note' );
 			}
 			else
 			{
@@ -1300,11 +1461,11 @@ switch( $action )
 				// Perform copy:
 				if( ! $edited_File->copy_to( $dest_File ) )
 				{	// Failed copying:
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
+					$Messages->add( sprintf( TB_('&laquo;%s&raquo; could not be copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'error' );
 				}
 				else
 				{	// Success copying:
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'success' );
+					$Messages->add( sprintf( TB_('&laquo;%s&raquo; has been successfully copied to &laquo;%s&raquo;'), $old_path, $new_path ), 'success' );
 					// Change old file to new copied in order to link it to profile:
 					$edited_File = $dest_File;
 				}
@@ -1319,12 +1480,12 @@ switch( $action )
 		$image_sizes = $edited_File->get_image_size( 'widthheight' );
 		if( $image_sizes[0] < $min_size || $image_sizes[1] < $min_size )
 		{	// Don't use this file as profile picture because it has small sizes
-			$Messages->add( sprintf( T_( 'Your profile picture must have a minimum size of %dx%d pixels.' ), $min_size, $min_size ), 'error' );
+			$Messages->add( sprintf( TB_( 'Your profile picture must have a minimum size of %dx%d pixels.' ), $min_size, $min_size ), 'error' );
 			break;
 		}
 
 		// Link file to user
-		$LinkOwner = get_link_owner( 'user', $edited_User->ID );
+		$LinkOwner = get_LinkOwner( 'user', $edited_User->ID );
 		$edited_File->link_to_Object( $LinkOwner );
 		// Assign avatar:
 		$edited_User->set( 'avatar_file_ID', $edited_File->ID );
@@ -1333,7 +1494,7 @@ switch( $action )
 		// Save to DB:
 		$edited_User->dbupdate();
 
-		$Messages->add( T_('Your profile picture has been changed.'), 'success' );
+		$Messages->add( TB_('Your profile picture has been changed.'), 'success' );
 
 		// REDIRECT / EXIT
 		header_redirect( $admin_url.'?ctrl=user&user_tab=avatar&user_ID='.$edited_User->ID );
@@ -1348,7 +1509,7 @@ switch( $action )
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			break;
 		}
 		$edited_File = & $selected_Filelist->get_by_idx(0);
@@ -1384,7 +1545,7 @@ switch( $action )
 		// Get the file we want to link:
 		if( !$selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			break;
 		}
 
@@ -1424,36 +1585,36 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'file' );
 
-		if( ! $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
+		if( ! check_user_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() ) )
 		{ // We do not have permission to edit files
-			$Messages->add( T_('You have no permission to edit/modify files.'), 'error' );
+			$Messages->add( TB_('You have no permission to edit/modify files.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
 		if( ! $selected_Filelist->count() )
 		{
-			$Messages->add( T_('Nothing selected.'), 'error' );
+			$Messages->add( TB_('Nothing selected.'), 'error' );
 			$action = 'list';
 			break;
 		}
 
 
 		param( 'perms', 'array:integer', array() );
-		param( 'edit_perms_default' ); // default value when multiple files are selected
+		param( 'edit_perms_default', 'string' ); // default value when multiple files are selected
 		param( 'use_default_perms', 'array:string', array() ); // array of file IDs that should be set to default
 
 		if( count( $use_default_perms ) && $edit_perms_default === '' )
 		{
-			param_error( 'edit_perms_default', T_('You have to give a default permission!') );
+			param_error( 'edit_perms_default', TB_('You have to give a default permission!') );
 			break;
 		}
 
 		// form params
 		$perms_read_readonly = is_windows();
 		$field_options_read_readonly = array(
-				array( 'value' => 444, 'label' => T_('Read-only') ),
-				array( 'value' => 666, 'label' => T_('Read and write') ) );
+				array( 'value' => 444, 'label' => TB_('Read-only') ),
+				array( 'value' => 666, 'label' => TB_('Read and write') ) );
 		$more_than_one_selected_file = ( $selected_Filelist->count() > 1 );
 
 		if( count( $perms ) || count( $use_default_perms ) )
@@ -1467,7 +1628,13 @@ switch( $action )
 				}
 				elseif( !isset($perms[ $l_File->get_md5_ID() ]) )
 				{ // happens for an empty text input or when no radio option is selected
-					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
+					$Messages->add( sprintf( TB_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
+					continue;
+				}
+				elseif( !$l_File->can_be_manipulated() )
+				{
+					$Messages->add( $l_File->get_name().' - '.sprintf( TB_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+							'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error' );
 					continue;
 				}
 				else
@@ -1480,7 +1647,7 @@ switch( $action )
 
 				if( $newperms === false )
 				{
-					$Messages->add( sprintf( T_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $l_File->dget('name'), $chmod ), 'error' );
+					$Messages->add( sprintf( TB_('Failed to set permissions on &laquo;%s&raquo; to &laquo;%s&raquo;.'), $l_File->dget('name'), $chmod ), 'error' );
 				}
 				else
 				{
@@ -1489,11 +1656,11 @@ switch( $action )
 
 					if( $newperms === $oldperms )
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
+						$Messages->add( sprintf( TB_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
 					}
 					else
 					{
-						$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $l_File->dget('name'), $l_File->get_perms() ), 'success' );
+						$Messages->add( sprintf( TB_('Permissions for &laquo;%s&raquo; changed to &laquo;%s&raquo;.'), $l_File->dget('name'), $l_File->get_perms() ), 'success' );
 					}
 				}
 			}
@@ -1530,11 +1697,11 @@ switch( $fm_mode )
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Files'), '?ctrl=files&amp;blog=$blog$' );
 if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type_ID != $Blog->ID )
 {	// Display only if we're not browsing our home blog
 	$AdminUI->breadcrumbpath_add( $fm_FileRoot->name, '?ctrl=files&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID,
-			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
+			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( TB_('You are ready to post files from %s into %s...'),
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
 
@@ -1547,9 +1714,6 @@ if( $mode != 'modal' )
 {
 	// require colorbox js
 	require_js_helper( 'colorbox' );
-	// require File Uploader js and css
-	require_js( 'multiupload/fileuploader.js' );
-	require_css( 'fileuploader.css' );
 
 	if( $mode == 'upload' || $mode == 'import' )
 	{ // Add css to remove spaces around window
@@ -1570,7 +1734,7 @@ if( $mode != 'modal' )
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
 // Filemanager content differs.
 ?>
-<script type="text/javascript">
+<script>
 	<!--
 	if( opener
 			&& opener.document.FilesForm
@@ -1596,7 +1760,7 @@ if( $mode != 'modal' )
 /*
  * Display payload:
  */
-if( !empty($action ) && $action != 'list' && $action != 'nil' )
+if( !empty( $action ) && $action != 'list' && $action != 'nil' )
 {
 
 	// Action displays:
@@ -1614,6 +1778,11 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 			$AdminUI->disp_view( 'files/views/_file_rename.form.php' );
 			break;
 
+		case 'resize':
+			// Resize file(s). We arrive here either if not confirmed or in case of error(s).
+			$AdminUI->disp_view( 'files/views/_file_resize.form.php' );
+			break;
+
 		case 'delete':
 			// Delete file(s). We arrive here either if not confirmed or in case of error(s).
 			$AdminUI->disp_view( 'files/views/_file_delete.form.php' );
@@ -1625,6 +1794,10 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 
 		case 'create_zip':
 			$AdminUI->disp_view( 'files/views/_file_create_zip.form.php' );
+			break;
+
+		case 'unpack_zip':
+			$AdminUI->disp_view( 'files/views/_file_unpack_zip.view.php' );
 			break;
 
 		case 'edit_perms':
@@ -1669,9 +1842,44 @@ if( $mode != 'modal' )
 	// -------------------
 	// Browsing interface:
 	// -------------------
-	// Display VIEW:
-	$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
-
+	$show_existing_attachments_tab = ( $mode == 'upload' ) && isset( $LinkOwner ) && in_array( get_class( $LinkOwner->link_Object ), array( 'Comment', 'Item', 'EmailCampaign' ) );
+	if( $show_existing_attachments_tab )
+	{	// Display existing attachments tab:
+		$attach_files_url = get_htsrv_url().'async.php?action=browse_existing_attachments&amp;root='.$root
+				.'&amp;path='.$path
+				.'&amp;prefix='.$prefix
+				.'&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type )
+				.( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
+		?>
+		<div class="margin-bottom-md">
+			<ul class="nav nav-tabs">
+				<li class="active">
+					<a href="#file_browser" data-toggle="tab"><?php echo T_('File browser'); ?></a>
+				</li>
+				<li>
+					<a href="<?php echo $attach_files_url;?>" data-toggle="tabajax" data-target="#existing_attachments">
+						<?php echo T_('Existing attachments'); ?>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<div class="tab-content">
+			<div class="tab-pane active" id="file_browser">
+				<?php
+				// Display VIEW:
+				$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
+				?>
+			</div>
+			<div class="tab-pane" id="existing_attachments"></div>
+		</div>
+		<?php
+		expose_var_to_js( 'evo_tabs_ajax_load__click', true );
+	}
+	else
+	{
+		// Display VIEW:
+		$AdminUI->disp_view( 'files/views/_file_browse.view.php' );
+	}
 
 	// End payload block:
 	$AdminUI->disp_payload_end();

@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -19,7 +19,7 @@ class adjust_headings_plugin extends Plugin
 	var $code = 'h_levels';
 	var $name = 'Adjust headings';
 	var $priority = 105;
-	var $version = '6.7.9';
+	var $version = '7.3.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -95,24 +95,16 @@ class adjust_headings_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
-		if( ! empty( $params['Item'] ) )
-		{ // Get Item from params:
-			$Item = & $params['Item'];
-		}
-		elseif( ! empty( $params['Comment'] ) )
-		{ // Get Item from Comment:
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-		}
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
 
-		if( empty( $Item ) )
-		{ // Unknown call, Don't render this case:
+		if( ! $setting_Blog )
+		{	// Unknown call, Don't render this case:
 			return;
 		}
 
-		// Get setting level of current blog:
-		$item_Blog = & $Item->get_Blog();
-		$this->setting_level = $this->get_coll_setting( 'level', $item_Blog );
+		// Get setting level of requested collection:
+		$this->setting_level = $this->get_coll_setting( 'level', $setting_Blog );
 
 		// Adjust headings:
 		$content = $this->do_adjust_headings( $content );
@@ -210,7 +202,7 @@ class adjust_headings_plugin extends Plugin
 		$this->highest_level = NULL;
 
 		// Find the highest heading level in the current content:
-		replace_content_outcode( '#</h([1-6])>#i', array( $this, 'callback_find_highest_heading' ), $content, 'replace_content_callback' );
+		replace_outside_code_tags( '#</h([1-6])>#i', array( $this, 'callback_find_highest_heading' ), $content, 'replace_content_callback' );
 
 		if( is_null( $this->highest_level ) || $this->highest_level == $this->setting_level )
 		{ // The html heading tags have not been detected in the content
@@ -219,7 +211,7 @@ class adjust_headings_plugin extends Plugin
 		}
 
 		// Replace the headings with new:
-		$content = replace_content_outcode( '#<(/?)h([1-6])([^>]*)?>#i', array( $this, 'callback_adjust_headings' ), $content, 'replace_content_callback' );
+		$content = replace_outside_code_tags( '#<(/?)h([1-6])([^>]*)?>#i', array( $this, 'callback_adjust_headings' ), $content, 'replace_content_callback' );
 
 		return $content;
 	}

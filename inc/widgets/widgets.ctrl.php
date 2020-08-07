@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,10 @@ global $Plugins;
 $UserSettings->set( 'pref_coll_settings_tab', 'widgets' );
 $UserSettings->dbupdate();
 
+load_funcs( 'widgets/_widgets.funcs.php' );
+
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
+load_class( 'widgets/model/_widgetcontainer.class.php', 'WidgetContainer' );
 
 
 // Check permissions on requested blog and autoselect an appropriate blog if necessary.
@@ -48,24 +51,31 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 else
 {	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
-	// redirect to blog list:
-	header_redirect( $admin_url.'?ctrl=dashboard' );
-	// EXITED:
-	$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
-	$action = 'nil';
-	$tab = '';
+	$Messages->add( TB_('Sorry, you have no permission to edit collection properties.'), 'error' );
+	// Redirect to collections list:
+	header_redirect( get_admin_url( 'ctrl=collections', '&' ) );
+	// EXITED.
 }
+
+param( 'skin_type', 'string', 'normal' );
 
 $action = param_action( 'list' );
 param( 'display_mode', 'string', 'normal' );
 $display_mode = ( in_array( $display_mode, array( 'js', 'normal' ) ) ? $display_mode : 'normal' );
 if( $display_mode == 'js' )
-{	// Javascript in debug mode conflicts/fails.
+{	// JavaScript mode:
+
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'widget' );
+
+	// Javascript in debug mode conflicts/fails.
 	// fp> TODO: either fix the debug javascript or have an easy way to disable JS in the debug output.
 	$debug = 0;
 	$debug_jslog = false;
 }
 // This should probably be handled with teh existing $mode var
+
+param( 'wico_ID', 'integer', 0, true );
 
 /*
  * Init the objects we want to work on.
@@ -75,30 +85,53 @@ switch( $action )
 	case 'nil':
 	case 'list':
 	case 'reload':
+	case 'new_container':
+	case 'edit_container':
+	case 'create_container':
+	case 'update_container':
+	case 'reload_container':
 	case 'activate':
 	case 'deactivate':
 		// Do nothing
+		break;
+
+	case 'duplicate':
+		param( 'wi_ID', 'integer', true );
 		break;
 
 	case 'create':
 		param( 'type', 'string', true );
 		param( 'code', 'string', true );
 	case 'new':
-		param( 'container', 'string', true, true );	// memorize
-		// Change the symbols back to normal view as they are stored in DB
-		$container = str_replace( array( '_', '-' ), array( ' ', ':' ), $container );
+	case 'add_list':
+	case 'customize':
+		param( 'container', 'string', $action == 'add_list', true );	// memorize
+		param( 'container_code', 'string' );
+		param( 'skin_type', 'string' );
 		break;
 
 	case 're-order' : // js request
+		param( 'wico_ID', 'integer', 0 );
 		param( 'container_list', 'string', true );
-		$containers_list = explode( ',', $container_list );
+		$containers_list = explode( ',', trim( $container_list, ',' ) );
 		$containers = array();
+		$passed_widget_IDs = array(); // Store here all passed IDs in order to compare them with current DB
 		foreach( $containers_list as $a_container )
-		{	// add each container and grab its widgets:
-			if( $container_name = trim( str_replace( array( 'container_', '_', '-' ), array( '', ' ', ':' ), $a_container ), ',' ) )
+		{	// Add each container and grab its widgets:
+			$a_container_widgets = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
+			foreach( $a_container_widgets as $a => $a_container_widget )
 			{
-				$containers[ $container_name ] = explode( ',', param( trim( $a_container, ',' ), 'string', true ) );
+				if( $a_container_widget_ID = preg_replace( '~[^0-9]~', '', $a_container_widget ) )
+				{	// Use only correct widget ID for reordering:
+					$a_container_widgets[ $a ] = $a_container_widget_ID;
+					$passed_widget_IDs[] = $a_container_widget_ID;
+				}
+				else
+				{	// Skip wrong passed widget ID:
+					unset( $a_container_widgets[ $a ] );
+				}
 			}
+			$containers[substr( $a_container, 10 )] = $a_container_widgets;
 		}
 		break;
 
@@ -114,15 +147,24 @@ switch( $action )
 		param( 'wi_ID', 'integer', true );
 		$WidgetCache = & get_WidgetCache();
 		$edited_ComponentWidget = & $WidgetCache->get_by_ID( $wi_ID );
-		// Take blog from here!
-		// echo $edited_ComponentWidget->coll_ID;
-		set_working_blog( $edited_ComponentWidget->coll_ID );
+		// Take blog from Widget if it is not in a shared container ( coll_ID is not set in case of shared containers )!
+		$WidgetContainer = & $edited_ComponentWidget->get_WidgetContainer();
+		if( ! empty( $WidgetContainer->coll_ID ) )
+		{
+			set_working_blog( $WidgetContainer->coll_ID );
+		}
 		$BlogCache = & get_BlogCache();
 		/**
 		* @var Blog
 		*/
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
+		break;
+
+	case 'destroy_container':
+		param( 'wico_ID', 'integer', 0 );
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
 		break;
 
 	default:
@@ -138,9 +180,9 @@ switch( $display_mode )
 {
 	case 'js' : // js response needed
 // fp> when does this happen -- should be documented
-		if( !$current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+		if( ! check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 		{	// user doesn't have permissions
-			$Messages->add( T_('You do not have permission to perform this action' ) );
+			$Messages->add( TB_('You do not have permission to perform this action' ) );
 // fp>does this only happen when we try to edit settings. The hardcoded 'closeWidgetSettings' response looks bad.
 			send_javascript_message( array( 'closeWidgetSettings' => array() ) );
 		}
@@ -148,16 +190,10 @@ switch( $display_mode )
 
 	case 'normal':
 	default : // take usual approach
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 }
-
-// Get Skin used by current Blog:
-$blog_normal_skin_ID = $Blog->get_setting( 'normal_skin_ID' );
-$SkinCache = & get_SkinCache();
-$Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
-// Make sure containers are loaded for that skin:
-$container_list = $Skin->get_containers();
-
 
 /**
  * Perform action:
@@ -167,8 +203,41 @@ switch( $action )
 	case 'nil':
 	case 'new':
 	case 'edit':
+	case 'add_list':
+	case 'customize':
 		// Do nothing
 		break;
+
+	case 'new_container':
+		// Initialize widget container for creating form:
+		param( 'container_type', 'string', NULL );
+		$edited_WidgetContainer = new WidgetContainer();
+		if( $container_type == 'shared' )
+		{	// Default settings for new shared container:
+			$edited_WidgetContainer->set( 'main', 1 );
+		}
+		elseif( $container_type != 'shared-sub' )
+		{	// Default settings for new container:
+			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
+		}
+		$edited_WidgetContainer->set( 'skin_type', $skin_type );
+		break;
+
+	case 'edit_container':
+		// Initialize widget container for editing form:
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
+		break;
+
+	case 'duplicate':
+		// Duplicate a Widget to container:
+
+		$WidgetCache = & get_WidgetCache();
+		$duplicated_Widget = & $WidgetCache->get_by_ID( $wi_ID );
+		$duplicated_Widget->load_param_array();
+
+		$type = $duplicated_Widget->type;
+		$code = $duplicated_Widget->code;
 
 	case 'create':
 		// Add a Widget to container:
@@ -176,9 +245,18 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		if( !in_array( $container, $container_list ) )
+		if( $action == 'duplicate' )
 		{
-			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
+			$WidgetContainer = & $duplicated_Widget->get_WidgetContainer();
+			$container = 'wico_ID_'.$WidgetContainer->ID;
+		}
+		else
+		{
+			$WidgetContainer = & get_WidgetContainer_by_coll_skintype_fieldset( $Blog->ID, $skin_type, $container );
+		}
+		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers( $skin_type ) ) ) )
+		{ // The container is not part of the current skin
+			$Messages->add( TB_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'warning' );
 		}
 
 		switch( $type )
@@ -206,21 +284,66 @@ switch( $action )
 				debug_die( 'Unhandled widget type' );
 		}
 
-		$edited_ComponentWidget->set( 'coll_ID', $Blog->ID );
-		$edited_ComponentWidget->set( 'sco_name', $container );
+		$DB->begin();
+
+		if( $WidgetContainer->ID == 0 )
+		{ // New widget container needs to be saved
+			$WidgetContainer->dbinsert();
+		}
+		$edited_ComponentWidget->set( 'wico_ID', $WidgetContainer->ID );
 		$edited_ComponentWidget->set( 'enabled', 1 );
+
+		if( $action == 'duplicate' )
+		{	// Copy all params from the original widget:
+			$duplicated_Widget->load_param_array();
+			$edited_ComponentWidget->param_array = $duplicated_Widget->param_array;
+
+			// Get widget order for new widget, must be next to the duplicated widget:
+			$widget_order = $duplicated_Widget->order + 1;
+			$edited_ComponentWidget->set( 'order', $widget_order );
+
+			// Move other widgets in the same container down, two-step update necessary to prevent unique key violation:
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_order = wi_order + 1
+				WHERE wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ).'
+				ORDER BY wi_order DESC' );
+
+			$DB->query( 'UPDATE T_widget__widget
+					SET wi_order = wi_order - 1
+				WHERE wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ).'
+				AND wi_order <= '.$DB->quote( $widget_order ).'
+				ORDER BY wi_order ASC' );
+
+			$edited_ComponentWidget->set( 'enabled', $duplicated_Widget->get( 'enabled' ) );
+
+			if( ! empty( $duplicated_Widget->get_param( 'title' ) ) )
+			{	// Append "(copy)" to title:
+				$edited_ComponentWidget->set( 'title', $duplicated_Widget->get_param( 'title' ).' ('.TB_('copy').')' );
+			}
+		}
 
 		// INSERT INTO DB:
 		$edited_ComponentWidget->dbinsert();
 
-		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
-					$edited_ComponentWidget->get_name(), T_($container)	), 'success' );
+		$DB->commit();
+
+		$Messages->add( sprintf( TB_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
+					$edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) ), 'success' );
 
 		switch( $display_mode )
 		{
 			case 'js' :	// this is a js call, lets return the settings page -- fp> what do you mean "settings page" ?
 				// fp> wthis will visually live insert the new widget into the container; it probably SHOULD open the edit properties right away
-				send_javascript_message( array(
+				if( $edited_ComponentWidget->type == 'plugin' && $edited_ComponentWidget->get_Plugin() == false )
+				{
+					$plugin_disabled = 1;
+				}
+				else
+				{
+					$plugin_disabled = 0;
+				}
+
+				$methods =  array(
 					'addNewWidgetCallback' => array(
 						$edited_ComponentWidget->ID,
 						$container,
@@ -228,18 +351,25 @@ switch( $action )
 						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
 							.$edited_ComponentWidget->get_desc_for_list()
 						.'</a> '.$edited_ComponentWidget->get_help_link(),
+						$edited_ComponentWidget->enabled,
+						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
+						( ( $action == 'duplicate' ) && isset( $duplicated_Widget ) ) ? $duplicated_Widget->ID : NULL,
+						$mode,
 					),
-					// Open widget settings:
-					'editWidget' => array(
-						'wi_ID_'.$edited_ComponentWidget->ID,
-					),
-				) );
+				);
+
+				if( $mode != 'customizer' )
+				{	// Open widget settings, except when in customizer mode:
+					$methods['editWidget'] = array( 'wi_ID_'.$edited_ComponentWidget->ID );
+				}
+
+				send_javascript_message( $methods );
 				break;
 
 			case 'normal' :
 			default : // take usual action
-				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID );
+				header_redirect( get_admin_url( 'ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $mode == 'customizer' ? '&mode=customizer' : '' ), '&' ) );
 				break;
 		}
 		break;
@@ -252,12 +382,15 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
+		// Update the folding states for current user:
+		save_fieldset_folding_values( $Blog->ID );
+
 		$edited_ComponentWidget->load_from_Request();
 
-		if(	! param_errors_detected() )
+		if( ! param_errors_detected() )
 		{ // Update settings:
 			$edited_ComponentWidget->dbupdate();
-			$Messages->add( T_('Widget settings have been updated'), 'success' );
+			$Messages->add( TB_('Widget settings have been updated'), 'success' );
 			switch( $display_mode )
 			{
 				case 'js' : // js reply
@@ -269,32 +402,41 @@ switch( $action )
 							$edited_ComponentWidget->get_cache_status( true )
 						);
 					if( $action == 'update' )
-					{ // Close window after update, and don't close it when user wants continue editing after updating
-						$methods['closeWidgetSettings'] = array();
+					{	// Close window after update, and don't close it when user wants continue editing after updating:
+						$methods['closeWidgetSettings'] = array( $action );
 					}
 					else
-					{ // Scroll to messages after update
-						$methods['showMessagesWidgetSettings'] = array();
+					{	// Scroll to messages after update:
+						$methods['showMessagesWidgetSettings'] = array( 'success' );
+						if( ! empty( $edited_ComponentWidget->reload_page_after_update ) )
+						{	// Reload page because it is required to update widget form with some new content which was created during updating:
+							$methods['location.reload'] = array();
+						}
 					}
 					send_javascript_message( $methods, true );
 					break;
 			}
 			if( $action == 'update_edit' )
 			{	// Stay on edit widget form:
-				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID, 303 );
+				header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID.'&display_mode='.$display_mode, '&' ), 303 );
 			}
 			else
-			{	// Redirect to widgets list:
+			{	// If $action == 'update'
+				// Redirect to widgets list:
 				$Session->set( 'fadeout_id', $edited_ComponentWidget->ID );
-				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+				if( $mode == 'customizer' && ! empty( $edited_ComponentWidget->reload_page_after_update ) )
+				{	// Set flag to refresh customizer page because it is required to update widget form with some new content which was created during updating:
+					// (e.g. used to display new auto created sub-container by widget "Columns(Sub-Containers)" - subcontainer_row_Widget)
+					$Session->set( 'refresh_customizer_window', 1 );
+				}
+				header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 			}
 		}
 		elseif( $display_mode == 'js' )
-		{ // send errors back as js
-			send_javascript_message( array( 'showMessagesWidgetSettings' => array() ), true );
+		{	// Send errors back as js:
+			send_javascript_message( array( 'showMessagesWidgetSettings' => array( 'failed' ) ), true );
 		}
 		break;
-
 
 	case 'move_up':
 		// Move the widget up:
@@ -307,12 +449,12 @@ switch( $action )
 
  		// Get the previous element
 		$row = $DB->get_row( 'SELECT *
-														FROM T_widget
-													 WHERE wi_coll_ID = '.$Blog->ID.'
-													 	 AND wi_sco_name = '.$DB->quote($edited_ComponentWidget->sco_name).'
-														 AND wi_order < '.$order.'
-													 ORDER BY wi_order DESC
-													 LIMIT 0,1' );
+				FROM T_widget__widget
+				WHERE wi_wico_ID = '.$edited_ComponentWidget->wico_ID.' AND wi_order < '.$order.'
+				ORDER BY wi_order DESC
+				LIMIT 0,1'
+			);
+
 		if( !empty( $row) )
 		{
 			$prev_ComponentWidget = new ComponentWidget( $row );
@@ -342,12 +484,12 @@ switch( $action )
 
  		// Get the next element
 		$row = $DB->get_row( 'SELECT *
-														FROM T_widget
-													 WHERE wi_coll_ID = '.$Blog->ID.'
-													 	 AND wi_sco_name = '.$DB->quote($edited_ComponentWidget->sco_name).'
-														 AND wi_order > '.$order.'
-													 ORDER BY wi_order ASC
-													 LIMIT 0,1' );
+				FROM T_widget__widget
+				WHERE wi_wico_ID = '.$edited_ComponentWidget->wico_ID.' AND wi_order > '.$order.'
+				ORDER BY wi_order ASC
+				LIMIT 0,1'
+			);
+
 		if( !empty( $row ) )
 		{
 			$next_ComponentWidget = new ComponentWidget( $row );
@@ -376,22 +518,31 @@ switch( $action )
 		$edited_ComponentWidget->set( 'enabled', (int)! $enabled );
 		$edited_ComponentWidget->dbupdate();
 
-		if ( $enabled )
+		if( $edited_ComponentWidget->type == 'plugin' && $edited_ComponentWidget->get_Plugin() == false )
 		{
-			$msg = T_( 'Widget has been disabled.' );
+			$plugin_disabled = 1;
 		}
 		else
 		{
-			$msg = T_( 'Widget has been enabled.' );
+			$plugin_disabled = 0;
+		}
+
+		if ( $enabled )
+		{
+			$msg = TB_( 'Widget has been disabled.' );
+		}
+		else
+		{
+			$msg = TB_( 'Widget has been enabled.' );
 		}
 		$Messages->add( $msg, 'success' );
 
 		if ( $display_mode == 'js' )
 		{
 			// EXITS:
-			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled ) ) );
+			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled, $plugin_disabled ) ) );
 		}
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 		break;
 
 	case 'cache_enable':
@@ -403,7 +554,7 @@ switch( $action )
 
 		if( $edited_ComponentWidget->get_cache_status() == 'disallowed' )
 		{ // Don't allow to change cache status because it is not allowed by widget config
-			$Messages->add( T_( 'This widget cannot be cached in the block cache.' ), 'error' );
+			$Messages->add( TB_( 'This widget cannot be cached in the block cache.' ), 'error' );
 		}
 		else
 		{ // Update widget cache status
@@ -412,11 +563,11 @@ switch( $action )
 
 			if( $action == 'cache_enable' )
 			{
-				$Messages->add( T_( 'Block caching has been turned on for this widget.' ), 'success' );
+				$Messages->add( TB_( 'Block caching has been turned on for this widget.' ), 'success' );
 			}
 			else
 			{
-				$Messages->add( T_( 'Block caching has been turned off for this widget.' ), 'success' );
+				$Messages->add( TB_( 'Block caching has been turned off for this widget.' ), 'success' );
 			}
 		}
 
@@ -428,7 +579,7 @@ switch( $action )
 					$edited_ComponentWidget->get_cache_status( true ),
 				) ) );
 		}
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 		break;
 
 	case 'activate':
@@ -439,28 +590,44 @@ switch( $action )
 		$Session->assert_received_crumb( 'widget' );
 
 		$widgets = param( 'widgets', 'array:integer' );
+		$wico_ID = param( 'wico_ID', 'integer', 0 );
 
 		if( count( $widgets ) )
 		{ // Enable/Disable the selected widgets
-			$updated_widgets = $DB->query( 'UPDATE T_widget
+			$updated_widgets = $DB->query( 'UPDATE T_widget__widget
+				INNER JOIN T_widget__container ON wico_ID = wi_wico_ID
 				  SET wi_enabled = '.$DB->quote( $action == 'activate' ? '1' : '0' ).'
 				WHERE wi_ID IN ( '.$DB->quote( $widgets ).' )
-				  AND wi_coll_ID = '.$DB->quote( $Blog->ID ) );
+				  AND wico_coll_ID = '.$DB->quote( $Blog->ID ) );
 		}
 
 		if( ! empty( $updated_widgets ) )
 		{ // Display a result message only when at least one widget has been updated
 			if( $action == 'activate' )
 			{
-				$Messages->add( sprintf( T_( '%d widgets have been enabled.' ), $updated_widgets ), 'success' );
+				$Messages->add( sprintf( TB_( '%d widgets have been enabled.' ), $updated_widgets ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_( '%d widgets have been disabled.' ), $updated_widgets ), 'success' );
+				$Messages->add( sprintf( TB_( '%d widgets have been disabled.' ), $updated_widgets ), 'success' );
 			}
 		}
 
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		if( $mode == 'customizer' )
+		{	// Set an URL to redirect back to customizer mode:
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer', '&' );
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			if( $WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID, false, false ) )
+			{
+				$redirect_to .= '&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) );
+			}
+		}
+		else
+		{	// Set an URL to redirect to normal mode:
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' );
+		}
+
+		header_redirect( $redirect_to, 303 );
 		break;
 
 	case 'delete':
@@ -469,7 +636,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		$msg = sprintf( T_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
+		$msg = sprintf( TB_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
 		$edited_widget_ID = $edited_ComponentWidget->ID;
 		$edited_ComponentWidget->dbdelete();
 		unset( $edited_ComponentWidget );
@@ -479,59 +646,99 @@ switch( $action )
 		switch( $display_mode )
 		{
 			case 'js' :	// js call : return success message
-				send_javascript_message( array( 'doDelete' => $edited_widget_ID ) );
+				send_javascript_message();
 				break;
 
 			case 'normal' :
 			default : // take usual action
 				// PREVENT RELOAD & Switch to list mode:
-				header_redirect( '?ctrl=widgets&blog='.$blog );
+				header_redirect( get_admin_url( 'ctrl=widgets&blog='.$blog, '&' ) );
 				break;
 		}
 		break;
 
- 	case 'list':
+	case 'list':
 		break;
 
- 	case 're-order' : // js request
- 		// Check that this action request is not a CSRF hacked request:
+	case 're-order' : // js request
+		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
- 		$DB->begin();
+		$DB->begin();
 
- 		// Reset the current orders and make container names temp to avoid duplicate entry errors
-		$DB->query( 'UPDATE T_widget
-										SET wi_order = wi_order * -1,
-												wi_sco_name = CONCAT( \'temp_\', wi_sco_name )
-									WHERE wi_coll_ID = '.$Blog->ID );
+		if( $wico_ID > 0 )
+		{	// Re-order widgets of ONE given container:
+			$blog_container_IDs = array( $wico_ID );
+		}
+		else
+		{	// Re-order widgets of ALL containers:
+			$SQL = new SQL( 'Get IDs of all widget containers of collection #'.$Blog->ID );
+			$SQL->SELECT( 'wico_ID' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( '( wico_coll_ID = '.$Blog->ID.' OR wico_coll_ID IS NULL )' );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+			$blog_container_IDs = $DB->get_col( $SQL );
+		}
 
-		foreach( $containers as $container => $widgets )
-		{	// loop through each container and set new order
-			$order = 0; // reset counter for this container
-			foreach( $widgets as $widget )
-			{	// loop through each widget
-				if( $widget = preg_replace( '~[^0-9]~', '', $widget ) )
-				{ // valid widget id
+		// Check if current reordering contains all actual widgets from DB:
+		if( empty( $blog_container_IDs ) )
+		{
+			$server_widget_IDs = array();
+		}
+		else
+		{
+			$SQL = new SQL( 'Get all widget IDs for checking correct re-order request' );
+			$SQL->SELECT( 'wi_ID' );
+			$SQL->FROM( 'T_widget__widget' );
+			$SQL->WHERE( 'wi_wico_ID IN ( '.implode( ',', $blog_container_IDs ).' )' );
+			$server_widget_IDs = $DB->get_col( $SQL );
+		}
+		$checked_new_widgets = array_diff( $server_widget_IDs, $passed_widget_IDs );
+		$checked_old_widgets = array_diff( $passed_widget_IDs, $server_widget_IDs );
+
+		// Don't allow to reorder if at least one widget was added or deleted in DB since after last page refresh:
+		$result = empty( $checked_new_widgets ) && empty( $checked_old_widgets );
+
+		if( $result && $blog_container_IDs )
+		{
+			$blog_container_IDs = $DB->quote( $blog_container_IDs );
+
+			// Reset the current orders to avoid duplicate entry errors
+			$DB->query( 'UPDATE T_widget__widget
+				SET wi_order = wi_order * -1
+				WHERE wi_wico_ID IN ( '.$blog_container_IDs.' )' );
+
+			foreach( $containers as $container_fieldset_id => $widgets )
+			{ // loop through each container and set new order
+				$WidgetContainer = & get_WidgetContainer_by_coll_skintype_fieldset( $Blog->ID, $skin_type, $container_fieldset_id );
+				if( ( $WidgetContainer->ID == 0 ) && ( count( $widgets ) > 0 ) )
+				{ // Widget was moved to an empty main widget container, it needs to be created
+					$WidgetContainer->dbinsert();
+				}
+				$order = 0; // reset counter for this container
+				foreach( $widgets as $widget )
+				{ // loop through each widget
 					$order++;
-					$DB->query( 'UPDATE T_widget
-													SET wi_order = '.$order.',
-															wi_sco_name = '.$DB->quote( $container ).'
-												WHERE wi_ID = '.$widget.'
-												  AND wi_coll_ID = '.$Blog->ID );	// Doh! Don't trust the client request!!
+					$DB->query( 'UPDATE T_widget__widget
+						SET wi_order = '.$order.',
+							wi_wico_ID = '.$WidgetContainer->ID.'
+						WHERE wi_ID = '.$widget.' AND wi_wico_ID IN ( '.$blog_container_IDs.' )' );	// Doh! Don't trust the client request!!
 				}
 			}
 		}
 
-		// Cleanup deleted widgets and empty temp containers
-		$DB->query( 'DELETE FROM T_widget
-									WHERE wi_order < 1
-										AND wi_coll_ID = '.$Blog->ID ); // Doh! Don't touch other blogs!
-
-		$DB->commit();
-
- 		$Messages->add( T_( 'Widgets updated' ), 'success' );
- 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
- 		break;
+		if( $result )
+		{	// Send success message:
+			$DB->commit();
+			$Messages->add( TB_( 'Widgets updated' ), 'success' );
+		}
+		else
+		{	// Send error message if widgets cannot be reordered:
+			$DB->rollback();
+			$Messages->add( T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.'), 'error' );
+		}
+		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
+		break;
 
 
 	case 'reload':
@@ -540,19 +747,95 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
- 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		// Save to DB, and display correpsonding messages:
+		$Blog->db_save_main_containers( true, $skin_type );
 
-		$SkinCache = & get_SkinCache();
-		/**
-		 * @var Skin
-		 */
-		$edited_Skin = & $SkinCache->get_by_ID( $blog_normal_skin_ID );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type, '&' ), 303 );
+		break;
 
-		// Save to DB:
-		$edited_Skin->db_save_containers();
+	case 'create_container':
+	case 'update_container':
+		// Save widget container:
 
-		header_redirect( '?ctrl=widgets&blog='.$Blog->ID, 303 );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget_container' );
+
+		if( $wico_ID > 0 )
+		{	// Get the existing widget container:
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
+		}
+		else
+		{	// Get new widget container:
+			$edited_WidgetContainer = new WidgetContainer();
+		}
+		if( $edited_WidgetContainer->load_from_Request() )
+		{	// If widget container has been saved successfully:
+			if( $edited_WidgetContainer->dbsave() )
+			{
+				$Messages->add( sprintf( TB_('%s has been saved.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
+			}
+			if( $mode == 'customizer' )
+			{	// Redirect back to customizer mode:
+				$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer', '&' );
+			}
+			else
+			{	// Redirect back to back-office widgets list:
+				$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), '&' );
+			}
+			header_redirect( $redirect_to, 303 );
+		}
+		break;
+
+	case 'destroy_container':
+		// Destroy a widget container
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget_container' );
+
+		$success_msg = sprintf( TB_('Widget container &laquo;%s&raquo; removed.'), $edited_WidgetContainer->get( 'name' ) );
+		// Remove the widget container from the database
+		$edited_WidgetContainer->dbdelete();
+		unset( $edited_WidgetContainer );
+		forget_param( 'wico_ID' );
+		$Messages->add( $success_msg, 'success' );
+
+		if( $mode == 'customizer' )
+		{	// Redirect back to customizer mode:
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$blog.'&skin_type='.$skin_type.'&action=customize&mode=customizer', '&' );
+		}
+		else
+		{	// Redirect back to back-office widgets list:
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$blog, '&' );
+		}
+		header_redirect( $redirect_to, 303 );
+		break;
+
+	case 'reload_container':
+		// Reload widget container:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget_container' );
+
+		// Get the existing widget container:
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
+
+		if( get_default_widgets_by_container( $edited_WidgetContainer->get( 'code' ) ) == false )
+		{	// Display error when container is not found 
+			// Do NOT translate because it must not happen in normal work:
+			$Messages->add( sprintf( '%s cannot be reloaded because it is not configured for default widgets.', $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'error' );
+		}
+		else
+		{	// Reload widgets:
+			$DB->query( 'DELETE FROM T_widget__widget
+				WHERE wi_wico_ID = '.$edited_WidgetContainer->ID );
+			$new_inserted_widgets_num = install_new_default_widgets( $edited_WidgetContainer->get( 'code' ), '*', $Blog->ID, $edited_WidgetContainer->get( 'skin_type' ) );
+			$Messages->add( sprintf( TB_('%s has been reset to defaults (populated with %d widgets).'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"', $new_inserted_widgets_num ), 'success' );
+		}
+
+		// Redirect back to back-office widgets list:
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), '&' ), 303 );
 		break;
 
 	default:
@@ -567,7 +850,7 @@ if( $display_mode == 'normal' )
 	 */
 	$AdminUI->set_coll_list_params( 'blog_properties', 'edit', array( 'ctrl' => 'widgets' ) );
 
-	$AdminUI->set_path( 'collections', 'widgets' );
+	$AdminUI->set_path( 'collections', 'widgets', 'skin_'.$skin_type );
 
 	// We should activate toolbar menu items for this controller and mode
 	$activate_collection_toolbar = true;
@@ -589,22 +872,37 @@ if( $display_mode == 'normal' )
 	 *
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
-	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
-	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
-	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
-	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
-	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
-	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
-	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
-	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
+	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => TB_( 'Edit widget settings!' ) ) ).'\';
+	var duplicate_icon_tag = \''.get_icon( 'duplicate', 'imgtag', array( 'title' => TB_('Duplicate') ) ).'\';
+	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => TB_( 'Remove this widget!' ) ) ).'\';
+	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => TB_( 'The widget is enabled.' ) ) ).'\';
+	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => TB_( 'The widget is disabled.' ) ) ).'\';
+	var disabled_plugin_tag = \''.get_icon( 'warning', 'imgtag', array( 'title' => TB_('Inactive / Uninstalled plugin') ) ).'\';
+	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => TB_( 'Enable this widget!' ) ) ).'\';
+	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => TB_( 'Disable this widget!' ) ) ).'\';
+	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => TB_( 'Caching is enabled. Click to disable.' ) ) ).'\';
+	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => TB_( 'Caching is disabled. Click to enable.' ) ) ).'\';
+	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => TB_( 'This widget cannot be cached.' ) ) ).'\';
+	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => TB_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
 
-	var b2evo_dispatcher_url = "'.$admin_url.'";' );
-	require_js( '#jqueryUI#' ); // auto requires jQuery
+	var widget_crumb_url_param = \''.url_crumb( 'widget' ).'\';
+
+	var b2evo_dispatcher_url = "'.get_admin_url().'";' );
+	require_js_defer( '#jqueryUI#' ); // auto requires jQuery
 	require_css( 'blog_widgets.css' );
+	init_tokeninput_js();
+	init_hotkeys_js( 'blog', array( 'ctrl+s', 'command+s', 'ctrl+enter', 'command+enter' ) );
 
+	if( $action == 'list' && $Session->get( 'refresh_customizer_window' ) )
+	{	// This is a request to refresh customizer back-office window:
+		// (e.g. used to display new auto created sub-container by widget "Columns(Sub-Containers)" - subcontainer_row_Widget)
+		add_js_headline( 'window.parent.document.getElementById( "evo_customizer__backoffice" ).contentDocument.location.reload();' );
+		// Clear temp variable:
+		$Session->delete( 'refresh_customizer_window' );
+	}
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
-	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => get_admin_url( 'ctrl=collections' ) ) );
+	$AdminUI->breadcrumbpath_add( T_('Widgets'), get_admin_url( 'ctrl=widgets&amp;blog=$blog$' ) );
 
 	// Set an url for manual page:
 	$AdminUI->set_page_manual_link( 'widget-settings' );
@@ -637,6 +935,19 @@ switch( $action )
 		$AdminUI->disp_payload_end();
 		break;
 
+	case 'new_container':
+	case 'edit_container':
+	case 'create_container':
+	case 'update_container':
+		// Begin payload block:
+		$AdminUI->disp_payload_begin();
+
+		// Display VIEW:
+		$AdminUI->disp_view( 'widgets/views/_widget_container.form.php' );
+
+		// End payload block:
+		$AdminUI->disp_payload_end();
+		break;
 
 	case 'edit':
 	case 'update':	// on error
@@ -648,7 +959,10 @@ switch( $action )
 				// Display VIEW:
 				$AdminUI->disp_view( 'widgets/views/_widget.form.php' );
 				$output = ob_get_clean();
-				send_javascript_message( array( 'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ) ) );
+				send_javascript_message( array(
+						'widgetSettings' => array( $output, $edited_ComponentWidget->get( 'type' ), $edited_ComponentWidget->get( 'code' ) ),
+						'evo_initialize_colorpicker_inputs' => array(),
+					) );
 				break;
 
 			case 'normal' :
@@ -666,6 +980,52 @@ switch( $action )
 		break;
 
 
+	case 'add_list':
+		// A list of widgets which can be added:
+		switch( $mode )
+		{
+			case 'customizer':
+				if( preg_match( '#^(coll|shared):(.+)$#', $container_code, $container_match ) )
+				{	// Sub-container may be from Collection and may be Shared:
+					$container_coll_ID = $container_match[1] == 'coll' ? $blog : NULL;
+					$container_code = $container_match[2];
+				}
+				else
+				{	// Normal container:
+					$container_coll_ID = $blog;
+				}
+
+				// Try to get widget container by collection ID, container code and requested skin type:
+				$WidgetContainerCache = & get_WidgetContainerCache();
+				$WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $container_coll_ID, $skin_type, $container_code );
+
+				// Change this param to proper work of func get_WidgetContainer_by_coll_skintype_fieldset():
+				set_param( 'container', 'wico_ID_'.$WidgetContainer->ID );
+
+				$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
+				break;
+		}
+		break;
+
+	case 'customize':
+		if( preg_match( '#^(coll|shared):(.+)$#', $container_code, $container_match ) )
+		{	// Sub-container may be from Collection and may be Shared:
+			$container_coll_ID = $container_match[1] == 'coll' ? $blog : NULL;
+			$container_code = $container_match[2];
+		}
+		else
+		{	// Normal container:
+			$container_coll_ID = $blog;
+		}
+
+		if( ! empty( $container_code ) )
+		{	// Try to get widget container by collection ID, container code and requested skin type:
+			$WidgetContainerCache = & get_WidgetContainerCache();
+			$selected_WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $container_coll_ID, $skin_type, $container_code );
+		}
+		$AdminUI->disp_view( 'widgets/views/_widget_customize.form.php' );
+		break;
+
 	case 'list':
 	default:
 		// Begin payload block:
@@ -677,18 +1037,11 @@ switch( $action )
 		echo '<div class="available_widgets">'."\n";
 		echo '<div class="available_widgets_toolbar modal-header">'
 						.'<a href="#" class="floatright close">'.get_icon('close').'</a>'
-						.'<h4 class="modal-title">'.T_( 'Select widget to add:' ).'</h4>'
+						.'<h4 class="modal-title">'.TB_( 'Select widget to add:' ).'</h4>'
 					.'</div>'."\n";
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );
 		echo '</div></div>'."\n";
-		echo '
-		<script type="text/javascript">
-			<!--
-			var blog = '.$Blog->ID.';
-			// -->
-		</script>
-		';
 
 		// Display VIEW:
 		$AdminUI->disp_view( 'widgets/views/_widget_list.view.php' );
@@ -698,7 +1051,9 @@ switch( $action )
 		break;
 }
 
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+if( $display_mode == 'normal' )
+{	// Normal mode:
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

@@ -160,6 +160,8 @@ $user_agents = array(
 	1067 => array('robot', 'IstellaBot/', 'IstellaBot' ),
 	1068 => array('robot', 'exb.de/crawler', 'ExB Language Crawler' ),
 	1069 => array('robot', 'SemrushBot', 'SemrushBot' ),
+	1070 => array('robot', 'UptimeRobot', 'UptimeRobot' ),
+	1071 => array('robot', 'Qwantify', 'Qwant' ),
 	// Unknown robots:
 	5000 => array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
@@ -279,7 +281,8 @@ $referer_type_color = array(
 	'direct'  => '00FFCC',
 	'spam'    => 'FF0000',
 	'self'    => '00FF99',
-	'admin'   => '999999'
+	'admin'   => '999999',
+	'ajax'    => '339966',
 	);
 
 $agent_type_array = array (
@@ -314,7 +317,8 @@ $hit_type_color = array(
 	'admin'            => 'AAE0E0',
 	'standard_robot'   => 'FF9900',
 	'standard_browser' => 'FFCC00',
-	'api'              => '5BC0DE'
+	'api'              => '5BC0DE',
+	'unknown'          => 'CCCCCC',
 );
 
 $hit_method_color = array(
@@ -335,6 +339,12 @@ $user_gender_color = array(
 	'nogender_active'    => '666666',
 	'nogender_notactive' => '999999',
 	'nogender_closed'    => 'cccccc'
+);
+
+$activity_type_color = array(
+	'users'     => 'FF9900',
+	'posts'    => '6699CC',
+	'comments' => '5BC0DE'
 );
 
 ?>

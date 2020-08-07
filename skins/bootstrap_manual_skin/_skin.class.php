@@ -21,7 +21,7 @@ class bootstrap_manual_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.0';
+	var $version = '7.3.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -43,7 +43,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -55,7 +55,7 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -99,6 +99,29 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_secondary_area' => NULL,
+				'item_single_header'        => NULL,
+				'chapter_main_area'         => array( NT_('Chapter Main Area'), 46 ),
+				'sidebar_single'            => array( NT_('Sidebar Single'), 95 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -106,24 +129,30 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
-					'max_image_height' => array(
-						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
-						'defaultvalue' => '',
-						'type' => 'integer',
-						'size' => '7',
-						'allow_empty' => true,
-					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
 						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
 						'defaultvalue' => 0,
 						'type' => 'checkbox',
+					),
+					'use_3_cols' => array(
+						'label' => T_('Use 3 cols'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'other',        T_('On other disps'), 0 ),
+						),
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -221,9 +250,40 @@ class bootstrap_manual_Skin extends Skin
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
 							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
-							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ),
+						) ),
 				'section_access_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_advanced_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced')
+				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+				'section_advanced_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -244,25 +304,24 @@ class bootstrap_manual_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Layout Settings / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		// Initialize a template depending on current page
 		switch( $disp )
@@ -273,7 +332,7 @@ class bootstrap_manual_Skin extends Skin
 				break;
 
 			case 'posts':
-				global $cat, $bootstrap_manual_posts_text;
+				global $cat, $tag, $bootstrap_manual_posts_text;
 
 				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
@@ -290,10 +349,13 @@ class bootstrap_manual_Skin extends Skin
 				break;
 		}
 
-		if( $this->is_left_navigation_visible() )
+		if( $this->is_side_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			$this->require_js( 'left_navigation.js' );
+			require_js_defer( 'src/evo_affix_sidebars.js', 'blog', false, '#', 'footerlines' );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
@@ -348,15 +410,6 @@ class bootstrap_manual_Skin extends Skin
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -372,10 +425,12 @@ class bootstrap_manual_Skin extends Skin
 					'search_cell_author_end'   => '</p>',
 					'search_date_format'       => 'F jS, Y',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				);
 
 			default:
@@ -386,44 +441,118 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
-	 * Check if left navigation is visible for current page
+	 * Check if side(left and/or right) navigations are visible for current page
 	 *
-	 * @return boolean TRUE
+	 * @return boolean TRUE on visible
 	 */
-	function is_left_navigation_visible()
+	function is_side_navigation_visible()
 	{
 		global $disp;
 
-		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
-			return $this->is_visible_container( 'sidebar' ) || $this->is_visible_container( 'sidebar2' );
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
 	}
 
 
 	/**
-	 * Check if we can display a widget container
+	 * Check if 3rd/right column layout can be used for current page
 	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
+	 * @return boolean
 	 */
-	function is_visible_container( $container_key )
+	function is_3rd_right_column_layout()
 	{
-		global $Collection, $Blog;
+		global $disp, $disp_detail;
 
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
+		if( ! $this->is_side_navigation_visible() )
+		{	// Side navigation is hidden for current page:
+			return false;
 		}
 
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
+		// Check when we should use layout with 3 columns:
+		if( $disp == 'front' )
+		{	// Front page
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'front' );
+		}
 
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
+		if( $disp == 'single' )
+		{	// Single post/item page:
+			return ( $this->get_checklist_setting( 'use_3_cols', 'single' )
+				// old setting should be supported:
+				|| $this->get_setting( 'single_3_cols' ) );
+		}
+
+		if( $disp_detail == 'posts-topcat-nointro' || $disp_detail == 'posts-topcat-intro' )
+		{	// Category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
+		}
+
+		if( $disp_detail == 'posts-subcat-nointro' || $disp_detail == 'posts-subcat-intro' )
+		{	// Sub-category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
+		}
+
+		// All other disps:
+		return (boolean)$this->get_checklist_setting( 'use_3_cols', 'other' );
+	}
+
+
+	/**
+	 * Get layout style class depending on skin settings and current disp
+	 *
+	 * @param string Place where class is used
+	 */
+	function get_layout_class( $place )
+	{
+		$r = '';
+
+		switch( $place )
+		{
+			case 'container':
+				$r .= 'container';
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= ' container-xxl';
+				}
+				break;
+
+			case 'main_column':
+				if( $this->is_side_navigation_visible() )
+				{	// Layout with visible left sidebar:
+					if( $this->is_3rd_right_column_layout() )
+					{	// Layout with 3 columns on current page:
+						$r .= 'col-xxl-8 col-xxl-pull-2 ';
+					}
+					$r .= 'col-md-9 pull-right-md';
+				}
+				else
+				{
+					$r .= 'col-md-12';
+				}
+				break;
+
+			case 'left_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-left-md';
+				break;
+
+			case 'right_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 col-xxl-push-8 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-right-md';
+				break;
+		}
+
+		return $r;
 	}
 }
-
 ?>

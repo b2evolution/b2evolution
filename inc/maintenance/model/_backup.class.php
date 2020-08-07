@@ -47,28 +47,28 @@ global $backup_tables;
  */
 $backup_paths = array(
 	'application_files'   => array(
-		'label'    => T_('Application files'), /* It is files root. Please, don't remove it. */
+		'label'    => TB_('Application files'), /* It is files root. Please, don't remove it. */
 		'path'     => '*',
 		'included' => true ),
 
 	'configuration_files' => array(
-		'label'    => T_('Configuration files'),
+		'label'    => TB_('Configuration files'),
 		'path'     => $conf_subdir,
 		'included' => true ),
 
 	'skins_files'         => array(
-		'label'    => T_('Skins'),
+		'label'    => TB_('Skins'),
 		'path'     => array( $skins_subdir,
 							$adminskins_subdir ),
 		'included' => true ),
 
 	'plugins_files'       => array(
-		'label'    => T_('Plugins'),
+		'label'    => TB_('Plugins'),
 		'path'     => $plugins_subdir,
 		'included' => true ),
 
 	'media_files'         => array(
-		'label'    => T_('Media folder'),
+		'label'    => TB_('Media folder'),
 		'path'     => $media_subdir,
 		'included' => false ),
 
@@ -113,18 +113,19 @@ $backup_exclude_folders = array(
  */
 $backup_tables = array(
 	'content_tables'      => array(
-		'label'    => T_('Content tables'), /* It means collection of all of the tables. Please, don't remove it. */
+		'label'    => TB_('Content tables'), /* It means collection of all of the tables. Please, don't remove it. */
 		'table'   => '*',
 		'included' => true ),
 
 	'logs_stats_tables'   => array(
-		'label'    => T_('Logs & stats tables'),
+		'label'    => TB_('Logs & stats tables'),
 		'table'   => array(
-			'T_sessions',
+			'T_email__log',
 			'T_hitlog',
-			'T_basedomains',
+			'T_sessions',
 			'T_track__goalhit',
 			'T_track__keyphrase',
+			'T_syslog',
 		),
 		'included' => false ) );
 
@@ -159,6 +160,17 @@ class Backup
 	 * @var array
 	 */
 	var $backup_tables;
+
+	/**
+	 * Add "CREATE TABLE" statements for ALL tables
+	 * @var boolean
+	 */
+	var $backup_db_structure = true;
+
+	/**
+	 * Add "DROP TABLE IF EXISTS" before every "CREATE TABLE"
+	 */
+	var $drop_table_first = true;
 
 	/**
 	 * True if pack backup files
@@ -233,12 +245,18 @@ class Backup
 			$this->backup_tables[$name] = param( 'bk_'.$name, 'boolean', 0, $memorize_params );
 		}
 
+		$this->backup_db_structure = param( 'db_structure', 'boolean', false, $memorize_params );
+
+		$this->drop_table_first = param( 'drop_table_first', 'boolean', false, $memorize_params );
+
 		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean', 0, $memorize_params );
 
 		// Check are there something to backup
-		if( !$this->has_included( $this->backup_paths ) && !$this->has_included( $this->backup_tables ) )
+		if( ! $this->has_included( $this->backup_paths ) &&
+		    ! $this->has_included( $this->backup_tables ) &&
+		    ! $this->backup_db_structure )
 		{
-			$Messages->add( T_('You have not selected anything to backup.'), 'error' );
+			$Messages->add( TB_('You have not selected anything to backup.'), 'error' );
 			return false;
 		}
 
@@ -256,7 +274,7 @@ class Backup
 		// Create current backup path
 		$cbackup_path = $backup_path.date( 'Y-m-d-H-i-s', $servertimenow ).'/';
 
-		echo '<p>'.sprintf( T_('Starting backup to: &laquo;%s&raquo; ...'), $cbackup_path ).'</p>';
+		echo '<p>'.sprintf( TB_('Starting backup to: &laquo;%s&raquo; ...'), $cbackup_path ).'</p>';
 		evo_flush();
 
 		// Prepare backup directory
@@ -275,7 +293,7 @@ class Backup
 		}
 
 		// Backup database
-		if( $success && $this->has_included( $this->backup_tables ) )
+		if( $success && ( $this->has_included( $this->backup_tables ) || $this->backup_db_structure ) )
 		{
 			// Prepare database backup directory
 			if( $success = prepare_maintenance_dir( $cbackup_path, false ) )
@@ -286,7 +304,7 @@ class Backup
 
 		if( $success )
 		{
-			echo '<p>'.sprintf( T_('Backup complete. Directory: &laquo;%s&raquo;'), $cbackup_path ).'</p>';
+			echo '<p>'.sprintf( TB_('Backup complete. Directory: &laquo;%s&raquo;'), $cbackup_path ).'</p>';
 			evo_flush();
 
 			return true;
@@ -303,9 +321,9 @@ class Backup
 	 */
 	function backup_files( $backup_dirpath )
 	{
-		global $basepath, $backup_paths, $backup_exclude_folders, $backup_current_exclude_folders, $inc_path;
+		global $basepath, $backup_paths, $backup_exclude_folders, $inc_path, $Settings;
 
-		echo '<h4>'.T_('Creating folders/files backup...').'</h4>';
+		echo '<h4>'.TB_('Creating folders/files backup...').'</h4>';
 		evo_flush();
 
 		// Find included and excluded files
@@ -373,7 +391,7 @@ class Backup
 			}
 			else
 			{
-				echo '<p style="color:red">'.sprintf( T_('Config file %s cannot be read.'), '<b>'.$backup_ignore_file.'</b>' ).'</p>';
+				echo '<p style="color:red">'.sprintf( TB_('Config file %s cannot be read.'), '<b>'.$backup_ignore_file.'</b>' ).'</p>';
 				evo_flush();
 			}
 		}
@@ -382,48 +400,13 @@ class Backup
 		$included_files = array_diff( $included_files, $excluded_files );
 
 		if( $this->pack_backup_files )
-		{ // Create ZIPped backup
+		{	// Create ZIPped backup:
 			$zip_filepath = $backup_dirpath.'www.zip';
 
-			// Pack using 'zlib' extension and PclZip wrapper
-
-			if( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			{ // Set path for temp files of PclZip
-				define( 'PCLZIP_TEMPORARY_DIR', $backup_dirpath );
-			}
-			// Load PclZip class (PHP4):
-			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
-
-			$PclZip = new PclZip( $zip_filepath );
-
-			echo sprintf( T_('Archiving files to &laquo;<strong>%s</strong>&raquo;...'), $zip_filepath ).'<br/>';
+			echo sprintf( TB_('Archiving files to &laquo;<strong>%s</strong>&raquo;...'), $zip_filepath ).'<br/>';
 			evo_flush();
 
-			foreach( $included_files as $included_file )
-			{
-				echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $basepath.$included_file );
-				evo_flush();
-
-				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ),
-					PCLZIP_OPT_ADD_PATH, 'www',
-					PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ),
-					PCLZIP_CB_PRE_ADD, 'callback_backup_files' );
-				if( $file_list == 0 )
-				{
-					echo '<p style="color:red">'
-							.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
-							.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
-						.'</p>';
-					evo_flush();
-
-					return false;
-				}
-				else
-				{
-					echo ' OK.<br />';
-					evo_flush();
-				}
-			}
+			return pack_archive( $zip_filepath, $basepath, $included_files, 'www', $backup_current_exclude_folders );
 		}
 		else
 		{	// Copy directories and files to backup directory
@@ -446,13 +429,19 @@ class Backup
 	 */
 	function backup_database( $backup_dirpath )
 	{
-		global $DB, $db_config, $backup_tables, $inc_path;
+		global $DB, $db_config, $backup_tables, $inc_path, $Settings;
 
-		echo '<h4>'.T_('Creating database backup...').'</h4>';
+		echo '<h4>'.TB_('Creating database backup...').'</h4>';
 		evo_flush();
 
+		$backup_structure = array();
+		$backup_data = array();
+		if( $this->backup_db_structure )
+		{	// Backup structure of all tables:
+			$backup_structure = $DB->get_col( 'SHOW TABLES' );
+		}
+
 		// Collect all included tables
-		$ready_to_backup = array();
 		foreach( $this->backup_tables as $name => $included )
 		{
 			if( $included )
@@ -460,24 +449,22 @@ class Backup
 				$tables = aliases_to_tables( $backup_tables[$name]['table'] );
 				if( is_array( $tables ) )
 				{
-					$ready_to_backup = array_merge( $ready_to_backup, $tables );
+					$backup_data = array_merge( $backup_data, $tables );
 				}
 				elseif( $tables == '*' )
 				{
-					foreach( $DB->get_results( 'SHOW TABLES', ARRAY_N ) as $row )
-					{
-						$ready_to_backup[] = $row[0];
-					}
+					$backup_data = array_merge( $backup_data, $DB->get_col( 'SHOW TABLES' ) );
 				}
 				else
 				{
-					$ready_to_backup[] = $tables;
+					$backup_data[] = $tables;
 				}
 			}
 		}
 
 		// Ensure there are no duplicated tables
-		$ready_to_backup = array_unique( $ready_to_backup );
+		$backup_data = array_unique( $backup_data );
+		$backup_structure = array_unique( array_merge( $backup_structure, $backup_data ) );
 
 		// Exclude tables
 		foreach( $this->backup_tables as $name => $included )
@@ -487,14 +474,22 @@ class Backup
 				$tables = aliases_to_tables( $backup_tables[$name]['table'] );
 				if( is_array( $tables ) )
 				{
-					$ready_to_backup = array_diff( $ready_to_backup, $tables );
+					$backup_data = array_diff( $backup_data, $tables );
+					if( ! $this->backup_db_structure )
+					{
+						$backup_structure = array_diff( $backup_structure, $tables );;
+					}
 				}
 				elseif( $tables != '*' )
 				{
-					$index = array_search( $tables, $ready_to_backup );
+					$index = array_search( $tables, $backup_data );
 					if( $index )
 					{
-						unset( $ready_to_backup[$index] );
+						unset( $backup_data[$index] );
+						if( ! $this->backup_db_structure )
+						{
+							unset( $backup_structure[$index] );
+						}
 					}
 				}
 			}
@@ -507,7 +502,7 @@ class Backup
 		// Check if backup file exists
 		if( file_exists( $backup_sql_filepath ) )
 		{	// Stop tables backup, because backup file exists
-			echo '<p style="color:red">'.sprintf( T_('Unable to write database dump. Database dump already exists: &laquo;%s&raquo;'), $backup_sql_filepath ).'</p>';
+			echo '<p style="color:red">'.sprintf( TB_('Unable to write database dump. Database dump already exists: &laquo;%s&raquo;'), $backup_sql_filepath ).'</p>';
 			evo_flush();
 
 			return false;
@@ -516,79 +511,96 @@ class Backup
 		$f = @fopen( $backup_sql_filepath , 'w+' );
 		if( $f == false )
 		{	// Stop backup, because it can't open backup file for writing
-			echo '<p style="color:red">'.sprintf( T_('Unable to write database dump. Could not open &laquo;%s&raquo; for writing.'), $backup_sql_filepath ).'</p>';
+			echo '<p style="color:red">'.sprintf( TB_('Unable to write database dump. Could not open &laquo;%s&raquo; for writing.'), $backup_sql_filepath ).'</p>';
 			evo_flush();
 
 			return false;
 		}
 
-		echo sprintf( T_('Dumping tables to &laquo;<strong>%s</strong>&raquo;...'), $backup_sql_filepath ).'<br/>';
+		echo sprintf( TB_('Dumping tables to &laquo;<strong>%s</strong>&raquo;...'), $backup_sql_filepath ).'<br/>';
 		evo_flush();
 
+		if( $this->drop_table_first )
+		{	// Disable foreign key check to avoid errors due to referencial constraints:
+			fwrite( $f, "SET @fkey_check = @@foreign_key_checks;\n" );
+			fwrite( $f, "SET FOREIGN_KEY_CHECKS=0;\n\n" );
+		}
+
 		// Create and save created SQL backup script
-		foreach( $ready_to_backup as $table )
+		foreach( $backup_structure as $table )
 		{
 			// progressive display of what backup is doing
-			echo sprintf( T_('Backing up table &laquo;<strong>%s</strong>&raquo; ...'), $table );
+			echo sprintf( TB_('Backing up table &laquo;<strong>%s</strong>&raquo; to SQL file...'), $table );
 			evo_flush();
 
+			if( $this->drop_table_first )
+			{	// Drop existing table before creating a new one:
+				fwrite( $f, 'DROP TABLE IF EXISTS `'.$table."`;\n" );
+			}
 			$row_table_data = $DB->get_row( 'SHOW CREATE TABLE '.$table, ARRAY_N );
 			fwrite( $f, $row_table_data[1].";\n\n" );
 
-			$page = 0;
-			$page_size = 500;
-			$is_insert_sql_started = false;
-			$is_first_insert_sql_value = true;
-			while( ! empty( $rows ) || $page == 0 )
-			{ // Get the records by page(500) in order to save memory and avoid fatal error
-				$rows = $DB->get_results( 'SELECT * FROM '.$table.' LIMIT '.( $page * $page_size ).', '.$page_size, ARRAY_N );
+			if( in_array( $table, $backup_data ) )
+			{	// Dump data of the table:
+				$page = 0;
+				$page_size = 500;
+				$is_insert_sql_started = false;
+				$is_first_insert_sql_value = true;
+				while( ! empty( $rows ) || $page == 0 )
+				{ // Get the records by page(500) in order to save memory and avoid fatal error
+					$rows = $DB->get_results( 'SELECT * FROM '.$table.' LIMIT '.( $page * $page_size ).', '.$page_size, ARRAY_N );
 
-				if( $page == 0 && ! $is_insert_sql_started && ! empty( $rows ) )
-				{ // Start SQL INSERT clause
-					fwrite( $f, 'INSERT INTO '.$table.' VALUES ' );
-					$is_insert_sql_started = true;
-				}
+					if( $page == 0 && ! $is_insert_sql_started && ! empty( $rows ) )
+					{ // Start SQL INSERT clause
+						fwrite( $f, 'INSERT INTO '.$table.' VALUES ' );
+						$is_insert_sql_started = true;
+					}
 
-				foreach( $rows as $row )
-				{
-					$values = '(';
-					$num_fields = count( $row );
-					for( $index = 0; $index < $num_fields; $index++ )
+					foreach( $rows as $row )
 					{
-						if( isset( $row[$index] ) )
+						$values = '(';
+						$num_fields = count( $row );
+						for( $index = 0; $index < $num_fields; $index++ )
 						{
-							$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
-							$values .= '\''.$row[$index].'\'' ;
+							if( isset( $row[$index] ) )
+							{
+								$row[$index] = str_replace("\n","\\n", addslashes( $row[$index] ) );
+								$values .= '\''.$row[$index].'\'' ;
+							}
+							else
+							{ // The $row[$index] value is not set or is NULL
+								$values .= 'NULL';
+							}
+
+							if( $index<( $num_fields-1 ) )
+							{
+								$values .= ',';
+							}
+						}
+						$values .= ')';
+						if( $is_first_insert_sql_value )
+						{ // Don't write a comma before first row values
+							$is_first_insert_sql_value = false;
 						}
 						else
-						{ // The $row[$index] value is not set or is NULL
-							$values .= 'NULL';
+						{ // Write a comma between row values
+							$values = ','.$values;
 						}
 
-						if( $index<( $num_fields-1 ) )
-						{
-							$values .= ',';
-						}
+						fwrite( $f, $values );
 					}
-					$values .= ')';
-					if( $is_first_insert_sql_value )
-					{ // Don't write a comma before first row values
-						$is_first_insert_sql_value = false;
-					}
-					else
-					{ // Write a comma between row values
-						$values = ','.$values;
-					}
-
-					fwrite( $f, $values );
+					$page++;
 				}
 				unset( $rows );
-				$page++;
-			}
 
-			if( $is_insert_sql_started )
-			{ // End SQL INSERT clause
-				fwrite( $f, ";\n\n" );
+				if( $is_insert_sql_started )
+				{ // End SQL INSERT clause
+					fwrite( $f, ";\n\n" );
+				}
+			}
+			else
+			{	// Display info to know only structure is backed up of the table:
+				echo '<span class="text-warning">('.TB_('only structure').')</span>';
 			}
 
 			// Flush the output to a file
@@ -600,35 +612,19 @@ class Backup
 			evo_flush();
 		}
 
+		if( $this->drop_table_first )
+		{	// Restore foreign key check:
+			fwrite( $f, "SET FOREIGN_KEY_CHECKS=@fkey_check;\n" );
+		}
+
 		// Close backup file input stream
 		fclose( $f );
 
+		$result = true;
+
 		if( $this->pack_backup_files )
 		{ // Pack created backup SQL script
-
-			// Pack using 'zlib' extension and PclZip wrapper
-
-			if( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			{ // Set path for temp files of PclZip
-				define( 'PCLZIP_TEMPORARY_DIR', $backup_dirpath );
-			}
-			// Load PclZip class (PHP4):
-			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
-
-			$zip_filepath = $backup_dirpath.'db.zip';
-			$PclZip = new PclZip( $zip_filepath );
-
-			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $backup_dirpath ) );
-			if( $file_list == 0 )
-			{
-				echo '<p style="color:red">'
-						.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
-						.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
-					.'</p>';
-				evo_flush();
-
-				return false;
-			}
+			$result = pack_archive( $backup_dirpath.'db.zip', $backup_dirpath, $backup_sql_filename );
 
 			unlink( $backup_sql_filepath );
 		}
@@ -679,7 +675,7 @@ class Backup
 				{
 					if( $root )
 					{ // progressive display of what backup is doing
-						echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $srcfile ).'<br/>';
+						echo sprintf( TB_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $srcfile ).'<br/>';
 						evo_flush();
 					}
 					$this->recurse_copy( $srcfile, $dest . '/' . $file, false, $exclude_folders );

@@ -1,5 +1,7 @@
 <?php
 /**
+ * This is an EXPERIMENTAL DEMO of grouping several skins into a single Theme. 
+ *
  * This file implements a class derived of the generic Skin class in order to provide custom code for
  * the skin in this folder.
  *
@@ -21,7 +23,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.8.1';
+	var $version = '7.3.0';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -34,7 +36,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Green Bootstrap Theme';
+		return 'Green Bootstrap Theme (EXPERIMENTAL)';
 	}
 
 
@@ -43,7 +45,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_default_type()
 	{
-		return 'normal';
+		return 'rwd';
 	}
 
 
@@ -87,6 +89,26 @@ class green_bootstrap_theme_Skin extends Skin
 	}
 
 
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+			// TODO: Implement widget containers for this skin!
+			);
+	}
+
+
 	/*
 	 * What CSS framework does has this skin been designed with?
 	 *
@@ -106,17 +128,35 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_main( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -127,19 +167,25 @@ class green_bootstrap_theme_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image section')
 				),
-					'front_bg_image' => array(
+					'front_bg_image_file_ID' => array(
 						'label' => T_('Background image'),
-						'note' => T_('Set background image in Main Area section.'),
-						'defaultvalue' => 'shared/global/sunset/sunset.jpg',
-						'type' => 'text',
-						'size' => '50'
+						'type' => 'fileselect',
+						'initialize_with' => 'shared/global/sunset/sunset.jpg',
+						'thumbnail_size' => 'fit-320x320'
+					),
+					'front_bg_color' => array(
+						'label' => T_('Background color'),
+						'note' => T_('This color will be used if Background image is not set or does not exist.'),
+						'defaultvalue' => '#333333',
+						'type' => 'color',
+						'transparency' => true,
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'2_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Main Area Overlay')
+					'label'  => T_('Front Page Main Area Settings')
 				),
 					'front_width' => array(
 						'label' => T_('Width'),
@@ -158,51 +204,34 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
-					'front_bg_color' => array(
+					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#000000',
+						'defaultvalue' => 'rgba(0,0,0,0.1)',
 						'type' => 'color',
-					),
-					'front_bg_opacity' => array(
-						'label' => T_('Background opacity'),
-						'note' => '%. ' . T_('Adjust the background transparency level.'),
-						'size' => '7',
-						'maxlength' => '3',
-						'defaultvalue' => '10',
-						'type' => 'integer',
-						'valid_range' => array(
-							'min' => 0, // from 0%
-							'max' => 100, // to 100%
-						),
+						'transparency' => true,
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'front_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'pict_muted_color' => array(
 						'label' => T_('Muted text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_icon_color' => array(
 						'label' => T_('Inverse icon color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#CCCCCC',
 						'type' => 'color',
 					),
@@ -211,15 +240,42 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 				'3_start' => array(
 					'layout' => 'begin_fieldset',
-					'label'  => T_('Front Page Secondary Area Overlay')
+					'label'  => T_('Front Page Secondary Area Settings')
 				),
+					'secondary_bg_color' => array(
+						'label' => T_('Background color'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+						'transparency' => true,
+					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 				'3_end' => array(
+					'layout' => 'end_fieldset',
+				),
+				'4_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Featured posts Settings')
+				),
+					'bgimg_text_color' => array(
+						'label' => T_('Text color on background image'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+					),
+					'bgimg_link_color' => array(
+						'label' => T_('Link color on background image'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+					'bgimg_hover_link_color' => array(
+						'label' => T_('Hover link color on background image'),
+						'defaultvalue' => '#6cb2ef',
+						'type' => 'color',
+					),
+				'4_end' => array(
 					'layout' => 'end_fieldset',
 				),
 				'section_colorbox_start' => array(
@@ -333,6 +389,9 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_std( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -352,25 +411,68 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
 					),
-					'font_size' => array(
-						'label' => T_('Font size'),
-						'note' => T_('Select content font size.'),
-						'defaultvalue' => 'default',
-						'options' => array(
-								'default'        => T_('Default (14px)'),
-								'standard'       => T_('Standard (16px)'),
-								'medium'         => T_('Medium (18px)'),
-								'large'          => T_('Large (20px)'),
-								'very_large'     => T_('Very large (22px)'),
+
+					'font' => array(
+						'label' => T_('Default font'),
+						'type'  => 'input_group',
+						'inputs' => array(
+							'_family' => array(
+								'defaultvalue' => 'system_helveticaneue',
+								'options'      => $this->get_font_definitions(),
+								'type'         => 'select'
 							),
-						'type' => 'select',
+							'_size' => array(
+								'label' => T_('Size'),
+								'defaultvalue' => 'default',
+								'options'      => array(
+									'default'        => T_('Default (14px)'),
+									'standard'       => T_('Standard (16px)'),
+									'medium'         => T_('Medium (18px)'),
+									'large'          => T_('Large (20px)'),
+									'very_large'     => T_('Very large (22px)'),
+								),
+								'type' => 'select'
+							),
+							'_weight' => array(
+								'label' => T_('Weight'),
+								'defaultvalue' => '400',
+								'options' => array(
+										'100' => '100',
+										'200' => '200',
+										'300' => '300',
+										'400' => '400 ('.T_('Normal').')',
+										'500' => '500',
+										'600' => '600',
+										'700' => '700 ('.T_('Bold').')',
+										'800' => '800',
+										'900' => '900',
+									),
+								'type' => 'select',
+							)
+						)
+					),
+
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -383,51 +485,76 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'page_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('E-g: #ff0000 for red'),
-						'defaultvalue' => '#dfd',
+						'defaultvalue' => '#DFD',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'page_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_hover_link_color' => array(
 						'label' => T_('Hover link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'bgimg_text_color' => array(
 						'label' => T_('Text color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'bgimg_link_color' => array(
 						'label' => T_('Link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
 					'bgimg_hover_link_color' => array(
 						'label' => T_('Hover link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
+					),
+					'current_tab_bg_color' => array(
+						'label' => T_('Current tab background color'),
+						'defaultvalue' => '#fff',
+						'type' => 'color',
+						'transparency' => true,
+					),
+					'hover_tab_bg_color' => array(
+						'label' => T_('Hovered tab background color'),
+						'defaultvalue' => '#eee',
+						'type' => 'color',
+						'transparency' => true,
+					),
+					'panel_bg_color' => array(
+						'label' => T_('Panel background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#ffffff',
+						'type' => 'color',
+						'transparency' => true,
+					),
+					'panel_border_color' => array(
+						'label' => T_('Panel border color'),
+						'note' => T_('Choose border color for function panels and widgets.'),
+						'defaultvalue' => '#ddd',
+						'type' => 'color',
+					),
+					'panel_heading_bg_color' => array(
+						'label' => T_('Panel heading background color'),
+						'note' => T_('Choose background color for function panels and widgets.'),
+						'defaultvalue' => '#f5f5f5',
+						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_color_end' => array(
 					'layout' => 'end_fieldset',
@@ -557,7 +684,8 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
-						'note' => 'px. ' . T_('Set maximum height for comment images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for comment images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -577,18 +705,18 @@ class green_bootstrap_theme_Skin extends Skin
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size in Media index'),
-						'note' => T_('Select thumbnail size for Media index images') . ' (disp=mediaidx).',
-						'defaultvalue' => 'fit-256x256',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
 					'banner_public' => array(
 						'label' => T_('Display "Public" banner'),
 						'note' => T_('Display banner for "Public" albums (albums & comments)'),
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'allow_empty' => true,
 					),
 				'section_image_end' => array(
 					'layout' => 'end_fieldset',
@@ -608,27 +736,24 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#dfd',
+						'defaultvalue' => '#DFD',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',
@@ -745,6 +870,9 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_forum( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -761,6 +889,12 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_general_affix' => array(
+						'label' => T_('Fixed position for General Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 0,
+					),
 					'layout_single' => array(
 						'label' => T_('Single Thread Layout'),
 						'note' => T_('Select skin layout for single threads') . ' (disp=single).',
@@ -772,12 +906,33 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Fixed position for Single Sidebar'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
+					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -794,17 +949,26 @@ class green_bootstrap_theme_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				   'workflow_display_mode' => array(
-					  'label'    => T_('Workflow column'),
-					  'note'     => '',
-					  'type'     => 'radio',
-					  'field_lines' => true,
-					  'options'  => array(
-						 array( 'status_and_author', T_('Display Status & Item Author') ),
-						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
-					  ),
-					  'defaultvalue' => 'status_and_author',
-				   ),
+					'workflow_display_mode' => array(
+						'label' => T_('Workflow column'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options'  => array(
+							array( 'status_and_author', T_('Display Status & Item Author') ),
+							array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+						),
+						'defaultvalue' => 'status_and_author',
+					),
+					'voting_place' => array(
+						'label' => T_('Voting'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options' => array(
+							array( 'under_content', T_('Under posts/comments') ),
+							array( 'left_score', T_('Show score on the left of each post/comment') ),
+						),
+						'defaultvalue' => 'under_content',
+					),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -823,27 +987,24 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',
@@ -961,24 +1122,30 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_manual( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
-					'max_image_height' => array(
-						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
-						'defaultvalue' => '',
-						'type' => 'integer',
-						'size' => '7',
-						'allow_empty' => true,
-					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
 						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
 						'defaultvalue' => 0,
 						'type' => 'checkbox',
+					),
+					'use_3_cols' => array(
+						'label' => T_('Use 3 cols'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'other',        T_('On other disps'), 0 ),
+						),
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -1076,9 +1243,40 @@ class green_bootstrap_theme_Skin extends Skin
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
 							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
-							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ),
+						) ),
 				'section_access_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_advanced_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced')
+				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+				'section_advanced_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -1097,14 +1295,10 @@ class green_bootstrap_theme_Skin extends Skin
 	{
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 	}
@@ -1117,134 +1311,113 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function display_init_main()
 	{
-		global $Messages, $disp, $debug;
+		global $Messages, $disp, $debug, $Session, $blog;
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
+		// Skin specific initializations:
+
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Layout Settings / END ****
+
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
 		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+			// **** Image section / START ****
+			// Background image:
+			$this->dynamic_style_rule( 'front_bg_image_file_ID', '.evo_pictured_layout { background-image: $setting_value$ }', array(
+				'type' => 'image_file',
+			) );
+			// Background color:
+			$this->dynamic_style_rule( 'front_bg_color', '.evo_pictured_layout { background-color: $setting_value$ }' );
+			// **** Image section / END ****
+
+			// **** Front Page Main Area Settings / START ****
+			// Width:
+			$this->dynamic_style_rule( 'front_width', 'div.front_main_area { width: $setting_value$ }' );
+
+			// Title color:
+			$this->dynamic_style_rule( 'pict_title_color', 'body.pictured .main_page_wrapper .front_main_area .widget_core_coll_title h2 a { color: $setting_value$ }' );
+
+			// Muted text color:
+			$this->dynamic_style_rule( 'pict_muted_color', 'body.pictured .main_page_wrapper .text-muted { color: $setting_value$ }' );
+
+			// Background color:
+			$this->dynamic_style_rule( 'front_bg_cont_color', '.front_main_content { background-color: $setting_value$ }' );
+
+			// Text color:
+			$this->dynamic_style_rule( 'front_text_color',
+				'body.pictured .front_main_content, '.
+				'body.pictured .front_main_content h1 small, '.
+				'.evo_container__header, '.
+				'.evo_container__page_top, '.
+				'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block, '.
+				'body.pictured.disp_access_denied .evo_widget.widget_core_content_block '.
+				'{ color: $setting_value$ }'
+			);
+
+			// Link color:
+			$this->dynamic_style_rule( 'front_link_color',
+				'body.pictured .main_page_wrapper .front_main_area a:not(.btn),'.
+				'body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: $setting_value$ }'.
+				'body.pictured .main_page_wrapper .front_main_area div.widget_uil_autotemp.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: $setting_value$'." }\n".
+				'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: $setting_value$'." }\n".
+				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$ }'
+			);
+
+			// Inverse icon color:
+			$this->dynamic_style_rule( 'front_icon_color',
+				'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: $setting_value$'." }\n".
+				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: $setting_value$ }'
+			);
+
+			// Position:
+			$this->dynamic_style_rule( 'front_position', 'div.front_main_area { $setting_value$ }', array(
+				'options' => array(
+					'left'   => '',// default value
+					'middle' => 'float: none; margin-left: auto; margin-right: auto;',
+					'right'  => 'float: right;',
+				)
+			) );
+			// **** Front Page Main Area Settings / END ****
+
+			// **** Front Page Secondary Area Settings / START ****
+			// Background color:
+			$this->dynamic_style_rule( 'secondary_bg_color', 'section.secondary_area { background-color: $setting_value$ }' );
+			// Text color:
+			$this->dynamic_style_rule( 'secondary_text_color', 'section.secondary_area, .widget_core_org_members { color: $setting_value$ !important }' );
+			// **** Front Page Secondary Area Settings / END ****
 		}
 
-		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-		{
-			global $media_url, $media_path;
+		// **** Featured posts Settings / START ****
+		// Text color on background image:
+		$this->dynamic_style_rule( 'bgimg_text_color', '.evo_hasbgimg { color: $setting_value$ }' );
+		// Link color on background image:
+		$this->dynamic_style_rule( 'bgimg_link_color', '.evo_hasbgimg a { color: $setting_value$ }' );
+		// Hover link color on background image:
+		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:hover { color: $setting_value$ }' );
+		// **** Featured posts Settings / END ****
 
-			// Add custom CSS:
-			$custom_css = '';
+		// Add dynamic CSS rules headline:
+		// Use standard bootstrap style on width <= 640px only for disp=front:
+		$media_exception = ( $disp == 'front' ? '@media only screen and (min-width: 641px)' : NULL );
+		$this->add_dynamic_css_headline( $media_exception );
 
-			$bg_image = $this->get_setting( 'front_bg_image' );
-			if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-			{ // Custom body background image:
-				$custom_css .= '#bg_picture { background-image: url('.$media_url.$bg_image.") }\n";
-			}
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 
-			if( $color = $this->get_setting( 'pict_title_color' ) )
-			{ // Custom title color:
-				$custom_css .= 'body.pictured .main_page_wrapper .widget_core_coll_title h1 a { color: '.$color." }\n";
-			}
-
-			if( $color = $this->get_setting( 'pict_muted_color' ) )
-			{ // Custom muted text color:
-				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
-			}
-
-			if( $color = $this->get_setting( 'front_bg_color' ) )
-			{ // Custom body background color:
-				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
-				$color = substr( $color, 1 );
-				if( strlen( $color ) == '6' )
-				{ // Color value in format #FFFFFF
-					$color = str_split( $color, 2 );
-				}
-				else
-				{ // Color value in format #FFF
-					$color = str_split( $color, 1 );
-					foreach( $color as $c => $v )
-					{
-						$color[ $c ] = $v.$v;
-					}
-				}
-				$custom_css .= '.front_main_content { background-color: rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')'." }\n";
-			}
-
-			if( $color = $this->get_setting( 'front_text_color' ) )
-			{ // Custom text color:
-				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top { color: '.$color." }\n";
-			}
-
-			$link_color = $this->get_setting( 'front_link_color' );
-			$icon_color = $this->get_setting( 'front_icon_color' );
-			if( $link_color )
-			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a,
-				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
-			}
-			if( $link_color && $icon_color )
-			{ // Custom icon color:
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: '.$icon_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: '.$icon_color." }\n";
-			}
-
-			if( $width = $this->get_setting( 'front_width' ) )
-			{ // Custom width for front main area:
-				$custom_css .= 'div.front_main_area { width: '.$width." }\n";
-			}
-
-			if( $position = $this->get_setting( 'front_position' ) )
-			{ // Custom width for front main area:
-				if( $position == 'middle' )
-				{
-					$custom_css .= 'div.front_main_area { float: none; margin-left: auto; margin-right: auto;'." }\n";
-				}
-				elseif( $position == 'right' )
-				{
-					$custom_css .= 'div.front_main_area { float: right;'." }\n";
-				}
-			}
-
-			if( $color = $this->get_setting( 'secondary_text_color' ) )
-			{ // Custom text color on secondary area:
-				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
-			}
-
-			if( ! empty( $custom_css ) )
-			{
-				if( $disp == 'front' )
-				{ // Use standard bootstrap style on width <= 640px only for disp=front
-					$custom_css = '@media only screen and (min-width: 641px)
-						{
-							'.$custom_css.'
-						}';
-				}
-				$custom_css = '<style type="text/css">
-	<!--
-		'.$custom_css.'
-	-->
-	</style>';
-				add_headline( $custom_css );
-			}
+		if( $Session->get( 'designer_mode_'.$blog ) )
+		{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+			add_js_headline( 'jQuery( document ).ready( function()
+			{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+				jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				jQuery( window ).resize( function()
+				{	// Update height on window resizing:
+					jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				} );
+			} );' );
 		}
-
-		if( $disp == 'front' )
-		{ // Initialize script to scroll down to widget container with users team:
-			add_js_headline( '
-jQuery( document ).ready( function()
-{
-	jQuery( "#slide_button" ).click( function()
-	{
-		jQuery( "html, body, #skin_wrapper" ).animate(
-		{
-			scrollTop: jQuery( ".evo_container__front_page_secondary" ).offset().top
-		}, 1500 );
-	} );
-} );' );
-		}
-
 	}
 
 
@@ -1257,123 +1430,117 @@ jQuery( document ).ready( function()
 	{
 		global $Messages, $disp, $debug, $media_url, $media_path;
 
-		// Add custom CSS:
-		$custom_css = '';
+		// Skin specific initializations:
 
-		if( $color = $this->get_setting( 'page_bg_color' ) )
-		{ // Custom page background color:
-			$custom_css .= 'body { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'page_text_color' ) )
-		{ // Custom page text color:
-			$custom_css .= 'body { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'page_link_color' ) )
-		{ // Custom page link color:
-			$custom_css .= 'a { color: '.$color." }\n";
-			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: '.$color." !important }\n";
-			$custom_css .= '.pagination li.active a, .pagination li.active span { color: #fff; background-color: '.$color.' !important; border-color: '.$color." }\n";
-			if( $this->get_setting( 'gender_colored' ) !== 1 )
-			{ // If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
-				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
-			}
-		}
-		if( $color = $this->get_setting( 'page_hover_link_color' ) )
-		{ // Custom page link color on hover:
-			$custom_css .= 'a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_text_color' ) )
-		{	// Custom text color on background image:
-			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_link_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
-		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'current_tab_text_color' ) )
-		{ // Custom current tab text color:
-			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// Default font - Family:
+		$this->dynamic_style_rule( 'font_family', '#skin_wrapper { font-family: $setting_value$ }', array(
+			'options' => $this->get_font_definitions( 'style' )
+		) );
+		// Default font - Size:
+		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(
+			'options' => array(
+				'default' => '',
+				'standard' =>
+					'.container { font-size: 16px !important}'.
+					'.container input.search_field { height: 100%}'.
+					'.container h1 { font-size: 38px }'.
+					'.container h2 { font-size: 32px }'.
+					'.container h3 { font-size: 26px }'.
+					'.container h4 { font-size: 18px }'.
+					'.container h5 { font-size: 16px }'.
+					'.container h6 { font-size: 14px }'.
+					'.container .small { font-size: 85% !important }',
+				'medium' =>
+					'.container { font-size: 18px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 40px }'.
+					'.container h2 { font-size: 34px }'.
+					'.container h3 { font-size: 28px }'.
+					'.container h4 { font-size: 20px }'.
+					'.container h5 { font-size: 18px }'.
+					'.container h6 { font-size: 16px }'.
+					'.container .small { font-size: 85% !important }',
+				'large' =>
+					'.container { font-size: 20px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 42px }'.
+					'.container h2 { font-size: 36px }'.
+					'.container h3 { font-size: 30px }'.
+					'.container h4 { font-size: 22px }'.
+					'.container h5 { font-size: 20px }'.
+					'.container h6 { font-size: 18px }'.
+					'.container .small { font-size: 85% !important }',
+				'very_large' =>
+					'.container { font-size: 22px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 44px }'.
+					'.container h2 { font-size: 38px }'.
+					'.container h3 { font-size: 32px }'.
+					'.container h4 { font-size: 24px }'.
+					'.container h5 { font-size: 22px }'.
+					'.container h6 { font-size: 20px }'.
+					'.container .small { font-size: 85% !important }',
+			)
+		) );
+		// Default font - Weight:
+		$this->dynamic_style_rule( 'font_weight', '#skin_wrapper { font-weight: $setting_value$ }' );
+		// **** Layout Settings / END ****
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'." }\n";
+		// **** Custom Settings / START ****
+		// Background color:
+		$this->dynamic_style_rule( 'page_bg_color', '#skin_wrapper { background-color: $setting_value$ }' );
+		// Text color:
+		$this->dynamic_style_rule( 'page_text_color', '#skin_wrapper { color: $setting_value$ }' );
+		// Link color:
+		$this->dynamic_style_rule( 'page_link_color',
+			'a { color: $setting_value$ }'.
+			'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: $setting_value$ !important }'.
+			'.pagination li.active a, .pagination li.active span { color: #fff; background-color: $setting_value$ !important; border-color: $setting_value$ }'
+		);
+		if( $this->get_setting( 'gender_colored' ) !== 1 )
+		{	// If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
+			$this->dynamic_style_rule( 'page_link_color', 'h4.panel-title a { color: $setting_value$ }' );
 		}
+		// Hover link color:
+		$this->dynamic_style_rule( 'page_hover_link_color', 'a:hover { color: $setting_value$ }' );
+		// Text color on background image:
+		$this->dynamic_style_rule( 'bgimg_text_color', '.evo_hasbgimg { color: $setting_value$ }' );
+		// Link color on background image:
+		$this->dynamic_style_rule( 'bgimg_link_color', '.evo_hasbgimg a:not(.btn) { color: $setting_value$ }' );
+		// Hover link color on background image:
+		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:not(.btn):hover { color: $setting_value$ }' );
+		// Current tab text color:
+		$this->dynamic_style_rule( 'current_tab_text_color', 'ul.nav.nav-tabs li a.selected { color: $setting_value$ }' );
+		// Current tab background color:
+		$this->dynamic_style_rule( 'current_tab_bg_color', 'ul.nav.nav-tabs li a.selected { background-color: $setting_value$ }' );
+		// Hovered tab background color:
+		$this->dynamic_style_rule( 'hover_tab_bg_color', 'ul.nav.nav-tabs li a.default:hover { background-color: $setting_value$; border-top-color: $setting_value$; border-left-color: $color; border-right-color: $setting_value$ }' );
+		// Panel background color:
+		$this->dynamic_style_rule( 'panel_bg_color', '.panel, .pagination>li>a { background-color: $setting_value$ }' );
+		// Panel border color:
+		$this->dynamic_style_rule( 'panel_border_color',
+			'.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,'.
+			'.nav-tabs, .panel-default, .panel .panel-footer,'.
+			'.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th'.
+			'{ border-color: $setting_value$ }'.
+			'.panel .panel-heading { border-color: $setting_value$; background-color: $setting_value$ }'.
+			'.nav-tabs>li>a:hover { border-bottom: 1px solid $setting_value$ }'.
+			'.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: $setting_value$; border-left-color: $setting_value$; border-right-color: $setting_value$ }'
+		);
+		// Panel heading background color:
+		$this->dynamic_style_rule( 'panel_heading_bg_color', '.panel .panel-heading, .panel .panel-footer { background-color: $setting_value$ }' );
+		// **** Custom Settings / END ****
 
-		// Font size customization
-		if( $font_size = $this->get_setting( 'font_size' ) )
-		{
-			switch( $font_size )
-			{
-				case 'default': // When default font size, no CSS entry
-					//$custom_css .= '';
-					break;
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
-				case 'standard':// When standard layout
-					$custom_css .= '.container { font-size: 16px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 38px'." }\n";
-					$custom_css .= '.container h2 { font-size: 32px'." }\n";
-					$custom_css .= '.container h3 { font-size: 26px'." }\n";
-					$custom_css .= '.container h4 { font-size: 18px'." }\n";
-					$custom_css .= '.container h5 { font-size: 16px'." }\n";
-					$custom_css .= '.container h6 { font-size: 14px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-
-				case 'medium': // When default font size, no CSS entry
-					$custom_css .= '.container { font-size: 18px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 40px'." }\n";
-					$custom_css .= '.container h2 { font-size: 34px'." }\n";
-					$custom_css .= '.container h3 { font-size: 28px'." }\n";
-					$custom_css .= '.container h4 { font-size: 20px'." }\n";
-					$custom_css .= '.container h5 { font-size: 18px'." }\n";
-					$custom_css .= '.container h6 { font-size: 16px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-
-				case 'large': // When default font size, no CSS entry
-					$custom_css .= '.container { font-size: 20px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 42px'." }\n";
-					$custom_css .= '.container h2 { font-size: 36px'." }\n";
-					$custom_css .= '.container h3 { font-size: 30px'." }\n";
-					$custom_css .= '.container h4 { font-size: 22px'." }\n";
-					$custom_css .= '.container h5 { font-size: 20px'." }\n";
-					$custom_css .= '.container h6 { font-size: 18px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-
-				case 'very_large': // When default font size, no CSS entry
-					$custom_css .= '.container { font-size: 22px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 44px'." }\n";
-					$custom_css .= '.container h2 { font-size: 38px'." }\n";
-					$custom_css .= '.container h3 { font-size: 32px'." }\n";
-					$custom_css .= '.container h4 { font-size: 24px'." }\n";
-					$custom_css .= '.container h5 { font-size: 22px'." }\n";
-					$custom_css .= '.container h6 { font-size: 20px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-			}
-		}
-
-		if( ! empty( $custom_css ) )
-		{	// Function for custom_css:
-			$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-			add_headline( $custom_css );
-		}
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
@@ -1503,12 +1670,12 @@ jQuery( document ).ready( function()
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
 		{	// Init JS to autcomplete the user logins
-			require_js( '#bootstrap_typeahead#', 'blog' );
+			require_js_defer( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
@@ -1547,6 +1714,12 @@ jQuery( document ).ready( function()
 		</style>';
 		add_headline( $custom_css );
 		}
+
+		if( ( $this->get_setting( 'sidebar_general_affix' ) && $this->is_visible_sidebar_forums( true, 'general' ) ) ||
+		    ( $this->get_setting( 'sidebar_single_affix' ) && $this->is_visible_sidebar_forums( true, 'single' ) ) )
+		{	// Init JS to fix sidebars on scroll down:
+			require_js_defer( 'src/evo_affix_sidebars.js', 'blog', false, '#', 'footerlines' );
+		}
 	}
 
 
@@ -1559,12 +1732,17 @@ jQuery( document ).ready( function()
 	{
 		global $Messages, $disp, $debug;
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// Skin specific initializations:
+
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// **** Layout Settings / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		// Initialize a template depending on current page
 		switch( $disp )
@@ -1575,7 +1753,7 @@ jQuery( document ).ready( function()
 				break;
 
 			case 'posts':
-				global $cat, $bootstrap_manual_posts_text;
+				global $cat, $tag, $bootstrap_manual_posts_text;
 
 				// Init star rating for intro posts:
 				init_ratings_js( 'blog', true );
@@ -1592,10 +1770,13 @@ jQuery( document ).ready( function()
 				break;
 		}
 
-		if( $this->is_left_navigation_visible() )
+		if( $this->is_side_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			$this->require_js( 'left_navigation.js' );
+			$this->require_js_defer( 'left_navigation.js' );
 		}
+
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
@@ -1725,64 +1906,21 @@ jQuery( document ).ready( function()
 	}
 
 
-	/**
-	 * Check if we can display a widget container
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function is_visible_container( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
-
-	/**** Functions for collection kind "std" ****/
-
-
-	/**
-	 * Check if we can display a sidebar for the current layout
-	 *
-	 * @param boolean TRUE to check if at least one sidebar container is visible
-	 * @return boolean TRUE to display a sidebar
-	 */
-	function is_visible_sidebar( $check_containers = false )
-	{
-		$layout = $this->get_setting( 'layout' );
-
-		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
-		{ // Sidebar is not displayed for selected skin layout
-			return false;
-		}
-
-		if( $check_containers )
-		{ // Check if at least one sidebar container is visible
-			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
-		}
-		else
-		{ // We should not check the visibility of the sidebar containers for this case
-			return true;
-		}
-	}
-
+	/**** Template Functions depending on collection kind: ****/
 
 	/**
 	 * Get value for attribute "class" of column block
 	 * depending on skin setting "Layout"
 	 *
+	 * @param string Layout: 'general' or 'single'
 	 * @return string
 	 */
-	function get_column_class()
+	function get_column_class( $layout = 'general' )
+	{
+		return $this->call_func_by_coll_type( __FUNCTION__, func_get_args() );
+	}
+	// Alias of get_column_class() for collection kind "Blog":
+	function get_column_class_std( $layout = 'general' )
 	{
 		switch( $this->get_setting( 'layout' ) )
 		{
@@ -1804,7 +1942,22 @@ jQuery( document ).ready( function()
 
 			case 'left_sidebar':
 				// Left Sidebar
-				return 'col-md-9 pull-right';
+				return 'col-md-9 pull-right-md';
+
+			case 'right_sidebar':
+				// Right Sidebar
+			default:
+				return 'col-md-9';
+		}
+	}
+	// Alias of get_column_class() for collection kind "Forums":
+	function get_column_class_forums( $layout = 'general' )
+	{
+		switch( $this->get_setting_layout( $layout ) )
+		{
+			case 'left_sidebar':
+				// Left Sidebar
+				return 'col-md-9 pull-right-md';
 
 			case 'right_sidebar':
 				// Right Sidebar
@@ -1816,9 +1969,82 @@ jQuery( document ).ready( function()
 				return 'col-md-12';
 		}
 	}
+	// Alias of get_column_class() for collection kind "Photo":
+	function get_column_class_photo( $layout = 'general' )
+	{
+		switch( $this->get_setting( 'layout' ) )
+		{
+			case 'single_column':
+				// Single Column Large
+				return 'col-md-12';
+
+			case 'single_column_normal':
+				// Single Column
+				return 'col-xs-12 col-sm-12 col-md-12 col-lg-10 col-lg-offset-1';
+
+			case 'single_column_narrow':
+				// Single Column Narrow
+				return 'col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2';
+
+			case 'single_column_extra_narrow':
+				// Single Column Extra Narrow
+				return 'col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3';
+		}
+	}
 
 
-	/**** Functions for collection kind "photo" + "forum" ****/
+	/**
+	 * Get value for attribute "class" of column block
+	 * depending on skin setting "Layout"
+	 *
+	 * @param string Layout: 'general' or 'single'
+	 * @return string
+	 */
+	function is_visible_sidebar( $check_containers = false, $layout = 'general' )
+	{
+		return $this->call_func_by_coll_type( __FUNCTION__, func_get_args() );
+	}
+	// Alias of is_visible_sidebar() for collection kind "Blog":
+	function is_visible_sidebar_std( $check_containers = false, $layout = 'general' )
+	{
+		$layout = $this->get_setting( 'layout' );
+
+		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
+		{ // Sidebar is not displayed for selected skin layout
+			return false;
+		}
+
+		if( $check_containers )
+		{ // Check if at least one sidebar container is visible
+			return ( $this->is_visible_container( 'sidebar' ) ||  $this->is_visible_container( 'sidebar2' ) );
+		}
+		else
+		{ // We should not check the visibility of the sidebar containers for this case
+			return true;
+		}
+	}
+	// Alias of is_visible_sidebar() for collection kind "Forums":
+	function is_visible_sidebar_forums( $check_containers = false, $layout = 'general' )
+	{
+		$layout = $this->get_setting_layout( $layout );
+
+		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
+		{ // Sidebar is not displayed for selected skin layout
+			return false;
+		}
+
+		if( $check_containers )
+		{ // Check if at least one sidebar container is visible
+			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
+		}
+		else
+		{ // We should not check the visibility of the sidebar containers for this case
+			return true;
+		}
+	}
+
+
+	/**** Functions for collection kind "Forums" ****/
 
 
 	/**
@@ -1842,9 +2068,6 @@ jQuery( document ).ready( function()
 		// Don't display status banner
 		return false;
 	}
-
-
-	/**** Functions for collection kind "forum" ****/
 
 
 	/**
@@ -1881,49 +2104,18 @@ jQuery( document ).ready( function()
 	{
 		global $Collection, $Blog;
 
-		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
-		{	// For not logged in users AND if the tracking of unread content is turned off for the collection
-			$btn_class = 'btn-info';
-			$btn_title = T_('Recent Topics');
+		// Get a number of unread posts by current User:
+		$unread_posts_count = $Blog->get_unread_posts_count();
+
+		if( $unread_posts_count > 0 )
+		{	// If at least one new unread topic exists
+			$btn_class = 'btn-warning';
+			$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
 		}
 		else
-		{	// For logged in users:
-			global $current_User, $DB, $localtimenow;
-
-			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
-			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
-			$ItemList2->set_default_filters( array(
-					'unit' => 'all', // set this to don't calculate total rows
-				) );
-			$ItemList2->query_init();
-
-			// Get a count of the unread topics for current user:
-			$unread_posts_SQL = new SQL();
-			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
-			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
-			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
-			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
-			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
-			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_last_touched_ts' );
-			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_last_touched_ts' );
-
-			// Execute a query with to know if current user has new data to view:
-			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
-
-			if( $unread_posts_count > 0 )
-			{	// If at least one new unread topic exists
-				$btn_class = 'btn-warning';
-				$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
-			}
-			else
-			{	// Current user already have read all topics
-				$btn_class = 'btn-info';
-				$btn_title = T_('Recent Topics');
-			}
+		{	// Current user already have read all topics
+			$btn_class = 'btn-info';
+			$btn_title = T_('Recent Topics');
 		}
 
 		// Print out the button:
@@ -1935,19 +2127,57 @@ jQuery( document ).ready( function()
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Item
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_item_voting_panel( $Item, $params = array() )
+	function display_item_voting_panel( $Item, $place, $params = array() )
 	{
-		skin_widget( array_merge( array(
-				// CODE for the widget:
-				'widget'      => 'item_vote',
-				// Optional display params
-				'Item'        => $Item,
-				'block_start' => '',
-				'block_end'   => '',
-				'skin_ID'     => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'      => 'item_vote',
+						// Optional display params
+						'Item'        => $Item,
+						'block_start' => '',
+						'block_end'   => '',
+						'skin_ID'     => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				global $disp;
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'                 => 'item_vote',
+						// Optional display params
+						'Item'                   => $Item,
+						'block_start'            => '',
+						'block_end'              => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'title_text'             => '',
+						'title_empty'            => '',
+						'display_summary'        => 'no',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'display_noactive'       => true,
+						'score_class'            => ( in_array( $disp, array( 'posts', 'flagged' ) ) ? 'vote_score__status_'.$Item->get_read_status() : '' ),
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+			}
 	}
 
 
@@ -1955,16 +2185,47 @@ jQuery( document ).ready( function()
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Comment
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_comment_voting_panel( $Comment, $params = array() )
+	function display_comment_voting_panel( $Comment, $place, $params = array() )
 	{
-		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
-				'before_title'          => '',
-				'helpful_text'          => T_('Is this reply helpful?'),
-				'class'                 => 'vote_helpful',
-				'skin_ID'               => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title' => '',
+						'helpful_text' => T_('Is this reply helpful?'),
+						'skin_ID'      => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title'           => '',
+						'helpful_text'           => T_('Is this reply helpful?'),
+						'class'                  => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'display_noactive'       => true,
+						'title_text'             => '',
+						'title_empty'            => '',
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+		}
 	}
 
 
@@ -2000,11 +2261,26 @@ jQuery( document ).ready( function()
 		$post_button = '';
 
 		$chapter_is_locked = false;
+		$default_new_ItemType = $Blog->get_default_new_ItemType();
+
+		if( $default_new_ItemType === false )
+		{ // Do not show button on disabled default item type for new items:
+			return '';
+		}
 
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			if( empty( $default_new_ItemType ) )
+			{	// Use default button text:
+				$button_text = T_('New topic');
+			}
+			else
+			{	// Use button text from Item Type:
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
+			}
+
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
@@ -2029,7 +2305,7 @@ jQuery( document ).ready( function()
 			}
 			else
 			{ // Display button to post a reply
-				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> '.T_('Reply').'</a>';
+				$post_button .= ' <a href="'.$Item->get_feedback_url().'#form_p'.$Item->ID.'" class="btn btn-default '.$params['button_class'].'" title="'.T_('Reply to topic').'"><i class="fa fa-reply"></i> './* TRANS: verb */ T_('Reply').'</a>';
 			}
 		}
 
@@ -2040,25 +2316,214 @@ jQuery( document ).ready( function()
 	}
 
 
+	/**
+	 * Display header for posts list
+	 *
+	 * @param string Title
+	 */
+	function display_posts_list_header( $title, $params = array() )
+	{
+		global $Blog;
+
+		$params = array_merge( array(
+				'actions' => '',
+				// Normal template:
+				'before_normal_header'  => '<header class="panel-heading">',
+				'after_normal_header'   => '<div class="clearfix"></header>',
+				'before_normal_title'   => '<div class="pull-left">',
+				'after_normal_title'    => '</div>',
+				'before_normal_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'after_normal_status'   => '</div>',
+				'before_normal_actions' => '',
+				'after_normal_actions'  => '',
+				// Template with workflow task status selector:
+				'before_workflow_header'  => '<header class="panel-heading panel-heading-columns">',
+				'after_workflow_header'   => '<div class="clearfix"></header>',
+				'before_workflow_title'   => '<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">',
+				'after_workflow_title'    => '</div>',
+				'before_workflow_status'  => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">',
+				'after_workflow_status'   => '</div>',
+				'before_workflow_actions' => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 text-right">',
+				'after_workflow_actions'  => '</div>',
+			), $params );
+
+		// Check if current User can view workflow properties:
+		$can_view_workflow =
+			// Workflow must be enabled for current Collection:
+			$Blog->get_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
+
+		// Get template depending on permission of current User:
+		$template = ( $can_view_workflow ? 'workflow' : 'normal' );
+
+		echo $params['before_'.$template.'_header'];
+
+		// Title:
+		echo $params['before_'.$template.'_title'];
+		echo $title;
+		echo $params['after_'.$template.'_title'];
+
+		if( $can_view_workflow )
+		{	// Display status filter only when current User a permission to view workflow properties:
+			$ItemStatusCache = & get_ItemStatusCache();
+			$ItemStatusCache->clear();
+			$item_statuses_SQL = $ItemStatusCache->get_SQL_object();
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__status_type ON pst_ID = its_pst_ID' );
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON its_ityp_ID = itc_ityp_ID' );
+			$item_statuses_SQL->WHERE( 'itc_coll_ID = '.$Blog->ID );
+			$ItemStatusCache->load_by_sql( $item_statuses_SQL );
+			$status = param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' );
+
+			echo $params['before_workflow_status'];
+			echo '<select id="evo_workflow_status_filter" class="form-control input-sm">'
+					.'<option value="">'.T_('All statuses').'</option>'
+					.'<option value="-"'.( $status == '-' ? ' selected="selected"' : '' ).'>'.T_('No status').'</option>'
+					.$ItemStatusCache->get_option_list( $status )
+				.'</select>';
+				// JavaScript to reload page with new selected task status:
+				/*echo '<script>
+				jQuery( "#evo_workflow_status_filter" ).change( function()
+				{
+					var url = location.href.replace( /([\?&])((status|redir)=[^&]*(&|$))+/, "$1" );
+					var status_ID = jQuery( this ).val();
+					if( status_ID !== "" )
+					{
+						url += ( url.indexOf( "?" ) == -1 ? "?" : "&" ) + "status=" + status_ID + "&redir=no";
+					}
+					location.href = url.replace( "?&", "?" ).replace( /\?$/, "" );
+				} );
+				</script>';*/
+			echo $params['after_workflow_status'];
+		}
+
+		if( ! empty( $params['actions'] ) )
+		{	// Actions:
+			echo $params['before_'.$template.'_actions'];
+			echo $params['actions'];
+			echo $params['after_'.$template.'_actions'];
+		}
+
+		echo $params['after_'.$template.'_header'];
+	}
+
+
 	/**** Functions for collection kind "manual" ****/
 
 
 	/**
-	 * Check if left navigation is visible for current page
+	 * Check if side(left and/or right) navigations are visible for current page
 	 *
-	 * @return boolean TRUE
+	 * @return boolean TRUE on visible
 	 */
-	function is_left_navigation_visible()
+	function is_side_navigation_visible()
 	{
 		global $disp;
 
-		if( in_array( $disp, array( 'access_requires_login', 'access_denied' ) ) )
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
 		{ // Display left navigation column on this page when at least one sidebar container is visible:
-			return $this->is_visible_container( 'sidebar' ) || $this->is_visible_container( 'sidebar2' );
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
+	}
+
+
+	/**
+	 * Check if 3rd/right column layout can be used for current page
+	 *
+	 * @return boolean
+	 */
+	function is_3rd_right_column_layout()
+	{
+		global $disp, $disp_detail;
+
+		if( ! $this->is_side_navigation_visible() )
+		{	// Side navigation is hidden for current page:
+			return false;
+		}
+
+		// Check when we should use layout with 3 columns:
+		if( $disp == 'front' )
+		{	// Front page
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'front' );
+		}
+
+		if( $disp == 'single' )
+		{	// Single post/item page:
+			return ( $this->get_checklist_setting( 'use_3_cols', 'single' )
+				// old setting should be supported:
+				|| $this->get_setting( 'single_3_cols' ) );
+		}
+
+		if( $disp_detail == 'posts-topcat-nointro' || $disp_detail == 'posts-topcat-intro' )
+		{	// Category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
+		}
+
+		if( $disp_detail == 'posts-subcat-nointro' || $disp_detail == 'posts-subcat-intro' )
+		{	// Sub-category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
+		}
+
+		// All other disps:
+		return (boolean)$this->get_checklist_setting( 'use_3_cols', 'other' );
+	}
+
+
+	/**
+	 * Get layout style class depending on skin settings and current disp
+	 *
+	 * @param string Place where class is used
+	 */
+	function get_layout_class( $place )
+	{
+		$r = '';
+
+		switch( $place )
+		{
+			case 'container':
+				$r .= 'container';
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= ' container-xxl';
+				}
+				break;
+
+			case 'main_column':
+				if( $this->is_side_navigation_visible() )
+				{	// Layout with visible left sidebar:
+					if( $this->is_3rd_right_column_layout() )
+					{	// Layout with 3 columns on current page:
+						$r .= 'col-xxl-8 col-xxl-pull-2 ';
+					}
+					$r .= 'col-md-9 pull-right-md';
+				}
+				else
+				{
+					$r .= 'col-md-12';
+				}
+				break;
+
+			case 'left_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-left-md';
+				break;
+
+			case 'right_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 col-xxl-push-8 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-right-md';
+				break;
+		}
+
+		return $r;
 	}
 }
 

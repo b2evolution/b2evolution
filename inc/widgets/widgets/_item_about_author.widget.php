@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_about_author_Widget extends ComponentWidget
 {
+	var $icon = 'user-o';
+
 	/**
 	 * Constructor
 	 */
@@ -92,6 +94,15 @@ class item_about_author_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $admin_url;
+
+		// Get available templates:
+		$context = 'item_details';
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_by_context( $context );
+
+		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+
 		// Load Userfield class and all fields:
 		load_class( 'users/model/_userfield.class.php', 'Userfield' );
 		$UserFieldCache = & get_UserFieldCache();
@@ -117,6 +128,17 @@ class item_about_author_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => NULL,
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
 				'thumb_size' => array(
 					'label' => T_('Display user image'),
@@ -172,66 +194,104 @@ class item_about_author_Widget extends ComponentWidget
 		global $Item;
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
+		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
 			return false;
 		}
 
 		$this->init_display( $params );
 
-		if( empty( $this->disp_params['user_field'] ) )
-		{ // Not defined user field in the widget settings
-			return false;
-		}
-
-		// Load user fields
-		$creator_User = & $Item->get_creator_User();
-		$creator_User->userfields_load();
-		if( empty( $creator_User->userfields_by_type[ $this->disp_params['user_field'] ] ) )
-		{ // No user field by ID for current author
-			return false;
-		}
-
-		$user_info = '';
-
-		$user_info .= '<div class="evo_author_display_field">';
-		$user_info .= $creator_User->userfield_value_by_ID( $this->disp_params['user_field'] );
-		$user_info .= '</div>';
-
-		if( empty( $user_info ) )
-		{ // No user info
-			return false;
-		}
-
-		// Display user info only when it is defined for current author
-		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-
-		if( ! empty( $this->disp_params['thumb_size'] ) )
+		if( empty( $this->disp_params['template'] ) )
 		{
-			echo '<div class="evo_avatar">';
-
-			$user_url = $this->disp_params['link_profile'] ? $creator_User->get_userpage_url() : '';
-
-			if( ! empty( $user_url ) )
-			{
-				echo '<a href="'.$user_url.'" class="user_link" rel="bubbletip_user_'.$creator_User->ID.'">';
+			if( empty( $this->disp_params['user_field'] ) )
+			{	// Not defined user field in the widget settings:
+				$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no defined widget param "user_field".' );
+				return false;
 			}
 
-			echo $creator_User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
-			if( ! empty( $user_url ) )
-			{
-				echo '</a>';
+			// Load user fields
+			$creator_User = & $Item->get_creator_User();
+			$creator_User->userfields_load();
+			if( empty( $creator_User->userfields_by_type[ $this->disp_params['user_field'] ] ) )
+			{	// No user field by ID for current author:
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no defined widget param "user_field".' );
+				return false;
 			}
 
-			echo '</div>';
+			$user_info = '';
+
+			$user_info .= '<div class="evo_author_display_field">';
+			$user_info .= $creator_User->userfield_value_by_ID( $this->disp_params['user_field'] );
+			$user_info .= '</div>';
+
+			if( empty( $user_info ) )
+			{	// No user info:
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no user info.' );
+				return false;
+			}
+
+			// Display user info only when it is defined for current author
+			echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
+
+			if( ! empty( $this->disp_params['thumb_size'] ) )
+			{
+				echo '<div class="evo_avatar">';
+
+				$user_url = $this->disp_params['link_profile'] ? $creator_User->get_userpage_url() : '';
+
+				if( ! empty( $user_url ) )
+				{
+					echo '<a href="'.$user_url.'" class="user_link" rel="bubbletip_user_'.$creator_User->ID.'">';
+				}
+
+				echo $creator_User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
+				if( ! empty( $user_url ) )
+				{
+					echo '</a>';
+				}
+
+				echo '</div>';
+			}
+			echo $user_info;
+
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
 		}
-		echo $user_info;
+		else
+		{
+			$TemplateCache = & get_TemplateCache();
+			if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
+			{
+				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+				return false;
+			}
 
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+			$template = $this->disp_params['template'];
+			$item_author_User = & $Item->get_creator_User();
+			$rendered_template = render_template_code( $template, $this->disp_params, array( 'User' => $item_author_User ) );
 
-		return true;
+			if( ! empty( $rendered_template ) )
+			{
+				// Display user info only when it is defined for current author
+				echo $this->disp_params['block_start'];
+				$this->disp_title();
+				echo $this->disp_params['block_body_start'];
+
+				echo $rendered_template;
+
+				echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_end'];
+
+				return true;
+			}
+			
+			$this->display_debug_message();
+			return false;
+		}
 	}
 
 
@@ -257,7 +317,8 @@ class item_about_author_Widget extends ComponentWidget
 				'wi_ID'       => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID'     => $creator_user_ID, // Has the creator User changed?
-				'item_ID'     => $Item->ID, // Has the Item page changed?
+				'item_ID'     => ( empty( $Item->ID ) ? 0 : $Item->ID ), // Has the Item page changed?
+				'template_code' => $this->get_param( 'template' ), // Has the Template changed?
 			);
 	}
 }

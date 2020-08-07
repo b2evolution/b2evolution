@@ -21,7 +21,7 @@ if( evo_version_compare( $app_version, '6.4' ) < 0 )
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $Skin;
+global $Skin, $tag;
 
 
 // This is the main template; it may be used to display very different things.
@@ -52,10 +52,12 @@ skin_include( '_html_header.inc.php', array(
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
 	'front_text'        => T_('Forum'),
-	'posts_text'        => $posts_text,
+	// Display default title only for tag page without intro Item:
+	'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : $posts_text ),
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
 	'flagged_text'      => T_('Flagged topics'),
+	'mustread_text'     => T_('Must Read topics'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -72,13 +74,14 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
-		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Page Top'), array(
+			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+					'container_end'       => '</div></div>',
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -89,16 +92,15 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
 		?>
-		</div>
-	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
-		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
-			skin_container( NT_('Header'), array(
+			widget_container( 'header', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => true, // Display container anyway even if no widget
+					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+					'container_end'     => '</div></div>',
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
 					'block_title_start' => '<h1>',
@@ -106,22 +108,18 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Header" CONTAINER -----------------------------
 		?>
-		</div>
-	</div><!-- .col -->
 
 </header><!-- .row -->
 
-
-<nav class="row">
-
-	<div class="col-md-12">
-		<ul class="nav nav-tabs evo_container evo_container__menu">
 		<?php
 			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 			// Display container and contents:
 			// Note: this container is designed to be a single <ul> list
-			skin_container( NT_('Menu'), array(
+			widget_container( 'menu', array(
 					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+					'container_end'       => '</ul></div></nav>',
 					'block_start'         => '',
 					'block_end'           => '',
 					'block_display_title' => false,
@@ -136,22 +134,17 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 		?>
-		</ul>
-	</div><!-- .col -->
-
-</nav><!-- .row -->
-
 
 <div class="row">
 
-	<div class="<?php echo $Skin->get_column_class(); ?>">
+	<div class="evo_content_col <?php echo $Skin->get_column_class_forums(); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -176,14 +169,15 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
-					'display_edit_links'=> false,
 					'category_text'     => '',
 					'categories_text'   => '',
 					'catdir_text'       => '',
-					'comments_text'     => T_('Latest Replies'),
+					'comments_text'     => '',
+					'search_text'       => '',
 					'front_text'        => '',
 					'posts_text'        => '',
 					'flagged_text'      => '',
+					'mustread_text'     => '',
 					'useritems_text'    => T_('User\'s topics'),
 					'usercomments_text' => T_('User\'s replies'),
 					'register_text'     => '',
@@ -193,6 +187,13 @@ siteskin_include( '_site_body_header.inc.php' );
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'display_edit_links'  => ( $disp == 'edit' ),
+					'edit_links_template' => array(
+						'before'              => '<span class="pull-right">',
+						'after'               => '</span>',
+						'advanced_link_class' => 'btn btn-info btn-sm',
+						'close_link_class'    => 'btn btn-default btn-sm',
+					),
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
@@ -205,12 +206,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'widget' => 'coll_search_form',
 					// Optional display params
 					'block_display_title'  => false,
-					'search_class'         => 'compact_search_form',
-					'search_input_before'  => '<div class="input-group">',
-					'search_input_after'   => '',
-					'search_submit_before' => '<span class="input-group-btn">',
-					'search_submit_after'  => '</span></div>',
-					'button'               => T_('Search')
+					'search_class'         => 'index_compact_search_form',
+					'template'             => 'search_form_simple',
 				) );
 			// Display a button to view the Recent/New Topics:
 			$Skin->display_button_recent_topics();
@@ -261,15 +258,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -280,10 +268,12 @@ siteskin_include( '_site_body_header.inc.php' );
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron">',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -296,17 +286,18 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 	<?php
-	if( $Skin->is_visible_sidebar() )
+	if( $Skin->is_visible_sidebar_forums() )
 	{ // Display sidebar:
 	?>
-	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+	<aside class="evo_sidebar_col col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
-		<div class="evo_container evo_container__sidebar">
+		<div id="evo_container__sidebar">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
-			skin_container( NT_('Sidebar'), array(
+			widget_container( 'sidebar', array(
 					// The following (optional) params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
 					// This will enclose each widget in a block:
 					'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 					'block_end' => '</div>',
@@ -337,14 +328,13 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
-		</div>
 
-		<div class="evo_container evo_container__sidebar2">
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:
-			skin_container( NT_('Sidebar 2'), array(
+			widget_container( 'sidebar_2', array(
 					// The following (optional) params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
 					// This will enclose each widget in a block:
 					'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
 					'block_end' => '</div>',
@@ -379,83 +369,105 @@ siteskin_include( '_site_body_header.inc.php' );
 	</aside><!-- .col -->
 	<?php } ?>
 
-	<footer class="col-md-12">
-	<?php skin_include( '_legend.inc.php' ); ?>
+	<footer class="col-md-12 clear">
+		<?php skin_include( '_legend.inc.php' ); ?>
 	</footer>
 
 </div><!-- .row -->
 
+<?php
+// ------------------------- "Forum Front Secondary Area" CONTAINER EMBEDDED HERE --------------------------
+if( $disp == 'front' )
+{
+		// Display container and contents:
+		widget_container( 'forum_front_secondary_area', array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				'container_start'   => '<section class="secondary_area"><div class="evo_container $wico_class$">',
+				'container_end'     => '</div></section>',
+				'block_start'       => '<div class="evo_widget $wi_class$">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<h2 class="page-header">',
+				'block_title_end'   => '</h2>',
+			) );
+		// ----------------------------- END OF "Forum Front Secondary Area" CONTAINER -----------------------------
+}
+?>
 
-<footer class="row">
+<footer class="container-fluid">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="row">
+   
+		<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
-		<?php
-			// Display container and contents:
-			skin_container( NT_("Footer"), array(
-					// The following params will be used as defaults for widgets included in this container:
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
-				) );
-			// Note: Double quotes have been used around "Footer" only for test purposes.
-		?>
-		</div>
+				<?php
+				// Display container and contents:
+				widget_container( 'footer', array(
+						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
+					) );
+				?>
 
-		<p>
+			<p class="center">
+				<?php
+					// Display footer text (text can be edited in Blog Settings):
+					$Blog->footer_text( array(
+							'before' => '',
+							'after'  => ' &bull; ',
+						) );
+
+				// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
+				?>
+
+				<?php
+					// Display a link to contact the owner of this blog (if owner accepts messages):
+					$Blog->contact_link( array(
+							'before' => '',
+							'after'  => ' &bull; ',
+							'text'   => T_('Contact'),
+							'title'  => T_('Send a message to the owner of this blog...'),
+						) );
+					// Display a link to help page:
+					$Blog->help_link( array(
+							'before'      => ' ',
+							'after'       => ' ',
+							'text'        => T_('Help'),
+						) );
+				?>
+
+				<?php
+					// Display additional credits:
+					// If you can add your own credits without removing the defaults, you'll be very cool :))
+					// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
+					credits( array(
+							'list_start'  => '&bull;',
+							'list_end'    => ' ',
+							'separator'   => '&bull;',
+							'item_start'  => ' ',
+							'item_end'    => ' ',
+						) );
+				?>
+			</p>
+
 			<?php
-				// Display footer text (text can be edited in Blog Settings):
-				$Blog->footer_text( array(
-						'before' => '',
-						'after'  => ' &bull; ',
-					) );
-
-			// TODO: dh> provide a default class for pTyp, too. Should be a name and not the ityp_ID though..?!
-			?>
-
-			<?php
-				// Display a link to contact the owner of this blog (if owner accepts messages):
-				$Blog->contact_link( array(
-						'before' => '',
-						'after'  => ' &bull; ',
-						'text'   => T_('Contact'),
-						'title'  => T_('Send a message to the owner of this blog...'),
-					) );
-				// Display a link to help page:
-				$Blog->help_link( array(
-						'before'      => ' ',
-						'after'       => ' ',
-						'text'        => T_('Help'),
+				// Please help us promote b2evolution and leave this logo on your blog:
+				powered_by( array(
+						'block_start' => '<div class="powered_by">',
+						'block_end'   => '</div>',
+						// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
+						'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
+						'img_width'   => 120,
+						'img_height'  => 32,
 					) );
 			?>
-
-			<?php
-				// Display additional credits:
-				// If you can add your own credits without removing the defaults, you'll be very cool :))
-				// Please leave this at the bottom of the page to make sure your blog gets listed on b2evolution.net
-				credits( array(
-						'list_start'  => '&bull;',
-						'list_end'    => ' ',
-						'separator'   => '&bull;',
-						'item_start'  => ' ',
-						'item_end'    => ' ',
-					) );
-			?>
-		</p>
-
-		<?php
-			// Please help us promote b2evolution and leave this logo on your blog:
-			powered_by( array(
-					'block_start' => '<div class="powered_by">',
-					'block_end'   => '</div>',
-					// Check /rsc/img/ for other possible images -- Don't forget to change or remove width & height too
-					'img_url'     => '$rsc$img/powered-by-b2evolution-120t.gif',
-					'img_width'   => 120,
-					'img_height'  => 32,
-				) );
-		?>
-	</div><!-- .col -->
+		</div><!-- .col -->
+		
+	</div>
 
 </footer><!-- .row -->
 

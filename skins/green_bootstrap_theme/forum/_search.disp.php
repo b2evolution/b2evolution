@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_forums
@@ -18,27 +18,25 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 echo '<div class="forums_table_search">';
 
-// --------------------------------- START OF COMMON LINKS --------------------------------
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'coll_search_form',
-		// Optional display params
-		'block_start' => '<div class="panel panel-default"><div class="panel-heading">',
-		'block_end' => '</div></div>',
+// ------------------------- "Search Area" CONTAINER EMBEDDED HERE --------------------------
+	// Display container and contents:
+	widget_container( 'search_area', array(
+		// The following params will be used as defaults for widgets included in this container:
+		'container_display_if_empty' => false, // If no widget, don't display container at all
+		'container_start'     => '<div class="evo_container $wico_class$">',
+		'container_end'       => '</div>',
+		'block_start'         => '<div class="evo_widget $wi_class$">',
+		'block_end'           => '</div>',
 		'block_display_title' => false,
-		'disp_search_options' => 0,
-		'search_class' => 'extended_search_form',
-		'use_search_disp' => 1,
-		'button' => T_('Search')
 	) );
-// ---------------------------------- END OF COMMON LINKS ---------------------------------
+// ----------------------------- END OF "Search Area" CONTAINER -----------------------------
 
 // Display the search result
 search_result_block( array(
 		'title_prefix_post'     => T_('Topic: '),
-		'title_prefix_comment'  => T_('Reply: '),
-		'title_prefix_category' => T_('Forum: '),
-		'title_prefix_tag'      => T_('Tag: '),
+		'title_prefix_comment'  => /* TRANS: noun */ T_('Reply:'),
+		'title_prefix_category' => T_('Forum').': ',
+		'title_prefix_tag'      => /* TRANS: noun */ T_('Tag').': ',
 		'block_start' => '<div class="evo_search_list">',
 		'block_end'   => '</div>',
 		'row_start'   => '<div class="evo_search_list__row">',

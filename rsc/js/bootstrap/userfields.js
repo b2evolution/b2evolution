@@ -23,8 +23,26 @@ jQuery( document ).ready(function()
 		if( div_cache_ID != '' )
 		{ // Init popover for the first time event "focus"
 			var popover_params = {
+				container: 'body',
 				trigger: 'focus',
-				placement: 'right',
+				placement: function( context, source )
+				{
+					var input_obj = jQuery( source );
+					var input_pos = input_obj.offset();
+					var right_space = jQuery( window ).width() - input_pos.left - input_obj.width();
+
+					if( right_space < 290 && input_pos.left < 240 )
+					{
+						return 'bottom';
+					}
+
+					if( right_space < 290 )
+					{
+						return 'left';
+					}
+
+					return 'right';
+				},
 				html: true,
 				template: '<div class="popover popover-userfield"><div class="arrow"></div><div class="popover-content"></div></div>'
 			};
