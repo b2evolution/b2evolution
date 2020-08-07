@@ -1140,7 +1140,7 @@ function get_mail_headers( $headers, $nl = "\r\n" )
 function parse_mail_headers( $headers_string, $nl = "\r\n" )
 {
 	$headers = array();
-	preg_match_all( "/([^:]+):\s([^".$nl."]+)/x", $headers_string, $m );
+	preg_match_all( "/([^:\n\r\s]+):\s([^".$nl."]+)/x", $headers_string, $m );
 	$headers = array_combine( $m[1], $m[2] );
 
 	return $headers;
