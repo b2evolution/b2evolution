@@ -40,6 +40,33 @@ class videoplug_plugin extends Plugin
 
 
 	/**
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
+	 */
+	function GetDefaultSettings( & $params )
+	{
+		return array(
+			'youtube_load' => array(
+				'label' => 'YouTube',
+				'type' => 'radio',
+				'options' => array(
+					array( 'standard', T_('Standard').' <code>&lt;iframe&gt;</code>' ),
+					array( 'lazyload', T_('Lazy-Load') ),
+				),
+				'field_lines' => true,
+				'defaultvalue' => 'standard',
+			),
+		);
+	}
+
+
+	/**
 	 * Define here default custom settings that are to be made available
 	 *     in the backoffice for collections, private messages and newsletters.
 	 *
@@ -89,6 +116,20 @@ class videoplug_plugin extends Plugin
 					),
 			)
 		);
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		$this->require_css( 'videoplug.css' );
+		$this->require_js_defer( 'videoplug.js' );
 	}
 
 
@@ -164,14 +205,21 @@ class videoplug_plugin extends Plugin
 			return $m[0];
 		}
 
-		// Try to exctract video code from URL depending on video server:
+		// Try to extract video code from URL depending on video server:
 		switch( $m[4] )
 		{
 			case 'youtube.com':
 			case 'youtu.be':
 				if( preg_match( '#(^/(embed/)?|[\?&]v=)([^&=\?]+)(&|$)#', $m[5], $code ) )
 				{
-					$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$code[3].'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
+					if( $this->get_setting( 'youtube_load' ) == 'standard' )
+					{	// Use standard loading with iframe:
+						$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$code[3].'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+					}
+					else
+					{	// Use Lazy-loading:
+						$video_block = '<div class="evo_youtube" data-embed="'.$code[3].'"><div class="evo_youtube__play_button"></div></div>';
+					}
 				}
 				break;
 
