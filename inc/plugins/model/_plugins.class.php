@@ -674,7 +674,7 @@ class Plugins
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
 	{
-		global $Debuglog, $Timer;
+		global $Debuglog, $Timer, $Blog;
 
 		$Timer->resume( 'plugins_inst_'.$set_type );
 
@@ -706,7 +706,10 @@ class Plugins
 			// We should not merge them with $defaults because they are stored in different DB table,
 			// I.e. they are should be initialized in $Plugin->Settings, but we still need this object for a proper settings work:
 			$other_defaults = $Plugin->get_coll_setting_definitions( $params );
-			$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
+			if( isset( $Blog ) )
+			{	// Only when current collection is defined in order to avoid errors because global $Blog may be used inside:
+				$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
+			}
 		}
 
 		if( empty( $defaults ) && empty( $other_defaults ) )
