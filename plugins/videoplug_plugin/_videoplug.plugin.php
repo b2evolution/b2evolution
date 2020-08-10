@@ -129,7 +129,7 @@ class videoplug_plugin extends Plugin
 	function SkinBeginHtmlHead( & $params )
 	{
 		$this->require_css( 'videoplug.css' );
-		$this->require_js( 'videoplug.js' );
+		$this->require_js_defer( 'videoplug.js' );
 	}
 
 
