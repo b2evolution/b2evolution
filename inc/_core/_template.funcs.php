@@ -2879,7 +2879,7 @@ function display_login_form( $params )
 	if( count( $links ) )
 	{
 		echo '<div class="evo_form__login_links">'
-				.'<div class="floatright">'.implode( $links, ' &middot; ' ).'</div>'
+				.'<div class="floatright">'.implode( ' &middot; ', $links ).'</div>'
 				.'<div class="clear"></div>'
 			.'</div>';
 	}
