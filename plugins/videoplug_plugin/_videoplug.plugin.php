@@ -171,7 +171,7 @@ class videoplug_plugin extends Plugin
 			case 'youtu.be':
 				if( preg_match( '#(^/(embed/)?|[\?&]v=)([^&=\?]+)(&|$)#', $m[5], $code ) )
 				{
-					$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$code[3].'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
+					$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$code[3].'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
 				}
 				break;
 
