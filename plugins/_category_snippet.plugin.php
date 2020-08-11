@@ -58,12 +58,6 @@ class category_snippet_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		global $Blog;
-
-		// Get all catgories of the current Collection:
-		$ChapterCache = & get_ChapterCache();
-		$chapter_options = array( 0 => '---' ) + $ChapterCache->recurse_select_options( $Blog->ID );
-
 		return array_merge( array(
 			'snippets' => array(
 				'label' => T_('Snippets'),
@@ -73,7 +67,7 @@ class category_snippet_plugin extends Plugin
 					'cat' => array(
 						'label' => T_('Category'),
 						'type' => 'select',
-						'options' => $chapter_options,
+						'options' => $this->get_categories_selector_options(),
 					),
 					'html_snippet' => array(
 						'label' => T_('HTML snippet'),
@@ -97,10 +91,6 @@ class category_snippet_plugin extends Plugin
 	{
 		global $Blog, $admin_url;
 
-		// Get all catgories of the current Collection:
-		$ChapterCache = & get_ChapterCache();
-		$chapter_options = array( 0 => '---' ) + $ChapterCache->recurse_select_options( $Blog->ID );
-
 		return array(
 			'title' => array(
 				'label' => T_('Block title'),
@@ -117,7 +107,7 @@ class category_snippet_plugin extends Plugin
 					'cat' => array(
 						'label' => T_('Category'),
 						'type' => 'select',
-						'options' => $chapter_options,
+						'options' => $this->get_categories_selector_options(),
 					),
 					'html_snippet' => array(
 						'label' => T_('HTML snippet'),
@@ -128,6 +118,37 @@ class category_snippet_plugin extends Plugin
 				),
 			),
 		);
+	}
+
+
+	/**
+	 * Get categories options for selector in settings
+	 *
+	 * @return array
+	 */
+	function get_categories_selector_options()
+	{
+		global $Blog;
+
+		$options = array( 0 => '---' );
+
+		$ChapterCache = & get_ChapterCache();
+		if( get_allow_cross_posting() )
+		{	// Get ALL Categories from ALL Collections because cross-posting is enabled in system:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_all();
+			foreach( $BlogCache->cache as $cache_Blog )
+			{
+				$ChapterCache->clear(); // Clear categories from previois Collection:
+				$options[ $cache_Blog->get( 'name' ) ] = $ChapterCache->recurse_select_options( $cache_Blog->ID );
+			}
+		}
+		else
+		{	// Get Categories of the current Collection:
+			$options += $ChapterCache->recurse_select_options( $Blog->ID );
+		}
+
+		return $options;
 	}
 
 
