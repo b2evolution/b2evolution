@@ -4016,6 +4016,14 @@ class Plugin
 	 */
 	function init_widget_params( $params, $default_params = array() )
 	{
+		if( isset( $params['wi_ID'] ) &&
+		    ( ! isset( $this->current_widget_ID ) || $this->current_widget_ID != $params['wi_ID'] ) )
+		{	// Reset widget params on switch plugin to display next widget:
+			$this->widget_params = NULL;
+			// Store current widget ID to know when next widget is started to display:
+			$this->current_widget_ID = $params['wi_ID'];
+		}
+
 		if( ! isset( $this->widget_params ) )
 		{	// Don't initialize params twice:
 			$this->widget_params = array_merge( $default_params, $params );
