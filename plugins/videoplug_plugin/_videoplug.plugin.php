@@ -128,8 +128,11 @@ class videoplug_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		$this->require_css( 'videoplug.css' );
-		$this->require_js_defer( 'videoplug.js' );
+		$this->require_css( 'css/videoplug.min.css' );
+		// Initialize config for video plugin:
+		expose_var_to_js( 'evo_plugin_videoplug_config', array(
+			'youtube_lazyload_selector' => '.evo_youtube[data-embed]',
+		) );
 	}
 
 

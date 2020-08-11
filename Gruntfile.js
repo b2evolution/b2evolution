@@ -100,6 +100,9 @@ module.exports = function(grunt) {
 
 					// info dots plugin
 					'plugins/infodots_plugin/infodots.css': 'plugins/infodots_plugin/infodots.less',
+
+					// Video plugin
+					'plugins/videoplug_plugin/css/videoplug.css': 'plugins/videoplug_plugin/css/videoplug.less',
 				}
 			},
 
@@ -232,6 +235,10 @@ module.exports = function(grunt) {
 			jqplot: {
 				src: [ 'rsc/ext/jquery/jqplot/css/jquery.jqplot.css', 'rsc/ext/jquery/jqplot/css/jquery.jqplot.b2evo.css' ],
 				dest: 'rsc/build/b2evo_jqplot.bmin.css',
+			},
+			videoplug: {
+				src: 'plugins/videoplug_plugin/css/videoplug.css',
+				dest: 'plugins/videoplug_plugin/css/videoplug.min.css',
 			}
 		},
 
@@ -333,6 +340,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_plugin_polls.js',
 					'rsc/js/src/evo_init_plugin_shortcodes.js',
 					'rsc/js/src/evo_init_plugin_widescroll.js',
+					'rsc/js/src/evo_init_plugin_videoplug.js',
 					'rsc/js/src/evo_init_editable_column.js',
 					'rsc/js/src/evo_init_regional.js',
 					'rsc/js/src/evo_init_bootstrap_tooltips.js',
