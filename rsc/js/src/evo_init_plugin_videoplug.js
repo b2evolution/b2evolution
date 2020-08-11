@@ -1,11 +1,25 @@
-/* 
- * JavaSript for plugin Video Plug
+/**
+ * This file initialize plugin "Video Plug"
+ *
+ * This file is part of the evoCore framework - {@link http://evocore.net/}
+ * See also {@link https://github.com/b2evolution/b2evolution}.
+ *
+ * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
+ *
+ * @copyright (c)2003-2020 by Francois PLANQUE - {@link http://fplanque.com/}
+ * 
+ * Depends on jQuery
  */
 
 jQuery( document ).ready( function()
 {
+	if( typeof( evo_plugin_videoplug_config ) == 'undefined' )
+	{	// Don't execute code below because no config var is found:
+		return;
+	}
+
 	// Initialize YouTube player for Lazy-Loading:
-	jQuery( '.evo_youtube[data-embed]' ).each( function()
+	jQuery( evo_plugin_videoplug_config.youtube_lazyload_selector ).each( function()
 	{	// Load a preview image for the video:
 		var this_player = jQuery( this );
 		var image = new Image();
@@ -15,7 +29,7 @@ jQuery( document ).ready( function()
 			this_player.append( image );
 		} );
 	} );
-	jQuery( '.evo_youtube[data-embed]' ).click( function()
+	jQuery( evo_plugin_videoplug_config.youtube_lazyload_selector ).click( function()
 	{	// Initialize iframe on click to the preview player area:
 		var iframe = document.createElement( 'iframe' );
 		iframe.setAttribute( 'frameborder', '0' );
