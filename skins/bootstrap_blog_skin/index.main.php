@@ -41,6 +41,10 @@ siteskin_include( '_site_body_header.inc.php' );
 <div class="container">
 
 
+<?php
+if( $Skin->get_checklist_setting( 'display_sections', 'header' ) )
+{	// Display header section:
+?>
 <header class="row">
 
 	<?php
@@ -79,8 +83,13 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 </header><!-- .row -->
+<?php
+} // END of header section.
+?>
 
 <?php
+if( $Skin->get_checklist_setting( 'display_sections', 'menu' ) )
+{	// Display menu section:
 	// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
 	// Note: this container is designed to be a single <ul> list
@@ -102,9 +111,10 @@ siteskin_include( '_site_body_header.inc.php' );
 			'item_title_after'    => '',
 		) );
 	// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+}
 ?>
 
-<div class="row">
+<div class="row spacers_around_main">
 
 	<div class="<?php echo $Skin->get_column_class(); ?>">
 
@@ -332,6 +342,10 @@ siteskin_include( '_site_body_header.inc.php' );
 </div><!-- .row -->
 
 
+<?php
+if( $Skin->get_checklist_setting( 'display_sections', 'footer' ) )
+{	// Display footer section:
+?>
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
@@ -404,6 +418,9 @@ siteskin_include( '_site_body_header.inc.php' );
 	</div><!-- .col -->
 
 </footer><!-- .row -->
+<?php
+} // END of footer section.
+?>
 
 
 </div><!-- .container -->

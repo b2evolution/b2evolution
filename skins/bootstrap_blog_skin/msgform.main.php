@@ -44,6 +44,10 @@ siteskin_include( '_site_body_header.inc.php' );
 <div class="container">
 
 
+<?php
+if( $Skin->get_checklist_setting( 'display_sections', 'header' ) )
+{	// Display header section:
+?>
 <header class="row">
 
 	<?php
@@ -82,9 +86,13 @@ siteskin_include( '_site_body_header.inc.php' );
 	?>
 
 </header><!-- .row -->
+<?php
+} // END of header section.
+?>
 
 <?php
-if( $Skin->show_container_when_access_denied( 'menu' ) )
+if( $Skin->get_checklist_setting( 'display_sections', 'menu' ) &&
+    $Skin->show_container_when_access_denied( 'menu' ) )
 {	// Display 'Menu' widget container:
 
 	// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
@@ -110,7 +118,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 	// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 } ?>
 
-<div class="row">
+<div class="row spacers_around_main">
 	<div class="<?php echo $Skin->is_visible_sidebar( true ) ? $Skin->get_column_class() : 'col-md-12'; ?>">
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -237,6 +245,10 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 </div><!-- .row -->
 
 
+<?php
+if( $Skin->get_checklist_setting( 'display_sections', 'footer' ) )
+{	// Display footer section:
+?>
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
@@ -310,6 +322,9 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 	</div><!-- .col -->
 
 </footer><!-- .row -->
+<?php
+} // END of footer section.
+?>
 
 
 </div><!-- .container -->

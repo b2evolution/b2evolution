@@ -175,6 +175,16 @@ class bootstrap_blog_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
+					'display_sections' => array(
+						'label' => T_('Sections to display'),
+						'note' => '',
+						'type' => 'checklist',
+						'options' => array(
+							array( 'header', T_('Skin Header'), 1 ),
+							array( 'menu',   T_('Skin Menu'),   1 ),
+							array( 'footer', T_('Skin Footer'), 1 ),
+						),
+					),
 					'layout' => array(
 						'label' => T_('Layout'),
 						'note' => T_('Select skin layout.'),
