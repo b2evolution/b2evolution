@@ -144,11 +144,11 @@ if( $Skin->get_checklist_setting( 'display_sections', 'header' ) )
 		}
 		?>
 
-<div class="row">
+<div class="row spacer_above_main">
 
 	<div class="evo_content_col <?php echo $Skin->get_column_class(); ?>">
 
-		<main class="spacer_above_main"><!-- This is were a link like "Jump to main content" would land -->
+		<main><!-- This is were a link like "Jump to main content" would land -->
 
 		<!-- ================================= START OF MAIN AREA ================================== -->
 

@@ -125,9 +125,9 @@ if( $Skin->get_checklist_setting( 'display_sections', 'menu' ) &&
 			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 } ?>
 
-<div class="row">
+<div class="row spacer_above_main">
 	<div class="col-md-12">
-		<main class="spacer_above_main"><!-- This is were a link like "Jump to main content" would land -->
+		<main><!-- This is were a link like "Jump to main content" would land -->
 
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
