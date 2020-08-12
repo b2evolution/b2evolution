@@ -232,9 +232,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					'block_start'     => '<div class="evo_widget $wi_class$">',
 					'block_end'       => '</div>',
 				) );
-			?>
-		</div><!-- .evo_container__footer -->
-		<?php } ?>
+		} ?>
 
 		<p class="center">
 			<?php
