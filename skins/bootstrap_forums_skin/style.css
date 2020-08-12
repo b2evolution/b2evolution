@@ -4,6 +4,12 @@
 .evo_container__page_top .ufld_icon_links {
   text-align: right;
 }
+.nav.evo_container__menu {
+  margin-bottom: 0;
+}
+.spacer_above_main {
+  margin-top: 20px;
+}
 .powered_by a img {
   background-color: #ffffff;
   border-radius: 4px;

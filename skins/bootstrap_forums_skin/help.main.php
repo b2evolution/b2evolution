@@ -126,7 +126,7 @@ if( $Skin->get_checklist_setting( 'display_sections', 'menu' ) &&
 
 <div class="row">
 	<div class="col-md-12">
-		<main><!-- This is were a link like "Jump to main content" would land -->
+		<main class="spacer_above_main"><!-- This is were a link like "Jump to main content" would land -->
 
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
