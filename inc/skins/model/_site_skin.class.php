@@ -390,16 +390,26 @@ class site_Skin extends Skin
 	 *
 	 * @param array Tab data
 	 * @param integer Tab index in array of all tabs
+	 * @param array Additional params
 	 * @return string
 	 */
-	function get_header_tab_attr_class( $tab, $index = NULL )
+	function get_header_tab_attr_class( $tab, $index = NULL, $params = array() )
 	{
-		// Append extra CSS classes of Menu Entry:
-		$class = empty( $tab['class'] ) ? '' : $tab['class'];
+		$params = array_merge( array(
+				'class'        => '',
+				'class_active' => 'active',
+			), $params );
+
+		$class = $params['class'];
+
+		if( ! empty( $tab['class'] ) )
+		{	// Append extra CSS classes of Menu Entry:
+			$class .= ' '.$tab['class'];
+		}
 
 		if( $this->header_tab_active === $index || ! empty( $tab['active'] ) )
 		{	// This tab is active currently:
-			$class .= ' active';
+			$class .= ' '.$params['class_active'];
 		}
 
 		$class = trim( $class );
