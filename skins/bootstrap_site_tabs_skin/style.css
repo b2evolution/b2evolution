@@ -17,7 +17,7 @@
 }
 #evo_site_header .swhead_sitename.swhead_logo {
   display: table-cell;
-  background-color: #ddd;
+  margin: -17px 0 0 -6px;
 }
 #evo_site_header .swhead_sitename.swhead_logo a {
   padding: 0;
@@ -36,10 +36,11 @@
 #evo_site_header .swhead_menus div.level1 nav .pull-right {
   margin-top: -10px;
 }
-#evo_site_header .swhead_menus div.level1 nav .pull-left li {
-  margin-right: 2px;
+#evo_site_header .swhead_menus div.level1 nav .pull-right a {
+  max-height: 40px;
 }
 #evo_site_header .swhead_menus div.level1 nav .pull-left li a {
+  margin-right: 0;
   background-color: #eee;
   border-color: #ddd;
   border-bottom: 1px solid #ccc;
@@ -62,7 +63,7 @@ div.level1 {
 div.level1 nav ul.nav.nav-tabs {
   margin: 0;
   position: relative;
-  top: 1px;
+  top: 2px;
   border-bottom: 1px solid #ccc;
 }
 div.level1 nav ul.nav.nav-tabs li {

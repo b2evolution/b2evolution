@@ -221,7 +221,7 @@ class MentionClient {
 
       if(array_key_exists('Link', $headers)) {
         if(is_array($headers['Link'])) {
-          $link_header = implode($headers['Link'], ", ");
+          $link_header = implode(", ", $headers['Link']);
         } else {
           $link_header = $headers['Link'];
         }

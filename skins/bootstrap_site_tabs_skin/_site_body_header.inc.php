@@ -33,11 +33,6 @@ else
 
 <div id="evo_site_header" class="swhead_wrapper">
 
-		<?php if( $site_has_logo_file ) { ?>
-			<div class="swhead_sitename<?php echo $site_title_class; ?>">
-				<a href="<?php echo $baseurl; ?>"><?php echo $site_name_text; ?></a>
-			</div>
-		<?php } ?>
 	<div class="swhead_menus">
 		<div class="container-fluid level1">
 
@@ -64,6 +59,12 @@ else
 						) );
 					// ----------------------------- END OF "Right Navigation" CONTAINER -----------------------------
 				?>
+
+				<?php if( $site_has_logo_file ) { ?>
+				<div class="pull-left swhead_sitename<?php echo $site_title_class; ?>">
+					<a href="<?php echo $baseurl; ?>"><?php echo $site_name_text; ?></a>
+				</div>
+				<?php } ?>
 
 				<ul class="nav nav-tabs pull-left">
 <?php

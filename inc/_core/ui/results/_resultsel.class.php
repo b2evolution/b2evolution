@@ -181,7 +181,7 @@ class ResultSel extends Results
 			$this->Form->text( 'selection_'.$this->param_prefix.'name', $selection_name, 25, T_('Selection name'), '', 60 );
 
 			// List of IDs displayed on this page (needed for deletes):
-			$this->Form->hidden( 'item_ID_list', implode( $item_ID_array, ',' ) );
+			$this->Form->hidden( 'item_ID_list', implode( ',', $item_ID_array ) );
 
 			// actionArray[update_selection] is experimental
 			$this->Form->submit( array( 'actionArray[update_'.$this->param_prefix.'selection]', T_('Update selection'), 'SaveButton' ) );
@@ -427,7 +427,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 				{ // construction of the sql query depending on selected values in the result table
 					$sel_array[$i++] = ' ('.$item.','.$selection_ID.' ) ';
 				}
-				$sql_sel .= implode( $sel_array, ',' );
+				$sql_sel .= implode( ',', $sel_array );
 				$DB->query( $sql_sel ); // insertion of the relation between selections and items in the database
 			}
 
@@ -478,7 +478,7 @@ function selection_action( $action, $selection_ID, $selection_name, $prefix, $pr
 				{ // construction of the sql query depending on selected values in the result table
 					$sel_array[] = ' ( '.$item.', '.$selection_ID.' ) ';
 				}
-				$sql_sel .= implode( $sel_array, ',' );
+				$sql_sel .= implode( ',', $sel_array );
 				$DB->query( $sql_sel ); // insertion of the relation between selections and items in the database
 
 				$Messages->add( T_('New selections entries inserted.'), 'success' );
