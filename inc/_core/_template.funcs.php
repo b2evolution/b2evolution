@@ -1668,17 +1668,25 @@ function init_affix_messages_js( $offset = 50 )
 	}
 
 	add_js_headline( '
-	jQuery( document ).ready( function()
+	function evo_init_affixed_messages()
 	{
 		var msg_obj = jQuery( ".affixed_messages" );
 		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
 
-		if( msg_obj.length == 0 )
-		{ // No Messages, exit
+		if( msg_obj.length == 0 || msg_obj.data( "affixed" ) )
+		{ // No Messages or already affixed, exit
 			return;
 		}
 
-		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
+		// Flag to do not initalize this twice:
+		msg_obj.data( "affixed", true );
+		// Set original width for proper size when page is already scrolled down
+		msg_obj.css( { "width": msg_obj.css( "width" ) } );
+
+		if( msg_obj.parent( ".msg_wrapper" ).length == 0 )
+		{
+			msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
+		}
 		var wrapper = msg_obj.parent();
 
 		msg_obj.affix( {
@@ -1711,7 +1719,9 @@ function init_affix_messages_js( $offset = 50 )
 			{
 				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
 			} );
-	} );
+	}
+
+	jQuery( document ).ready( evo_init_affixed_messages );
 	' );
 }
 

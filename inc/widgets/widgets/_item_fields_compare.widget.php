@@ -1372,10 +1372,18 @@ jQuery( document ).ready( function()
 				}
 				// Display result messages:
 				messages_wrapper_obj.prepend( result.messages );
+				if( typeof( evo_init_affixed_messages ) == 'function' )
+				{	// Make messages affixed to see them when page is scrolled down:
+					evo_init_affixed_messages();
+				}
 			},
 			error: function( result )
 			{	// Display error:
 				messages_wrapper_obj.prepend( result.responseText );
+				if( typeof( evo_init_affixed_messages ) == 'function' )
+				{	// Make messages affixed to see them when page is scrolled down:
+					evo_init_affixed_messages();
+				}
 				jQuery( evo_item_custom_fields_widget_cell_selector ).data( 'field-updated', 1 );
 				closeModalWindow();
 				// Highlight the editing cell with orange color:
