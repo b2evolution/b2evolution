@@ -613,7 +613,7 @@ class SiteMenuEntry extends DataObject
 	/**
 	 * Get Menu Entry URL based on type
 	 *
-	 * @return string|boolean URL or FALSE on unknown type
+	 * @return string|boolean URL or FALSE on unknown type or No access for current User
 	 */
 	function get_url()
 	{
@@ -875,6 +875,21 @@ class SiteMenuEntry extends DataObject
 					return false;
 				}
 				return $entry_Blog->get( 'flaggedurl' );
+
+			case 'text':
+				// Text Menu Entry is used as top level menu,
+				// It has no own URL, It uses URL of first sub-entry, Find it:
+				$sub_entries = $this->get_children( true );
+				foreach( $sub_entries as $sub_SiteMenuEntry )
+				{
+					if( $menu_entry_url = $sub_SiteMenuEntry->get_url() )
+					{	// Only if the menu entry is allowed for current User, page and etc.:
+						return $menu_entry_url;
+						// STOP here, we have found first allowed sub Menu Entry for current User:
+					}
+				}
+				// This text Menu Entry has no allowed sub entries for current User:
+				return false;
 		}
 
 		return false;
@@ -1009,6 +1024,30 @@ class SiteMenuEntry extends DataObject
 
 			case 'flagged':
 				return $disp == 'flagged';
+
+			case 'text':
+				$entry_coll_url = $entry_Blog->get( 'url' );
+				$entry_url = $this->get_url();
+				if( $entry_url && strpos( $entry_url, $entry_coll_url ) === 0 )
+				{	// If URL of this Menu Entry is linked to Collection of this Menu Entry:
+					return true;
+					// STOP here, don't try to search active sub Menu Entry.
+				}
+				// Try to find first match URL in sub-entries:
+				$sub_entries = $this->get_children( true );
+				if( ! empty( $sub_entries ) )
+				{
+					foreach( $sub_entries as $sub_SiteMenuEntry )
+					{
+						$sub_entry_url = $sub_SiteMenuEntry->get_url();
+						if( $sub_entry_url && strpos( $sub_entry_url, $entry_coll_url ) === 0 )
+						{	// If sub Menu Entry has an URL to Collection of this Menu Entry:
+							return true;
+							// STOP here, don't try to search next active sub Menu Entry.
+						}
+					}
+				}
+				return false;
 		}
 
 		return false;

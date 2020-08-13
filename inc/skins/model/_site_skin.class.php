@@ -22,6 +22,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class site_Skin extends Skin
 {
+	var $header_tabs = NULL;
+	var $header_tab_active = NULL;
+
 	/**
 	 * Get generic param definitions for site header
 	 *
@@ -88,10 +91,25 @@ class site_Skin extends Skin
 			return false;
 		}
 
-		$header_tabs = $this->get_header_tabs();
+		$header_sub_menus = $this->get_sub_menus();
+		return count( $header_sub_menus ) > 1;
+	}
 
-		return ( isset( $header_tabs[ $this->header_tab_active ]['items'] ) &&
-			count( $header_tabs[ $this->header_tab_active ]['items'] ) > 1 );
+
+	/**
+	 * Get currently active sub menus
+	 *
+	 * @retrun array
+	 */
+	function get_sub_menus()
+	{
+		$header_tabs = $this->get_header_tabs();
+		if( isset( $header_tabs[ $this->header_tab_active ]['items'] ) )
+		{
+			return $header_tabs[ $this->header_tab_active ]['items'];
+		}
+
+		return array();
 	}
 
 
@@ -102,19 +120,27 @@ class site_Skin extends Skin
 	 */
 	function get_header_tabs()
 	{
+		if( $this->header_tabs !== NULL )
+		{	// Get header tabs from cache:
+			return $this->header_tabs;
+		}
+
 		if( $this->get_setting( 'menu_type' ) == 'custom' &&
 		    ( $SiteMenuCache = & get_SiteMenuCache() ) &&
 		    ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_setting( 'menu_ID' ), false, false ) ) )
 		{	// Use custom menu if it is found in DB:
-			return $this->get_header_tabs_custom( $SiteMenu->ID );
+			$this->header_tabs = $this->get_header_tabs_custom( $SiteMenu->ID );
 		}
 		elseif( $this->get_setting( 'menu_type' ) == 'auto_grouped' )
 		{	// Use automatic grouped menu:
-			return $this->get_header_tabs_auto();
+			$this->header_tabs = $this->get_header_tabs_auto();
+		}
+		else
+		{	// Don't use grouped header tabs:
+			$this->header_tabs = false;
 		}
 
-		// Don't use grouped header tabs:
-		return false;
+		return $this->header_tabs;
 	}
 
 
@@ -126,7 +152,7 @@ class site_Skin extends Skin
 	 */
 	function get_header_tabs_custom( $menu_ID )
 	{
-		global $DB, $current_locale;
+		global $DB, $current_locale, $ReqURL;
 
 		$header_tabs = array();
 
@@ -153,15 +179,14 @@ class site_Skin extends Skin
 			if( $header_tab = $this->get_header_tab_custom( $SiteMenuEntry ) )
 			{
 				$header_tabs[] = $header_tab;
-				if( ! empty( $header_tab['items'] ) )
+				if( $header_tab['active'] )
 				{
-					foreach( $header_tab['items'] as $sub_item )
+					// Set level 0 active tab for:
+					if( $this->header_tab_active === NULL || // First active Text/Level 0 Menu Entry
+					    $SiteMenuEntry->get( 'type' ) != 'text' || // OR even Last active NOT Text Menu Entry, because not Text entries have own specific URL
+					    strpos( $ReqURL, html_entity_decode( $header_tab['url'] ) ) === 0 ) // OR URL of the Menu Entry is linked to current URL
 					{
-						if( ! empty( $sub_item['active'] ) )
-						{
-							$this->header_tab_active = $level0_index;
-							break;
-						}
+						$this->header_tab_active = $level0_index;
 					}
 				}
 				$level0_index++;
@@ -200,8 +225,9 @@ class site_Skin extends Skin
 			{	// Display parent tab only if at least one sub tab is allowed for current display:
 				$header_tab = array(
 						'name'  => $SiteMenuEntry->get_text(),
-						'url'   => $sub_tabs[0]['url'],
+						'url'   => $SiteMenuEntry->get_url(),
 						'items' => $sub_tabs,
+						'active'=> $SiteMenuEntry->is_active(),
 						'class' => $SiteMenuEntry->get( 'class' ),
 					);
 			}
@@ -407,7 +433,7 @@ class site_Skin extends Skin
 			$class .= ' '.$tab['class'];
 		}
 
-		if( $this->header_tab_active === $index || ! empty( $tab['active'] ) )
+		if( $this->header_tab_active === $index || ( $index === NULL && ! empty( $tab['active'] ) ) )
 		{	// This tab is active currently:
 			$class .= ' '.$params['class_active'];
 		}

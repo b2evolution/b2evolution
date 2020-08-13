@@ -172,7 +172,8 @@ if( $site_Skin->has_sub_menus() )
 	<nav>
 		<ul class="nav nav-pills">
 <?php
-	foreach( $header_tabs[ $site_Skin->header_tab_active ]['items'] as $menu_item )
+	$header_sub_menus = $site_Skin->get_sub_menus();
+	foreach( $header_sub_menus as $menu_item )
 	{
 		if( is_array( $menu_item ) )
 		{	// Display menu item for collection:
