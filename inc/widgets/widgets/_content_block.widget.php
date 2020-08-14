@@ -278,20 +278,16 @@ class content_block_Widget extends ComponentWidget
 			return false;
 		}
 
-		echo $this->disp_params['block_start'];
-
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
 		// Get item by ID or slug:
 		$widget_Item = & $this->get_widget_Item();
 
 		if( ! $widget_Item && $this->get_param( 'select_type' ) == 'random' )
 		{	// If no item found ramdomly:
-			echo '<p class="evo_param_error">'.T_('No Item is found randomly.').'</p>';
+			$this->display_error_message( T_('No Item is found randomly.') );
+			return false;
 		}
-		elseif( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
+
+		if( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
 		{	// Item is not found by ID and slug or it is not a content block:
 			if( $widget_Item )
 			{	// It is not a content block:
@@ -303,25 +299,36 @@ class content_block_Widget extends ComponentWidget
 				$wrong_item_info = empty( $widget_item_ID ) ? '' : '#'.$widget_item_ID;
 				$wrong_item_info .= empty( $this->disp_params['item_slug'] ) ? '' : ' <code>'.$this->disp_params['item_slug'].'</code>';
 			}
-			echo '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>';
+			$this->display_error_message( sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ) );
+			return false;
 		}
-		elseif( ! $widget_Item->can_be_displayed() )
+
+		if( ! $widget_Item->can_be_displayed() )
 		{	// Current user has no permission to view item with such status:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			$this->display_error_message( sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
+			return false;
 		}
-		elseif( ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
-		        ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
-		        ( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) ) )
+
+		if( ! ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) &&
+		    ! ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) &&
+		    ! ( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) ) )
 		{	// Display a content block item ONLY if at least one condition:
 			//  - Content block Item is in same collection as this widget,
 			//  - Content block Item has same owner as owner of this widget's collection,
 			//  - Content block Item from collection for shared content blocks:
-			echo $widget_Item->get_content_block( array_merge( $params, array( 'template_code' => $this->disp_params['template'] ) ) );
+
+			// Display error if the requested content block item cannot be used in this place:
+			$this->display_error_message( sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
+			return false;
 		}
-		else
-		{	// Display error if the requested content block item cannot be used in this place:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
-		}
+
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
+
+		echo $widget_Item->get_content_block( array_merge( $params, array( 'template_code' => $this->disp_params['template'] ) ) );
 
 		echo $this->disp_params['block_body_end'];
 

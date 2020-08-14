@@ -244,9 +244,7 @@ class user_register_standard_Widget extends ComponentWidget
 			{
 				foreach( $missing_fields as $missing_field )
 				{
-					echo '<p class="evo_param_error">';
-					echo sprintf( T_('The template %s is missing the required field %s.'), '<code>'.$this->disp_params['reg1_template'].'</code>', '<code>'.$missing_field.'</code>' );
-					echo '</p>';
+					display_rendering_error( sprintf( T_('The template %s is missing the required field %s.'), '<code>'.$this->disp_params['reg1_template'].'</code>', '<code>'.$missing_field.'</code>' ) );
 				}
 			}
 

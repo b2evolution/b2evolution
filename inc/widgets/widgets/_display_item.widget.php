@@ -198,12 +198,6 @@ class display_item_Widget extends ComponentWidget
 			return false;
 		}
 
-		echo $this->disp_params['block_start'];
-
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
 		if( ! $widget_Item || ! in_array( $widget_Item->get_type_setting( 'usage' ), array( 'post', 'page' ) ) )
 		{	// Item is not found by ID and slug or it is not a post or page:
 			if( $widget_Item )
@@ -216,19 +210,36 @@ class display_item_Widget extends ComponentWidget
 				$wrong_item_info = empty( $widget_item_ID ) ? '' : '#'.$widget_item_ID;
 				$wrong_item_info .= empty( $this->disp_params['item_slug'] ) ? '' : ' <code>'.$this->disp_params['item_slug'].'</code>';
 			}
-			echo '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Post or Standalone Page.'), utf8_trim( $wrong_item_info ) ).'</p>';
+			$this->display_error_message( sprintf( T_('The referenced Item (%s) is not a Post or Standalone Page.'), utf8_trim( $wrong_item_info ) ) );
+			return false;
 		}
-		elseif( ! $widget_Item->can_be_displayed() )
+
+		if( ! $widget_Item->can_be_displayed() )
 		{	// Current user has no permission to view item with such status:
-			echo '<p class="evo_param_error">'.sprintf( T_('Post/Page "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			$this->display_error_message( sprintf( T_('Post/Page "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
+			return false;
 		}
-		elseif( ( $widget_Blog = & $this->get_Blog() ) && (
-		          ( $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
-		          ( $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) )
-		      ) )
+
+		$widget_Blog = & $this->get_Blog();
+		if( ! $widget_Blog || (
+		      ( $widget_Item->get_blog_ID() != $widget_Blog->ID ) &&
+		      ( $widget_Item->get( 'creator_user_ID' ) != $widget_Blog->get( 'owner_user_ID' ) )
+		  ) )
 		{	// Display an item ONLY if at least one condition:
 			//  - Item is in same collection as this widget,
 			//  - Item has same owner as owner of this widget's collection:
+
+			// Display error if the requested content block item cannot be used in this place:
+			$this->display_error_message( sprintf( T_('Post/Page "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
+			return false;
+		}
+
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
+
 			global $Item;
 
 			// Save current dispalying Item in temp var:
@@ -264,11 +275,6 @@ class display_item_Widget extends ComponentWidget
 
 			// Restore current dispalying Item:
 			$Item = $orig_current_Item;
-		}
-		else
-		{	// Display error if the requested content block item cannot be used in this place:
-			echo '<p class="evo_param_error">'.sprintf( T_('Post/Page "%s" cannot be included here. It must be in the same collection or have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
-		}
 
 		echo $this->disp_params['block_body_end'];
 

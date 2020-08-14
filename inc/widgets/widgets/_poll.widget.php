@@ -101,6 +101,23 @@ class poll_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
+		$PollCache = & get_PollCache();
+		$Poll = $PollCache->get_by_ID( $this->disp_params['poll_ID'], false, false );
+
+		if( ! $Poll )
+		{	// We cannot find a poll by the entered ID in widget settings:
+			$this->display_error_message( sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ) );
+			return false;
+		}
+
+		$poll_options = $Poll->get_poll_options();
+
+		if( empty( $poll_options ) )
+		{	// Display this red message to inform admin to create the poll options:
+			$this->display_error_message( T_('This poll doesn\'t contain any answer.') );
+			return false;
+		}
+
 		// START DISPLAY:
 		echo $this->disp_params['block_start'];
 
@@ -109,31 +126,19 @@ class poll_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		$PollCache = & get_PollCache();
-		$Poll = $PollCache->get_by_ID( $this->disp_params['poll_ID'], false, false );
-
-		if( ! $Poll )
-		{	// We cannot find a poll by the entered ID in widget settings:
-			echo '<p class="evo_param_error">'.sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ).'</p>';
-		}
-		else
-		{	// Display a form for voting on poll:
+			// Display a form for voting on poll:
 			$poll_question = empty( $this->disp_params['poll_question'] ) ? $Poll->get( 'question_text' ) : $this->disp_params['poll_question'];
 			if( $poll_question !== '-' )
 			{	// Display a poll question only when it doesn't equal "-":
 				echo '<p class="evo_poll__question">'.$poll_question.'</p>';
 			}
 
-			$poll_options = $Poll->get_poll_options();
-
 			if( $Poll->get( 'max_answers' ) < count( $poll_options ) )
 			{
 				echo '<p class="note">'.sprintf( T_('Select up to %d answers below.'), $Poll->get( 'max_answers' ) ).'</p>';
 			}
 
-
-			if( count( $poll_options ) )
-			{	// Display a form only if at least one poll option exists:
+				// Display a form only if at least one poll option exists:
 				if( is_logged_in() )
 				{	// Set form action to vote if current user is logged in:
 					$form_action = get_htsrv_url().'action.php?mname=polls';
@@ -212,12 +217,6 @@ class poll_Widget extends ComponentWidget
 				}
 
 				$Form->end_form();
-			}
-			else
-			{	// Display this red message to inform admin to create the poll options:
-				echo '<p class="evo_param_error">'.T_('This poll doesn\'t contain any answer.').'</p>';
-			}
-		}
 
 		echo $this->disp_params['block_body_end'];
 

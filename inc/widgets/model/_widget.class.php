@@ -866,7 +866,7 @@ class ComponentWidget extends DataObject
 				{	// Plugin failed (happens when a plugin has been disabled for example):
 					if( $this->mode == 'designer' )
 					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
-						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').': "'.$this->code.'"</span>'.$this->disp_params['block_end'];
+						echo $this->disp_params['block_start'].get_rendering_error( T_('Inactive / Uninstalled plugin').': "'.$this->code.'"', 'span' ).$this->disp_params['block_end'];
 					}
 					return false;
 				}
@@ -937,6 +937,9 @@ class ComponentWidget extends DataObject
 				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
+			// Start to collect output buffer in order to can clean up rendering errors when it need below:
+			ob_start();
+
 			if( ! empty( $designer_mode_data ) )
 			{	// Append designer mode html tag attributes to first not empty widget wrapper/container:
 				$widget_wrappers = array(
@@ -986,7 +989,7 @@ class ComponentWidget extends DataObject
 				}
 				if( ! $wrapper_is_found )
 				{	// Display error if widget has no wrappers to enable designer mode:
-					echo ' <span class="text-danger">Widget <code>'.$this->code.'</code> cannot be manipulated because it lacks a wrapper tag.</span> ';
+					echo ' '.get_rendering_error( 'Widget <code>'.$this->code.'</code> cannot be manipulated because it lacks a wrapper tag.', 'span' ).' ';
 				}
 			}
 
@@ -998,6 +1001,15 @@ class ComponentWidget extends DataObject
 			{	// Hide the widget by code if it is requsted from skin:
 				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden by code <code>'.$this->code.'</code> from skin template.' );
 			}
+
+			$widget_content = ob_get_clean();
+
+			if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+			{	// Clean up rendering errors from content if current User is not collection admin:
+				$widget_content = clear_rendering_errors( $widget_content );
+			}
+
+			echo $widget_content;
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -1027,6 +1039,11 @@ class ComponentWidget extends DataObject
 						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 					}
 					echo 'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
+				}
+
+				if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+				{	// Clean up rendering errors from content if current User is not collection admin:
+					$content = clear_rendering_errors( $content );
 				}
 
 				echo $content;
@@ -1062,7 +1079,14 @@ class ComponentWidget extends DataObject
 				}
 
 				// Save collected cached data if needed:
-				$this->BlockCache->end_collect();
+				$content = $this->BlockCache->end_collect( false );
+
+				if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+				{	// Clean up rendering errors from content if current User is not collection admin:
+					$content = clear_rendering_errors( $content );
+				}
+
+				echo $content;
 
 				if( $display_containers )
 				{ // DEBUG:
@@ -1556,7 +1580,7 @@ class ComponentWidget extends DataObject
 		if( ! ( $param_value_is_ID && $param_Item = & $ItemCache->get_by_ID( $param_value, false, false ) ) &&
 		    ! ( ! $param_value_is_ID && $param_Item = & $ItemCache->get_by_urltitle( $param_value, false, false ) ) )
 		{	// Item is not detected:
-			return '<span class="evo_param_error">'.T_('Item is not found.').'</span>';
+			return get_rendering_error( T_('Item is not found.'), 'span' );
 		}
 
 		$item_info = '';
@@ -1638,7 +1662,7 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_body_start'];
 		if( check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// Display error only for collection admin:
-			echo '<span class="evo_param_error">'.$message.'</span>';
+			display_rendering_error( $message, 'span' );
 		}
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
