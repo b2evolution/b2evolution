@@ -303,7 +303,7 @@ class generic_menu_link_Widget extends ComponentWidget
 					$message .= '('.$this->disp_params['link_type'].')';
 				}
 			}
-			echo $this->get_layout_standalone_menu_link( '#', '<span class="evo_param_error">'.$message.'</span>', false );
+			echo $this->get_layout_standalone_menu_link( '#', get_rendering_error( $message, 'span' ), false );
 		}
 	}
 }

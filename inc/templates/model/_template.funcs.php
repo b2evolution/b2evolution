@@ -205,7 +205,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Chapter = ( !isset( $objects['Chapter'] ) ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Chapter/Category is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Chapter/Category is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -214,7 +214,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
 			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Collection/Blog is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -223,7 +223,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Comment = ( !isset( $objects['Comment'] ) ? $Comment : $objects['Comment'] );
 			if( empty( $rendered_Comment ) || ! ( $rendered_Comment instanceof Comment ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Comment is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Comment is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -232,7 +232,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_File = ( !isset( $objects['File'] ) ? $File : $objects['File'] );
 			if( empty( $rendered_File ) || ! ( $rendered_File instanceof File ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object File is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object File is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -241,7 +241,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Form = ( !isset( $objects['Form'] ) ? $Form : $objects['Form'] );
 			if( empty( $rendered_Form ) || ! ( $rendered_Form instanceof Form ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Form is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Form is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -252,11 +252,11 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $rendered_Item ))
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Item is not defined at this moment.', 'span' );
 			}
 			if( ! ( $rendered_Item instanceof Item ) )
 			{
-				return '<span class="evo_param_error">Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.</span>';
+				return get_rendering_error( 'Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.', 'span' );
 			}
 			break;
 
@@ -271,7 +271,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $rendered_Plugin ) )
 			{
-				return '<span class="evo_param_error">Plugin <code>'.$match_var[3].'</code> is not installed.</span>';
+				return get_rendering_error( 'Plugin <code>'.$match_var[3].'</code> is not installed.', 'span' );
 			}
 
 			$var = $scope;
@@ -282,7 +282,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $tag ))
 			{
-				return '<span class="evo_param_error">['.$var.']: Tag is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Tag is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -290,11 +290,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			$param_name = substr( $var, 5 );
 			if( ! isset( $params[ $param_name ] ) )
 			{	// Param is not found:
-				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not passed.</span>';
+				return get_rendering_error( 'Param <code>'.$param_name.'</code> is not passed.', 'span' );
 			}
 			elseif( ! is_scalar( $params[ $param_name ] ) )
 			{	// Param is not scalar and cannot be printed on screen:
-				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not scalar.</span>';
+				return get_rendering_error( 'Param <code>'.$param_name.'</code> is not scalar.', 'span' );
 			}
 			break;
 
@@ -303,12 +303,12 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_User = ( !isset( $objects['User'] ) ? $User : $objects['User'] );
 			if( empty( $rendered_User ) || ! ( $rendered_User instanceof User ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object User is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object User is not defined at this moment.', 'span' );
 			}
 			break;
 
 		default:
-			return '<span class="evo_param_error">['.$var.']: Scope "'.$scope.':" is not recognized.</span>';
+			return get_rendering_error( '['.$var.']: Scope "'.$scope.':" is not recognized.', 'span' );
 	}
 
 	$match_found = true;
@@ -699,7 +699,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( ! $Blog )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Blog is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Blog is not defined at this moment.', 'span' );
 			}
 
 			$search_type = param( 'search_type', 'string', NULL );
@@ -1060,7 +1060,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $temp_params['disp'] ) )
 			{
-				echo '<span class="evo_param_error">['.$var.']: Missing required param "disp".</span>';
+				display_rendering_error( '['.$var.']: Missing required param "disp".', 'span' );
 				break;
 			}
 
@@ -1099,7 +1099,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			}
 			else
 			{
-				echo '<span class="evo_param_error">['.$var.']: disp "'.$temp_params['disp'].'" is not recognized.</span>';
+				display_rendering_error( '['.$var.']: disp "'.$temp_params['disp'].'" is not recognized.', 'span' );
 			}
 			break;
 
@@ -1117,7 +1117,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
 			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Collection/Blog is not defined at this moment.', 'span' );
 			}
 
 			$temp_params = array(
@@ -1258,7 +1258,7 @@ function render_template_callback( $var, $params, $objects = array() )
 	}
 	else
 	{	// Display error for not recognized variable:
-		return '<span class="evo_param_error">['.$var.'] is not recognized.</span>';
+		return get_rendering_error( '['.$var.'] is not recognized.', 'span' );
 	}
 }
 

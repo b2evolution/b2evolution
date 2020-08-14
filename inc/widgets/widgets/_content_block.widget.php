@@ -289,7 +289,7 @@ class content_block_Widget extends ComponentWidget
 
 		if( ! $widget_Item && $this->get_param( 'select_type' ) == 'random' )
 		{	// If no item found ramdomly:
-			echo '<p class="evo_param_error">'.T_('No Item is found randomly.').'</p>';
+			display_rendering_error( T_('No Item is found randomly.') );
 		}
 		elseif( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
 		{	// Item is not found by ID and slug or it is not a content block:
@@ -303,11 +303,11 @@ class content_block_Widget extends ComponentWidget
 				$wrong_item_info = empty( $widget_item_ID ) ? '' : '#'.$widget_item_ID;
 				$wrong_item_info .= empty( $this->disp_params['item_slug'] ) ? '' : ' <code>'.$this->disp_params['item_slug'].'</code>';
 			}
-			echo '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>';
+			display_rendering_error( sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ) );
 		}
 		elseif( ! $widget_Item->can_be_displayed() )
 		{	// Current user has no permission to view item with such status:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			display_rendering_error( sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
 		}
 		elseif( ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
 		        ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
@@ -320,7 +320,7 @@ class content_block_Widget extends ComponentWidget
 		}
 		else
 		{	// Display error if the requested content block item cannot be used in this place:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			display_rendering_error( sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
 		}
 
 		echo $this->disp_params['block_body_end'];

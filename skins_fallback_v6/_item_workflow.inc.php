@@ -20,7 +20,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
     ! $Item->can_meta_comment() && // If user can write internal comment then we display the workflow form in the internal comment form instead of here
     $Item->can_edit_workflow() )
 {
-	echo '<p class="evo_param_error">Please use the Worfklow properties widget to set workflow properties.</p>';
+	display_rendering_error( 'Please use the Worfklow properties widget to set workflow properties.' );
 }
 
 ?>

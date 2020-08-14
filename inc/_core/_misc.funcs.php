@@ -10666,4 +10666,46 @@ function use_defer()
 
 	return $r;
 }
+
+
+/**
+ * Get rendering error
+ *
+ * @param string Error message
+ * @param string HTML tag: <p>, <span>, <div>
+ * @return string
+ */
+function get_rendering_error( $error_message, $html_tag = 'p' )
+{
+	if( in_array( $html_tag, array( 'p', 'span', 'div' ) ) )
+	{	// Force not allowed html tag:
+		$html_tag = 'p';
+	}
+
+	return '<'.$html_tag.' class="evo_rendering_error">'.$error_message.'</'.$html_tag.'>';
+}
+
+
+/**
+ * Display rendering error
+ *
+ * @param string Error message
+ * @param string HTML tag: <p>, <span>, <div>
+ */
+function display_rendering_error( $error_message, $html_tag = 'p' )
+{
+	echo get_rendering_error( $error_message, $html_tag );
+}
+
+
+/**
+ * Clean up rendering errors `<p class="evo_rendering_error">...</p>` from provided content
+ *
+ * @param string Content with rendering error
+ * @return string Content without rendering error
+ */
+function clear_rendering_errors( $content )
+{
+	return preg_replace( '#<([a-z]+) class="evo_rendering_error">.+?</\1>#', '', $content );
+}
 ?>

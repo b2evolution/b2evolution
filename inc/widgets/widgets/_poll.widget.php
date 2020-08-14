@@ -114,7 +114,7 @@ class poll_Widget extends ComponentWidget
 
 		if( ! $Poll )
 		{	// We cannot find a poll by the entered ID in widget settings:
-			echo '<p class="evo_param_error">'.sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ).'</p>';
+			display_rendering_error( sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ) );
 		}
 		else
 		{	// Display a form for voting on poll:
@@ -215,7 +215,7 @@ class poll_Widget extends ComponentWidget
 			}
 			else
 			{	// Display this red message to inform admin to create the poll options:
-				echo '<p class="evo_param_error">'.T_('This poll doesn\'t contain any answer.').'</p>';
+				display_rendering_error( T_('This poll doesn\'t contain any answer.') );
 			}
 		}
 

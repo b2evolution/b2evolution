@@ -866,7 +866,7 @@ class ComponentWidget extends DataObject
 				{	// Plugin failed (happens when a plugin has been disabled for example):
 					if( $this->mode == 'designer' )
 					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
-						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').': "'.$this->code.'"</span>'.$this->disp_params['block_end'];
+						echo $this->disp_params['block_start'].get_rendering_error( T_('Inactive / Uninstalled plugin').': "'.$this->code.'"', 'span' ).$this->disp_params['block_end'];
 					}
 					return false;
 				}
@@ -1556,7 +1556,7 @@ class ComponentWidget extends DataObject
 		if( ! ( $param_value_is_ID && $param_Item = & $ItemCache->get_by_ID( $param_value, false, false ) ) &&
 		    ! ( ! $param_value_is_ID && $param_Item = & $ItemCache->get_by_urltitle( $param_value, false, false ) ) )
 		{	// Item is not detected:
-			return '<span class="evo_param_error">'.T_('Item is not found.').'</span>';
+			return get_rendering_error( T_('Item is not found.'), 'span' );
 		}
 
 		$item_info = '';
@@ -1638,7 +1638,7 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_body_start'];
 		if( check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// Display error only for collection admin:
-			echo '<span class="evo_param_error">'.$message.'</span>';
+			display_rendering_error( $message, 'span' );
 		}
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

@@ -2433,21 +2433,19 @@ class Item extends ItemLight
 		// Make sure, the pages are split up:
 		$this->split_pages( $format );
 
+		$content_page = '';
+
 		if( $preview && $this->pages > 1 && ! $this->ID )
 		{ // This is a preview of an unsaved  multipage item
-			$preview_content = '';
-
 			foreach( $this->content_pages[$format] as $page => $page_content )
 			{
 				if( $page !== 0 )
 				{
-					$preview_content .= '<span class="badge badge-info">Page '.( $page + 1 ).'</span>';
+					$content_page .= '<span class="badge badge-info">Page '.( $page + 1 ).'</span>';
 				}
 
-				$preview_content .= $page_content;
+				$content_page .= $page_content;
 			}
-
-			return $preview_content;
 		}
 		else
 		{
@@ -2461,8 +2459,15 @@ class Item extends ItemLight
 				$page = $this->pages;
 			}
 
-			return $this->content_pages[$format][$page-1];
+			$content_page = $this->content_pages[$format][$page-1];
 		}
+
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// Clean up rendering errors from content if current User has no permission to edit this Item:
+			$content_page = clear_rendering_errors( $content_page );
+		}
+
+		return $content_page;
 	}
 
 
@@ -3360,7 +3365,7 @@ class Item extends ItemLight
 		$field_name = $params['field'];
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{ // Custom field with this index doesn't exist
-			echo '<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>';
+			display_rendering_error( sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ), 'span' );
 			return;
 		}
 
@@ -4175,7 +4180,7 @@ class Item extends ItemLight
 					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ) ), $content );
 				continue;
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
@@ -4192,7 +4197,7 @@ class Item extends ItemLight
 				// - Review
 				// For example, if content block Item has a status "Public" but current/parent Item has a status "Community",
 				//              then such content block Item cannot be included into the current/parent Item.
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ) ), $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
@@ -4205,7 +4210,7 @@ class Item extends ItemLight
 				//  - Content block Item has same owner as owner of parent Item's collection,
 				//  - Content block Item is in same collection as parent Item,
 				//  - Content block Item from collection for shared content blocks:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ) ), $content );
 				continue;
 			}
 
@@ -4216,7 +4221,7 @@ class Item extends ItemLight
 
 			if( in_array( $content_Item->ID, $content_block_items ) )
 			{	// Replace inline content block tag with error message about recursion:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ) ), $content );
 				continue;
 			}
 
@@ -4387,7 +4392,7 @@ class Item extends ItemLight
 
 		if( ! ( $Template = & $TemplateCache->get_by_code( $params[0], false, false ) ) )
 		{	// Template is not found:
-			return '<span class="evo_param_error">Template "'.$params[0].'" is not found for <code>'.$m[0].'</code><span>';
+			return get_rendering_error( 'Template "'.$params[0].'" is not found for <code>'.$m[0].'</code>', 'span' );
 		}
 
 		if( isset( $params[1] ) )
@@ -9410,6 +9415,9 @@ class Item extends ItemLight
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
 		$first_content_part = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $first_content_part );
+
+		// Clean up rendering errors from autogenerated excerpt:
+		$first_content_part = clear_rendering_errors( $first_content_part );
 
 		return excerpt( $first_content_part, $maxlen, $tail );
 	}
