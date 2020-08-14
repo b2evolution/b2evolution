@@ -10677,7 +10677,7 @@ function use_defer()
  */
 function get_rendering_error( $error_message, $html_tag = 'p' )
 {
-	if( in_array( $html_tag, array( 'p', 'span', 'div' ) ) )
+	if( ! in_array( $html_tag, array( 'p', 'span', 'div' ) ) )
 	{	// Force not allowed html tag:
 		$html_tag = 'p';
 	}

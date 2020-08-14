@@ -3111,7 +3111,7 @@ class Item extends ItemLight
 				}
 				else
 				{	// Display an error if Link is not found in DB:
-					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
+					$custom_field_value = get_rendering_error( T_('Invalid link ID:').' '.$custom_field_value, 'span' );
 				}
 				break;
 
@@ -3509,6 +3509,11 @@ class Item extends ItemLight
 			$content = $this->render_templates( $content, $params );
 		}
 
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// Clean up rendering errors from content if current User has no permission to edit this Item:
+			$content = clear_rendering_errors( $content );
+		}
+
 		return $content;
 	}
 
@@ -3688,7 +3693,7 @@ class Item extends ItemLight
 						{	// Use parent item:
 							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
 							{	// Display error message if parent doesn't exist:
-								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
+								$widget_html = get_rendering_error( T_('This Item has no parent.'), 'span' );
 								break;
 							}
 							$widget_item_ID = $widget_Item->ID;
@@ -3701,7 +3706,7 @@ class Item extends ItemLight
 							if( ! ( $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_ID( $widget_item_ID_slug, false, false ) ) &&
 									! ( ! $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_urltitle( $widget_item_ID_slug, false, false ) ) )
 							{	// Display error message if other item is not found by ID and slug:
-								$widget_html = '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ).'</span>';
+								$widget_html = get_rendering_error( sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ), 'span' );
 								break;
 							}
 							$widget_item_ID = $widget_Item->ID;
@@ -3715,7 +3720,7 @@ class Item extends ItemLight
 						$custom_fields = $widget_Item->get_custom_fields_defs();
 						if( ! $custom_fields )
 						{	// Fields don't exist for this Item:
-							$widget_html = '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>';
+							$widget_html = get_rendering_error( T_('The Item has no custom fields.'), 'span' );
 							break;
 						}
 
@@ -3789,7 +3794,7 @@ class Item extends ItemLight
 					// Widget "Param Switcher":s
 					if( ! isset( $tag_params[0] ) || $tag_params[0] === '' )
 					{	// Skip wrong configured tag:
-						$widget_html = '<span class="text-danger">'.T_('Param code must be defined for switcher tag!').'</span>';
+						$widget_html = get_rendering_error( T_('Param code must be defined for switcher tag!'), 'span' );
 						break;
 					}
 
@@ -3806,7 +3811,7 @@ class Item extends ItemLight
 					}
 					if( empty( $widget_buttons ) )
 					{	// Don't try to render widget without buttons:
-						$widget_html = '<span class="text-danger">'.T_('At least one button must be defined for switcher tag!').'</span>';
+						$widget_html = get_rendering_error( T_('At least one button must be defined for switcher tag!'), 'span' );
 						break;
 					}
 
@@ -3870,7 +3875,7 @@ class Item extends ItemLight
 			$field_value = $this->get_custom_field_formatted( $field_name, $params );
 			if( $field_value === false )
 			{	// Wrong field request, display error:
-				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" does not exist.'), $field_name ), 'span' ), $content );
 			}
 			else
 			{	// Display field value:
@@ -3881,7 +3886,7 @@ class Item extends ItemLight
 				}
 				else
 				{	// Display an error for not public custom field:
-					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>', $content );
+					$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" is not public.'), $field_name ), 'span' ), $content );
 				}
 			}
 		}
@@ -3928,7 +3933,7 @@ class Item extends ItemLight
 				{	// Get data of item parent:
 					if( ! ( $other_Item = & $this->get_parent_Item() ) )
 					{	// Display error message if parent doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This Item has no parent.').'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], get_rendering_error( T_('This Item has no parent.'), 'span' ), $content );
 						continue;
 					}
 				}
@@ -3940,7 +3945,7 @@ class Item extends ItemLight
 					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
 					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
 					{	// Display error message if other item is not found by ID and slug:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], get_rendering_error( sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ), 'span' ), $content );
 						continue;
 					}
 				}
@@ -3953,7 +3958,7 @@ class Item extends ItemLight
 						$field_value = $other_Item->get_custom_field_formatted( $field_name, $params );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>', $content );
+							$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" does not exist.'), $field_name ), 'span' ), $content );
 						}
 						else
 						{	// Display field value:
@@ -3964,7 +3969,7 @@ class Item extends ItemLight
 							}
 							else
 							{	// Display an error for not public custom field:
-								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>', $content );
+								$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" is not public.'), $field_name ), 'span' ), $content );
 							}
 						}
 						break;
@@ -4067,7 +4072,7 @@ class Item extends ItemLight
 				{	// Try to use parent:
 					if( ! ( $other_Item = & $this->get_parent_Item() ) )
 					{	// Display error message if parent doesn't exist:
-						$content = substr_replace( $content, '<span class="text-danger">'.T_('This Item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
+						$content = substr_replace( $content, get_rendering_error( T_('This Item has no parent.'), 'span' ), strpos( $content, $source_tag ), strlen( $source_tag ) );
 						continue;
 					}
 				}
@@ -4079,7 +4084,7 @@ class Item extends ItemLight
 					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
 					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
 					{	// Display error message if other item is not found by ID and slug:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], get_rendering_error( sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ), 'span' ), $content );
 						continue;
 					}
 				}
@@ -4097,15 +4102,15 @@ class Item extends ItemLight
 				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url' );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $url_field_code ).'</span>';
+					$link_html = get_rendering_error( sprintf( T_('The field "%s" does not exist.'), $url_field_code ), 'span' );
 				}
 				elseif( ! $custom_fields[ $url_field_code ]['public'] )
 				{	// Display an error for not public custom field:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $url_field_code ).'</span>';
+					$link_html = get_rendering_error( sprintf( T_('The field "%s" is not public.'), $url_field_code ), 'span' );
 				}
 				elseif( $field_value === '' )
 				{	// Empty field value, display error:
-					$link_html = '<span class="text-danger">'.sprintf( T_('Referenced URL field is empty.'), $url_field_code ).'</span>';
+					$link_html = get_rendering_error( sprintf( T_('Referenced URL field is empty.'), $url_field_code ), 'span' );
 				}
 				else
 				{	// Display URL field as html link:
