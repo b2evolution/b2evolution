@@ -937,6 +937,7 @@ class ComponentWidget extends DataObject
 				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
 
+			// Start to collect output buffer in order to can clean up rendering errors when it need below:
 			ob_start();
 
 			if( ! empty( $designer_mode_data ) )
@@ -1003,8 +1004,8 @@ class ComponentWidget extends DataObject
 
 			$widget_content = ob_get_clean();
 
-			if( ! is_logged_in() )
-			{	// Clean up rendering errors from content if current User is not logged in:
+			if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+			{	// Clean up rendering errors from content if current User is not collection admin:
 				$widget_content = clear_rendering_errors( $widget_content );
 			}
 
@@ -1040,8 +1041,8 @@ class ComponentWidget extends DataObject
 					echo 'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
 				}
 
-				if( ! is_logged_in() )
-				{	// Clean up rendering errors from content if current User is not logged in:
+				if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+				{	// Clean up rendering errors from content if current User is not collection admin:
 					$content = clear_rendering_errors( $content );
 				}
 
@@ -1078,7 +1079,14 @@ class ComponentWidget extends DataObject
 				}
 
 				// Save collected cached data if needed:
-				$this->BlockCache->end_collect();
+				$content = $this->BlockCache->end_collect( false );
+
+				if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+				{	// Clean up rendering errors from content if current User is not collection admin:
+					$content = clear_rendering_errors( $content );
+				}
+
+				echo $content;
 
 				if( $display_containers )
 				{ // DEBUG:
