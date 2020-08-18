@@ -90,7 +90,7 @@ class site_Skin extends Skin
 
 		$header_tabs = $this->get_header_tabs();
 
-		return ( isset( $header_tabs[ $this->header_tab_active ]['items'] ) &&
+		return ( isset( $this->header_tab_active, $header_tabs[ $this->header_tab_active ]['items'] ) &&
 			count( $header_tabs[ $this->header_tab_active ]['items'] ) > 1 );
 	}
 
