@@ -13045,6 +13045,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 18010, 'Upgrade files table...' ) )
+	{	// part of 7.3.0-beta
+		db_modify_col( 'T_files', 'file_root_type', 'enum("absolute","user","collection","shared","skins","siteskins","plugins","import","export","emailcampaign") COLLATE ascii_general_ci NOT NULL DEFAULT "absolute"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

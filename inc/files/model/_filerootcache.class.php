@@ -116,6 +116,13 @@ class FileRootCache
 			$r[ $import_FileRoot->ID ] = & $import_FileRoot;
 		}
 
+		// Export root:
+		$export_FileRoot = & $FileRootCache->get_by_type_and_ID( 'export', 0, true );
+		if( $export_FileRoot )
+		{ // We got an export dir:
+			$r[ $export_FileRoot->ID ] = & $export_FileRoot;
+		}
+
 		// Email campaigns root:
 		$emailcampaign_ID = get_param( 'link_type' ) == 'emailcampaign' ? intval( get_param( 'link_object_ID' ) ) : 0;
 		if( ( $emailcampaign_FileRoot = & $FileRootCache->get_by_type_and_ID( 'emailcampaign', $emailcampaign_ID, true ) ) &&

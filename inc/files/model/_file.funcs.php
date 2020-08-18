@@ -2903,6 +2903,12 @@ function get_root_path_by_abspath( $abspath, $is_cache_path = false )
 			$start_relpath = 1;
 			break;
 
+		case 'export':
+			// Export media dir:
+			$root = FileRoot::gen_ID( 'export', 0 );
+			$start_relpath = 1;
+			break;
+
 		case 'emailcampaign':
 			// Email campaign media dir:
 			$EmailCampaignCache = & get_EmailCampaignCache();

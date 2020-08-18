@@ -147,6 +147,7 @@ class files_Module extends Module
 				$permfiles = 'all'; // Files permissions
 				$permshared = 'edit'; // Access to shared root
 				$permimport = 'edit'; // Access to import root
+				$permexport = 'edit'; // Access to import root
 				$permskins = 'edit'; // Access to skins root
 				$permplugins = 'edit'; // Access to plugins root
 				break;
@@ -154,6 +155,7 @@ class files_Module extends Module
 				$permfiles = 'add';
 				$permshared = 'add';
 				$permimport = 'none';
+				$permexport = 'none';
 				$permskins = 'none';
 				$permplugins = 'none';
 				break;
@@ -161,6 +163,7 @@ class files_Module extends Module
 				$permfiles = 'edit_allowed';
 				$permshared = 'view';
 				$permimport = 'none';
+				$permexport = 'none';
 				$permskins = 'none';
 				$permplugins = 'none';
 				break;
@@ -168,6 +171,7 @@ class files_Module extends Module
 				$permfiles = 'add';
 				$permshared = 'none';
 				$permimport = 'none';
+				$permexport = 'none';
 				$permskins = 'none';
 				$permplugins = 'none';
 				break;
@@ -175,6 +179,7 @@ class files_Module extends Module
 				$permfiles = 'none';
 				$permshared = 'none';
 				$permimport = 'none';
+				$permexport = 'none';
 				$permskins = 'none';
 				$permplugins = 'none';
 				break;
@@ -186,6 +191,7 @@ class files_Module extends Module
 				'perm_files' => $permfiles,
 				'perm_shared_root' => $permshared,
 				'perm_import_root' => $permimport,
+				'perm_export_root' => $permimport,
 				'perm_skins_root' => $permskins,
 				'perm_plugins_root' => $permplugins,
 			);
@@ -250,6 +256,21 @@ class files_Module extends Module
 				'label' => T_('Access to import root'),
 				'user_func'  => 'check_importroot_user_perm',
 				'group_func' => 'check_importroot_group_perm',
+				'perm_block' => 'file',
+				'options'  => array(
+						// format: array( radio_button_value, radio_button_label, radio_button_note )
+						array( 'none', T_('No Access') ),
+						array( 'view', T_('Read only') ),
+						array( 'add', T_('Add/Upload') ),
+						array( 'edit', T_('Edit') ),
+					),
+				'perm_type' => 'radiobox',
+				'field_lines' => false,
+				),
+			'perm_export_root' => array(
+				'label' => T_('Access to export root'),
+				'user_func'  => 'check_exportroot_user_perm',
+				'group_func' => 'check_exportroot_group_perm',
 				'perm_block' => 'file',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
@@ -381,6 +402,12 @@ class files_Module extends Module
 						$permlevel = 'edit';
 					}
 					return check_user_perm( 'import_root', $permlevel );
+				case 'export':
+					if( $permlevel == 'edit_allowed' )
+					{	// We have no perm level 'edit_allowed' for this root type, Use 'edit' instead:
+						$permlevel = 'edit';
+					}
+					return check_user_perm( 'export_root', $permlevel );
 				case 'skins':
 				case 'siteskins':
 					if( $permlevel == 'edit_allowed' )
@@ -477,6 +504,45 @@ class files_Module extends Module
 	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 */
 	function check_importroot_group_perm( $permlevel, $permvalue, $permtarget )
+	{
+		$perm = false;
+		switch ( $permvalue )
+		{
+			case 'edit':
+				if( $permlevel == 'edit' )
+				{ // User can ask for normal edit perm...
+					$perm = true;
+					break;
+				}
+
+			case 'add':
+				// User can ask for normal add perm...
+				if( $permlevel == 'add' )
+				{
+					$perm = true;
+					break;
+				}
+
+			case 'view':
+				// User can ask for normal view perm...
+				if( $permlevel == 'view' )
+				{
+					$perm = true;
+					break;
+				}
+		}
+		return $perm;
+	}
+
+	/**
+	 * Callback function to check a group permission for export root. ( see 'group_func' in get_available_group_permissions() function )
+	 *
+	 * @param string Permission level: 'edit', 'add', 'view'
+	 * @param string Permission value: 'edit', 'add', 'view'
+	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @return boolean True on success (permission is granted), false if permission is not granted
+	 */
+	function check_exportroot_group_perm( $permlevel, $permvalue, $permtarget )
 	{
 		$perm = false;
 		switch ( $permvalue )

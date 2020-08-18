@@ -6658,7 +6658,7 @@ function item_edit_actions( $Item )
 	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Item only for PRO version:
 		$r .= action_icon( T_('Export this Item...'), 'download',
-			$admin_url.'?ctrl=exportxml&amp;action=export_item&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID.'&amp;'.url_crumb( 'item' ) );
+			$admin_url.'?ctrl=exportxml&amp;action=item_options&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID );
 	}
 
 	// Display delete button if current user has the rights:

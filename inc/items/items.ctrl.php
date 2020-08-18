@@ -3091,6 +3091,18 @@ switch( $action )
 						) );
 				}
 
+				// Display icon to Export Item:
+				if( is_pro() &&
+				    check_user_perm( 'options', 'edit' ) &&
+				    check_user_perm( 'item_post!CURSTATUS', 'view', false, $edited_Item ) )
+				{	// Only for PRO version and if current User has a permission to edit system options and view the Item:
+					$AdminUI->global_icon( TB_('Export Item'), 'download',
+						get_admin_url( 'ctrl=exportxml&amp;action=item_options&amp;item_ID='.$edited_Item->ID ),
+						' '.TB_('Export'), 4, 3, array(
+								'style' => 'margin-right: 3ex;',
+						) );
+				}
+
 				if( check_user_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
 					$AdminUI->global_icon( TB_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),

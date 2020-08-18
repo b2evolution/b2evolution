@@ -196,6 +196,26 @@ class FileRoot
 				}
 				return;
 
+			case 'export':
+				// Export dir
+				global $media_path, $media_url;
+				$rds_import_subdir = 'export/';
+				$ads_import_dir = $media_path.$rds_import_subdir;
+				if( ! mkdir_r( $ads_import_dir ) )
+				{
+					if( is_admin_page() )
+					{ // Only display error on an admin page:
+						$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; could not be created.'), $rds_import_subdir ).get_manual_link('directory_creation_error'), 'error' );
+					}
+				}
+				else
+				{
+					$this->name = T_('Export');
+					$this->ads_path = $media_path.$rds_import_subdir;
+					$this->ads_url = $media_url.$rds_import_subdir;
+				}
+				return;
+
 			case 'emailcampaign':
 				// Email campaign dir
 				global $media_path, $media_url;
@@ -261,7 +281,7 @@ class FileRoot
 	/**
 	 * Generate ID for File Root
 	 *
-	 * @param string Root type: 'user', 'shared', 'collection', 'skins', 'import'
+	 * @param string Root type: 'user', 'shared', 'collection', 'skins', 'import', 'export'
 	 * @param integer Root ID
 	 * @return string
 	 */
@@ -281,6 +301,7 @@ class FileRoot
 			case 'siteskins':
 			case 'plugins':
 			case 'import':
+			case 'export':
 			case 'emailcampaign':
 				return $root_type.'_'.$root_in_type_ID;
 		}

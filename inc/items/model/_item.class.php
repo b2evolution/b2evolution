@@ -11200,17 +11200,16 @@ class Item extends ItemLight
 	 * 		- 'edit': url to this item edit screen
 	 * @return string the url if exists, empty string otherwise
 	 */
-	function get_url( $type )
+	function get_url( $type, $glue = '&amp;' )
 	{
-		global $admin_url;
 		switch( $type )
 		{
 			case 'admin_view':
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
+				return get_admin_url( 'ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'p='.$this->ID, $glue );
 			case 'public_view':
-				return $this->get_permanent_url();
+				return $this->get_permanent_url( '', '', $glue );
 			case 'edit':
-				return $this->get_edit_url();
+				return $this->get_edit_url( array( 'glue' => $glue ));
 			default:
 				return '';
 		}

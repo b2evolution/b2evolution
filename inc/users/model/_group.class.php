@@ -347,7 +347,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'plugins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'export_root', 'skins_root', 'plugins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
