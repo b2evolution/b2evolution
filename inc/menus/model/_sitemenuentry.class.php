@@ -1026,21 +1026,25 @@ class SiteMenuEntry extends DataObject
 				return $disp == 'flagged';
 
 			case 'text':
+				global $Blog;
 				$entry_coll_url = $entry_Blog->get( 'url' );
-				$entry_url = $this->get_url();
-				if( $entry_url && strpos( $entry_url, $entry_coll_url ) === 0 )
-				{	// If URL of this Menu Entry is linked to Collection of this Menu Entry:
-					return true;
-					// STOP here, don't try to search active sub Menu Entry.
-				}
-				// Try to find first match URL in sub-entries:
 				$sub_entries = $this->get_children( true );
-				if( ! empty( $sub_entries ) )
-				{
+				if( empty( $sub_entries ) )
+				{	// If this Menu Entry is a leaf(no sub-entries):
+					$entry_url = $this->get_url();
+					if( isset( $Blog ) && $Blog->ID == $entry_Blog->ID &&
+					    $entry_url && strpos( $entry_url, $entry_coll_url ) === 0 )
+					{	// If URL of this Menu Entry is linked to Collection of this Menu Entry:
+						return true;
+					}
+				}
+				else
+				{	// If this Menu Entry is a group of other sub-entries:
 					foreach( $sub_entries as $sub_SiteMenuEntry )
 					{
 						$sub_entry_url = $sub_SiteMenuEntry->get_url();
-						if( $sub_entry_url && strpos( $sub_entry_url, $entry_coll_url ) === 0 )
+						if( isset( $Blog ) && $Blog->ID == $sub_SiteMenuEntry->get_Blog()->ID &&
+						    $sub_entry_url && strpos( $sub_entry_url, $entry_coll_url ) === 0 )
 						{	// If sub Menu Entry has an URL to Collection of this Menu Entry:
 							return true;
 							// STOP here, don't try to search next active sub Menu Entry.
