@@ -565,13 +565,19 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 
 		$zip_result = $zip_result && $file_result;
 	}
-	
-	echo sprintf( TB_('Compressing &laquo;<strong>%s</strong>&raquo;...'), $archive_path );
-	evo_flush();
-	
+
+	if( $log_type == 'print' )
+	{
+		echo sprintf( TB_('Compressing &laquo;<strong>%s</strong>&raquo;...'), $archive_path );
+		evo_flush();
+	}
+
 	$ZipArchive->close();
-	
-	echo ' OK.<br />';
+
+	if( $log_type == 'print' )
+	{
+		echo ' OK.<br />';
+	}
 
 	// Set rights for new created ZIP file:
 	@chmod( $archive_path, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
