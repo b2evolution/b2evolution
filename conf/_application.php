@@ -21,7 +21,7 @@ $app_version = '7.1.7-stable';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2020-08-13';
+$app_date = '2020-08-18';
 
 /**
  * Is this b2evolution PRO?

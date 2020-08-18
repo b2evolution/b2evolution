@@ -234,15 +234,15 @@ foreach( $skin_folders as $skin_folder )
 		$skin_folders_data[$skin_folder]['status'] = 'duplicate';
 	}
 	elseif( ! @$skin_class_file_contents = file_get_contents( $skins_path.$skin_folder.'/_skin.class.php' ) )
-	{ 	// Could not load the contents of the skin file:
+	{	// Could not load the contents of the skin file:
 		$disp_params = array(
 				'function'        => 'broken',
 				'msg'             => T_('_skin.class.php NOT FOUND!'),
 			);
 		$skin_folders_data[$skin_folder]['status'] = 'missing class file';
 	}
-	elseif( strpos( $skin_class_file_contents, 'class '.$skin_class_name.' extends Skin' ) === false )
-	{
+	elseif( ! preg_match( '/class '.preg_quote( $skin_class_name ).' extends (site_)?Skin/', $skin_class_file_contents ) )
+	{	// Skin has no correct initialization:
 		$disp_params = array(
 				'function'        => 'broken',
 				'msg'             => T_('MALFORMED _skin.class.php'),
