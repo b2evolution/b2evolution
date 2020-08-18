@@ -104,7 +104,7 @@ class site_Skin extends Skin
 	function get_sub_menus()
 	{
 		$header_tabs = $this->get_header_tabs();
-		if( isset( $header_tabs[ $this->header_tab_active ]['items'] ) )
+		if( isset( $this->header_tab_active, $header_tabs[ $this->header_tab_active ]['items'] ) )
 		{
 			return $header_tabs[ $this->header_tab_active ]['items'];
 		}
