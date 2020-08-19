@@ -9469,7 +9469,8 @@ class Item extends ItemLight
 				$query .= '( '.$this->ID.', '.$extra_cat_ID;
 				if( ! empty( $postcat_order_field ) )
 				{	// Insert item order per category only when this field exists in DB:
-					$query .= ', '.$DB->quote( $this->get_order( $extra_cat_ID ) );
+					$order = $this->get_order( $extra_cat_ID );
+					$query .= ', '.$DB->quote( $order === '' ? NULL : $order );
 				}
 				$query .= ' ),';
 			}
