@@ -152,7 +152,7 @@ class site_Skin extends Skin
 	 */
 	function get_header_tabs_custom( $menu_ID )
 	{
-		global $DB, $current_locale, $ReqURL;
+		global $DB, $current_locale, $ReqURL, $Blog;
 
 		$header_tabs = array();
 
@@ -172,6 +172,10 @@ class site_Skin extends Skin
 
 		$this->header_tab_active = NULL;
 
+		// Set TRUE if all sub-entries of currently active top entry are not active,
+		// and we should fallback to find one active by match current URL:
+		$fallback_search_active_subentry = false;
+
 		$site_menu_entries = $SiteMenu->get_entries();
 		$level0_index = 0;
 		foreach( $site_menu_entries as $SiteMenuEntry )
@@ -187,9 +191,37 @@ class site_Skin extends Skin
 					    strpos( $ReqURL, html_entity_decode( $header_tab['url'] ) ) === 0 ) // OR URL of the Menu Entry is linked to current URL
 					{
 						$this->header_tab_active = $level0_index;
+						if( ! empty( $header_tab['items'] ) )
+						{	// Chec if all sub-entries are not active of this active top entry:
+							$fallback_search_active_subentry = true;
+							foreach( $header_tab['items'] as $header_tab_item )
+							{
+								if( $header_tab_item['active'] )
+								{	// At least one sub-entry is active:
+									$fallback_search_active_subentry = false;
+									// No need to find others:
+									continue;
+								}
+							}
+						}
 					}
 				}
 				$level0_index++;
+			}
+		}
+
+		if( $fallback_search_active_subentry )
+		{	// Try to find at least one active sun-entry of currently active entry:
+			foreach( $header_tabs[ $this->header_tab_active ]['items'] as $i => $header_tab_item )
+			{
+				if( $header_tab_item['highlight'] && // This sub-entry can be highlighted
+				    isset( $Blog ) && $Blog->ID == $header_tab_item['coll_ID'] && // Collection of the sub-entry is same as current
+				    strpos( $ReqURL, $header_tab_item['url'] ) === 0 ) // URL of the sub-entry matches to current URL
+				{	// If sub Menu Entry has an URL to Collection of this Menu Entry:
+					$header_tabs[ $this->header_tab_active ]['items'][ $i ]['active'] = true;
+					continue;
+					// STOP here, don't try to search next active sub Menu Entry.
+				}
 			}
 		}
 
@@ -229,6 +261,8 @@ class site_Skin extends Skin
 						'items' => $sub_tabs,
 						'active'=> $SiteMenuEntry->is_active(),
 						'class' => $SiteMenuEntry->get( 'class' ),
+						'coll_ID'   => $SiteMenuEntry->get_Blog()->ID,
+						'highlight' => $SiteMenuEntry->get( 'highlight' ),
 					);
 			}
 		}
@@ -239,6 +273,8 @@ class site_Skin extends Skin
 					'url'    => $menu_entry_url,
 					'active' => $SiteMenuEntry->is_active(),
 					'class'  => $SiteMenuEntry->get( 'class' ),
+					'coll_ID'   => $SiteMenuEntry->get_Blog()->ID,
+					'highlight' => $SiteMenuEntry->get( 'highlight' ),
 				);
 		}
 
