@@ -174,6 +174,9 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 				</td>';
 		}
 
+		// Collection ID:
+		$r .= '<td class="right">'.$SiteMenuEntry->get( 'coll_ID' ).'</td>';
+
 		// Entry type:
 		$r .= '<td class="nowrap">'.get_site_menu_type_title( $SiteMenuEntry->get( 'type' ) ).'</td>';
 
@@ -268,6 +271,10 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		);
 	$Table->cols[] = array(
 			'th' => TB_('Entry'),
+			'th_class' => 'shrinkwrap',
+		);
+	$Table->cols[] = array(
+			'th' => TB_('Coll ID'),
 			'th_class' => 'shrinkwrap',
 		);
 	$Table->cols[] = array(

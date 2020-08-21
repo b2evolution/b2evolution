@@ -28,6 +28,7 @@ function get_menu_types()
 				'recentposts'    => T_('Latest posts').' (disp=posts)',
 				'latestcomments' => T_('Latest comments').' (disp=comments)',
 				'search'         => T_('Search page').' (disp=search)',
+				'flagged'        => T_('Flagged Items').' (disp=flagged)',
 				'item'           => T_('Any item (post, page, etc...)').' (disp=single|page) ',
 				'arcdir'         => T_('Archives').' (disp=arcdir)',
 				'catdir'         => T_('Categories').' (disp=catdir)',
@@ -60,7 +61,6 @@ function get_menu_types()
 				'contacts' => T_('Messaging contacts'),
 			),
 			T_('Other') => array(
-				'flagged' => T_('Flagged Items'),
 				'postnew' => T_('Create new Item').' (disp=edit)',
 				'admin'   => T_('Go to Back-Office'),
 				'url'     => T_('Go to any URL'),

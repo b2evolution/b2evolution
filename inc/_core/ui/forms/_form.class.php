@@ -2831,6 +2831,19 @@ class Form extends Widget
 			$input_suffix = "\n";
 		}
 
+		if( isset( $field_params['disabled'] ) )
+		{	// Set html attribute "disabled":
+			if( empty( $field_params['disabled'] ) )
+			{	// Don't set attribute if it must be not disabled:
+				unset( $field_params['disabled'] );
+			}
+			elseif( $field_params['disabled'] === true )
+			{	// Use proper string value instead of boolean:
+				$field_params['disabled'] = 'disabled';
+			}
+			// else use the passed value
+		}
+
 		$r .= $input_prefix.'<select'.get_field_attribs_as_string( $field_params ).'>'
 			 .$field_options
 			 .'</select>'.$input_suffix;

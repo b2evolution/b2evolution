@@ -44,6 +44,21 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New Menu Entry') : TB_('Menu Ent
 
 	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'type' ), get_site_menu_types(), TB_('Type') );
 
+	$BlogCache = & get_BlogCache();
+	$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
+	$coll_id_is_disabled = in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar', 'messages', 'contacts' ) );
+	$Form->select_input_object( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), $BlogCache, TB_('Collection'), array(
+			'note' => T_( 'Leave empty for current collection.' )
+				.( $msg_Blog ? ' <span class="evo_setting_coll_disabled red"'.( $coll_id_is_disabled ? '' : ' style="display:none"' ).'>'
+					.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
+						'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
+						'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
+			'hide' => in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ),
+			'disabled' => $coll_id_is_disabled,
+			'loop_object_method' => 'get_maxlen_name',
+			'prepend_options' => array( '' => TB_('None - Current collection') )
+	) );
+
 	$Form->select_input_array( 'ment_coll_logo_size', $edited_SiteMenuEntry->get( 'coll_logo_size' ), get_available_thumb_sizes( TB_('No logo') ), TB_('Collection logo before link text'), NULL, array(
 			'hide' => in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ),
 		) );
@@ -57,19 +72,6 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New Menu Entry') : TB_('Menu Ent
 	$Form->checkbox_input( 'ment_show_badge', $edited_SiteMenuEntry->get( 'show_badge' ), TB_('Show Badge'), array(
 			'note' => TB_('Show a badge with count.'),
 			'hide' => ! in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'messages', 'flagged' ) )
-		) );
-
-	$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
-	$coll_id_is_disabled = in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar', 'messages', 'contacts' ) );
-	$Form->text_input( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), 11, TB_('Collection ID'), '', array(
-			'maxlength' => 11,
-			'hide' => in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ),
-			'disabled' => $coll_id_is_disabled,
-			'note' => T_( 'Leave empty for current collection.' )
-				.( $msg_Blog ? ' <span class="evo_setting_coll_disabled red"'.( $coll_id_is_disabled ? '' : ' style="display:none"' ).'>'
-					.sprintf( T_('The site is <a %s>configured</a> to always use collection %s for profiles/messaging functions.'),
-						'href="'.$admin_url.'?ctrl=collections&amp;tab=site_settings"',
-						'<b>'.$msg_Blog->get( 'name' ).'</b>' ).'</span>' : '' ),
 		) );
 
 	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, TB_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ! in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'recentposts', 'postnew' ) ) ) );
