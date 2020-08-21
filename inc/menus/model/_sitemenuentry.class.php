@@ -903,7 +903,7 @@ class SiteMenuEntry extends DataObject
 	 */
 	function is_active()
 	{
-		global $Blog, $disp;
+		global $Blog, $disp, $disp_detail;
 
 		if( ! $this->get( 'highlight' ) )
 		{	// Don't highlight this menu entry:
@@ -930,7 +930,8 @@ class SiteMenuEntry extends DataObject
 			case 'recentposts':
 				global $cat;
 				$entry_Chapter = & $this->get_Chapter();
-				return ( $disp == 'posts' && ( empty( $entry_Chapter ) || $cat == $entry_Chapter->ID ) );
+				return ( $disp_detail == 'posts-default' && empty( $entry_Chapter ) ) ||
+					( $disp == 'posts' && $entry_Chapter && $cat == $entry_Chapter->ID );
 
 			case 'search':
 				return ( $disp == 'search' );
@@ -1026,24 +1027,14 @@ class SiteMenuEntry extends DataObject
 				return $disp == 'flagged';
 
 			case 'text':
-				global $Blog;
-				$entry_coll_url = $entry_Blog->get( 'url' );
 				$sub_entries = $this->get_children( true );
-				if( empty( $sub_entries ) )
-				{	// If this Menu Entry is a leaf(no sub-entries):
-					$entry_url = $this->get_url();
-					if( isset( $Blog ) && $Blog->ID == $entry_Blog->ID &&
-					    $entry_url && strpos( $entry_url, $entry_coll_url ) === 0 )
-					{	// If URL of this Menu Entry is linked to Collection of this Menu Entry:
-						return true;
-					}
-				}
-				else
+				if( ! empty( $sub_entries ) )
 				{	// If this Menu Entry is a group of other sub-entries:
+					$entry_coll_url = $entry_Blog->get( 'url' );
 					foreach( $sub_entries as $sub_SiteMenuEntry )
 					{
 						$sub_entry_url = $sub_SiteMenuEntry->get_url();
-						if( isset( $Blog ) && $Blog->ID == $sub_SiteMenuEntry->get_Blog()->ID &&
+						if( $current_blog_ID == $sub_SiteMenuEntry->get_Blog()->ID &&
 						    $sub_entry_url && strpos( $sub_entry_url, $entry_coll_url ) === 0 )
 						{	// If sub Menu Entry has an URL to Collection of this Menu Entry:
 							return true;
@@ -1051,6 +1042,8 @@ class SiteMenuEntry extends DataObject
 						}
 					}
 				}
+				// Else if this "Text" Menu Entry is a leaf(no sub-entries) then
+				// it doesn't have an URL and it is always not active:
 				return false;
 		}
 
