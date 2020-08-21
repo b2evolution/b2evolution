@@ -97,25 +97,17 @@ class templates_Module extends Module
 	 */
 	function build_evobar_menu()
 	{
-		/**
-		 * @var Menu
-		 */
 		global $topleft_Menu;
-		global $admin_url;
-		global $Collection, $Blog;
 
-		//pre_dump( $topleft_Menu->get_menu_entries( 'site') ); 
-
-		if( check_user_perm( 'admin', 'restricted' ) )
-		{
-
-			// FM enabled and permission to view files:
-			$entries['templates'] = array(
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'options', 'view' ) )
+		{	// If current User has a permission to view Templates:
+			$topleft_Menu->insert_menu_entries_after( array( 'site', 'site', 'menus' ), array(
+				'templates' => array(
 					'text' => T_('Templates').'&hellip;',
-					'href' => $admin_url.'?ctrl=templates',
-				);
-
-			$topleft_Menu->insert_menu_entries_after( array( 'site', 'skin' ), $entries );
+					'href' => get_admin_url( 'ctrl=templates' ),
+				),
+			) );
 		}
 	}
 

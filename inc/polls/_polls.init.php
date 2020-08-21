@@ -113,6 +113,26 @@ class polls_Module extends Module
 
 
 	/**
+	 * Build the evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		global $topleft_Menu;
+
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'polls', 'create' ) )
+		{	// If current User has a permission to view Polls:
+			$topleft_Menu->insert_menu_entries_after( array( 'site', 'site', 'tags' ), array(
+				'polls' => array(
+					'text' => T_('Polls').'&hellip;',
+					'href' => get_admin_url( 'ctrl=polls' ),
+				),
+			) );
+		}
+	}
+
+
+	/**
 	 * Get default module permissions
 	 *
 	 * #param integer Group ID

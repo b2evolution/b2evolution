@@ -703,6 +703,51 @@ class collections_Module extends Module
 
 
 	/**
+	 * Build the evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		global $topleft_Menu;
+	
+		$site_entries = array();
+
+		if( check_user_perm( 'admin', 'normal' ) )
+		{	// If current User has an access to back-office:
+			if( check_user_perm( 'slugs', 'view' ) )
+			{	// If current User has a permission to view Slugs:
+				$site_entries['slugs'] = array(
+					'text' => T_('Slugs').'&hellip;',
+					'href' => get_admin_url( 'ctrl=slugs' ),
+				);
+			}
+
+			if( check_user_perm( 'options', 'view' ) )
+			{	// If current User has a permission to view Tags:
+				$site_entries['tags'] = array(
+					'text' => T_('Tags').'&hellip;',
+					'href' => get_admin_url( 'ctrl=itemtags' ),
+				);
+			}
+		}
+
+		if( ! empty( $site_entries ) )
+		{	// Append at least one allowed entry:
+			$topleft_Menu->insert_menu_entries_after( array( 'site', 'site', 'skin' ), $site_entries );
+		}
+
+		if( check_user_perm( 'admin', 'restricted' ) )
+		{	// If current User has a permission to view Collections in back-office:
+			$topleft_Menu->insert_menu_entries_after( array( 'site', 'site' ), array(
+				'collections' => array(
+					'text' => T_('Collection List').'&hellip;',
+					'href' => get_admin_url( 'ctrl=collections' ),
+				),
+			) );
+		}
+	}
+
+
+	/**
 	 * Builds the 1st half of the menu. This is the one with the most important features
 	 */
 	function build_menu_1()

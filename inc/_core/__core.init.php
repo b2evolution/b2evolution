@@ -1186,13 +1186,19 @@ class _core_Module extends Module
 			if( $perm_admin_normal && check_user_perm( 'options', 'view' ) )
 			{	// If current User has an access to backoffice and can view settings:
 				$entries['site']['entries'][] = array( 'separator' => true );
-				$entries['site']['entries']['settings'] = array(
-					'text' => T_('Site Settings').'&hellip;',
-					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings'
+				$entries['site']['entries']['site'] = array(
+					'text' => T_('Site Level'),
+					'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings',
+					'entries' => array(
+						'settings' => array(
+							'text' => T_('Site Settings').'&hellip;',
+							'href' => $admin_url.'?ctrl=collections&amp;tab=site_settings',
+						),
+					),
 				);
 				if( $Settings->get( 'site_skins_enabled' ) )
 				{	// Display menu item of site skin only when it is enabled:
-					$entries['site']['entries']['skin'] = array(
+					$entries['site']['entries']['site']['entries']['skin'] = array(
 						'text' => T_('Site skin').'&hellip;',
 						'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin',
 					);

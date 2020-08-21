@@ -113,6 +113,26 @@ class menus_Module extends Module
 
 
 	/**
+	 * Build the evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		global $topleft_Menu;
+
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'options', 'view' ) )
+		{	// If current User has a permission to view Menus:
+			$topleft_Menu->insert_menu_entries_after( array( 'site', 'site', 'skin' ), array(
+				'menus' => array(
+					'text' => T_('Menus').'&hellip;',
+					'href' => get_admin_url( 'ctrl=menus' ),
+				),
+			) );
+		}
+	}
+
+
+	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.

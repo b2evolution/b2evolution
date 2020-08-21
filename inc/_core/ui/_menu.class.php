@@ -124,14 +124,19 @@ class Menu extends Widget
 		}
 		$entries = & $menu['entries'];
 		if( $menu_item )
-		{ // find index of menu itemafter which to insert new entries
+		{	// Find index of menu item after which to insert new entries:
 			$keys = array_keys( $entries );
 
 			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys, true );
 		}
 
-		if( ( $index === false ) || ($index === NULL) )
-		{
+		if( $index === false )
+		{	// Insert new menu entry at the end if no entry is found by path:
+			$index = count( $entries );
+		}
+
+		if( $index === NULL )
+		{	// Index is not found, probably wrong path was passed:
 			return false;
 		}
 
