@@ -50,7 +50,7 @@ function get_actions_for_itemtype( $id )
 	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Item Type only for PRO version:
 		$action .= action_icon( T_('Export this Item Type...'), 'download',
-			$admin_url.'?ctrl=exportxml&amp;action=export_itemtype&amp;ityp_ID='.$id.'&amp;'.url_crumb( 'itemtype' ) );
+			$admin_url.'?ctrl=export&amp;action=export_itemtype&amp;ityp_ID='.$id.'&amp;'.url_crumb( 'itemtype' ) );
 	}
 
 	if( ! in_array( $id, $default_ids ) )

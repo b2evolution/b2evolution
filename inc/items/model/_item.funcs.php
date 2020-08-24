@@ -6157,6 +6157,20 @@ function item_type_global_icons( $object_Widget )
 				}
 			}
 
+			if( is_pro() )
+			{	// Export only for PRO version:
+				$object_Widget->global_icon( TB_('Export').'...', 'download',
+					get_admin_url( 'ctrl=export&amp;action=item_options&amp;blog_ID='.$Blog->ID ),
+					TB_('Export').'...', 3, 4,
+					array( 'class' => 'action_icon btn-default hidden-xs' ),
+					NULL,
+					array(
+						'parent'     => $icon_group_create_type,
+						'item_class' => 'visible-xs',
+					)
+				);
+			}
+
 			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit',
 				$admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ),
 				T_('Mass edit'), 3, 4,
@@ -6658,7 +6672,7 @@ function item_edit_actions( $Item )
 	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Item only for PRO version:
 		$r .= action_icon( T_('Export this Item...'), 'download',
-			$admin_url.'?ctrl=exportxml&amp;action=item_options&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID );
+			$admin_url.'?ctrl=export&amp;action=item_options&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID );
 	}
 
 	// Display delete button if current user has the rights:
