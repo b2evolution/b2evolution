@@ -27,3 +27,4 @@ media/blogs/*
 media/import/logs
 /_backup
 _logs/
+.DS_Store
