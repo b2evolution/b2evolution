@@ -14,6 +14,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $admin_url;
+
 memorize_param( 'action', 'string', '', 'find_broken_slugs' );
 
 $SQL = new SQL();
@@ -60,7 +62,9 @@ if( ( $current_User->check_perm('options', 'edit', false) ) && ( $Results->get_n
 	global $DB;
 	$slug_IDs = $DB->get_col( $SQL->get() );
 
-	echo '<p>[<a href="'.regenerate_url( 'action', 'action=del_broken_slugs&amp;slugs='.implode( ',', $slug_IDs ).'&amp;'.url_crumb( 'tools' ) ).'">'.T_( 'Delete these slugs' ).'</a>]</p>';
+	echo '<p><a href="'.regenerate_url( 'action', 'action=del_broken_slugs&amp;slugs='.implode( ',', $slug_IDs ).'&amp;'.url_crumb( 'tools' ) ).'" class="btn btn-danger">'.T_( 'Delete these slugs' ).'</a></p>';
 }
 
+// Display buttton to back to tools menu:
+echo '<p><a href="'.$admin_url.'?ctrl=tools" class="btn btn-primary">'.T_('Back to tools menu').'</a></p>';
 ?>

@@ -13,6 +13,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $admin_url;
+
 $confirm_title = TB_('Clear all item versions?');
 
 $block_item_Widget = new Widget( 'block_item' );
@@ -38,4 +40,7 @@ $Form->button( array( 'submit', '', TB_('Cancel'), 'CancelButton' ) );
 $Form->end_form();
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
+
+// Display buttton to back to tools menu:
+echo '<p><a href="'.$admin_url.'?ctrl=tools" class="btn btn-primary">'.T_('Back to tools menu').'</a></p>';
 ?>
