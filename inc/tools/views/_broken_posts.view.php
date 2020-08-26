@@ -14,6 +14,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $admin_url;
+
 $SQL = new SQL();
 
 $SQL->SELECT( 'post_ID, post_title, post_main_cat_ID, post_canonical_slug_ID' );
@@ -95,8 +97,10 @@ if( ( check_user_perm('options', 'edit', false) ) && ( $Results->get_num_rows() 
 	global $DB;
 	$post_IDs = $DB->get_col( $SQL->get() );
 
-	echo '<p>[<a href="'.regenerate_url( 'action', 'action=del_broken_posts&amp;posts='.implode( ',', $post_IDs ).'&amp;'.url_crumb( 'tools' ) ).'">'
-		.T_( 'Delete these posts' ).'</a>]</p>';
+	echo '<p><a href="'.regenerate_url( 'action', 'action=del_broken_posts&amp;posts='.implode( ',', $post_IDs ).'&amp;'.url_crumb( 'tools' ) ).'" class="btn btn-danger">'
+		.T_( 'Delete these posts' ).'</a></p>';
 }
 
+// Display buttton to back to tools menu:
+echo '<p><a href="'.$admin_url.'?ctrl=tools" class="btn btn-primary">'.T_('Back to tools menu').'</a></p>';
 ?>
