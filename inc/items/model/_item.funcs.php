@@ -2192,7 +2192,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	// ---------- PREVIEW ----------
 	if( ! $inskin || $display_preview )
 	{
-		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
+		$url = force_https_if_needed( $Blog->get( 'url' ) ); // was dynurl
 		echo '<div class="btn-group dropup PreviewButton">
 				<button type="button" class="btn btn-info" onclick="return b2edit_open_preview( this.form, \''.$url.'\' )" data-shortcut="f9">'./* TRANS: Verb */ T_('Preview').'</button>
 				<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
