@@ -3374,7 +3374,7 @@ class Plugin
 			}
 
 			// Use the same protocol as with current host (so includes from within https do not fail when on http):
-			$r = url_same_protocol( $r );
+			$r = force_https_if_needed( $r );
 
 			$this->_plugin_url = $r;
 		}
