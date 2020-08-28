@@ -854,21 +854,22 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url_alias( $ReqAbsUrl, $alias, false ) ) !== false )
 	{ // We found a matching collection:
 		$Debuglog->add( 'Found matching collection: '.$blog. 'using alias '.$alias, 'url_decode_part_1' );
+		// Find tail from the currently requested alias URL:
 		$same_protocol_alias = url_same_protocol( $alias, $ReqAbsUrl );
 		$tail_Path = str_replace( $same_protocol_alias, '', $ReqURL );
 		if( substr( $tail_Path, 0, 1 ) != '/' )
 		{ // Tail must start with '/'
 			$tail_Path = '/'.$tail_Path;
 		}
-		if( $Blog->get_setting( 'http_protocol' ) == 'always_redirect' )
-		{
-			$redirect_to = url_same_protocol( url_add_tail( $Blog->gen_blogurl(), $tail_Path ), $alias );
-		}
-		else
-		{
+		// Redirect from alias collection URL to real collection URL:
+		$redirect_to = url_add_tail( $Blog->gen_blogurl(), $tail_Path );
+		if( $Blog->get_setting( 'http_protocol' ) == 'allow_both' )
+		{	// Allow any protocol of the current alias URL:
 // fp> DO we really want to redirect immediately here (in case there is extra path?)
-			$redirect_to = url_same_protocol( url_add_tail( $Blog->gen_blogurl(), $tail_Path ), $ReqAbsUrl );
+// yb> Here we always need a redirect from alias collection URL to real collection URL.
+			$redirect_to = url_same_protocol( $redirect_to, $ReqAbsUrl );
 		}
+		// Else redirect to real collection URL only with protocol that is used by default for the collection base URL:
 		header_redirect( $redirect_to, 301 );
 	}
 
