@@ -564,7 +564,28 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL,
 
 
 /**
+ * Force URL to https if currently this protocol is used
+ *
+ * @param string URL
+ * @return string URL forced to https protocol
+ */
+function force_https_if_needed( $url )
+{
+	if( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] != 'off' &&
+	    substr( $url, 0, 7 ) == 'http://' )
+	{	// Force http URL to currently used https protocol:
+		$url = 'https://'.substr( $url, 7 );
+	}
+	// else: we do NOT need to change https -> http
+
+	return $url;
+}
+
+
+/**
  * Get $url with the same protocol (http/https) as $other_url.
+ *
+ * @deprecated Use force_https_if_needed() instead because we do NOT need to change https -> http, only http -> https is really important.
  *
  * @param string URL
  * @param string other URL (defaults to {@link $ReqHost})
