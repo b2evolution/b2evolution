@@ -77,6 +77,14 @@ class content_blocks_plugin extends Plugin
 		// Remove block level short tag [include:...] inside <p> blocks and move them before the paragraph:
 		$content = move_short_tags( $content, '#\[(include|cblock):[^\]]+\]#i' );
 
+		// Don't render several short tags because they may have dynamic
+		// data which should not be cached in Item's pre-rendered content:
+		$params['render_block_widgets'] = false;
+		$params['render_inline_widgets'] = false;
+		$params['render_other_item'] = false;
+		$params['render_links'] = false;
+		$params['render_collection'] = false;
+
 		// Replace [include:item-slug] or [cblock:item-slug] short tags with item content:
 		$params['check_code_block'] = true;
 		$content = $Item->render_content_blocks( $content, $params );
