@@ -5585,13 +5585,17 @@ class Comment extends DataObject
 	{
 		$params = array_merge( array(
 				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
-				'render_inline_files'   => true,
+				'render_tag_image'     => true,
+				'render_tag_file'      => true,
+				'render_tag_inline'    => true,
+				'render_tag_video'     => true,
+				'render_tag_audio'     => true,
+				'render_tag_thumbnail' => true,
+				'render_tag_folder'    => true,
 			), $params );
 
-		if( $params['render_inline_files'] )
-		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
-			$content = render_inline_files( $content, $this, $params );
-		}
+		// Render inline file tags like [image:123:caption] or [file:123:caption]:
+		$content = render_inline_files( $content, $this, $params );
 
 		return $content;
 	}

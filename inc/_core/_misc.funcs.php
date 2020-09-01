@@ -8903,7 +8903,49 @@ function render_inline_files( $content, $Object, $params = array() )
 	$params = array_merge( array(
 			'check_code_block' => false,
 			'clear_paragraph'  => true,
+			'render_tag_image'     => true,
+			'render_tag_file'      => true,
+			'render_tag_inline'    => true,
+			'render_tag_video'     => true,
+			'render_tag_audio'     => true,
+			'render_tag_thumbnail' => true,
+			'render_tag_folder'    => true,
 		), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_image'] )
+		{	// Render short tag [image:]
+			$render_tags[] = 'image';
+		}
+		if( $params['render_tag_file'] )
+		{	// Render short tag [file:]
+			$render_tags[] = 'file';
+		}
+		if( $params['render_tag_inline'] )
+		{	// Render short tag [inline:]
+			$render_tags[] = 'inline';
+		}
+		if( $params['render_tag_video'] )
+		{	// Render short tag [video:]
+			$render_tags[] = 'video';
+		}
+		if( $params['render_tag_audio'] )
+		{	// Render short tag [audio:]
+			$render_tags[] = 'audio';
+		}
+		if( $params['render_tag_thumbnail'] )
+		{	// Render short tag [thumbnail:]
+			$render_tags[] = 'thumbnail';
+		}
+		if( $params['render_tag_folder'] )
+		{	// Render short tag [folder:]
+			$render_tags[] = 'folder';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
 
 	if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 	{	// Call render_inline_files() on everything outside code/pre:
@@ -8922,7 +8964,7 @@ function render_inline_files( $content, $Object, $params = array() )
 	}
 
 	// Find all matches with inline tags
-	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+	preg_match_all( '/\[('.implode( '|', $render_tags ).'):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 	if( !empty( $inlines[0] ) )
 	{	// There are inline tags in the content...
