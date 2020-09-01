@@ -339,41 +339,48 @@ $Form->begin_form( '', '', $params );
 	echo '<input type="hidden" name="tab_pane_active[tab_pane_itemform]" id="itemform_tab_pane" value="'.$active_tab_pane_value.'">';
 
 	echo '<ul class="nav nav-tabs">';
-	
+
 	$tab_panes = array();
 
-	$tab_panes[] = '#attachment';
-	
-	echo '<li><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+	// Attachments:
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) )
+	{	// If attachments are allowed for the Item Type:
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+		if( $LinkOwner->check_perm( 'edit', false ) )
+		{	// If current User has a permission to edit attachments of the edited Item:
+			$tab_panes[] = '#attachment';
+			echo '<li><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+		}
+	}
 
+	// Custom fields:
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
-	{	
+	{
 		$tab_panes[] = '#custom_fields';
-		
 		echo '<li><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
 	}
 
+	// Advanced properties:
 	$tab_panes[] = '#advance_properties';
-	
 	echo '<li><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
 
-	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
+	// Additional actions:
+	if( isset( $Blog ) && $Blog->get( 'allowtrackbacks' ) )
 	{
 		$tab_panes[] = '#allowtrackbacks';
-		
 		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
 	}
 
+	// Internal comments:
 	if( $edited_Item->can_see_meta_comments() )
 	{	// Meta/Internal comments are allowed only when current User has a permission to view them:
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
-		
 		$tab_panes[] = '#internal_comments';
-		
 		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
 	}
 
+	// Checklist:
 	if( $edited_Item->can_see_meta_comments() && // Current User must has at least a permission to view meta comments
 	    ( ! $creating || $edited_Item->can_meta_comment() ) ) // No need to display this tab for new Item if current User cannot add checklist item
 	{	// Checklist is allowed only for users who can see meta/internal comments:
@@ -403,9 +410,9 @@ $Form->begin_form( '', '', $params );
 		}
 
 		$Form->open_tab_pane( array( 'id' => 'custom_fields', 'class' => 'tab_pane_pads', 'right_items' => $custom_fields_title ) );
-		
+
 		$Form->switch_layout( 'fields_table' );
-		
+
 		// Display inputs to edit custom fields:
 		display_editable_custom_fields( $Form, $edited_Item );
 
@@ -1221,13 +1228,14 @@ tab_href_value = jQuery( '.content-form-with-tab #itemform_tab_pane' ).val();
 // Check if database saved active tab pane value exits in the tab pane or not
 if( js_tab_panes_array.indexOf( tab_href_value ) == -1 )
 {
-	tab_href_value = '#attachment';
+	tab_href_value = js_tab_panes_array[0];
 }
 
-// Watch for new checklist items and update badge accordingly:
-var checklist = document.querySelector( '.checklist_lines' );
-var observer_config = { attributes: true, childList: true, characterData: true };
-var observer = new MutationObserver( function( mutations ) {
+if( jQuery( '.checklist_lines' ).length > 0 )
+{	// Watch for new checklist items and update badge accordingly:
+	var checklist = document.querySelector( '.checklist_lines' );
+	var observer_config = { attributes: true, childList: true, characterData: true };
+	var observer = new MutationObserver( function( mutations ) {
 		mutations.forEach( function( mutation )
 			{
 				if( ( mutation.addedNodes && mutation.addedNodes.length > 0 ) || ( mutation.removedNodes && mutation.removedNodes.length > 0 ) )
@@ -1261,13 +1269,17 @@ var observer = new MutationObserver( function( mutations ) {
 				}
 			} );
 	} );
-observer.observe( checklist, observer_config );
+	observer.observe( checklist, observer_config );
+}
 
 jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
 jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
 
-// Show attachment tab result summary in single line
-jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
+if( jQuery( '.content-form-with-tab #attachment' ).length > 0 )
+{	// Show attachment tab result summary in single line:
+	jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
+}
+
 jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )
 {	// Do tab wise operations
 	tab_href_value = jQuery( event.target ).attr( "href" );
