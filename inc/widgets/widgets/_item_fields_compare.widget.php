@@ -102,7 +102,7 @@ class item_fields_compare_Widget extends ComponentWidget
 						'param' => sprintf( T_('As specified by "%s" URL param'), 'items=' ),
 						'list'  => T_('Specific IDs listed below'),
 					),
-					'defaultvalue' => 'param',
+					'defaultvalue' => 'all',
 				),
 				'items' => array(
 					'label' => T_('Specific Item IDs'),
@@ -319,13 +319,19 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Get IDs of items which should be compared:
 		$items = $this->get_items_IDs();
 
+		if( empty( $items ) )
+		{	// No items to compare:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no Items to compare.' );
+			return false;
+		}
+
 		// Get custom fields with compared data:
 		$custom_fields = $this->get_custom_fields( $items );
 
 		if( empty( $custom_fields ) )
-		{	// Nothing to compare:
+		{	// No fields to compare:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no fields to compare.' );
-			return;
+			return false;
 		}
 
 		// Check if headers for item statuses should be displayed
