@@ -79,11 +79,17 @@ class content_blocks_plugin extends Plugin
 
 		// Don't render several short tags because they may have dynamic
 		// data which should not be cached in Item's pre-rendered content:
-		$params['render_block_widgets'] = false;
-		$params['render_inline_widgets'] = false;
-		$params['render_other_item'] = false;
-		$params['render_links'] = false;
-		$params['render_collection'] = false;
+		$params['render_tag_switcher'] = false;
+		$params['render_tag_item_subscribe'] = false;
+		$params['render_tag_item_emailcapture'] = false;
+		$params['render_tag_item_compare'] = false;
+		$params['render_tag_item_fields'] = false;
+		$params['render_tag_item_field'] = false;
+		$params['render_tag_item_titlelink'] = false;
+		$params['render_tag_item_url'] = false;
+		$params['render_tag_item_link'] = false;
+		$params['render_tag_coll_name'] = false;
+		$params['render_tag_coll_shortname'] = false;
 
 		// Replace [include:item-slug] or [cblock:item-slug] short tags with item content:
 		$params['check_code_block'] = true;

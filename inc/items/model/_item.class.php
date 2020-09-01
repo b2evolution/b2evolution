@@ -3442,72 +3442,75 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
-				'render_content_blocks' => true,
-				'render_inline_files'   => true,
-				'render_links'          => true,
-				'render_custom_fields'  => true,
-				'render_other_item'     => true,
-				'render_collection'     => true,
-				'render_inline_widgets' => true,
-				'render_block_widgets'  => true,
-				'render_switchable_blocks' => true,
-				'render_templates'      => true,
+				// render_content_blocks():
+				'render_tag_include'           => true,
+				'render_tag_cblock'            => true,
+				// render_inline_widgets():
+				'render_tag_item_subscribe'    => true,
+				'render_tag_item_emailcapture' => true,
+				'render_tag_item_compare'      => true,
+				'render_tag_item_fields'       => true,
+				// render_block_widgets():
+				'render_tag_switcher'          => true,
+				// render_inline_files():
+				'render_tag_image'             => true,
+				'render_tag_file'              => true,
+				'render_tag_inline'            => true,
+				'render_tag_video'             => true,
+				'render_tag_audio'             => true,
+				'render_tag_thumbnail'         => true,
+				'render_tag_folder'            => true,
+				// render_link_data():
+				'render_tag_item_link'         => true,
+				// render_custom_fields():
+				'render_tag_field'             => true,
+				// render_other_item_data():
+				'render_tag_item_field'        => true,
+				'render_tag_item_titlelink'    => true,
+				'render_tag_item_url'          => true,
+				// render_collection_data():
+				'render_tag_coll_name'         => true,
+				'render_tag_coll_shortname'    => true,
+				// render_switchable_blocks():
+				'render_tag_switchable_div'    => true,
+				// render_templates():
+				'render_tag_template'          => true,
 			), $params );
 
 		// Remove block level short tags inside <p> blocks and move them before the paragraph:
 		$content = move_short_tags( $content );
 
-		if( $params['render_content_blocks'] )
-		{	// Render Content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug]:
-			$content = $this->render_content_blocks( $content, $params );
-		}
+		// Render Content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug]:
+		$content = $this->render_content_blocks( $content, $params );
 
-		if( $params['render_inline_widgets'] )
-		{	// Render widget tags (subscribe, emailcapture, compare, fields):
-			$content = $this->render_inline_widgets( $content, $params );
-		}
+		// Render widget tags (subscribe, emailcapture, compare, fields):
+		$content = $this->render_inline_widgets( $content, $params );
 
-		if( $params['render_block_widgets'] )
-		{	// Render widget tags (switcher):
-			$content = $this->render_block_widgets( $content, $params );
-		}
+		// Render widget tags (switcher):
+		$content = $this->render_block_widgets( $content, $params );
 
-		if( $params['render_inline_files'] )
-		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
-			$content = render_inline_files( $content, $this, array_merge( $params, array(
-					'clear_paragraph' => false, // Don't clear paragraph twice
-				) ) );
-		}
+		// Render inline file tags like [image:123:caption] or [file:123:caption]:
+		$content = render_inline_files( $content, $this, array_merge( $params, array(
+				'clear_paragraph' => false, // Don't clear paragraph twice
+			) ) );
 
-		if( $params['render_links'] )
-		{	// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
-			$content = $this->render_link_data( $content, $params );
-		}
+		// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
+		$content = $this->render_link_data( $content, $params );
 
-		if( $params['render_custom_fields'] )
-		{	// Render single value of Custom Fields [field:first_string_field]:
-			$content = $this->render_custom_fields( $content, $params );
-		}
+		// Render single value of Custom Fields [field:first_string_field]:
+		$content = $this->render_custom_fields( $content, $params );
 
-		if( $params['render_other_item'] )
-		{	// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
-			$content = $this->render_other_item_data( $content, $params );
-		}
+		// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
+		$content = $this->render_other_item_data( $content, $params );
 
-		if( $params['render_collection'] )
-		{	// Render Collection Data [coll:name], [coll:shortname]:
-			$content = $this->render_collection_data( $content, $params );
-		}
+		// Render Collection Data [coll:name], [coll:shortname]:
+		$content = $this->render_collection_data( $content, $params );
 
-		if( $params['render_switchable_blocks'] )
-		{	// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
-			$content = $this->render_switchable_blocks( $content, $params );
-		}
+		// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
+		$content = $this->render_switchable_blocks( $content, $params );
 
-		if( $params['render_templates'] )
-		{	// Render template tags like [template:template_code|param1=value1|param2=value2]:
-			$content = $this->render_templates( $content, $params );
-		}
+		// Render template tags like [template:template_code|param1=value1|param2=value2]:
+		$content = $this->render_templates( $content, $params );
 
 		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{	// Clean up rendering errors from content if current User has no permission to edit this Item:
@@ -3529,6 +3532,36 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
+		$params = array_merge( array(
+				'render_tag_item_subscribe'    => true,
+				'render_tag_item_emailcapture' => true,
+				'render_tag_item_compare'      => true,
+				'render_tag_item_fields'       => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_item_subscribe'] )
+		{	// Render short tag [subscribe:]
+			$render_tags[] = 'subscribe';
+		}
+		if( $params['render_tag_item_emailcapture'] )
+		{	// Render short tag [emailcapture:]
+			$render_tags[] = 'emailcapture';
+		}
+		if( $params['render_tag_item_compare'] )
+		{	// Render short tag [compare:]
+			$render_tags[] = 'compare';
+		}
+		if( $params['render_tag_item_fields'] )
+		{	// Render short tag [fields:]
+			$render_tags[] = 'fields';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		load_funcs( 'skins/_skin.funcs.php' );
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_collection_data() on everything outside code/pre:
@@ -3540,7 +3573,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of widgets:
-		preg_match_all( '/\[(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields):?([^\]]*)\]/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:\]]+:)?('.implode( '|', $render_tags ).'):?([^\]]*)\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one widget tag is found in content:
@@ -3766,6 +3799,15 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
+		$params = array_merge( array(
+				'render_tag_switcher' => true,
+			), $params );
+
+		if( ! $params['render_tag_switcher'] )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		load_funcs( 'skins/_skin.funcs.php' );
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_collection_data() on everything outside code/pre:
@@ -3856,6 +3898,15 @@ class Item extends ItemLight
 	 */
 	function render_custom_fields( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_field' => true,
+			), $params );
+
+		if( ! $params['render_tag_field'] )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_custom_fields() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -3913,6 +3964,31 @@ class Item extends ItemLight
 	 */
 	function render_other_item_data( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_item_field'     => true,
+				'render_tag_item_titlelink' => true,
+				'render_tag_item_url'       => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_item_field'] )
+		{	// Render short tag [item:123:field:]
+			$render_tags[] = 'field';
+		}
+		if( $params['render_tag_item_titlelink'] )
+		{	// Render short tag [item:123:titlelink]
+			$render_tags[] = 'titlelink';
+		}
+		if( $params['render_tag_item_url'] )
+		{	// Render short tag [item:123:url]
+			$render_tags[] = 'url';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_other_item_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -3923,7 +3999,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of parent data:
-		preg_match_all( '/\[(parent|item:[^:]+):([a-z]+):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[(parent|item:[^:]+):('.implode( '|', $render_tags ).'):?([^\]]*)?\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one other item tag is found in content:
@@ -4002,6 +4078,26 @@ class Item extends ItemLight
 	 */
 	function render_collection_data( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_coll_name'      => true,
+				'render_tag_coll_shortname' => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_coll_name'] )
+		{	// Render short tag [coll:name]
+			$render_tags[] = 'name';
+		}
+		if( $params['render_tag_coll_shortname'] )
+		{	// Render short tag [coll:shortname]
+			$render_tags[] = 'shortname';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_collection_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -4012,7 +4108,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of collection data:
-		preg_match_all( '/\[coll:([a-z]+)\]/i', $content, $tags );
+		preg_match_all( '/\[coll:('.implode( '|', $render_tags ).')\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one collection tag is found in content:
@@ -4052,6 +4148,15 @@ class Item extends ItemLight
 	 */
 	function render_link_data( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_item_link' => true,
+			), $params );
+
+		if( ! $params['render_tag_item_link'] )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_link_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -4142,6 +4247,26 @@ class Item extends ItemLight
 	{
 		global $content_block_items;
 
+		$params = array_merge( array(
+				'render_tag_include' => true,
+				'render_tag_cblock'  => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_include'] )
+		{	// Render short tag [include:]
+			$render_tags[] = 'include';
+		}
+		if( $params['render_tag_cblock'] )
+		{	// Render short tag [cblock:]
+			$render_tags[] = 'cblock';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_content_blocks() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -4152,7 +4277,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of content block posts:
-		preg_match_all( '/\[(include|cblock):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[('.implode( '|', $render_tags ).'):?([^\]]*)?\]/i', $content, $tags );
 
 		$ItemCache = & get_ItemCache();
 
@@ -4367,7 +4492,13 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block' => true,
+				'render_tag_template' => true,
 			), $params );
+
+		if( ! $params['render_tag_template'] )
+		{	// No tags for rendering:
+			return $content;
+		}
 
 		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call render_templates() on everything outside code/pre:
@@ -4427,7 +4558,13 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block' => true,
+				'render_tag_switchable_div' => true,
 			), $params );
+
+		if( ! $params['render_tag_switchable_div'] )
+		{	// No tags for rendering:
+			return $content;
+		}
 
 		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call render_switchable_content() on everything outside code/pre:
@@ -9410,12 +9547,23 @@ class Item extends ItemLight
 
 		// Render inline tags to HTML code, except of inline file tags because they are removed below:
 		$first_content_part = $this->render_inline_tags( $first_content_part, array(
-				'render_inline_files'      => false,
-				'render_links'             => false,
-				'render_other_item'        => false,
-				'render_inline_widgets'    => false,
-				'render_block_widgets'     => false,
-				'render_switchable_blocks' => false,
+				'render_tag_image'             => false,
+				'render_tag_file'              => false,
+				'render_tag_inline'            => false,
+				'render_tag_video'             => false,
+				'render_tag_audio'             => false,
+				'render_tag_thumbnail'         => false,
+				'render_tag_folder'            => false,
+				'render_tag_item_link'         => false,
+				'render_tag_item_field'        => false,
+				'render_tag_item_titlelink'    => false,
+				'render_tag_item_url'          => false,
+				'render_tag_item_subscribe'    => false,
+				'render_tag_item_emailcapture' => false,
+				'render_tag_item_compare'      => false,
+				'render_tag_item_fields'       => false,
+				'render_tag_switcher'          => false,
+				'render_tag_switchable_div'    => false,
 			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
