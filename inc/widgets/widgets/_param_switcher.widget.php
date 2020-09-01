@@ -306,25 +306,17 @@ class param_switcher_Widget extends generic_menu_link_Widget
 					'defaults'             => $defaults,
 					'display_mode'         => $this->get_display_mode(),
 				);
-			expose_var_to_js( 'param_switcher_'.$this->ID, $switchable_buttons_config, 'evo_init_switchable_buttons_config' );
+			expose_var_to_js( 'param_switcher_'.$this->get_param( 'param_code' ), $switchable_buttons_config, 'evo_init_switchable_buttons_config' );
+
+			// NOTE: These JS files must be included inline here in order to make
+			//       it works for short/inline tags [switcher:...] [option:...]...[/option] [/switcher]
+			//       because for them we cannot call Widget->request_required_files() to include JS files in <head>
+			// WARNING: Cannot uglify evo_switchable_blocks.js because of the arrow function there.
+			require_js_defer( '#jquery#', 'blog', true );
+			require_js_defer( 'src/evo_switchable_blocks.js', 'blog', true );
 		}
 
 		return $active_button_value;
-	}
-
-
-	/**
-	 * Request all required css and js files for this widget
-	 */
-	function request_required_files()
-	{
-		// TODO: This does not get run when the param switcher is inserted into a post/item via shorttag.
-		//       Cannot uglify evo_switchable_blocks.js because of the arrow function there.
-		if( $this->get_param( 'allow_switch_js' ) )
-		{	// Load JS to switch between blocks on change URL in address bar:
-			require_js_defer( '#jquery#', 'blog' );
-			require_js_defer( 'src/evo_switchable_blocks.js', 'blog' );
-		}
 	}
 }
 
