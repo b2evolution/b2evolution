@@ -781,6 +781,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Widget Page Section 1 */
 	$default_widgets['widget_page_section_1'] = array(
+		'coll_type' => 'main',
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
@@ -796,6 +797,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Widget Page Section 2 */
 	$default_widgets['widget_page_section_2'] = array(
+		'coll_type' => 'main',
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 2'),
 		'order'   => 20,
@@ -805,6 +807,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	/* Widget Page Section 3 */
 	$default_widgets['widget_page_section_3'] = array(
+		'coll_type' => 'main',
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 3'),
 		'order'   => 30,
