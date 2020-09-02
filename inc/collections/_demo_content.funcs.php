@@ -2637,9 +2637,9 @@ It can have multiple lines.' ),
 <p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
 <p>'.sprintf( TD_('We can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
 <p>'.sprintf( TD_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
-<p>'.TD_('Finally, you could also use re-usable content blocks, for example:').' [cblock:eur-usd-switcher]</p>
+<p>'.TD_('Finally, you could also use re-usable content blocks, for example:').' [cblock:#get_item#eur_usd_switcher#slug#]</p>
 
-[cblock:fields-example]',
+[cblock:#get_item#fields_example#slug#]',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123.45' ),
 			array( 'second_numeric_field', '456' ),
@@ -3541,6 +3541,8 @@ a school bus stop where you wouldn\'t really expect it!
 					'mongolian_beef',
 					'stuffed_peppers',
 					'custom_fields_example',
+					'fields_example',
+					'eur_usd_switcher',
 					'another_custom_fields_example',
 					'child_post_example',
 				);
@@ -3707,6 +3709,8 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 					'mongolian_beef',
 					'stuffed_peppers',
 					'custom_fields_example',
+					'fields_example',
+					'eur_usd_switcher',
 					'another_custom_fields_example',
 					'child_post_example',
 				);
@@ -3836,6 +3840,12 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			$item_date = date( 'Y-m-d H:i:s', $item_timestamp_array[ $item_i++ ] );
 
+			$highest_publish_status = 'published';
+			if( $item_type == 'Content Block' )
+			{	// Force status of Content Block because by default they allow to be created with "Public" status even if collection is not public like "Blog B":
+				$highest_publish_status = get_highest_publish_status( 'post', $blog_ID, false, $highest_publish_status );
+			}
+
 			// Insert new Item:
 			$insert_new_item_result = $new_Item->insert(
 				$owner_ID,
@@ -3844,7 +3854,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				$item_date,
 				$category_ID,
 				$extra_cats_IDs,
-				'published',
+				$highest_publish_status,
 				isset( $demo_item['locale'] ) ? $demo_item['locale'] : '#',
 				isset( $demo_item['slug'] ) ? $demo_item['slug'] : '',
 				isset( $demo_item['url'] ) ? $demo_item['url'] : '',
@@ -3861,8 +3871,13 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				continue;
 			}
 
-			// Set Item ID after creating:
+			// Set Item's data after creating:
 			$demo_items[ $demo_item_key]['ID'] = $new_Item->ID;
+			if( ! isset( $demo_items[ $demo_item_key]['slug'] ) )
+			{	// Set slug only it was not provided:
+				// (This may be used on next creating Items, e.g. slug of Item "eur_usd_switcher" in content of Item "another_custom_fields_example")
+				$demo_items[ $demo_item_key]['slug'] = $new_Item->get( 'urltitle' );
+			}
 
 			$update_new_item = false;
 			if( ! empty( $demo_item['files'] ) )
