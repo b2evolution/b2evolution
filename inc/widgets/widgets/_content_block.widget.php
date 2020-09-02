@@ -267,6 +267,8 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $Item;
+
 		$this->init_display( $params );
 
 		$TemplateCache = & get_TemplateCache();
@@ -309,16 +311,49 @@ class content_block_Widget extends ComponentWidget
 			return false;
 		}
 
-		if( ! ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) &&
-		    ! ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) &&
-		    ! ( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) ) )
-		{	// Display a content block item ONLY if at least one condition:
-			//  - Content block Item is in same collection as this widget,
-			//  - Content block Item has same owner as owner of this widget's collection,
-			//  - Content block Item from collection for shared content blocks:
+		// Display a content block Item if at least one condition is true:
+		$content_block_is_allowed = false;
+		if( isset( $Item ) && ( $Item instanceof Item ) )
+		{	// 1. Content block Item has same owner as owner of the current Item:
+			$content_block_is_allowed = $widget_Item->get( 'creator_user_ID' ) == $Item->get( 'creator_user_ID' );
+		}
+		$content_block_is_allowed = $content_block_is_allowed ||
+			// 2. Content block Item is in same collection as this widget:
+			( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
+			// 3. Content block Item has same owner as owner of this widget's collection:
+			( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ) ||
+			// 4. Content block Item from collection for shared content blocks:
+			( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID );
 
-			// Display error if the requested content block item cannot be used in this place:
-			$this->display_error_message( sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
+		if( ! $content_block_is_allowed )
+		{	// Display error if the requested content block item cannot be used in this place:
+			if( isset( $Item ) && ( $Item instanceof Item ) )
+			{	// For page with current Item:
+				$this->display_error_message( sprintf(
+					T_('Content block #%d %s (Coll #%d) (Owner: %s) cannot be included here. It must be in the same collection as this Widget (Coll #%d) or the info pages collection (Coll #%d)').'; '.
+					T_('in any other case, it must have the same owner as the current Item (Item #%d) of the page (Owner: %s) or the same owner as the current Item\'s collection (Owner: %s).'),
+						$widget_Item->ID, '<code>'.$widget_Item->get( 'urltitle' ).'</code>', // Content block #%d %s
+						$widget_Item->get_blog_ID(), // (Coll #%d)
+						get_user_identity_link( NULL, $widget_Item->get( 'creator_user_ID' ) ), // (Owner: %s)
+						$widget_Blog->ID, // as this Widget (Coll #%d)
+						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
+						$Item->ID, get_user_identity_link( NULL, $Item->get( 'creator_user_ID' ) ), // the current Item (Item #%d) (Owner: %s)
+						$Item->get_Blog() ? get_user_identity_link( NULL, $Item->get_coll_setting( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the current Item\'s collection (Owner: %s)
+					) );
+			}
+			else
+			{	// For page without current Item:
+				$this->display_error_message( sprintf(
+					T_('Content block #%d %s (Coll #%d) (Owner: %s) cannot be included here. It must be in the same collection as this Widget (Coll #%d) or the info pages collection (Coll #%d)').'. '.
+					T_('In any other case, it must have the same owner as the current collection (Owner: %s). Note: this page has no current Item, so we cannot check for "same owner as current Item".'),
+						$widget_Item->ID, '<code>'.$widget_Item->get( 'urltitle' ).'</code>', // Content block #%d %s
+						$widget_Item->get_blog_ID(), // (Coll #%d)
+						get_user_identity_link( NULL, $widget_Item->get( 'creator_user_ID' ) ), // (Owner: %s)
+						$widget_Blog->ID, // as this Widget (Coll #%d)
+						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
+						$widget_Blog ? get_user_identity_link( NULL, $widget_Blog->get( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the current collection (Owner: %s)
+					) );
+			}
 			return false;
 		}
 
