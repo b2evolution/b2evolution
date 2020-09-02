@@ -2599,19 +2599,47 @@ It can have multiple lines.' ),
 		),
 	);
 
+	$demo_items['fields_example'] = array(
+		'title'    => TD_('Fields example'),
+		'tags'     => 'demo',
+		'category' => 'background',
+		'type'     => 'Content Block',
+		'content'  => TD_('This is in a content block:')."\n\n"
+.'[-fields:first_numeric_field,first_string_field,second_numeric_field,usd_price,eur_price]',
+		'settings' => array(
+				'editor_code' => 'html',
+			),
+	);
+
+	$demo_items['eur_usd_switcher'] = array(
+		'title'    => TD_('EUR USD switcher'),
+		'tags'     => 'demo',
+		'category' => 'background',
+		'type'     => 'Content Block',
+		'content'  => '<div>'.TD_('This switcher is in a content block:').' [switcher:cur:.inline-block][option:usd]USD[/option][option:eur]EUR[/option][/switcher]</div>',
+		'settings' => array(
+				'editor_code' => 'html',
+			),
+	);
+
 	$demo_items['another_custom_fields_example'] = array(
 		'title'    => TD_('Another Custom Fields Example'),
 		'tags'     => 'demo,custom fields',
 		'category' => 'background',
 		'type'     => 'Post with Custom Fields',
 		'content'  => '<p>'.TD_('This post has a special post type called "Post with Custom Fields".').'</p>
-<p>'.TD_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+<p>'.TD_('This post type defines several custom fields. Here are the sample values that have been entered in these fields:').'</p>
 <p>[fields]</p>
+<p>'.TD_('This particular post also as "Switchable content" enabled in the Advanced properties.').'</p>
+<div>'.sprintf( TD_('Here is a switcher example: %s'), '[switcher:cur:.inline-block][option:usd]USD[/option][option:eur]EUR[/option][/switcher]' ).'</div>
 [teaserbreak]
 <p>'.TD_('It is also possible to selectively display only a couple of these fields:').'</p>
 <p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
-<p>'.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
-<p>'.sprintf( TD_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+<p>'.sprintf( TD_('We can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( TD_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
+<p>'.TD_('Finally, you could also use re-usable content blocks, for example:').' [cblock:eur-usd-switcher]</p>
+
+[cblock:fields-example]',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123.45' ),
 			array( 'second_numeric_field', '456' ),
@@ -2628,6 +2656,10 @@ This is an extra line.' ),
 		'files' => array(
 			array( 'monument-valley/monument-valley-road.jpg', 'attachment', 'custom_field' => 'image_1' ),
 		),
+		'settings' => array(
+				'switchable'  => 1,
+				'switchable_params' => 'cur=eur',
+			),
 	);
 
 	$demo_items['child_post_example'] = array(
