@@ -124,7 +124,7 @@ function init_MainList( $items_nb_limit )
 		}
 	}
 
-	param( 'more', 'integer', 0, true );
+	param( 'more', 'integer', 0, ! param_ismemorized( 'more' )/* Don't override default memorized value */ );
 	param( 'page', 'integer', 1, true ); // Post page to show
 }
 

@@ -361,7 +361,7 @@ if( $resolve_extra_path )
 
 				// Set a lot of defaults as if we had received a complex URL:
 				$m = '';
-				$more = 1; // Display the extended entries' text
+				param( 'more', 'integer', 1, true ); // Display the extended entries' text
 
 				if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 				{ // The last param is of the form p000
@@ -694,7 +694,7 @@ if( $stats || $disp == 'stats' )
 }
 elseif( !empty($preview) )
 {	// Preview
-	$disp = 'single';
+	change_param( 'disp', 'single' );
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
@@ -722,15 +722,15 @@ elseif( $disp == '-' && !empty($Item) )
 	}
 	elseif( $Item->get_type_setting( 'usage' ) == 'page' )
 	{
-		$disp = 'page';
+		change_param( 'disp', 'page' );
 	}
 	elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
 	{
-		$disp = 'widget_page';
+		change_param( 'disp', 'widget_page' );
 	}
 	else
 	{
-		$disp = 'single';
+		change_param( 'disp', 'single' );
 	}
 }
 elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'front_disp' ) ) )
@@ -799,7 +799,7 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 		}
 		elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
 		{	// Switch to proper disp for Widget-Page Item in order to set correct filters on init $MainList:
-			$disp = 'widget_page';
+			change_param( 'disp', 'widget_page' );
 		}
 	}
 }
