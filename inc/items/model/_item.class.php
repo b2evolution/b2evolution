@@ -4336,11 +4336,22 @@ class Item extends ItemLight
 		          ( ! ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) || $content_Item->get_blog_ID() != $info_Blog->ID )
 			      )
 			{	// We can display a content block item with at least one condition:
-				//  - Content block Item has same owner as owner of parent Item,
-				//  - Content block Item has same owner as owner of parent Item's collection,
-				//  - Content block Item is in same collection as parent Item,
-				//  - Content block Item from collection for shared content blocks:
-				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ) ), $content );
+				//  1. Content block Item has same owner as owner of parent Item,
+				//  2. Content block Item has same owner as owner of parent Item's collection,
+				//  3. Content block Item is in same collection as parent Item,
+				//  4. Content block Item from collection for shared content blocks:
+				$content_Blog = & $content_Item->get_Blog();
+				$content = str_replace( $source_tag, get_rendering_error( sprintf(
+					T_('Content block #%d %s (Coll #%d) (Owner: %s) cannot be included here. It must be in the same collection as including Item (Coll #%d) or the info pages collection (Coll #%d)').'; '.
+					T_('in any other case, it must have the same owner as the including Item (Item #%d) (Owner: %s) or the same owner as the including Item\'s collection (Owner: %s).'),
+						$content_Item->ID, '<code>'.$content_Item->get( 'urltitle' ).'</code>', // Content block #%d %s
+						$content_Item->get_blog_ID(), // (Coll #%d)
+						get_user_identity_link( NULL, $content_Item->get( 'creator_user_ID' ) ), // (Owner: %s)
+						$this->get_blog_ID(), // as including Item (Coll #%d)
+						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
+						$this->ID, get_user_identity_link( NULL, $this->get( 'creator_user_ID' ) ), // the including Item (Item #%d) (Owner: %s)
+						$item_Blog ? get_user_identity_link( NULL, $item_Blog->get( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the including Item\'s collection (Owner: %s)
+					) ), $content );
 				continue;
 			}
 
