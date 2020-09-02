@@ -3833,7 +3833,7 @@ class Item extends ItemLight
 			switch( $widget_name )
 			{
 				case 'switcher':
-					// Widget "Param Switcher":s
+					// Widget "Param Switcher":
 					if( ! isset( $tag_params[0] ) || $tag_params[0] === '' )
 					{	// Skip wrong configured tag:
 						$widget_html = get_rendering_error( T_('Param code must be defined for switcher tag!'), 'span' );
@@ -3864,9 +3864,17 @@ class Item extends ItemLight
 						'buttons'    => $widget_buttons,
 					);
 
-					if( isset( $tag_params[1] ) && in_array( $tag_params[1], array( 'auto', 'list', 'buttons' ) ) )
+					$tag_param_index = 1;
+
+					if( isset( $tag_params[ $tag_param_index ] ) && in_array( $tag_params[ $tag_param_index ], array( 'auto', 'list', 'buttons' ) ) )
 					{	// Set a display mode:
-						$widget_params['display_mode'] = $tag_params[1];
+						$widget_params['display_mode'] = $tag_params[ $tag_param_index ];
+						$tag_param_index++;
+					}
+
+					if( isset( $tag_params[ $tag_param_index ] ) && substr( $tag_params[ $tag_param_index ], 0, 1 ) == '.' )
+					{	// Set a widget block class:
+						$widget_params['widget_css_class'] = substr( $tag_params[ $tag_param_index ], 1 );
 					}
 					break;
 			}
