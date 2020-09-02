@@ -1339,8 +1339,18 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_display_condition_attr( $condition, $items = array() )
 	{
+		global $Item;
+
 		if( $condition == '' )
 		{	// No display condition:
+			return '';
+		}
+
+		if( ! isset( $Item ) ||
+		    ! ( $Item instanceof Item ) ||
+		    ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item->get_setting( 'switchable' ) )
+		{	// Don't apply switchable conditions if current Item has no enabled switchable params:
 			return '';
 		}
 
