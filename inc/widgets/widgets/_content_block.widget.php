@@ -338,7 +338,7 @@ class content_block_Widget extends ComponentWidget
 						$widget_Blog->ID, // as this Widget (Coll #%d)
 						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
 						$Item->ID, get_user_identity_link( NULL, $Item->get( 'creator_user_ID' ) ), // the current Item (Item #%d) (Owner: %s)
-						$Item->get_Blog() ? get_user_identity_link( NULL, $Item->get_coll_setting( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the current Item\'s collection (Owner: %s)
+						$Item->get_Blog() ? get_user_identity_link( NULL, $Item->get_Blog()->get( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the current Item\'s collection (Owner: %s)
 					) );
 			}
 			else
