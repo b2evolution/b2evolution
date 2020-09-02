@@ -2575,7 +2575,7 @@ hearty crack of pepper') ),
 		'category' => 'background',
 		'type'     => 'Post with Custom Fields',
 		'content'  => '<p>'.TD_('This post has a special post type called "Post with Custom Fields".').'</p>
-<p>'.TD_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+<p>'.TD_('This post type defines several custom fields. Here are the sample values that have been entered in these fields:').'</p>
 <p>[fields]</p>
 [teaserbreak]
 <p>'.TD_('It is also possible to selectively display only a couple of these fields:').'</p>
