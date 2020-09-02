@@ -247,6 +247,10 @@ class WidgetContainer extends DataObject
 							{	// Display error for unavailable item:
 								param_error( 'wico_item_ID', T_('Item can be used for page container only with Item Type usage "Widget Page"!') );
 							}
+							if( $widget_page_Item->get_blog_ID() != $wico_coll_ID )
+							{	// Display error for Item from another Collection:
+								param_error( 'wico_item_ID', T_('Item cannot be used from another collection!') );
+							}
 						}
 						break;
 				}
