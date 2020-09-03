@@ -536,7 +536,8 @@ function param( $var, $type, $default = '', $memorize = false,
 	 * STEP 3: memorize the value for later url regeneration
 	 */
 	if( $memorize === true ||
-	    ( $memorize === 'auto' && ( isset( $_POST[$var] ) || isset( $_GET[$var] ) || isset( $_COOKIE[$var] ) ) ) )
+	    ( $memorize === 'auto' && ( isset( $_POST[$var] ) || isset( $_GET[$var] ) || isset( $_COOKIE[$var] ) ) ) ||
+	    ( $memorize === 'ifnotyet' && ! param_ismemorized( $var ) ) )
 	{	// Memorize this parameter:
 		memorize_param( $var, $type, $default );
 	}
