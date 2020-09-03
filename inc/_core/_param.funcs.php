@@ -2007,6 +2007,26 @@ function set_param( $var, $value )
 }
 
 
+/**
+ * Force param to new value AND
+ * Change default value if it is memorized in order to don't built this param in URL by regenerate_url()
+ *
+ * @param string Param name
+ * @param mixed New forced param value
+ */
+function force_param( $var, $value )
+{
+	if( param_ismemorized( $var ) )
+	{	// Update current and default values if param is memorized:
+		global $global_param_list;
+		memorize_param( $var, $global_param_list[$var]['type'], $value, $value );
+	}
+	else
+	{	// Update only current value if param is not memorized
+		set_param( $var, $value );
+	}
+}
+
 
 /**
  * Get the value of a param.
