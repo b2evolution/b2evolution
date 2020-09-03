@@ -361,7 +361,7 @@ if( $resolve_extra_path )
 
 				// Set a lot of defaults as if we had received a complex URL:
 				$m = '';
-				$more = 1; // Display the extended entries' text
+				memorize_param( 'more', 'integer', 1, 1 ); // Display the extended entries' text
 
 				if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 				{ // The last param is of the form p000
