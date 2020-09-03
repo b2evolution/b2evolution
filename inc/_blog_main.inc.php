@@ -694,7 +694,7 @@ if( $stats || $disp == 'stats' )
 }
 elseif( !empty($preview) )
 {	// Preview
-	$disp = 'single';
+	memorize_param( 'disp', 'string', 'single', 'single' );
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
@@ -722,15 +722,15 @@ elseif( $disp == '-' && !empty($Item) )
 	}
 	elseif( $Item->get_type_setting( 'usage' ) == 'page' )
 	{
-		$disp = 'page';
+		memorize_param( 'disp', 'string', 'page', 'page' );
 	}
 	elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
 	{
-		$disp = 'widget_page';
+		memorize_param( 'disp', 'string', 'widget_page', 'widget_page' );
 	}
 	else
 	{
-		$disp = 'single';
+		memorize_param( 'disp', 'string', 'single', 'single' );
 	}
 }
 elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'front_disp' ) ) )
@@ -799,7 +799,7 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 		}
 		elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
 		{	// Switch to proper disp for Widget-Page Item in order to set correct filters on init $MainList:
-			$disp = 'widget_page';
+			memorize_param( 'disp', 'string', 'widget_page', 'widget_page' );
 		}
 	}
 }
