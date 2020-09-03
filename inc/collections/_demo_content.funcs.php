@@ -2446,7 +2446,11 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 
 	if( ! isset( $installed_collection_info_pages ) )
 	{	// Array for item IDs which should be used in default shared widget containers "Main Navigation" and "Navigation Hamburger":
-		$installed_collection_info_pages = array();
+		$installed_collection_info_pages = array( $blog_ID => array() );
+	}
+	if( ! isset( $installed_collection_info_pages[ $blog_ID ] ) )
+	{	// Initialize array per Collection:
+		$installed_collection_info_pages[ $blog_ID ] = array();
 	}
 
 	$timestamp = time();
@@ -2567,6 +2571,19 @@ hearty crack of pepper') ),
 		'files' => array(
 			array( 'recipes/stuffed-peppers.jpg', 'teaser' ),
 		),
+	);
+
+	$demo_items['compare_demo'] = array(
+		'title'    => TD_('Compare Demo'),
+		'featured' => true,
+		'tags'     => 'demo',
+		'category' => 'recipes',
+		'type'     => 'Widget Page',
+		'settings' => array(
+				'switchable'  => 1,
+				'switchable_params' => 'details=std',
+			),
+		'widget_info_page' => 'compare_demo',
 	);
 
 	$demo_items['custom_fields_example'] = array(
@@ -3069,10 +3086,10 @@ Hello
 				'contributors' => TD_('Contributors'),
 			);
 
-			// Don't install generic items(except of two recipes) for this collection type:
+			// Don't install generic items(except of two recipes and one compare item) for this collection type:
 			foreach( $demo_items as $demo_item_key => $demo_item_data )
 			{
-				if( $demo_item_key != 'mongolian_beef' && $demo_item_key != 'stuffed_peppers' )
+				if( ! in_array( $demo_item_key, array( 'mongolian_beef', 'stuffed_peppers', 'compare_demo' ) ) )
 				{
 					unset( $demo_items[ $demo_item_key ] );
 				}
@@ -3538,6 +3555,7 @@ a school bus stop where you wouldn\'t really expect it!
 
 			// Don't install the following demo Items:
 			$exclude_demo_items = array(
+					'compare_demo',
 					'mongolian_beef',
 					'stuffed_peppers',
 					'custom_fields_example',
@@ -3706,6 +3724,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Don't install the following demo Items:
 			$exclude_demo_items = array(
+					'compare_demo',
 					'mongolian_beef',
 					'stuffed_peppers',
 					'custom_fields_example',
@@ -3923,7 +3942,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! empty( $demo_item['widget_info_page'] ) )
 			{	// Update global variable which may be used on install default widgets:
-				$installed_collection_info_pages[ $demo_item['widget_info_page'] ] = $new_Item->ID;
+				$installed_collection_info_pages[ $new_Item->get_blog_ID() ][ $demo_item['widget_info_page'] ] = $new_Item->ID;
 			}
 
 			switch( $item_type )

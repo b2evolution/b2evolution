@@ -11074,7 +11074,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			// Get only pages which are allowed to be displayed on front-office:
 			$SQL->WHERE_and( 'post_status IN ( '.$DB->quote( get_inskin_statuses( $info_Blog->ID, 'post' ) ).' )' );
 			// Set pages from info/shared collection in order to create menu items in shared widget containers "Main Navigation" and "Navigation Hamburger":
-			$installed_collection_info_pages = $DB->get_col( $SQL );
+			$installed_collection_info_pages = array( $info_Blog->ID => $DB->get_col( $SQL ) );
 		}
 
 		// Install new shared widgets/containers:

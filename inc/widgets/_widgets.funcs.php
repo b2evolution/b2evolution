@@ -61,6 +61,15 @@ function get_default_widgets( $coll_type = '', $context = array() )
 			'install_test_features' => false,
 		), $context );
 
+	if( isset( $installed_collection_info_pages[ $context['current_coll_ID'] ] ) )
+	{	// Use only pages of current Collection:
+		$installed_current_collection_info_pages = $installed_collection_info_pages[ $context['current_coll_ID'] ];
+	}
+	elseif( $context['current_coll_ID'] === NULL && isset( $installed_collection_info_pages[1] ) )
+	{	// For shared containers we should use pages from first installed Collection:
+		$installed_current_collection_info_pages = $installed_collection_info_pages[1];
+	}
+
 	$default_widgets = array();
 
 	/* Header */
@@ -675,9 +684,9 @@ function get_default_widgets( $coll_type = '', $context = array() )
 			) ),
 	);
 	$tmp_widget_order = 20;
-	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
+	if( ! empty( $installed_current_collection_info_pages ) && is_array( $installed_current_collection_info_pages ) )
 	{	// Install additional menu items for each page from info/shared collection:
-		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
+		foreach( $installed_current_collection_info_pages as $installed_collection_info_page_item_ID )
 		{
 			$default_widgets['navigation_hamburger'][] = array( $tmp_widget_order++, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
@@ -719,9 +728,9 @@ function get_default_widgets( $coll_type = '', $context = array() )
 			) )
 	);
 	$tmp_widget_order = 20;
-	if( ! empty( $installed_collection_info_pages ) && is_array( $installed_collection_info_pages ) )
+	if( ! empty( $installed_current_collection_info_pages ) && is_array( $installed_current_collection_info_pages ) )
 	{	// Install additional menu items for each page from info/shared collection:
-		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
+		foreach( $installed_current_collection_info_pages as $installed_collection_info_page_item_ID )
 		{
 			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
@@ -776,7 +785,35 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	// **** PAGE CONTAINERS ***** //
 
-	if( isset( $installed_collection_info_pages['widget_page'] ) )
+	if( isset( $installed_current_collection_info_pages['compare_demo'] ) )
+	{	// Install page containers only with defined item ID:
+
+		// Get Item Type to compare only Recipes:
+		$ItemTypeCache = & get_ItemTypeCache();
+		$recipe_ItemType = & $ItemTypeCache->get_by_name( 'Recipe', false, false );
+
+		/* Comapare Widget Page Section */
+		$default_widgets['compare_widget_page_section'] = array(
+			'coll_type' => '-main,forum,group',
+			'type'    => 'page',
+			'name'    => NT_('Compare Widget Page Section'),
+			'order'   => 10,
+			'item_ID' => $installed_current_collection_info_pages['compare_demo'],
+			array( 10, 18010, 'param_switcher', 'params' => array(
+					'param_code' => 'details',
+					'buttons' => array(
+						array( 'value' => 'min',  'text' => TD_('Minimal') ),
+						array( 'value' => 'std',  'text' => TD_('Standard') ),
+						array( 'value' => 'full', 'text' => TD_('Full Details') ),
+					),
+				) ),
+			array( 20, 18010, 'item_fields_compare', 'params' => array(
+					'items_type' => $recipe_ItemType ? $recipe_ItemType->ID : 'default',
+				) ),
+		);
+	}
+
+	if( isset( $installed_current_collection_info_pages['widget_page'] ) )
 	{	// Install page containers only with defined item ID:
 
 	/* Widget Page Section 1 */
@@ -785,7 +822,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
-		'item_ID' => $installed_collection_info_pages['widget_page'],
+		'item_ID' => $installed_current_collection_info_pages['widget_page'],
 		array(  5, 15000, 'free_text', 'params' => array(
 				'title'   => T_('This is a sample widget page'),
 				'content' => T_('A widget page is a page that is constructed entirely with widgets, rather than being constructed around a classic structure of title, content and comments.'),
@@ -801,7 +838,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 2'),
 		'order'   => 20,
-		'item_ID' => $installed_collection_info_pages['widget_page'],
+		'item_ID' => $installed_current_collection_info_pages['widget_page'],
 		array( 10, 15000, 'org_members' ),
 	);
 
@@ -811,7 +848,7 @@ function get_default_widgets( $coll_type = '', $context = array() )
 		'type'    => 'page',
 		'name'    => NT_('Widget Page Section 3'),
 		'order'   => 30,
-		'item_ID' => $installed_collection_info_pages['widget_page'],
+		'item_ID' => $installed_current_collection_info_pages['widget_page'],
 	);
 
 	}
