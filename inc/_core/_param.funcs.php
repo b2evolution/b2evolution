@@ -2007,25 +2007,6 @@ function set_param( $var, $value )
 }
 
 
-/**
- * Change param to new value and update default value if it is memorized
- *
- * @param string Param name
- * @param mixed New param Value
- */
-function change_param( $var, $value )
-{
-	if( param_ismemorized( $var ) )
-	{	// Update current and default values if param is memorized:
-		global $global_param_list;
-		memorize_param( $var, $global_param_list[$var]['type'], $value, $value );
-	}
-	else
-	{	// Update only current value if param is not memorized
-		set_param( $var, $value );
-	}
-}
-
 
 /**
  * Get the value of a param.
