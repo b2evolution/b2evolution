@@ -124,7 +124,11 @@ function init_MainList( $items_nb_limit )
 		}
 	}
 
-	param( 'more', 'integer', 0, true );
+	if( get_param( 'more' ) === NULL )
+	{	// Initialize it once, because it may be done before this code,
+		// e.g. in the file _blog_main.inc.php for disp=single as `$more = 1`:
+		set_param( 'more', 0 );
+	}
 	param( 'page', 'integer', 1, true ); // Post page to show
 }
 
