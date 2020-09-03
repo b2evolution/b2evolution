@@ -203,10 +203,25 @@ switch( $action )
 			param_error( 'create_demo_contents', TB_('Please select an option for "New contents"') );
 		}
 
+		if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
+		{	// Allow to create demo organization and users only for collection admins:
+			param( 'create_demo_org', 'boolean', false );
+			param( 'create_demo_users', 'boolean', false );
+		}
+		else
+		{	// Deny to create demo organization and users for not collection admins:
+			set_param( 'create_demo_org', false );
+			set_param( 'create_demo_users', false );
+		}
+
 		if( $edited_Blog->load_from_Request() )
 		{
 			// create the new blog
-			$edited_Blog->create( $kind );
+			$edited_Blog->create( $kind, array(
+					'create_demo_contents' => $create_demo_contents,
+					'create_demo_users'    => $create_demo_users,
+					'create_demo_org'      => $create_demo_org,
+				) );
 
 			global $Settings;
 
@@ -227,52 +242,6 @@ switch( $action )
 				$Settings->set( 'msg_blog_ID', $edited_Blog->ID );
 			}
 			$Settings->dbupdate();
-
-			// Create demo contents for the new collection:
-			if( $create_demo_contents )
-			{
-				global $user_org_IDs;
-
-				load_funcs( 'collections/_demo_content.funcs.php' );
-				if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
-				{ // Only collection admins can create demo organization and users
-					param( 'create_demo_org', 'boolean', false );
-					param( 'create_demo_users', 'boolean', false );
-				}
-				else
-				{
-					set_param( 'create_demo_org', false );
-					set_param( 'create_demo_users', false );
-				}
-				$user_org_IDs = NULL;
-
-				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', false ) )
-				{ // Create the demo organization
-					if( $new_demo_organization = create_demo_organization( $edited_Blog->owner_user_ID ) )
-					{
-						$user_org_IDs = array( $new_demo_organization->ID );
-					}
-				}
-
-				// Switch locale to translate content
-				locale_temp_switch( param( 'blog_locale', 'string' ) );
-
-				$error_messages = array();
-				if( $create_demo_users )
-				{
-					get_demo_users( true, false, $error_messages );
-				}
-
-				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, true, 86400, $error_messages );
-				if( $error_messages )
-				{
-					foreach( $error_messages as $error_message )
-					{
-						$Messages->add_to_group( $error_message, 'error', TB_('Demo contents').':' );
-					}
-				}
-				locale_restore_previous();
-			}
 
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );

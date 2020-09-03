@@ -3804,10 +3804,18 @@ class Blog extends DataObject
 	 * Create a new blog...
 	 *
 	 * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
+	 * @param array Params
 	 */
-	function create( $kind = '' )
+	function create( $kind = '', $params = array() )
 	{
 		global $DB, $Messages, $basepath, $admin_url, $current_User, $Settings;
+
+		$params = array_merge( array(
+				'create_demo_contents' => false,
+				'create_demo_users'    => false,
+				'create_demo_org'      => false,
+			), $params );
+
 		$DB->begin();
 
 		// DB INSERT
@@ -3861,6 +3869,43 @@ class Blog extends DataObject
 		$edited_Chapter->dbinsert();
 
 		$Messages->add_to_group( T_('A default category has been created for this collection.'), 'success', T_('New collection created:') );
+
+		// Create demo contents for the new created collection:
+		// NOTE: This must be done before install default widgets!
+		if( $params['create_demo_contents'] )
+		{
+			global $user_org_IDs;
+
+			load_funcs( 'collections/_demo_content.funcs.php' );
+			$user_org_IDs = NULL;
+
+			if( $params['create_demo_org'] && is_logged_in() && $current_User->check_perm( 'orgs', 'create', false ) )
+			{ // Create the demo organization
+				if( $new_demo_organization = create_demo_organization( $this->get( 'owner_user_ID' ) ) )
+				{
+					$user_org_IDs = array( $new_demo_organization->ID );
+				}
+			}
+
+			// Switch to collection locale:
+			locale_temp_switch( $this->get( 'locale' ) );
+
+			$error_messages = array();
+			if( $params['create_demo_users'] )
+			{
+				get_demo_users( true, false, $error_messages );
+			}
+
+			create_sample_content( $kind, $this->ID, $this->get( 'owner_user_ID' ), true, 86400, $error_messages );
+			if( $error_messages )
+			{
+				foreach( $error_messages as $error_message )
+				{
+					$Messages->add_to_group( $error_message, 'error', TB_('Demo contents').':' );
+				}
+			}
+			locale_restore_previous();
+		}
 
 		// ADD DEFAULT WIDGETS:
 		load_funcs( 'widgets/_widgets.funcs.php' );
