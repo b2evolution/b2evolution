@@ -737,7 +737,7 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 {	// No specific request of any kind OR
 	$requested_disp = $disp;
 	// We consider this is home front page:
-	$disp = $Blog->get_setting( 'front_disp' );
+	memorize_param( 'disp', 'string', $Blog->get_setting( 'front_disp' ), $Blog->get_setting( 'front_disp' ) );
 	// Note: the above is where we MIGHT in fact set $disp = 'front';
 
 	$is_front = true; // we have detected that we are displaying the front page
@@ -775,7 +775,7 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 	{	// We must find first item from disp=posts and display it on front page:
 		if( $Item = & $Blog->get_first_mainlist_Item() )
 		{	// The item is found, Use it:
-			set_param( 'p', $Item->ID );
+			memorize_param( 'p', 'integer', $Item->ID, $Item->ID );
 			$c = 1; // Display comments
 		}
 
@@ -787,7 +787,7 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 
 	if( $disp == 'page' )
 	{ // Specific page is displayed on front page
-		set_param( 'p', $Blog->get_setting('front_post_ID') );
+		memorize_param( 'p', 'integer', $Blog->get_setting( 'front_post_ID' ), $Blog->get_setting( 'front_post_ID' ) );
 		$c = 1; // Display comments
 
 		$ItemCache = & get_ItemCache();
@@ -893,7 +893,7 @@ if( $disp == 'terms' )
 	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
 	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
 	{	// Only if item ID is defined for terms page:
-		set_param( 'p', $terms_item_ID );
+		memorize_param( 'p', 'integer' , $terms_item_ID, $terms_item_ID );
 		$c = 0; // Don't display comments
 
 		$ItemCache = & get_ItemCache();
