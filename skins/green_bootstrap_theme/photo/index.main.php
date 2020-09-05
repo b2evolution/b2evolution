@@ -136,6 +136,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			'title_none'        => '',
 			'glue'              => ' - ',
 			'title_single_disp' => false,
+			'title_widget_page_disp'  => false,
 			'format'            => 'htmlbody',
 			'arcdir_text'       => T_('Index'),
 			'catdir_text'       => '',

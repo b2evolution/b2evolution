@@ -168,6 +168,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_after'       => '</h2>',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'category_text'     => '',
 					'categories_text'   => '',
