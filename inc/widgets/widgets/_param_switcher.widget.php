@@ -87,8 +87,11 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	{
 		$r = array_merge( array(
 				'param_code' => array(
+					'type' => 'text',
 					'label' => T_('Param code'),
 					'size' => 60,
+					'allow_empty' => false,
+					'defaultvalue' => 'tab',
 				),
 				'buttons' => array(
 					'type' => 'array',

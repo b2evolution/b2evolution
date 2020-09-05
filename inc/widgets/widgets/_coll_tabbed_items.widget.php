@@ -341,6 +341,12 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 
 		$this->init_display( $params );
 
+		if( $this->get_param( 'param_code' ) == '' )
+		{	// Display error when param code is not defined:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because you did not set a param code for tab swicthing.' );
+			return false;
+		}
+
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 
 		$listBlog = ( $blog_ID ? $BlogCache->get_by_ID( $blog_ID, false ) : $Blog );
@@ -349,6 +355,23 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		{	// Display error when wrong collection is requested by this widget:
 			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the requested Collection #'.$this->disp_params['blog_ID'].' doesn\'t exist any more.' );
 			return false;
+		}
+
+		if( isset( $Item ) && $Item instanceof Item )
+		{	// Additional checks if this is an Item page:
+			if( ! $Item->get_type_setting( 'allow_switchable' ) ||
+			    ! $Item->get_setting( 'switchable' ) )
+			{	// Don't allow this widget if it is not allowed by Item Type and disabled for current Item:
+				$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because the enclosing page  does not support switchable content.' );
+				return false;
+			}
+
+			$item_switchable_params = $Item->get_switchable_params();
+			if( ! isset( $item_switchable_params[ $this->get_param( 'param_code' ) ] ) )
+			{	// Don't allow this widget if it is not allowed by Item Type and disabled for current Item:
+				$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because it wants to use  param <code>'.$this->get_param( 'param_code' ).'</code> but the enclosing page does not allow this param for switchable content.' );
+				return false;
+			}
 		}
 
 		// Create ItemList
