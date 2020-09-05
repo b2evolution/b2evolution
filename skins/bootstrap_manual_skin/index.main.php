@@ -139,6 +139,7 @@ siteskin_include( '_site_body_header.inc.php', array(
 					'title_after'       => '</h1>',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'category_text'     => '',
 					'categories_text'   => '',

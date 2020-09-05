@@ -177,6 +177,7 @@ if( $Skin->get_checklist_setting( 'display_sections', 'header' ) )
 					'title_after'       => '</h2>',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'category_text'     => '',
 					'categories_text'   => '',

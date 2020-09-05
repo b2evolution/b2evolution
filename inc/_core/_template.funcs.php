@@ -502,6 +502,9 @@ function get_request_title( $params = array() )
 			'title_page_disp'     => true,
 			'title_page_before'   => '#',
 			'title_page_after'    => '#',
+			'title_widget_page_disp'   => true,
+			'title_widget_page_before' => '#',
+			'title_widget_page_after'  => '#',
 			'title_terms_disp'    => true,
 			'title_terms_before'  => '#',
 			'title_terms_after'   => '#',
@@ -740,6 +743,7 @@ function get_request_title( $params = array() )
 
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 			// We are displaying a single message:
 			if( $preview )

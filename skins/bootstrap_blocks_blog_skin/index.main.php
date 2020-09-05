@@ -148,6 +148,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'glue'              => ' - ',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'register_text'     => '',
 					'login_text'        => '',
