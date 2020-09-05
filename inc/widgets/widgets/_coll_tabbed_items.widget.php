@@ -362,7 +362,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 			if( ! $Item->get_type_setting( 'allow_switchable' ) ||
 			    ! $Item->get_setting( 'switchable' ) )
 			{	// Don't allow this widget if it is not allowed by Item Type and disabled for current Item:
-				$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because the enclosing page  does not support switchable content.' );
+				$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because the enclosing page  does not allow switchable content.' );
 				return false;
 			}
 
