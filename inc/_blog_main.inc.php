@@ -742,14 +742,76 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 
 	$is_front = true; // we have detected that we are displaying the front page
 
-	// Do we need to handle the canoncial url?
+	if( $disp == 'single' )
+	{	// We must find first item from disp=posts and display it on front page:
+		if( $Item = & $Blog->get_first_mainlist_Item() )
+		{	// The item is found, Use it:
+			memorize_param( 'p', 'integer', $Item->ID, $Item->ID );
+			$c = 1; // Display comments
+		}
+
+		if( empty( $Item ) )
+		{	// If item is not found, display 404 page with below error message:
+			$Messages->add( sprintf( T_('Front page is set to display first post but there is nothing to display.'), $p ), 'error' );
+		}
+	}
+	elseif( $disp == 'page' )
+	{ // Specific page is displayed on front page
+		memorize_param( 'p', 'integer', $Blog->get_setting( 'front_post_ID' ), $Blog->get_setting( 'front_post_ID' ) );
+		$c = 1; // Display comments
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
+
+		if( empty( $Item ) || ! in_array( $Item->get_type_setting( 'usage' ), array ( 'page', 'widget-page' ) ) )
+		{	// Display error when page or widget-page Item is not found:
+			$Messages->add( sprintf( T_('Front page is set to display page ID=%d but it does not exist.'), $p ), 'error' );
+		}
+		elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
+		{	// Switch to proper disp for Widget-Page Item in order to set correct filters on init $MainList:
+			memorize_param( 'disp', 'string', 'widget_page', 'widget_page' );
+		}
+	}
+}
+
+if( $disp == 'terms' )
+{	// Display a page of terms & conditions:
+	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
+	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
+	{	// Only if item ID is defined for terms page:
+		memorize_param( 'p', 'integer' , $terms_item_ID, $terms_item_ID );
+		$c = 0; // Don't display comments
+
+		$ItemCache = & get_ItemCache();
+		$Item = & $ItemCache->get_by_ID( $p, false );
+
+		if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
+		{	// Display the message if current user already accepted the terms:
+			$Messages->add( T_('You already accepted these terms.'), 'success' );
+		}
+
+		// Don't redirect to permanent url of the page:
+		$redir = 'no';
+	}
+}
+
+if( ! empty( $is_front ) )
+{	// Do we need to handle the canoncial url for front page?
 	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 	    || $Blog->get_setting( 'relcanonical_homepage' )
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		// Keep ONLY allowed params from current URL in the canonical URL by configs:
-		$canonical_url = url_keep_canonicals_params( $canonical_url );
+		if( ! empty( $Item ) )
+		{	// Also keep front Item's switchable params in the collection canonical URL:
+			$keep_additional_front_canonicals_params = array_keys( $Item->get_switchable_params() );
+		}
+		else
+		{	// No additional canonicals params for current front page:
+			$keep_additional_front_canonicals_params = array();
+		}
+		// Keep ONLY allowed params from current URL in the canonical URL by configs AND additional params if they are allowed depending on front disp:
+		$canonical_url = url_keep_canonicals_params( $canonical_url, '&', $keep_additional_front_canonicals_params );
 		// Consider URL with possible params like disp=front or coll_locale=en-US as front canonical URL of the current Collection:
 		$current_url = preg_replace( '#[\?&]((coll_locale=[^&]+|disp='.preg_quote( $disp ).')(&|$))+#', '', $ReqURL );
 		if( ! is_same_url( $current_url, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
@@ -768,38 +830,6 @@ elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'fron
 		elseif( $Blog->get_setting( 'self_canonical_homepage' ) )
 		{	// Use self-referencing rel="canonical" tag:
 			add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
-		}
-	}
-
-	if( $disp == 'single' )
-	{	// We must find first item from disp=posts and display it on front page:
-		if( $Item = & $Blog->get_first_mainlist_Item() )
-		{	// The item is found, Use it:
-			memorize_param( 'p', 'integer', $Item->ID, $Item->ID );
-			$c = 1; // Display comments
-		}
-
-		if( empty( $Item ) )
-		{	// If item is not found, display 404 page with below error message:
-			$Messages->add( sprintf( T_('Front page is set to display first post but there is nothing to display.'), $p ), 'error' );
-		}
-	}
-
-	if( $disp == 'page' )
-	{ // Specific page is displayed on front page
-		memorize_param( 'p', 'integer', $Blog->get_setting( 'front_post_ID' ), $Blog->get_setting( 'front_post_ID' ) );
-		$c = 1; // Display comments
-
-		$ItemCache = & get_ItemCache();
-		$Item = & $ItemCache->get_by_ID( $p, false );
-
-		if( empty( $Item ) || ! in_array( $Item->get_type_setting( 'usage' ), array ( 'page', 'widget-page' ) ) )
-		{	// Display error when page or widget-page Item is not found:
-			$Messages->add( sprintf( T_('Front page is set to display page ID=%d but it does not exist.'), $p ), 'error' );
-		}
-		elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
-		{	// Switch to proper disp for Widget-Page Item in order to set correct filters on init $MainList:
-			memorize_param( 'disp', 'string', 'widget_page', 'widget_page' );
 		}
 	}
 }
@@ -886,27 +916,6 @@ if( ( $disp == 'user' ) && isset( $user_ID ) && isset( $current_User ) && ( $use
 elseif( ( $disp == 'visits' ) && isset( $user_ID ) && isset( $current_User ) && ( $user_ID == $current_User->ID ) && ( $Settings->get( 'enable_visit_tracking') == 1 ) )
 {
 	reset_user_profile_view_ts( $user_ID );
-}
-
-if( $disp == 'terms' )
-{	// Display a page of terms & conditions:
-	$terms_item_ID = intval( $Settings->get( 'site_terms' ) );
-	if( $Settings->get( 'site_terms_enabled' ) && $terms_item_ID  > 0 )
-	{	// Only if item ID is defined for terms page:
-		memorize_param( 'p', 'integer' , $terms_item_ID, $terms_item_ID );
-		$c = 0; // Don't display comments
-
-		$ItemCache = & get_ItemCache();
-		$Item = & $ItemCache->get_by_ID( $p, false );
-
-		if( is_logged_in() && $UserSettings->get( 'terms_accepted', $current_User->ID ) )
-		{	// Display the message if current user already accepted the terms:
-			$Messages->add( T_('You already accepted these terms.'), 'success' );
-		}
-
-		// Don't redirect to permanent url of the page:
-		$redir = 'no';
-	}
 }
 
 // Check if terms & conditions should be accepted by current user:
