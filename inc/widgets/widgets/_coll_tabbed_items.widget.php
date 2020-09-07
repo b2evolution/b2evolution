@@ -488,7 +488,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 				);
 		}
 		// Set active tab by default on page loading:
-		if( ! in_array( $disp, array( 'single', 'page', 'widget-page' ) ) && isset( $items_tabs[0] ) )
+		if( ! in_array( $disp, array( 'single', 'page', 'widget_page' ) ) && isset( $items_tabs[0] ) )
 		{	// Use first item tab by default for not single Item pages:
 			$default_tabs = array( $this->get_param( 'param_code' ) => $items_tabs[0]['value'] );
 		}
