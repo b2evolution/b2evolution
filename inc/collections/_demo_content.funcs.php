@@ -2573,17 +2573,17 @@ hearty crack of pepper') ),
 		),
 	);
 
-	$demo_items['compare_demo'] = array(
-		'title'    => TD_('Compare Demo'),
+	$demo_items['switchers_demo'] = array(
+		'title'    => TD_('Switchers Demo'),
 		'featured' => true,
 		'tags'     => 'demo',
 		'category' => 'recipes',
 		'type'     => 'Widget Page',
 		'settings' => array(
 				'switchable'  => 1,
-				'switchable_params' => 'details=std',
+				'switchable_params' => 'details=std,tab=stuffed-peppers',
 			),
-		'widget_info_page' => 'compare_demo',
+		'widget_info_page' => 'switchers_demo',
 	);
 
 	$demo_items['custom_fields_example'] = array(
@@ -3089,7 +3089,7 @@ Hello
 			// Don't install generic items(except of two recipes and one compare item) for this collection type:
 			foreach( $demo_items as $demo_item_key => $demo_item_data )
 			{
-				if( ! in_array( $demo_item_key, array( 'mongolian_beef', 'stuffed_peppers', 'compare_demo' ) ) )
+				if( ! in_array( $demo_item_key, array( 'mongolian_beef', 'stuffed_peppers', 'switchers_demo' ) ) )
 				{
 					unset( $demo_items[ $demo_item_key ] );
 				}
@@ -3555,7 +3555,7 @@ a school bus stop where you wouldn\'t really expect it!
 
 			// Don't install the following demo Items:
 			$exclude_demo_items = array(
-					'compare_demo',
+					'switchers_demo',
 					'mongolian_beef',
 					'stuffed_peppers',
 					'custom_fields_example',
@@ -3724,7 +3724,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Don't install the following demo Items:
 			$exclude_demo_items = array(
-					'compare_demo',
+					'switchers_demo',
 					'mongolian_beef',
 					'stuffed_peppers',
 					'custom_fields_example',

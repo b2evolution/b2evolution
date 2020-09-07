@@ -785,20 +785,20 @@ function get_default_widgets( $coll_type = '', $context = array() )
 
 	// **** PAGE CONTAINERS ***** //
 
-	if( isset( $installed_current_collection_info_pages['compare_demo'] ) )
+	if( isset( $installed_current_collection_info_pages['switchers_demo'] ) )
 	{	// Install page containers only with defined item ID:
 
 		// Get Item Type to compare only Recipes:
 		$ItemTypeCache = & get_ItemTypeCache();
 		$recipe_ItemType = & $ItemTypeCache->get_by_name( 'Recipe', false, false );
 
-		/* Comapare Widget Page Section */
-		$default_widgets['compare_widget_page_section'] = array(
+		/* Switchers Widget Page Section 1 */
+		$default_widgets['switchers_widget_page_section_1'] = array(
 			'coll_type' => '-main,forum,group',
 			'type'    => 'page',
-			'name'    => NT_('Compare Widget Page Section'),
+			'name'    => NT_('Switchers Widget Page Section 1'),
 			'order'   => 10,
-			'item_ID' => $installed_current_collection_info_pages['compare_demo'],
+			'item_ID' => $installed_current_collection_info_pages['switchers_demo'],
 			array( 10, 18010, 'param_switcher', 'params' => array(
 					'param_code' => 'details',
 					'buttons' => array(
@@ -809,6 +809,18 @@ function get_default_widgets( $coll_type = '', $context = array() )
 				) ),
 			array( 20, 18010, 'item_fields_compare', 'params' => array(
 					'items_type' => $recipe_ItemType ? $recipe_ItemType->ID : 'default',
+				) ),
+		);
+
+		/* Switchers Widget Page Section 2 */
+		$default_widgets['switchers_widget_page_section_2'] = array(
+			'coll_type' => '-main,forum,group',
+			'type'    => 'page',
+			'name'    => NT_('Switchers Widget Page Section 2'),
+			'order'   => 20,
+			'item_ID' => $installed_current_collection_info_pages['switchers_demo'],
+			array( 10, 18010, 'coll_tabbed_items', 'params' => array(
+					'item_type' => $recipe_ItemType ? $recipe_ItemType->ID : 'default',
 				) ),
 		);
 	}
