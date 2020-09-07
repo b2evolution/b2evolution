@@ -1716,7 +1716,7 @@ function create_default_templates( $is_task = true )
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
 			'context'  => 'item_details',
-			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
+			'template' => '[flag_icon] Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] [history_link|before=&bull; ] [propose_change_link|before=&bull; ]'
 		),
 		'item_details_author_details' => array(
 			'name'     => 'Item Details: Author Details',
