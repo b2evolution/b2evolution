@@ -1034,7 +1034,8 @@ class SiteMenuEntry extends DataObject
 					foreach( $sub_entries as $sub_SiteMenuEntry )
 					{
 						$sub_entry_url = $sub_SiteMenuEntry->get_url();
-						if( $current_blog_ID == $sub_SiteMenuEntry->get_Blog()->ID &&
+						if( $sub_SiteMenuEntry->get( 'coll_ID' ) !== NULL && // sub Menu Entry must be specified for Collection
+						    $current_blog_ID == $sub_SiteMenuEntry->get_Blog()->ID &&
 						    $sub_entry_url && strpos( $sub_entry_url, $entry_coll_url ) === 0 )
 						{	// If sub Menu Entry has an URL to Collection of this Menu Entry:
 							return true;
