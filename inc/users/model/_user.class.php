@@ -7921,25 +7921,40 @@ class User extends DataObject
 	/**
 	 * Get a count of flagged items by this user in current collection
 	 *
+	 * @param integer Collection ID, NULL to use current
 	 * @return integer
 	 */
-	function get_flagged_items_count()
+	function get_flagged_items_count( $coll_ID = NULL )
 	{
-		global $Collection, $Blog;
-
 		if( ! is_logged_in() )
 		{	// Only logged in users can have the flagged items:
 			return 0;
 		}
 
-		if( empty( $Blog ) )
+		if( $coll_ID === NULL )
+		{	// Use current Collection:
+			global $Collection, $Blog;
+			$flagged_Blog = $Blog;
+		}
+		else
+		{	// Use requested Collection:
+			$BlogCache = & get_BlogCache();
+			$flagged_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false );
+		}
+
+		if( empty( $flagged_Blog ) )
 		{	// Collection must be defined:
 			return 0;
 		}
 
 		if( ! isset( $this->flagged_items_count ) )
+		{	// Initialize array once:
+			$this->flagged_items_count = array();
+		}
+
+		if( ! isset( $this->flagged_items_count[ $coll_ID ] ) )
 		{	// Get it from DB only first time and then cache in var:
-			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'flagged' );
+			$flagged_ItemList2 = new ItemList2( $flagged_Blog, $flagged_Blog->get_timestamp_min(), $flagged_Blog->get_timestamp_max(), NULL, 'ItemCache', 'flagged' );
 
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
 			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
@@ -7952,10 +7967,10 @@ class User extends DataObject
 			// Run query initialization to get total rows:
 			$flagged_ItemList2->query_init();
 
-			$this->flagged_items_count = $flagged_ItemList2->total_rows;
+			$this->flagged_items_count[ $coll_ID ] = $flagged_ItemList2->total_rows;
 		}
 
-		return $this->flagged_items_count;
+		return $this->flagged_items_count[ $coll_ID ];
 	}
 
 
