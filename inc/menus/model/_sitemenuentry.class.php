@@ -570,7 +570,7 @@ class SiteMenuEntry extends DataObject
 
 				case 'flagged':
 					// Show badge with count of flagged items:
-					$flagged_items_count = $current_User->get_flagged_items_count();
+					$flagged_items_count = $current_User->get_flagged_items_count( $entry_Blog->ID );
 					if( $flagged_items_count > 0 )
 					{	// If at least one flagged item:
 						$text .= ' <span class="badge badge-warning">'.$flagged_items_count.'</span>';
