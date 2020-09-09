@@ -189,12 +189,14 @@ if( $action != 'view' )
 
 		if( $edited_User->has_avatar() || count( $user_avatars ) )
 		{ // If user uploaded at least one profile picture
-			$change_picture_title = TB_('Change').' &raquo;';
+			$change_picture_text = T_('Change').' &raquo;';
+			$change_picture_title = T_('Change profile picture').'...';
 			$change_picture_icon = 'edit';
 		}
 		else
 		{ // If user has no profile picture yet
-			$change_picture_title = TB_('Upload now').' &raquo;';
+			$change_picture_text = T_('Upload now').' &raquo;';
+			$change_picture_title = T_('Upload profile picture').'...';
 			$change_picture_icon = 'move_up_green';
 		}
 
@@ -202,23 +204,23 @@ if( $action != 'view' )
 		$user_pictures = '<div class="avatartag main image_rounded">'
 				.$edited_User->get_avatar_imgtag( 'crop-top-320x320', 'avatar', 'top', true, '', 'user', '160x160' )
 				.'<div class="avatar_actions">'
-					.action_icon( $change_picture_title, $change_picture_icon, get_user_settings_url( 'avatar', $edited_User->ID ), ' '.$change_picture_title, 3, 4 );
+					.action_icon( $change_picture_title, $change_picture_icon, get_user_settings_url( 'avatar', $edited_User->ID ), ' '.$change_picture_text, 3, 4 );
 		if( $edited_User->has_avatar() && ( $avatar_Link = & $edited_User->get_avatar_Link() ) )
 		{ // Display these actions only for existing avatar file
 			$user_pictures .= '<br />'
-					.action_icon( TB_('No longer use this as main profile picture'), 'move_down', $remove_picture_url, ' '.TB_('No longer use this as main profile picture'), 3, 4 ).'<br />'
+					.action_icon( T_('No longer use this as main profile picture'), 'move_down', $remove_picture_url, ' '.T_('No longer use this as main profile picture'), 3, 4 ).'<br />'
 					.$forbid_link
-					.action_icon( TB_('Delete this profile picture'), 'delete', $delete_picture_url, ' '.TB_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
+					.action_icon( T_('Delete this profile picture'), 'delete', $delete_picture_url, ' '.T_('Delete this profile picture'), 3, 4, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this picture?').'\');' ) ).'<br />'
 					.$edited_User->get_rotate_avatar_icons( $edited_User->avatar_file_ID, array(
 							'before'   => '',
 							'after'    => '<br />',
-							'text'     => ' '.TB_('Rotate'),
+							'text'     => ' '.T_('Rotate'),
 							'user_tab' => 'avatar',
 						) )
 					.$edited_User->get_crop_avatar_icon( $edited_User->avatar_file_ID, array(
 							'before'   => '',
 							'after'    => '',
-							'text'     => ' '.TB_('Crop'),
+							'text'     => ' '.T_('Crop'),
 							'user_tab' => 'avatar',
 							'onclick'  => 'return user_crop_avatar( '.$edited_User->ID.', '.$edited_User->avatar_file_ID.', \'avatar\' )'
 						) );

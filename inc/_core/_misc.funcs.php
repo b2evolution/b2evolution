@@ -5079,7 +5079,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		// OR we default to icon because the user doesn't want the word either!!
 
 		$icon_attribs = array_merge( array(
-				'title' => $title
+				'title' => false, // No need to set attribute "ttile" for icon because parent <a> already has it
 			), $icon_attribs );
 
 		if( $icon_s = get_icon( $icon, 'imgtag', $icon_attribs, true ) )
