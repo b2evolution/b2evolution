@@ -336,7 +336,7 @@ class RestApi
 
 			case 'PUT':
 				// List of valid resources
-				$valid_resources = array( 'favorite', 'items_flag' );
+				$valid_resources = array( 'favorite', 'items_flag', 'items_resolve' );
 				break;
 
 			default:
@@ -395,6 +395,14 @@ class RestApi
 		{	// Set controller name for single object and action:
 			$coll_controller = $coll_controller.'_'.$object_action;
 			$coll_controller_params[] = $object_ID;
+		}
+
+		if( count( $this->args ) > 5 )
+		{	// Append additional params:
+			for( $a = 5; $a < count( $this->args ); $a++ )
+			{
+				$coll_controller_params[] = $this->args[ $a ];
+			}
 		}
 
 		if( ! method_exists( $this, 'controller_coll_'.$coll_controller ) )

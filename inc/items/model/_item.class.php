@@ -349,6 +349,13 @@ class Item extends ItemLight
 	var $revisions;
 
 	/**
+	 * ID of Comment which is selected as the best answer by Item author
+	 *
+	 * @var integer
+	 */
+	var $resolve_cmt_ID = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -489,6 +496,9 @@ class Item extends ItemLight
 			// Voting fields:
 			$this->addvotes = $db_row->post_addvotes;
 			$this->countvotes = $db_row->post_countvotes;
+
+			// Comment ID which is selected as the best answer for this Item:
+			$this->resolved_cmt_ID = $db_row->post_resolved_cmt_ID;
 		}
 
 		modules_call_method( 'constructor_item', array( 'Item' => & $this ) );
@@ -14362,6 +14372,181 @@ class Item extends ItemLight
 		}
 
 		return $result;
+	}
+
+
+	/*
+	 * Check if current User can resolve this Item
+	 *
+	 * @param string Mode: 'edit', 'view'
+	 * @return boolean
+	 */
+	function can_resolve( $mode = 'edit' )
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not created yet:
+			return false;
+		}
+
+		if( $mode == 'edit' && ! is_logged_in( false ) )
+		{	// If user is NOT logged in OR NOT activated yet:
+			return false;
+		}
+
+		if( ! $this->get_type_setting( 'allow_resolving_comments' ) )
+		{	// This Item doesn't allow to ba a resolved:
+			return false;
+		}
+
+		if( $mode == 'edit' )
+		{	// For edit mode we should check if current User is author of this Item:
+			global $current_User;
+			$item_creator_User = & $this->get_creator_User();
+			if( ! $item_creator_User || $current_User->ID != $item_creator_User->ID )
+			{	// Current User must be an author of the comment's Item:
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Display status if this Item is resolved
+	 *
+	 * @param array Params
+	 */
+	function resolved_status( $params = array() )
+	{
+		echo $this->get_resolved_status( $params );
+	}
+
+
+	/**
+	 * Get status text if this Item is resolved
+	 *
+	 * @param array Params
+	 * @return string HTML of the status text
+	 */
+	function get_resolved_status( $params = array() )
+	{
+		if( ! $this->can_resolve( 'view' ) )
+		{	// Don't display the resolved status if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'comment_ID'         => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
+				'before'             => '',
+				'after'              => '',
+				'text'               => '#icon# '.T_('This thread is resolved.'),
+				'title'              => T_('This thread is resolved.'),
+				'display_for_author' => false,
+			), $params );
+
+		if( ! $params['display_for_author'] && is_logged_in() )
+		{	// This should not be displayed for author:
+			global $current_User;
+			$item_creator_User = & $this->get_creator_User();
+			if( $item_creator_User && $current_User->ID == $item_creator_User->ID )
+			{	// Current User is an author of this Item, Don't display:
+				return '';
+			}
+		}
+
+		$item_Blog = & $this->get_Blog();
+
+		if( $params['comment_ID'] !== $this->get( 'resolved_cmt_ID' ) &&
+		    ( $params['comment_ID'] !== 0 || $this->get( 'resolved_cmt_ID' ) === NULL ) )
+		{	// If Item is not resolved:
+			return '';
+		}
+
+		$r = $params['before'];
+
+		$r .= '<span class="evo_post_resolve_status"'.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ) ).'">'
+				.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text'] )
+			.'</span>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Display button to resolve this Item
+	 * (Select the best answer/comment OR Resolve this Item without selected Comment)
+	 *
+	 * @param array Params
+	 */
+	function mark_resolved_button( $params = array() )
+	{
+		echo $this->get_mark_resolved_button( $params );
+	}
+
+
+	/**
+	 * Get button to resolve this Item
+	 * (Select the best answer/comment OR Resolve this Item without selected Comment)
+	 *
+	 * @param array Params
+	 * @return string HTML of the button
+	 */
+	function get_mark_resolved_button( $params = array() )
+	{
+		if( ! $this->can_resolve() )
+		{	// Don't display the resolve button if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'comment_ID'          => 0, // 0 - when Item is resolved without selected Comment, > 0 - ID of the Comment which should be used to resolve/unresolve
+				'before'              => '',
+				'after'               => '',
+				'btn_class_resolve'   => 'btn btn-default',
+				'btn_class_unresolve' => 'btn btn-success',
+				'text_resolve'        => '#icon# '.T_('Mark this thread as resolved'),
+				'text_unresolve'      => '#icon# '.T_('You marked this thread as Resolved'),
+				'title_resolve'       => T_('Mark this thread as resolved').'.',
+				'title_unresolve'     => T_('You have resolved this thread. Click to unresolve.'),
+			), $params );
+
+		$item_Blog = & $this->get_Blog();
+
+		// Get current state of resolving:
+		$is_resolved = ( $params['comment_ID'] === $this->get( 'resolved_cmt_ID' ) ||
+		               ( $params['comment_ID'] === 0 && $this->get( 'resolved_cmt_ID' ) !== NULL ) );
+
+		$r = $params['before'];
+
+		$r .= '<span class="evo_post_resolve_btn">';
+
+		$action_url = get_htsrv_url().'action.php?mname=collections&amp;p='.$this->ID.'&amp;blog='.$item_Blog->ID.'&amp;action=';
+
+		if( $is_resolved )
+		{	// Icon + Text to Unresolve:
+			$r .= '<a href="'.$action_url.'item_unresolve&amp;'.url_crumb( 'collections_item_unresolve' ).'"'
+						.' class="'.$params['btn_class_unresolve'].'"'
+						.( empty( $params['title_unresolve'] ) ? '' : ' title="'.format_to_output( $params['title_unresolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text_unresolve'] )
+				.'</a>';
+		}
+		else
+		{	// Icon + Text to Resolve:
+			$r .= '<a href="'.$action_url.'item_resolve&amp;c='.$params['comment_ID'].'&amp;'.url_crumb( 'collections_item_resolve' ).'"'
+						.' class="'.$params['btn_class_resolve'].'"'
+						.( empty( $params['title_resolve'] ) ? '' : ' title="'.format_to_output( $params['title_resolve'], 'htmlattr' ).'"' ).'>'
+					.str_replace( '#icon#', get_icon( 'resolve_off' ), $params['text_resolve'] )
+				.'</a>';
+		}
+
+		$r .= '</span>';
+
+		$r .= $params['after'];
+
+		return $r;
 	}
 
 

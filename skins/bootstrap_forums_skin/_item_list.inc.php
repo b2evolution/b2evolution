@@ -180,17 +180,30 @@ $display_workflow =
 	if( ! $display_workflow )
 	{ // --------------------------------------------------------------------------------------------------------------------------
 		echo '<div class="ft_count col-lg-1 col-md-1 col-sm-1 col-xs-5">';
+
+		// Get status if current Item is resolved:
+		$item_resolve_status = $Item->get_resolved_status( array(
+				'before'             => '',
+				'after'              => ' ',
+				'text'               => '#icon#',
+				'display_for_author' => true,
+			) );
+
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
 		{ // The comments are disabled:
+			if( ! empty( $item_resolve_status ) )
+			{
+				echo '<div>'.$item_resolve_status.'</div>';
+			}
 			echo /* TRANS: "Not Available" */ T_('N/A');
 		}
 		else if( $latest_Comment = & $Item->get_latest_Comment() )
 		{	// At least one reply exists:
-			printf( T_('%s replies'), '<div><a href="'.$latest_Comment->get_permanent_url().'" title="'.T_('View latest comment').'">'.$comments_number.'</a></div>' );
+			printf( T_('%s replies'), '<div>'.$item_resolve_status.'<a href="'.$latest_Comment->get_permanent_url().'" title="'.format_to_output( T_('View latest comment'), 'htmlattr' ).'">'.$comments_number.'</a></div>' );
 		}
 		else
 		{	// No replies yet:
-			printf( T_('%s replies'), '<div>0</div>' );
+			printf( T_('%s replies'), '<div>'.$item_resolve_status.'0</div>' );
 		}
 
 		echo '</div>';
@@ -240,6 +253,15 @@ $display_workflow =
 
 			// Workflow status
 			echo '<span><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></span>';
+
+			// Display status if current Item is resolved:
+			$Item->resolved_status( array(
+					'before'             => ' ',
+					'after'              => '',
+					'text'               => '#icon#',
+					'display_for_author' => true,
+				) );
+
 			echo '</div>';
 
 			echo '</div>'; // /col
@@ -251,6 +273,15 @@ $display_workflow =
 
 			// Workflow status
 			echo '<b><a href="'.$url.'" style="color:'.$priority_color.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
+
+			// Display status if current Item is resolved:
+			$Item->resolved_status( array(
+					'before' => ' ',
+					'after'  => '',
+					'text'   => '#icon#',
+					'display_for_author' => true,
+				) );
+
 			echo '</div>';
 
 			// b2evonet:
@@ -299,6 +330,15 @@ $display_workflow =
 		{	// No replies yet:
 			printf( T_('%s replies'), '0' );
 		}
+
+		// Display status if current Item is resolved:
+		$Item->resolved_status( array(
+				'before'             => ' ',
+				'after'              => '',
+				'text'               => '#icon#',
+				'display_for_author' => true,
+			) );
+
 		echo '</div>';
 	} // ==========================================================================================================================
 	else

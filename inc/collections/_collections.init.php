@@ -1820,6 +1820,76 @@ class collections_Module extends Module
 				$debug_jslog = false;
 
 				exit( evo_json_encode( $response ) );
+			break;
+
+			case 'item_resolve':
+			case 'item_unresolve':
+				// Resolve/Unresolve Item or set/unset Comment as the best answer:
+				global $Blog;
+
+				// Get params:
+				$item_ID = param( 'p', 'integer', true );
+				$comment_ID = param( 'c', 'integer', NULL );
+
+				$ItemCache = & get_ItemCache();
+				$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
+
+				if( ! $Item || $Item->get_blog_ID() != $Blog->ID )
+				{	// Item should be called for current collection:
+					bad_request_die( 'Wrong request!' );
+					// Exit here.
+				}
+
+				if( $action == 'item_resolve' && ! empty( $comment_ID ) )
+				{	// Check if comment is really posted on the Item:
+					$CommentCache = & get_CommentCache();
+					$Comment = & $CommentCache->get_by_ID( $comment_ID, false, false );
+					if( ! $Comment ||
+							! ( $comment_Item = & $Comment->get_Item() ) ||
+							$comment_Item->ID != $Item->ID )
+					{	// Comment is wrong or Comment is from another Item:
+						bad_request_die( 'Wrong request!' );
+						// Exit here.
+					}
+				}
+
+				if( ( ! empty( $Comment ) && ! $Comment->can_resolve() ) ||
+						( empty( $Comment ) && ! $Item->can_resolve() ) )
+				{	// Don't allow resolve:
+					$Messages->add( sprintf( T_('You don\'t have a permission to resolve the Item #%d' ), $Item->ID ), 'error' );
+					header_redirect();
+				}
+
+				if( $action == 'item_unresolve' )
+				{	// Force comment to NULL if action requires to unresolve the Item:
+					$comment_ID = NULL;
+				}
+
+				// Resolve or unresolve the Item:
+				$Item->set( 'resolved_cmt_ID', $comment_ID, true );
+				if( $Item->dbupdate( $comment_ID ) )
+				{	// Inform author about result of action:
+					if( $action == 'item_resolve' )
+					{
+						$Messages->add( T_('You marked this thread as Resolved' ).'.', 'success' );
+					}
+					else
+					{
+						$Messages->add( T_('You marked this thread as Unresolved' ).'.', 'success' );
+					}
+
+					// If Comment has been selected as the best answer:
+					if( $action == 'item_resolve' &&
+					    ! empty( $Comment ) &&
+					    $Comment->can_vote_helpful() )
+					{	// Auto voting for comment helpful if current user can vote:
+						$Comment->set_vote( 'helpful', 'yes' );
+						$Comment->dbupdate();
+					}
+				}
+
+				header_redirect();
+				break;
 		}
 	}
 }

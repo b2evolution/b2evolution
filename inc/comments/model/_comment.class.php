@@ -2050,6 +2050,41 @@ class Comment extends DataObject
 
 
 	/**
+	 * Check if user can vote helpful on this
+	 *
+	 * @param boolean Check author, because comment's author cannot vote on own comments
+	 * @return boolean
+	 */
+	function can_vote_helpful( $check_author = true )
+	{
+		if( $this->is_meta() )
+		{	// Don't allow voting on meta comments:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// If User is not logged:
+			return false;
+		}
+
+		if( ! ( $comment_Item = & $this->get_Item() ) ||
+		    ! ( $item_Blog = & $comment_Item->get_Blog() ) ||
+		    ! $item_Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
+		{	// If the voting is disabled by collection setting:
+			return false;
+		}
+
+		global $current_User;
+		if( $check_author && $current_User->ID == $this->author_user_ID )
+		{	// Do not allow users to vote on their own comments:
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Display links to vote a comment as HELPFUL if user is logged
 	 *
 	 * @param string to display before link
@@ -2101,15 +2136,12 @@ class Comment extends DataObject
 			return;
 		}
 
-		global $current_User;
-
-		$comment_Item = & $this->get_Item();
-		$comment_Item->load_Blog();
-
-		if( ! is_logged_in( false ) || ! $comment_Item->Blog->get_setting('allow_rating_comment_helpfulness') )
-		{ // If User is not logged OR Users cannot vote
-			return false;
+		if( ! $this->can_vote_helpful( false ) )
+		{	// If voting is not allowed by some reason:
+			return;
 		}
+
+		global $current_User;
 
 		echo $before;
 
@@ -5601,6 +5633,28 @@ class Comment extends DataObject
 	}
 
 
+	/*
+	 * Check if user can select this Comment as the best answer of the Item
+	 *
+	 * @param string Mode: 'edit', 'view'
+	 * @return boolean
+	 */
+	function can_resolve(  $mode = 'edit'  )
+	{
+		if( empty( $this->ID ) )
+		{	// Comment is not created yet:
+			return false;
+		}
+
+		if( $comment_Item = & $this->get_Item() )
+		{	// Check if Item of this Comment can be resolved:
+			return $comment_Item->can_resolve( $mode );
+		}
+
+		return false;
+	}
+
+
 	/**
 	 * Link attachments from temporary object to new created Comment
 	 */
@@ -5670,6 +5724,65 @@ class Comment extends DataObject
 
 
 	/**
+	 * Display status if this Comment is selected as the best answer
+	 *
+	 * @param array Params
+	 */
+	function resolved_status( $params = array() )
+	{
+		echo $this->get_resolved_status( $params );
+	}
+
+
+	/**
+	 * Get status text if this Comment is selected as the best answer
+	 *
+	 * @param array Params
+	 * @return string HTML of the status text
+	 */
+	function get_resolved_status( $params = array() )
+	{
+		global $disp;
+
+		if( isset( $disp ) && $disp != 'single' &&  $disp != 'page' )
+		{	// Allow display the resolved status only on Item view page:
+			return '';
+		}
+
+		if( ! $this->can_resolve( 'view' ) )
+		{	// Don't display the resolved status if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'before' => '',
+				'after'  => '',
+				'text'   => '#icon# '.T_('This is the Best Answer.'),
+				'title'  => T_('This is the Best Answer.'),
+			), $params );
+
+		$comment_Item = & $this->get_Item();
+
+		// Set comment ID to mark this comment is the best answer:
+		$params['comment_ID'] = $this->ID;
+
+		return $comment_Item->get_resolved_status( $params );
+	}
+
+
+	/**
+	 * Display button to resolve Item of this Comment
+	 * (Select the best answer)
+	 *
+	 * @param array Params
+	 */
+	function mark_resolved_button( $params = array() )
+	{
+		echo $this->get_mark_resolved_button( $params );
+	}
+
+
+	/**
 	 * Display or log notification message
 	 *
 	 * @param string Message
@@ -5683,6 +5796,47 @@ class Comment extends DataObject
 		{	// Call same function of the comment's Item for proper permission checking:
 			$commnet_Item->display_notification_message( $message, $log_messages, $message_type, $message_group );
 		}
+	}
+
+
+	/*
+	 * Get button to resolve Item of this Comment
+	 * (Select the best answer)
+	 *
+	 * @param array Params
+	 * @return string HTML of the button
+	 */
+	function get_mark_resolved_button( $params = array() )
+	{
+		global $disp;
+
+		if( isset( $disp ) && $disp != 'single' &&  $disp != 'page' )
+		{	// Allow display the resolve button only on Item view page:
+			return '';
+		}
+
+		if( ! $this->can_resolve() )
+		{	// Don't display the resolve button if it is not allowed by some reason:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'before'              => '',
+				'after'               => '',
+				'btn_class_resolve'   => 'btn btn-default btn-xs',
+				'btn_class_unresolve' => 'btn btn-success btn-xs',
+				'text_resolve'        => '#icon# '.T_('Mark this as Best Answer'),
+				'text_unresolve'      => '#icon# '.T_('You marked this as Best Answer'),
+				'title_resolve'       => T_('Mark this as Best Answer').'.',
+				'title_unresolve'     => T_('You have selected this as the best answer. Click to unselect.'),
+			), $params );
+
+		$comment_Item = & $this->get_Item();
+
+		// Set comment ID to mark this comment is the best answer:
+		$params['comment_ID'] = $this->ID;
+
+		return $comment_Item->get_mark_resolved_button( $params );
 	}
 }
 
