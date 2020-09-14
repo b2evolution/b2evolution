@@ -69,7 +69,7 @@ if( $perm_abuse_management )
 else
 { // In case of simple thread list view
 	$Results->register_filter_preset( 'all', T_('All conversations'), get_dispctrl_url( 'threads', 'show_closed=1' ) );
-	$Results->register_filter_preset( 'all', T_('Active conversations'), get_dispctrl_url( 'threads', 'show_closed=0' ) );
+	$Results->register_filter_preset( 'active', T_('Active conversations'), get_dispctrl_url( 'threads', 'show_closed=0' ) );
 }
 
 // Initialize Results object
