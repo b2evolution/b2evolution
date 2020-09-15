@@ -854,6 +854,22 @@ function skin_init( $disp )
 				case 'messages':
 					// Actions ONLY for disp=messages
 
+					// Mode, e-g 'move' to display radio boxes to select moving private message
+					$view = param( 'view', 'string' );
+
+					switch( $view )
+					{
+						case 'move':
+							// STEP 1: Inform user before moving to collection:
+							$Messages->add( T_('Select which message you want to move...'), 'note' );
+							break;
+
+						case 'move2':
+							// STEP 2: Allow to select collection:
+							param( 'move_msg_ID', 'integer', true );
+							break;
+					}
+
 					// fp> The correct place to get thrd_ID is here, because we want it in redirect_to in case we need to ask for login.
 					$thrd_ID = param( 'thrd_ID', 'integer', '', true );
 

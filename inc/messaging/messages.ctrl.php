@@ -35,6 +35,22 @@ if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 // Get action parameter from request:
 param_action();
 
+// Mode, e-g 'move' to display radio boxes to select moving private message
+$view = param( 'view', 'string' );
+
+switch( $view )
+{
+	case 'move':
+		// STEP 1: Inform user before moving to collection:
+		$Messages->add( T_('Select which message you want to move...'), 'note' );
+		break;
+
+	case 'move2':
+		// STEP 2: Allow to select collection:
+		param( 'move_msg_ID', 'integer', true );
+		break;
+}
+
 /**
  * @var set TRUE if we want to see a messages as abuse manager
  */

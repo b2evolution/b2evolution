@@ -760,6 +760,52 @@ class Item extends ItemLight
 		global $default_locale, $localtimenow, $Blog, $Plugins;
 		global $item_typ_ID;
 
+		// Try to prefill Item/Post fields from source private message ONLY for new creating post:
+		if( empty( $this->ID ) && param( 'msg_ID', 'integer', NULL ) !== NULL )
+		{	// If new post is moving from a private message:
+			$MessageCache = & get_MessageCache();
+			$source_Message = & $MessageCache->get_by_ID( get_param( 'msg_ID' ), false, false );
+			if( $source_Message &&
+			    $source_Thread = & $source_Message->get_Thread() &&
+			    $source_Thread->can_be_moved_to_collection( $this->get_blog_ID(), $source_Message->ID ) )
+			{	// If given Thread can be moved to current collection:
+				$source_message_author_User = & $source_Message->get_author_User();
+				$this->set( 'title', $source_Thread->get( 'title' ) );
+				$this->set( 'content', $source_Message->get( 'text' ) );
+				$this->set_creator_User( $source_message_author_User );
+				$this->set_renderers( $source_Message->get_renderers() );
+
+				$tmp_object_ID = param( 'temp_link_owner_ID', 'integer', 0 );
+				if( empty( $tmp_object_ID ) )
+				{	// If a create item edit form is not submitted yet:
+					$LinkMessage = new LinkMessage( $source_Message );
+					if( $message_LinkList = $LinkMessage->get_attachment_LinkList() )
+					{	// If message has at least one attachment:
+						$LinkItem = new LinkItem( $this );
+						set_param( 'temp_link_owner_ID', $LinkItem->link_Object->tmp_ID );
+						while( $message_Link = & $message_LinkList->get_next() )
+						{	// Copy each attachment from sourse Message to new create Item:
+							$message_File = & $message_Link->get_File();
+							$LinkItem->add_link( $message_File->ID, $message_Link->get( 'position' ), $message_Link->get( 'order' ) );
+						}
+					}
+				}
+
+				// Inform user that other replies will not be copied to new creating post:
+				global $action;
+				if( ! empty( $action ) && strpos( $action, 'create' ) === false )
+				{
+					$thread_messages_count = $source_Thread->get_messages_count();
+					if( $thread_messages_count > 1 )
+					{
+						global $Messages;
+						$Messages->add( T_('You can edit the moved message below if needed. When finished, use the Publish button.'), 'note' );
+						$Messages->add( sprintf( T_('%d replies of this thread have not been copied.'), $thread_messages_count - 1 ), 'error' );
+					}
+				}
+			}
+		}
+
 		// LOCALE:
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
@@ -1470,7 +1516,7 @@ class Item extends ItemLight
 			return;
 		}
 
-		// Change link owner from temporary to message object:
+		// Change link owner from temporary to Item object:
 		$DB->query( 'UPDATE T_links
 			  SET link_itm_ID = '.$this->ID.',
 			      link_tmp_ID = NULL
@@ -1478,15 +1524,16 @@ class Item extends ItemLight
 
 		$item_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
 
-		// Move all temporary files to folder of new created message:
+		// Move all temporary files to folder of new created Item:
 		foreach( $LinkOwner->Links as $item_Link )
 		{
 			if( $item_File = & $item_Link->get_File() &&
 			    $item_FileRoot = & $item_File->get_FileRoot() &&
-			    $item_Link->is_single_linked_file() )
+			    $item_Link->is_single_linked_file() &&
+			    file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/'.$item_File->get_name() ) )
 			{	// If file is not linked to any other object:
 				if( ! file_exists( $item_FileRoot->ads_path.$item_slug_folder_name ) )
-				{	// Create if folder doesn't exist for files of new created message:
+				{	// Create if folder doesn't exist for files of new created Item:
 					mkdir_r( $item_FileRoot->ads_path.$item_slug_folder_name );
 				}
 				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_slug_folder_name.$item_File->get_name(), true );
@@ -8893,6 +8940,9 @@ class Item extends ItemLight
 
 			// Update last touched date of this Item and also all categories of this Item
 			$this->update_last_touched_date( false, false );
+
+			// Send notification after creating new post from thread:
+			$this->send_moved_thread_notification();
 		}
 
 		if( ! $result )
@@ -12380,6 +12430,40 @@ class Item extends ItemLight
 
 		// Update the cached item date:
 		$this->set_user_data( 'item_date', $timestamp );
+	}
+
+
+	/**
+	 * Send notification when new post is created from thread
+	 */
+	function send_moved_thread_notification()
+	{
+		$msg_ID = param( 'msg_ID', 'integer', NULL );
+
+		if( empty( $msg_ID ) )
+		{	// Message ID must be passed from a submitted form
+			return false;
+		}
+
+		$MessageCache = & get_MessageCache();
+		$source_Message = & $MessageCache->get_by_ID( $msg_ID, false, false );
+		if( ! $source_Message ||
+		    ! ( $source_Thread = & $source_Message->get_Thread() ) ||
+		    ! $source_Thread->can_be_moved_to_collection( $this->get_blog_ID(), $msg_ID ) )
+		{	// Wrong Thread, because it can not be moved to collection of this Item:
+			return false;
+		}
+
+		$item_Blog = & $this->get_Blog();
+
+		// Insert new private message to inform author thread:
+		$notif_Message = new Message();
+		$notif_Message->set( 'thread_ID', $source_Thread->ID );
+		$notif_Message->set( 'text', sprintf( T_('Automatic notification: your question has been published to "%s": %s'),
+			$item_Blog->get( 'shortname' ),
+			$this->get_permanent_url() ) );
+
+		return $notif_Message->dbinsert_message();
 	}
 
 

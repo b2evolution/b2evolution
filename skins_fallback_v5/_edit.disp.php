@@ -82,6 +82,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'post_ID', $edited_Item->ID );
 		}
 	}
+
+	// Try to get the message ID (For example, on moving a private message to collection):
+	$msg_ID = get_param( 'msg_ID' );
+	if( ! empty( $msg_ID ) )
+	{
+		$Form->hidden( 'msg_ID', $msg_ID );
+	}
+
 	$Form->hidden( 'redirect_to', $redirect_to );
 
 	// In case we send this to the blog for a preview :

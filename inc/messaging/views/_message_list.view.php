@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $action, $view, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message, $admin_url;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -104,6 +104,11 @@ foreach( $recipient_status_list as $row )
 }
 $is_recipient = $edited_Thread->check_thread_recipient( $current_User->ID );
 $leave_msg_ID = ( $is_recipient ? $leave_status_list[ $current_User->ID ] : NULL );
+
+// Current user is involved in this thread, only involved users can send a message
+// we had to check this because admin user can see all messages in 'Abuse management', but should not be able to reply
+// Also don't display the form to send new message if user is moving a message to a collection:
+$display_new_message_form = $is_recipient && $view != 'move' && $view != 'move2';
 
 // Create SELECT query:
 $select_SQL = new SQL();
@@ -196,6 +201,18 @@ $Results->filter_area = array(
 	);
 $Results->register_filter_preset( 'all', T_('All'), get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID ) );
 
+if( $view == 'move' || $view == 'move2' )
+{	// Radio box to select a private message:
+	$Results->cols[] = array(
+			'th' => '',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => '<input type="radio" name="msg_ID" value="$msg_ID$" data-author-id="$msg_user_ID$"'
+				.( $view == 'move2' ? '~conditional( #msg_ID# == "'.get_param( 'move_msg_ID' ).'", \' checked="checked"\', \'\' )~' : '' )
+				.( $view == 'move2' ? ' disabled="disabled"' : '' ).' />'
+		);
+}
+
 /**
  * Author:
  */
@@ -236,9 +253,8 @@ if( check_user_perm( 'perm_messaging', 'delete' ) && ( $Results->get_total_rows(
 						);
 }
 
-if( $is_recipient )
-{ // Current user is involved in this thread, only involved users can send a message
-	// we had to check this because admin user can see all messages in 'Abuse management', but should not be able to reply
+if( $display_new_message_form )
+{	// Display form to send new message only when it is allowed:
 	// get all available recipient in this thread
 	$available_recipients = array();
 	foreach( $recipient_list as $recipient_ID )
@@ -393,7 +409,7 @@ if( $is_recipient )
 }
 
 // Display Leave or Close conversation action if they are available
-if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
+if( $display_new_message_form && empty( $leave_msg_ID ) && ( count( $available_recipients ) > 0 ) )
 { // user is recipient and didn't leave this conversation yet and this conversation is not closed
 	echo '<div class="fieldset messages_list_actions">';
 	if( count( $available_recipients ) > 1 )
@@ -428,6 +444,11 @@ if( $is_recipient && empty( $leave_msg_ID ) && ( count( $available_recipients ) 
 	{ // user want's to close this conversation ( there is only one recipient )
 		echo ' <a href="'.$close_and_block_url.'" onclick="return confirm( \''.$confirm_block_text.'\' );" class="btn btn-default btn-sm">'.$block_text.'</a>';
 	}
+	echo ' <a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move' ).'"'
+				.' class="btn btn-default btn-sm">'
+					.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move to a collection...') ) ).' '
+					.T_('Move to a collection...')
+				.'</a>';
 	echo '</p>';
 	echo '</div>';
 }
@@ -451,5 +472,86 @@ $display_params['list_start'] = str_replace( 'table-hover', '', $Results->params
 $Results->display( $display_params );
 
 echo $params['messages_list_end'];
+
+switch( $view )
+{
+	case 'move':
+		// Display a button to move a selected message to a collection:
+		echo '<p><a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move' ).'"'
+			.' onclick="return evo_msg_move_to_coll();"'
+			.' class="btn btn-primary">'
+				.get_icon( 'copy', 'imgtag', array( 'title' => T_('Move selected message to a collection...') ) ).' '
+				.T_('Move selected message to a collection...')
+			.'</a></p>';
+		break;
+
+	case 'move2':
+		// Display a button to move a selected message to a collection:
+		echo '<p>';
+		$MessageCache = & get_MessageCache();
+		$moving_Message = & $MessageCache->get_by_ID( get_param( 'move_msg_ID' ) );
+
+		$BlogCache = get_BlogCache();
+		$BlogCache->clear();
+		$BlogCache->load_create_post_colls( array( $current_User->ID, $moving_Message->author_user_ID ) );
+		if( empty( $BlogCache->cache ) )
+		{	// No available collections:
+			echo T_('No found collection where you and author of the selected message can create a post.');
+		}
+		else
+		{	// Display a form 
+			echo T_('Move selected message to');
+			echo ' <select id="msg_move_coll" class="form-control" style="display:inline-block;width:auto">';
+			foreach( $BlogCache->cache as $msg_Blog )
+			{
+				echo '<option value="'.$msg_Blog->ID.'" data-url="'.format_to_output( $msg_Blog->gen_blogurl(), 'htmlattr' ).'">'.$msg_Blog->get( 'name' ).'</option>';
+			}
+			echo '</select>';
+			echo ' <a href="'.get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&amp;view=move2&amp;move_msg_ID='.get_param( 'move_msg_ID' ) ).'"'
+				.' onclick="return evo_msg_move2_to_coll();"'
+				.' class="btn btn-primary">'
+					.get_icon( 'copy', 'imgtag', array( 'title' => T_('Continue').'...' ) ).' '
+					.T_('Continue').'...'
+				.'</a>';
+		}
+		echo '<p>';
+		break;
+}
+
+if( is_admin_page() )
+{	// New item URL for back-office:
+	$new_item_url = $admin_url.'?ctrl=items&action=new&msg_ID='.get_param( 'move_msg_ID' ).'&blog=\' + coll_id + \'';
+}
+else
+{	// New item URL for front-office:
+	$new_item_url = '\' + coll_url + ( coll_url.indexOf( \'?\' ) > 0 ? \'&\' : \'?\' ) + \'disp=edit&msg_ID='.get_param( 'move_msg_ID' );
+}
+
 echo_image_insert_modal();
 ?>
+<script type="text/javascript">
+function evo_msg_move_to_coll()
+{
+	var selected_message = jQuery( 'input[type=radio][name=msg_ID]:checked' );
+	if( selected_message.length == 0 )
+	{	// If message is not selected
+		alert( '<?php echo TS_('Select which message you want to move...'); ?>' );
+		return false;
+	}
+
+	location.href = '<?php echo get_dispctrl_url( 'messages', 'thrd_ID='.$edited_Thread->ID.'&view=move2&move_msg_ID=', '&' ); ?>' + selected_message.val();
+
+	return false;
+}
+
+function evo_msg_move2_to_coll()
+{
+	var selected_coll = jQuery( 'select#msg_move_coll option:selected' );
+	var coll_id = selected_coll.val();
+	var coll_url = selected_coll.data( 'url' );
+
+	location.href = '<?php echo $new_item_url; ?>';
+
+	return false;
+}
+</script>
