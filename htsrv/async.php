@@ -1331,6 +1331,216 @@ switch( $action )
 		$Widget->disp_template_raw( 'block_end' );
 		break;
 
+	case 'rotate_90_left':
+	case 'rotate_180':
+	case 'rotate_90_right':
+	case 'flip_horizontal':
+	case 'flip_vertical':
+	case 'reload_image':
+		// Perform quick image manipulation:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'image' );
+
+		// We need this param early to check blog perms, if possible
+		param( 'root', 'string', true, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+		if( preg_match( '/^collection_(\d+)$/', $root, $perm_blog ) )
+		{	// OK, we got a blog ID:
+			$perm_blog = $perm_blog[1];
+		}
+		else
+		{	// No blog ID, we will check the global group perm
+			$perm_blog = NULL;
+		}
+
+		// Check permission (#2):
+		$current_User->check_perm( 'files', 'view', true, $perm_blog );
+
+		// Load fileroot infos
+		$FileRootCache = & get_FileRootCache();
+		$FileRoot = & $FileRootCache->get_by_ID( $root );
+
+		// Create file object
+		param( 'path', 'filepath', true, true );
+		$selected_File = new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
+
+		switch( $action )
+		{
+			case 'rotate_90_left':
+				$degrees = 90;
+				break;
+			case 'rotate_180':
+				$degrees = 180;
+				break;
+			case 'rotate_90_right':
+				$degrees = 270;
+				break;
+			case 'flip_horizontal':
+				$mode = 'horizontal';
+				break;
+			case 'flip_vertical':
+				$mode = 'vertical';
+				break;
+		}
+
+		load_funcs( 'files/model/_image.funcs.php' );
+		$err = NULL;
+
+		switch( $action )
+		{
+			case 'rotate_90_left':
+			case 'rotate_180':
+			case 'rotate_90_right':
+				if( ! rotate_image( $selected_File, $degrees ) )
+				{
+					$err = T_('Unable to perform image rotation operation.');
+				}
+				break;
+
+			case 'flip_horizontal':
+			case 'flip_vertical':
+				if( ! flip_image( $selected_File, $mode ) )
+				{
+					$err = T_('Unable to perform image flipping operation.');
+				}
+				break;
+		}
+
+		if( $err )
+		{
+			$data = array(
+				'status' => 'error',
+				'error_msg' => $err	);
+		}
+		else
+		{
+			$r = '<img ';
+			if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
+			{
+				$r .= 'alt="'.$alt.'" ';
+			}
+			if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
+			{
+				$r .= 'title="'.$title.'" ';
+			}
+			$imgSize = $selected_File->get_image_size( 'widthheight' );
+			$r .= 'src="'.$selected_File->get_url().'"'.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
+
+			$data = array(
+				'status' => 'ok',
+				'content' => $r );
+		}
+
+		echo json_encode( $data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info.
+
+	case 'save_image':
+		// Save image edited by TUI image editor:
+
+		$Session->assert_received_crumb( 'image' );
+
+		$root = param( 'root', 'string', true );
+		$file_path = param( 'path', 'string', true );
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+
+		if( $current_File = & $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) )
+		{
+			$fm_FileRoot = & $current_File->get_FileRoot();
+			if( ! check_perm_upload_files( NULL, $fm_FileRoot ) )
+			{
+				$err = 'You don\'t have permission to upload on this file root.';
+			}
+			elseif( ! $current_File->is_image() )
+			{
+				$err = 'Not an image file.';
+			}
+			elseif( empty( $fm_FileRoot ) )
+			{ // Stop when this object is NULL, it can happens when media path has no rights to write
+				$err = sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' );
+			}
+			else
+			{
+				require_once dirname(__FILE__).'/upload_handler.php';
+				load_funcs('files/model/_image.funcs.php');
+
+				$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
+				if( $Settings->get( 'upload_maxkb' ) )
+				{
+					$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
+				}
+
+				$file = new UploadHandler();
+				// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
+				$file->allowedExtensions = array(); // all files types allowed by default
+				// Specify max file size in bytes.
+				$file->sizeLimit = min( $size_limits );
+				// Specify the input name set in the javascript.
+				$file->inputName = "image_data";
+				// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
+				$file->chunksFolder = 'chunks';
+
+				$method = $_SERVER['REQUEST_METHOD'];
+				if ( $method == 'POST' )
+				{
+					header( 'Content-Type: text/plain' );
+					// Assumes you have a chunking.success.endpoint set to point here with a query parameter of "done".
+					// For example: /myserver/handlers/endpoint.php?done
+					if ( isset( $_GET['done'] ) )
+					{
+						$result = $file->combineChunks();
+					}
+					else
+					{ // Handles upload requests
+						// Call handleUpload() with the name of the folder, relative to PHP's getcwd()
+						$result = $file->handleUpload();
+						// To return a name used for uploaded file you can use the following line.
+						$result["uploadName"] = $file->getUploadName();
+					}
+				}
+				else
+				{	// We only allow POST requests:
+					header( 'HTTP/1.0 405 Method Not Allowed' );
+				}
+
+				// If everything is ok, save the file somewhere
+				if( ! isset( $result['success'] ) || ! $result['success'] )
+				{ // Error on upload
+					$err = $result['error'];
+				}
+				else
+				{
+					$file_content = $result['contents'];
+					$imh = imagecreatefromstring( $file_content );
+					$Filetype = & $current_File->get_Filetype();
+					$err = save_image( $imh, $current_File->get_full_path(), $Filetype->mimetype );
+
+					// Update thumbnails:
+					regenerate_thumbnails( $current_File );
+				}
+			}
+		}
+		else
+		{
+			$err = 'File object not found.';
+		}
+
+		if( empty( $err ) )
+		{
+			$data['status'] = 'ok';
+		}
+		else
+		{
+			$data['status'] = 'error';
+			$data['error_msg'] = $err;
+		}
+
+		echo evo_json_encode( $data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info.
+
 	default:
 		$incorrect_action = true;
 		break;

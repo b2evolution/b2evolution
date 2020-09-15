@@ -966,6 +966,12 @@ $library_local_urls = array(
 		'#fontawesome#' => array( 'ext:font-awesome/css/font-awesome.min.css', 'ext:font-awesome/css/font-awesome.css' ),
 		'#clipboardjs#' => array( 'ext:clipboardjs/clipboard.min.js' ),
 		'#hotkeys#' => array( 'ext:hotkeys/hotkeys.min.js' ),
+		'#fabricjs#' => array( 'ext:toastui/fabric.js', 'ext:toastui/fabric.js' ),
+		'#tui_code_snippet#' => array( 'ext:toastui/tui-code-snippet.min.js', 'ext:toastui/tui-code-snippet.js' ),
+		'#tui_color_picker#' => array( 'ext:toastui/tui-color-picker.min.js', 'ext:toastui/tui-color-picker.js' ),
+		'#tui_image_editor#' => array( 'ext:toastui/tui-image-editor.min.js', 'ext:toastui/tui-image-editor.js' ),
+		'#tui_color_picker_css#' => array( 'ext:toastui/css/tui-color-picker.min.css', 'ext:toastui/css/tui-color-picker.css' ),
+		'#tui_image_editor_css#' => array( 'ext:toastui/css/tui-image-editor.min.css', 'ext:toastui/css/tui-image-editor.css' ),
 	);
 
 /**

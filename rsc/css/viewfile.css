@@ -1,8 +1,12 @@
 /* This file has been lost. Quick regen... OMG! */
+html {
+	height: 100%;
+}
 
 body {
 	margin: 0;
 	padding: 0;
+	height: 100%;
 }
 
 .content-type-text .filebody {
@@ -45,4 +49,31 @@ div.filecode {
 	font-family:monospace;
 	color:black;
 	font-weight:normal;font-style:normal; /* to be sure */
+}
+
+button.tui-processing {
+	background-color: #aaa !important;
+	border-color: #666 !important;
+}
+button.tui-error {
+	background-color: #f66 !important;
+	border-color: #a00 !important;
+}
+
+div#advanced_editor {
+	height: 100%;
+	width: 100%;
+}
+
+div.img_preview {
+	padding-top: 56px;
+	height: 100%;
+	width: 100%;
+}
+
+div.editor_toggle {
+	position: absolute;
+	top: 1em;
+	left: 1em;
+	z-index: 10000;
 }
