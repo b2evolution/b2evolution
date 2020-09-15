@@ -183,11 +183,16 @@ switch( $viewtype )
 				$mimetype = 'png';
 				break;
 		}
+
+		// The advanced image editor is allowed only sinve PHP 7:
+		$advanced_image_editor_is_allowed = version_compare( phpversion(), '7', '>=' );
+
 		?>
 		<div class="editor_toggle">
 			<div class="btn-group">
-				<button id="advanced_button" class="btn btn-default active" onclick="toggle_editor('advanced');"><?php echo T_('Advanced edit');?></button>
-				<button id="quick_button" class="btn btn-default" onclick="toggle_editor('quick');"><?php echo T_('Quick edit');?></button>
+				<button id="advanced_button" class="btn btn-default<?php echo $advanced_image_editor_is_allowed ? ' active' : '' ?>" onclick="toggle_editor('advanced');"><?php echo T_('Advanced edit');?></button>
+				<button id="quick_button" class="btn btn-default<?php echo $advanced_image_editor_is_allowed ? '' : ' active' ?>" onclick="toggle_editor('quick');"><?php echo T_('Quick edit');?></button>
+			</div>
 				<script>
 					function toggle_editor( mode )
 					{
@@ -216,9 +221,11 @@ switch( $viewtype )
 						}
 					}
 				</script>
-			</div>
 		</div>
-		<div id="advanced_editor">
+		<div id="advanced_editor"<?php echo $advanced_image_editor_is_allowed ? '' : ' style="display:none"' ?>>
+			<?php if( $advanced_image_editor_is_allowed )
+			{	// Initialize advanced image editor only on PHP >= 7:
+			?>
 			<div id="image-editor"></div>
 			<script>
 			var saveInProgress = false;
@@ -344,9 +351,16 @@ switch( $viewtype )
 				}
 			}
 			</script>
+			<?php
+			}
+			else
+			{	// Display error when adnvanced image editor is not allowed:
+				echo '<p class="alert alert-danger" style="margin:56px 15px 0 15px">'.T_('This feature requires PHP 7.').'</p>';
+			}
+			?>
 		</div>
 
-		<div id="quick_editor">
+		<div id="quick_editor"<?php echo $advanced_image_editor_is_allowed ? ' style="display:none"' : '' ?>>
 			<div class="img_preview content-type-image">
 
 			<?php

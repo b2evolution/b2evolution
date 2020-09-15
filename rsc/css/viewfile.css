@@ -61,13 +61,8 @@ button.tui-error {
 }
 
 div#advanced_editor {
-	display: block;
 	height: 100%;
 	width: 100%;
-}
-
-div#quick_editor {
-	display: none;
 }
 
 div.img_preview {
