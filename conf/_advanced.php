@@ -834,10 +834,23 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
  * NOTE: For Item URL we automatically include enabled switchable params of the Item (see "Switchable content" on https://b2evolution.net/man/post-advanced-properties-panel)
  */
 $accepted_in_canonicals__params = array(
-	'page',          // For showing a different page in a multipage post
-	'quote_post',    // For quoting a post in the forums
-	'quote_comment', // For quoting a comment in the forums
 	'get_redirected_debuginfo_from_sess_ID', // For display debug info of redirected page from different domain
+);
+// For pages depending on $disp:
+$accepted_in_canonicals_disp__params = array(
+	'single' => array(
+		'page',          // For showing a different page in a multipage post
+		'quote_post',    // For quoting a post in the forums
+		'quote_comment', // For quoting a comment in the forums
+	),
+	'page' => array(
+		'page',          // For showing a different page in a multipage post
+		'quote_post',    // For quoting a post in the forums
+		'quote_comment', // For quoting a comment in the forums
+	),
+	'posts' => array(
+		'paged',         // For switching between pages of posts
+	),
 );
 
 

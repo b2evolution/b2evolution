@@ -1259,12 +1259,18 @@ function url_keep_params( $url, $glue = '&', $custom_keep_params = array() )
  */
 function url_keep_canonicals_params( $canonical_url, $glue = '&', $custom_keep_params = array() )
 {
-	global $accepted_in_canonicals__params;
+	global $accepted_in_canonicals__params, $accepted_in_canonicals_disp__params, $disp;
 
 	// For canonical URLs we should keep params from additional config:
 	if( is_array( $accepted_in_canonicals__params ) )
 	{	// Merge config and custom params:
 		$custom_keep_params = array_merge( $accepted_in_canonicals__params, $custom_keep_params );
+	}
+
+	if( isset( $disp, $accepted_in_canonicals_disp__params[ $disp ] ) &&
+	    is_array( $accepted_in_canonicals_disp__params[ $disp ] ) )
+	{	// Allow also params per current disp:
+		$custom_keep_params = array_merge( $accepted_in_canonicals_disp__params[ $disp ], $custom_keep_params );
 	}
 
 	return url_keep_params( $canonical_url, $glue, $custom_keep_params );
