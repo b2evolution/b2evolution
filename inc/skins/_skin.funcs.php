@@ -402,12 +402,12 @@ function skin_init( $disp )
 				    || $Blog->get_setting( 'self_canonical_posts' ) )
 				{	// Check if the URL was canonical:
 					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
-					// Keep ONLY allowed params from current URL in the canonical URL by configs:
-					$canonical_url = url_keep_canonicals_params( $canonical_url );
 					if( $is_next_pages )
 					{	// Set param for paged url:
 						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
 					}
+					// Keep ONLY allowed params from current URL in the canonical URL by configs:
+					$canonical_url = url_keep_canonicals_params( $canonical_url );
 					if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 					{	// We are not on the canonical blog url:
 						if( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
