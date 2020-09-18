@@ -851,6 +851,17 @@ $accepted_in_canonicals_disp__params = array(
 	'posts' => array(
 		'paged',         // For switching between pages of posts
 	),
+	'flagged' => array(
+		'paged',
+	),
+	'mustread' => array(
+		'paged',
+	),
+	'users' => array(
+		'filter_query',
+		'results_u_order',
+		'u_paged',
+	),
 );
 
 
