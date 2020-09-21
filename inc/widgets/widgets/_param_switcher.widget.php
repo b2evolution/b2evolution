@@ -178,11 +178,16 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		$this->init_display( $params );
 
 		if( ! isset( $Item ) ||
-		    ! $Item instanceof Item ||
-		    ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item instanceof Item )
+		{	// No current Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because this is not an Item page, so there can be no switcher params.' );
+			return false;
+		}
+
+		if( ! $Item->get_type_setting( 'allow_switchable' ) ||
 		    ! $Item->get_setting( 'switchable' ) )
-		{	// No current Item or Item doesn't use a switcher:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use swicther params.' );
+		{	// Item doesn't use switcher params:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use switcher params.' );
 			return false;
 		}
 
