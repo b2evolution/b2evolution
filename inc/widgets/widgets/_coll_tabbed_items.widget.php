@@ -31,6 +31,10 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 	 */
 	function __construct( $db_row = NULL )
 	{
+		// Use standard style to display debug messages on customizer for this widget
+		// instead of menu style that is used by default on the parent class:
+		$this->debug_message_style = 'standard';
+
 		// Call parent constructor:
 		parent::__construct( $db_row, 'core', 'coll_tabbed_items' );
 	}
