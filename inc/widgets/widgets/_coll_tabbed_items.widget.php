@@ -486,7 +486,10 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		{	// Initialize tabs from items list:
 			$items_tabs[] = array(
 					'value' => $row_Item->get( 'urltitle' ),
-					'text'  => $row_Item->get( 'title' )
+					'text'  => $row_Item->get_title( array(
+							'title_field' => 'short_title,title',
+							'link_type'   => 'none',
+						) ),
 				);
 		}
 		// Set active tab by default on page loading:
