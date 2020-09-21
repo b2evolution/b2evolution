@@ -346,17 +346,22 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		$this->init_display( $params );
 
 		if( ! isset( $Item ) ||
-		    ! $Item instanceof Item ||
-		    ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item instanceof Item )
+		{	// No current Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because this is not an Item page, so there can be no switcher params.' );
+			return false;
+		}
+
+		if( ! $Item->get_type_setting( 'allow_switchable' ) ||
 		    ! $Item->get_setting( 'switchable' ) )
-		{	// No current Item or Item doesn't use a switcher:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use swicther params.' );
+		{	// Item doesn't use switcher params:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use switcher params.' );
 			return false;
 		}
 
 		if( $this->get_param( 'param_code' ) == '' )
 		{	// Display error when param code is not defined:
-			$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because you did not set a param code for tab swicthing.' );
+			$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because you did not set a param code for tab switching.' );
 			return false;
 		}
 	
