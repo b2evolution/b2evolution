@@ -401,7 +401,11 @@ function skin_init( $disp )
 				    || $Blog->get_setting( 'relcanonical_posts' )
 				    || $Blog->get_setting( 'self_canonical_posts' ) )
 				{	// Check if the URL was canonical:
-					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
+					$canonical_url = $Blog->get( 'url', array( 'glue' => '&' ) );
+					if( ! is_front_page() )
+					{	// Append disp param only on not front page, because front page hides disp param in URL:
+						$canonical_url = url_add_param( $canonical_url, 'disp=posts', '&' );
+					}
 					if( $is_next_pages )
 					{	// Set param for paged url:
 						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
