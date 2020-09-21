@@ -31,6 +31,10 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 	 */
 	function __construct( $db_row = NULL )
 	{
+		// Use standard style to display debug messages on customizer for this widget
+		// instead of menu style that is used by default on the parent class:
+		$this->debug_message_style = 'standard';
+
 		// Call parent constructor:
 		parent::__construct( $db_row, 'core', 'coll_tabbed_items' );
 	}
@@ -341,9 +345,24 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 
 		$this->init_display( $params );
 
+		if( ! isset( $Item ) ||
+		    ! $Item instanceof Item ||
+		    ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item->get_setting( 'switchable' ) )
+		{	// No current Item or Item doesn't use a switcher:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use swicther params.' );
+			return false;
+		}
+
 		if( $this->get_param( 'param_code' ) == '' )
 		{	// Display error when param code is not defined:
 			$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because you did not set a param code for tab swicthing.' );
+			return false;
+		}
+	
+		if( $Item->get_switchable_param( $this->get_param( 'param_code' ) ) === NULL )
+		{	// No default value:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the param <code>'.$this->get_param( 'param_code' ).'</code> has not been declared/initialized in the Item.' );
 			return false;
 		}
 
@@ -355,23 +374,6 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		{	// Display error when wrong collection is requested by this widget:
 			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the requested Collection #'.$this->disp_params['blog_ID'].' doesn\'t exist any more.' );
 			return false;
-		}
-
-		if( isset( $Item ) && $Item instanceof Item )
-		{	// Additional checks if this is an Item page:
-			if( ! $Item->get_type_setting( 'allow_switchable' ) ||
-			    ! $Item->get_setting( 'switchable' ) )
-			{	// Don't allow this widget if it is not allowed by Item Type and disabled for current Item:
-				$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because the enclosing page  does not allow switchable content.' );
-				return false;
-			}
-
-			$item_switchable_params = $Item->get_switchable_params();
-			if( ! isset( $item_switchable_params[ $this->get_param( 'param_code' ) ] ) )
-			{	// Don't allow this widget if it is not allowed by Item Type and disabled for current Item:
-				$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because it wants to use  param <code>'.$this->get_param( 'param_code' ).'</code> but the enclosing page does not allow this param for switchable content.' );
-				return false;
-			}
 		}
 
 		// Create ItemList
@@ -484,7 +486,10 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		{	// Initialize tabs from items list:
 			$items_tabs[] = array(
 					'value' => $row_Item->get( 'urltitle' ),
-					'text'  => $row_Item->get( 'title' )
+					'text'  => $row_Item->get_title( array(
+							'title_field' => 'short_title,title',
+							'link_type'   => 'none',
+						) ),
 				);
 		}
 		// Set active tab by default on page loading:

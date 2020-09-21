@@ -28,6 +28,9 @@ class generic_menu_link_Widget extends ComponentWidget
 	// Enable additional params for classes of Link/Button:
 	var $allow_link_css_params = true;
 
+	// Style to display debug messages on customizer mode: 'menu', 'standard'
+	var $debug_message_style = 'menu';
+
 	/**
 	 * Get a layout for menu link
 	 *
@@ -263,6 +266,13 @@ class generic_menu_link_Widget extends ComponentWidget
 	 */
 	function display_debug_message( $message = NULL )
 	{
+		if( $this->debug_message_style == 'standard' )
+		{	// Use standard debug message without menu style:
+			parent::display_debug_message( $message );
+			return;
+		}
+
+		// Menu style:
 		if( $this->mode == 'designer' )
 		{	// Display message on designer mode:
 			if( $message === NULL )
@@ -286,6 +296,13 @@ class generic_menu_link_Widget extends ComponentWidget
 	 */
 	function display_error_message( $message = NULL )
 	{
+		if( $this->debug_message_style == 'standard' )
+		{	// Use standard debug message without menu style:
+			parent::display_error_message( $message );
+			return;
+		}
+
+		// Menu style:
 		global $current_User, $Blog;
 
 		if( isset( $this->BlockCache ) )
