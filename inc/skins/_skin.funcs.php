@@ -391,10 +391,11 @@ function skin_init( $disp )
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
 
+			$is_front_disp = ( $Blog->get_setting( 'front_disp' ) == 'posts' );
 			$is_first_page = ( empty( $active_filters ) || array_diff( $active_filters, array( 'posts' ) ) == array() );
 			$is_next_pages = ( ! $is_first_page && array_diff( $active_filters, array( 'posts', 'page' ) ) == array() );
 
-			if( ( $is_first_page && $Blog->get_setting( 'front_disp' ) != 'posts' ) || $is_next_pages )
+			if( ( $is_first_page && ! $is_front_disp ) || $is_next_pages )
 			{	// This is first(but not front disp) or next pages of disp=posts:
 				// Do we need to handle the canoncial url?
 				if( ( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
@@ -402,8 +403,8 @@ function skin_init( $disp )
 				    || $Blog->get_setting( 'self_canonical_posts' ) )
 				{	// Check if the URL was canonical:
 					$canonical_url = $Blog->get( 'url', array( 'glue' => '&' ) );
-					if( ! is_front_page() )
-					{	// Append disp param only on not front page, because front page hides disp param in URL:
+					if( ! $is_front_disp )
+					{	// Append disp param only when this disp is not used as front page, because front page hides disp param in URL:
 						$canonical_url = url_add_param( $canonical_url, 'disp=posts', '&' );
 					}
 					if( $is_next_pages )
@@ -423,8 +424,10 @@ function skin_init( $disp )
 							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 						}
 					}
-					elseif( $Blog->get_setting( 'self_canonical_posts' ) )
-					{	// Use self-referencing rel="canonical" tag:
+					elseif( $Blog->get_setting( 'self_canonical_posts' ) &&
+					        ! ( $is_front_disp && $Blog->get_setting( 'self_canonical_homepage' ) ) )
+					{	// Use self-referencing rel="canonical" tag,
+						// but don't add twice when it is already added for front page:
 						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
 				}
