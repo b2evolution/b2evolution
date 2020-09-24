@@ -291,10 +291,12 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 	$post_types[] = array(
 			'name'           => 'Forum Topic',
 			'allow_html'     => 0,
+			'allow_resolving_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'       => 'Bug Report',
 			'allow_html' => 0,
+			'allow_resolving_comments' => 1,
 		);
 	$post_types[] = array(
 			'name'           => 'Standalone Page',
@@ -439,6 +441,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'name'                 => 'Task',
 			'allow_html'           => 0,
 			'front_order_workflow' => 20,
+			'allow_resolving_comments' => 1,
 		);
 	// Default settings:
 	$post_type_default_settings = array(
@@ -468,6 +471,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'allow_closing_comments'   => 1,
 			'allow_disabling_comments' => 0,
 			'use_comment_expiration'   => 'optional',
+			'allow_resolving_comments' => 0,
 			'schema'                   => NULL,
 			'use_coordinates'          => 'never',
 			'front_order_title'        => 10,

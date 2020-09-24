@@ -13063,8 +13063,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 18040, 'Dummy upgrade block, just to force execution of the upgrade procedure to update templates for Search Results...' ) )
+	if( upg_task_start( 18040, 'Updating Item Types for new feature to select best answer...' ) )
 	{	// part of 7.3.0-beta
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_allow_resolving_comments = 1
+			WHERE ityp_name IN ( "Forum Topic", "Bug Report", "Task" )' );
 		upg_task_end();
 	}
 
