@@ -2475,7 +2475,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Item:permalink] <span class="label label-primary">[Item:type]</span></div>
+		<div class="search_title">[Item:permalink] <span class="label label-primary">[Item:type]</span>[Item:resolved_status|text=#icon# #short_text#|class=small green|before= ]</div>
 		<div class="result_content">[Item:excerpt|excerpt_more_text=]</div>
 		<div class="search_info dimmed">[Item:categories|before=In ]</div>
 		<div class="search_info dimmed">Published by [Item:author|

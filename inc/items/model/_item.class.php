@@ -14524,9 +14524,10 @@ class Item extends ItemLight
 				'comment_ID'         => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
 				'before'             => '',
 				'after'              => '',
-				'text'               => '#icon# '.T_('This thread is resolved.'),
+				'text'               => '#icon# #long_text#',
 				'title'              => T_('This thread is resolved.'),
 				'display_for_author' => false,
+				'class'              => '',
 			), $params );
 
 		if( ! $params['display_for_author'] && is_logged_in() )
@@ -14539,18 +14540,23 @@ class Item extends ItemLight
 			}
 		}
 
-		$item_Blog = & $this->get_Blog();
-
 		if( $params['comment_ID'] !== $this->get( 'resolved_cmt_ID' ) &&
 		    ( $params['comment_ID'] !== 0 || $this->get( 'resolved_cmt_ID' ) === NULL ) )
 		{	// If Item is not resolved:
 			return '';
 		}
 
+		$text_masks = array(
+			'#icon#'       => get_icon( 'resolve_on' ),
+			'#long_text#'  => T_('This thread is resolved.'),
+			'#short_text#' => T_('Resolved'),
+		);
+
 		$r = $params['before'];
 
-		$r .= '<span class="evo_post_resolve_status"'.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ) ).'">'
-				.str_replace( '#icon#', get_icon( 'resolve_on' ), $params['text'] )
+		$r .= '<span class="evo_post_resolve_status'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'"'
+				.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ) ).'">'
+				.str_replace( array_keys( $text_masks ), $text_masks, $params['text'] )
 			.'</span>';
 
 		$r .= $params['after'];

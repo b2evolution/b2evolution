@@ -1014,6 +1014,12 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
+		case 'Item:resolved_status':
+			$rendered_Item->resolved_status( array_merge( array(
+					'display_for_author' => true,
+				), $params ) );
+			break;
+
 		case 'Item:refresh_contents_last_updated_link':
 			echo $rendered_Item->get_refresh_contents_last_updated_link( $params );
 			break;
