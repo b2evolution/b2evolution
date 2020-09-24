@@ -5826,9 +5826,9 @@ class Comment extends DataObject
 				'btn_class_resolve'   => 'btn btn-default btn-xs',
 				'btn_class_unresolve' => 'btn btn-success btn-xs',
 				'text_resolve'        => '#icon# '.T_('Mark this as Best Answer'),
-				'text_unresolve'      => '#icon# '.T_('You marked this as Best Answer'),
+				'text_unresolve'      => '#icon# '.T_('This is marked as Best Answer'),
 				'title_resolve'       => T_('Mark this as Best Answer').'.',
-				'title_unresolve'     => T_('You have selected this as the best answer. Click to unselect.'),
+				'title_unresolve'     => T_('This is marked as the best answer. Click to unmark.'),
 			), $params );
 
 		$comment_Item = & $this->get_Item();

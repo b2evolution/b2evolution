@@ -14483,13 +14483,8 @@ class Item extends ItemLight
 		}
 
 		if( $mode == 'edit' )
-		{	// For edit mode we should check if current User is author of this Item:
-			global $current_User;
-			$item_creator_User = & $this->get_creator_User();
-			if( ! $item_creator_User || $current_User->ID != $item_creator_User->ID )
-			{	// Current User must be an author of the comment's Item:
-				return false;
-			}
+		{	// For edit mode we should check if current User can edit this Item:
+			return check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this );
 		}
 
 		return true;
@@ -14613,9 +14608,9 @@ class Item extends ItemLight
 				'btn_class_resolve'   => 'btn btn-default',
 				'btn_class_unresolve' => 'btn btn-success',
 				'text_resolve'        => '#icon# '.T_('Mark this thread as resolved'),
-				'text_unresolve'      => '#icon# '.T_('You marked this thread as Resolved'),
+				'text_unresolve'      => '#icon# '.T_('This thread is marked as Resolved'),
 				'title_resolve'       => T_('Mark this thread as resolved').'.',
-				'title_unresolve'     => T_('You have resolved this thread. Click to unresolve.'),
+				'title_unresolve'     => T_('This thread is marked as resolved. Click to unresolve.'),
 			), $params );
 
 		$item_Blog = & $this->get_Blog();
