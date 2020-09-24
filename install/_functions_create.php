@@ -2492,7 +2492,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="search_result">
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
-		<div class="search_title">[Comment:permalink] <span class="label label-primary">Comment</span></div>
+		<div class="search_title">[Comment:permalink] <span class="label label-primary">Comment</span>[Comment:resolved_status|text=#icon# Solution|class=small green|before= ]</div>
 		<div class="result_content">[Comment:excerpt]</div>
 		<div class="search_info dimmed">Published by [Comment:author|
 			link_text=avatar_name|

@@ -389,6 +389,12 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
+		case 'Comment:resolved_status':
+			$rendered_Comment->resolved_status( array_merge( array(
+					'display_for_author' => true,
+				), $params ) );
+			break;
+
 		// File:
 		case 'File:description':
 			echo $rendered_File->get_description( $params );

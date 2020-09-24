@@ -5744,7 +5744,7 @@ class Comment extends DataObject
 	{
 		global $disp;
 
-		if( isset( $disp ) && $disp != 'single' &&  $disp != 'page' )
+		if( isset( $disp ) && $disp != 'single' && $disp != 'page' && $disp != 'search' )
 		{	// Allow display the resolved status only on Item view page:
 			return '';
 		}
