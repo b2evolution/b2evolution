@@ -338,6 +338,16 @@ skin_widget( array(
 	</div><!-- ../panel panel-default -->
 	</section><!-- ../table evo_content_block -->
 	<?php
+		// Display a link to go to best answer:
+		$Item->resolved_status( array(
+			'before'             => '<p>',
+			'after'              => '</p>',
+			'link_type'          => 'best_answer',
+			'text'               => '#icon# '.T_('Go to best answer'),
+			'title'              => T_('Go to best answer'),
+			'display_for_author' => true,
+		) );
+
 		$Item->locale_temp_switch(); // Temporarily switch to post locale (useful for multilingual blogs)
 	?>
 

@@ -14528,6 +14528,7 @@ class Item extends ItemLight
 				'title'              => T_('This thread is resolved.'),
 				'display_for_author' => false,
 				'class'              => '',
+				'link_type'          => 'none', // 'best_answer' - Link to comment marked as best answer, 'none' - Don't link
 			), $params );
 
 		if( ! $params['display_for_author'] && is_logged_in() )
@@ -14551,12 +14552,26 @@ class Item extends ItemLight
 			'#long_text#'  => T_('This thread is resolved.'),
 			'#short_text#' => T_('Resolved'),
 		);
+		$text = str_replace( array_keys( $text_masks ), $text_masks, $params['text'] );
+
+		if( $params['link_type'] == 'best_answer' )
+		{	// Link to best answer:
+			$CommentCache = & get_CommentCache();
+			if( $best_Comment = & $CommentCache->get_by_ID( $this->get( 'resolved_cmt_ID' ), false, false ) )
+			{	// If Comment exists:
+				$text = '<a href="'.$best_Comment->get_permanent_url().'">'.$text.'</a>';
+			}
+			else
+			{	// Don't display even simple text for this link type because it may be not clear without link:
+				return '';
+			}
+		}
 
 		$r = $params['before'];
 
 		$r .= '<span class="evo_post_resolve_status'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'"'
 				.( empty( $params['title'] ) ? '' : ' title="'.format_to_output( $params['title'], 'htmlattr' ) ).'">'
-				.str_replace( array_keys( $text_masks ), $text_masks, $params['text'] )
+				.$text
 			.'</span>';
 
 		$r .= $params['after'];
