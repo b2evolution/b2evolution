@@ -340,10 +340,10 @@ skin_widget( array(
 	<?php
 		// Display a link to go to best answer:
 		$Item->resolved_status( array(
-			'before'             => '<p>',
+			'before'             => '<p style="margin-top:-10px">',
 			'after'              => '</p>',
 			'link_type'          => 'best_answer',
-			'text'               => '#icon# '.T_('Go to best answer'),
+			'text'               => '#icon# '.T_('Go to best answer').' <span class="fa fa-angle-double-down"></span>',
 			'title'              => T_('Go to best answer'),
 			'display_for_author' => true,
 		) );
