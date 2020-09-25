@@ -14516,25 +14516,14 @@ class Item extends ItemLight
 		}
 
 		$params = array_merge( array(
-				'comment_ID'         => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
-				'before'             => '',
-				'after'              => '',
-				'text'               => '#icon# #long_text#',
-				'title'              => T_('This thread is resolved.'),
-				'display_for_author' => false,
-				'class'              => '',
-				'link_type'          => 'none', // 'best_answer' - Link to comment marked as best answer, 'none' - Don't link
+				'comment_ID' => 0, // 0 - to check if this Item is resolved with any Comment, > 0 - ID of the Comment to check if this Item is resolved with the Comment
+				'before'     => '',
+				'after'      => '',
+				'text'       => '#icon# #long_text#',
+				'title'      => T_('This thread is resolved.'),
+				'class'      => '',
+				'link_type'  => 'none', // 'best_answer' - Link to comment marked as best answer, 'none' - Don't link
 			), $params );
-
-		if( ! $params['display_for_author'] && is_logged_in() )
-		{	// This should not be displayed for author:
-			global $current_User;
-			$item_creator_User = & $this->get_creator_User();
-			if( $item_creator_User && $current_User->ID == $item_creator_User->ID )
-			{	// Current User is an author of this Item, Don't display:
-				return '';
-			}
-		}
 
 		if( $params['comment_ID'] !== $this->get( 'resolved_cmt_ID' ) &&
 		    ( $params['comment_ID'] !== 0 || $this->get( 'resolved_cmt_ID' ) === NULL ) )
@@ -14552,8 +14541,9 @@ class Item extends ItemLight
 		if( $params['link_type'] == 'best_answer' )
 		{	// Link to best answer:
 			$CommentCache = & get_CommentCache();
-			if( $best_Comment = & $CommentCache->get_by_ID( $this->get( 'resolved_cmt_ID' ), false, false ) )
-			{	// If Comment exists:
+			if( ( $best_Comment = & $CommentCache->get_by_ID( $this->get( 'resolved_cmt_ID' ), false, false ) ) &&
+			    $best_Comment->can_be_displayed() )
+			{	// If Comment exists and current User can see it:
 				$text = '<a href="'.$best_Comment->get_permanent_url().'">'.$text.'</a>';
 			}
 			else
@@ -14598,7 +14588,8 @@ class Item extends ItemLight
 	{
 		if( ! $this->can_resolve() )
 		{	// Don't display the resolve button if it is not allowed by some reason:
-			return '';
+			// But try to display status instead if it is allowed:
+			return $this->get_resolved_status( $params );
 		}
 
 		$params = array_merge( array(

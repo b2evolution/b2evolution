@@ -309,10 +309,8 @@ echo $params['comment_body_after'];
 	$Comment->vote_spam( '', '', '&amp;', true, true );
 
 	// Display button to select current Comment as the best answer:
-	$Comment->mark_resolved_button();
-
-	// Display status if current Comment is selected as the best answer:
-	$Comment->resolved_status( array(
+	// Or display a resolved status instead:
+	$Comment->mark_resolved_button( array(
 			'before' => ' '
 		) );
 

@@ -423,13 +423,8 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 	}
 
 	// Display button to resolve current Item:
+	// Or display a resolved status instead:
 	$Item->mark_resolved_button( array(
-			'before' => '<p class="text-center">',
-			'after'  => '</p>',
-		) );
-
-	// Display status if current Item is resolved:
-	$Item->resolved_status( array(
 			'before' => '<p class="text-center">',
 			'after'  => '</p>',
 		) );

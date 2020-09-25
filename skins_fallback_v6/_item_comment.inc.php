@@ -196,12 +196,8 @@ echo '<div class="action_btn_group">';
 echo '</div>';
 
 // Display button to select current Comment as the best answer:
+// Or display a resolved status instead:
 $Comment->mark_resolved_button( array(
-		'before' => ' '
-	) );
-
-// Display status if current Comment is selected as the best answer:
-$Comment->resolved_status( array(
 		'before' => ' '
 	) );
 

@@ -390,9 +390,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Comment:resolved_status':
-			$rendered_Comment->resolved_status( array_merge( array(
-					'display_for_author' => true,
-				), $params ) );
+			$rendered_Comment->resolved_status( $params );
 			break;
 
 		// File:
@@ -1021,9 +1019,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:resolved_status':
-			$rendered_Item->resolved_status( array_merge( array(
-					'display_for_author' => true,
-				), $params ) );
+			$rendered_Item->resolved_status( $params );
 			break;
 
 		case 'Item:refresh_contents_last_updated_link':

@@ -5639,7 +5639,7 @@ class Comment extends DataObject
 	 * @param string Mode: 'edit', 'view'
 	 * @return boolean
 	 */
-	function can_resolve(  $mode = 'edit'  )
+	function can_resolve( $mode = 'edit' )
 	{
 		if( empty( $this->ID ) )
 		{	// Comment is not created yet:
@@ -5817,7 +5817,8 @@ class Comment extends DataObject
 
 		if( ! $this->can_resolve() )
 		{	// Don't display the resolve button if it is not allowed by some reason:
-			return '';
+			// But try to display status instead if it is allowed:
+			return $this->get_resolved_status( $params );
 		}
 
 		$params = array_merge( array(

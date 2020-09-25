@@ -183,10 +183,9 @@ $display_workflow =
 
 		// Get status if current Item is resolved:
 		$item_resolve_status = $Item->get_resolved_status( array(
-				'before'             => '',
-				'after'              => ' ',
-				'text'               => '#icon#',
-				'display_for_author' => true,
+				'before' => '',
+				'after'  => ' ',
+				'text'   => '#icon#',
 			) );
 
 		if( $comments_number == 0 && $Item->comment_status == 'disabled' )
@@ -256,10 +255,9 @@ $display_workflow =
 
 			// Display status if current Item is resolved:
 			$Item->resolved_status( array(
-					'before'             => ' ',
-					'after'              => '',
-					'text'               => '#icon#',
-					'display_for_author' => true,
+					'before' => ' ',
+					'after'  => '',
+					'text'   => '#icon#',
 				) );
 
 			echo '</div>';
@@ -279,7 +277,6 @@ $display_workflow =
 					'before' => ' ',
 					'after'  => '',
 					'text'   => '#icon#',
-					'display_for_author' => true,
 				) );
 
 			echo '</div>';
@@ -333,10 +330,9 @@ $display_workflow =
 
 		// Display status if current Item is resolved:
 		$Item->resolved_status( array(
-				'before'             => ' ',
-				'after'              => '',
-				'text'               => '#icon#',
-				'display_for_author' => true,
+				'before' => ' ',
+				'after'  => '',
+				'text'   => '#icon#',
 			) );
 
 		echo '</div>';
