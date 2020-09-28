@@ -14483,8 +14483,10 @@ class Item extends ItemLight
 		}
 
 		if( $mode == 'edit' )
-		{	// For edit mode we should check if current User can edit this Item:
-			return check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+		{	// For edit mode we should check if current User is author or can edit this Item:
+			global $current_User;
+			return ( ( $item_creator_User = & $this->get_creator_User() ) && $current_User->ID == $item_creator_User->ID ) ||
+				check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this );
 		}
 
 		return true;
