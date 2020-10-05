@@ -72,7 +72,7 @@ else
 
 $block_item_Widget->title = $block_title.get_manual_link( 'installing-skins' );
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
 	$block_item_Widget->global_icon( T_('Cancel installation!'), 'close', $redirect_to );
 }
@@ -88,15 +88,19 @@ $Form->hidden( 'skin_type', get_param( 'skin_type' ) );
 $Form->hidden( 'kind', get_param( 'kind' ) );
 $Form->hidden( 'tab', $tab );
 $Form->begin_form( 'skin_selector_filters' );
-$Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
+$skin_type_options = array(
 		''        => T_('All skins'),
 		'normal'  => T_('Standard skins'),
 		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
 		'alt'     => T_('Alt skins'),
-		'feed'    => T_('Feed skins'),
-		'sitemap' => T_('Sitemap skins'),
-	), T_('Skin type'), '', array(
+	);
+if( get_param( 'tab' ) != 'coll_skin' && get_param( 'tab' ) != 'site_skin' )
+{	// Allow install feed and sitemap skins only on normal mode and don't allow when we select new skin for collection:
+	$skin_type_options['feed'] = T_('Feed skins');
+	$skin_type_options['sitemap'] = T_('Sitemap skins');
+}
+$Form->select_input_array( 'sel_skin_type', $sel_skin_type, $skin_type_options, T_('Skin type'), '', array(
 		'force_keys_as_values' => true,
 		'onchange' => 'this.form.submit()'
 	) );
@@ -234,15 +238,15 @@ foreach( $skin_folders as $skin_folder )
 		$skin_folders_data[$skin_folder]['status'] = 'duplicate';
 	}
 	elseif( ! @$skin_class_file_contents = file_get_contents( $skins_path.$skin_folder.'/_skin.class.php' ) )
-	{ 	// Could not load the contents of the skin file:
+	{	// Could not load the contents of the skin file:
 		$disp_params = array(
 				'function'        => 'broken',
 				'msg'             => T_('_skin.class.php NOT FOUND!'),
 			);
 		$skin_folders_data[$skin_folder]['status'] = 'missing class file';
 	}
-	elseif( strpos( $skin_class_file_contents, 'class '.$skin_class_name.' extends Skin' ) === false )
-	{
+	elseif( ! preg_match( '/class '.preg_quote( $skin_class_name ).' extends (site_)?Skin/', $skin_class_file_contents ) )
+	{	// Skin has no correct initialization:
 		$disp_params = array(
 				'function'        => 'broken',
 				'msg'             => T_('MALFORMED _skin.class.php'),
@@ -338,7 +342,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 
 
 			if( $kind != '' && $folder_Skin->supports_coll_kind( $kind ) != 'yes' )
-			{ // Filter skin by support for collection type
+			{	// Filter skin by support for collection type:
 				$skin_folders_data[$skin_folder]['supported'] = false;
 				$skin_folders_data[$skin_folder]['status'] = 'ignore';
 			}
@@ -399,7 +403,8 @@ foreach( $skin_folders_data as $skin_folder => $data )
 															.( empty( $skin_type ) ? '' : '&amp;skin_type='.$skin_type )
 															.'&amp;skin_folder='.rawurlencode( $skin_folder )
 															.'&amp;redirect_to='.rawurlencode( $redirect_to_after_install )
-															.'&amp;'.url_crumb( 'skin' )
+															.'&amp;'.url_crumb( 'skin' ),
+					'onclick'         => ( $tab == 'coll_skin' ? 'return confirm_skin_selection( this, "'.$folder_Skin->type.'" )' : '' ),
 				);
 				$skin_folders_data[$skin_folder]['status'] = 'ok';
 			}
@@ -479,6 +484,11 @@ else
 $Form->end_form( $form_buttons );
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
+
+if( $tab == 'coll_skin' )
+{	// JavaScript code to confirm skin selection:
+	echo_confirm_skin_selection_js();
+}
 
 ?>
 <script>

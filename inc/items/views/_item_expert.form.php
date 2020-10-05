@@ -14,10 +14,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var Item
  */
 global $edited_Item;
@@ -47,6 +43,7 @@ global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
 global $redirect_to, $orig_action;
+global $attachment_tab;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -109,7 +106,7 @@ $Form->begin_form( '', '', $params );
 ?>
 <div class="row">
 
-<div class="left_col col-lg-9 col-md-8">
+<div class="left_col col-lg-9 col-md-8 content-form-with-tab">
 
 	<?php
 	// ############################ INSTRUCTIONS ##############################
@@ -145,7 +142,7 @@ $Form->begin_form( '', '', $params );
 			$form_title_item_ID = TB_('New Item');
 		}
 	}
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Add an icon to edit item type if current user has a permission:
 		$item_type_edit_link = ' '.action_icon( TB_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$edited_Item->get( 'ityp_ID' ) );
 	}
@@ -153,8 +150,18 @@ $Form->begin_form( '', '', $params );
 	{
 		$item_type_edit_link = '';
 	}
+	if( $ItemType->is_enabled( $edited_Item->get_blog_ID() ) )
+	{	// If Item Type is enabled for the Item's Collection:
+		$item_type_before = '';
+		$item_type_after = '';
+	}
+	else
+	{	// Mark with orange label if Item Type is disabled for the Item's Collection:
+		$item_type_before = '<span class="label label-warning" title="'.format_to_output( TB_('This type is disabled for this collection.'), 'htmlattr' ).'">';
+		$item_type_after = '</span>';
+	}
 	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
-				.'<span class="pull-right">'.sprintf( TB_('Type: %s'), $item_type_link ).$item_type_edit_link.'</span>',
+				.'<span class="pull-right">'.$item_type_before.TB_('Type').$item_type_after.': '.$item_type_link.$item_type_edit_link.'</span>',
 			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'fields_table' );
@@ -190,10 +197,46 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_title', $item_title );
 	}
 	$Form->end_fieldset();
+
+	// URL slugs:
+	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
+	$Form->hidden( 'slug_changed', 0 );
+	$edit_slug_link = '';
+	if( $edited_Item->ID > 0 && check_user_perm( 'slugs', 'view' ) )
+	{	// Current User has a permission to view slugs:
+		// Get icon to copy canonical slug to clipboard:
+		$edit_slug_link = action_icon( TB_('Copy slug to clipboard'), 'clipboard-copy', '#', TB_('Copy slug'), 3, 4, array(
+				'id'      => 'item_canonical_slug_clipboard_icon', // ID is used to highlight on coping process
+				'onclick' => 'return evo_copy_to_clipboard( \'item_canonical_slug_clipboard_icon\', \''.format_to_js( $edited_Item->get( 'urltitle' ) ).'\' )',
+			) ).' ';
+		// Get link to edit slugs page:
+		$edit_slug_link .= action_icon( TB_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, TB_('Edit slugs'), 3, 4 )
+			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this post"
+			.' '.TB_('for this post').' - ';
+	}
+
+	if( empty( $edited_Item->tiny_slug_ID ) )
+	{	// No tiny URL:
+		$tiny_slug_info = TB_('No Tiny URL yet.');
+	}
+	else
+	{	// Get a link to tiny URL:
+		$tiny_slug_info = $edited_Item->get_tinyurl_link( array(
+				'before' => TB_('Tiny URL').': ',
+				'after'  => ''
+			) ).' ';
+		// Get icon to copy tiny URL to clipboard:
+		$tiny_slug_info .= action_icon( TB_('Copy Tiny URL to clipboard'), 'clipboard-copy', '#', '', NULL, NULL, array(
+				'id'      => 'item_tiny_url_clipboard_icon', // ID is used to highlight on coping process
+				'onclick' => 'return evo_copy_to_clipboard( \'item_tiny_url_clipboard_icon\', \''.$edited_Item->get_tinyurl().'\' )',
+			) );
+	}
+	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, TB_('URL slugs'), $edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210 ) );
+
 	$Form->switch_layout( NULL );
 
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-	    $current_User->check_perm( 'files', 'view', false ) )
+	    check_user_perm( 'files', 'view', false ) )
 	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
 		load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 		// Initialize this object as global because this is used in many link functions:
@@ -273,7 +316,7 @@ $Form->begin_form( '', '', $params );
 		echo '</span>';
 	}
 	if( $edited_Item->get_type_setting( 'usage' ) == 'widget-page' &&
-	    $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+	    check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 	{	// Display a button to edit widgets only if item type is used for page containers and current user has permission to edit widgets:
 		echo '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'" class="btn btn-primary">'.TB_('Edit widgets now').'</a>';
 	}
@@ -289,17 +332,74 @@ $Form->begin_form( '', '', $params );
 
 	$Form->end_fieldset();
 
+	global $UserSettings;
+	
+	$active_tab_pane_value = $UserSettings->get_collection_setting( 'active_tab_pane_itemform', $Blog->ID );
+	
+	echo '<input type="hidden" name="tab_pane_active[tab_pane_itemform]" id="itemform_tab_pane" value="'.$active_tab_pane_value.'">';
 
-	// ####################### ATTACHMENTS/LINKS #########################
+	echo '<ul class="nav nav-tabs">';
+
+	$tab_panes = array();
+
+	// Attachments:
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) )
+	{	// If attachments are allowed for the Item Type:
+		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+		if( $LinkOwner->check_perm( 'edit', false ) )
+		{	// If current User has a permission to edit attachments of the edited Item:
+			$tab_panes[] = '#attachment';
+			echo '<li><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+		}
+	}
+
+	// Custom fields:
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) )
+	{
+		$tab_panes[] = '#custom_fields';
+		echo '<li><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
+	}
+
+	// Advanced properties:
+	$tab_panes[] = '#advance_properties';
+	echo '<li><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
+
+	// Additional actions:
+	if( isset( $Blog ) && $Blog->get( 'allowtrackbacks' ) )
+	{
+		$tab_panes[] = '#allowtrackbacks';
+		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
+	}
+
+	// Internal comments:
+	if( $edited_Item->can_see_meta_comments() )
+	{	// Meta/Internal comments are allowed only when current User has a permission to view them:
+		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
+		$tab_panes[] = '#internal_comments';
+		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
+	}
+
+	// Checklist:
+	if( $edited_Item->can_see_meta_comments() && // Current User must has at least a permission to view meta comments
+	    ( ! $creating || $edited_Item->can_meta_comment() ) ) // No need to display this tab for new Item if current User cannot add checklist item
+	{	// Checklist is allowed only for users who can see meta/internal comments:
+		$tab_panes[] = '#checklist';
+		$unchecked_checklist_lines = $edited_Item->get_unchecked_checklist_lines();
+		echo '<li><a data-toggle="tab" href="#checklist">'.T_('Checklist').( $unchecked_checklist_lines > 0 ? ' <span id="checklist_counter" class="badge badge-important">'.$unchecked_checklist_lines.'</span>' : '' ).'</a></li>';
+	}
+
+	echo '</ul>';
+
+	echo '<div class="tab-content evo_tab_pane_itemform_content">';
+
+	$attachment_tab = true;
 	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
 	$Form->attachments_fieldset( $edited_Item, $fold_images_attachments_block );
 
-
-	// ############################ CUSTOM FIELDS #############################
-	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
 	{	// Display fieldset with custom fields only if at least one exists:
-		$custom_fields_title = TB_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+		$custom_fields_title = get_manual_link( 'post-custom-fields-panel' );
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
 			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
@@ -309,55 +409,30 @@ $Form->begin_form( '', '', $params );
 				.'</span>';
 		}
 
-		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+		$Form->open_tab_pane( array( 'id' => 'custom_fields', 'class' => 'tab_pane_pads', 'right_items' => $custom_fields_title ) );
 
 		$Form->switch_layout( 'fields_table' );
-		$Form->begin_fieldset();
 
 		// Display inputs to edit custom fields:
 		display_editable_custom_fields( $Form, $edited_Item );
 
-		$Form->end_fieldset();
 		$Form->switch_layout( NULL );
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
+
+	
 
 	// ############################ ADVANCED PROPERTIES #############################
 
-	$Form->begin_fieldset( TB_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
+	$Form->open_tab_pane( array( 'id' => 'advance_properties', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-advanced-properties-panel' ) ) );
 
 	$Form->switch_layout( 'fields_table' );
-	$Form->begin_fieldset();
-
-	// URL slugs:
-	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
-	$Form->hidden( 'slug_changed', 0 );
-	$edit_slug_link = '';
-	if( $edited_Item->ID > 0 && $current_User->check_perm( 'slugs', 'view' ) )
-	{ // user has permission to view slugs:
-		$edit_slug_link = action_icon( TB_('Edit slugs'), 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$edited_Item->ID, TB_('Edit slugs'), 3, 4 )
-			// TRANS: Full phrase is "<a href="">Edit slugs</a> for this post"
-			.' '.TB_('for this post').' - ';
-	}
-
-	if( empty( $edited_Item->tiny_slug_ID ) )
-	{
-		$tiny_slug_info = TB_('No Tiny URL yet.');
-	}
-	else
-	{
-		$tiny_slug_info = $edited_Item->get_tinyurl_link( array(
-				'before' => TB_('Tiny URL').': ',
-				'after'  => ''
-			) );
-	}
-	$Form->text_input( 'post_urltitle', $edited_Item->get_slugs(), 40, TB_('URL slugs'), $edit_slug_link.$tiny_slug_info, array( 'maxlength' => 210 ) );
 
 	if( $edited_Item->get_type_setting( 'use_tags' ) != 'never' )
 	{	// Display tags:
 		$link_to_tags_manager = '';
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{ // Display a link to manage tags only when current use has the rights
 			$link_to_tags_manager = ' &ndash; <a href="'.$admin_url.'?ctrl=itemtags&amp;tag_item_ID='.$edited_Item->ID.'">'.TB_('Go to tags manager').'</a>';
 		}
@@ -485,17 +560,15 @@ $Form->begin_form( '', '', $params );
 		}
 	}
 
-	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
-	$Form->end_fieldset();
-
+	$Form->close_tab_pane();
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( TB_('Additional actions').get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
+		$Form->open_tab_pane( array( 'id' => 'allowtrackbacks', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-edit-additional-actions-panel' ) ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
@@ -506,25 +579,17 @@ $Form->begin_form( '', '', $params );
 		</div>
 		<?php
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
 
-
-	// ####################### PLUGIN FIELDSETS #########################
-
-	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
-
-	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	if( $edited_Item->can_see_meta_comments() )
 	{
 		// ####################### INTERNAL COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
-		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( TB_('Internal comments').get_manual_link( 'meta-comments-panel' )
-						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
-					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
+		$Form->open_tab_pane( array( 'id' => 'internal_comments', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'meta-comments-panel' ) ) );
 
 		if( $creating )
 		{	// Display button to save new creating item:
@@ -569,8 +634,38 @@ $Form->begin_form( '', '', $params );
 			load_funcs( 'comments/model/_comment_js.funcs.php' );
 		}
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
+
+	// ####################### CHECKLIST #########################
+	if( $edited_Item->can_see_meta_comments() && // Current User must has at least a permission to view meta comments
+	    ( ! $creating || $edited_Item->can_meta_comment() ) ) // No need to display this tab for new Item if current User cannot add checklist item
+	{	// Checklist is allowed only for users who can see meta/internal comments:
+		$Form->open_tab_pane( array( 'id' => 'checklist', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'item-checklist-panel' ) ) );
+		if( $creating )
+		{	// Display button to save new creating item:
+			$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ TB_('Save post to start adding Checklist lines'), 'btn-primary' ) );
+		}
+		else
+		{
+			// Make sure the widget does not insert a form here!
+			skin_widget( array(
+				// CODE for the widget:
+				'widget' => 'item_checklist_lines',
+				// Optional display params
+				'Item'  => $edited_Item,
+				'title' => NULL,
+			) );
+		}
+		$Form->close_tab_pane();
+	}
+
+	echo '</div><br>';
+
+	// ####################### PLUGIN FIELDSETS #########################
+
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
+
 	?>
 
 </div>
@@ -634,29 +729,11 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 	{	// Display parent ID:
-		$parent_info = '<span id="parent_item_info">';
-		if( $parent_Item = & $edited_Item->get_parent_Item() )
-		{	// Get parent item info if it is defined:
-			$status_icons = get_visibility_statuses( 'icons' );
-			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
-			{	// Status colored icon:
-				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
-			}
-			// Title with link to permament url:
-			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
-			// Icon to edit:
-			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
-		}
-		$parent_info .= '</span>';
-
-		// Icon to select parent:
-		$parent_info .= action_icon( TB_('Select parent'), 'magnifier', '#', NULL, NULL, NULL, array(
-				'onclick' => 'return evo_select_parent_load_window( '.$edited_Item->ID.', \''.$edited_Item->get_blog()->get( 'urlname' ).'\' )' ) );
-
 		echo '<tr><td><strong>'.TB_('Parent ID').':</strong></td><td>';
-		$Form->text_input( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), 11, '', $parent_info, array(
-				'required' => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
-				'style'    => 'width:115px',
+		$Form->item_selector( 'post_parent_ID', $edited_Item->get( 'parent_ID' ), '', array(
+				'window_title_page1' => NT_('Select the parent'),
+				'window_title_page2' => NT_('Select this Post as parent:'),
+				'required'           => ( $edited_Item->get_type_setting( 'use_parent' ) == 'required' ),
 			) );
 		echo '</td></tr>';
 	}
@@ -665,7 +742,7 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 	}
 
-	if( $current_User->check_perm( 'users', 'edit' ) )
+	if( check_user_perm( 'users', 'edit' ) )
 	{	// If current User has full access to edit other users,
 		// Display item's owner:
 		echo '<tr><td class="flabel_item_owner_login"><strong>'.TB_('Owner').':</strong></td><td>';
@@ -689,7 +766,7 @@ $Form->begin_form( '', '', $params );
 
 	echo '</table>';
 
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:
 		if( $edited_Item->get_type_setting( 'allow_featured' ) )
 		{ // Display featured
@@ -712,7 +789,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// Single/page view:
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:
 		if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
 		{	// We don't need this setting for intro, content block and special items:
@@ -727,7 +804,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// Issue date:
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:
 		echo '<div class="itemform_extra_radio">';
 		$Form->output = false;
@@ -849,7 +926,7 @@ $Form->begin_form( '', '', $params );
 			$Form->switch_layout( NULL );
 		}
 
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
 			{ // Display comment expiration
@@ -875,7 +952,7 @@ $Form->begin_form( '', '', $params );
 
 		// ################### USER TAGGING ###################
 		$Form->begin_fieldset( TB_('User Tagging').get_manual_link( 'post-user-tagging-panel' )
-						.( $current_User->check_perm( 'options', 'view' ) ? action_icon( TB_('User Tags'), 'edit', $admin_url.'?ctrl=usertags', TB_('User Tags'), 3, 4, array( 'class' => 'action_icon pull-right' ) ) : '' ),
+						.( check_user_perm( 'options', 'view' ) ? action_icon( TB_('User Tags'), 'edit', $admin_url.'?ctrl=usertags', TB_('User Tags'), 3, 4, array( 'class' => 'action_icon pull-right' ) ) : '' ),
 					array( 'id' => 'itemform_usertags', 'fold' => true ) );
 
 		$Form->switch_layout( 'table' );
@@ -902,7 +979,7 @@ $Form->begin_form( '', '', $params );
 	}
 
 	if( $is_not_content_block &&
-	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	    check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// Display goal tracking and notifications for item with type usage except of content block
 		// and if user has a permission to edit advanced properties of items:
 
@@ -1026,7 +1103,7 @@ $Form->begin_form( '', '', $params );
 	$quick_setting_url = $admin_url.'?ctrl=items&amp;prev_action='.$prev_action.( $item_ID > 0 ? '&amp;p='.$item_ID : '' )
 		.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'item' ).'&amp;action=';
 
-	if( $current_User->check_perm( 'blog_post!published', 'create', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_post!published', 'create', false, $Blog->ID ) )
 	{ // Display a link to show/hide quick button to publish the post ONLY if current user has a permission:
 		echo '<p>';
 		if( $UserSettings->get_collection_setting( 'show_quick_publish', $Blog->ID ) )
@@ -1130,15 +1207,89 @@ echo_item_merge_js();
 echo_item_add_version_js();
 // JS code for link to link new version:
 echo_item_link_version_js();
-// JS code for selecting parent item:
-if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
-{
-	echo_item_select_parent_js();
+if( $edited_Item->can_meta_comment() )
+{	// Init Item Checklist JS to update red badge in tab of not checked lines:
+	expose_var_to_js( 'evo_item_checklist_config', true );
 }
 
 // JS to post excerpt mode switching:
 ?>
 <script>
+
+<?php
+
+$js_tab_panes_array = json_encode($tab_panes);
+echo "var js_tab_panes_array = ". $js_tab_panes_array . ";\n";
+
+?>
+
+tab_href_value = jQuery( '.content-form-with-tab #itemform_tab_pane' ).val();
+
+// Check if database saved active tab pane value exits in the tab pane or not
+if( js_tab_panes_array.indexOf( tab_href_value ) == -1 )
+{
+	tab_href_value = js_tab_panes_array[0];
+}
+
+if( jQuery( '.checklist_lines' ).length > 0 )
+{	// Watch for new checklist items and update badge accordingly:
+	var checklist = document.querySelector( '.checklist_lines' );
+	var observer_config = { attributes: true, childList: true, characterData: true };
+	var observer = new MutationObserver( function( mutations ) {
+		mutations.forEach( function( mutation )
+			{
+				if( ( mutation.addedNodes && mutation.addedNodes.length > 0 ) || ( mutation.removedNodes && mutation.removedNodes.length > 0 ) )
+				{
+					var nodes_to_check = [];
+					// element added to DOM
+					if( mutation.addedNodes.length > 0 )
+					{
+						nodes_to_check = mutation.addedNodes;
+					}
+					else if( mutation.removedNodes.length > 0 )
+					{
+						nodes_to_check = mutation.removedNodes;
+					}
+					var hasClass = [].some.call( nodes_to_check, function( el )
+						{	// Check if added/removed node has class '.checklist_line':
+							if( el.classList )
+							{
+								return el.classList.contains( 'checklist_line' );
+							}
+							else
+							{
+								return false;
+							}
+						} );
+
+					if( hasClass )
+					{	// element has class `.checklist_line`, update counter:
+						window.update_checklist_tab_badge();
+					}
+				}
+			} );
+	} );
+	observer.observe( checklist, observer_config );
+}
+
+jQuery( '.content-form-with-tab .nav-tabs a[href="' + tab_href_value + '"]' ).tab( 'show' );
+jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
+
+if( jQuery( '.content-form-with-tab #attachment' ).length > 0 )
+{	// Show attachment tab result summary in single line:
+	jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
+}
+
+jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )
+{	// Do tab wise operations
+	tab_href_value = jQuery( event.target ).attr( "href" );
+	jQuery( '.content-form-with-tab #itemform_tab_pane' ).val( tab_href_value );
+	if( tab_href_value === '#advance_properties' )
+	{
+		jQuery( window ).resize();
+	}
+});
+
 jQuery( '#post_excerpt' ).on( 'keyup', function()
 {
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:

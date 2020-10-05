@@ -100,7 +100,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		// Set URL to redirect after succesful action:
 		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog.( empty( $mode ) ? '' : '&mode='.$mode );
@@ -149,6 +149,7 @@ switch( $action )
 			case 'features':
 			case 'contact':
 			case 'userdir':
+			case 'search':
 			case 'other':
 			case 'popup':
 			case 'metadata':
@@ -178,8 +179,27 @@ switch( $action )
 					if( $edited_Blog->load_from_Request( array() ) )
 					{ // Commit update to the DB:
 						$edited_Blog->dbupdate();
-						// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
-						$edited_Blog->db_save_main_containers();
+
+						if( param( 'reset_widgets', 'integer', 0 ) )
+						{	// Widget must be reseted:
+							$updated_skin_type = '';
+							if( get_param( 'normal_skin_ID' ) !== NULL )
+							{	// Normal skin has been changed:
+								$updated_skin_type = 'normal';
+							}
+							elseif( get_param( 'tablet_skin_ID' ) !== NULL )
+							{	// Tablet skin has been changed:
+								$updated_skin_type = 'tablet';
+							}
+							elseif( get_param( 'mobile_skin_ID' ) !== NULL )
+							{	// Mobile skin has been changed:
+								$updated_skin_type = 'mobile';
+							}
+							if( ! empty( $updated_skin_type ) )
+							{	// Reset previous widgets with new from skin default widget declarations:
+								$edited_Blog->reset_widgets( $updated_skin_type );
+							}
+						}
 
 						$Messages->add( TB_('The blog skin has been changed.')
 											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.TB_('Edit...').'</a>', 'success' );
@@ -285,7 +305,7 @@ switch( $action )
 			case 'advanced':
 				if( $edited_Blog->load_from_Request( array( 'pings', 'cache', 'authors', 'login', 'styles', 'template', 'credits', 'meta' ) ) )
 				{ // Commit update to the DB:
-					if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+					if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 					{
 						$cache_status = param( 'cache_enabled', 'integer', 0 );
 						load_funcs( 'collections/model/_blog.funcs.php' );
@@ -332,7 +352,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 		$update_redirect_url = '?ctrl=coll_settings&tab='.$tab.'&blog='.$blog;
 
 		param( 'reset', 'boolean', '' );
@@ -346,22 +366,13 @@ switch( $action )
 		}
 
 		if( $reset )
-		{ // Reset all settings
-			// Remove previous widgets, widget containers, plugin and skin settings
-			$DB->query( 'DELETE wico, wi
-				FROM T_widget__container AS wico
-			 	LEFT JOIN T_widget__widget AS wi ON wi_wico_ID = wico_ID
-			 	WHERE wico_coll_ID = '.$DB->quote( $edited_Blog->ID ) );
-
+		{	// Reset all settings:
+			// Remove previous plugin and skin settings:
 			$DB->query( 'DELETE FROM T_coll_settings
 				WHERE cset_coll_ID = '.$DB->quote( $edited_Blog->ID ).'
 				AND ( cset_name LIKE "skin%" OR cset_name LIKE "plugin%" )' );
-			// ADD DEFAULT WIDGETS:
-			load_funcs( 'widgets/_widgets.funcs.php' );
-			insert_basic_widgets( $edited_Blog->ID, 'normal', false, $type );
-			insert_basic_widgets( $edited_Blog->ID, 'mobile', false, $type );
-			insert_basic_widgets( $edited_Blog->ID, 'tablet', false, $type );
-			insert_basic_widgets( $edited_Blog->ID, 'alt', false, $type );
+			// Reset previous widgets with new from all skins default widget declarations:
+			$edited_Blog->reset_widgets();
 		}
 
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );
@@ -381,7 +392,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		$update_redirect_url = $admin_url.'?ctrl=collections';
 
@@ -475,7 +486,7 @@ if( $action == 'dashboard' )
 	// load dashboard functions
 	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
 
-	if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $blog ) )
+	if( ! check_user_perm( 'blog_ismember', 'view', false, $blog ) )
 	{ // We don't have permission for the requested blog (may happen if we come to admin from a link on a different blog)
 		set_working_blog( 0 );
 		unset( $Blog, $Collection );
@@ -496,7 +507,7 @@ if( $action == 'dashboard' )
 	$activate_collection_toolbar = true;
 
 	// Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-	require_js( '#jqueryUI#' );
+	require_js_defer( '#jqueryUI#' );
 
 	// Load the appropriate blog navigation styles (including calendar, comment forms...):
 	require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -504,8 +515,8 @@ if( $action == 'dashboard' )
 	require_js_helper( 'colorbox' );
 
 	// Include files to work with charts
-	require_js( '#easypiechart#' );
-	require_css( 'jquery/jquery.easy-pie-chart.css' );
+	require_js_defer( '#easypiechart#' );
+	require_css( 'ext:jquery/easy-pie-chart/css/jquery.easy-pie-chart.css' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
@@ -529,7 +540,7 @@ if( $action == 'dashboard' )
 
 		foreach( $blog_moderation_statuses as $status )
 		{
-			if( ( $status !== $highest_publish_status ) && $current_User->check_perm( 'blog_comment!'.$status, 'edit', false, $blog ) )
+			if( ( $status !== $highest_publish_status ) && check_user_perm( 'blog_comment!'.$status, 'edit', false, $blog ) )
 			{
 				$user_modeartion_statuses[] = $status;
 			}
@@ -611,7 +622,7 @@ if( $action == 'dashboard' )
 		echo '<div class="row browse">';
 
 		// Block Group 1
-		$perm_options_edit = $current_User->check_perm( 'options', 'edit' );
+		$perm_options_edit = check_user_perm( 'options', 'edit' );
 
 		if( $perm_options_edit )
 		{
@@ -620,7 +631,7 @@ if( $action == 'dashboard' )
 			echo '<div class="col-xs-12 col-sm-12 col-md-3 col-md-push-0 col-lg-'.( ($have_comments_to_moderate || $have_posts_to_moderate) ? '6' : '3' ).' col-lg-push-0 floatright">';
 
 			$side_item_Widget = new Widget( 'side_item' );
-			$perm_blog_properties = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID );
+			$perm_blog_properties = check_user_perm( 'blog_properties', 'edit', false, $Blog->ID );
 
 			// Collection Analytics Block
 			if( $perm_options_edit )
@@ -666,7 +677,7 @@ if( $action == 'dashboard' )
 			if( $Blog->get( 'notes' ) )
 			{
 				$edit_link = '';
-				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 				{
 					$edit_link = action_icon( TB_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.TB_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
 				}
@@ -762,7 +773,7 @@ if( $action == 'dashboard' )
 				.( $have_comments_to_moderate || $have_posts_to_moderate ? ' col-md-pull-0 col-lg-6 col-lg-pull-0' : '' ).'">';
 		}
 
-		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+		if( check_user_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 		{	// If user has a perm to view internal comments of the collection:
 
 			// Latest Internal Comments Block
@@ -844,7 +855,7 @@ if( $action == 'dashboard' )
 			$nb_blocks_displayed++;
 
 			echo '<!-- Start of Recently Edited Post Block-->';
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 			{	// We have permission to add a post with at least one status:
 				$block_item_Widget->global_icon( TB_('Write a new post...'), 'new', '?ctrl=items&amp;action=new&amp;blog='.$Blog->ID, TB_('New post').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary btn-sm' ) );
 			}
@@ -889,8 +900,8 @@ if( $action == 'dashboard' )
 						'after'               => '</div>',
 						'image_size'          => 'crop-80x80',
 						'limit'               => 1,
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'cover'
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'cover'|'background'
+						'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink,aftermore,inline',
 						// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 						'links_sql_select'    => ', CASE '
 								.'WHEN link_position = "cover"      THEN "1" '
@@ -1090,6 +1101,13 @@ else
 			$AdminUI->set_page_manual_link( 'features-user-directory' );
 			break;
 
+		case 'search':
+			$AdminUI->set_path( 'collections', 'features', $tab );
+			$AdminUI->breadcrumbpath_add( TB_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
+			$AdminUI->breadcrumbpath_add( TB_('Search'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+			$AdminUI->set_page_manual_link( 'features-search' );
+			break;
+
 		case 'other':
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( TB_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
@@ -1170,7 +1188,7 @@ else
 			$AdminUI->breadcrumbpath_add( TB_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
 			// Load JavaScript to toggle checkboxes:
-			require_js( 'collectionperms.js', 'rsc_url' );
+			require_js_async( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -1180,7 +1198,7 @@ else
 			$AdminUI->breadcrumbpath_add( TB_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
 			// Load JavaScript to toggle checkboxes:
-			require_js( 'collectionperms.js', 'rsc_url' );
+			require_js_async( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 
@@ -1216,6 +1234,9 @@ else
 					break;
 				case 'userdir':
 					$AdminUI->disp_view( 'collections/views/_coll_user_dir.form.php' );
+					break;
+				case 'search':
+					$AdminUI->disp_view( 'collections/views/_coll_search.form.php' );
 					break;
 				case 'other':
 					$AdminUI->disp_view( 'collections/views/_coll_other.form.php' );

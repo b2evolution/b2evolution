@@ -15,14 +15,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 // Set options path:
 $AdminUI->set_path( 'options', 'syslog' );

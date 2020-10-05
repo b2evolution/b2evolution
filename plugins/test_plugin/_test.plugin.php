@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -1080,7 +1080,7 @@ class test_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		require_js( '#jquery#', 'blog' );
+		require_js_defer( '#jquery#', 'blog' );
 	}
 
 

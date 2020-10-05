@@ -136,6 +136,8 @@ class ItemListLight extends DataObjectList2
 				'assignees' => NULL,
 				'assignees_login' => NULL,
 				'author_assignee' => NULL,
+				'involves' => NULL,
+				'involves_login' => NULL,
 				'lc' => 'all',									// Filter on requested locale
 				'keywords' => NULL,
 				'keyword_scope' => 'title,content', // What fields are used for searching: 'title', 'content'
@@ -149,6 +151,7 @@ class ItemListLight extends DataObjectList2
 				'ymdhms_min' => NULL,
 				'ymdhms_max' => NULL,
 				'statuses' => NULL,
+				'statuses_array' => NULL,
 				'types' => NULL, // Filter by item type IDs (separated by comma)
 				'itemtype_usage' => 'post', // Filter by item type usage (separated by comma): post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
 				'visibility_array' => get_inskin_statuses( is_null( $this->Blog ) ? NULL : $this->Blog->ID, 'post' ),
@@ -158,6 +161,7 @@ class ItemListLight extends DataObjectList2
 				'posts' => $this->limit,
 				'page' => 1,
 				'featured' => NULL,
+				'renderers' => NULL,
 			) );
 	}
 
@@ -262,6 +266,14 @@ class ItemListLight extends DataObjectList2
 			memorize_param( $this->param_prefix.'author_assignee', 'string', $this->default_filters['author_assignee'], $this->filters['author_assignee'] );
 
 			/*
+			 * Restrict to selected involves:
+			 */
+			// List of involved user IDs to restrict to
+			memorize_param( $this->param_prefix.'involves', 'string', $this->default_filters['involves'], $this->filters['involves'] );
+			// List of involved user logins to restrict to
+			memorize_param( $this->param_prefix.'involves_login', 'string', $this->default_filters['involves_login'], $this->filters['involves_login'] );
+
+			/*
 			 * Restrict to selected locale:
 			 */
 			memorize_param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], $this->filters['lc'] );  // Locale to restrict to
@@ -270,6 +282,7 @@ class ItemListLight extends DataObjectList2
 			 * Restrict to selected statuses:
 			 */
 			memorize_param( $this->param_prefix.'status', 'string', $this->default_filters['statuses'], $this->filters['statuses'] );  // List of statuses to restrict to
+			memorize_param( $this->param_prefix.'statuses', 'array:string', $this->default_filters['statuses_array'], $this->filters['statuses_array'] );  // Array of statuses to restrict to
 
 			/*
 			 * Restrict to selected post type:
@@ -320,6 +333,11 @@ class ItemListLight extends DataObjectList2
 			 */
 			// Note: oftentimes, $show_statuses will have been preset to a more restrictive set of values
 			memorize_param( $this->param_prefix.'show_statuses', 'array', $this->default_filters['visibility_array'], $this->filters['visibility_array'] );	// Array of sharings to restrict to
+
+			/*
+			 * Restrict to selected renderer plugins:
+			 */
+			memorize_param( $this->param_prefix.'renderers', 'array:string', $this->default_filters['renderers'], $this->filters['renderers'] );
 
 			/*
 			 * OLD STYLE orders:
@@ -397,7 +415,9 @@ class ItemListLight extends DataObjectList2
 		$cat = param( 'cat', '/^[*\-\|]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], true ); // List of cats to restrict to
 		$catsel = param( 'catsel', 'array:integer', $this->default_filters['cat_array'], true );  // Array of cats to restrict to
 
-		if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
+		if( ( empty( $catsel ) || // 'catsel' multicats filter is not defined
+		      ( is_array( $catsel ) && count( $catsel ) == 1 ) // 'catsel' filter is used for single cat, e.g. when skin config 'cat_array_mode' = 'parent'
+		    ) && preg_match( '~^[0-9]+$~', $cat ) ) // 'cat' filter is ID of category and NOT modifier for 'catsel' multicats
 		{	// We are on a single cat page: (equivalent to $disp_detail == 'posts-topcat')
 			// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 			// BUT: - this can resolve to including children
@@ -446,6 +466,15 @@ class ItemListLight extends DataObjectList2
 
 
 		/*
+		 * Restrict to selected involves:
+		 */
+		// List of involved user IDs to restrict to
+		$this->filters['involves'] = param( $this->param_prefix.'involves', '/^-?[0-9]+(,[0-9]+)*$/', $this->default_filters['involves'], true );
+		// List of involved user logins to restrict to
+		$this->filters['involves_login'] = param( $this->param_prefix.'involves_login', '/^-?[A-Za-z0-9_\.]+(,[A-Za-z0-9_\.]+)*$/', $this->default_filters['involves_login'], true );
+
+
+		/*
 		 * Restrict to selected locale:
 		 */
 		$this->filters['lc'] = param( $this->param_prefix.'lc', 'string', $this->default_filters['lc'], true );
@@ -455,6 +484,7 @@ class ItemListLight extends DataObjectList2
 		 * Restrict to selected statuses:
 		 */
 		$this->filters['statuses'] = param( $this->param_prefix.'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', $this->default_filters['statuses'], true );      // List of statuses to restrict to
+		$this->filters['statuses_array'] = param( $this->param_prefix.'statuses', 'array:string', $this->default_filters['statuses_array'], true ); // Array of statuses to restrict to
 
 		/*
 		 * Restrict to selected types:
@@ -537,6 +567,11 @@ class ItemListLight extends DataObjectList2
 						, true, false, true, false );	// Array of sharings to restrict to
 
 		/*
+		 * Restrict to selected renderer plugins:
+		 */
+		$this->filters['renderers'] = param( $this->param_prefix.'renderers', 'array:string', $this->default_filters['renderers'], true );
+
+		/*
 		 * Ordering:
 		 */
 		$this->filters['order'] = param( $this->param_prefix.'order', '/^(asc|desc)([ ,](asc|desc))*$/i', $this->default_filters['order'], true );		// ASC or DESC
@@ -584,8 +619,6 @@ class ItemListLight extends DataObjectList2
 	 */
 	function query_init()
 	{
-		global $current_User;
-
 		// Call reset to init the ItemQuery
 		// This prevents from adding the same conditions twice if the ItemQuery was already initialized
 		$this->reset();
@@ -627,8 +660,11 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_assignees( $this->filters['assignees'] );
 		$this->ItemQuery->where_assignees_logins( $this->filters['assignees_login'] );
 		$this->ItemQuery->where_author_assignee( $this->filters['author_assignee'] );
+		$this->ItemQuery->where_involves( $this->filters['involves'] );
+		$this->ItemQuery->where_involves_logins( $this->filters['involves_login'] );
 		$this->ItemQuery->where_locale( $this->filters['lc'] );
 		$this->ItemQuery->where_statuses( $this->filters['statuses'] );
+		$this->ItemQuery->where_statuses_array( $this->filters['statuses_array'] );
 		$this->ItemQuery->where_types( $this->filters['types'] );
 		$this->ItemQuery->where_itemtype_usage( $this->filters['itemtype_usage'] );
 		$this->ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
@@ -646,6 +682,7 @@ class ItemListLight extends DataObjectList2
 			$this->ItemQuery->where_locale_visibility();
 		}
 		$this->ItemQuery->where_mustread( $this->filters['mustread'] );
+		$this->ItemQuery->where_renderers( $this->filters['renderers'] );
 
 
 		/*
@@ -890,8 +927,11 @@ class ItemListLight extends DataObjectList2
 		$lastpost_ItemQuery->where_author_logins( $this->filters['authors_login'] );
 		$lastpost_ItemQuery->where_assignees( $this->filters['assignees'] );
 		$lastpost_ItemQuery->where_assignees_logins( $this->filters['assignees_login'] );
+		$lastpost_ItemQuery->where_involves( $this->filters['involves'] );
+		$lastpost_ItemQuery->where_involves_logins( $this->filters['involves_login'] );
 		$lastpost_ItemQuery->where_locale( $this->filters['lc'] );
 		$lastpost_ItemQuery->where_statuses( $this->filters['statuses'] );
+		$lastpost_ItemQuery->where_statuses_array( $this->filters['statuses_array'] );
 		$lastpost_ItemQuery->where_types( $this->filters['types'] );
 		$lastpost_ItemQuery->where_itemtype_usage( $this->filters['itemtype_usage'] );
 		$lastpost_ItemQuery->where_keywords( $this->filters['keywords'], $this->filters['phrase'], $this->filters['exact'], $this->filters['keyword_scope'] );
@@ -901,6 +941,7 @@ class ItemListLight extends DataObjectList2
 		                                   $this->filters['ts_min'], $this->filters['ts_max'] );
 		$lastpost_ItemQuery->where_visibility( $this->filters['visibility_array'] );
 		$lastpost_ItemQuery->where_locale_visibility();
+		$lastpost_ItemQuery->where_renderers( $this->filters['renderers'] );
 
 		/*
 		 * order by stuff:
@@ -975,6 +1016,7 @@ class ItemListLight extends DataObjectList2
 				'display_status'      => true,
 				'status_text'         => T_('Status').': ',
 				'statuses_text'       => T_('Statuses').': ',
+				'statuses_nor_text'   => T_('All but '),
 
 				'display_itemtype'    => true,
 				'type_text'           => T_('Item Type').': ',
@@ -986,11 +1028,19 @@ class ItemListLight extends DataObjectList2
 				'display_assignee'    => true,
 				'assignes_text'       => T_('Assigned to').': ',
 
+				'display_involves'    => true,
+				'involves_text'       => T_('Involves').': ',
+				'involves_nor_text'   => T_('All involves except').': ',
+
 				'display_locale'      => true,
 				'display_time'        => true,
 				'display_limit'       => true,
 				'display_flagged'     => true,
 				'display_mustread'    => true,
+
+				'display_renderer'    => true,
+				'renderer_text'       => T_('Renderer').': ',
+				'renderers_text'      => T_('Renderers').': ',
 
 				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
 				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
@@ -1322,6 +1372,55 @@ class ItemListLight extends DataObjectList2
 		}
 
 
+		// INVOLVES:
+		if( $params['display_involves'] )
+		{
+			if( ! empty( $this->filters['involves'] ) || ! empty( $this->filters['involves_login'] ) )
+			{
+				$involves = trim( $this->filters['involves'].','.get_users_IDs_by_logins( $this->filters['involves_login'] ), ',' );
+				$exclude_involves = false;
+				if( substr( $involves, 0, 1 ) == '-' )
+				{	// Authors are excluded
+					$involves = substr( $involves, 1 );
+					$exclude_involves = true;
+				}
+				$involves = preg_split( '~\s*,\s*~', $involves, -1, PREG_SPLIT_NO_EMPTY );
+				$involves_names = array();
+				if( $involves )
+				{
+					$UserCache = & get_UserCache();
+					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+					foreach( $involves as $involves_ID )
+					{
+						if( $tmp_User = $UserCache->get_by_ID( $involves_ID, false, false ) )
+						{
+							$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'involves='.$involves_ID ) ) : '';
+							$involves_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( $params['involves_text'], $tmp_User->get( 'login' ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask'] );
+						}
+					}
+					$filter_class_i++;
+				}
+				if( count( $involves_names ) > 0 )
+				{	// Display info of filter by involves
+					if( $exclude_involves )
+					{	// Exclude involves
+						$involves_names_string = $params['involves_nor_text'].implode( $params['separator_nor'], $involves_names );
+					}
+					else
+					{	// Filter by involves
+						$involves_names_string = implode( $params['separator_comma'], $involves_names );
+					}
+
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						array( $params['involves_text'], $params['before_items'].$involves_names_string.$params['after_items'] ),
+						$params['group_mask'] );
+				}
+			}
+		}
+
+
 		// LOCALE:
 		if( $params['display_locale'] )
 		{
@@ -1340,41 +1439,72 @@ class ItemListLight extends DataObjectList2
 		}
 
 
-		// EXTRA STATUSES:
+		// EXTRA(WORKFLOW/TASK) STATUSES:
 		if( $params['display_status'] )
 		{
-			if( !empty($this->filters['statuses']) )
+			if( ! empty( $this->filters['statuses'] ) || ! empty( $this->filters['statuses_array'] ) )
 			{
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
-				if( $this->filters['statuses'] == '-' )
-				{
-					$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'status=-' ) ) : '';
-					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
-						array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
-						$params['filter_mask_nogroup'] );
+				if( isset( $this->filters['statuses_array'] ) &&
+				    is_array( $this->filters['statuses_array'] ) &&
+				    ! empty( $this->filters['statuses_array'] ) )
+				{	// Filter by array of statuses is used currently:
+					$filter_statuses = $this->filters['statuses_array'];
+					$filter_status_param = $this->param_prefix.'statuses';
+					$task_status_separator = $params['separator_or'];
+					$task_status_prefix = '';
+				}
+				elseif( ! empty( $this->filters['statuses'] ) )
+				{	// Filter by list/string of statuses is used currently:
+					$filter_statuses = explode( ',', $this->filters['statuses'] );
+					$filter_status_param = $this->param_prefix.'status';
+					if( strlen( $filter_statuses[0] ) > 1 &&
+					    substr( $filter_statuses[0], 0, 1 ) == '-' )
+					{	// Filter to exclude by statuses:
+						$filter_statuses[0] = substr( $filter_statuses[0], 1 );
+						$task_status_separator = $params['separator_nor'];
+						$task_status_prefix = $params['statuses_nor_text'];
+						$params['status_text'] = $params['statuses_text'];
+					}
+					else
+					{	// Filter to include by statuses:
+						$task_status_separator = $params['separator_or'];
+						$task_status_prefix = '';
+					}
 				}
 				else
-				{
-					$status_IDs = explode( ',', $this->filters['statuses'] );
-					$ItemStatusCache = & get_ItemStatusCache();
-					$statuses = array();
-					foreach( $status_IDs as $status_ID )
-					{
-						if( $ItemStatus = & $ItemStatusCache->get_by_ID( $status_ID ) )
-						{
-							$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'status='.$status_ID ) ) : '';
-							$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
-								array( $params['status_text'], $ItemStatus->get_name(), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
-								$params['filter_mask'] );
-						}
-					}
-					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
-						( ( count( $statuses ) > 1 ) ?
-							array( $params['statuses_text'], $params['before_items'].implode( $params['separator_comma'], $statuses ).$params['after_items'] ):
-							array( $params['status_text'], implode( $params['separator_comma'], $statuses ) ) ),
-						$params['group_mask'] );
+				{	// No filters by status:
+					$filter_statuses = array();
 				}
-				$filter_class_i++;
+				$ItemStatusCache = & get_ItemStatusCache();
+				$task_status_titles = array();
+				foreach( $filter_statuses as $filter_status )
+				{
+					if( $filter_status == '-' )
+					{	// Without status:
+						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $filter_status_param.'=-' ) ) : '';
+						$task_status_titles[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask_nogroup'] );
+					}
+					elseif( $ItemStatus = & $ItemStatusCache->get_by_ID( $filter_status, false, false ) )
+					{	// Specific status:
+						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $filter_status_param.'='.$ItemStatus->ID ) ) : '';
+						$task_status_titles[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( $params['status_text'], $ItemStatus->get_name(), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+				}
+				if( count( $task_status_titles ) > 0 )
+				{
+					$task_status_titles_string = $task_status_prefix.implode( $task_status_separator, $task_status_titles );
+					$title_array['task_statuses'] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $task_status_titles ) > 1 ?
+							array( $params['statuses_text'], $params['before_items'].$task_status_titles_string.$params['after_items'] ) :
+							array( $params['status_text'], $task_status_titles_string ) ),
+						$params['group_mask'] );
+					$filter_class_i++;
+				}
 			}
 		}
 
@@ -1593,6 +1723,36 @@ class ItemListLight extends DataObjectList2
 				$title_array['mustread'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 					array( T_('Must read'), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
 					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+
+		// RENDERERS:
+		if( $params['display_renderer'] &&
+		    ! empty( $this->filters['renderers'] ) )
+		{
+			global $Plugins;
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			$task_renderer_titles = array();
+			foreach( $this->filters['renderers'] as $renderer_plugin_code )
+			{
+				if( $renderer_Plugin = & $Plugins->get_by_code( $renderer_plugin_code, false, false ) )
+				{
+					$renderer_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'renderers='.$renderer_Plugin->code ) ) : '';
+					$task_renderer_titles[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( $params['renderer_text'], $renderer_Plugin->name, $renderer_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+			}
+			if( count( $task_renderer_titles ) > 0 )
+			{
+				$task_renderer_titles_string = implode( $params['separator_or'], $task_renderer_titles );
+				$title_array['task_renderers'] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $task_renderer_titles ) > 1 ?
+						array( $params['renderers_text'], $params['before_items'].$task_renderer_titles_string.$params['after_items'] ) :
+						array( $params['renderer_text'], $task_renderer_titles_string ) ),
+					$params['group_mask'] );
 				$filter_class_i++;
 			}
 		}
@@ -1967,8 +2127,11 @@ class ItemListLight extends DataObjectList2
 	 */
 	function display_list( $params )
 	{
+		global $Item, $cat;
+
 		$params = array_merge( array(
 				'template' => NULL,
+				'highlight_current' => true,
 			), $params );
 
 		if( ! empty( $params['template'] ) )
@@ -2005,6 +2168,31 @@ class ItemListLight extends DataObjectList2
 			// ONLY SUPPORTING Plain list: (not grouped by category) for now
 			// TODO: maybe support group by category. Use case???
 
+			$item_template = $params['item_template'];
+
+			if( ! empty( $params['highlight_current'] ) )
+			{	// Use template for active Item only when requested to highlight currently active Item:
+				$active_item_template = empty( $params['active_item_template'] ) ? $item_template : $params['active_item_template'];
+				if( $active_item_template == $item_template ||
+				    ! ( $active_item_Template = & $TemplateCache->get_by_code( $active_item_template, false, false ) ) )
+				{	// If active item template is not found in DB then use normal item template instead:
+					$active_item_template = $item_template;
+				}
+				// Highlight currently active Item ony when templates are different:
+				$highlight_current_item = ( $active_item_template != $item_template );
+			}
+			else
+			{	// Don't highlight currently active Item because it is not requested:
+				$highlight_current_item = false;
+			}
+
+			$crossposted_item_template = empty( $params['crossposted_item_template'] ) ? $item_template : $params['crossposted_item_template'];
+			if( $crossposted_item_template == $item_template ||
+			    ! ( $crossposted_item_Template = & $TemplateCache->get_by_code( $crossposted_item_template, false, false ) ) )
+			{	// If crossposted item template is not found in DB then use normal item template instead:
+				$crossposted_item_template = $item_template;
+			}
+
 			$this->restart();
 			while( $row_Item = & $this->get_item() )
 			{
@@ -2015,8 +2203,25 @@ class ItemListLight extends DataObjectList2
 						.( $params['active_item_slug'] == $row_Item->get( 'urltitle' ) ? '' : ' style="display:none"' ).'>';
 				}
 
+				if( $highlight_current_item &&
+				    ! empty( $Item ) &&
+				    $row_Item->ID == $Item->ID )
+				{	// Use different template for currently active Item:
+					$row_item_template = $active_item_template;
+				}
+				elseif( ! empty( $cat ) &&
+				        $row_Item->main_cat_ID != $cat &&
+				        in_array( $cat, $row_Item->get( 'extra_cat_IDs' ) ) )
+				{	// Use different template for crossposted Item:
+					$row_item_template = $crossposted_item_template;
+				}
+				else
+				{	// Use normal template to not active Item:
+					$row_item_template = $item_template;
+				}
+
 				// Render Item by quick template:
-				echo render_template_code( $params['item_template'], $params, array( 'Item' => $row_Item ) );
+				echo render_template_code( $row_item_template, $params, array( 'Item' => $row_Item ) );
 
 				if( ! empty( $params['switch_param_code'] ) )
 				{	// End of switchable item block:
@@ -2209,7 +2414,7 @@ class ItemListLight extends DataObjectList2
 		$disp_param_prefix = $chapter_mode ? 'group_' : '';
 
 		// Is this the current item?
-		if( !empty($Item) && $disp_Item->ID == $Item->ID )
+		if( ! empty( $params['highlight_current'] ) && ! empty( $Item ) && $disp_Item->ID == $Item->ID )
 		{	// The current page is currently displaying the Item this link is pointing to
 			// Let's display it as selected
 			$link_class = $params['link_selected_class'];
@@ -2246,7 +2451,7 @@ class ItemListLight extends DataObjectList2
 		if( $params['disp_first_image'] == 'special' )
 		{	// If we should display first picture before title then get "Cover" images and order them at top:
 			$cover_image_params = array(
-					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+					'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink,aftermore,inline',
 					// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 					'links_sql_select'  => ', CASE '
 							.'WHEN link_position = "cover"      THEN "1" '

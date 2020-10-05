@@ -16,14 +16,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'regional/model/_region.class.php', 'Region' );
 load_funcs( 'regional/model/_regional.funcs.php' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
@@ -55,7 +50,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'region' );
 
 		// Disable a region only if it is enabled, and user has edit access.
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure the region information was loaded. If not, just exit with error.
 		if( empty($edited_Region) )
@@ -93,7 +88,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'region' );
 
 		// Disable a region only if it is enabled, and user has edit access.
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure the region information was loaded. If not, just exit with error.
 		if( empty($edited_Region) )
@@ -126,7 +121,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset($edited_Region) )
 		{	// We don't have a model to use, start with blank object:
@@ -141,12 +136,12 @@ switch( $action )
 
 	case 'csv':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an rgn_ID:
 		param( 'rgn_ID', 'integer', true );
@@ -162,7 +157,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'region' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request
 		if( $edited_Region->load_from_Request() )
@@ -201,7 +196,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'region' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an rgn_ID:
 		param( 'rgn_ID', 'integer', true );
@@ -227,7 +222,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'region' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an rgn_ID:
 		param( 'rgn_ID', 'integer', true );
@@ -259,7 +254,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'region' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		set_max_execution_time( 0 );
 

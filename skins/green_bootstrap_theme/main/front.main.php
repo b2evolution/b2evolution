@@ -94,6 +94,7 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'glue'              => ' - ',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'register_text'     => '',
 					'login_text'        => '',
@@ -102,6 +103,8 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
+					'search_text'       => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

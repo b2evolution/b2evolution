@@ -38,7 +38,7 @@ $Form->switch_template_parts(
 );
 
 $link_attribs = array( 'style' => 'margin-left:1ex', 'class' => 'btn btn-sm btn-default' ); // Avoid misclicks by all means!
-if( $current_User->check_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
+if( check_user_perm( 'blog_post!draft', 'edit', false, $Blog->ID ) )
 {
 	$Form->global_icon( TB_( 'Post as a quote' ), 'elevate', '?ctrl=comments&amp;action=elevate&amp;type=quote&amp;comment_ID='.$edited_Comment->ID.'&amp;'.url_crumb('comment'),
 				TB_( 'Post as a quote' ), 4, 3, $link_attribs, 'elevate' );
@@ -96,7 +96,7 @@ $Form->hidden( 'from', 'backoffice' );
 		echo '<div class="col-sm-12">';
 
 		$Blog_owner_User = & $Blog->get_owner_User();
-		if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		if( ( $Blog_owner_User->ID == $current_User->ID ) || check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// User has permission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
 			$Form->hidden( 'moveto_post', $comment_Item->ID );
 		}
@@ -114,7 +114,7 @@ $Form->hidden( 'from', 'backoffice' );
 
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			if( check_user_perm( 'users', 'edit' ) )
 			{	// Allow to change an author if current user has a permission:
 				$Form->username( 'comment_author_login', $edited_Comment->get_author_User(), TB_('Author'), '' );
 			}
@@ -231,7 +231,7 @@ $Form->hidden( 'from', 'backoffice' );
 	}
 
 	// ####################### ADVANCED PROPERTIES #########################
-	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{ // ------------------------------------ TIME STAMP -------------------------------------
 		$Form->begin_fieldset( TB_('Date & Time'), array( 'id' => 'cmntform_datetime', 'fold' => true ) );
 

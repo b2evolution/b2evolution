@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -116,6 +116,45 @@ class bootstrap_blog_Skin extends Skin
 	function get_css_framework()
 	{
 		return 'bootstrap';
+	}
+
+
+	/**
+	 * Get the declarations of the widgets that the skin wants to use.
+	 *
+	 * @param string Collection type: 'std', 'main', 'photo', 'group', 'forum', 'manual'
+	 * @param string Skin type: 'normal' - Standard, 'mobile' - Phone, 'tablet' - Tablet
+	 * @param array Additional params. Example value 'init_as_blog_b' => true
+	 * @return array Array of default widgets:
+	 *          - Key - Container code,
+	 *          - Value - array of widget arrays OR SPECIAL VALUES:
+	 *             - 'coll_type': Include this container only for collection kinds separated by comma, first char "-" means to exclude,
+	 *             - 'type': Container type, empty - main container, other values: 'sub', 'page', 'shared', 'shared-sub',
+	 *             - 'name': Container name,
+	 *             - 'order': Container order,
+	 *             - widget data array():
+	 *                - 0: Widget order (*mandatory field*),
+	 *                - 1: Widget code (*mandatory field*),
+	 *                - 'params' - Widget params(array or serialized string),
+	 *                - 'type' - Widget type(default = 'core', another value - 'plugin'),
+	 *                - 'enabled' - Boolean value; default is TRUE; FALSE to install the widget as disabled,
+	 *                - 'coll_type': Include this widget only for collection types separated by comma, first char "-" means to exclude,
+	 *                - 'skin_type': Include this widget only for skin types separated by comma, first char "-" means to exclude,
+	 *                - 'install' - Boolean value; default is TRUE; FALSE to skip this widget on install.
+	 */
+	function get_default_widgets( $coll_type = '', $skin_type = 'normal', $context = array() )
+	{
+		$default_widgets = array();
+
+		/* Sidebar 2 */
+		$default_widgets['sidebar_2'] = array(
+			array( 30, 15000, 'free_html', 'params' => array(
+					'title'   => 'Bootstrap Blog Skin Sidebar 2',
+					'content' => 'This widget was added by the Bootstrap Blog Skin.',
+				) ),
+		);
+
+		return $default_widgets;
 	}
 
 
@@ -415,14 +454,10 @@ class bootstrap_blog_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 

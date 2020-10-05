@@ -28,10 +28,6 @@ global $lFile;
  */
 global $fm_flatmode;
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var UserSettings
  */
 global $UserSettings;
@@ -169,8 +165,8 @@ $Form->begin_form();
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
 
 	// Set FileList perms
-	$all_perm = $current_User->check_perm( 'files', 'all', false );
-	$edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
+	$all_perm = check_user_perm( 'files', 'all', false );
+	$edit_allowed_perm = check_user_perm( 'files', 'edit_allowed', false, $fm_Filelist->get_FileRoot() );
 
 	/***********************************************************/
 	/*                    MAIN FILE LIST:                      */
@@ -190,7 +186,6 @@ $Form->begin_form();
 		/********************    Checkbox:    *******************/
 
 		echo '<td class="checkbox firstcol">';
-		echo '<span name="surround_check" class="checkbox_surround_init">';
 		echo '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"
 					name="fm_selected[]" value="'.format_to_output( $lFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_'.$countFiles.'"';
 		if( $checkall || $selected_Filelist->contains( $lFile ) )
@@ -198,7 +193,6 @@ $Form->begin_form();
 			echo ' checked="checked"';
 		}
 		echo ' />';
-		echo '</span>';
 
 		/***********  Hidden info used by Javascript:  ***********/
 
@@ -502,7 +496,7 @@ $Form->begin_form();
 	// -------------
 	// Quick upload with drag&drop button:
 	// --------------
-	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( $Settings->get( 'upload_enabled' ) && check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{	// Upload is enabled and we have permission to use it...
 	?>
 		<tr class="evo_fileuploader_form listfooter firstcol lastcol">
@@ -616,18 +610,19 @@ $Form->begin_form();
 
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
-					'fileroot_ID'          => $fm_FileRoot->ID,
-					'path'                 => $path,
-					'listElement'          => 'jQuery( ".filelist_tbody" ).get(0)',
-					'list_style'           => 'table',
-					'template'             => $template,
-					'display_support_msg'  => false,
+					'fileroot_ID'            => $fm_FileRoot->ID,
+					'path'                   => empty( $path ) ? './' : $path,
+					'listElement'            => 'jQuery( ".filelist_tbody" ).get(0)',
+					'list_element'           => '.filelist_tbody',
+					'list_style'             => 'table',
+					'template'               => $template,
+					'display_support_msg'    => false,
 					'display_status_success' => false,
-					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
-					'filename_before'      => $icon_to_link_files,
-					'table_headers'        => $table_headers,
-					'noresults'            => $noresults,
-					'table_id'             => 'FilesForm',
+					'additional_dropzone'    => '[ jQuery( ".filelist_tbody" ).get(0) ]',
+					'filename_before'        => $icon_to_link_files,
+					'table_headers'          => $table_headers,
+					'noresults'              => $noresults,
+					'table_id'               => 'FilesForm',
 				) );
 			?>
 			</td>
@@ -644,7 +639,7 @@ $Form->begin_form();
 
 		<?php
 		echo '<div id="evo_multi_file_selector" class="pull-left"'.( $countFiles == 0 ? ' style="display:none"' : '' ).'>';
-			echo $Form->check_all();
+			$Form->checkbox_controls( 'fm_selected', array( 'button_class' => 'btn btn-default' ) );
 			$Form->add_crumb( 'file' );
 
 			$field_options = array();
@@ -659,9 +654,9 @@ $Form->begin_form();
 			}
 
 			if( ( $fm_Filelist->get_root_type() == 'collection' || ( ! empty( $Blog )
-						&& $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
+						&& check_user_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ) )
 				&& $mode != 'upload'
-				&& $current_User->check_perm( 'admin', 'normal' ) )
+				&& check_user_perm( 'admin', 'normal' ) )
 			{ // We are browsing files for a collection:
 				// User must have access to admin permission
 				// fp> TODO: use current as default but let user choose into which blog he wants to post
@@ -735,7 +730,7 @@ $Form->begin_form();
 			 * CREATE FILE/FOLDER CREATE PANEL:
 			 */
 			if( ( $Settings->get( 'fm_enable_create_dir' ) || $Settings->get( 'fm_enable_create_file' ) )
-						&& $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+						&& check_user_perm( 'files', 'add', false, $fm_FileRoot ) )
 			{	// dir or file creation is enabled and we're allowed to add files:
 				global $create_type;
 

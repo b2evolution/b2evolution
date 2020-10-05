@@ -16,10 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -80,7 +76,7 @@ $Form->begin_fieldset( TB_('SMTP Server connection settings').get_manual_link('s
 	$Form->text_input( 'smtp_server_username', $Settings->get( 'smtp_server_username' ), 25,
 				TB_('SMTP Username'), TB_('User name for authenticating on your SMTP server.'), array( 'maxlength' => 255, 'autocomplete' => 'off' ) );
 
-	if( $current_User->check_perm( 'emails', 'edit' ) )
+	if( check_user_perm( 'emails', 'edit' ) )
 	{
 		// Disply this fake hidden password field before real because Chrome ignores attribute autocomplete="off"
 		echo '<input type="password" name="password" value="" style="display:none" />';
@@ -108,7 +104,7 @@ if( $email_send_allow_php_mail )
 }
 
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

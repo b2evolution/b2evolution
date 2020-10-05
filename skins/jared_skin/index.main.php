@@ -87,6 +87,7 @@ if( $is_other_disp ) {
 					'glue'              => ' - ',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'register_text'     => '',
 					'login_text'        => '',
@@ -95,6 +96,8 @@ if( $is_other_disp ) {
 					'msgform_text'      => '',
 					'user_text'         => T_( 'User settings' ),
 					'users_text'        => T_( 'Users' ),
+					'comments_text'     => '',
+					'search_text'       => '',
 					'posts_text'        => T_( 'Posts' ),
 					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
@@ -173,17 +176,9 @@ if( $is_other_disp ) {
 		// Go Grab the featured post:
 		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
 		{	// We have a featured/intro post to display:
-			$intro_item_style = '';
-			$LinkOwner = new LinkItem( $Item );
-			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
-			if( ! empty( $LinkList ) &&
-					$Link = & $LinkList->get_next() &&
-					$File = & $Link->get_File() &&
-					$File->exists() &&
-					$File->is_image() )
-			{	// Use cover image of intro-post as background:
-				$intro_item_style = 'background-image: url("'.$File->get_url().'")';
-			}
+			// Use background position image of intro-post for background URL:
+			$background_image_url = $Item->get_cover_image_url( 'background' );
+			$intro_item_style = $background_image_url ? 'background-image: url("'.$background_image_url.'")' : '';
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,

@@ -23,7 +23,7 @@ global $Collection, $Blog;
  */
 global $edited_Item;
 
-global $admin_url, $current_User;
+global $admin_url;
 
 if( $lastedit_User = & $edited_Item->get_lastedit_User() )
 {	// Get login of last edit user
@@ -204,7 +204,7 @@ $Results->cols[] = array(
  */
 function iver_td_actions( $iver_ID, $iver_type )
 {
-	global $edited_Item, $current_User;
+	global $edited_Item;
 	$r = '';
 
 	// Button to view the version:

@@ -153,6 +153,7 @@ class coll_current_filters_Widget extends ComponentWidget
 		$filters =  implode( ' '.T_('AND').' ', $params['ItemList']->get_filter_titles( array(), array(
 				'categories_text'     => '',
 				'categories_nor_text' => T_('NOT').' ',
+				'statuses_nor_text'   => T_('NOT').' ',
 				'tags_nor_text'       => T_('NOT').' ',
 				'authors_nor_text'    => T_('NOT').' ',
 				'group_mask'          => '$filter_items$',

@@ -6,12 +6,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @var instance of GeneralSettings class
  */
 global $Settings;
-/**
- * @var instance of User class
- */
-global $current_User;
 
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 $Form = new Form( NULL, 'usersettings_checkchanges' );
 
@@ -110,7 +106,7 @@ $Form->begin_fieldset( TB_('User latitude').get_manual_link('user-profile-latitu
 
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 {
 	$Form->buttons( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

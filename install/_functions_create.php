@@ -435,6 +435,11 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'usage'           => 'post',
 			'use_short_title' => 'optional',
 		);
+	$post_types[] = array(
+			'name'                 => 'Task',
+			'allow_html'           => 0,
+			'front_order_workflow' => 20,
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',
@@ -467,6 +472,7 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'use_coordinates'          => 'never',
 			'front_order_title'        => 10,
 			'front_order_attachments'  => 30,
+			'front_order_workflow'     => NULL,
 			'front_order_text'         => 80,
 			'front_order_location'     => 90,
 		);
@@ -847,9 +853,9 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 
 
 	task_begin( 'Creating default Post Statuses... ' );
-	$post_status = array( 'New', 'In Progress', 'Duplicate', 'Not A Bug', 'In Review', 'Fixed', 'Closed', 'OK' );
-
-	$DB->query( "INSERT INTO T_items__status ( pst_name )	VALUES ( '".implode( "' ),( '", $post_status )." ')" );
+	$post_status_with_order = array(" ( 'New', 10 ) ", " ( 'In Progress', 20 ) ", " ( 'Duplicate', 30 ) ", " ( 'Not A Bug', 40 ) ", " ( 'In Review', 50 ) ", " ( 'Fixed', 60 ) ", " ( 'Closed', 70 ) ", " ( 'OK', 80 ) ", );
+	
+	$DB->query( "INSERT INTO T_items__status ( pst_name, pst_order )	VALUES ". implode( ",", $post_status_with_order ) );
 	task_end();
 
 
@@ -1584,8 +1590,8 @@ function create_demo_users()
 		{	// Impossible to rename the admin folder to another name
 
 			// Display the errors:
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
-			echo get_install_format_text( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to rename <code>%s</code> to <code>%s</code>.', $src_admin_dir, $dest_admin_dir ).'</evo:error></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-danger"><evo:error>'.sprintf( 'ERROR: Impossible to use "%s" for the admin account. Using "admin" instead.', $User_Admin->login ).'</evo:error></span> ' );
 
 			// Change admin login to "admin":
 			$User_Admin->set( 'login', 'admin' );
@@ -1702,9 +1708,126 @@ function create_default_templates( $is_task = true )
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
 			'context'  => 'item_details',
-			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
+			'template' => '[flag_icon] Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] [history_link|before=&bull; ] [propose_change_link|before=&bull; ]'
+		),
+		'item_details_author_details' => array(
+			'name'     => 'Item Details: Author Details',
+			'context'  => 'item_details',
+			'template' => '<table>
+	<tbody>
+		<tr>
+			<th>Picture</th>
+			<td>[User:picture|size=crop-top-128x128]</td>
+		</tr>
+		<tr>
+			<th>Fullname</th>
+			<td>[User:fullname]</td>
+		</tr>
+		<tr>
+			<th>Last name</th>
+			<td>[User:last_name]</td>
+		</tr>
+		<tr>
+			<th>First name</th>
+			<td>[User:first_name]</td>
+		</tr>
+		<tr>
+			<th>Nickname</th>
+			<td>[User:nick_name]</td>
+		</tr>
+		<tr>
+			<th>Preferred name</th>
+			<td>[User:preferred_name]</td>
+		</tr>
+		<tr>
+			<th>ID</th>
+			<td>[User:id]</td>
+		</tr>
+		<tr>
+			<th>Login</th>
+			<td>[User:login]</td>
+		</tr>
+		<tr>
+			<th>Email</th>
+			<td>[User:email]</td>
+		</tr>
+		<tr>
+			<th>Micro bio</th>
+			<td>[User:custom|field=microbio]</td>
+		</tr>
+		<tr>
+			<th>Twitter</th>
+			<td>[User:custom|field=twitter]</td>
+		</tr>
+		<tr>
+			<th>Facebook</th>
+			<td>[User:custom|field=facebook]</td>
+		</tr>
+		<tr>
+			<th>LinkedIn</th>
+			<td>[User:custom|field=linkedin]</td>
+		</tr>
+		<tr>
+			<th>GitHub</th>
+			<td>[User:custom|field=github]</td>
+		</tr>
+		<tr>
+			<th>Website</th>
+			<td>[User:custom|field=website|separator=<br />]</td>
+		</tr>
+	</tbody>
+</table>'
 		),
 
+		// Item attachments:
+		'item_details_files_list' => array(
+			'name'     => 'Item Details: Attachments: List',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=<div class="item_attachments"><ul class="bFiles">|
+				before_attach=<li>|
+				before_attach_size=<span class="file_size">(|
+				after_attach_size=)</span>|
+				after_attach=</li>|
+				after=</ul></div>|
+				file_link_format=$file_name$|
+				display_download_icon=1|
+				file_link_text=title|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
+		'item_details_files_buttons' => array(
+			'name'     => 'Item Details: Attachments: Buttons',
+			'context'  => 'item_details',
+			'template' => '[files|
+				before=|
+				before_attach=|
+				before_attach_size=(|
+				after_attach_size=)|
+				after_attach=|
+				after=|
+				attach_format=$file_link$|
+				file_link_format=$icon$ <b>Download Now!</b><br />$file_name$ $file_size$ $file_desc$|
+				display_download_icon=1|
+				file_link_text=title|
+				file_link_class=btn btn-success|
+				display_file_size=1|
+				display_file_desc=1|
+			]'
+		),
+
+		// About Author widget:
+		'about_author' => array(
+			'name'     => 'Item Details: About Author',
+			'context'  => 'item_details',
+			'template' => '<div class="clearfix"><div class="evo_avatar" rel="bubbletip_user_[User:id]">
+	[User:picture|size=crop-top-48x48]
+</div>
+<div class="evo_author_display_field">
+	[User:custom|field=microbio]
+</div></div>',
+		),
 
 		// Content List widget:
 		'content_list' => array(
@@ -1713,7 +1836,9 @@ function create_default_templates( $is_task = true )
 			'template' => '[set:before_list=<ul class="chapters_list posts_list">]
 [set:after_list=</ul>]
 [set:subcat_template=content_list_subcat]
-[set:item_template=content_list_item]',
+[set:item_template=content_list_item]
+[set:crossposted_item_template=content_list_crossposted_item| // Use same as item_template]
+[set:active_item_template=content_list_active_item| // Use same as item_template]',
 		),
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
@@ -1735,6 +1860,39 @@ function create_default_templates( $is_task = true )
 		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </li>',
 		),
+		'content_list_crossposted_item' => array(
+			'name'     => 'Content List: Crossposted Item',
+			'context'  => 'content_list_item',
+			'template' => '<li><i>
+	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
+	[Item:excerpt|
+		before=<div class="evo_post__excerpt_text">|
+		after=</div>|
+		excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+</i></li>',
+		),
+
+		// Content Title List:
+		'content_title_list' => array(
+			'name'     => 'Content Title List',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<ul>]
+[set:after_list=</ul>]
+[set:item_template=content_title_list_item]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=content_title_list_active_item]',
+		),
+		'content_title_list_item' => array(
+			'name'     => 'Content Title List: Item',
+			'context'  => 'content_list_item',
+			'template' => '<li>[Item:permalink|class=default|title=]</li>',
+		),
+		'content_title_list_active_item' => array(
+			'name'     => 'Content Title List: Active Item',
+			'context'  => 'content_list_item',
+			'template' => '<li class="selected">[Item:permalink|class=selected|title=]</li>',
+		),
 
 
 		// Content Tiles style 1 (default):
@@ -1745,6 +1903,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat|          // Sub-template for displaying categories]
 [set:item_template=content_tiles_item|              // Sub-template for displaying items]
+[set:crossposted_item_template=|                    // Sub-template for displaying crossposted items]
+[set:active_item_template=|                         // Sub-template for displaying active item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4| // RWD classes for tile containers]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow| // Modifier classes for each tile]
 [set:evo_tile_image__modifiers=|                    // Modifier classes for each tile image]
@@ -1761,6 +1921,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
 [set:evo_tile_image__modifiers=]
@@ -1837,6 +1999,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_btn_subcat]
 [set:item_template=content_tiles_btn_item]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__shadow]
 [set:evo_tile_image__modifiers=evo_tile_image__margin]
@@ -1907,6 +2071,8 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_bgimg_subcat]
 [set:item_template=content_tiles_bgimg_item]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
 [set:evo_tile_image__modifiers=]
@@ -2126,6 +2292,8 @@ function create_default_templates( $is_task = true )
 			'template' => '[set:before_list=<div class="row">]
 [set:after_list=</div>]
 [set:item_template=content_tabs_item]
+[set:crossposted_item_template=| // Use same as item_template]
+[set:active_item_template=| // Use same as item_template]
 [set:rwd_header_col=col-sm-5 col-xs-12]
 [set:rwd_text_col=col-sm-5 col-xs-12]
 [set:rwd_image_col=col-sm-7 pull-right-sm col-xs-12]
@@ -2221,7 +2389,7 @@ function create_default_templates( $is_task = true )
 [set:reg1_template=registration_email_social]
 [set:reg1_required=email]
 
-[set:reg2_template=registration_step2]
+[set:reg2_template=registration_step2| // Page 2 is not implemented yet]
 [set:reg2_required=firstname]
 ',
 		),
@@ -2241,7 +2409,7 @@ function create_default_templates( $is_task = true )
 		class=btn btn-default|
 		text=Already have an account... ?]
 </div>
-[Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
+[Plugin:evo_sociallogin| // Call the SkinTag of the plugin
 	before=<div class="evo_social_login_buttons margin-top-md">|
 	after=</div>]
 ',
@@ -2382,6 +2550,45 @@ function create_default_templates( $is_task = true )
 		<div class="result_content">[echo:tag_post_count] posts are tagged with "[Tag:name]"</div>
 	</div>
 </div>',
+		),
+
+		'content_list_with_thumbnail' => array(
+			'name'     => 'Content List with Thumbnail',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<ul class="evo_thumblist">]
+[set:after_list=</ul>]
+[set:item_template=content_list_with_thumbnail_item| // Sub-template for displaying items]
+[set:crossposted_item_template=|                     // Sub-template for displaying crossposted items]
+[set:active_item_template=|                          // Sub-template for displaying active item]
+[set:evo_thumblist_image__modifiers=|                // Modifier classes for each thumbnail image]
+[set:evo_thumblist_image__size=crop-80x80|           // Image size for displaying image]',
+		),
+
+		'content_list_with_thumbnail_item' => array(
+			'name'     => 'Content List with Thumbnail: Item',
+			'context'  => 'content_list_item',
+			'template' => '<li>
+		<div class="evo_thumblist_image [echo:evo_thumblist_image__modifiers]">
+			[Item:images|
+				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
+				limit=1|	                                      // Max 1 images
+				image_size=$evo_thumblist_image__size$|                
+				image_link_to=single|	                                  // Link to item details
+				placeholder=#file_thumbnail_text_icon|	                  // If no image available, display text file icon
+			]
+		</div>
+		<div class="evo_thumblist_title">
+			[Item:permalink|text=#title|class=default]
+		</div>
+		<div class="evo_thumblist_body">
+			<p>[Item:excerpt|
+							excerpt_no_more_link=| // No "more" link
+							max_words=20| // how many words we will display
+			]
+			</p> 
+			[Item:permalink|text=...|class=btn btn-default  evo_thumblist_button evo_thumblist_button__transparent|title=]
+		</div>
+</li>',
 		)
 
 	);

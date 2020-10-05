@@ -83,7 +83,7 @@ $Form->begin_fieldset( TB_('Suspect users').get_manual_link('antispam-settings-s
 
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array(
 		array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ),

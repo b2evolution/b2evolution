@@ -90,16 +90,16 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
 		$template_options = array( NULL => T_('No template') ) + $TemplateCache->get_code_option_array();
-		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+		$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 				.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-				array( 'onclick' => 'return b2template_list_highlight( this )' ),
+				array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 				array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
 		// Get all catgories of the widget Collection:
@@ -288,9 +288,36 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function display_item_template( $param_Item, $level, $params = array() )
 	{
+		global $Item;
+
 		if( empty( $params['item_template'] ) )
 		{	// No template is provided for listing an item:
 			return;
+		}
+
+		$TemplateCache = & get_TemplateCache();
+		$item_template = $params['item_template'];
+
+		// Check if the param Item is currently active:
+		$highlight_current_item = ( ! empty( $Item ) && $param_Item->ID == $Item->ID );
+
+		if( $highlight_current_item )
+		{	// Get template for currently active Item:
+			$active_item_template = isset( $params['active_item_template'] ) ? $params['active_item_template'] : $item_template;
+			if( $active_item_template != $item_template &&
+			    ( $active_item_Template = & $TemplateCache->get_by_code( $active_item_template, false, false ) ) )
+			{	// Use active item template when it is different and found in DB:
+				$item_template = $active_item_template;
+			}
+		}
+		elseif( $param_Item->main_cat_ID != $params['chapter_ID'] )
+		{	// Get template for crossposted Item:
+			$crossposted_item_template = isset( $params['crossposted_item_template'] ) ? $params['crossposted_item_template'] : $item_template;
+			if( $crossposted_item_template != $item_template &&
+			    ( $crossposted_item_Template = & $TemplateCache->get_by_code( $crossposted_item_template, false, false ) ) )
+			{	// Use crossposted item template when it is different and found in DB:
+				$item_template = $crossposted_item_template;
+			}
 		}
 
 		$item_template_params = array_merge( $params, array(
@@ -301,7 +328,7 @@ class cat_content_list_Widget extends ComponentWidget
 			) );
 
 		// Render Item by quick template:
-		echo render_template_code( $params['item_template'], $item_template_params, array( 'Item' => $param_Item ) );
+		echo render_template_code( $item_template, $item_template_params, array( 'Item' => $param_Item ) );
 	}
 }
 

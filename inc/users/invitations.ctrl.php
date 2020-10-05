@@ -15,13 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load Invitation class:
 load_class( 'users/model/_invitation.class.php', 'Invitation' );
 
-/**
- * @var User
- */
-global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 // Set options path:
 $AdminUI->set_path( 'users', 'usersettings', 'invitations' );
@@ -46,7 +42,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		if( ! isset( $edited_Invitation ) )
 		{ // We don't have a model to use, start with blank object:
@@ -61,7 +57,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ivc_ID:
 		param( 'ivc_ID', 'integer', true );
@@ -77,7 +73,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'invitation' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// load data from request
 		if( $edited_Invitation->load_from_Request() )
@@ -136,7 +132,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'invitation' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ivc_ID:
 		param( 'ivc_ID', 'integer', true );
@@ -165,7 +161,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'invitation' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Make sure we got an ivc_ID:
 		param( 'ivc_ID', 'integer', true );

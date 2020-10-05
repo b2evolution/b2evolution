@@ -79,7 +79,7 @@ if( count( $res_hits ) )
 		<tr class="<?php echo ( $r % 2 == 1 ) ? 'odd' : 'even'; ?>">
 			<td class="firstcol shrinkwrap" style="text-align:right"><?php
 				echo date( 'D '.locale_datefmt(), $this_date );
-				if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+				if( $is_live_mode && check_user_perm( 'stats', 'edit' ) )
 				{	// Display a link to prune hits only for live data and if current user has a permission:
 					echo action_icon( T_('Prune hits for this date!'), 'delete', $admin_url.'?ctrl=stats&amp;action=prune&amp;date='.$this_date.'&amp;show=summary&amp;blog='.$blog.'&amp;'.url_crumb( 'stats' ) );
 				}

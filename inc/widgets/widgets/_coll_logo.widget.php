@@ -140,7 +140,7 @@ class coll_logo_Widget extends ComponentWidget
 					),
 					'height' => array(
 						'label' => T_('Image height'),
-						'note' => '',
+						'note' => T_('Leave blank for auto.'),
 						'defaultvalue' => '',
 						'allow_empty' => true,
 						'size' => 4,
@@ -151,7 +151,6 @@ class coll_logo_Widget extends ComponentWidget
 					),
 				'size_end_line' => array(
 					'type' => 'end_line',
-					'label' => T_('Leave blank for auto.'),
 				),
 				'alt' => array(
 					'label' => T_('Image Alt text'),

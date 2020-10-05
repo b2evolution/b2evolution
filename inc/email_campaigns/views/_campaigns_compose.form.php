@@ -83,7 +83,7 @@ $Form->attachments_fieldset( $edited_EmailCampaign );
 
 
 $buttons = array();
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 	$buttons[] = array( 'submit', 'actionArray[save]', TB_('Save & continue').' >>', 'SaveButton' );
 }

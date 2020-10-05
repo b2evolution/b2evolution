@@ -28,6 +28,9 @@ class generic_menu_link_Widget extends ComponentWidget
 	// Enable additional params for classes of Link/Button:
 	var $allow_link_css_params = true;
 
+	// Style to display debug messages on customizer mode: 'menu', 'standard'
+	var $debug_message_style = 'menu';
+
 	/**
 	 * Get a layout for menu link
 	 *
@@ -35,9 +38,10 @@ class generic_menu_link_Widget extends ComponentWidget
 	 * @param string Link text
 	 * @param boolean Is active menu link?
 	 * @param string Link template, possible masks: $link_url$, $link_class$, $link_text$
+	 * @param string Extra link class
 	 * @return string
 	 */
-	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = NULL )
+	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = NULL, $extra_link_class = '' )
 	{
 		if( $link_template === NULL )
 		{	// Use default template:
@@ -63,10 +67,18 @@ class generic_menu_link_Widget extends ComponentWidget
 
 		$r = $this->get_menu_link_item_start( $is_active_link );
 
+		$link_class = $this->get_link_class( $is_active_link );
+
+		if( ! empty( $extra_link_class ) )
+		{	// Append extra CSS class:
+			$r = update_html_tag_attribs( $r, array( 'class' => $extra_link_class ) );
+			$link_class = trim( $link_class.' '.$extra_link_class );
+		}
+
 		// Get a link/button/tab from template:
 		$r .= str_replace(
 			array( '$link_url$', '$link_class$', '$link_text$' ),
-			array( $link_url, $this->get_link_class( $is_active_link ), $link_text ),
+			array( $link_url, $link_class, $link_text ),
 			$link_template );
 
 		$r .= $item_end;
@@ -145,29 +157,45 @@ class generic_menu_link_Widget extends ComponentWidget
 				// Buttons:
 				if( $is_active_link )
 				{	// Class for active button:
-					return empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
+					$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
 				}
-				// Class for normal(not active) button:
-				return empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
+				else
+				{	// Class for normal(not active) button:
+					$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
+				}
+				break;
 
 			case 'tabs':
 				// Tabs:
 				if( $is_active_link )
 				{	// Class for active tab:
-					return trim( $this->disp_params['tab_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] ) );
+					$link_class = $this->disp_params['tab_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] );
 				}
-				// Class for normal(not active) tab:
-				return trim( $this->disp_params['tab_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] ) );
+				else
+				{	// Class for normal(not active) tab:
+					$link_class = $this->disp_params['tab_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] );
+				}
+				break;
 
 			default:
 				// List:
 				if( $is_active_link )
 				{	// Class for active link:
-					return trim( $this->disp_params['link_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] ) );
+					$link_class = $this->disp_params['link_selected_class'].( empty( $this->disp_params['widget_active_link_class'] ) ? '' : ' '.$this->disp_params['widget_active_link_class'] );
 				}
-				// Class for normal(not active) link:
-				return trim( $this->disp_params['link_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] ) );
+				else
+				{	// Class for normal(not active) link:
+					$link_class = $this->disp_params['link_default_class'].( empty( $this->disp_params['widget_link_class'] ) ? '' : ' '.$this->disp_params['widget_link_class'] );
+				}
+				break;
 		}
+
+		if( ! empty( $this->disp_params['link_type'] ) )
+		{	// Append class per link type:
+			$link_class .= ' evo_widget_'.$this->code.'_'.$this->disp_params['link_type'];
+		}
+
+		return trim( $link_class );
 	}
 
 
@@ -238,6 +266,13 @@ class generic_menu_link_Widget extends ComponentWidget
 	 */
 	function display_debug_message( $message = NULL )
 	{
+		if( $this->debug_message_style == 'standard' )
+		{	// Use standard debug message without menu style:
+			parent::display_debug_message( $message );
+			return;
+		}
+
+		// Menu style:
 		if( $this->mode == 'designer' )
 		{	// Display message on designer mode:
 			if( $message === NULL )
@@ -261,6 +296,13 @@ class generic_menu_link_Widget extends ComponentWidget
 	 */
 	function display_error_message( $message = NULL )
 	{
+		if( $this->debug_message_style == 'standard' )
+		{	// Use standard debug message without menu style:
+			parent::display_error_message( $message );
+			return;
+		}
+
+		// Menu style:
 		global $current_User, $Blog;
 
 		if( isset( $this->BlockCache ) )
@@ -278,7 +320,7 @@ class generic_menu_link_Widget extends ComponentWidget
 					$message .= '('.$this->disp_params['link_type'].')';
 				}
 			}
-			echo $this->get_layout_standalone_menu_link( '#', '<span class="evo_param_error">'.$message.'</span>', false );
+			echo $this->get_layout_standalone_menu_link( '#', get_rendering_error( $message, 'span' ), false );
 		}
 	}
 }

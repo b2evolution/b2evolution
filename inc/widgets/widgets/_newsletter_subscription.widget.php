@@ -247,20 +247,18 @@ class newsletter_subscription_Widget extends ComponentWidget
 			return false;
 		}
 
+		if( ! $widget_Newsletter ||
+		    ! $widget_Newsletter->get( 'active' ) )
+		{	// Display an error when newsletter is not found or not active:
+			$this->display_error_message( T_('List subscription widget references an inactive list.') );
+			return false;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$redirect_to = param( 'redirect_to', 'url', regenerate_url( '', '', '', '&' ) );
 
-		if( ! $widget_Newsletter ||
-		    ! $widget_Newsletter->get( 'active' ) )
-		{	// Display an error when newsletter is not found or not active:
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo '<div class="evo_param_error">'.T_('List subscription widget references an inactive list.').'</div>';
-			echo $this->disp_params['block_body_end'];
-		}
-		else
-		{	// Display a form to subscribe⁄unsubscribe:
+			// Display a form to subscribe⁄unsubscribe:
 			$check_tag = false;
 			if( $this->disp_params['unsubscribed_if_not_tagged'] && ! empty( $this->disp_params['usertags'] ) )
 			{
@@ -345,7 +343,6 @@ class newsletter_subscription_Widget extends ComponentWidget
 			}
 
 			echo $this->disp_params['block_body_end'];
-		}
 
 		echo $this->disp_params['block_end'];
 

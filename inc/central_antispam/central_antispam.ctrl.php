@@ -18,7 +18,7 @@ load_class( 'central_antispam/model/_keyword.class.php', 'CaKeyword' );
 load_class( 'central_antispam/model/_source.class.php', 'CaSource' );
 
 // Check permission:
-$current_User->check_perm( 'centralantispam', 'view', true );
+check_user_perm( 'centralantispam', 'view', true );
 
 param_action( '', true );
 param( 'tab', 'string', 'keywords', true );
@@ -59,7 +59,7 @@ switch( $action )
 {
 	case 'keyword_new':
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'create', true );
+		check_user_perm( 'centralantispam', 'create', true );
 
 		if( ! isset( $edited_CaKeyword ) )
 		{ // We don't have a model to use, start with blank object:
@@ -75,7 +75,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'cakeyword' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		// load data from request
 		if( $edited_CaKeyword->load_from_Request() )
@@ -142,7 +142,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'cakeyword' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		// load data from request
 		if( $edited_CaKeyword->load_from_Request() )
@@ -171,7 +171,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'casource' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		// Load data from request:
 		if( $edited_CaSource->load_from_Request() )
@@ -193,7 +193,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'cakeywordsimport' );
 
 		// Check permission:
-		$current_User->check_perm( 'centralantispam', 'edit', true );
+		check_user_perm( 'centralantispam', 'edit', true );
 
 		$import_keywords = param( 'import_keywords', 'array:string' );
 
@@ -312,19 +312,19 @@ switch( $tab )
 			// Initialize date picker:
 			init_datepicker_js();
 		}
-		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
+		if( empty( $action ) && check_user_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
-			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( '#jquery#', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 
 	case 'reporters':
 		$AdminUI->breadcrumbpath_add( TB_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
-		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
+		if( empty( $action ) && check_user_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit source status from list:
-			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( '#jquery#', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 }

@@ -29,7 +29,7 @@ class site_Skin extends Skin
 	 */
 	function get_site_header_param_definitions()
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Set params for setting "Collection for Info Pages":
 		$BlogCache = & get_BlogCache();
@@ -59,7 +59,7 @@ class site_Skin extends Skin
 			),
 			'menu_ID' => array(
 				'label' => T_('Menu to display'),
-				'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
+				'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
 				'type' => 'select_object',
 				'object' => $SiteMenuCache,
 				'allow_none' => true,
@@ -90,7 +90,7 @@ class site_Skin extends Skin
 
 		$header_tabs = $this->get_header_tabs();
 
-		return ( isset( $header_tabs[ $this->header_tab_active ]['items'] ) &&
+		return ( isset( $this->header_tab_active, $header_tabs[ $this->header_tab_active ]['items'] ) &&
 			count( $header_tabs[ $this->header_tab_active ]['items'] ) > 1 );
 	}
 
@@ -202,6 +202,7 @@ class site_Skin extends Skin
 						'name'  => $SiteMenuEntry->get_text(),
 						'url'   => $sub_tabs[0]['url'],
 						'items' => $sub_tabs,
+						'class' => $SiteMenuEntry->get( 'class' ),
 					);
 			}
 		}
@@ -211,6 +212,7 @@ class site_Skin extends Skin
 					'name'   => $SiteMenuEntry->get_text(),
 					'url'    => $menu_entry_url,
 					'active' => $SiteMenuEntry->is_active(),
+					'class'  => $SiteMenuEntry->get( 'class' ),
 				);
 		}
 
@@ -294,7 +296,7 @@ class site_Skin extends Skin
 				}
 
 				if( $in_bloglist == 'member' &&
-						! $current_User->check_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
+						! check_user_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
 				{	// Only members have an access to this collection, Skip it:
 					continue;
 				}
@@ -380,6 +382,39 @@ class site_Skin extends Skin
 		}
 
 		return $this->header_tabs;
+	}
+
+
+	/**
+	 * Get attribute for header tab
+	 *
+	 * @param array Tab data
+	 * @param integer Tab index in array of all tabs
+	 * @param array Additional params
+	 * @return string
+	 */
+	function get_header_tab_attr_class( $tab, $index = NULL, $params = array() )
+	{
+		$params = array_merge( array(
+				'class'        => '',
+				'class_active' => 'active',
+			), $params );
+
+		$class = $params['class'];
+
+		if( ! empty( $tab['class'] ) )
+		{	// Append extra CSS classes of Menu Entry:
+			$class .= ' '.$tab['class'];
+		}
+
+		if( $this->header_tab_active === $index || ! empty( $tab['active'] ) )
+		{	// This tab is active currently:
+			$class .= ' '.$params['class_active'];
+		}
+
+		$class = trim( $class );
+
+		return $class === '' ? '' : ' class="'.$class.'"';
 	}
 
 

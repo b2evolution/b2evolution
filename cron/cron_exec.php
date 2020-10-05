@@ -306,11 +306,14 @@ detect_timeout_cron_jobs( $error_task );
 
 
 if( ! $is_cli && ! is_admin_page() )
-{ // This is a web request:
+{	// This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';
 	echo '<!-- This is invalid HTML but it is SOOOOOO helpful! (Delay will be triggered when we reach that point -->';
 	echo '<meta http-equiv="Refresh" content="15" />';
+
+	// Add JavaScript and CSS files included by plugins and skin
+	include_footerlines();
 	?>
 	</body>
 	</html>

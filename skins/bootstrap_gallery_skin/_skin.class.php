@@ -21,7 +21,7 @@ class bootstrap_gallery_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -325,14 +325,10 @@ class bootstrap_gallery_Skin extends Skin
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
-				'jquery',                  // Load jQuery
-				'font_awesome',            // Load Font Awesome (and use its icons as a priority over the Bootstrap glyphicons)
-				'bootstrap',               // Load Bootstrap (without 'bootstrap_theme_css')
-				'bootstrap_evo_css',       // Load the b2evo_base styles for Bootstrap (instead of the old b2evo_base styles)
+				'superbundle',             // Load general front-office JS + bundled jQuery and Bootstrap
 				'bootstrap_messages',      // Initialize $Messages Class to use Bootstrap styles
 				'style_css',               // Load the style.css file of the current skin
 				'colorbox',                // Load Colorbox (a lightweight Lightbox alternative + customizations for b2evo)
-				'bootstrap_init_tooltips', // Inline JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions)
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
@@ -353,8 +349,8 @@ class bootstrap_gallery_Skin extends Skin
 		// Page link color:
 		$this->dynamic_style_rule( 'page_link_color',
 			'#skin_wrapper .container a:not(.btn .active) { color: $setting_value$ }'.
-			'#skin_wrapper ul li a:not(.btn) { color: $setting_value$ }'.
-			'#skin_wrapper ul li a:not(.btn) {background-color: transparent }'.
+			'#skin_wrapper ul:not(.nav) li a:not(.btn) { color: $setting_value$ }'.
+			'#skin_wrapper ul:not(.nav) li a:not(.btn) {background-color: transparent }'.
 			'.ufld_icon_links a:not(.btn) {color: #fff !important}'
 		);
 		// Current tab text color:

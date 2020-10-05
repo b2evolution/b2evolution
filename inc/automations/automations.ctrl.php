@@ -19,8 +19,8 @@ load_class( 'automations/model/_automation.class.php', 'Automation' );
 load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 param_action( '', true );
 param( 'display_mode', 'string', 'normal' );
@@ -56,7 +56,7 @@ switch( $action )
 		// New Automation form:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Create object of new Automation:
 		$edited_Automation = new Automation();
@@ -68,7 +68,7 @@ switch( $action )
 		// Edit Automation/Step forms:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( $action == 'copy_step' )
 		{	// Clear an order of the duplicating step in order to set this automatically right below current one:
@@ -85,7 +85,7 @@ switch( $action )
 		// New Automation Step form:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Create object of new Automation:
 		$edited_AutomationStep = new AutomationStep();
@@ -105,7 +105,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to create automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_Automation->load_from_Request() )
@@ -143,7 +143,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to edit automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
@@ -169,7 +169,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
@@ -202,7 +202,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to edit automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
@@ -248,7 +248,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check that current user has permission to edit automations:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got IDs:
 		param( 'autm_ID', 'integer', true );
@@ -307,7 +307,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to create automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! $edited_AutomationStep->can_be_modified() )
 		{	// If step cannot be modified currently
@@ -392,7 +392,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to create automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edited_AutomationStep = new AutomationStep();
 
@@ -423,7 +423,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to create automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$duplicated_step_ID = $edited_AutomationStep->ID;
 		$duplicated_step_order = $edited_AutomationStep->get( 'order' );
@@ -483,7 +483,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check that current user has permission to edit automation steps:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an step_ID:
 		param( 'step_ID', 'integer', true );
@@ -514,7 +514,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'pos', 'array:integer' );
 
@@ -537,7 +537,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'connection_type', 'string', true );
 
@@ -579,7 +579,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Reset positions of all steps of the edited Automation:
 		$DB->query( 'UPDATE T_automation__step
@@ -600,7 +600,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automationstep' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an autm_ID:
 		param( 'autm_ID', 'integer', true );
@@ -631,7 +631,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
@@ -670,7 +670,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
@@ -702,7 +702,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'automation' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'user_ID', 'integer', true );
 		$UserCache = & get_UserCache();
@@ -791,10 +791,10 @@ switch( $action )
 				$AdminUI->set_page_manual_link( 'automation-diagram-view' );
 				$AdminUI->set_path( 'email', 'automations', 'diagram' );
 				// Load files to draw diagram by plugin jsPlumb:
-				require_js( 'jquery/jsplumb/jsplumb.min.js', 'rsc_url' );
-				require_css( 'jquery/jsplumb/jsplumbtoolkit-defaults.css', 'rsc_url' );
-				require_css( 'jquery/jsplumb/jsplumbtoolkit-b2evo.css', 'rsc_url' );
-				require_js( 'jquery/jquery.panzoom.min.js', 'rsc_url' );
+				require_js_defer( 'ext:jquery/jsplumb/js/jsplumb.min.js', 'rsc_url' );
+				require_css( 'ext:jquery/jsplumb/css/jsplumbtoolkit-defaults.css', 'rsc_url' );
+				require_css( 'ext:jquery/jsplumb/css/jsplumbtoolkit-b2evo.css', 'rsc_url' );
+				require_js_defer( 'ext:jquery/panzoom/js/jquery.panzoom.min.js', 'rsc_url' );
 				break;
 
 			default:

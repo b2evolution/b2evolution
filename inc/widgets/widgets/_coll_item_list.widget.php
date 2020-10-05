@@ -44,7 +44,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'content_list_master';
@@ -82,11 +82,17 @@ class coll_item_list_Widget extends ComponentWidget
 					'type' => 'select',
 					'options' => $template_options,
 					'defaultvalue' => NULL,
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 					'class' => 'evo_template_select',
+				),
+				'highlight_current' => array(
+					'label' => T_('Highlight current'),
+					'note' => T_('Check this to highlight the currently displayed item.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 1,
 				),
 				'title_link' => array(
 					'label' => T_('Link to blog'),
@@ -322,10 +328,14 @@ class coll_item_list_Widget extends ComponentWidget
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
-		{	// Disable "allow blockcache" because this widget uses the selected items
-			$r['allow_blockcache']['defaultvalue'] = false;
-			$r['allow_blockcache']['disabled'] = 'disabled';
-			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		{
+			if( $this->get_param( 'highlight_current', 1 ) )
+			{	// Disable "allow blockcache" because this widget uses the selected items:
+				$r['allow_blockcache']['defaultvalue'] = false;
+				$r['allow_blockcache']['disabled'] = 'disabled';
+			}
+			// Additional note when random order is used:
+			$r['allow_blockcache']['note'] .= ' <span class="red">'.T_('If you use random order and you cache, the random order will stay the same after the initial cache filling.').'</span>';
 		}
 
 		return $r;
@@ -339,7 +349,12 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_edit_form_javascript()
 	{
-		return get_post_orderby_js( $this->get_param_prefix().'order_by', $this->get_param_prefix().'order_dir' );
+		return get_post_orderby_js( $this->get_param_prefix().'order_by', $this->get_param_prefix().'order_dir' )
+			// Disable option "Allow caching" when option "Highlight current" is used:
+			.'jQuery( "#'.$this->get_param_prefix().'highlight_current" ).click( function()
+				{
+					jQuery( "#'.$this->get_param_prefix().'allow_blockcache" ).prop( "disabled", jQuery( this ).prop( "checked" ) );
+				} );';
 	}
 
 
@@ -421,6 +436,22 @@ class coll_item_list_Widget extends ComponentWidget
 	function get_desc()
 	{
 		return T_('Can list Items (Posts/Pages/Links...) in a variety of ways.');
+	}
+
+
+	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		parent::init_display( $params );
+
+		if( $this->disp_params['highlight_current'] )
+		{	// Disable block caching for this widget when it highlights the selected items:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
 	}
 
 
@@ -781,6 +812,7 @@ class coll_item_list_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $blog_ID ) ? $Blog->ID : $blog_ID, // Has the content of the displayed blog changed ?
 				'template_code'=> $this->get_param( 'template' ), // Has the Template changed?
+				'master_template' => true, // This widget cache must be invalidated on updating of any Template because it may has a Master Template.
 			);
 	}
 }

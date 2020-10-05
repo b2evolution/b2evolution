@@ -133,7 +133,7 @@ $Form->begin_fieldset( TB_('Plugin events').' ('.TB_('Advanced').') ', array( 'f
 
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => TB_('Save Changes!'), 'class' => 'SaveButton', 'data-shortcut' => 'ctrl+enter,command+enter' ),

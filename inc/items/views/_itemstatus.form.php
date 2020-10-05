@@ -37,6 +37,7 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New post status') : TB_('Post st
 
 $Form->begin_fieldset( TB_('General') );
 	$Form->text_input( 'pst_name', $edited_ItemStatus->get( 'name' ), 30, TB_('Name'), '', array( 'required' => true ) );
+	$Form->text_input( 'pst_order', $edited_ItemStatus->get( 'order' ), 30, TB_('Order'), '', array( 'type' => 'number' ) );
 $Form->end_fieldset();
 
 /**
@@ -174,9 +175,7 @@ $Results->cols[] = array(
 
 function get_name_for_itemtype( $id, $name )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemtypes&amp;ityp_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}

@@ -29,6 +29,8 @@
 // Item Workflow widget:
 @import "_item_workflow_widget.module.less";
 
+// Checklist Items widget:
+@import "_item_checklist_lines_widget.module.less";
 
 // ----- PLUGINS -----
 
@@ -46,6 +48,11 @@
 
 // Tiles style 2
 @import "_evo_tile_2.module.less";
+
+// -----
+
+// Thumblist style
+@import "_evo_thumblist.module.less";
 
 // -----
 
@@ -78,7 +85,7 @@ div.children-widgets-inline > div.evo_widget {
 
 // MILOS > Intro posts style padding alignment
 main .well {
-	padding: 15px 15px 25px 15px;
+	padding: 15px 15px 5px 15px;
 	header .small.text-muted {
 		margin: 4px 0px 10px 0px;
 		a {
@@ -101,7 +108,7 @@ main .well {
 			background: #ddd;
 		}
 	}
-	> a:before {
+	> a::before {
 		font-family: FontAwesome;
 		content: '\f02b \00a0 ';
 		color: #aaa;
@@ -310,7 +317,7 @@ div.widget_core_user_profile_pics {
 }
 
 // Profile menu link widget alignment issue fix
-.widget_core_profile_menu_link ul li a img {
+.evo_widget_basic_menu_link_myprofile ul li a img {
 	vertical-align: middle;
 	.border-radius;
 }
@@ -1179,7 +1186,7 @@ div.evo_fileuploader_form {
 		background: #c0c0c0;
 		height: 6px;
 		bottom: 0;
-		&:after {
+		&::after {
 			content: "...";
 			font-size: 10px;
 			top: -7px;
@@ -1234,6 +1241,83 @@ div.evo_fileuploader_form {
 }
 @media (max-width: 431px) {
 	.evo_attachments_fieldset__wrapper {
+		.evo_attachments_fieldset__overlay {
+			top: -65px;
+			height: 162px;
+			font-size: 140%;
+		}
+	}
+}
+
+.evo_attachments_tab_pane__wrapper {
+	width: 100%;
+	height: auto;
+	position: relative;
+	padding-bottom: 6px;
+	box-sizing: content-box;
+	.evo_attachments_fieldset__block {
+		overflow: auto;
+		height: 100%;
+	}
+	.ui-resizable-s {
+		background: #c0c0c0;
+		height: 6px;
+		bottom: 0;
+		&:after {
+			content: "...";
+			font-size: 10px;
+			top: -7px;
+			position: relative;
+			text-align: center;
+			display: block;
+		}
+	}
+	.table_scroll {
+		// Use this position to fix red triangle when attachment is dragged by mouse:
+		position: relative;
+	}
+	div.results, div.table_scroll {
+		overflow: initial;
+	}
+	table tbody {
+		.dragged {
+			opacity: 0.8;
+			position: absolute;
+			z-index: 1000;
+		}
+		td {
+			cursor: move;
+		}
+	}
+	.evo_attachments_fieldset__overlay {
+		position: absolute;
+		top: -43px;
+		z-index: 1;
+		width: 100%;
+		height: 140px;
+		background: rgba( 0, 0, 0, 0.5 );
+		color: #FFF;
+		text-align: center;
+		font-size: 200%;
+		b {
+			width: 100%;
+			margin: 0;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+	}
+}
+@media (max-width: 768px) {
+	.evo_attachments_tab_pane__wrapper {
+		.evo_attachments_fieldset__overlay {
+			font-size: 170%;
+		}
+	}
+}
+@media (max-width: 431px) {
+	.evo_attachments_tab_pane__wrapper {
 		.evo_attachments_fieldset__overlay {
 			top: -65px;
 			height: 162px;
@@ -1332,5 +1416,16 @@ div.evo_fileuploader_form {
 .evo_widget.widget_core_basic_menu_link {
 	img {
 		margin-top: -2px;
+	}
+}
+// Item form tab pane text colors: 
+.evo_tab_pane_itemform_content {
+	.tab_pane_pads {
+		.btn-primary {
+			color: #fff !important;
+		}
+		a {
+			color: #337ab7 !important;
+		}
 	}
 }

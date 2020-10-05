@@ -747,7 +747,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow, $Blog, $Plugins;
+		global $default_locale, $localtimenow, $Blog, $Plugins;
 		global $item_typ_ID;
 
 		// LOCALE:
@@ -824,7 +824,7 @@ class Item extends ItemLight
 		}
 
 		// Single/page view:
-		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
 		    ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
 		{	// If user has a permission to edit advanced properties of items:
 			if( $this->get( 'status' ) == 'redirected' )
@@ -847,9 +847,8 @@ class Item extends ItemLight
 
 		// ISSUE DATE / TIMESTAMP:
 		$this->load_Blog();
-		if( is_logged_in() &&
-		    $current_User->check_perm( 'admin', 'restricted' ) &&
-		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) )
 		{ // Allow to update timestamp fields only if user has a permission to edit such fields
 		  //    and also if user has an access to back-office
 			$item_dateset = param( 'item_dateset', 'integer', NULL );
@@ -955,7 +954,7 @@ class Item extends ItemLight
 		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
-		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 		}
@@ -980,7 +979,7 @@ class Item extends ItemLight
 			}
 
 			// Goal ID:
-			if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+			if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 			{	// If user has a permission to edit advanced properties of items:
 				$goal_ID = param( 'goal_ID', 'integer', NULL );
 				if( $goal_ID !== NULL )
@@ -998,7 +997,7 @@ class Item extends ItemLight
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
-		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
+		if( check_user_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
 		{	// only admins can change the owner..
 			if( param_check_not_empty( 'item_owner_login', T_('Please enter valid owner login.') ) )
 			{	// If valid user login is entered:
@@ -1079,7 +1078,7 @@ class Item extends ItemLight
 		}
 
 		// EXPIRY DELAY:
-		if( is_logged_in() && $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			$expiry_delay = param_duration( 'expiry_delay' );
 			if( empty( $expiry_delay ) )
@@ -1262,8 +1261,6 @@ class Item extends ItemLight
 	 */
 	function load_workflow_from_Request()
 	{
-		global $current_User;
-
 		// Get Item's Collection for settings and permissions validation:
 		$item_Blog = & $this->get_Blog();
 
@@ -1728,7 +1725,7 @@ class Item extends ItemLight
 	 */
 	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array(), $comment_type = 'comment' )
 	{
-		global $current_User, $disp;
+		global $disp;
 
 		if( $comment_type == 'meta' && $this->can_meta_comment() )
 		{	// Meta comment are always allowed!
@@ -1792,7 +1789,7 @@ class Item extends ItemLight
 				return false;
 			}
 
-			if( is_logged_in() && ( $this->Blog->get( 'advanced_perms' ) ) && !$current_User->check_perm( 'blog_comment_statuses', 'create', false, $this->Blog->ID ) )
+			if( is_logged_in() && ( $this->Blog->get( 'advanced_perms' ) ) && ! check_user_perm( 'blog_comment_statuses', 'create', false, $this->Blog->ID ) )
 			{ // User doesn't have permission to create comments and advanced perms are enabled
 				if( $display )
 				{
@@ -1844,9 +1841,7 @@ class Item extends ItemLight
 			}
 		}
 
-		global $current_User;
-
-		return $current_User->check_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
+		return check_user_perm( 'meta_comment', 'view', false, $this->get_blog_ID() );
 	}
 
 
@@ -1857,14 +1852,7 @@ class Item extends ItemLight
 	 */
 	function can_meta_comment()
 	{
-		if( ! is_logged_in() )
-		{	// User must be logged in
-			return false;
-		}
-
-		global $current_User;
-
-		return $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
+		return check_user_perm( 'meta_comment', 'add', false, $this->get_blog_ID() );
 	}
 
 
@@ -1878,8 +1866,6 @@ class Item extends ItemLight
 	 */
 	function check_blog_settings( $settings_name, $settings_object = NULL )
 	{
-		global $current_User;
-
 		$this->load_Blog();
 
 		if( ( $settings_name == 'allow_attachments' )
@@ -1900,9 +1886,9 @@ class Item extends ItemLight
 			case 'registered':
 				return is_logged_in( false );
 			case 'member':
-				return (is_logged_in( false ) && $current_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) );
+				return check_user_perm( 'blog_ismember', 'view', false, $this->get_blog_ID(), false );
 			case 'moderator':
-				return (is_logged_in( false ) && $current_User->check_perm( 'blog_comments', 'edit', false, $this->get_blog_ID() ) );
+				return check_user_perm( 'blog_comments', 'edit', false, $this->get_blog_ID(), false );
 			default:
 				debug_die( 'Invalid blog '.$settings_name.' settings!' );
 		}
@@ -1921,7 +1907,7 @@ class Item extends ItemLight
 	 */
 	function can_attach( $link_tmp_ID = false, $comment_type = 'comment' )
 	{
-		global $Settings, $current_User;
+		global $Settings;
 
 		$attachments_quota_is_full = false;
 		if( is_logged_in() )
@@ -1936,7 +1922,7 @@ class Item extends ItemLight
 			$max_attachments = (int)$this->Blog->get_setting( 'max_attachments' );
 			if( $max_attachments > 0 )
 			{	// Check attachments quota only when Blog setting "Max # of attachments" is defined
-				global $DB, $current_User, $Session;
+				global $DB, $Session;
 
 				// Get a number of attachments for current user on this post
 				$link_tmp_ID = false;
@@ -2362,16 +2348,29 @@ class Item extends ItemLight
 		if( ! empty( $r ) )
 		{
 			echo $params['before'];
+			
+			if( isset( $params['max_words'] ) )
+			{	
+				// to stop displaying double hellip
+				$params['avoid_end_hellip'] = true;
+				
+				echo excerpt_words( $r, $params['max_words'], $params );
+			}
+			else
+			{
+				echo $r;
+			}
 
-			echo $r;
-
-			$this->permanent_link( array(
-					'before'      => $params['excerpt_before_more'],
-					'after'       => $params['excerpt_after_more'],
-					'text'        => $params['excerpt_more_text'],
-					'title'       => '#',
-					'class'       => $params['excerpt_more_class'],
-				) );
+			if( ! isset( $params['excerpt_no_more_link'] ) )
+			{
+				$this->permanent_link( array(
+						'before'      => $params['excerpt_before_more'],
+						'after'       => $params['excerpt_after_more'],
+						'text'        => $params['excerpt_more_text'],
+						'title'       => '#',
+						'class'       => $params['excerpt_more_class'],
+					) );
+			}
 
 			echo $params['after'];
 		}
@@ -2434,21 +2433,19 @@ class Item extends ItemLight
 		// Make sure, the pages are split up:
 		$this->split_pages( $format );
 
+		$content_page = '';
+
 		if( $preview && $this->pages > 1 && ! $this->ID )
 		{ // This is a preview of an unsaved  multipage item
-			$preview_content = '';
-
 			foreach( $this->content_pages[$format] as $page => $page_content )
 			{
 				if( $page !== 0 )
 				{
-					$preview_content .= '<span class="badge badge-info">Page '.( $page + 1 ).'</span>';
+					$content_page .= '<span class="badge badge-info">Page '.( $page + 1 ).'</span>';
 				}
 
-				$preview_content .= $page_content;
+				$content_page .= $page_content;
 			}
-
-			return $preview_content;
 		}
 		else
 		{
@@ -2462,8 +2459,15 @@ class Item extends ItemLight
 				$page = $this->pages;
 			}
 
-			return $this->content_pages[$format][$page-1];
+			$content_page = $this->content_pages[$format][$page-1];
 		}
+
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// Clean up rendering errors from content if current User has no permission to edit this Item:
+			$content_page = clear_rendering_errors( $content_page );
+		}
+
+		return $content_page;
 	}
 
 
@@ -3107,7 +3111,7 @@ class Item extends ItemLight
 				}
 				else
 				{	// Display an error if Link is not found in DB:
-					$custom_field_value = '<span class="text-danger">'.T_('Invalid link ID:').' '.$custom_field_value.'</span>';
+					$custom_field_value = get_rendering_error( T_('Invalid link ID:').' '.$custom_field_value, 'span' );
 				}
 				break;
 
@@ -3164,7 +3168,8 @@ class Item extends ItemLight
 			if( isset( $link_fallbacks[ $custom_field['link'] ] ) )
 			{
 				$fallback_count = count( $link_fallbacks[ $custom_field['link'] ] );
-				$link_class_attr = empty( $custom_field['link_class'] ) ? '' : ' class="'.format_to_output( $custom_field['link_class'], 'htmlattr' ).'"';
+				$link_class = trim( $custom_field['link_class'] );
+				$link_class_attr = ( $link_class === '' ? '' : ' class="'.format_to_output( $link_class, 'htmlattr' ).'"' );
 				$nofollow_attr = $custom_field['link_nofollow'] ? ' rel="nofollow"' : '';
 				foreach( $link_fallbacks[ $custom_field['link'] ] as $l => $link_fallback )
 				{
@@ -3188,7 +3193,7 @@ class Item extends ItemLight
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
-								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $custom_field['link_class'], '', '', NULL, array(), array( 'nofollow' => $custom_field['link_nofollow'] ) );
+								$custom_field_value = $this->get_permanent_link( $custom_field_value, '#', $link_class, '', '', NULL, array(), array( 'nofollow' => $custom_field['link_nofollow'] ) );
 								break 2;
 							}
 							// else fallback to other points:
@@ -3211,7 +3216,17 @@ class Item extends ItemLight
 							// Use value of url fields as URL to the link:
 							if( ! empty( $orig_custom_field_value ) )
 							{	// Format URL to link only with not empty URL otherwise display URL as simple text if special text is defined in format for empty URL:
-								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'.$nofollow_attr.$link_class_attr.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'.$custom_field_value.'</a>';
+								$url_link_class = $custom_field['link_class'];
+								if( $custom_field_value == $orig_custom_field_value )
+								{	// Use word-break style only when original URL is used for link text because URL may contains very long single word:
+									$url_link_class .= ' linebreak';
+								}
+								$custom_field_value = '<a href="'.$orig_custom_field_value.'"'
+									.$nofollow_attr
+									.' class="'.format_to_output( trim( $url_link_class ), 'htmlattr' ).'"'
+									.( $link_fallback == 'urlblank' ? ' target="_blank"' : '' ).'>'
+										.$custom_field_value
+									.'</a>';
 							}
 							break 2;
 					}
@@ -3350,7 +3365,7 @@ class Item extends ItemLight
 		$field_name = $params['field'];
 		if( ! isset( $custom_fields[ $field_name ] ) )
 		{ // Custom field with this index doesn't exist
-			echo '<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>';
+			display_rendering_error( sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ), 'span' );
 			return;
 		}
 
@@ -3427,71 +3442,79 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
-				'render_content_blocks' => true,
-				'render_inline_files'   => true,
-				'render_links'          => true,
-				'render_custom_fields'  => true,
-				'render_other_item'     => true,
-				'render_collection'     => true,
-				'render_inline_widgets' => true,
-				'render_block_widgets'  => true,
-				'render_switchable_blocks' => true,
-				'render_templates'      => true,
+				// render_content_blocks():
+				'render_tag_include'           => true,
+				'render_tag_cblock'            => true,
+				// render_inline_widgets():
+				'render_tag_item_subscribe'    => true,
+				'render_tag_item_emailcapture' => true,
+				'render_tag_item_compare'      => true,
+				'render_tag_item_fields'       => true,
+				// render_block_widgets():
+				'render_tag_switcher'          => true,
+				// render_inline_files():
+				'render_tag_image'             => true,
+				'render_tag_file'              => true,
+				'render_tag_inline'            => true,
+				'render_tag_video'             => true,
+				'render_tag_audio'             => true,
+				'render_tag_thumbnail'         => true,
+				'render_tag_folder'            => true,
+				// render_link_data():
+				'render_tag_item_link'         => true,
+				// render_custom_fields():
+				'render_tag_field'             => true,
+				// render_other_item_data():
+				'render_tag_item_field'        => true,
+				'render_tag_item_titlelink'    => true,
+				'render_tag_item_url'          => true,
+				// render_collection_data():
+				'render_tag_coll_name'         => true,
+				'render_tag_coll_shortname'    => true,
+				// render_switchable_blocks():
+				'render_tag_switchable_div'    => true,
+				// render_templates():
+				'render_tag_template'          => true,
 			), $params );
 
 		// Remove block level short tags inside <p> blocks and move them before the paragraph:
 		$content = move_short_tags( $content );
 
-		if( $params['render_content_blocks'] )
-		{	// Render Content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug]:
-			$content = $this->render_content_blocks( $content, $params );
-		}
+		// Render Content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug]:
+		$content = $this->render_content_blocks( $content, $params );
 
-		if( $params['render_inline_widgets'] )
-		{	// Render widget tags (subscribe, emailcapture, compare, fields):
-			$content = $this->render_inline_widgets( $content, $params );
-		}
+		// Render widget tags (subscribe, emailcapture, compare, fields):
+		$content = $this->render_inline_widgets( $content, $params );
 
-		if( $params['render_block_widgets'] )
-		{	// Render widget tags (switcher):
-			$content = $this->render_block_widgets( $content, $params );
-		}
+		// Render widget tags (switcher):
+		$content = $this->render_block_widgets( $content, $params );
 
-		if( $params['render_inline_files'] )
-		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
-			$content = render_inline_files( $content, $this, array_merge( $params, array(
-					'clear_paragraph' => false, // Don't clear paragraph twice
-				) ) );
-		}
+		// Render inline file tags like [image:123:caption] or [file:123:caption]:
+		$content = render_inline_files( $content, $this, array_merge( $params, array(
+				'clear_paragraph' => false, // Don't clear paragraph twice
+			) ) );
 
-		if( $params['render_links'] )
-		{	// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
-			$content = $this->render_link_data( $content, $params );
-		}
+		// Render Collection Data [link:url_field], [link:url_field]title[/link] and etc.:
+		$content = $this->render_link_data( $content, $params );
 
-		if( $params['render_custom_fields'] )
-		{	// Render single value of Custom Fields [field:first_string_field]:
-			$content = $this->render_custom_fields( $content, $params );
-		}
+		// Render single value of Custom Fields [field:first_string_field]:
+		$content = $this->render_custom_fields( $content, $params );
 
-		if( $params['render_other_item'] )
-		{	// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
-			$content = $this->render_other_item_data( $content, $params );
-		}
+		// Render parent/other item data [parent:titlelink], [parent:url], [parent:field:first_string_field], [item:123:titlelink], [item:slug:titlelink] and etc.:
+		$content = $this->render_other_item_data( $content, $params );
 
-		if( $params['render_collection'] )
-		{	// Render Collection Data [coll:name], [coll:shortname]:
-			$content = $this->render_collection_data( $content, $params );
-		}
+		// Render Collection Data [coll:name], [coll:shortname]:
+		$content = $this->render_collection_data( $content, $params );
 
-		if( $params['render_switchable_blocks'] )
-		{	// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
-			$content = $this->render_switchable_blocks( $content, $params );
-		}
+		// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
+		$content = $this->render_switchable_blocks( $content, $params );
 
-		if( $params['render_templates'] )
-		{	// Render template tags like [template:template_code|param1=value1|param2=value2]:
-			$content = $this->render_templates( $content, $params );
+		// Render template tags like [template:template_code|param1=value1|param2=value2]:
+		$content = $this->render_templates( $content, $params );
+
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// Clean up rendering errors from content if current User has no permission to edit this Item:
+			$content = clear_rendering_errors( $content );
 		}
 
 		return $content;
@@ -3509,6 +3532,36 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
+		$params = array_merge( array(
+				'render_tag_item_subscribe'    => true,
+				'render_tag_item_emailcapture' => true,
+				'render_tag_item_compare'      => true,
+				'render_tag_item_fields'       => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_item_subscribe'] )
+		{	// Render short tag [subscribe:]
+			$render_tags[] = 'subscribe';
+		}
+		if( $params['render_tag_item_emailcapture'] )
+		{	// Render short tag [emailcapture:]
+			$render_tags[] = 'emailcapture';
+		}
+		if( $params['render_tag_item_compare'] )
+		{	// Render short tag [compare:]
+			$render_tags[] = 'compare';
+		}
+		if( $params['render_tag_item_fields'] )
+		{	// Render short tag [fields:]
+			$render_tags[] = 'fields';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		load_funcs( 'skins/_skin.funcs.php' );
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_collection_data() on everything outside code/pre:
@@ -3520,7 +3573,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of widgets:
-		preg_match_all( '/\[(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields):?([^\]]*)\]/i', $content, $tags );
+		preg_match_all( '/\[(parent:|item:[^:\]]+:)?('.implode( '|', $render_tags ).'):?([^\]]*)\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one widget tag is found in content:
@@ -3673,7 +3726,7 @@ class Item extends ItemLight
 						{	// Use parent item:
 							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
 							{	// Display error message if parent doesn't exist:
-								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
+								$widget_html = get_rendering_error( T_('This Item has no parent.'), 'span' );
 								break;
 							}
 							$widget_item_ID = $widget_Item->ID;
@@ -3686,7 +3739,7 @@ class Item extends ItemLight
 							if( ! ( $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_ID( $widget_item_ID_slug, false, false ) ) &&
 									! ( ! $widget_item_data_is_number && $widget_Item = & $ItemCache->get_by_urltitle( $widget_item_ID_slug, false, false ) ) )
 							{	// Display error message if other item is not found by ID and slug:
-								$widget_html = '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ).'</span>';
+								$widget_html = get_rendering_error( sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$widget_item_ID_slug.'</code>' ), 'span' );
 								break;
 							}
 							$widget_item_ID = $widget_Item->ID;
@@ -3700,7 +3753,7 @@ class Item extends ItemLight
 						$custom_fields = $widget_Item->get_custom_fields_defs();
 						if( ! $custom_fields )
 						{	// Fields don't exist for this Item:
-							$widget_html = '<span class="text-danger">'.T_('The Item has no custom fields.').'</span>';
+							$widget_html = get_rendering_error( T_('The Item has no custom fields.'), 'span' );
 							break;
 						}
 
@@ -3746,6 +3799,15 @@ class Item extends ItemLight
 	{
 		global $Settings;
 
+		$params = array_merge( array(
+				'render_tag_switcher' => true,
+			), $params );
+
+		if( ! $params['render_tag_switcher'] )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		load_funcs( 'skins/_skin.funcs.php' );
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_collection_data() on everything outside code/pre:
@@ -3774,7 +3836,7 @@ class Item extends ItemLight
 					// Widget "Param Switcher":s
 					if( ! isset( $tag_params[0] ) || $tag_params[0] === '' )
 					{	// Skip wrong configured tag:
-						$widget_html = '<span class="text-danger">'.T_('Param code must be defined for switcher tag!').'</span>';
+						$widget_html = get_rendering_error( T_('Param code must be defined for switcher tag!'), 'span' );
 						break;
 					}
 
@@ -3791,7 +3853,7 @@ class Item extends ItemLight
 					}
 					if( empty( $widget_buttons ) )
 					{	// Don't try to render widget without buttons:
-						$widget_html = '<span class="text-danger">'.T_('At least one button must be defined for switcher tag!').'</span>';
+						$widget_html = get_rendering_error( T_('At least one button must be defined for switcher tag!'), 'span' );
 						break;
 					}
 
@@ -3836,6 +3898,15 @@ class Item extends ItemLight
 	 */
 	function render_custom_fields( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_field' => true,
+			), $params );
+
+		if( ! $params['render_tag_field'] )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_custom_fields() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -3855,7 +3926,7 @@ class Item extends ItemLight
 			$field_value = $this->get_custom_field_formatted( $field_name, $params );
 			if( $field_value === false )
 			{	// Wrong field request, display error:
-				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" does not exist.'), $field_name ), 'span' ), $content );
 			}
 			else
 			{	// Display field value:
@@ -3866,7 +3937,7 @@ class Item extends ItemLight
 				}
 				else
 				{	// Display an error for not public custom field:
-					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>', $content );
+					$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" is not public.'), $field_name ), 'span' ), $content );
 				}
 			}
 		}
@@ -3893,6 +3964,31 @@ class Item extends ItemLight
 	 */
 	function render_other_item_data( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_item_field'     => true,
+				'render_tag_item_titlelink' => true,
+				'render_tag_item_url'       => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_item_field'] )
+		{	// Render short tag [item:123:field:]
+			$render_tags[] = 'field';
+		}
+		if( $params['render_tag_item_titlelink'] )
+		{	// Render short tag [item:123:titlelink]
+			$render_tags[] = 'titlelink';
+		}
+		if( $params['render_tag_item_url'] )
+		{	// Render short tag [item:123:url]
+			$render_tags[] = 'url';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_other_item_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -3903,7 +3999,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of parent data:
-		preg_match_all( '/\[(parent|item:[^:]+):([a-z]+):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[(parent|item:[^:]+):('.implode( '|', $render_tags ).'):?([^\]]*)?\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one other item tag is found in content:
@@ -3913,7 +4009,7 @@ class Item extends ItemLight
 				{	// Get data of item parent:
 					if( ! ( $other_Item = & $this->get_parent_Item() ) )
 					{	// Display error message if parent doesn't exist:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.T_('This Item has no parent.').'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], get_rendering_error( T_('This Item has no parent.'), 'span' ), $content );
 						continue;
 					}
 				}
@@ -3925,7 +4021,7 @@ class Item extends ItemLight
 					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
 					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
 					{	// Display error message if other item is not found by ID and slug:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], get_rendering_error( sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ), 'span' ), $content );
 						continue;
 					}
 				}
@@ -3938,7 +4034,7 @@ class Item extends ItemLight
 						$field_value = $other_Item->get_custom_field_formatted( $field_name, $params );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>', $content );
+							$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" does not exist.'), $field_name ), 'span' ), $content );
 						}
 						else
 						{	// Display field value:
@@ -3949,7 +4045,7 @@ class Item extends ItemLight
 							}
 							else
 							{	// Display an error for not public custom field:
-								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>', $content );
+								$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The field "%s" is not public.'), $field_name ), 'span' ), $content );
 							}
 						}
 						break;
@@ -3982,6 +4078,26 @@ class Item extends ItemLight
 	 */
 	function render_collection_data( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_coll_name'      => true,
+				'render_tag_coll_shortname' => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_coll_name'] )
+		{	// Render short tag [coll:name]
+			$render_tags[] = 'name';
+		}
+		if( $params['render_tag_coll_shortname'] )
+		{	// Render short tag [coll:shortname]
+			$render_tags[] = 'shortname';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_collection_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -3992,7 +4108,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of collection data:
-		preg_match_all( '/\[coll:([a-z]+)\]/i', $content, $tags );
+		preg_match_all( '/\[coll:('.implode( '|', $render_tags ).')\]/i', $content, $tags );
 
 		if( count( $tags[0] ) > 0 )
 		{	// If at least one collection tag is found in content:
@@ -4032,6 +4148,15 @@ class Item extends ItemLight
 	 */
 	function render_link_data( $content, $params = array() )
 	{
+		$params = array_merge( array(
+				'render_tag_item_link' => true,
+			), $params );
+
+		if( ! $params['render_tag_item_link'] )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_link_data() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -4052,7 +4177,7 @@ class Item extends ItemLight
 				{	// Try to use parent:
 					if( ! ( $other_Item = & $this->get_parent_Item() ) )
 					{	// Display error message if parent doesn't exist:
-						$content = substr_replace( $content, '<span class="text-danger">'.T_('This Item has no parent.').'</span>', strpos( $content, $source_tag ), strlen( $source_tag ) );
+						$content = substr_replace( $content, get_rendering_error( T_('This Item has no parent.'), 'span' ), strpos( $content, $source_tag ), strlen( $source_tag ) );
 						continue;
 					}
 				}
@@ -4064,7 +4189,7 @@ class Item extends ItemLight
 					if( ! ( $other_item_data_is_number && $other_Item = & $ItemCache->get_by_ID( $other_item_ID_slug, false, false ) ) &&
 					    ! ( ! $other_item_data_is_number && $other_Item = & $ItemCache->get_by_urltitle( $other_item_ID_slug, false, false ) ) )
 					{	// Display error message if other item is not found by ID and slug:
-						$content = str_replace( $tags[0][ $t ], '<span class="text-danger">'.sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ).'</span>', $content );
+						$content = str_replace( $tags[0][ $t ], get_rendering_error( sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$other_item_ID_slug.'</code>' ), 'span' ), $content );
 						continue;
 					}
 				}
@@ -4082,19 +4207,24 @@ class Item extends ItemLight
 				$field_value = $other_Item->get_custom_field_value( $url_field_code, 'url' );
 				if( $field_value === false )
 				{	// Wrong field request, display error:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $url_field_code ).'</span>';
+					$link_html = get_rendering_error( sprintf( T_('The field "%s" does not exist.'), $url_field_code ), 'span' );
 				}
 				elseif( ! $custom_fields[ $url_field_code ]['public'] )
 				{	// Display an error for not public custom field:
-					$link_html = '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $url_field_code ).'</span>';
+					$link_html = get_rendering_error( sprintf( T_('The field "%s" is not public.'), $url_field_code ), 'span' );
 				}
 				elseif( $field_value === '' )
 				{	// Empty field value, display error:
-					$link_html = '<span class="text-danger">'.sprintf( T_('Referenced URL field is empty.'), $url_field_code ).'</span>';
+					$link_html = get_rendering_error( sprintf( T_('Referenced URL field is empty.'), $url_field_code ), 'span' );
 				}
 				else
 				{	// Display URL field as html link:
-					$link_class = empty( $link_data[1] ) ? '' : ' class="'.trim( str_replace( '.', ' ', $link_data[1] ) ).'"';
+					$link_class = empty( $link_data[1] ) ? '' : str_replace( '.', ' ', $link_data[1] );
+					if( empty( $tags[4][ $t ] ) )
+					{	// Add style class to break long urls:
+						$link_class .= ' linebreak';
+					}
+					$link_class = ' class="'.trim( $link_class ).'"';
 					$link_text = empty( $tags[4][ $t ] ) ? $field_value : $tags[4][ $t ];
 					$link_html = '<a href="'.$field_value.'"'.$link_class.'>'.$link_text.'</a>';
 				}
@@ -4117,6 +4247,26 @@ class Item extends ItemLight
 	{
 		global $content_block_items;
 
+		$params = array_merge( array(
+				'render_tag_include' => true,
+				'render_tag_cblock'  => true,
+			), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_include'] )
+		{	// Render short tag [include:]
+			$render_tags[] = 'include';
+		}
+		if( $params['render_tag_cblock'] )
+		{	// Render short tag [cblock:]
+			$render_tags[] = 'cblock';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
+
 		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call $this->render_content_blocks() on everything outside code/pre:
 			$params['check_code_block'] = false;
@@ -4127,7 +4277,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of content block posts:
-		preg_match_all( '/\[(include|cblock):?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[('.implode( '|', $render_tags ).'):?([^\]]*)?\]/i', $content, $tags );
 
 		$ItemCache = & get_ItemCache();
 
@@ -4160,7 +4310,7 @@ class Item extends ItemLight
 					$wrong_item_info = '<code>'.$item_ID_slug.'</code>';
 				}
 				// Replace inline content block tag with error message about wrong referenced item:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ) ), $content );
 				continue;
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
@@ -4177,7 +4327,7 @@ class Item extends ItemLight
 				// - Review
 				// For example, if content block Item has a status "Public" but current/parent Item has a status "Community",
 				//              then such content block Item cannot be included into the current/parent Item.
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ) ), $content );
 				continue;
 			}
 			elseif( $content_Item->get( 'creator_user_ID' ) != $this->get( 'creator_user_ID' ) &&
@@ -4186,11 +4336,22 @@ class Item extends ItemLight
 		          ( ! ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) || $content_Item->get_blog_ID() != $info_Blog->ID )
 			      )
 			{	// We can display a content block item with at least one condition:
-				//  - Content block Item has same owner as owner of parent Item,
-				//  - Content block Item has same owner as owner of parent Item's collection,
-				//  - Content block Item is in same collection as parent Item,
-				//  - Content block Item from collection for shared content blocks:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
+				//  1. Content block Item has same owner as owner of parent Item,
+				//  2. Content block Item has same owner as owner of parent Item's collection,
+				//  3. Content block Item is in same collection as parent Item,
+				//  4. Content block Item from collection for shared content blocks:
+				$content_Blog = & $content_Item->get_Blog();
+				$content = str_replace( $source_tag, get_rendering_error( sprintf(
+					T_('Content block #%d %s (Coll #%d) (Owner: %s) cannot be included here. It must be in the same collection as including Item (Coll #%d) or the info pages collection (Coll #%d)').'; '.
+					T_('in any other case, it must have the same owner as the including Item (Item #%d) (Owner: %s) or the same owner as the including Item\'s collection (Owner: %s).'),
+						$content_Item->ID, '<code>'.$content_Item->get( 'urltitle' ).'</code>', // Content block #%d %s
+						$content_Item->get_blog_ID(), // (Coll #%d)
+						get_user_identity_link( NULL, $content_Item->get( 'creator_user_ID' ) ), // (Owner: %s)
+						$this->get_blog_ID(), // as including Item (Coll #%d)
+						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
+						$this->ID, get_user_identity_link( NULL, $this->get( 'creator_user_ID' ) ), // the including Item (Item #%d) (Owner: %s)
+						$item_Blog ? get_user_identity_link( NULL, $item_Blog->get( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the including Item\'s collection (Owner: %s)
+					) ), $content );
 				continue;
 			}
 
@@ -4201,7 +4362,7 @@ class Item extends ItemLight
 
 			if( in_array( $content_Item->ID, $content_block_items ) )
 			{	// Replace inline content block tag with error message about recursion:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ).'</p>', $content );
+				$content = str_replace( $source_tag, get_rendering_error( sprintf( T_('Content inclusion loop detected. Not including "%s".'), '#'.$content_Item->ID.' '.$content_Item->get( 'title' ) ) ), $content );
 				continue;
 			}
 
@@ -4241,10 +4402,26 @@ class Item extends ItemLight
 
 			if( get_param( 'preview' ) === 1 && get_param( 'preview_block' ) === 1 )
 			{	// Display orange debug wrapper around included content-block Item:
+				// Item debug info with Title + Slug:
+				$title_debug_info = '<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get( 'urltitle' ).')';
+				if( $item_edit_url = $content_Item->get_edit_url() )
+				{	// Link to edit Item if current User has a permission:
+					$title_debug_info = '<a href="'.$item_edit_url.'">'.$title_debug_info.'</a>';
+				}
+				// Content Template debug info with Name + Code:
+				$TemplateCache = & get_TemplateCache();
+				if( $content_Template = & $TemplateCache->get_localized_by_code( $tag_template, false, false ) )
+				{	// Display template info:
+					$template_debug_info = '<b>'.$content_Template->get( 'name' ).'</b> ('.$content_Template->get( 'code' ).')';
+					if( check_user_perm( 'options', 'edit' ) )
+					{	// Link to edit Template if current User has a permission:
+						$template_debug_info = '<a href="'.get_admin_url( 'ctrl=templates&amp;action=edit&amp;tpl_ID='.$content_Template->ID ).'">'.$template_debug_info.'</a>';
+					}
+					$title_debug_info .= ' / '.$template_debug_info;
+				}
 				$current_tag_item_content = '<div class="dev-blocks dev-blocks--content-block">'."\n"
 					.'<div class="dev-blocks-name">'
-						.$content_Item->get_edit_link( array( 'before' => '<span class="dev-blocks-action">', 'after' => '</span>', 'text' => T_('Edit') ) )
-						.'<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get( 'urltitle' ).')'
+						.$title_debug_info
 					.'</div>'."\n"
 					.$current_tag_item_content."\n"
 				.'</div>';
@@ -4326,7 +4503,13 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block' => true,
+				'render_tag_template' => true,
 			), $params );
+
+		if( ! $params['render_tag_template'] )
+		{	// No tags for rendering:
+			return $content;
+		}
 
 		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call render_templates() on everything outside code/pre:
@@ -4356,7 +4539,7 @@ class Item extends ItemLight
 
 		if( ! ( $Template = & $TemplateCache->get_by_code( $params[0], false, false ) ) )
 		{	// Template is not found:
-			return '<span class="evo_param_error">Template "'.$params[0].'" is not found for <code>'.$m[0].'</code><span>';
+			return get_rendering_error( 'Template "'.$params[0].'" is not found for <code>'.$m[0].'</code>', 'span' );
 		}
 
 		if( isset( $params[1] ) )
@@ -4386,7 +4569,13 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block' => true,
+				'render_tag_switchable_div' => true,
 			), $params );
+
+		if( ! $params['render_tag_switchable_div'] )
+		{	// No tags for rendering:
+			return $content;
+		}
 
 		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 		{	// Call render_switchable_content() on everything outside code/pre:
@@ -5100,6 +5289,7 @@ class Item extends ItemLight
 
 			case 'teaserperm':
 			case 'cover':
+			case 'background':
 				// Teaser-Permalink or Cover
 				global $disp;
 				if( isset( $disp ) && $disp == 'single' )
@@ -5138,12 +5328,16 @@ class Item extends ItemLight
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : 'lightbox[p'.$this->ID.']';	// Make one "gallery" per post.
 		}
 
+		if( empty( $params['image_alt'] ) )
+		{	// Override image alt text by current Item title only when it is not passed e.g. from inline/short tag `[image:123::Custom Alt Text]`:
+			$params['image_alt'] = $this->get( 'title' );
+		}
+
 		// Generate the IMG tag with all the alt, title and desc if available
 		return $Link->get_tag( array_merge( $params, array(
 					'image_link_to'    => $link_to,   // can be URL, can be empty
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
-					'image_alt'        => $this->get( 'title' ),
 				) ) );
 	}
 
@@ -5198,9 +5392,9 @@ class Item extends ItemLight
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
 				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
-																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+																// '#cover_and_teaser_all' => 'cover,background,teaser,teaserperm,teaserlink'
 				'limit'                      => 1000, // Max # of images displayed
 				'placeholder'                => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
@@ -5227,7 +5421,7 @@ class Item extends ItemLight
 				$params['restrict_to_image_position'] = 'teaser,teaserperm,teaserlink';
 				break;
 			case '#cover_and_teaser_all':
-				$params['restrict_to_image_position'] = 'cover,teaser,teaserperm,teaserlink';
+				$params['restrict_to_image_position'] = 'cover,background,teaser,teaserperm,teaserlink';
 				break;
 		}
 
@@ -5252,6 +5446,9 @@ class Item extends ItemLight
 				case '#file_text_icon';
 					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-file-text-o"></i></a></div>';
 					break;
+				case '#file_thumbnail_text_icon';
+					$placeholder_html = '<div class="evo_thumblist_placeholder" style="width:80px;height:80px"><a href="$url$"></a></div>';
+					break; 
 			}
 			return str_replace( '$url$', $this->get_item_url( $params['target_blog'], $params['post_navigation'], $params['nav_target'] ), $placeholder_html );
 		}
@@ -5396,7 +5593,7 @@ class Item extends ItemLight
 				$params['position'] = 'teaser,teaserperm,teaserlink';
 				break;
 			case '#cover_and_teaser_all':
-				$params['position'] = 'cover,teaser,teaserperm,teaserlink';
+				$params['position'] = 'cover,background,teaser,teaserperm,teaserlink';
 				break;
 		}
 
@@ -5463,7 +5660,7 @@ class Item extends ItemLight
 	 * Get URL of a first cover image
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
-	 *               Position can be 'cover'|'teaser'|'aftermore'|'inline'
+	 *               Position can be 'cover'|'background'|'teaser'|'aftermore'|'inline'
 	 *               Use comma as separator
 	 * @return string|NULL cover URL or NULL if it doesn't exist
 	 */
@@ -5500,7 +5697,7 @@ class Item extends ItemLight
 	 * Get a number of images linked to the current Item
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
-	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 	 *               Use comma as separator
 	 * @param integer Number of images
 	 */
@@ -5550,8 +5747,8 @@ class Item extends ItemLight
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,attachment',
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
+				'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink,aftermore,attachment',
 				'data'                       => '',
 				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
 				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
@@ -5631,7 +5828,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_image() )
+			if( ! isset( $params['image_attachment'] ) && $File->is_image() )
 			{ // Skip images (except those in the attachment position) because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
@@ -5680,8 +5877,9 @@ class Item extends ItemLight
 			}
 			if( $File->exists() )
 			{	// Get file link to download if file exists:
+				$file_download_url = $this->get_coll_setting( 'download_enable' ) ? $Link->get_download_url() : NULL;
 				$file_link = ( strpos( $params['attach_format'], '$file_link$' ) !== false ) ?
-						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $Link->get_download_url() ) : '';
+						$File->get_view_link( $file_link_text, NULL, NULL, $file_link_format, $params['file_link_class'], $file_download_url ) : '';
 			}
 			else
 			{	// File doesn't exist, We cannot display a link, Display only file name and warning:
@@ -5950,8 +6148,8 @@ class Item extends ItemLight
 				'stay_in_same_collection' => 'auto', // 'auto' - follow 'allow_crosspost_urls' if we are cross posted, true - always stay in same collection if we are cross posted, false - always go to permalink if we are cross posted
 			), $params );
 
-		if( $params['show_in_single_mode'] == false && is_single_page() )
-		{	// We are viewing the single page for this pos, which (typically) )contains comments, so we don't want to display this link
+		if( $params['show_in_single_mode'] == false && is_single_page( $this->ID ) )
+		{	// We are viewing the single page for this Item, which (typically) contains comments, so we don't want to display this link
 			return;
 		}
 
@@ -6367,7 +6565,7 @@ class Item extends ItemLight
 								), $params );
 		*/
 
-		if( isset($current_User) &&	$current_User->check_perm( 'blog_comment!draft', 'moderate', false, $this->get_blog_ID() ) )
+		if( isset($current_User) &&	check_user_perm( 'blog_comment!draft', 'moderate', false, $this->get_blog_ID() ) )
 		{	// We have permission to edit comments:
 			if( $edit_comments_link == '#' )
 			{	// Use default link:
@@ -6462,12 +6660,10 @@ class Item extends ItemLight
 	 */
 	function get_delete_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $button = false, $actionurl = '#', $confirm_text = '#', $redirect_to = '' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $this ) )
-		{ // User has right to delete this post
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'delete', false, $this, false ) )
+		{	// User has no rights to delete this Item:
 			return false;
 		}
 
@@ -6556,7 +6752,7 @@ class Item extends ItemLight
 	 */
 	function get_copy_link( $params = array() )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$actionurl = $this->get_copy_url($params);
 		if( ! $actionurl )
@@ -6610,7 +6806,7 @@ class Item extends ItemLight
 	 */
 	function get_copy_url( $params = array() )
 	{
-		global $admin_url, $current_User;
+		global $admin_url;
 
 		if( ! is_logged_in( false ) ) return false;
 
@@ -6636,12 +6832,12 @@ class Item extends ItemLight
 			{	// Current user can copy this post from Front-office
 				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&cp='.$this->ID );
 			}
-			else if( $current_User->check_perm( 'admin', 'restricted' ) )
+			else if( check_user_perm( 'admin', 'restricted' ) )
 			{	// Current user can copy this post from Back-office
 				$url = $admin_url.'?ctrl=items&amp;action=copy&amp;blog='.$this->Blog->ID.'&amp;p='.$this->ID;
 			}
 		}
-		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		else if( check_user_perm( 'admin', 'restricted' ) )
 		{	// Copy a post from Back-office
 			$url = $admin_url.'?ctrl=items&amp;action=copy&amp;blog='.$this->Blog->ID.'&amp;p='.$this->ID;
 			if( $params['save_context'] )
@@ -6899,24 +7095,17 @@ class Item extends ItemLight
 	 */
 	function can_link_version( $allow_new_item = false )
 	{
-		global $current_User;
-
 		if( ! $allow_new_item && ! $this->ID )
 		{	// Item must be saved in DB:
 			return false;
 		}
 
-		if( ! is_logged_in( false ) )
-		{	// User must be logged in
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false ) )
 		{	// User has no rights to edit this Item
 			return false;
 		}
 
-		if( ! is_admin_page() || ! $current_User->check_perm( 'admin', 'restricted' ) )
+		if( ! is_admin_page() || ! check_user_perm( 'admin', 'restricted' ) )
 		{	// This feature is allowed only for back-office yet
 			return false;
 		}
@@ -6938,7 +7127,7 @@ class Item extends ItemLight
 	 */
 	function get_edit_link( $params = array() )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		$actionurl = $this->get_edit_url($params);
 		if( ! $actionurl )
@@ -6979,14 +7168,10 @@ class Item extends ItemLight
 	 */
 	function can_be_edited()
 	{
-		global $current_User;
-
 		// Item must be stored in DB:
 		return ! empty( $this->ID ) &&
-			// User must be logged in and activated:
-			is_logged_in( false ) &&
-			// User must has a permission to edit this Item:
-			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+			// User must be logged in and activated and has a permission to edit this Item:
+			check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false );
 	}
 
 
@@ -6998,12 +7183,7 @@ class Item extends ItemLight
 	 */
 	function get_edit_url( $params = array() )
 	{
-		global $admin_url, $current_User;
-
-		if( ! $this->can_be_edited() )
-		{	// Don't allow to edit this Item if it cannot be edited by curren User:
-			return false;
-		}
+		global $admin_url;
 
 		// default params
 		$params += array(
@@ -7011,20 +7191,26 @@ class Item extends ItemLight
 				'glue'                     => '&amp;',
 				'force_in_skin_editing'    => false,
 				'force_backoffice_editing' => false,
+				'check_perm'               => true, // FALSE - if this link must be displayed even if current has no permission to view item history page
 			);
+
+		if( empty( $this->ID ) || ( $params['check_perm'] && ! $this->can_be_edited() ) )
+		{	// Don't allow to edit this Item if it is not created yet or if this Item cannot be edited by current User:
+			return false;
+		}
 
 		$this->load_Blog();
 		$url = false;
 		if( $this->Blog->get_setting( 'in_skin_editing' ) &&
-		    ( ! $params['force_backoffice_editing'] || ! $current_User->check_perm( 'admin', 'restricted' ) ) &&
+		    ( ! $params['force_backoffice_editing'] || ! check_user_perm( 'admin', 'restricted' ) ) &&
 		    ( ! is_admin_page() || $params['force_in_skin_editing'] ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
-			if( check_item_perm_edit( $this->ID, false ) )
+			if( ! $params['check_perm'] || check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
 				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=edit&p='.$this->ID );
 			}
 		}
-		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		else if( ! $params['check_perm'] || check_user_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
 			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
@@ -7107,19 +7293,14 @@ class Item extends ItemLight
 	 */
 	function get_propose_change_url( $params = array() )
 	{
-		global $admin_url, $current_User;
-
-		if( ! is_logged_in( false ) )
-		{	// User must be logged in and activated for this action:
-			return false;
-		}
+		global $admin_url;
 
 		if( ! $this->ID )
 		{	// Don't display this button in preview mode:
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID(), false ) )
 		{	// User has no right to propose a change for this Item:
 			return false;
 		}
@@ -7133,7 +7314,7 @@ class Item extends ItemLight
 		{	// We have a mode 'In-skin editing' for the current Blog
 			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=proposechange&p='.$this->ID );
 		}
-		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		else if( check_user_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office:
 			$url = $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
 			if( $params['save_context'] )
@@ -7197,9 +7378,9 @@ class Item extends ItemLight
 	 */
 	function get_changes_url( $glue = '&amp;' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{	// Current user cannot see item changes:
 			return false;
 		}
@@ -7235,19 +7416,12 @@ class Item extends ItemLight
 	 */
 	function get_merge_click_js()
 	{
-		global $current_User;
-
-		if( ! is_logged_in( false ) )
-		{	// Current User must be logged in and activated:
-			return false;
-		}
-
 		if( ! $this->ID )
 		{	// Item must be stored in DB:
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false ) )
 		{	// User has no right to edit this Item:
 			return false;
 		}
@@ -7332,8 +7506,6 @@ class Item extends ItemLight
 	 */
 	function get_next_status( $publish )
 	{
-		global $current_User;
-
 		if( !is_logged_in( false ) )
 		{
 			return false;
@@ -7351,7 +7523,7 @@ class Item extends ItemLight
 		while( !$has_perm && ( $publish ? ( $curr_index < 4 ) : ( $curr_index > 0 ) ) )
 		{
 			$curr_index = $publish ? ( $curr_index + 1 ) : ( $curr_index - 1 );
-			$has_perm = $current_User->check_perm( 'item_post!'.$status_order[$curr_index][0], 'moderate', false, $this );
+			$has_perm = check_user_perm( 'item_post!'.$status_order[$curr_index][0], 'moderate', false, $this );
 		}
 		if( $has_perm )
 		{
@@ -7376,18 +7548,15 @@ class Item extends ItemLight
 	 */
 	function get_publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( $this->status != 'draft' )
 		{
 			return false;
 		}
 
-		if( ! is_logged_in( false ) ) return false;
-
-		$this->load_Blog();
-		if( ! ($current_User->check_perm( 'item_post!published', 'edit', false, $this ))
-			|| ! ($current_User->check_perm( 'blog_edit_ts', 'edit', false, $this->Blog->ID ) ) )
+		if( ! check_user_perm( 'item_post!published', 'edit', false, $this, false ) ||
+		    ! check_user_perm( 'blog_edit_ts', 'edit', false, $this->get_blog_ID(), false ) )
 		{ // User has no right to publish this post now:
 			return false;
 		}
@@ -7418,7 +7587,7 @@ class Item extends ItemLight
 	 */
 	function highest_publish_link( $params = array() )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		if( !is_logged_in( false ) )
 		{
@@ -7448,7 +7617,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! ($current_User->check_perm( 'item_post!'.$highest_status, 'edit', false, $this ) ) )
+		if( ! (check_user_perm( 'item_post!'.$highest_status, 'edit', false, $this ) ) )
 		{ // User has no right to edit this post
 			return false;
 		}
@@ -7623,12 +7792,10 @@ class Item extends ItemLight
 	 */
 	function get_deprecate_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $redirect_to = '' )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( ($this->status == 'deprecated') // Already deprecated!
-			|| ! ($current_User->check_perm( 'item_post!deprecated', 'edit', false, $this )) )
+		if( $this->status == 'deprecated' || // Already deprecated!
+		    ! check_user_perm( 'item_post!deprecated', 'edit', false, $this, false ) )
 		{ // User has no right to deprecated this post:
 			return false;
 		}
@@ -8375,7 +8542,7 @@ class Item extends ItemLight
 	{
 		global $current_User;
 
-		if( !isset( $current_User ) )
+		if( ! is_logged_in() )
 		{	// No logged in user
 			return;
 		}
@@ -8458,6 +8625,7 @@ class Item extends ItemLight
 
 		if( $post_comment_status == 'closed' || $post_comment_status == 'disabled' )
 		{	// Check if item type allows these options:
+			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemType = & $ItemTypeCache->get_by_ID( $item_typ_ID );
 			if( $post_comment_status == 'closed' && ! $ItemType->get( 'allow_closing_comments' ) )
 			{
@@ -8472,6 +8640,14 @@ class Item extends ItemLight
 		if( empty( $item_typ_ID ) )
 		{	// Use first item type by default for wrong request:
 			$item_typ_ID = 1;
+		}
+
+		// Set Item Type here in order to get item type settings below:
+		$this->set( 'ityp_ID', $item_typ_ID );
+
+		if( ! $this->get_type_setting( 'allow_html' ) )
+		{	// Strip HTML tags from content if HTML is not allowed for Item Type of this Item:
+			$post_content = utf8_strip_tags( $post_content );
 		}
 
 		if( $post_locale == '#' ) $post_locale = $default_locale;
@@ -8509,7 +8685,6 @@ class Item extends ItemLight
 		$this->set( 'url', $post_url );
 		$this->set( 'comment_status', $post_comment_status );
 		$this->set_renderers( $post_renderers );
-		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $postcat_order );
 
@@ -9094,7 +9269,7 @@ class Item extends ItemLight
 			if( $this->get_type_setting( 'usage' ) == 'content-block' &&
 			    empty( $this->content_block_invalidate_reported ) )
 			{	// Display warning on updating of content block item:
-				global $admin_url, $current_User;
+				global $admin_url;
 
 				// Get items where currently updated content block is included:
 				$invalidated_items = $this->get_included_item_IDs( $this->ID.'|'.$this->get_slugs( '|' ) );
@@ -9109,9 +9284,8 @@ class Item extends ItemLight
 				// Display info message about invalidated cache:
 				$invalidate_message = TB_('INFO: you edited a content block.').' '
 					.sprintf( TB_('We invalidated %d pre-rendered Items that include the content block.'), $invalidated_items_num ).' ';
-				if( is_logged_in() &&
-				    $current_User->check_perm( 'admin', 'normal' ) &&
-				    $current_User->check_perm( 'options', 'view' ) )
+				if( check_user_perm( 'admin', 'normal' ) &&
+				    check_user_perm( 'options', 'view' ) )
 				{	// If current user has a permission to the clear tool:
 					$Messages->add( $invalidate_message.sprintf( TB_('You may <a %s>invalidate the <b>complete</b> pre-rendering cache NOW</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=del_itemprecache&amp;'.url_crumb( 'tools' ).'" target="_blank"' ), 'note' );
 				}
@@ -9384,16 +9558,30 @@ class Item extends ItemLight
 
 		// Render inline tags to HTML code, except of inline file tags because they are removed below:
 		$first_content_part = $this->render_inline_tags( $first_content_part, array(
-				'render_inline_files'      => false,
-				'render_links'             => false,
-				'render_other_item'        => false,
-				'render_inline_widgets'    => false,
-				'render_block_widgets'     => false,
-				'render_switchable_blocks' => false,
+				'render_tag_image'             => false,
+				'render_tag_file'              => false,
+				'render_tag_inline'            => false,
+				'render_tag_video'             => false,
+				'render_tag_audio'             => false,
+				'render_tag_thumbnail'         => false,
+				'render_tag_folder'            => false,
+				'render_tag_item_link'         => false,
+				'render_tag_item_field'        => false,
+				'render_tag_item_titlelink'    => false,
+				'render_tag_item_url'          => false,
+				'render_tag_item_subscribe'    => false,
+				'render_tag_item_emailcapture' => false,
+				'render_tag_item_compare'      => false,
+				'render_tag_item_fields'       => false,
+				'render_tag_switcher'          => false,
+				'render_tag_switchable_div'    => false,
 			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
 		$first_content_part = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $first_content_part );
+
+		// Clean up rendering errors from autogenerated excerpt:
+		$first_content_part = clear_rendering_errors( $first_content_part );
 
 		return excerpt( $first_content_part, $maxlen, $tail );
 	}
@@ -9980,7 +10168,7 @@ class Item extends ItemLight
 	 */
 	function send_assignment_notification( $executed_by_userid = NULL )
 	{
-		global $current_User, $Messages, $UserSettings;
+		global $Messages, $UserSettings;
 
 		$notified_user_IDs = array();
 
@@ -10705,14 +10893,15 @@ class Item extends ItemLight
 	 */
 	function load_orders()
 	{
-		if( ! isset( $this->orders ) && $this->ID > 0 )
+		if( ! isset( $this->orders ) && ( $this->ID > 0 || isset( $this->parent_item_ID ) ) )
 		{	// Initialize item orders in all assigned categories:
+			$item_ID = ( $this->ID > 0 ) ? $this->ID : $this->parent_item_ID;
 			global $DB;
-			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
+			$SQL = new SQL( 'Get all orders per categories of Item #'.$item_ID );
 			$SQL->SELECT( 'cat_ID, cat_blog_ID, postcat_order' );
 			$SQL->FROM( 'T_postcats' );
 			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
-			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$SQL->WHERE( 'postcat_post_ID = '.$item_ID );
 			$orders = $DB->get_results( $SQL );
 			$this->orders = array();
 			$this->orders_per_coll = array();
@@ -12220,7 +12409,7 @@ class Item extends ItemLight
 			return 'read';
 		}
 
-		global $DB, $current_User;
+		global $DB;
 
 		$read_date = $this->get_user_data( 'item_date' );
 
@@ -12456,10 +12645,10 @@ class Item extends ItemLight
 	 */
 	function get_type_edit_link( $attr = 'link', $link_text = '', $link_title = '' )
 	{
-		global $admin_url, $current_User;
+		global $admin_url;
 
 		// Check if current user can edit the type of this item
-		$has_perm_edit = is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+		$has_perm_edit = check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this );
 
 		if( $has_perm_edit )
 		{ // Initialize url params only when current user has a permission to edit this
@@ -12885,8 +13074,6 @@ class Item extends ItemLight
 	 */
 	function get_flag( $params = array() )
 	{
-		global $current_User;
-
 		$params = array_merge( array(
 				'before'       => '',
 				'after'        => '',
@@ -13423,14 +13610,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! is_logged_in( false ) )
-		{	// If current user is not logged in or not activated:
-			return false;
-		}
-
-		global $current_User;
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $this, false ) )
 		{	// If user has no perm to edit this Item:
 			return false;
 		}
@@ -13599,7 +13779,7 @@ class Item extends ItemLight
 		}
 
 		$LinkOwner = new LinkItem( $this );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,background,teaser,teaserperm,teaserlink,inline', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has linked files
@@ -13869,7 +14049,7 @@ class Item extends ItemLight
 			return false;
 		}
 
-		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
 		{	// User has no right to propose a change for this Item:
 
 			// Display a message:
@@ -14187,16 +14367,15 @@ class Item extends ItemLight
 	 */
 	function display_notification_message( $message, $log_messages = false, $message_type = 'note', $message_group = NULL )
 	{
-		global $current_User, $Messages;
+		global $Messages;
 
 		if( $log_messages == 'cron_job' )
 		{	// Log message for cron job:
 			cron_log_append( $message."\n", $message_type );
 		}
 		elseif( ! empty( $this->ID ) && // Item must be stored in DB
-			is_logged_in( false ) && // User must be logged in and activated
-			// User must be a collection admin
-			$current_User->check_perm( 'blog_admin', 'edit', false, $this->get_blog_ID() ) )
+			// User must be logged in and activated and be a collection admin
+			check_user_perm( 'blog_admin', 'edit', false, $this->get_blog_ID(), false ) )
 		{	// Display notification message only for collection admin:
 			if( $message_group === NULL )
 			{	// Set default group title:
@@ -14411,17 +14590,13 @@ class Item extends ItemLight
 	 */
 	function can_edit_workflow( $permname = 'any', $assert = false )
 	{
-		global $current_User;
-
 		$perm =
 			// Main Category must be defined for this Item in order to check permission in Collection of the Category:
 			! empty( $this->main_cat_ID ) &&
-			// User must be logged in:
-			is_logged_in() &&
 			// Workflow must be enabled for current Collection:
 			$this->get_coll_setting( 'use_workflow' ) &&
 			// Current User must has a permission to be assigned for tasks of the current Collection:
-			$current_User->check_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() );
+			check_user_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() );
 
 		if( $perm )
 		{	// Additional checking for several permissions when main checking is true:
@@ -14429,9 +14604,9 @@ class Item extends ItemLight
 			{
 				case 'any':
 					// Check if current User can edit at least one workflow property:
-					$perm = $current_User->check_perm( 'blog_workflow_status', 'edit', false, $this->get_blog_ID() ) ||
-						$current_User->check_perm( 'blog_workflow_user', 'edit', false, $this->get_blog_ID() ) ||
-						$current_User->check_perm( 'blog_workflow_priority', 'edit', false, $this->get_blog_ID() );
+					$perm = check_user_perm( 'blog_workflow_status', 'edit', false, $this->get_blog_ID() ) ||
+						check_user_perm( 'blog_workflow_user', 'edit', false, $this->get_blog_ID() ) ||
+						check_user_perm( 'blog_workflow_priority', 'edit', false, $this->get_blog_ID() );
 					break;
 				case 'deadline':
 					// Deadline has additional collection setting to be enabled:
@@ -14456,14 +14631,14 @@ class Item extends ItemLight
 				return $perm;
 			case 'status':
 				// Check if current User can edit the workflow status:
-				return $current_User->check_perm( 'blog_workflow_status', 'edit', $assert, $this->get_blog_ID() );
+				return check_user_perm( 'blog_workflow_status', 'edit', $assert, $this->get_blog_ID() );
 			case 'user':
 				// Check if current User can edit the workflow user:
-				return $current_User->check_perm( 'blog_workflow_user', 'edit', $assert, $this->get_blog_ID() );
+				return check_user_perm( 'blog_workflow_user', 'edit', $assert, $this->get_blog_ID() );
 			case 'priority':
 			case 'deadline':
 				// Check if current User can edit the workflow priority or deadline:
-				return $current_User->check_perm( 'blog_workflow_priority', 'edit', $assert, $this->get_blog_ID() );
+				return check_user_perm( 'blog_workflow_priority', 'edit', $assert, $this->get_blog_ID() );
 			default:
 				// Wrong request:
 				debug_die( 'Unhandled Item workflow permission name "'.$permname.'"' );
@@ -14575,6 +14750,7 @@ class Item extends ItemLight
 			'short_title',
 			'instruction',
 			'attachments',
+			'workflow',
 			'text',
 			'tags',
 			'excerpt',
@@ -14655,7 +14831,33 @@ class Item extends ItemLight
 			$redirect_to = pro_tinyurl_redirect_add_params( $redirect_to, $item_Blog, $slug, $slug_extra_term );
 		}
 
+		// Keep ONLY allowed params from current URL in the canonical URL by configs AND Item's switchable params:
+		$redirect_to = url_keep_canonicals_params( $redirect_to, '&', array_keys( $this->get_switchable_params() ) );
+
 		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect
+	}
+
+
+	/**
+	 * Get info for form field selector
+	 *
+	 * @return string
+	 */
+	function get_form_selector_info()
+	{
+		$r = '';
+
+		$status_icons = get_visibility_statuses( 'icons' );
+		if( isset( $status_icons[ $this->get( 'status' ) ] ) )
+		{	// Status colored icon:
+			$r .= $status_icons[ $this->get( 'status' ) ];
+		}
+		// Title with link to permament url:
+		$r .= ' '.$this->get_title( array( 'link_type' => 'permalink' ) );
+		// Icon to edit if current User has a permission:
+		$r .= ' '.$this->get_edit_link( array( 'text' => '#icon#' ) );
+
+		return $r;
 	}
 }
 ?>

@@ -41,7 +41,7 @@ $Form->begin_form( 'fform', ( $creating ? TB_('New organization') : TB_('Organiz
 
 	$Form->hiddens_by_key( get_memorized( 'action' ) ); // (this allows to come back to the right list order & page)
 
-	if( $current_User->check_perm( 'orgs', 'edit' ) )
+	if( check_user_perm( 'orgs', 'edit' ) )
 	{	// Allow to change an owner if current user has a permission to edit all polls:
 		$Form->username( 'org_owner_login', $edited_Organization->get_owner_User(), TB_('Owner'), '', '', array( 'required' => true ) );
 	}
@@ -68,7 +68,7 @@ $Form->begin_form( 'fform', ( $creating ? TB_('New organization') : TB_('Organiz
 			), TB_('Role in organization'), true );
 
 $buttons = array();
-if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
+if( check_user_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:
 	if( $creating )
 	{

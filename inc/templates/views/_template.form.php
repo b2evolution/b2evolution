@@ -58,7 +58,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, TB_('Code'), '', array( 'maxlength' => 128 ) );
 
 	// Context:
-	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts(), TB_('Context') );
+	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts( 'raw' ), TB_('Context') );
 
 	// Owner:
 	$GroupCache = & get_GroupCache();
@@ -93,7 +93,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->textarea( 'tpl_template_code', $edited_Template->get( 'template_code' ), 20, TB_('Template code'), '', 80, '', true );
 
 	$buttons = array();
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Allow to save template if current User has a permission:
 		if( $action == 'copy' )
 		{

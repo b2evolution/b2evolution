@@ -95,17 +95,13 @@ $core_componentwidget_defs = array(
 		),
 	'menu_item' => array(
 			'basic_menu_link',   // Menu link or button
-			'msg_menu_link',     // Messaging Menu link or button
-			'flag_menu_link',    // Flagged Items Menu link or button
-			'profile_menu_link', // My Profile Menu link or button
 			'embed_menu',        // Embed Menu
 			'colls_list_public', // Collections list
 			'colls_list_owner',  // Same owner's collections list
-			'coll_common_links', // Common Navigation Links
-			'user_tools',        // User Tools
 		),
 	'navigation' => array(
 			'breadcrumb_path',              // Breadcrumb Path
+			'request_title',                // Request Title
 			'coll_search_form',             // Search Form
 			'site_logo',                    // Site logo
 			'cat_title',                    // Category Title
@@ -117,6 +113,7 @@ $core_componentwidget_defs = array(
 			'coll_category_list',           // Category list
 			'content_hierarchy',            // Content Hierarchy
 			'coll_tag_cloud',               // Tag cloud
+			'coll_item_list_sort_order',    // Sort order
 			// Plugin: Calendar
 			// Plugin: Date Archives
 		),
@@ -156,6 +153,7 @@ $core_componentwidget_defs = array(
 			'item_vote',                 // Voting
 			'item_seen_by',              // Seen by
 			'item_workflow',             // Workflow Properties
+			'item_checklist_lines',      // Checklist Lines
 			'item_comment_form',         // Comment Form
 			'item_comment_feed_link',    // Comment Feed Link
 			'item_comment_notification', // Comment Notification

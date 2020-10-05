@@ -92,26 +92,53 @@ class Session
 	/**
 	 * Constructor
 	 *
-	 * If valid session cookie received: pull session from DB
+	 * If valid session cookie received or param session ID is provided: pull session from DB
 	 * Otherwise, INSERT a session into DB
+	 *
+	 * @param integer Session ID
 	 */
-	function __construct()
+	function __construct( $session_ID = NULL )
 	{
-		global $DB, $Debuglog, $current_User, $localtimenow, $Messages, $Settings, $UserSettings;
+		global $DB, $Debuglog, $localtimenow, $Messages, $Settings, $UserSettings;
 		global $Hit;
 		global $cookie_session, $cookie_expires;
 
 		$Debuglog->add( 'Session: cookie_domain='.get_cookie_domain(), 'request' );
 		$Debuglog->add( 'Session: cookie_path='.get_cookie_path(), 'request' );
 
-		$session_cookie = param_cookie( $cookie_session, 'string', '' );
-		if( empty( $session_cookie ) )
-		{
-			$Debuglog->add( 'Session: No session cookie received.', 'request' );
+		$timeout_sessions = NULL;
+		if( $this->user_ID != NULL )
+		{	// User is not anonymous, get custom session timeout (may return NULL):
+			$timeout_sessions = $UserSettings->get( 'timeout_sessions', $this->user_ID );
+		}
+		if( empty( $timeout_sessions ) )
+		{	// User is anonymous or has no custom session timeout. So, we use default session timeout:
+			$timeout_sessions = $Settings->get( 'timeout_sessions' );
+		}
+
+		if( $session_ID !== NULL )
+		{	// Get Session by requested ID:
+			$Debuglog->add( 'Session: ID='.$session_ID, 'request' );
+
+			$session_SQL = new SQL( 'Get session data by ID#'.$session_ID );
+			$session_SQL->SELECT( 'sess_ID, sess_key, sess_data, sess_user_ID, sess_start_ts, sess_lastseen_ts, sess_device' );
+			$session_SQL->FROM( 'T_sessions' );
+			$session_SQL->WHERE( 'sess_ID  = '.$DB->quote( $session_ID ) );
+			$session_SQL->WHERE_and( 'UNIX_TIMESTAMP(sess_lastseen_ts) > '.( $localtimenow - $timeout_sessions ) );
+			$row = $DB->get_row( $session_SQL );
+			if( empty( $row ) )
+			{
+				$Debuglog->add( 'Session: Session by ID is invalid!', 'request' );
+			}
 		}
 		else
-		{ // session ID sent by cookie
-			if( ! preg_match( '~^(\d+)_(\w+)$~', $session_cookie, $match ) )
+		{	// Get Session from cookie data ID + key:
+			$session_cookie = param_cookie( $cookie_session, 'string', '' );
+			if( empty( $session_cookie ) )
+			{
+				$Debuglog->add( 'Session: No session cookie received.', 'request' );
+			}
+			elseif( ! preg_match( '~^(\d+)_(\w+)$~', $session_cookie, $match ) )
 			{
 				$Debuglog->add( 'Session: Invalid session cookie format!', 'request' );
 			}
@@ -121,17 +148,6 @@ class Session
 				$session_key_by_cookie = $match[2];
 
 				$Debuglog->add( 'Session: Session ID received from cookie: '.$session_id_by_cookie, 'request' );
-
-				$timeout_sessions = NULL;
-				if( $this->user_ID != NULL )
-				{	// User is not anonymous, get custom session timeout (may return NULL):
-					$timeout_sessions = $UserSettings->get( 'timeout_sessions', $this->user_ID );
-				}
-
-				if( empty( $timeout_sessions ) )
-				{	// User is anonymous or has no custom session timeout. So, we use default session timeout:
-					$timeout_sessions = $Settings->get('timeout_sessions');
-				}
 
 				$row = $DB->get_row( '
 					SELECT sess_ID, sess_key, sess_data, sess_user_ID, sess_start_ts, sess_lastseen_ts, sess_device
@@ -143,8 +159,11 @@ class Session
 				{
 					$Debuglog->add( 'Session: Session ID/key combination is invalid!', 'request' );
 				}
-				else
-				{ // ID + key are valid: load data
+			}
+		}
+
+				if( ! empty( $row ) )
+				{	// Load session data if row is found in DB:
 					$Debuglog->add( 'Session: Session ID is valid.', 'request' );
 					$this->ID = $row->sess_ID;
 					$this->key = $row->sess_key;
@@ -204,8 +223,6 @@ class Session
 						}
 					}
 				}
-			}
-		}
 
 
 		if( $this->ID )
@@ -215,8 +232,9 @@ class Session
 				$this->session_needs_save( true );
 			}
 		}
-		else
-		{ // create a new session! :
+		elseif( $session_ID === NULL )
+		{	// Create a new session! Only for session from cookie:
+			// Do NOT create new session on request by ID!
 			$this->key = generate_random_key( 32 );
 
 			// Detect user device

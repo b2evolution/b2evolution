@@ -147,7 +147,7 @@ polls_results_block( array(
 evo_flush();
 
 
-if( $action != 'view' && $current_User->ID != $edited_User->ID && $edited_User->ID != 1 && $current_User->check_perm( 'users', 'edit' ) )
+if( $action != 'view' && $current_User->ID != $edited_User->ID && $edited_User->ID != 1 && check_user_perm( 'users', 'edit' ) )
 { // User can NOT delete admin and own account
 	echo '<div style="margin:25px 0">';
 	echo action_icon( T_('Delete User and All his contributions'), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_userdata&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete User and All his contributions'), 3, 4, array( 'class' => 'btn btn-danger' ) );

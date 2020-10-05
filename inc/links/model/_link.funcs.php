@@ -153,8 +153,7 @@ function get_link_owner_type( $link_ID )
  */
 function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fieldset_prefix = '' )
 {
-	global $admin_url, $inc_path;
-	global $current_User, $action;
+	global $admin_url, $inc_path, $action;
 
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 	{	// Files module is not enabled:
@@ -213,13 +212,13 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		$fieldset_title .= ' '.get_manual_link( 'images-attachments-panel' );
 	}
 
-	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	if( check_user_perm( 'admin', 'restricted' ) && check_user_perm( 'files', 'view' ) )
 	{	// Check if current user has a permission to back-office files manager:
 		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
 		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
 		{	// Get first file of the Link Owner:
 			$linkowner_File = & $linkowner_FileList->get_next();
-			if( ! empty( $linkowner_File ) && $current_User->check_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
+			if( ! empty( $linkowner_File ) && check_user_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
 			{	// Obtain and use file root of first file:
 				$linkowner_FileRoot = & $linkowner_File->get_FileRoot();
 				$attach_files_url .= '&amp;root='.$linkowner_FileRoot->ID;
@@ -243,7 +242,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
 				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'refresh\', \''.$fieldset_prefix.'\' )' ) )
 
-			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
+			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || check_user_perm( 'admin', 'restricted' ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
 				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\', \''.$fieldset_prefix.'\' )' ) )
@@ -257,7 +256,8 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 			'id' => $fieldset_prefix.$form_id,
 			'style' => 'display:none', // Show this uploader fieldset only when JS is enabled
 			'fold' => $fold,
-			'deny_fold' => ( $links_count > 0 )
+			'deny_fold' => ( $links_count > 0 ),
+			'data-fieldset-prefix' => $fieldset_prefix,
 		) );
 
 	echo '<div id="'.$fieldset_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
@@ -275,45 +275,47 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	$Form->end_fieldset();
 
 	// Show fieldset of quick uploader only when JS is enabled:
-	echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
-
-	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
+	if( is_ajax_request() )
+	{
+		echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
+	}
+	else
+	{
+		expose_var_to_js( 'fieldset_'.$fieldset_prefix.$form_id, array( 'fieldset_prefix' => $fieldset_prefix, 'form_id' => $form_id ), 'evo_display_attachments_fieldset_config' );
+	}
+	
+	if( check_user_perm( 'admin', 'restricted' ) && check_user_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
 	{	// Check if current user has a permission to back-office files manager:
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
-?>
-<script>
-function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
-{
-	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo get_htsrv_url(); ?>async.php',
-		data:
+
+		$link_attachment_window_config = array(
+				'loader_title' => T_('Loading...'),
+				'window_title' => $window_title,
+				'crumb_link'   => get_crumb( 'link' ),
+			);
+
+		if( is_ajax_request() )
 		{
-			'action': 'link_attachment',
-			'link_owner_type': link_owner_type,
-			'link_owner_ID': link_owner_ID,
-			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
-			'root': typeof( root ) == 'undefined' ? '' : root,
-			'path': typeof( path ) == 'undefined' ? '' : path,
-			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight,
-			'prefix': typeof( prefix ) == 'undefined' ? '' : prefix,
-		},
-		success: function(result)
-		{
-			openModalWindow( result, '90%', '80%', true, '<?php echo $window_title; ?>', '' );
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+				if( ! window.evo_link_attachment_window_config )
+				{
+					window.evo_link_attachment_window_config = <?php echo evo_json_encode( $dragdrop_upload_button_config );?>;
+				}
+			} );
+			</script>
+			<?php
 		}
-	} );
-	return false;
-}
-</script>
-<?php
-// Print JS function to allow edit file properties on modal window
-echo_file_properties();
+		else
+		{
+			expose_var_to_js( 'evo_link_attachment_window_config', evo_json_encode( $link_attachment_window_config ) );
+		}
+
+		// Print JS function to allow edit file properties on modal window
+		echo_file_properties();
 	}
 }
 
@@ -326,7 +328,7 @@ echo_file_properties();
  */
 function display_attachments( & $LinkOwner, $params = array() )
 {
-	global $current_User, $redirect_to;
+	global $redirect_to;
 
 	$params = array_merge( array(
 			'block_start' => '<div class="attachment_list">',
@@ -366,7 +368,7 @@ function display_attachments( & $LinkOwner, $params = array() )
 		echo '</td><td class="nowrap left">';
 		echo $link_File->get_view_link();
 		echo '</td><td class="lastcol shrinkwrap">';
-		if( $current_User->check_perm( 'files', 'edit' ) )
+		if( check_user_perm( 'files', 'edit' ) )
 		{ // display delete link action
 			$delete_url = get_htsrv_url().'action.php?mname=collections&amp;action=unlink&amp;link_ID='.$Link->ID.'&amp;crumb_collections_unlink='.get_crumb( 'collections_unlink' ).'&amp;redirect_to='.$redirect_to;
 			echo action_icon( T_('Remove'), 'remove', $delete_url );
@@ -489,7 +491,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 	 * @var File
 	 */
 	global $current_File;
-	global $LinkOwner, $current_User;
+	global $LinkOwner;
 	global $iframe_name, $admin_url, $blog;
 
 	$r = '';
@@ -515,7 +517,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 									 'data-link-id' => $link_ID ) );
 	}
 
-	if( $current_File && is_logged_in() && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+	if( $current_File && check_user_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 	{ // Locate file
 		$title = $current_File->dir_or_file( T_('Locate this directory!'), T_('Locate this file!') );
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
@@ -527,9 +529,9 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
-	if( $current_File && is_logged_in() &&
-	    $current_User->check_perm( 'admin', 'restricted' ) &&
-	    $current_User->check_perm( 'files', 'edit_allowed', false, $current_File->get_FileRoot() ) )
+	if( $current_File &&
+	    check_user_perm( 'admin', 'restricted' ) &&
+	    check_user_perm( 'files', 'edit_allowed', false, $current_File->get_FileRoot() ) )
 	{	// Edit file:
 		$title = T_('Edit properties...');
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
@@ -671,25 +673,17 @@ function display_link_position( & $row, $show_actions = true, $fieldset_prefix =
 function echo_link_position_js()
 {
 	global $Session;
-?>
-<script>
-var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
-var deferInlineReminder = false;
 
-jQuery( document ).on( 'change', 'select[id^=display_position_]', {
-		url:   '<?php echo get_htsrv_url(); ?>',
-		crumb: '<?php echo get_crumb( 'link' ); ?>',
-}, function( event )
-{
-	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
-	{ // Display inline position reminder
-		alert( '<?php echo TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
-		displayInlineReminder = false;
-	}
-	evo_link_change_position( this, event.data.url, event.data.crumb );
-} );
-</script>
-<?php
+	$evo_link_position_config = array(
+			'selector' => 'select[id^=display_position_]',
+			'url'       => get_htsrv_url(),
+			'crumb'     => get_crumb( 'link' ),
+			'alert_msg' => TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.'),
+			'display_inline_reminder' => $Session->get( 'display_inline_reminder', 'true' ),
+			'defer_inline_reminder'   => false,
+		);
+
+	expose_var_to_js( 'evo_link_position_config', json_encode( $evo_link_position_config ) );
 }
 
 
@@ -700,73 +694,30 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
  */
 function echo_link_sortable_js( $fieldset_prefix = '' )
 {
-?>
-<script>
-jQuery( document ).ready( function()
-{
-	jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table' ).sortable(
+	$link_sortable_js_config = array(
+			'fieldset_prefix' => $fieldset_prefix,
+			'crumb_link'      => get_crumb( 'link' ),
+		);
+
+	if( is_ajax_request() )
 	{
-		containerSelector: 'table',
-		itemPath: '> tbody',
-		itemSelector: 'tr',
-		placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
-		onMousedown: function( $item, _super, event )
-		{
-			if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
-			{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
-				event.preventDefault();
-				return true;
+		?>
+		<script>
+		jQuery( document ).ready( function() {
+			if( typeof( window.evo_link_sortable_js_config ) == 'undefined' )
+			{
+				window.evo_link_sortable_js_config = {};
 			}
-		},
-		onDrop: function( $item, container, _super )
-		{
-			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).removeClass( 'odd even' );
-			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:odd' ).addClass( 'even' );
-			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:even' ).addClass( 'odd' );
-
-			var link_IDs = '';
-			jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).each( function()
-			{
-				var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
-				if( link_ID_cell.length > 0 )
-				{
-					link_IDs += link_ID_cell.html() + ',';
-				}
-			} );
-			link_IDs = link_IDs.slice( 0, -1 );
-
-			jQuery.ajax(
-			{
-				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-				type: 'POST',
-				data:
-				{
-					'action': 'update_links_order',
-					'links': link_IDs,
-					'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
-				},
-				success: function( data )
-				{
-					link_data = JSON.parse( ajax_debug_clear( data ) );
-					// Update data-order attributes
-					jQuery( '#attachments_fieldset_table table tr' ).each( function()
-					{
-						var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
-						if( link_ID_cell.length > 0 )
-						{
-							link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
-						}
-					} );
-					evoFadeSuccess( $item );
-				}
-			} );
-
-			$item.removeClass(container.group.options.draggedClass).removeAttr("style");
-		}
-	} );
-} );
-</script>
-<?php
+			window.evo_link_sortable_js_config['link_sortable_<?php echo $fieldset_prefix;?>'] = <?php echo evo_json_encode( $link_sortable_js_config );?>;
+			window.init_link_sortable( evo_link_sortable_js_config['link_sortable_<?php echo $fieldset_prefix;?>'] );
+		} );
+		</script>
+		<?php
+	}
+	else
+	{
+		expose_var_to_js( 'link_sortable_'.$fieldset_prefix, $link_sortable_js_config, 'evo_link_sortable_js_config' );
+	}
 }
 
 
@@ -822,7 +773,7 @@ function get_file_links( $file_ID, $params = array() )
 				if( $Item = & $ItemCache->get_by_ID( $link->link_itm_ID, false ) )
 				{
 					$Collection = $Blog = $Item->get_Blog();
-					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
+					if( check_user_perm( 'item_post!CURSTATUS', 'view', false, $Item ) )
 					{ // Current user can edit the linked post
 						$r .= $params['post_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$link->link_itm_ID ).'">'.$Item->get( 'title' ).'</a>';
 					}
@@ -838,7 +789,7 @@ function get_file_links( $file_ID, $params = array() )
 				if( $Comment = & $CommentCache->get_by_ID( $link->link_cmt_ID, false ) )
 				{
 					$Item = $Comment->get_Item();
-					if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+					if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 					{ // Current user can edit the linked Comment
 						$r .= $params['comment_prefix'].'<a href="'.url_add_param( $admin_url, 'ctrl=comments&amp;action=edit&amp;comment_ID='.$link->link_cmt_ID ).'">'.$Item->get( 'title' ).'</a>';
 					}
@@ -853,9 +804,24 @@ function get_file_links( $file_ID, $params = array() )
 			{ // File is linked to user
 				if( $User = & $UserCache->get_by_ID( $link->link_usr_ID, false ) )
 				{
-					if( $current_User->ID != $User->ID && !$current_User->check_perm( 'users', 'view' ) )
+					if( $current_User->ID != $User->ID && ! check_user_perm( 'users', 'view' ) )
 					{ // No permission to view other users in admin form
-						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->get_username().'</a>';
+						$BlogCache = & get_BlogCache();
+						$BlogCache->load_user_blogs();
+						$user_url = '';
+						if( ! empty( $BlogCache->cache ) )
+						{	// Try to use alias user url:
+							foreach( $BlogCache->cache as $user_Blog )
+							{	// Use first found collection:
+								$user_url = $user_Blog->get( 'userurl', array( 'user_ID' => $User->ID, 'user_login' => $User->login ) );
+								break;
+							}
+						}
+						if( empty( $user_url ) )
+						{	// Use standard user url:
+							$user_url = url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID );
+						}
+						$r .= $params['user_prefix'].'<a href="'.$user_url.'">'.$User->get_username().'</a>';
 					}
 					else
 					{ // Build a link to display a user in admin form
@@ -868,7 +834,7 @@ function get_file_links( $file_ID, $params = array() )
 			{	// File is linked to email campaign:
 				if( $EmailCampaign = & $EmailCampaignCache->get_by_ID( $link->link_ecmp_ID, false ) )
 				{
-					if( ! $current_User->check_perm( 'emails', 'view' ) )
+					if( ! check_user_perm( 'emails', 'view' ) )
 					{	// Build a link to display an email campaign in edit back-office form:
 						$r .= $params['emailcampaign_prefix'].'<a href="?ctrl=campaigns&action=edit&tab=info&ecmp_ID='.$EmailCampaign->ID.'">'.$EmailCampaign->get( 'name' ).'</a>';
 					}
@@ -884,7 +850,7 @@ function get_file_links( $file_ID, $params = array() )
 				if( $Message = & $MessageCache->get_by_ID( $link->link_msg_ID, false ) )
 				{
 					$Thread = & $Message->get_Thread();
-					if( ! $current_User->check_perm( 'perm_messaging', 'reply' ) )
+					if( ! check_user_perm( 'perm_messaging', 'reply' ) )
 					{	// Build a link to display a message in edit back-office form:
 						$r .= $params['message_prefix'].'<a href="?ctrl=messages&thrd_ID='.$Thread->ID.'">'.$Thread->get( 'title' ).' #'.$Message->ID.'</a>';
 					}
@@ -1074,5 +1040,174 @@ function display_subtype( $link_ID )
 	$current_File = $Link->get_File();
 
 	return $Link->get_preview_thumb();
+}
+
+/**
+ * Display attachments tab pane
+ *
+ * @param object Form
+ * @param object LinkOwner object
+ * @param boolean true to allow folding for this fieldset, false otherwise
+ * @param string Tab pane prefix
+ */
+function display_attachments_tab_pane( & $Form, & $LinkOwner, $fold = false, $tab_pane_prefix = '' )
+{
+	global $admin_url, $inc_path;
+	global $current_User, $action;
+
+	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
+	{	// Files module is not enabled:
+		return;
+	}
+
+	if( ! $LinkOwner->check_perm( 'edit', false ) )
+	{	// Current user has no perm to edit the link owner:
+		return;
+	}
+
+	// Set title for modal window:
+	switch( $LinkOwner->type )
+	{
+		case 'item':
+			if( $LinkOwner->is_temp() )
+			{
+				$window_title = '';
+			}
+			else
+			{
+				$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+				if( ! $LinkOwner->Item->check_proposed_change_restriction() )
+				{	// Display overlay if the Item has a restriction by existing proposed change:
+					$restriction_overlay = T_('You must save the post and/or accept the proposed changes before you can edit the attachments.');
+				}
+			}
+			$form_id = 'itemform_links';
+			break;
+
+		case 'comment':
+			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
+			$form_id = 'cmntform_links';
+			break;
+
+		case 'emailcampaign':
+			$window_title = format_to_js( sprintf( T_('Attach files to email campaign "%s"'), $LinkOwner->EmailCampaign->get( 'name' ) ) );
+			$form_id = 'ecmpform_links';
+			break;
+
+		case 'message':
+			$window_title = '';
+			$form_id = 'msgform_links';
+			break;
+
+		default:
+			$window_title = '';
+			$form_id = 'atchform_links';
+			break;
+	}
+
+	$items_left = '';
+	$items_right = '';
+
+	if( is_admin_page() )
+	{	// Display a link to manual page only on back-office:
+		$items_right .= ' '.get_manual_link( 'images-attachments-panel' );
+	}
+
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	{	// Check if current user has a permission to back-office files manager:
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
+		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
+		{	// Get first file of the Link Owner:
+			$linkowner_File = & $linkowner_FileList->get_next();
+			if( ! empty( $linkowner_File ) && $current_User->check_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
+			{	// Obtain and use file root of first file:
+				$linkowner_FileRoot = & $linkowner_File->get_FileRoot();
+				$attach_files_url .= '&amp;root='.$linkowner_FileRoot->ID;
+				$attach_files_url .= '&amp;path='.dirname( $linkowner_File->get_rdfs_rel_path() ).'/';
+			}
+		}
+		$items_left .= action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
+				T_('Attach existing files'), 3, 4,
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'\', \'\', \'\', \''.$tab_pane_prefix.'\' )' ) );
+		if( ! $LinkOwner->is_temp() )
+		{	// Don't allow this option for new creating objects:
+			$items_left .= action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
+				T_('Attach existing files'), 1, 0,
+				array( 'target' => '_blank' ) );
+		}
+	}
+
+	$items_right .= action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
+			T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
+
+		.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
+			? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
+			: $LinkOwner->get_edit_url().'#',
+			T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) );
+
+	// Get a count of links in order to deny folding when there is at least one link
+	$links_count = count( $LinkOwner->get_Links() );
+	$Form->open_tab_pane( array(
+			'id' => 'attachment',
+			'class' => 'in active tab_pane_no_pads',
+			'left_items' => $items_left,
+			'right_items' => $items_right,
+		) );
+
+	echo '<div id="'.$tab_pane_prefix.'attachments_tab_pane_wrapper" class="evo_attachments_tab_pane__wrapper">';
+		if( ! empty( $restriction_overlay ) )
+		{	// Restrict attachments with overlay:
+			echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_overlay" class="evo_attachments_fieldset__overlay"><b>'.$restriction_overlay.'</b></div>';
+		}
+		echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_block" class="evo_attachments_fieldset__block">';
+			echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_table" class="evo_attachments_fieldset__table">';
+				require $inc_path.'links/views/_link_list.view.php';
+			echo '</div>';
+		echo '</div>';
+	echo '</div>';
+
+	$Form->close_tab_pane();
+
+	// Show fieldset of quick uploader only when JS is enabled:
+	echo '<script type="text/javascript">jQuery( "#'.$tab_pane_prefix.$form_id.'" ).show()</script>';
+
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
+	{	// Check if current user has a permission to back-office files manager:
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
+?>
+<script>
+function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
+{
+	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'link_attachment',
+			'link_owner_type': link_owner_type,
+			'link_owner_ID': link_owner_ID,
+			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+			'root': typeof( root ) == 'undefined' ? '' : root,
+			'path': typeof( path ) == 'undefined' ? '' : path,
+			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight,
+			'prefix': typeof( prefix ) == 'undefined' ? '' : prefix,
+		},
+		success: function(result)
+		{
+			openModalWindow( result, '90%', '80%', true, '<?php echo $window_title; ?>', '' );
+		}
+	} );
+	return false;
+}
+</script>
+<?php
+// Print JS function to allow edit file properties on modal window
+echo_file_properties();
+	}
 }
 ?>

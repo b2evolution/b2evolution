@@ -1,0 +1,73 @@
+// Checklist Lines widget
+
+.checklist_lines {
+
+    margin-bottom: 0.5rem;
+
+    .checklist_line {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        label {
+            // min-width set to 0 ensures the element doesn't auto-resize to the parent flex container, and wraps as needed.
+            min-width: 0;
+            display: flex;
+
+            input[type="checkbox"] {
+                flex-shrink: 0;
+            }
+
+            .checklist_line_label {
+                word-break: break-word;
+            }
+        }
+
+        .checklist_line_delete {
+            flex-shrink: 0;
+            margin-left: 3px;
+        }
+
+        // Show delete action icon on hover:
+        &:hover {
+            .checklist_line_delete {
+                visibility: visible !important;
+            }
+
+            // Hide delete actino icon when dragged:
+            &.ui-draggable-dragging .checklist_line_delete {
+                visibility: hidden !important;
+            }
+        }
+
+        // Strikeout checked lines:
+        input[type="checkbox"]:checked + .checklist_line_label {
+            text-decoration: line-through;
+        }
+    }
+
+    .droppable-hover > label:after {
+        content: "";
+        position: absolute;
+        width: 102%;
+        height: 2px;
+        background: #F00;
+        left: 0;
+        bottom: -2px;
+    }
+
+    .checklist_droparea {
+        height: 2px;
+        &.droppable-hover {
+            background: #F00;
+        }
+    }
+}
+
+.checklist_line_input {
+    overflow-y: hidden;
+
+    &.add_checklist_line_input {
+        margin-bottom: 0.5rem;
+    }
+}

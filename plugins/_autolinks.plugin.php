@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -568,6 +568,11 @@ class autolinks_plugin extends Plugin
 			$additional_attrs = ' '.trim( $additional_attrs );
 		}
 
+		// Add style class to break long urls:
+		$additional_attrs = stripos( $additional_attrs, ' class="' ) === false
+			? $additional_attrs.' class="linebreak"'
+			: preg_replace( '/ class="([^"]*)"/i', ' class="$1 linebreak"', $additional_attrs );
+
 		$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
 		$text = preg_replace(
 			/* Tblue> I removed the double quotes from the first RegExp because
@@ -826,7 +831,7 @@ class autolinks_plugin extends Plugin
 					if( $User )
 					{	// Replace @usernames
 						$user_link_attrs = str_replace( '%user_ID%', $User->ID, $link_attrs );
-						$user_link = '<a href="'.$User->get_userpage_url().'"'.$user_link_attrs.'>'.$username_source.'</a>';
+						$user_link = '<a href="'.$User->get_userpage_url( $this->current_Blog->ID ).'"'.$user_link_attrs.'>'.$username_source.'</a>';
 						$content = preg_replace( '#'.preg_quote( $username_source, '#' ).'#', $user_link, $content, 1 );
 						$this->already_linked_usernames[] = $username;
 					}

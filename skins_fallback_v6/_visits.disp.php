@@ -37,7 +37,7 @@ if( empty( $user_ID ) || $user_ID !== $current_User->ID )
 }
 
 $viewed_User = & $UserCache->get_by_ID( $user_ID );
-//$view_perm = $current_User->ID == $viewed_User->ID || $current_User->check_perm( 'users', 'view', false, $viewed_User );
+//$view_perm = $current_User->ID == $viewed_User->ID || check_user_perm( 'users', 'view', false, $viewed_User );
 $view_perm = $current_User->ID == $viewed_User->ID;
 
 // Check if admin, moderator or user with 'view details' permission

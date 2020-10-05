@@ -25,7 +25,7 @@ class videoplug_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $number_of_installs = 1;
 
 
@@ -128,8 +128,11 @@ class videoplug_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		$this->require_css( 'videoplug.css' );
-		$this->require_js( 'videoplug.js' );
+		$this->require_css( 'css/videoplug.min.css' );
+		// Initialize config for video plugin:
+		expose_var_to_js( 'evo_plugin_videoplug_config', array(
+			'youtube_lazyload_selector' => '.evo_youtube[data-embed]',
+		) );
 	}
 
 
@@ -491,7 +494,7 @@ class videoplug_plugin extends Plugin
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 			//<![CDATA[

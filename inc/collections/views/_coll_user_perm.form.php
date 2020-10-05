@@ -108,8 +108,8 @@ $Results->cols[] = array(
 						( $edited_Blog->get_setting( 'use_workflow' )
 							? ' %coll_perm_checkbox( {row}, \'bloguser_\', \'can_be_assignee\', \''.format_to_output( TB_('Workflow Member (Items can be assigned to this User)'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
 							 .' %coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_status\', \''.format_to_output( TB_('User can change task status'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
-							 .' %coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_user\', \''.format_to_output( TB_('User can assign items to others'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
-							 .' %coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_priority\', \''.format_to_output( TB_('User can set priority / deadline'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
+							 .'%coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_user\', \''.format_to_output( TB_('User can assign items to others'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
+							 .'%coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_priority\', \''.format_to_output( TB_('User can set priority / deadline'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
 							: '' ),
 						'td_class' => 'center',
 					);

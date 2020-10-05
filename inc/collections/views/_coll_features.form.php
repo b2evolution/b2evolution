@@ -34,6 +34,8 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( TB_('Post list').get_manual_link('item-list-features') );
 
+	$Form->checkbox( 'postlist_enable', $edited_Blog->get_setting( 'postlist_enable' ), TB_('Enable Post list') );
+
 	// Display the 3 orderby fields with order direction
 	for( $order_index = 0; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
 	{ // The order fields:
@@ -195,7 +197,7 @@ $Form->begin_fieldset( TB_('Create/Edit options').get_manual_link('blog-features
 			TB_('Post category options'), true );
 
 	$coll_in_skin_editing_options = array();
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings:
 		$coll_in_skin_editing_options[] = array( 'in_skin_editing', 1, TB_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) );
 		$coll_in_skin_editing_options[] = array( 'in_skin_editing_renderers', 1, TB_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );

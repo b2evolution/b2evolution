@@ -163,7 +163,7 @@ function param_format( $value, $type = 'raw' )
  *              'allow_empty' will refuse illegal values but will always accept empty values (This helps blocking dirty spambots or borked index bots. Saves a lot of processor time by killing invalid requests)
  * @return mixed Final value of Variable, or false if we don't force setting and did not set
  */
-function param( $var, $type = 'raw', $default = '', $memorize = false,
+function param( $var, $type, $default = '', $memorize = false,
 								$override = false, $use_default = true, $strict_typing = 'allow_empty' )
 {
 	global $Debuglog, $debug, $evo_charset, $io_charset, $is_cli;
@@ -536,7 +536,8 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 	 * STEP 3: memorize the value for later url regeneration
 	 */
 	if( $memorize === true ||
-	    ( $memorize === 'auto' && ( isset( $_POST[$var] ) || isset( $_GET[$var] ) || isset( $_COOKIE[$var] ) ) ) )
+	    ( $memorize === 'auto' && ( isset( $_POST[$var] ) || isset( $_GET[$var] ) || isset( $_COOKIE[$var] ) ) ) ||
+	    ( $memorize === 'ifnotyet' && ! param_ismemorized( $var ) ) )
 	{	// Memorize this parameter:
 		memorize_param( $var, $type, $default );
 	}
@@ -2373,7 +2374,6 @@ function param_check_gender( $var, $required = false )
 {
 	if( empty( $GLOBALS[$var] ) )
 	{	// empty is OK if not required:
-		global $current_User;
 		if( $required )
 		{
 			param_error( $var, T_( 'Please select a gender.' ) );

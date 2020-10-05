@@ -10,7 +10,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $baseurl, $Settings, $Blog, $disp, $current_User, $site_Skin;
+global $baseurl, $Settings, $Blog, $disp, $site_Skin;
 
 $notification_logo_file_ID = intval( $Settings->get( 'notification_logo_file_ID' ) );
 if( $notification_logo_file_ID > 0 &&
@@ -54,7 +54,7 @@ else
 				foreach( $header_tabs as $s => $header_tab )
 				{	// Display level 0 tabs:
 ?>
-					<li<?php echo ( $site_Skin->header_tab_active === $s ? ' class="active"' : '' ); ?>>
+					<li<?php echo $site_Skin->get_header_tab_attr_class( $header_tab, $s ); ?>>
 						<a href="<?php echo $header_tab['url']; ?>"<?php echo empty( $header_tab['rel'] ) ? '' : ' rel="'.$header_tab['rel'].'"'; ?>><?php echo $header_tab['name']; ?></a>
 					</li>
 <?php
@@ -149,7 +149,7 @@ else
 							'item_end'            => '',
 							'item_selected_start' => '',
 							'item_selected_end'   => '',
-							'profile_menu_link_text' => 'avatar_force_login',
+							'link_text_myprofile' => '$login$',
 						) );
 					// ----------------------------- END OF "Right Navigation" CONTAINER -----------------------------
 				?>
@@ -171,7 +171,7 @@ if( $site_Skin->has_sub_menus() )
 		if( is_array( $menu_item ) )
 		{	// Display menu item for collection:
 ?>
-			<li<?php echo ( $menu_item['active'] ? ' class="active"' : '' ); ?>>
+			<li<?php echo $site_Skin->get_header_tab_attr_class( $menu_item ); ?>>
 				<a href="<?php echo $menu_item['url']; ?>"<?php echo empty( $menu_item['rel'] ) ? '' : ' rel="'.$menu_item['rel'].'"'; ?>><?php echo $menu_item['name']; ?></a>
 			</li>
 <?php
@@ -214,33 +214,7 @@ if( $site_Skin->has_sub_menus() )
 { // Check if "Back to Top" button is enabled
 ?>
 <a class="btn btn-primary slide-top<?php echo ( show_toolbar() ? ' slide-top-toolbar' : '' ).( $site_Skin->get_setting( 'fixed_header' ) ? ' slide-top-fixed-header' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
-
-<script type="text/javascript">
-	// Scroll to Top
-	// ======================================================================== /
-	// browser window scroll ( in pixels ) after which the "scroll to top" link is show
-	var offset = 400,
-	// browser window scroll (in pixels) after which the "scroll to top" link opacity is reduced
-	offset_opacity = 1200,
-	// duration of the top scrolling animatiion (in ms)
-	scroll_top_duration = 700,
-	// grab the "back to top" link
-	$slide_top = jQuery( '.slide-top' );
-	
-	// hide or show the "scroll to top" link
-	jQuery( window ).scroll( function()
-	{
-		( jQuery( this ).scrollTop() > offset ) ? $slide_top.addClass( 'slide-top-visible' ) : $slide_top.removeClass( 'slide-top-visible' );
-	});
-
-	// Smooth scroll to top
-	$slide_top.on( 'click', function(event)
-	{
-		event.preventDefault();
-		jQuery( 'body, html' ).animate(
-		{
-			scrollTop: 0,
-		}, scroll_top_duration );
-	} );
-</script>
-<?php } ?>
+<?php
+}
+expose_var_to_js( 'evo_init_scroll_to_top', true );
+?>

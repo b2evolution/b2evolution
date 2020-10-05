@@ -83,13 +83,6 @@ class user_register_standard_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
-
-		// Get available templates:
-		$context = 'registration';
-		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_by_context( $context );
-
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
@@ -251,9 +244,7 @@ class user_register_standard_Widget extends ComponentWidget
 			{
 				foreach( $missing_fields as $missing_field )
 				{
-					echo '<p class="evo_param_error">';
-					echo sprintf( T_('The template %s is missing the required field %s.'), '<code>'.$this->disp_params['reg1_template'].'</code>', '<code>'.$missing_field.'</code>' );
-					echo '</p>';
+					display_rendering_error( sprintf( T_('The template %s is missing the required field %s.'), '<code>'.$this->disp_params['reg1_template'].'</code>', '<code>'.$missing_field.'</code>' ) );
 				}
 			}
 
@@ -362,7 +353,7 @@ class user_register_standard_Widget extends ComponentWidget
 				$Form->end_form();
 
 				// Display javascript password strength indicator bar:
-				display_password_indicator( array( 'field-width' => $params['register_field_width'] ) );
+				display_password_indicator( array( 'field_width' => $params['register_field_width'] ) );
 
 				// Display javascript login validator:
 				display_login_validator();

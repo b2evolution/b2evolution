@@ -61,7 +61,7 @@
 }
 .evo_tile__grey_bg {
 	background-color: rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,255);
-	.evo_tile_text__gradient:after { 
+	.evo_tile_text__gradient::after { 
 		// Override the "faedout gradient" (see further below) using correct color:
 		background: linear-gradient(rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,0), rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,255));
 	}
@@ -165,7 +165,7 @@
 
 // Tile > TEXT
 // Modifiers:
-.evo_tile_text__gradient:after { // Make a fadeout gradient on the text
+.evo_tile_text__gradient::after { // Make a fadeout gradient on the text
     content:"";
     position:absolute;
     bottom:0;

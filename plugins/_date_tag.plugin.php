@@ -21,7 +21,7 @@ class date_tag_plugin extends Plugin
 	var $code = 'evo_datetag';
 	var $name = 'Date tag';
 	var $priority = 57;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -241,7 +241,7 @@ class date_tag_plugin extends Plugin
 
 		if( $date_source === false )
 		{	// Display error if source cannot be used for the rendering object:
-			return '<span class="evo_param_error">'.sprintf( T_('%s is not valid for %s'), $matches[0], $object_type ).'</span>';
+			return get_rendering_error( sprintf( T_('%s is not valid for %s'), $matches[0], $object_type ), 'span' );
 		}
 
 		if( preg_match( '/-?\d{1,2}([\.,:]\d{1,2})?/', $date_offset ) && ! empty( $date_offset ) )

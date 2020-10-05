@@ -185,8 +185,8 @@ echo '<div class="profile_column_left">';
 	// Check if current user can edit other users or own user from back-office:
 	$user_perms_backoffice_edit = ( $is_logged_in &&
 			( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
-			$current_User->check_status( 'can_access_admin' ) &&
-			$current_User->check_perm( 'admin', 'restricted' )
+			check_user_status( 'can_access_admin' ) &&
+			check_user_perm( 'admin', 'restricted' )
 		);
 
 	// - Message:
@@ -202,8 +202,8 @@ echo '<div class="profile_column_left">';
 
 	// - Contact:
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
-			$current_User->check_perm( 'perm_messaging', 'reply' ) &&
-			$current_User->check_status( 'can_edit_contacts' ) )
+			check_user_perm( 'perm_messaging', 'reply' ) &&
+			check_user_status( 'can_edit_contacts' ) )
 	{ // User is logged in, has messaging access permission and is not the same user as displayed user
 		$is_contact = check_contact( $User->ID );
 		if( $is_contact === NULL )
@@ -237,7 +237,7 @@ echo '<div class="profile_column_left">';
 
 	// - Report:
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
-			$current_User->check_status( 'can_report_user', $User->ID ) )
+			check_user_status( 'can_report_user', $User->ID ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
 		if( ! isset( $buttons['group'] ) )
 		{
@@ -264,7 +264,7 @@ echo '<div class="profile_column_left">';
 				.'<button type="button" class="btn btn-primary">'.$params['edit_user_admin_link_text'].'</button>'
 			.'</a>';
 
-		if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
+		if( $current_User->ID != $User->ID && check_user_perm( 'users', 'edit' ) )
 		{ // - Delete in back-office:
 			$buttons['del'] = array();
 			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID ).'" class="btn btn-danger">'
@@ -324,7 +324,7 @@ echo '</div>';
 // ---- START OF RIGHT COLUMN ---- //
 echo '<div class="profile_column_right">';
 
-	if( $is_logged_in && $current_User->check_status( 'can_view_user', $user_ID ) )
+	if( check_user_status( 'can_view_user', $user_ID ) )
 	{ // Display other pictures, but only for logged in and activated users:
 		$user_avatars = $User->get_avatar_Links();
 		if( count( $user_avatars ) > 0 )

@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $number_of_installs = 1;
 
 
@@ -355,7 +355,7 @@ class polls_plugin extends Plugin
 			), $params );
 
 		// Load JS to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		// Load CSS for modal window
 		$this->require_css( 'polls.css', true );
@@ -363,123 +363,40 @@ class polls_plugin extends Plugin
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
 
-		?>
-		<script>
-		//<![CDATA[
-		function polls_toolbar( title, prefix )
-		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-					+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
-					+ '<input type="button" title="<?php echo TS_('Insert a Poll');?>"'
-					+ ' class="<?php echo $this->get_template( 'toolbar_button_class' );?>"'
-					+ ' data-func="polls_load_window|' + prefix + '" value="<?php echo TS_('Insert a Poll');?>" />'
-					+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
+		$js_config = array(
+				'prefix'               => $params['js_prefix'],
+				'plugin_code'          => $this->code,
+				'debug'                => $debug,
 
-			jQuery( '.' + prefix + '<?php echo $this->code;?>_toolbar' ).html( r );
+				'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
+				'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
+				'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
+				'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
+				'toolbar_title'        => T_('Polls').':',
+				
+				'button_title'         => T_('Insert a Poll'),
+				'button_value'         => T_('Insert a Poll'),
+				'button_class'         => $this->get_template( 'toolbar_button_class' ),
+				'modal_window_title'   => T_('Insert a Poll'),
+			);
+
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_polls_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'polls_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_polls_toolbar_config' );
 		}
 
-		function polls_load_window( prefix )
-		{
-			openModalWindow( '<div id="poll_wrapper"></div>', 'auto', '', true,
-					'<?php echo TS_('Insert a Poll');?>',
-					[ 'Insert Poll' ],
-					true );
-
-			// Load available polls
-			polls_load_polls( prefix );
-
-			// To prevent link default event
-			return false;
-		}
-
-		function polls_api_request( api_path, obj_selector, func )
-		{
-			jQuery.ajax( {
-					url: restapi_url + api_path
-				} )
-				.then( func, function( jqXHR )
-				{
-					polls_api_print_error( obj_selector, jqXHR );
-				} );
-		}
-
-		function polls_api_print_error( obj_selector, error )
-		{
-			if( typeof( error ) != 'string' && typeof( error.code ) == 'undefined' )
-			{
-				error = typeof( error.responseJSON ) == 'undefined' ? error.statusText : error.responseJSON;
-			}
-
-			if( typeof( error.code ) == 'undefined' )
-			{ // Unknown non-JSON response
-				var error_text = '<h4 class="text-danger">Unknown error: ' + error + '</h4>';
-			}
-			else
-			{
-				var error_text = '<h4 class="text-danger">' + error.message + '</h4>';
-				<?php
-				if( $debug )
-				{
-				?>
-				error_text += '<div><b>Code:</b> '	+ error.code + '</div>'
-						+ '<div><b>Status:</b> ' + error.data.status + '</div>';
-				<?php
-				}
-				?>
-			}
-
-			jQuery( obj_selector ).html( error_text );
-		}
-
-		function polls_load_polls( prefix )
-		{
-			prefix = ( prefix ? prefix : '' );
-
-			polls_api_request( 'polls', '#poll_wrapper', function( data )
-			{
-				var r = '<div id="' + prefix + 'polls_list">';
-
-				r += '<ul>';
-				for( var p in data.polls )
-				{
-					var poll = data.polls[p];
-					r += '<li><a href="#" data-poll-id="' + poll.pqst_ID + '" data-prefix="' + prefix + '">' + poll.pqst_question_text + '</a></li>';
-				}
-				r += '</ul>';
-				r += '</div>';
-
-				jQuery( '#poll_wrapper' ).html( r );
-
-			} );
-		}
-
-		// Insert a poll short tag to textarea
-		jQuery( document ).on( 'click', '#<?php echo $params['js_prefix']; ?>polls_list a[data-poll-id]', function()
-		{
-			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{
-				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
-			}
-
-			var prefix = jQuery( this ).data( 'prefix' ) ? jQuery( this ).data( 'prefix' ) : '';
-
-			// Insert tag text in area
-			textarea_wrap_selection( window[ prefix + 'b2evoCanvas' ], '[poll:' + jQuery( this ).data( 'pollId' ) + ']', '', 0 );
-			// Close main modal window
-			closeModalWindow();
-
-			// To prevent link default event
-			return false;
-		} );
-
-		//]]>
-		</script>
-		<?php
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?>
-		<script>polls_toolbar( '<?php echo TS_('Polls').':';?>', '<?php echo $params['js_prefix']; ?>' );</script>
-		<?php
 
 		return true;
 	}

@@ -17,7 +17,7 @@ class email_elements_plugin extends Plugin
 	var $code = 'b2evEmailEl';
 	var $name = 'Email Elements';
 	var $priority = 50;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -455,7 +455,7 @@ class email_elements_plugin extends Plugin
 					}
 					if( $current_element_error_message !== NULL )
 					{	// Replace original short tag with error message:
-						$rendered_tag = str_replace( $current_element, '<span class="evo_param_error">'.$current_element.' - '.$current_element_error_message.'</span>', $rendered_tag );
+						$rendered_tag = str_replace( $current_element, get_rendering_error( $current_element.' - '.$current_element_error_message, 'span' ), $rendered_tag );
 						continue;
 					}
 					// If image file is correct we should display it instead of text:

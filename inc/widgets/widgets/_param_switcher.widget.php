@@ -87,8 +87,11 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	{
 		$r = array_merge( array(
 				'param_code' => array(
+					'type' => 'text',
 					'label' => T_('Param code'),
 					'size' => 60,
+					'allow_empty' => false,
+					'defaultvalue' => 'tab',
 				),
 				'buttons' => array(
 					'type' => 'array',
@@ -175,11 +178,16 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		$this->init_display( $params );
 
 		if( ! isset( $Item ) ||
-		    ! $Item instanceof Item ||
-		    ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item instanceof Item )
+		{	// No current Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because this is not an Item page, so there can be no switcher params.' );
+			return false;
+		}
+
+		if( ! $Item->get_type_setting( 'allow_switchable' ) ||
 		    ! $Item->get_setting( 'switchable' ) )
-		{	// No current Item or Item doesn't use a switcher:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use swicther params.' );
+		{	// Item doesn't use switcher params:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use switcher params.' );
 			return false;
 		}
 
@@ -295,36 +303,28 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			$item_start = $this->get_menu_link_item_start( true );
 			preg_match( '/class="([^"]+)"/i', $item_start, $match_class );
 			$wrapper_class_active = empty( $match_class[1] ) ? '' : $match_class[1];
-?>
-<script>
-evo_init_switchable_buttons( {
-	selector:             'a[data-param-switcher][data-code=<?php echo $this->get_param( 'param_code' ); ?>]',
-	link_class_normal:    '<?php echo $this->get_link_class( false ); ?>',
-	link_class_active:    '<?php echo $this->get_link_class( true ); ?>',
-	wrapper_class_normal: '<?php echo $wrapper_class_normal; ?>',
-	wrapper_class_active: '<?php echo $wrapper_class_active; ?>',
-	add_redir_no:         <?php echo $this->get_param( 'add_redir_no' ) ? 'true' : 'false'; ?>,
-	defaults:             <?php echo json_encode( $defaults ); ?>,
-	display_mode:         '<?php echo $this->get_display_mode(); ?>',
-} );
-</script>
-<?php
+
+			$switchable_buttons_config = array(
+					'selector'             => 'a[data-param-switcher][data-code='.$this->get_param( 'param_code' ).']',
+					'link_class_normal'    => $this->get_link_class( false ),
+					'link_class_active'    => $this->get_link_class( true ),
+					'wrapper_class_normal' => $wrapper_class_normal,
+					'wrapper_class_active' => $wrapper_class_active,
+					'add_redir_no'         => $this->get_param( 'add_redir_no' ) ? true : false,
+					'defaults'             => $defaults,
+					'display_mode'         => $this->get_display_mode(),
+				);
+			expose_var_to_js( 'param_switcher_'.$this->get_param( 'param_code' ), $switchable_buttons_config, 'evo_init_switchable_buttons_config' );
+
+			// NOTE: These JS files must be included inline here in order to make
+			//       it works for short/inline tags [switcher:...] [option:...]...[/option] [/switcher]
+			//       because for them we cannot call Widget->request_required_files() to include JS files in <head>
+			// WARNING: Cannot uglify evo_switchable_blocks.js because of the arrow function there.
+			require_js_defer( '#jquery#', 'blog', true );
+			require_js_defer( 'src/evo_switchable_blocks.js', 'blog', true );
 		}
 
 		return $active_button_value;
-	}
-
-
-	/**
-	 * Request all required css and js files for this widget
-	 */
-	function request_required_files()
-	{
-		if( $this->get_param( 'allow_switch_js' ) )
-		{	// Load JS to switch between blocks on change URL in address bar:
-			require_js( '#jquery#', 'blog' );
-			require_js( 'src/evo_switchable_blocks.js', 'blog' );
-		}
 	}
 }
 

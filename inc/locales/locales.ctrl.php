@@ -15,8 +15,8 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 load_funcs('locales/model/_translation.funcs.php');
 
@@ -53,7 +53,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// If default locale has not been selected on form use default locale from config var $default_locale:
 		param( 'newdefault_locale', 'string', $default_locale );
@@ -78,7 +78,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'newloc_locale', 'string', true );
 		param_check_regexp( 'newloc_locale', '/^[a-z]{2,3}-[A-Z]{2}.*$/', TB_('Please use valid locale format.') );
@@ -247,7 +247,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$nofile_locales = array();
 		if( is_array( $locales ) )
@@ -319,7 +319,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Get PO file for that edit_locale:
 		$AdminUI->append_to_titlearea( sprintf( TB_('Extracting language file for %s...'), '<b>'.$edit_locale.'</b>' ) );
@@ -399,7 +399,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edit_locale_messages = ( empty( $locales[ $edit_locale ]['messages'] ) ) ? $edit_locale : str_replace( '-', '_', $locales[ $edit_locale ]['messages'] );
 		$edit_locale_path = $locales_path.$edit_locale_messages.'/'.$edit_locale.'.locale.php';
@@ -445,7 +445,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( isset( $locales ) && isset( $locales[ $edit_locale ] ) &&
 		    ! empty( $locales[ $edit_locale ]['enabled'] ) )
@@ -490,7 +490,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'locales' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$switchcond = '';
 		if( $action == 'prioup' )

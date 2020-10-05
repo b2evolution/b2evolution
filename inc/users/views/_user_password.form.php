@@ -94,7 +94,7 @@ else
 	$form_class = $params['form_class_user_pass'];
 }
 
-$has_full_access = $current_User->check_perm( 'users', 'edit' );
+$has_full_access = check_user_perm( 'users', 'edit' );
 
 
 $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
@@ -153,10 +153,10 @@ $Form->end_form();
 
 // Display javascript password strength indicator bar
 display_password_indicator( array(
-			'pass1-id'    => 'edited_user_pass1',
-			'pass2-id'    => 'edited_user_pass2',
-			'login-id'    => 'edited_user_login',
-			'field-width' => 165,
+			'pass1_id'    => 'edited_user_pass1',
+			'pass2_id'    => 'edited_user_pass2',
+			'login_id'    => 'edited_user_login',
+			'field_width' => 165,
 	) );
 
 // Display javascript code to edit password:

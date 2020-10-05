@@ -246,20 +246,19 @@ function comments_number( $zero='#', $one='#', $more='#', $post_ID = NULL )
  */
 function get_allowed_statuses( $blog )
 {
-	global $current_User;
 	$statuses = array();
 
-	if( $current_User->check_perm( 'blog_draft_comments', 'edit', false, $blog ) )
+	if( check_user_perm( 'blog_draft_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'draft';
 	}
 
-	if( $current_User->check_perm( 'blog_published_comments', 'edit', false, $blog ) )
+	if( check_user_perm( 'blog_published_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'published';
 	}
 
-	if( $current_User->check_perm( 'blog_deprecated_comments', 'edit', false, $blog ) )
+	if( check_user_perm( 'blog_deprecated_comments', 'edit', false, $blog ) )
 	{
 		$statuses[] = 'deprecated';
 	}
@@ -457,9 +456,7 @@ function add_jsban( $url )
  */
 function add_ban_icons( $content )
 {
-	global $current_User;
-
-	if( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+	if( ! check_user_perm( 'spamblacklist', 'edit' ) )
 	{ // Current user has no permission to edit the spam contents
 		return $content;
 	}
@@ -581,7 +578,7 @@ function add_ban_icons_callback( $content )
  */
 function get_opentrash_link( $check_perm = true, $force_show = false, $params = array() )
 {
-	global $admin_url, $current_User, $DB, $blog;
+	global $admin_url, $DB, $blog;
 
 	$params = array_merge( array(
 			'before' => '<div id="recycle_bin" class="pull-right">',
@@ -589,7 +586,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 			'class'  => 'action_icon btn btn-default btn-sm',
 		), $params );
 
-	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
+	$show_recycle_bin = ( !$check_perm || check_user_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
 	{ // get number of trash comments:
 		$SQL = new SQL( 'Get number of trash comments for open trash link' );
@@ -630,7 +627,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
  */
 function echo_disabled_comments( $allow_comments_value, $item_url, $params = array() )
 {
-	global $Settings, $current_User;
+	global $Settings;
 
 	$params = array_merge( array(
 			'comments_disabled_text_member'     => T_( 'You must be a member of this blog to comment.' ),
@@ -684,7 +681,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	{ // user is not logged in
 		$login_link = '<a class="btn btn-primary btn-sm" href="'.get_login_url( 'cannot comment', $item_url ).'">'.T_( 'Log in now!' ).'</a>';
 	}
-	elseif( $current_User->check_status( 'can_be_validated' ) )
+	elseif( check_user_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated
 		$disabled_text = $params['comments_disabled_text_validated'];
 		$form_disabled_text = $disabled_text;
@@ -917,53 +914,20 @@ function echo_comment_reply_js( $Item )
 {
 	global $Collection, $Blog;
 
-	if( !isset( $Blog ) )
-	{
+	if( ! isset( $Blog ) || ! $Blog->get_setting( 'threaded_comments' ) )
+	{	// If threaded comments are not enabled for current Collection:
 		return false;
 	}
 
-	if( !$Blog->get_setting( 'threaded_comments' ) )
-	{
-		return false;
-	}
+	$js_config = array(
+			'item_ID' => $Item->ID,
+			'reply_button_msg' => TS_('Reply to this comment'),
+			'link_back_url' => url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ),
+			'link_back_specific_comment_msg' => TS_('You are currently replying to a specific comment'),
+			'link_back_current_comment_msg' => TS_('You are currently replying to this comment'),
+		);
 
-?>
-<script>
-jQuery( 'a.comment_reply' ).click( function()
-{	// The click action for the links "Reply to this comment"
-	var comment_ID = jQuery( this ).attr( 'rel' );
-
-	// Remove data of a previous comment
-	jQuery( 'a.comment_reply_current' ).remove();
-	jQuery( 'input[name=reply_ID]' ).remove();
-	jQuery( 'a.comment_reply' ).removeClass( 'active' )
-		.html( '<?php echo TS_('Reply to this comment') ?>' );
-
-	// Add data for a current comment
-	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
-	var hidden_reply_ID = '<input type="hidden" name="reply_ID" value="' + comment_ID + '" />';
-	jQuery( '#evo_comment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
-
-	jQuery( this ).addClass( 'active' )
-		.html( '<?php echo TS_('You are currently replying to this comment') ?>' );
-	// Scroll to the comment form
-	jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
-
-	return false;
-} );
-
-jQuery( document ).on( 'click', 'a.comment_reply_current', function()
-{	// The click action for a link "You are currently replying to a specific comment"
-	var comment_ID = jQuery( this ).attr( 'rel' );
-
-	// Scroll to the comment
-	jQuery( window ).scrollTop( jQuery( 'a#c' + comment_ID ).offset().top - 10 );
-
-	return false;
-} );
-</script>
-<?php
-
+	expose_var_to_js( 'evo_init_comment_reply_config', $js_config );
 }
 
 
@@ -998,8 +962,7 @@ function echo_comment_moderate_js()
  */
 function check_comment_mass_delete( $CommentList )
 {
-	global $current_User;
-	if( !$current_User->check_perm( 'blogs', 'all' ) )
+	if( ! check_user_perm( 'blogs', 'all' ) )
 	{	// Check permission
 		return false;
 	}
@@ -1202,8 +1165,7 @@ function comments_results_block( $params = array() )
 		return;
 	}
 
-	global $current_User;
-	if( !$current_User->check_perm( 'users', 'moderate' ) )
+	if( ! check_user_perm( 'users', 'moderate' ) )
 	{	// Check minimum permission:
 		return;
 	}
@@ -1550,9 +1512,7 @@ function handle_comment_cookies( $set_cookies, $author, $email = '', $url = '', 
  */
 function get_type( $Comment )
 {
-	global $current_User;
-
-	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'type' );
 	}
@@ -1571,9 +1531,7 @@ function get_type( $Comment )
  */
 function get_author( $Comment )
 {
-	global $current_User;
-
-	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		$author_User = $Comment->get_author_User();
 		if( $author_User != NULL )
@@ -1598,9 +1556,7 @@ function get_author( $Comment )
  */
 function get_url( $Comment )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->author_url_with_actions( NULL, false );
 	}
@@ -1619,9 +1575,7 @@ function get_url( $Comment )
  */
 function get_author_email( $Comment )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get_author_email();
 	}
@@ -1640,9 +1594,7 @@ function get_author_email( $Comment )
  */
 function get_author_ip( $Comment, $param_prefix = '' )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		if( empty( $Comment->author_IP ) )
 		{
@@ -1674,9 +1626,7 @@ function get_author_ip( $Comment, $param_prefix = '' )
  */
 function get_spam_karma( $Comment )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( check_user_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'spam_karma' );
 	}
@@ -1726,7 +1676,7 @@ function get_styled_status( $status_value, $status_title, $status_class = '' )
  */
 function comment_edit_actions( $Comment )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$r = '';
 	if( !is_logged_in() )
@@ -1734,8 +1684,8 @@ function comment_edit_actions( $Comment )
 		return $r;
 	}
 
-	$user_has_edit_perm = $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $Comment );
-	$user_has_delete_perm = $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+	$user_has_edit_perm = check_user_perm( 'comment!CURSTATUS', 'edit', false, $Comment );
+	$user_has_delete_perm = check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 
 	if( $user_has_edit_perm || $user_has_delete_perm )
 	{ // Display edit and delete button if current user has the rights:

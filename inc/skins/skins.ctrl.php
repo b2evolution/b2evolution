@@ -27,12 +27,12 @@ param( 'skin_type', 'string', '' );
 if( $action != 'reset_coll' )
 {	// Check permission to display site options:
 	// (exception for reset collection skin settings where we should check permission to edit collection properties)
-	$current_User->check_perm( 'options', 'view', true );
+	check_user_perm( 'options', 'view', true );
 }
 
 if( $tab == 'system' )
 {	// Check minimum permission:
-	$current_User->check_perm( 'admin', 'normal', true );
+	check_user_perm( 'admin', 'normal', true );
 }
 
 param( 'redirect_to', 'url', $admin_url.'?ctrl=skins&tab='.$tab.( isset( $blog ) ? '&blog='.$blog : '' ) );
@@ -74,7 +74,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'skin' );
 
 		// Check permission to edit:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// CREATE NEW SKIN:
 		$edited_Skin = & skin_install( $skin_folder );
@@ -96,8 +96,11 @@ switch( $action )
 			// Set new installed skins for the selected collection:
 			$edited_Blog->set( $skin_type.'_skin_ID', $edited_Skin->ID );
 			$edited_Blog->dbupdate();
-			// Re-scan and create widget containers from new switched skin if they don't exist for the edited collection:
-			$edited_Blog->db_save_main_containers();
+
+			if( param( 'reset_widgets', 'integer', 0 ) )
+			{	// Reset previous widgets with new from skin default widget declarations:
+				$edited_Blog->reset_widgets( $skin_type );
+			}
 
 			$Messages->add( TB_('The blog skin has been changed.')
 								.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.TB_('Edit...').'</a>', 'success' );
@@ -173,7 +176,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'skin' );
 
 		// Check permission to edit:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$SkinCache = & get_SkinCache();
 
@@ -208,7 +211,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'skin' );
 
 		// Check permission to edit:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'skin_folders', 'array:/([-A-Za-z0-9._]|\.\.)/', array() );
 
@@ -242,7 +245,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'skin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an skin_ID:
 		param( 'skin_ID', 'integer', true );
@@ -271,7 +274,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'skin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an skin_ID:
 		param( 'skin_ID', 'integer', true );
@@ -314,7 +317,7 @@ switch( $action )
 		{	// Collection skin:
 
 			// Check permission:
-			$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+			check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 			// At some point we may want to remove skin settings from all blogs
 			$DB->query( 'DELETE FROM T_coll_settings
@@ -327,7 +330,7 @@ switch( $action )
 		{	// Site skin:
 
 			// Check permission:
-			$current_User->check_perm( 'options', 'edit', true );
+			check_user_perm( 'options', 'edit', true );
 
 			// At some point we may want to remove skin settings from all blogs
 			$DB->query( 'DELETE FROM T_settings

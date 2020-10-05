@@ -17,7 +17,7 @@
 }
 #evo_site_header .swhead_sitename.swhead_logo {
   display: table-cell;
-  margin: -17px 0 0 -6px;
+  margin: -17px 0 -1px -6px;
 }
 #evo_site_header .swhead_sitename.swhead_logo a {
   padding: 0;
@@ -41,7 +41,6 @@
 }
 #evo_site_header .swhead_menus div.level1 nav .pull-left li a {
   margin-right: 0;
-  background-color: #eee;
   border-color: #ddd;
   border-bottom: 1px solid #ccc;
 }
@@ -63,7 +62,7 @@ div.level1 {
 div.level1 nav ul.nav.nav-tabs {
   margin: 0;
   position: relative;
-  top: 2px;
+  top: 1px;
   border-bottom: 1px solid #ccc;
 }
 div.level1 nav ul.nav.nav-tabs li {
@@ -103,11 +102,11 @@ div.level1 nav div.pull-right .btn {
   padding-top: 10px;
   padding-bottom: 10px;
 }
-div.level1 nav div.pull-right .btn.login {
+div.level1 nav div.pull-right .btn.evo_widget_basic_menu_link_myprofile {
   padding-top: 3px;
   padding-bottom: 3px;
 }
-div.level1 nav div.pull-right .btn.login img {
+div.level1 nav div.pull-right .btn.evo_widget_basic_menu_link_myprofile img {
   vertical-align: middle;
 }
 div.level1 nav div.pull-right .btn.btn-default {

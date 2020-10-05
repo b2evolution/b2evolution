@@ -827,12 +827,53 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
- * Allow parameters in URL without redirect to Item canonical URL when collection setting "301 redirect to canonical URL when possible" is enabled
+ * Allow parameters in canonical URLs
+ * These params will NOT trigger a "301 redirect to canonical" even if the checkboxes for such redirects are enabled
+ * This applies to ANY canonical URLs (Items but ALSO: Collection, Category, disp=posts, Archive, Tag, User profile) canonical URLs
+ *
+ * NOTE: For Item URL we automatically include enabled switchable params of the Item (see "Switchable content" on https://b2evolution.net/man/post-advanced-properties-panel)
  */
-$noredir_params = array(
-	'page',          // For showing a different page in a multipage post
-	'quote_post',    // For quoting a post in the forums
-	'quote_comment', // For quoting a comment in the forums
+$accepted_in_canonicals__params = array(
+	'get_redirected_debuginfo_from_sess_ID', // For display debug info of redirected page from different domain
+);
+// For pages depending on $disp:
+$accepted_in_canonicals_disp__params = array(
+	'single' => array(
+		'page',          // For showing a different page in a multipage post
+		'quote_post',    // For quoting a post in the forums
+		'quote_comment', // For quoting a comment in the forums
+	),
+	'page' => array(
+		'page',          // For showing a different page in a multipage post
+		'quote_post',    // For quoting a post in the forums
+		'quote_comment', // For quoting a comment in the forums
+	),
+	'posts' => array(
+		'paged',         // For switching between pages of posts
+	),
+	'flagged' => array(
+		'paged',
+	),
+	'mustread' => array(
+		'paged',
+	),
+	'users' => array(
+		'filter_query',
+		'results_u_order',
+		'u_paged',
+	),
+);
+
+
+/**
+ * Pass through the following params in ANY redirect.
+ * If these params exist, we include them in ANY redirect we make.
+ * We also do NOT overwrite them (e-g: in case of tiny slugs)
+ */
+$passthru_in_all_redirs__params = array(
+	'utm_source',
+	'utm_campaign',
+	'utm_medium',
 );
 
 
@@ -913,44 +954,67 @@ $library_cdn_urls = array(
  * The first string is the production (minified URL), the second is the development URL (optional).
  */
 $library_local_urls = array(
-		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
-		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
-		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
-		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
+		'#jquery#' => array( 'ext:jquery/jquery.min.js', 'ext:jquery/jquery.js' ),
+		'#jquery_migrate#' => array( 'ext:jquery/jquery-migrate.min.js', 'ext:jquery/jquery-migrate.js' ),
+		'#jqueryUI#' => array( 'ext:jquery/ui/js/jquery.ui.b2evo.min.js', 'ext:jquery/ui/js/jquery.ui.b2evo.js' ),
+		'#jqueryUI_css#' => array( 'ext:jquery/ui/css/smoothness/jquery-ui.b2evo.min.css', 'ext:jquery/ui/css/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
-#		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
-#		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.min.css', 'jquery/smoothness/jquery-ui.css' ),
-		'#bootstrap#' => array( 'bootstrap/bootstrap.min.js', 'bootstrap/bootstrap.js' ),
-		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
-		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
-		'#bootstrap_typeahead#' => array( 'bootstrap/typeahead.bundle.min.js', 'bootstrap/typeahead.bundle.js' ),
-		'#easypiechart#' => array( 'jquery/jquery.easy-pie-chart.min.js', 'jquery/jquery.easy-pie-chart.js' ),
-		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
-		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
-		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js', 'jquery/jqplot/jquery.jqplot.js' ),
-		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js', 'jquery/jqplot/jqplot.barRenderer.js' ),
-		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js', 'jquery/jqplot/jqplot.canvasAxisTickRenderer.js' ),
-		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js', 'jquery/jqplot/jqplot.canvasTextRenderer.js' ),
-		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js', 'jquery/jqplot/jqplot.categoryAxisRenderer.js' ),
-		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js', 'jquery/jqplot/jqplot.enhancedLegendRenderer.js' ),
-		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js', 'jquery/jqplot/jqplot.highlighter.js' ),
-		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js', 'jquery/jqplot/jqplot.canvasOverlay.js' ),
-		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js', 'jquery/jqplot/jqplot.donutRenderer.js' ),
-		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
-		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
-		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
-		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
-		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
-		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
-		'#videojs#' => array( 'videojs/video.min.js', 'videojs/video.js' ),
-		'#videojs_css#' => array( 'videojs/video-js.min.css', 'videojs/video-js.css' ),
-		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
-		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
-		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
-		'#clipboardjs#' => array( 'clipboardjs/clipboard.min.js' ),
-		'#hotkeys#' => array( 'hotkeys/hotkeys.min.js' ),
+#		'#jqueryUI#' => array( 'ext:jquery/ui/js/jquery.ui.all.min.js', 'ext:jquery/ui/js/jquery.ui.all.js' ),
+#		'#jqueryUI_css#' => array( 'ext:jquery/ui/css/smoothness/jquery-ui.min.css', 'ext:jquery/ui/css/smoothness/jquery-ui.css' ),
+		'#bootstrap#' => array( 'ext:bootstrap/js/bootstrap.min.js', 'ext:bootstrap/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( 'ext:bootstrap/css/bootstrap.min.css', 'ext:bootstrap/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( 'ext:bootstrap/css/bootstrap-theme.min.css', 'ext:bootstrap/css/bootstrap-theme.css' ),
+		'#bootstrap_typeahead#' => array( 'ext:bootstrap/js/typeahead.bundle.min.js', 'ext:bootstrap/js/typeahead.bundle.js' ),
+		'#easypiechart#' => array( 'ext:jquery/easy-pie-chart/js/jquery.easy-pie-chart.min.js', 'ext:jquery/easy-pie-chart/js/jquery.easy-pie-chart.js' ),
+		'#scrollto#' => array( 'customized:jquery/scrollto/jquery.scrollto.min.js', 'customized:jquery/scrollto/jquery.scrollto.js' ),
+		'#touchswipe#' => array( 'ext:jquery/touchswipe/jquery.touchswipe.min.js', 'ext:jquery/touchswipe/jquery.touchswipe.js' ),
+		'#jqplot#' => array( 'ext:jquery/jqplot/js/jquery.jqplot.min.js' ),
+		'#jqplot_barRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.barRenderer.min.js' ),
+		'#jqplot_canvasAxisTickRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.canvasAxisTickRenderer.min.js' ),
+		'#jqplot_canvasTextRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.canvasTextRenderer.min.js' ),
+		'#jqplot_categoryAxisRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.categoryAxisRenderer.min.js' ),
+		'#jqplot_enhancedLegendRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.enhancedLegendRenderer.min.js' ),
+		'#jqplot_highlighter#' => array( 'ext:jquery/jqplot/js/jqplot.highlighter.min.js' ),
+		'#jqplot_canvasOverlay#' => array( 'ext:jquery/jqplot/js/jqplot.canvasOverlay.min.js' ),
+		'#jqplot_donutRenderer#' => array( 'ext:jquery/jqplot/js/jqplot.donutRenderer.min.js' ),
+		'#jqplot_css#' => array( 'ext:jquery/jqplot/css/jquery.jqplot.min.css', 'ext:jquery/jqplot/css/jquery.jqplot.css' ),
+		'#tinymce#' => array( 'ext:tiny_mce/tinymce.min.js' ),
+		'#tinymce_jquery#' => array( 'ext:tiny_mce/jquery.tinymce.min.js' ),
+		'#flowplayer#' => array( 'ext:flowplayer/flowplayer.min.js', 'ext:flowplayer/flowplayer.js' ),
+		'#mediaelement#' => array( 'ext:mediaelement/js/mediaelement-and-player.min.js', 'ext:mediaelement/js/mediaelement-and-player.js' ),
+		'#mediaelement_css#' => array( 'ext:mediaelement/css/mediaelementplayer.min.css', 'ext:mediaelement/css/mediaelementplayer.css' ),
+		'#videojs#' => array( 'ext:videojs/js/video.min.js', 'ext:videojs/js/video.js' ),
+		'#videojs_css#' => array( 'ext:videojs/css/video-js.min.css', 'ext:videojs/css/video-js.css' ),
+		'#jcrop#' => array( 'ext:jquery/jcrop/js/jquery.jcrop.min.js', 'ext:jquery/jcrop/js/jquery.jcrop.js' ),
+		'#jcrop_css#' => array( 'ext:jquery/jcrop/css/jquery.jcrop.min.css', 'ext:jquery/jcrop/css/jquery.jcrop.css' ),
+		'#fontawesome#' => array( 'ext:font-awesome/css/font-awesome.min.css', 'ext:font-awesome/css/font-awesome.css' ),
+		'#clipboardjs#' => array( 'ext:clipboardjs/clipboard.min.js' ),
+		'#hotkeys#' => array( 'ext:hotkeys/hotkeys.min.js' ),
 	);
 
+/**
+ * JS/CSS files which contain other JS/CSS files in order to don't required them twice when main file is required on current page
+ *
+ * Key - Alias or relative path of main JS/CSS file, Value - array of bundled files inside the main JS/CSS file
+ */
+$bundled_files = array(
+	'build/bootstrap-evo_frontoffice-superbundle.bmin.js' => array(
+		'#jquery#',
+		'#jquery_migrate#',
+		'#jqueryUI#',
+		'#bootstrap#',
+	),
+	'bootstrap-b2evo_base-superbundle.bundle.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bundle.css',
+	),
+	'bootstrap-b2evo_base-superbundle.bmin.css' => array(
+		'#fontawesome#',
+		'#bootstrap_css#',
+		'bootstrap-b2evo_base.bmin.css',
+	),
+);
 
 /**
  * Allow to send outbound pings on localhost
@@ -989,6 +1053,40 @@ $max_skin_api_version = 7;
  * Used to enable using of evo helpdesk widget from other sites
  */
 $access_control_allow_origin = false; // set to '*' or to specific URL to enable CORS requests
+
+
+/**
+ * Allow to use a "defer" way for loading of JavaScript files
+ * 
+ * TODO: Implement new value 'front' in order to allow this only on front-office
+ */
+$use_defer = true;
+
+$use_defer_for_backoffice = false;
+$use_defer_for_loggedin_users = true;
+$use_defer_for_anonymous_users = true;
+
+$use_defer_for_default_register_form = true;
+
+$use_defer_for_anonymous_disp_register = true;
+$use_defer_for_anonymous_disp_register_finish = true;
+$use_defer_for_anonymous_disp_users = true;
+$use_defer_for_anonymous_disp_anonpost = true;
+
+$use_defer_for_loggedin_disp_single_page = true;
+$use_defer_for_loggedin_disp_front = true;
+$use_defer_for_loggedin_disp_messages = true;
+$use_defer_for_loggedin_disp_threads = true;
+$use_defer_for_loggedin_disp_profile = true;
+$use_defer_for_loggedin_disp_pwdchange = true;
+$use_defer_for_loggedin_disp_edit = true;
+$use_defer_for_loggedin_disp_proposechange = true;
+$use_defer_for_loggedin_disp_edit_comment = true;
+$use_defer_for_loggedin_disp_comments = true;
+$use_defer_for_loggedin_disp_visits = true;
+$use_defer_for_loggedin_disp_contacts = true;
+
+$disable_tinymce_for_frontoffice_comment_form = false; // Disables TinyMCE plugin in the front-office for comment forms
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

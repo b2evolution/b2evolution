@@ -236,8 +236,11 @@ class BlockCache
 	 *
 	 * We just concatenate all the individual keys to have a single one
 	 * Then we store with the current timestamp
+	 *
+	 * @param boolean TRUE - Flush content on screen, FALSE - Return content as result
+	 * @return string Content if $flush = false
 	 */
-	function end_collect()
+	function end_collect( $flush = true )
 	{
 		global $Debuglog, $servertimenow;
 
@@ -246,10 +249,23 @@ class BlockCache
 			return;
 		}
 
-		ob_end_flush();
+		if( $flush )
+		{	// Flush content on screen:
+			ob_end_flush();
+		}
+		else
+		{	// Return content without flushing it on screen:
+			$content = ob_get_clean();
+		}
 
 		// We use servertimenow because we may have used data that was loaded at the very start of this page
+		// NOTE: Call this after ob_end_flush():
 		$this->cacheproviderstore( $this->serialized_keys, $servertimenow.' '.$this->cached_page_content );
+
+		if( ! $flush )
+		{	// Return content:
+			return $content;
+		}
 	}
 
 

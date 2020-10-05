@@ -8,6 +8,11 @@
 /**
  * Javascript function to toggle DIVs (EXPLAIN, results, backtraces).
  * Used in DB and other debug_output related functions.
+ * 
+ * TODO: change this function so we can use "defer" loading of debug.js
+ * (We could not implement this before because the debug_onclick_toggle_div()
+ *  must be called at the display time, so we cannot wait when debug.js will be
+ *  loaded by defer or async way)
  */
 function debug_onclick_toggle_div( div_id, text_show, text_hide, insert_before ) {
 	if( typeof insert_before === 'undefined' )

@@ -13,8 +13,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'edit', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'edit', true );
 
 load_class( 'tools/model/_markdownimport.class.php', 'MarkdownImport' );
 
@@ -101,15 +101,17 @@ switch( $action )
 	case 'file':
 	default:
 		// Step 1:
-		// Initialize markdown import object:
-		if( $app_pro )
-		{	// Use PRO markdown import:
-			load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
-			$MarkdownImport = new MarkdownImportPro();
-		}
-		else
-		{	// Use default markdown import:
-			$MarkdownImport = new MarkdownImport();
+		if( ! isset( $MarkdownImport ) )
+		{	// Initialize markdown import object:
+			if( $app_pro )
+			{	// Use PRO markdown import:
+				load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
+				$MarkdownImport = new MarkdownImportPro();
+			}
+			else
+			{	// Use default markdown import:
+				$MarkdownImport = new MarkdownImport();
+			}
 		}
 		$AdminUI->disp_view( 'tools/views/_md_file.form.php' );
 		break;

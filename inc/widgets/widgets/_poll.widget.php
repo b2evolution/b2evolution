@@ -101,6 +101,23 @@ class poll_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
+		$PollCache = & get_PollCache();
+		$Poll = $PollCache->get_by_ID( $this->disp_params['poll_ID'], false, false );
+
+		if( ! $Poll )
+		{	// We cannot find a poll by the entered ID in widget settings:
+			$this->display_error_message( sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ) );
+			return false;
+		}
+
+		$poll_options = $Poll->get_poll_options();
+
+		if( empty( $poll_options ) )
+		{	// Display this red message to inform admin to create the poll options:
+			$this->display_error_message( T_('This poll doesn\'t contain any answer.') );
+			return false;
+		}
+
 		// START DISPLAY:
 		echo $this->disp_params['block_start'];
 
@@ -109,31 +126,19 @@ class poll_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		$PollCache = & get_PollCache();
-		$Poll = $PollCache->get_by_ID( $this->disp_params['poll_ID'], false, false );
-
-		if( ! $Poll )
-		{	// We cannot find a poll by the entered ID in widget settings:
-			echo '<p class="evo_param_error">'.sprintf( T_('Poll ID %s not found.'), '<b>'.format_to_output( $this->disp_params['poll_ID'], 'text' ).'</b>' ).'</p>';
-		}
-		else
-		{	// Display a form for voting on poll:
+			// Display a form for voting on poll:
 			$poll_question = empty( $this->disp_params['poll_question'] ) ? $Poll->get( 'question_text' ) : $this->disp_params['poll_question'];
 			if( $poll_question !== '-' )
 			{	// Display a poll question only when it doesn't equal "-":
 				echo '<p class="evo_poll__question">'.$poll_question.'</p>';
 			}
 
-			$poll_options = $Poll->get_poll_options();
-
 			if( $Poll->get( 'max_answers' ) < count( $poll_options ) )
 			{
 				echo '<p class="note">'.sprintf( T_('Select up to %d answers below.'), $Poll->get( 'max_answers' ) ).'</p>';
 			}
 
-
-			if( count( $poll_options ) )
-			{	// Display a form only if at least one poll option exists:
+				// Display a form only if at least one poll option exists:
 				if( is_logged_in() )
 				{	// Set form action to vote if current user is logged in:
 					$form_action = get_htsrv_url().'action.php?mname=polls';
@@ -197,38 +202,8 @@ class poll_Widget extends ComponentWidget
 				}
 				echo '</table>';
 
-				global $evo_poll_answer_JS_is_initialized;
-				if( empty( $evo_poll_answer_JS_is_initialized ) || $Poll->get( 'max_answers' ) > 1 )
-				{	// Initialize JS code to restrict max answers per user and Fix answer long text width:
-				?>
-				<script>
-				jQuery( document ).ready( function()
-				{
-					jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', function()
-					{	// Check max possible answers per user for multiple poll:
-						var poll_table = jQuery( this ).closest( '.evo_poll__table' );
-						var is_disabled = ( jQuery( '.evo_poll__selector input:checked', poll_table ).length >= poll_table.data( 'max-answers' ) );
-						jQuery( '.evo_poll__selector input[type=checkbox]:not(:checked)', poll_table ).prop( 'disabled', is_disabled );
-					} );
-
-					jQuery( '.evo_poll__table' ).each( function()
-					{	// Fix answer long text width because of labels uses css "white-space:nowrap" by default:
-						var table = jQuery( this );
-						if( table.width() > table.parent().width() )
-						{	// If table width more than parent:
-							jQuery( '.evo_poll__title', table ).css( 'white-space', 'normal' );
-							jQuery( '.evo_poll__title label', table ).css( {
-								'width': Math.floor( table.parent().width() / 2 ) + 'px', // Use 50% of table width for long answers
-								'word-wrap': 'break-word' // Wrap long words
-							} );
-						}
-					} );
-				} );
-				</script>
-				<?php
-					// Set flag to don't print out this code twice of the same page with several poll widgets:
-					$evo_poll_answer_JS_is_initialized = true;
-				}
+				// Set JS var to initialize code in evo_init_widget_poll.js:
+				expose_var_to_js( 'evo_widget_poll_initialize', 'true' );
 
 				if( is_logged_in() )
 				{	// Display a button to vote:
@@ -242,12 +217,6 @@ class poll_Widget extends ComponentWidget
 				}
 
 				$Form->end_form();
-			}
-			else
-			{	// Display this red message to inform admin to create the poll options:
-				echo '<p class="evo_param_error">'.T_('This poll doesn\'t contain any answer.').'</p>';
-			}
-		}
 
 		echo $this->disp_params['block_body_end'];
 

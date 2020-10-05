@@ -22,7 +22,7 @@ class snippets_plugin extends Plugin
 	var $code = 'snippets';
 	var $name = 'Snippets';
 	var $priority = 60;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -161,7 +161,7 @@ class snippets_plugin extends Plugin
 		}
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 		//<![CDATA[

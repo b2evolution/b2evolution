@@ -370,10 +370,8 @@ if( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
 
 	$message['warning'] = $warning;
 	$message['path'] = $newFile->get_rdfp_rel_path();
-	$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
-			.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
+	$message['checkbox'] = '<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
 			.' name="fm_selected[]" value="'.format_to_output( $newFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_u'.$newFile->ID.'" />'
-		.'</span>'
 		.'<input type="hidden" name="img_tag_u'.$newFile->ID.'" id="img_tag_u'.$newFile->ID.'"'
 			.' value="'.format_to_output( $newFile->get_tag(), 'formvalue' ).'" />';
 
@@ -401,6 +399,7 @@ if( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
 	// EXIT here.
 }
 
-evo_uploader_error( T_('The file could not be saved!') );
+// Display log error message from the called function save_to_file() above:
+evo_uploader_error( empty( $evo_save_file_error_msg ) ? T_('The file could not be saved!') : $evo_save_file_error_msg );
 // EXIT here.
 ?>

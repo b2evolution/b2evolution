@@ -50,10 +50,15 @@ class CollectionSettings extends AbstractSettings
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
 			'permalinks'      => 'single',				// single, archive, subchap
+			'postlist_enable' => 1,
 
 		// Page 2,3,4..; settings:
 			'paged_noindex' => '1',							// META NOINDEX on following blog pages
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
+
+		// User profile page settings:
+			'user_prefix' => 'user',
+			'user_links' => 'params',
 
 		// Single post settings:
 			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
@@ -147,6 +152,9 @@ class CollectionSettings extends AbstractSettings
 			'tag_noindex' => '1',				      	// META NOINDEX on Tag pages
 			'tag_prefix' => '',							// fp> fp> we want this changed to prefix only for new blogs only
 			'tag_rel_attrib' => 1,						// rel="tag" attribute for tag links (http://microformats.org/wiki/rel-tag) -- valid only in prefix-only mode
+
+		// User profile page settings:
+			'canonical_user_urls' => 1, // Redirect user profile pages to their canonical Url?
 
 		// Other filtered pages:
 			'filtered_noindex' => '1',					// META NOINDEX on other filtered pages
@@ -272,6 +280,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Other settings:
 			'image_size_messaging' => 'crop-top-32x32', // Used in disp = threads
+			'search_enable'        => 1, // Enable disp=search
 			'search_per_page'      => 20, // Number of results per page on disp=search
 			'search_sort_by'       => 'score', // Sort type of results on disp=search ('score', 'date')
 			'search_include_cats'  => 1, // Include categories to results on disp=search
@@ -324,6 +333,7 @@ class CollectionSettings extends AbstractSettings
 			'last_invalidation_timestamp' => 0,
 
 		// Download settings:
+			'download_enable' => 1,
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,

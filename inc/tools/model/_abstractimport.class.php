@@ -30,6 +30,12 @@ class AbstractImport
 	var $log_cli_format = 'text';
 
 	/**
+	 * Log here what wrappers are opened currently
+	 * @var array Key - autoincremented started with 0, Value - wrapper types: 'list'
+	 */
+	private $log_wrappers = array();
+
+	/**
 	 * Get collection
 	 *
 	 * @param object|NULL|FALSE Collection
@@ -47,7 +53,7 @@ class AbstractImport
 	 * Start to log into file on disk
 	 */
 	function start_log()
-	{
+	{	// TODO: Factorize with start_install_log():
 		global $baseurl, $media_path, $rsc_url, $app_version_long;
 
 		// Get file path for log:
@@ -112,7 +118,7 @@ class AbstractImport
 	 * End of log into file on disk
 	 */
 	function end_log()
-	{
+	{	// TODO: Factorize with end_install_log():
 		// Display finish time:
 		$this->log( 'Import finished at: '.date( 'Y-m-d H:i:s' ) );
 
@@ -137,7 +143,7 @@ class AbstractImport
 	 * @return string|FALSE Formatted log message, FALSE - when message should not be displayed
 	 */
 	function get_log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
-	{
+	{	// TODO: Factorize with get_install_log():
 		if( $message === '' )
 		{	// Don't log empty strings:
 			return false;
@@ -151,17 +157,25 @@ class AbstractImport
 				break;
 
 			case 'error':
-				$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label ? '<span class="label label-danger">ERROR</span>' : '' ).' ';
+			case 'text-error':
+				$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label  && $type == 'error'? '<span class="label label-danger">ERROR</span>' : '' ).' ';
 				$after = '</'.$type_html_tag.'>';
 				break;
 
 			case 'warning':
-				$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
+			case 'text-warning':
+				$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label && $type == 'warning' ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
 				$after = '</'.$type_html_tag.'>';
 				break;
 
 			case 'info':
-				$before = '<'.$type_html_tag.' class="text-info">'.( $display_label ? '<span class="label label-info">INFO</span>' : '' ).' ';
+			case 'text-info':
+				$before = '<'.$type_html_tag.' class="text-info">'.( $display_label && $type == 'info' ? '<span class="label label-info">INFO</span>' : '' ).' ';
+				$after = '</'.$type_html_tag.'>';
+				break;
+
+			case 'text':
+				$before = '<'.$type_html_tag.'>';
 				$after = '</'.$type_html_tag.'>';
 				break;
 
@@ -176,6 +190,94 @@ class AbstractImport
 
 
 	/**
+	 * Log message inside list
+	 * Helper for quick log in list
+	 *
+	 * @param string Message
+	 * @param string Type: 'success', 'error', 'warning', 'text', NULL - to don't use wrapper around message
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 */
+	function log_list( $message, $type = 'text', $type_html_tag = 'li' )
+	{
+		$this->log_inside( 'list' );
+		$this->log( $message, $type, $type_html_tag );
+	}
+
+
+	/**
+	 * Start to log next messages inside requested wrapper
+	 * Print start of wrapper tag if it was not opened yet,
+	 * otherwise continue log in currently opened wrapper
+	 *
+	 * @param string Wrapper type
+	 */
+	function log_inside( $wrapper_type )
+	{
+		if( in_array( $wrapper_type, $this->log_wrappers ) )
+		{	// The requested wrapper is already opened,
+			// don't open this twice:
+			return;
+		}
+
+		// Flag to know the wrapper is already opened:
+		$this->log_wrappers[] = $wrapper_type;
+
+		switch( $wrapper_type )
+		{
+			case 'list':
+				$this->log( '<ul class="list-default" style="margin-bottom:0">' );
+				break;
+
+			case 'p':
+				$this->log( '<p>' );
+				break;
+		}
+	}
+
+
+	/**
+	 * Close last/currently opened log wrapper
+	 *
+	 * @return string|FALSE Type of last ended wrapper, FALSE - if no opened wrappers
+	 */
+	function close_log_wrapper()
+	{
+		if( empty( $this->log_wrappers ) )
+		{	// No opened wrappers
+			return false;
+		}
+
+		// Get last wrapper:
+		if( ! ( $last_wrapper_type = array_pop( $this->log_wrappers ) ) )
+		{	// No found last wrapper
+			return false;
+		}
+
+		switch( $last_wrapper_type )
+		{
+			case 'list':
+				$this->log( '</ul>' );
+				break;
+
+			case 'p':
+				$this->log( '</p>' );
+				break;
+		}
+
+		return $last_wrapper_type;
+	}
+
+
+	/**
+	 * Close ALL opened log wrappers
+	 */
+	function close_log_wrappers()
+	{
+		while( $this->close_log_wrapper() !== false );
+	}
+
+
+	/**
 	 * Log a message on screen and into file on disk
 	 *
 	 * @param string Message
@@ -184,7 +286,7 @@ class AbstractImport
 	 * @param boolean TRUE to display label
 	 */
 	function log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
-	{
+	{	// TODO: Factorize with prepare_install_log_message():
 		$message = $this->get_log( $message, $type, $type_html_tag, $display_label );
 
 		if( $message === false )
@@ -263,7 +365,7 @@ class AbstractImport
 	 * @param string Message
 	 */
 	function log_to_file( $message )
-	{
+	{	// TODO: Factorize with install_log_to_file():
 		if( ! $this->log_file )
 		{	// Don't log into file:
 			return;

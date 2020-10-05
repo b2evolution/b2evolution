@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( '_core/ui/_table.class.php', 'Table' );
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-global $edited_Itemtype, $thumbnail_sizes, $admin_url, $Blog, $current_User;
+global $edited_Itemtype, $thumbnail_sizes, $admin_url, $Blog;
 
 // Determine if we are creating or updating...
 global $action;
@@ -69,7 +69,7 @@ $Form->begin_fieldset( TB_('General').get_manual_link('item-type-general') );
 	$TemplateCache = & get_TemplateCache();
 	$TemplateCache->load_by_context( $context );
 	$template_options = array( NULL => sprintf( TB_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
-	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+	$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.'&amp;blog='.$Blog->ID, NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => TB_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'ityp_template_excerpt', $edited_Itemtype->get( 'template_excerpt' ), $template_options, TB_('Template for Excerpt display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'ityp_template_normal', $edited_Itemtype->get( 'template_normal' ), $template_options, TB_('Template for Teaser display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
@@ -162,8 +162,13 @@ $Form->begin_fieldset( TB_('Use of Advanced Properties').get_manual_link( 'item-
 	$Form->checkbox( 'ityp_allow_switchable', $edited_Itemtype->allow_switchable, TB_('Allow switchable'), TB_('Check to allow dynamically switchable blocks inside the content'), '', 1 );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( TB_('Use of Location').get_manual_link( 'item-type-location' ), array( 'id' => 'itemtype_location' ) );
-	$Form->begin_line( TB_('Use country') );
+$Form->begin_fieldset( T_('Workflow Properties').get_manual_link( 'workflow' ), array( 'id' => 'itemtype_features' ) );
+	$Form->text_input( 'ityp_front_order_workflow', $edited_Itemtype->front_order_workflow, 6,T_('Front-Office Order'), T_('Leave empty to hide'), $front_order_params );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Use of Location').get_manual_link( 'item-type-location' ), array( 'id' => 'itemtype_location' ) );
+	$Form->begin_line( T_('Use country') );
+
 		$Form->radio( 'ityp_use_country', $edited_Itemtype->use_country, $options );
 		$Form->text_input( 'ityp_front_order_location', $edited_Itemtype->front_order_location, 6, ' &nbsp; <b>'.TB_('Front-Office Order').':</b>', TB_('Leave empty to hide'), $front_order_params );
 	$Form->end_line();
@@ -517,15 +522,17 @@ echo '</div>';
 $SQL = new SQL();
 if( $current_ityp_ID )
 {
-	$SQL->SELECT( 'pst_ID, pst_name, its_ityp_ID' );
+	$SQL->SELECT( 'pst_ID, pst_order, pst_name, its_ityp_ID' );
 	$SQL->FROM( 'T_items__status' );
 	$SQL->FROM_add( 'JOIN T_items__type' );
 	$SQL->FROM_add( 'LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID' );
+	$SQL->ORDER_BY( 'pst_order' );
 	$SQL->WHERE( 'ityp_ID = '.$current_ityp_ID );
 }
 else
 {
-	$SQL->SELECT( 'pst_ID, pst_name, NULL AS its_ityp_ID' );
+	$SQL->SELECT( 'pst_ID, pst_order, pst_name, NULL AS its_ityp_ID' );
+	$SQL->ORDER_BY( 'pst_order' );
 	$SQL->FROM( 'T_items__status' );
 }
 
@@ -563,9 +570,7 @@ $Results->cols[] = array(
 
 function get_name_for_itemstatus( $id, $name )
 {
-	global $current_User;
-
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{ // Not reserved id AND current User has permission to edit the global settings
 		$ret_name = '<a href="'.regenerate_url( 'ctrl,action,ID,pst_ID', 'ctrl=itemstatuses&amp;pst_ID='.$id.'&amp;action=edit' ).'">'.$name.'</a>';
 	}
@@ -581,6 +586,11 @@ $Results->cols[] = array(
 		'th' => TB_('Name'),
 		'td' => '%get_name_for_itemstatus( #pst_ID#, #pst_name# )%'
 	);
+
+$Results->cols[] = array(
+		'th' => TB_('Order'),
+		'td' => '$pst_order$',
+	); 
 
 $display_params = array(
 		'page_url' => $admin_url.'?ctrl=itemtypes&ityp_ID='.$current_ityp_ID.'&action=edit'

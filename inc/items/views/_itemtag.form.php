@@ -96,7 +96,7 @@ if( $edited_ItemTag->ID > 0 )
 
 	function tagitem_edit_actions( $Item )
 	{
-		global $current_User, $edited_ItemTag;
+		global $edited_ItemTag;
 
 		// Display the edit icon if current user has the rights:
 		$r = $Item->get_edit_link( array(
@@ -106,7 +106,7 @@ if( $edited_ItemTag->ID > 0 )
 			'title'  => '#',
 			'class'  => '' ) );
 
-		if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{ // Display the unlink icon if current user has the rights:
 			$r .= action_icon( TB_('Unlink this tag from post!'), 'unlink',
 				regenerate_url( 'tag_ID,action,tag_filter', 'tag_ID='.$edited_ItemTag->ID.'&amp;item_ID='.$Item->ID.'&amp;action=unlink&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'&amp;'.url_crumb( 'tag' ) ),

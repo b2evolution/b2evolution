@@ -362,6 +362,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__status (
 			pst_ID   int(10) unsigned not null AUTO_INCREMENT,
 			pst_name varchar(30) COLLATE utf8mb4_unicode_ci not null,
+			pst_order   int(11) NULL DEFAULT NULL,
 			primary key ( pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
@@ -417,6 +418,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_front_order_short_title  SMALLINT NULL,
 			ityp_front_order_instruction  SMALLINT NULL,
 			ityp_front_order_attachments  SMALLINT NULL,
+			ityp_front_order_workflow     SMALLINT NULL,
 			ityp_front_order_text         SMALLINT NULL,
 			ityp_front_order_tags         SMALLINT NULL,
 			ityp_front_order_excerpt      SMALLINT NULL,
@@ -541,6 +543,18 @@ $schema_queries = array_merge( $schema_queries, array(
 			PRIMARY KEY (itvt_item_ID, itvt_user_ID),
 			KEY itvt_item_ID (itvt_item_ID),
 			KEY itvt_user_ID (itvt_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__checklist_lines' => array(
+		'Creating table for checklists',
+		"CREATE TABLE T_items__checklist_lines (
+			check_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			check_item_ID INT(10) UNSIGNED NOT NULL,
+			check_checked TINYINT(1) NOT NULL DEFAULT 0,
+			check_label   VARCHAR( 10000 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			check_order   INT(11) NOT NULL DEFAULT 1,
+			PRIMARY KEY (check_ID),
+			KEY check_item_ID (check_item_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_subscriptions' => array(

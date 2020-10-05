@@ -114,7 +114,7 @@ $Plugins->display_captcha( array(
 		'form_use_fieldset' => false,
 	) );
 
-if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
+if( is_admin_page() && check_user_perm( 'files', 'view' ) )
 {	// If current user has a permission to view the files AND it is back-office:
 	load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 	// Initialize this object as global because this is used in many link functions:
@@ -201,107 +201,29 @@ $Form->end_form( array(
 
 if( $params['allow_select_recipients'] )
 {	// User can select recipients
-?>
-<script>
-jQuery( document ).ready( function()
-{
-	check_multiple_recipients();
-} );
+	$thread_form_config = array(
+			'missing_username_msg' => T_('Please complete the entering of an username.'),
+			'username_display'     => $Settings->get( 'username_display' ) == 'name' ? 'fullname' : 'login',
+			'thrd_recipients_has_error' => param_has_error( 'thrd_recipients' ),
+			'token_input_config' => array(
+					'theme'             => 'facebook',
+					'queryParam'        => 'q',
+					'propertyToSearch'  => 'login',
+					'preventDuplicates' => true,
+					'prePopulate'       => $recipients_selected,
+					'hintText'          => T_('Type in a username'),
+					'noResultsText'     => T_('No results'),
+					'searchingText'     => T_('Searching...'),
+					'jsonContainer'     => 'users',
+				),
+		);
 
-jQuery( '#thrd_recipients' ).tokenInput(
-	'<?php echo get_restapi_url(); ?>users/recipients',
-	{
-		theme: 'facebook',
-		queryParam: 'q',
-		propertyToSearch: 'login',
-		preventDuplicates: true,
-		prePopulate: <?php echo evo_json_encode( $recipients_selected ) ?>,
-		hintText: '<?php echo TS_('Type in a username') ?>',
-		noResultsText: '<?php echo TS_('No results') ?>',
-		searchingText: '<?php echo TS_('Searching...') ?>',
-		jsonContainer: 'users',
-		tokenFormatter: function( user )
-		{
-			return '<li>' +
-					<?php echo $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login';?> +
-					'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
-					'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
-				'</li>';
-		},
-		resultsFormatter: function( user )
-		{
-			var title = user.login;
-			if( user.fullname != null && user.fullname !== undefined )
-			{
-				title += '<br />' + user.fullname;
-			}
-			return '<li>' +
-					user.avatar +
-					'<div>' +
-						title +
-					'</div><span></span>' +
-				'</li>';
-		},
-		onAdd: function()
-		{
-			check_multiple_recipients();
-		},
-		onDelete: function()
-		{
-			check_multiple_recipients();
-		},
-		onReady: function()
-		{
-			<?php
-			if( param_has_error( 'thrd_recipients' ) )
-			{ // Mark this field as error
-			?>
-				jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
-			<?php
-			}
-			?>
-			// Remove required attribute to prevent unfocusable field error during validation checking when the field is hidden:
-			jQuery( '#thrd_recipients' ).removeAttr( 'required' );
-		}
-	}
-);
-
-/**
- * Show the multiple recipients radio selection if the number of recipients more than one
- */
-function check_multiple_recipients()
-{
-	if( jQuery( 'input[name="thrd_recipients_array[login][]"]' ).length > 1 )
-	{
-		jQuery( '#multiple_recipients' ).show();
-	}
-	else
-	{
-		jQuery( '#multiple_recipients' ).hide();
-	}
+	expose_var_to_js( 'evo_thread_form_config', evo_json_encode( $thread_form_config ) );
 }
 
-/**
- * Check form fields before send a thread data
- *
- * @return boolean TRUE - success filling of the fields, FALSE - some erros, stop a submitting of the form
- */
-function check_form_thread()
-{
-	if( jQuery( 'input#token-input-thrd_recipients' ).val() != '' )
-	{	// Don't submit a form with incomplete username
-		alert( '<?php echo TS_('Please complete the entering of an username.') ?>' );
-		jQuery( 'input#token-input-thrd_recipients' ).focus();
-		return false;
-	}
-
-	return true;
-}
-</script>
-<?php }
 echo_image_insert_modal();
 if( $action == 'preview' )
-{ // ------------------ PREVIEW MESSAGE START ------------------ //
+{	// ------------------ PREVIEW MESSAGE START ------------------ //
 	if( isset( $edited_Thread->recipients_list ) )
 	{
 		$recipients_list = $edited_Thread->recipients_list;
@@ -336,7 +258,7 @@ if( $action == 'preview' )
 	$Results->Cache = & get_MessageCache();
 
 	if( $creating_success )
-	{ // Display error messages again before preview of message
+	{	// Display error messages again before preview of message
 		global $Messages;
 		$Messages->display();
 	}

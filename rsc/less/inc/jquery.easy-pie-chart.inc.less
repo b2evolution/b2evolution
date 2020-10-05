@@ -1,0 +1,33 @@
+// Custom styles for JS library jquery.easy-pie-chart
+// Used to draw chrats on back-office dashboards
+
+.charts {
+	display: flex;
+	display: -webkit-flex;
+	justify-content: space-around;
+	-webkit-justify-content: space-around;
+	flex-wrap: wrap;
+	-webkit-flex-wrap: wrap;
+	.chart {
+		position: relative;
+		text-align: center;
+		display: inline-block;
+		width: 75px;
+		margin: 5px;
+		canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+		.number {
+			height: 75px;
+			line-height: 75px;
+		}
+		.label {
+			font-size: 11px;
+			padding: 0;
+			color: #000;
+			font-weight: normal;
+		}
+	}
+}

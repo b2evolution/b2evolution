@@ -44,7 +44,7 @@ $blog = NULL;
 param( 'action', 'string', '' );
 
 // Check global permission:
-if( $action != 'test_api' && ( empty($current_User) || ! $current_User->check_perm( 'admin', 'restricted' ) ) )
+if( $action != 'test_api' && ! check_user_perm( 'admin', 'restricted' ) )
 {	// No permission to access admin... (Exclude action of API testing in order to make a quick request without logging in)
 	require $adminskins_path.'_access_denied.main.php';
 }
@@ -101,7 +101,7 @@ switch( $action )
 		// This does not require CSRF because it doesn't update the db, it only displays a new block of empty plugin setting fields
 
 		// Check permission to view plugin settings:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		// Set admin skin, used for buttons, @see button_class()
 		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
@@ -194,7 +194,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 
 		// Check user permission to edit this internal comment
-		$current_User->check_perm( 'meta_comment', 'edit', true, $edited_Comment );
+		check_user_perm( 'meta_comment', 'edit', true, $edited_Comment );
 
 		// Load Blog of the Item
 		$Collection = $Blog = & $edited_Comment_Item->get_Blog();
@@ -313,7 +313,7 @@ switch( $action )
 		if( $edited_Comment !== false )
 		{ // The comment still exists
 			// Check permission:
-			$current_User->check_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
+			check_user_perm( 'comment!CURSTATUS', 'delete', true, $edited_Comment );
 
 			$result_success = $edited_Comment->dbdelete();
 		}
@@ -349,7 +349,7 @@ switch( $action )
 		if( $edited_Comment !== false && $edited_Comment->author_url != NULL )
 		{	// The comment still exists
 			// Check permission:
-			$current_User->check_perm( 'comment!CURSTATUS', 'edit', true, $edited_Comment );
+			check_user_perm( 'comment!CURSTATUS', 'edit', true, $edited_Comment );
 
 			$edited_Comment->set( 'author_url', NULL );
 			$edited_Comment->dbupdate();
@@ -379,7 +379,7 @@ switch( $action )
 		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
-		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
+		check_user_perm( 'blog_ismember', 'view', true, $blog );
 
 		// Set admin skin, used for buttons, @see button_class()
 		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
@@ -404,7 +404,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'domtype' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		load_funcs('sessions/model/_hitlog.funcs.php');
 
@@ -424,7 +424,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'domstatus' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		load_funcs('sessions/model/_hitlog.funcs.php');
 
@@ -444,7 +444,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		$new_status = param( 'new_status', 'string' );
 		$iprange_ID = param( 'iprange_ID', 'integer', true );
@@ -462,7 +462,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'emadrstatus' );
 
 		// Check permission:
-		$current_User->check_perm( 'emails', 'edit', true );
+		check_user_perm( 'emails', 'edit', true );
 
 		$new_status = param( 'new_status', 'string' );
 		$emadr_ID = param( 'emadr_ID', 'integer', true );
@@ -503,7 +503,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'grouplevel' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		$group_level = param( 'new_group_level', 'integer' );
 		$group_ID = param( 'group_ID', 'integer' );
@@ -524,7 +524,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'country' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		load_funcs( 'regional/model/_regional.funcs.php' );
 
@@ -556,7 +556,7 @@ switch( $action )
 		$Item = & $ItemCache->get_by_ID( $post_ID );
 
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
 
 		$new_attrs = '';
 		switch( $field )
@@ -641,7 +641,7 @@ switch( $action )
 		$Item = & $ItemCache->get_by_ID( $post_ID );
 
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
 
 		if( $item_order === '-' || $item_order === '' )
 		{	// Set NULL for these values:
@@ -669,7 +669,7 @@ switch( $action )
 		$cat_ID = param( 'cat_ID', 'integer' );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_cats', 'edit', true, $blog );
+		check_user_perm( 'blog_cats', 'edit', true, $blog );
 
 		if( $cat_order === '-' || $cat_order === '' || intval( $cat_order ) == '' )
 		{ // Set NULL for these values
@@ -685,6 +685,38 @@ switch( $action )
 		}
 		break;
 
+	case 'item_status_order_edit':
+		// Update order of a item status from list screen by clicking on the order column
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'itemstatus' );
+
+		$item_status_order = param( 'new_item_status_order', 'string' );
+
+		// Make sure we got an pst_ID:
+		$item_status_ID = param( 'pst_ID', 'integer', true );
+
+		// Check permission:
+		check_user_perm( 'options', 'edit', true );
+
+		if( $item_status_order === '-' || $item_status_order === '' )
+		{	// Set NULL for these values:
+			$item_status_order = NULL;
+		}
+		else
+		{	// Make an order to integer:
+			$item_status_order = intval( $item_status_order );
+		}
+
+		$ItemStatusCache = & get_ItemStatusCache();
+		if( $edited_ItemStatus = & $ItemStatusCache->get_by_ID( $item_status_ID, false ) )
+		{ // Update item status order if it exists in DB
+			$edited_ItemStatus->set( 'order', ( $item_status_order === '' ? NULL : $item_status_order ), true );
+			$edited_ItemStatus->dbupdate();
+			echo '<a href="#">'.( $item_status_order === NULL ? '-' : $item_status_order ).'</a>';
+		}
+		break;
+
 	case 'cat_ityp_ID_edit':
 		// Update default Item Type of a chapter from list screen by clicking on the order column:
 
@@ -696,7 +728,7 @@ switch( $action )
 		$cat_ID = param( 'cat_ID', 'integer' );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_cats', '', true, $blog );
+		check_user_perm( 'blog_cats', '', true, $blog );
 
 		if( ! empty( $cat_ityp_ID ) )
 		{	// Remove prefix "_" which is used only for correct order in jeditable selector:
@@ -747,7 +779,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'itemgoal' );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog );
+		check_user_perm( 'blog_post_statuses', 'edit', true, $blog );
 
 		$cat_ID = param( 'cat_id', 'integer', 0 );
 
@@ -783,7 +815,7 @@ switch( $action )
 		param( 'fileroot_ID', 'string' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'add', true, $fileroot_ID );
+		check_user_perm( 'files', 'add', true, $fileroot_ID );
 
 		param( 'path', 'filepath' );
 		param( 'oldfile', 'filepath' );
@@ -825,7 +857,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'link' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'view' );
+		check_user_perm( 'files', 'view' );
 
 		param( 'iframe_name', 'string', '' );
 		param( 'link_owner_type', 'string', true );
@@ -840,12 +872,10 @@ switch( $action )
 		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
 		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
 
-		echo '<div style="background:#FFF;height:90%">'
-				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+		echo '<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'&amp;prefix='.$prefix.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
-					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
-			.'</div>';
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>';
 
 		break;
 
@@ -856,7 +886,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'file_attachment' );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'view' );
+		check_user_perm( 'files', 'view' );
 
 		param( 'iframe_name', 'string', '' );
 		param( 'field_name', 'string', '' );
@@ -871,12 +901,10 @@ switch( $action )
 		$additional_params .= empty( $fm_highlight ) ? '' : '&amp;fm_highlight='.$fm_highlight;
 		//$additional_params .= empty( $field_name ) ? '' : '&amp;field_name='.$field_name;
 
-		echo '<div style="background:#FFF;height:90%">'
-				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+		echo '<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;field_name='.$field_name.'&amp;file_type='.$file_type.'&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=file_select'.$additional_params.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
-					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
-			.'</div>';
+					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>';
 
 		break;
 
@@ -890,14 +918,12 @@ switch( $action )
 		$FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
 
 		// Check permission:
-		$current_User->check_perm( 'files', 'view', true, $FileRoot );
+		check_user_perm( 'files', 'view', true, $FileRoot );
 
-		echo '<div style="background:#FFF;height:80%">'
-				.'<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
+		echo '<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
 				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0&amp;path='.param( 'path', 'string' ).'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
-					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
-			.'</div>';
+					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>';
 
 		break;
 
@@ -913,7 +939,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'users' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		param( 'autm_ID', 'integer', true );
 		param( 'enlt_ID', 'integer', NULL );
@@ -973,7 +999,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'campaign' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		param( 'ecmp_ID', 'integer', true );
 		param( 'skip_tags', 'string', '' );
@@ -1008,7 +1034,7 @@ switch( $action )
 		// Get automation status:
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		param( 'autm_ID', 'integer', true );
 
@@ -1101,6 +1127,192 @@ switch( $action )
 
 		load_funcs( 'tools/model/_maintenance.funcs.php' );
 		dbm_delete_itemprecache();
+		break;
+
+	case 'browse_subdirs':
+		// Load sub-directories for Files Browser:
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', '' );
+
+		// Path to parent directory with root data:
+		param( 'path', 'filepath' );
+
+		if( ! preg_match( '#^([a-z]+)_(\d+):(.+)$#', $path, $path_data ) )
+		{	// Invalid path:
+			debug_die( 'Invalid path!' );
+		}
+
+		// Try to get File Root by requested path:
+		$FileRootCache = & get_FileRootCache();
+		$dir_FileRoot = & $FileRootCache->get_by_type_and_ID( $path_data[1], $path_data[2] );
+
+		// Check permission:
+		check_user_perm( 'files', 'view', true, $dir_FileRoot );
+
+		$FileCache = & get_FileCache();
+		if( ! ( $dir_File = & $FileCache->get_by_root_and_path( $path_data[1], $path_data[2], $path_data[3] ) ) ||
+		    ! $dir_File->is_dir() )
+		{	// Invalid directory:
+			debug_die( 'Invalid directory!' );
+		}
+
+		// Create list to load sub-folders:
+		load_class( 'files/model/_filelist.class.php', 'Filelist' );
+		$dir_Filelist = new Filelist( $dir_FileRoot, trailing_slash( $dir_File->get_full_path() ) );
+		check_showparams( $dir_Filelist );
+		$dir_Filelist->load();
+		$dir_Filelist->sort( 'name' );
+
+		if( ! $dir_Filelist->count_dirs() )
+		{	// Wrong requested directory:
+			debug_die( 'No sub-directories!' );
+		}
+
+		// Return sub-directories of the requested directory:
+		while( $subdir_File = & $dir_Filelist->get_next( 'dir' ) )
+		{
+			echo '<li>'.get_directory_tree( $dir_FileRoot, $subdir_File->get_full_path(), $dir_File->get_full_path(), false, $subdir_File->get_rdfs_rel_path(), true ).'</li>';
+		}
+		break;
+
+	case 'browse_existing_attachments':
+
+		global $DB;
+		$mode = 'upload';
+
+		$FileRootCache = & get_FileRootCache();
+
+		// Get all Item comments:
+		$link_type = param( 'link_type', 'string', true );
+		$link_object_ID = param( 'link_object_ID', 'integer', true );
+
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
+		$LinkCache = & get_LinkCache();
+
+		$links = array();
+		$link_owner_class = get_class( $LinkOwner->link_Object );
+
+		load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
+		$LinkCache = & get_LinkCache();
+		$ea_Linklist = new DataObjectList2( $LinkCache );
+
+		switch( $link_owner_class )
+		{
+			case 'Item':
+			case 'Comment':
+				if( $link_owner_class == 'Comment' )
+				{
+					$edited_Item = $LinkOwner->get_Item();
+				}
+				else
+				{
+					$edited_Item = $LinkOwner->Item;
+				}
+				$item_ID = $edited_Item->ID;
+
+				// Get list of comment IDs under Item or related to Comment:
+				$comments_SQL = new SQL( 'Get all the comments of an Item' );
+				$comments_SQL->SELECT( 'comment_ID' );
+				$comments_SQL->FROM( 'T_comments' );
+				$comments_SQL->WHERE( 'comment_item_ID = '.$DB->quote( $item_ID ) );
+				if( ! $edited_Item->can_meta_comment() )
+				{	// If current User doesn't have an access to meta comments:
+					$comments_SQL->WHERE( 'comment_type != "meta"' );
+				}
+				$comment_IDs = $DB->get_col( $comments_SQL );
+
+				$links_SQL = new SQL( 'Get all the links belonging to comments of an Item' );
+				$links_SQL->SELECT( '*' );
+				$links_SQL->FROM( 'T_links AS l' );
+				if( $comment_IDs )
+				{
+					$links_SQL->WHERE( 'link_cmt_ID IN ('.$DB->quote( $comment_IDs ).')' );
+				}
+				$links_SQL->WHERE_or( 'link_itm_ID = '.$DB->quote( $item_ID ) );
+				$links_SQL->ORDER_BY( 'link_datemodified DESC, link_datecreated DESC' );
+
+				$ea_Linklist->sql = $links_SQL->get();
+				$ea_Linklist->run_query( false, false, false, 'get_attachment_LinkList' );
+
+				// Get FileRoot and dummy FileList:
+				if( $ea_Linklist->get_total_rows() )
+				{	// Use first attachment to get the FileRoot:
+					$Link = & $ea_Linklist->get_by_idx( 0 );
+					$File = & $Link->get_File();
+					$fm_FileRoot = & $File->get_FileRoot();
+				}
+				else
+				{
+					global $Blog;
+
+					if( empty( $Blog ) )
+					{
+						$Blog = $edited_Item->get_Blog();
+					}
+
+					$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $Blog->ID );
+				}
+				load_class( 'files/model/_filelist.class.php', 'FileList' );
+				$fm_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
+				$selected_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
+				break;
+
+			case 'EmailCampaign':
+				if( $edited_Newsletter = & $LinkOwner->link_Object->get_Newsletter() )
+				{
+					// Get list of email campaign IDs under the same Newsletter:
+					$email_campaigns_SQL = new SQL( 'Get all the email campaigns of a List' );
+					$email_campaigns_SQL->SELECT( 'ecmp_ID' );
+					$email_campaigns_SQL->FROM( 'T_email__campaign' );
+					$email_campaigns_SQL->WHERE( 'ecmp_enlt_ID = '.$DB->quote( $edited_Newsletter->ID ) );
+					$email_campaign_IDs = $DB->get_col( $email_campaigns_SQL );
+
+					if( $email_campaign_IDs )
+					{
+						$links_SQL = new SQL( 'Get all the links belonging to email campaigns of a List' );
+						$links_SQL->SELECT( '*' );
+						$links_SQL->FROM( 'T_links AS l' );
+						$links_SQL->WHERE( 'link_ecmp_ID IN ('.$DB->quote( $email_campaign_IDs ).')' );
+						$links_SQL->ORDER_BY( 'link_datemodified DESC, link_datecreated DESC' );
+
+						$ea_Linklist->sql = $links_SQL->get();
+						$ea_Linklist->run_query( false, false, false, 'get_attachment_LinkList' );
+					}
+				}
+
+				// Get FileRoot and dummy FileList:
+				if( $ea_Linklist->get_total_rows() )
+				{	// Use first attachment to get the FileRoot:
+					$Link = & $ea_Linklist->get_by_idx( 0 );
+					$File = & $Link->get_File();
+					$fm_FileRoot = & $File->get_FileRoot();
+				}
+				else
+				{
+					$fm_FileRoot = & $FileRootCache->get_by_type_and_ID( 'emailcampaign', $LinkOwner->link_Object->ID );
+				}
+				load_class( 'files/model/_filelist.class.php', 'FileList' );
+				$fm_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
+				$selected_Filelist = new Filelist( $fm_FileRoot, false ); // Arbitrary list of attached files
+				break;
+
+			default:
+				debug_die( 'Existing attachments list not available to '.$link_owner_class );
+		}
+		
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+
+		$AdminUI = new AdminUI();
+		$Widget = new Widget( 'file_browser' );
+		$Widget->disp_template_replaced( 'block_start' );
+		
+		require $inc_path.'links/views/_link_file_list.inc.php';
+
+		$Widget->disp_template_raw( 'block_end' );
 		break;
 
 	default:

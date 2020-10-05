@@ -26,7 +26,7 @@ $creating = is_create_action( $action );
 $Form = new Form( NULL, 'section_checkchanges', 'post', 'compact' );
 
 // Get permission to edit the section:
-$perm_section_edit = $current_User->check_perm( 'section', 'edit', false, $edited_Section->ID );
+$perm_section_edit = check_user_perm( 'section', 'edit', false, $edited_Section->ID );
 
 if( ! $creating && $perm_section_edit && $edited_Section->ID != 1 )
 {	// Display a link to delete the section only if Current user has no permission to edit it:

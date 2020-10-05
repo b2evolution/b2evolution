@@ -1034,8 +1034,6 @@ class EmailCampaign extends DataObject
 
 		if( $mode == 'test' )
 		{ // Send a test newsletter
-			global $current_User;
-
 			$newsletter_params['boundary'] = 'b2evo-'.md5( rand() );
 			$headers = array( 'Content-Type' => 'multipart/mixed; boundary="'.$newsletter_params['boundary'].'"' );
 
@@ -1512,11 +1510,11 @@ class EmailCampaign extends DataObject
 	 */
 	function create_cron_job( $next_chunk = false )
 	{
-		global $Messages, $servertimenow, $current_User;
+		global $Messages, $servertimenow;
 
 		if( ! $next_chunk && ( $email_campaign_Cronjob = & $this->get_Cronjob() ) )
 		{	// If we create first cron job but this email campaign already has one:
-			if( $current_User->check_perm( 'options', 'view' ) )
+			if( check_user_perm( 'options', 'view' ) )
 			{	// If user has an access to view cron jobs:
 				global $admin_url;
 				$Messages->add( sprintf( T_('A scheduled job was already created for this campaign, <a %s>click here</a> to view it.'),
@@ -1734,6 +1732,20 @@ class EmailCampaign extends DataObject
 		}
 
 		return empty( $added_users_num ) ? false : $added_users_num;
+	}
+
+
+	/**
+	 * Get creation time of Email Campaign
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_creation_time( $format = '', $useGM = false )
+	{
+		$format = locale_resolve_datetime_fmt( $format );
+
+		return mysql2date( $format, $this->date_ts, $useGM );
 	}
 }
 

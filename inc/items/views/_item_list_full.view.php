@@ -114,7 +114,7 @@ $ItemList->display_init( $display_params );
 // Display navigation:
 $ItemList->display_nav( 'header' );
 
-$allow_items_list_form = ( $action != 'view' && $ItemList->total_rows > 0 && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $blog ) );
+$allow_items_list_form = ( $action != 'view' && $ItemList->total_rows > 0 && check_user_perm( 'blog_post_statuses', 'edit', false, $blog ) );
 if( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
 	global $admin_url;
@@ -162,7 +162,7 @@ while( $Item = & $ItemList->get_item() )
 						'after'  => ''
 					) );
 				global $admin_url;
-				if( $current_User->check_perm( 'slugs', 'view' ) )
+				if( check_user_perm( 'slugs', 'view' ) )
 				{ // user has permission to view slugs:
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
@@ -172,7 +172,7 @@ while( $Item = & $ItemList->get_item() )
 				if( $parent_Item = $Item->get_parent_Item() )
 				{	// Display parent ID if the Item has it:
 					echo ' &middot; '.T_('Parent ID').': ';
-					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
+					if( check_user_perm( 'item_post!CURSTATUS', 'view', false, $parent_Item ) )
 					{	// Display parent ID as link to view the parent post if current user has a permission:
 						echo '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$parent_Item->get_blog_ID().'&amp;p='.$parent_Item->ID.'" title="'.$parent_Item->dget( 'title', 'htmlattr' ).'">'.$parent_Item->ID.'</a>';
 					}
@@ -186,7 +186,7 @@ while( $Item = & $ItemList->get_item() )
 				$Item->locale_flag( array(' class' => 'flagtop' ) );
 				echo '</div>';
 
-				if( $action != 'view' && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+				if( $action != 'view' && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 				{	// Display checkbox to select item for action only on items list:
 					echo '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" /> ';
 				}
@@ -400,8 +400,8 @@ while( $Item = & $ItemList->get_item() )
 						'gallery_cell_end'    => '</div>',
 						'gallery_image_limit' => 1000,
 						'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
+						'restrict_to_image_position' => 'cover,background,background,teaser,teaserperm,teaserlink',
 					) );
 			?>
 
@@ -849,10 +849,10 @@ while( $Item = & $ItemList->get_item() )
 }
 
 // Instantiate ClipboardJS:
-echo '<script>var clipboard = new ClipboardJS("a.clipboard-copy");</script>';
+expose_var_to_js( 'evo_init_item_list_clipboard_js', true );
 
 if( $action == 'view' )
-{ // Load JS functions to work with comments
+{	// Load JS functions to work with comments
 	load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 	// Handle show_comments radioboxes
@@ -860,9 +860,14 @@ if( $action == 'view' )
 }
 elseif( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
-	echo '<input type="button" class="btn btn-default" value="'.T_('Check all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\' ).prop( \'checked\', true );" /> '.
-		'<input type="button" class="btn btn-default" value="'.T_('Uncheck all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).prop( \'checked\', false );" /> '.
-		'<input type="button" class="btn btn-default" value="'.T_('Reverse').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).each( function() { this.checked = !this.checked } );" /> ';
+
+	// Buttons to check/uncheck/invert all Items:
+	$Form->checkbox_controls( 'selected_items', array(
+		'before_buttons' => '<span class="btn-group">',
+		'after_buttons'  => '</span> ',
+		'button_class'   => 'btn btn-default',
+		'icon_class'     => '',
+	) );
 
 	echo T_('With checked posts').': ';
 
@@ -870,9 +875,11 @@ elseif( $allow_items_list_form )
 	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
 	echo_status_dropdown_button_js( 'post' );
 
+	echo ' <span class="btn-group">';
 	$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
 	$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
-	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	echo '</span> ';
+	if( is_pro() && check_user_perm( 'options', 'edit' ) )
 	{	// Export Items only for PRO version:
 		$Form->button( array( 'submit', 'actionArray[mass_export]', T_('Export to XML') ) );
 	}

@@ -23,11 +23,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function poll_td_question( $Poll )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$r = $Poll->get_name();
 
-	if( $current_User->check_perm( 'polls', 'view', false, $Poll ) )
+	if( check_user_perm( 'polls', 'view', false, $Poll ) )
 	{	// Display the question text as link to view the details:
 		$r = '<a href="'.$admin_url.'?ctrl=polls&amp;pqst_ID='.$Poll->ID.'&amp;action=edit'.'">'.$r.'</a>';
 	}
@@ -56,16 +56,16 @@ function poll_td_answers( $Poll )
  */
 function poll_td_actions( $Poll )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
 	$r = '';
 
-	if( $current_User->check_perm( 'polls', 'edit', false, $Poll ) )
+	if( check_user_perm( 'polls', 'edit', false, $Poll ) )
 	{	// Display the action icons to edit and delete the poll:
 		$r .= action_icon( T_('Edit this poll'), 'edit', $admin_url.'?ctrl=polls&amp;pqst_ID='.$Poll->ID.'&amp;action=edit' );
 		$r .= action_icon( T_('Delete this poll!'), 'delete', $admin_url.'?ctrl=polls&action=delete&amp;pqst_ID='.$Poll->ID.'&amp;'.url_crumb( 'poll' ) );
 	}
-	elseif( $current_User->check_perm( 'polls', 'view', false, $Poll ) )
+	elseif( check_user_perm( 'polls', 'view', false, $Poll ) )
 	{	// Display the action icons to view the poll:
 		$r .= action_icon( T_('View this poll'), 'magnifier', $admin_url.'?ctrl=polls&amp;pqst_ID='.$Poll->ID.'&amp;action=edit' );
 	}
@@ -103,7 +103,7 @@ function poll_filters_callback( & $Form )
  */
 function polls_results_block( $params = array() )
 {
-	global $current_User, $admin_url, $DB;
+	global $admin_url, $DB;
 
 	$params = array_merge( array(
 			'edited_User'          => NULL,
@@ -116,18 +116,13 @@ function polls_results_block( $params = array() )
 			'display_btn_user_del' => false,
 		), $params );
 
-	if( !is_logged_in() )
-	{	// Only logged in users can access to this function:
-		return;
-	}
-
-	if( ! $current_User->check_perm( 'polls', 'create' ) )
+	if( ! check_user_perm( 'polls', 'create' ) )
 	{	// Check minimum permission:
 		return;
 	}
 
 	// Get permission of current user if all polls are available to view:
-	$perm_poll_view = $current_User->check_perm( 'polls', 'view' );
+	$perm_poll_view = check_user_perm( 'polls', 'view' );
 
 	if( ! empty( $params['edited_User'] ) )
 	{	// Use a filter user ID from params:

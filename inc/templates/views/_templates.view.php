@@ -61,7 +61,7 @@ function filter_templates_list( & $Form )
 	$Form->text_input( 'q', get_param( 'q' ), 20, T_('Name / Code'), '', array( 'maxlength' => 50 ) );
 
 	// Context:
-	$field_options = array( NULL => T_('All contexts') ) + get_template_contexts();
+	$field_options = array( NULL => T_('All contexts') ) + get_template_contexts( 'raw' );
 	$Form->select_input_array( 'context', get_param( 'context' ), $field_options, T_('Context'), '', array( 'force_keys_as_values' => false ) );
 
 	// Owner:
@@ -76,9 +76,20 @@ $Results->filter_area = array(
 
 $Results->register_filter_preset( 'all', T_('All'), '?ctrl=templates' );
 
+$contexts = get_template_contexts( 'raw', array( 'custom1', 'custom2', 'custom3' ) );
+foreach( $contexts as $context => $context_description )
+{
+	$Results->register_filter_preset( $context, $context_description, '?ctrl=templates&amp;context='.$context );
+}
+
+function td_template_context( $context )
+{
+	$contexts = get_template_contexts( 'raw' );
+	return $contexts[$context];
+}
 $Results->cols[] = array(
 		'th' => T_('Context'),
-		'td' => '$tpl_context$',
+		'td' => '%td_template_context( #tpl_context# )%',
 		'order' => 'tpl_context, tpl_base_name, tpl_name, tpl_locale, tpl_code',
 	);
 
@@ -138,7 +149,7 @@ function td_template_actions( & $row )
 
 	return $action_icons;
 }
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	$Results->cols[] = array(
 		'th' => T_('Actions'),

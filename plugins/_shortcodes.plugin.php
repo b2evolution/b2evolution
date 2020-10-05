@@ -22,7 +22,7 @@ class shortcodes_plugin extends Plugin
 	var $code = 'evo_shortcodes';
 	var $name = 'Short Codes';
 	var $priority = 40;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -85,60 +85,40 @@ class shortcodes_plugin extends Plugin
 		}
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
-		?><script>
-		//<![CDATA[
-		var shortcodes_buttons = new Array();
+		$js_config = array(
+				'plugin_code' => $this->code,
+				'js_prefix' => $params['js_prefix'],
 
-		function shortcodes_button( id, text, tag, title, style )
-		{
-			this.id = id;       // used to name the toolbar button
-			this.text = text;   // label on button
-			this.tag = tag;     // tag code to insert
-			this.title = title; // title
-			this.style = style; // style on button
-		}
+				'btn_title_teaserbreak' => T_('Teaser break'),
+				'btn_title_pagebreak'   => T_('Page break'),
 
-		shortcodes_buttons[shortcodes_buttons.length] = new shortcodes_button(
-				'shortcodes_teaserbreak', '[teaserbreak]', '[teaserbreak]',
-				'<?php echo TS_('Teaser break') ?>', ''
-			);
-		shortcodes_buttons[shortcodes_buttons.length] = new shortcodes_button(
-				'shortcodes_pagebreak', '[pagebreak]', '[pagebreak]',
-				'<?php echo TS_('Page break') ?>'
+				'toolbar_title_before' => $this->get_template( 'toolbar_title_before' ),
+				'toolbar_title_after'  => $this->get_template( 'toolbar_title_after'),
+				'toolbar_group_before' => $this->get_template( 'toolbar_group_before' ),
+				'toolbar_group_after'  => $this->get_template( 'toolbar_group_after' ),
+				'toolbar_button_class' => $this->get_template( 'toolbar_button_class' ),
+				'toolbar_title'        => T_('Shortcodes'),
 			);
 
-		function shortcodes_toolbar( title )
+		if( is_ajax_request() )
 		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
-			for( var i = 0; i < shortcodes_buttons.length; i++ )
-			{
-				var button = shortcodes_buttons[i];
-				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="shortcodes_insert_tag|b2evoCanvas|'+i+'" value="' + button.text + '" />';
-			}
-			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-
-			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_shortcodes_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'shortcodes_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_shortcodes_toolbar_config' );
 		}
 
-		function shortcodes_insert_tag( canvas_field, i )
-		{
-			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{ // tinyMCE plugin is active now, we should focus cursor to the edit area
-				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
-			}
-			// Insert tag text in area
-			textarea_wrap_selection( canvas_field, shortcodes_buttons[i].tag, '', 0 );
-		}
-		//]]>
-		</script><?php
-
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script>shortcodes_toolbar( '<?php echo TS_('Shortcodes:'); ?>' );</script><?php
 
 		return true;
 	}

@@ -15,14 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Load Currency class (PHP4):
 load_class( 'regional/model/_currency.class.php', 'Currency' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
 $UserSettings->set( 'pref_glob_settings_tab', $ctrl );
@@ -54,7 +49,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Disable a currency only if it is enabled, and user has edit access.
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure the currency information was loaded. If not, just exit with error.
 		if( empty($edited_Currency) )
@@ -87,7 +82,7 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( ! isset($edited_Currency) )
 		{	// We don't have a model to use, start with blank object:
@@ -102,7 +97,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an curr_ID:
 		param( 'curr_ID', 'integer', true );
@@ -118,7 +113,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Load data from request
 		if( $edited_Currency->load_from_Request() )
@@ -157,7 +152,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an curr_ID:
 		param( 'curr_ID', 'integer', true );
@@ -183,7 +178,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'currency' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an curr_ID:
 		param( 'curr_ID', 'integer', true );

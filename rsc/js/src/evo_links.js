@@ -30,6 +30,7 @@ function evo_link_initialize_fieldset( fieldset_prefix )
 		{	// Make the attachments fieldset wrapper resizable:
 			minHeight: 80,
 			handles: 's',
+			zIndex: 0,
 			resize: function( e, ui )
 			{	// Limit max height by table of attachments:
 				jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height() );
@@ -98,7 +99,7 @@ function evo_link_change_position( selectInput, url, crumb )
 		if( r == "OK" ) {
 			evoFadeSuccess( jQuery(oThis).closest('tr') );
 			jQuery(oThis).closest('td').removeClass('error');
-			if( new_position == 'cover' )
+			if( new_position == 'cover' || new_position == 'background' )
 			{ // Position "Cover" can be used only by one link
 				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
 				{ // Replace previous position with "Inline"
@@ -365,11 +366,18 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 			// Refresh a content of the links list:
 			jQuery( '#' + prefix + 'attachments_fieldset_table' ).html( data.html );
 
-			// Remove temporary content of ajax loading indicator:
-			ajax_loading.remove();
+			// Initialize init_uploader( 'fieldset_' + prefix ) to display uploader button
+			if( window.evo_init_dragdrop_button_config && window.evo_init_dragdrop_button_config['fieldset_' + prefix] )
+			{
+				init_uploader( window.evo_init_dragdrop_button_config['fieldset_' + prefix] );
+			}
 
 			// Update the attachment block height after refreshing:
 			evo_link_fix_wrapper_height( prefix );
+			
+
+			// Remove temporary content of ajax loading indicator:
+			ajax_loading.remove();	
 		} );
 	}
 

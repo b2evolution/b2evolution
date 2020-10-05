@@ -441,12 +441,14 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty($shortname) ? T_('Tracker') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'tracker' : $urlname );
 				$this->set_setting( 'use_workflow', 1 );
+				$this->set_setting( 'in_skin_editing', '1' );
 				$this->set_setting( 'front_disp', 'front' );
+				$this->set_setting( 'download_enable', 0 );
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
 				$forum_topic_type_ID = $DB->get_var( 'SELECT ityp_ID
 					 FROM T_items__type
-					WHERE ityp_name = "Forum Topic"' );
+					WHERE ityp_name = "Task"' );
 				if( $forum_topic_type_ID )
 				{ // Set default post type as "Forum Topic"
 					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
@@ -477,6 +479,7 @@ class Blog extends DataObject
 				$this->set_setting( 'allow_rating_comment_helpfulness', 1 );
 				$this->set_setting( 'category_ordering', 'manual' );
 				$this->set_setting( 'disp_featured_above_list', 1 );
+				$this->set_setting( 'download_enable', 0 );
 
 				// Try to find post type "Forum Topic" in DB
 				global $DB;
@@ -597,7 +600,7 @@ class Blog extends DataObject
 			}
 			if( $new_sec_ID != $this->get( 'sec_ID' ) )
 			{	// If section has been changed to new:
-				if( ! $current_User->check_perm( 'blogs', 'create', false, $new_sec_ID ) )
+				if( ! check_user_perm( 'blogs', 'create', false, $new_sec_ID ) )
 				{
 					param_error( 'sec_ID', T_('You don\'t have a permission to create a collection in this section.') );
 				}
@@ -893,6 +896,17 @@ class Blog extends DataObject
 		// Tag posts per page:
 		$this->set_setting( 'tag_posts_per_page', param( 'tag_posts_per_page', 'integer', NULL ), true );
 
+		if( param( 'user_prefix', 'string', NULL ) !== NULL )
+		{	// User profile page prefix:
+			param_check_regexp( 'user_prefix', '#^[a-z0-9\-_]*$#i', sprintf( T_('User profile page prefix can contain only letters, digits, %s or %s.'), '<code>-</code>', '<code>_</code>' ) );
+			$this->set_setting( 'user_prefix', get_param( 'user_prefix' ) );
+		}
+
+		if( param( 'user_links', 'string', NULL ) !== NULL )
+		{	// User profile URLs:
+			$this->set_setting( 'user_links', get_param( 'user_links' ) );
+		}
+
 		if( param( 'single_links', 'string', NULL ) !== NULL )
 		{ // Single post link type:
 			$this->set_setting( 'single_links', get_param( 'single_links' ) );
@@ -967,7 +981,9 @@ class Blog extends DataObject
 		}
 
 		if( param( 'download_delay', 'integer', NULL ) !== NULL )
-		{ // Download delay
+		{	// Enable Download pages:
+			$this->set_setting( 'download_enable', param( 'download_enable', 'integer', 0 ) );
+			// Download delay
 			param_check_range( 'download_delay', 0, 10, T_('Download delay must be numeric (0-10).') );
 			$this->set_setting( 'download_delay', get_param( 'download_delay' ) );
 		}
@@ -1046,7 +1062,7 @@ class Blog extends DataObject
 
 			$this->set_setting( 'post_categories', param( 'post_categories', 'string', NULL ) );
 
-			if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			if( check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// We have permission to edit advanced admin settings:
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
 				if( $this->get_setting( 'in_skin_editing' ) )
@@ -1087,6 +1103,9 @@ class Blog extends DataObject
 				$this->set_setting( 'orderby_2', param( 'orderby_2', 'string', '' ) );
 				$this->set_setting( 'orderdir_2', param( 'orderdir_2', 'string', '' ) );
 			}
+
+			$postlist_enable = param( 'postlist_enable', 'integer', 0 );
+			$this->set_setting( 'postlist_enable', $postlist_enable );
 
 			$disp_featured_above_list = param( 'disp_featured_above_list', 'integer', 0 );
 			$this->set_setting( 'disp_featured_above_list', $disp_featured_above_list );
@@ -1227,11 +1246,12 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_lastseen_cheat', param( 'userdir_lastseen_cheat', 'integer', 0 ) );
 		}
 
-		if( in_array( 'other', $groups ) )
-		{ // we want to load the other settings:
+		if( in_array( 'search', $groups ) )
+		{ // we want to load the search settings:
 
 			// Search results:
 			param_integer_range( 'search_per_page', 1, 9999, T_('Number of search results per page must be between %d and %d.') );
+			$this->set_setting( 'search_enable', param( 'search_enable', 'integer', 0 ) );
 			$this->set_setting( 'search_per_page', get_param( 'search_per_page' ) );
 			$this->set_setting( 'search_sort_by', param( 'search_sort_by', 'string' ) );
 			$this->set_setting( 'search_include_cats', param( 'search_include_cats', 'integer', 0 ) );
@@ -1281,6 +1301,10 @@ class Blog extends DataObject
 			$this->set_setting( 'search_result_template_file', param( 'search_result_template_file', 'string' ) );
 			$this->set_setting( 'search_result_template_category', param( 'search_result_template_category', 'string' ) );
 			$this->set_setting( 'search_result_template_tag', param( 'search_result_template_tag', 'string' ) );
+		}
+
+		if( in_array( 'other', $groups ) )
+		{ // we want to load the other settings:
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -1341,7 +1365,7 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_comments', param( 'allow_comments', 'string', 'any' ) );
 			$this->set_setting( 'allow_view_comments', param( 'allow_view_comments', 'string', 'any' ) );
 			$new_feedback_status = param( 'new_feedback_status', 'string', 'draft' );
-			if( $new_feedback_status != $this->get_setting( 'new_feedback_status' ) && ( $new_feedback_status != 'published' || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			if( $new_feedback_status != $this->get_setting( 'new_feedback_status' ) && ( $new_feedback_status != 'published' || check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{ // Only admin can set this setting to 'Public'
 				$this->set_setting( 'new_feedback_status', $new_feedback_status );
 			}
@@ -1359,12 +1383,12 @@ class Blog extends DataObject
 			$this->set_setting( 'rating_question', param( 'rating_question', 'text' ) );
 			$this->set_setting( 'allow_rating_comment_helpfulness', param( 'allow_rating_comment_helpfulness', 'string', '0' ) );
 			$blog_allowtrackbacks = param( 'blog_allowtrackbacks', 'integer', 0 );
-			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			if( $blog_allowtrackbacks != $this->get( 'allowtrackbacks' ) && ( $blog_allowtrackbacks == 0 || check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
 			}
 			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
-			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
 			{	// Only admin can turn ON this setting
 				$this->set_setting( 'webmentions', $blog_webmentions );
 			}
@@ -1447,6 +1471,7 @@ class Blog extends DataObject
 			$this->set_setting( 'tags_structured_data', param( 'tags_structured_data', 'integer', 0 ) );
 			$this->set_setting( 'download_noindex', param( 'download_noindex', 'integer', 0 ) );
 			$this->set_setting( 'download_nofollowto', param( 'download_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'canonical_user_urls', param( 'canonical_user_urls', 'integer', 0 ) );
 		}
 
 		if( in_array( 'credits', $groups ) )
@@ -1462,8 +1487,8 @@ class Blog extends DataObject
 		/*
 		 * ADVANCED ADMIN SETTINGS
 		 */
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ||
-		    ( $this->ID == 0 && $current_User->check_perm( 'blogs', 'create', false, $this->sec_ID ) ) )
+		if( check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ||
+		    ( $this->ID == 0 && check_user_perm( 'blogs', 'create', false, $this->sec_ID ) ) )
 		{	// We have permission to edit advanced admin settings,
 			// OR user is creating/coping new collection in section where he has an access:
 			if( ( $blog_urlname = param( 'blog_urlname', 'string', NULL ) ) !== NULL )
@@ -1494,7 +1519,7 @@ class Blog extends DataObject
 				}
 			}
 		}
-		if( $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+		if( check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 		{	// We have permission to edit advanced admin settings:
 
 			if( in_array( 'cache', $groups ) )
@@ -1740,7 +1765,7 @@ class Blog extends DataObject
 				$this->set_setting( 'tinyurl_tag_extra_term', param( 'tinyurl_tag_extra_term', 'string', NULL ), true );
 			}
 
-			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// Cookies:
 				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );
 				if( get_param( 'cookie_domain_type' ) == 'custom' )
@@ -1774,7 +1799,7 @@ class Blog extends DataObject
 				}
 			}
 
-			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
+			if( ( param( 'rsc_assets_url_type', 'string', NULL ) !== NULL ) &&  check_user_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{ // Assets URLs / CDN:
 
 				// Check all assets types url settings:
@@ -2797,8 +2822,6 @@ class Blog extends DataObject
 	 */
 	function get_allowed_item_status( $status = NULL, $perm_target = NULL )
 	{
-		global $current_User;
-
 		if( ! is_logged_in() )
 		{	// User must be logged in:
 			return $this->get_max_allowed_status( $status );
@@ -2826,7 +2849,7 @@ class Blog extends DataObject
 			{	// All next statuses are allowed for this collection:
 				$max_status_is_allowed = true;
 			}
-			if( $status_is_allowed && $max_status_is_allowed && $current_User->check_perm( 'blog_post!'.$status_key, 'create', false, $this->ID ) )
+			if( $status_is_allowed && $max_status_is_allowed && check_user_perm( 'blog_post!'.$status_key, 'create', false, $this->ID ) )
 			{	// This status is allowed for this collection and current has a permission:
 				$allowed_status = $status_key;
 				break;
@@ -2904,7 +2927,7 @@ class Blog extends DataObject
 	 */
 	function get_media_dir( $create = true )
 	{
-		global $media_path, $current_User, $Messages, $Settings, $Debuglog;
+		global $media_path, $Messages, $Settings, $Debuglog;
 
 		if( ! $Settings->get( 'fm_enable_roots_blog' ) )
 		{ // User directories are disabled:
@@ -2936,7 +2959,7 @@ class Blog extends DataObject
 		if( $create && ! is_dir( $mediadir ) )
 		{
 			// Display absolute path to blog admin and relative path to everyone else
-			$msg_mediadir_path = ( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) ? $mediadir : rel_path_to_base( $mediadir );
+			$msg_mediadir_path = check_user_perm( 'blog_admin', 'edit', false, $this->ID ) ? $mediadir : rel_path_to_base( $mediadir );
 
 			// TODO: Link to some help page(s) with errors!
 			if( ! is_writable( dirname($mediadir) ) )
@@ -3160,10 +3183,9 @@ class Blog extends DataObject
 				return $this->gen_baseurl();
 
 			case 'customizer_url':
-				if( is_logged_in() &&
-				    ( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) ||
-				      $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
-				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
+				if( check_user_perm( 'blog_properties', 'edit', false, $this->ID ) ||
+				    ( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) ) )
+				{	// Return customizer URL only if current User can edit skin settings of collection or site:
 					if( ! empty( $params['customizing_url'] ) )
 					{	// Get customizing URL from passed param:
 						$customizing_url = $params['customizing_url'];
@@ -3451,11 +3473,52 @@ class Blog extends DataObject
 			}
 
 			if( $this_Blog->get_setting( 'front_disp' ) == $disp_param )
-			{ // Get home page of this blog because front page displays current disp
+			{	// Get home page of this blog because front page displays current disp:
 				$url = $this_Blog->gen_blogurl( 'default' );
 			}
+			elseif( $disp_param == 'user' && ( isset( $params['user_login'] ) || isset( $params['user_ID'] ) ) )
+			{	// Use alias if user login or ID is provided:
+				$UserCache = & get_UserCache();
+				if( ! isset( $params['user_ID'] ) &&
+				    ( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_links' ) == 'prefix_id' ) )
+				{	// We need get user ID by login:
+					if( $param_User = & $UserCache->get_by_login( $params['user_login'] ) )
+					{	// Set user ID if it is detected by login:
+						$params['user_ID'] = $param_User->ID;
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_ID" for Blog->get( "userurl" )' );
+					}
+				}
+				if( ! isset( $params['user_login'] ) &&
+				    $this_Blog->get_setting( 'user_links' ) == 'prefix_login' )
+				{	// We need get user login by ID:
+					if( $param_User = & $UserCache->get_by_ID( $params['user_ID'], false, false ) )
+					{	// Use login if user is detected in DB:
+						$params['user_login'] = $param_User->get( 'login' );
+					}
+					else
+					{	// Wrong request:
+						debug_die( 'Undefined param "user_login" for Blog->get( "userurl" )' );
+					}
+				}
+
+				if( $this_Blog->get_setting( 'user_links' ) == 'params' || $this_Blog->get_setting( 'user_prefix' ) == '' )
+				{	// Use params E-g: ?disp=user&user_ID=4
+					$url = url_add_param( $this_Blog->gen_blogurl(), 'disp=user'.$params['glue'].'user_ID='.$params['user_ID'], $params['glue'] );
+				}
+				elseif( $this_Blog->get_setting( 'user_links' ) == 'prefix_id' )
+				{	// Use prefix with user ID:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_ID'] );
+				}
+				else // 'prefix_login'
+				{	// Use prefix with user login:
+					$url = url_add_tail( $this_Blog->gen_blogurl(), '/'.$this_Blog->get_setting( 'user_prefix' ).':'.$params['user_login'] );
+				}
+			}
 			else
-			{ // Add disp param to blog's url when current disp is not a front page
+			{	// Add disp param to blog's url when current disp is not a front page:
 				$url = url_add_param( $this_Blog->gen_blogurl(), 'disp='.$disp_param, $params['glue'] );
 			}
 
@@ -3804,10 +3867,18 @@ class Blog extends DataObject
 	 * Create a new blog...
 	 *
 	 * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
+	 * @param array Params
 	 */
-	function create( $kind = '' )
+	function create( $kind = '', $params = array() )
 	{
-		global $DB, $Messages, $basepath, $admin_url, $current_User, $Settings;
+		global $DB, $Messages, $basepath, $admin_url, $Settings;
+
+		$params = array_merge( array(
+				'create_demo_contents' => false,
+				'create_demo_users'    => false,
+				'create_demo_org'      => false,
+			), $params );
+
 		$DB->begin();
 
 		// DB INSERT
@@ -3862,9 +3933,45 @@ class Blog extends DataObject
 
 		$Messages->add_to_group( T_('A default category has been created for this collection.'), 'success', T_('New collection created:') );
 
+		// Create demo contents for the new created collection:
+		// NOTE: This must be done before install default widgets!
+		if( $params['create_demo_contents'] )
+		{
+			global $user_org_IDs;
+
+			load_funcs( 'collections/_demo_content.funcs.php' );
+			$user_org_IDs = NULL;
+
+			if( $params['create_demo_org'] && check_user_perm( 'orgs', 'create', false ) )
+			{ // Create the demo organization
+				if( $new_demo_organization = create_demo_organization( $this->get( 'owner_user_ID' ) ) )
+				{
+					$user_org_IDs = array( $new_demo_organization->ID );
+				}
+			}
+
+			// Switch to collection locale:
+			locale_temp_switch( $this->get( 'locale' ) );
+
+			$error_messages = array();
+			if( $params['create_demo_users'] )
+			{
+				get_demo_users( true, false, $error_messages );
+			}
+
+			create_sample_content( $kind, $this->ID, $this->get( 'owner_user_ID' ), true, 86400, $error_messages );
+			if( $error_messages )
+			{
+				foreach( $error_messages as $error_message )
+				{
+					$Messages->add_to_group( $error_message, 'error', TB_('Demo contents').':' );
+				}
+			}
+			locale_restore_previous();
+		}
+
 		// ADD DEFAULT WIDGETS:
-		load_funcs( 'widgets/_widgets.funcs.php' );
-		insert_basic_widgets( $this->ID, 'normal', false, $kind );
+		$this->setup_default_widgets();
 
 		$Messages->add_to_group( T_('Default widgets have been set-up for this collection.'), 'success', T_('New collection created:') );
 
@@ -3969,7 +4076,7 @@ class Blog extends DataObject
 		}
 
 		$blog_urlname = param( 'blog_urlname', 'string', true );
-		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $duplicated_coll_ID ) )
+		if( ! check_user_perm( 'blog_admin', 'edit', false, $duplicated_coll_ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
 			// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
 			// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
@@ -5604,8 +5711,6 @@ class Blog extends DataObject
 		    ( ! is_logged_in() && $this->get_setting( 'post_anonymous' ) ) )
 		{	// Only logged in and activated users can write a Post,
 			// Or anonymous user can post if it is allowed with collection setting:
-			global $current_User;
-
 			$ChapterCache = & get_ChapterCache();
 			$selected_Chapter = $ChapterCache->get_by_ID( $cat_ID, false, false );
 			if( $selected_Chapter &&
@@ -5615,7 +5720,7 @@ class Blog extends DataObject
 				return '';
 			}
 
-			if( ! is_logged_in() || $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
+			if( ! is_logged_in() || check_user_perm( 'blog_post_statuses', 'edit', false, $this->ID ) )
 			{	// We have permission to add a post with at least one status:
 				if( $this->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
 				{	// We have a mode 'In-skin editing' for the current Blog
@@ -5632,7 +5737,7 @@ class Blog extends DataObject
 					}
 					$url = url_add_param( $this->get( 'url' ), ( is_logged_in() ? 'disp=edit' : 'disp=anonpost' ).$cat_url_param );
 				}
-				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
+				elseif( check_user_perm( 'admin', 'restricted' ) )
 				{	// Edit a post from Back-office
 					global $admin_url;
 					$url = $admin_url.'?ctrl=items&amp;action=new&amp;blog='.$this->ID;
@@ -5682,10 +5787,8 @@ class Blog extends DataObject
 
 		if( is_logged_in( false ) )
 		{	// Only logged in and activated users can write a Post
-			global $current_User;
-
-			if( $current_User->check_perm( 'admin', 'restricted' ) &&
-			    $current_User->check_perm( 'blog_cats', 'edit', false, $this->ID ) )
+			if( check_user_perm( 'admin', 'restricted' ) &&
+			    check_user_perm( 'blog_cats', 'edit', false, $this->ID ) )
 			{	// Check permissions to create a new chapter in this blog
 				global $admin_url;
 				$url = $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$this->ID;
@@ -5784,9 +5887,7 @@ class Blog extends DataObject
 		}
 		elseif( $allow_access == 'members' )
 		{ // Check if current user is member of this blog
-			global $current_User;
-
-			if( ! $current_User->check_perm( 'blog_ismember', 'view', false, $this->ID ) )
+			if( ! check_user_perm( 'blog_ismember', 'view', false, $this->ID ) )
 			{ // Force disp to restrict access for current user
 				$disp = 'access_denied';
 
@@ -5996,31 +6097,33 @@ class Blog extends DataObject
 			return false;
 		}
 
+		return true;
+	}
+
+
+	/**
+	 * Check if this collection has items per requested Item Type
+	 *
+	 * @param integer Item Type ID
+	 * @return boolean TRUE if at least one Item exists with given
+	 */
+	function has_items_per_item_type( $item_type_ID )
+	{
 		if( ! isset( $this->used_item_types ) )
-		{ // Get all item types that are used for posts in this collection:
+		{	// Get all Item Types which are used for Items in this Collection:
 			global $DB;
 
-			$coll_item_types_SQL = new SQL();
+			$coll_item_types_SQL = new SQL( 'Get all Item Types which are used for Items of Collection #'.$this->ID );
 			$coll_item_types_SQL->SELECT( 'post_ityp_ID' );
 			$coll_item_types_SQL->FROM( 'T_items__item' );
 			$coll_item_types_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$coll_item_types_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 			$coll_item_types_SQL->GROUP_BY( 'post_ityp_ID' );
 
-			$this->used_item_types = $DB->get_col( $coll_item_types_SQL->get() );
+			$this->used_item_types = $DB->get_col( $coll_item_types_SQL );
 		}
 
-		if( ! empty( $this->used_item_types ) && in_array( $item_type_ID, $this->used_item_types ) )
-		{ // Don't allow to disable an item type which is used at least for one post in this collection:
-			if( $display_message )
-			{
-				global $Messages;
-				$Messages->add( 'This post type is used at least for one post in this collection. Thus you cannot disable it.', 'error' );
-			}
-			return false;
-		}
-
-		return true;
+		return is_array( $this->used_item_types ) && in_array( $item_type_ID, $this->used_item_types );
 	}
 
 
@@ -6062,6 +6165,7 @@ class Blog extends DataObject
 			case 'forum':
 				$default_post_types = array(); // Don't install the default Item Types(see above) for forums collection.
 				$default_post_types[] = 'Forum Topic';
+				$default_post_types[] = 'Task';
 				break;
 
 			case 'manual':
@@ -6069,8 +6173,8 @@ class Blog extends DataObject
 				break;
 
 			case 'group':
-				$default_post_types[] = 'Forum Topic';
-				$default_post_types[] = 'Bug Report';
+				$default_post_types = array(); // Don't install the default Item Types(see above) for Tracker collection.
+				$default_post_types[] = 'Task';
 				break;
 
 			default: // 'std'
@@ -6869,6 +6973,222 @@ class Blog extends DataObject
 
 
 	/**
+	 * Setup default widgets for this collection
+	 *
+	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
+	 * @param array Context
+	 */
+	function setup_default_widgets( $skin_type = 'all', $context = array() )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// This function should be called only for created collection:
+			return;
+		}
+
+		if( $skin_type == 'all' )
+		{	// Setaup default widgets for skins of all types:
+			$this->setup_default_widgets( 'normal', $context );
+			$this->setup_default_widgets( 'mobile', $context );
+			$this->setup_default_widgets( 'tablet', $context );
+			$this->setup_default_widgets( 'alt', $context );
+			return;
+		}
+
+		$coll_skin_ID = $this->get_skin_ID( $skin_type );
+		$SkinCache = & get_SkinCache();
+		if( ! ( $coll_Skin = & $SkinCache->get_by_ID( $coll_skin_ID, false, false ) ) )
+		{	// This collection must has a correct skin:
+			return;
+		}
+
+		// Get the declarations of the widgets that the skin wants to use:
+		$context['current_coll_ID'] = $this->ID;
+		$skin_widgets = $coll_Skin->get_default_widgets( $this->get( 'type' ), $skin_type, $context );
+
+		// Check if the skin wants to use all b2evolution default widgets:
+		if( isset( $skin_widgets['*'] ) )
+		{	// Depending on how the skin want to use this:
+			$use_all_b2evo_default_widgets = $skin_widgets['*'];
+			unset( $skin_widgets['*'] );
+		}
+		else
+		{	// Use all default widgets if the skin does NOT say about this:
+			$use_all_b2evo_default_widgets = true;
+		}
+
+		load_funcs( 'widgets/_widgets.funcs.php' );
+
+		// Get the declarations of the widgets that b2evolution recommends by default:
+		$b2evo_default_widgets = get_default_widgets( $this->get( 'type' ), $context );
+
+		// Merge the skin widget declarations with b2evolution default widgets:
+		foreach( $b2evo_default_widgets as $container_code => $widgets )
+		{
+			if( // The skin has no widget declarations for this container and it allows to use b2evolution default widgets:
+			    ( ! isset( $skin_widgets[ $container_code ] ) &&
+			      $use_all_b2evo_default_widgets )
+			    ||
+			    // The skin wants to use default widget declarations for this container:
+			    ( isset( $skin_widgets[ $container_code ] ) &&
+			      $skin_widgets[ $container_code ] === true ) )
+			{	// Merge widgets from b2evolution default declarations to the skin:
+				$skin_widgets[ $container_code ] = $widgets;
+			}
+			elseif( isset( $skin_widgets[ $container_code ] ) &&
+			        is_array( $skin_widgets[ $container_code ] ) )
+			{	// Append custom skin widgets to default widgets:
+				$skin_widgets[ $container_code ] = array_merge( $widgets, $skin_widgets[ $container_code ] );
+			}
+		}
+
+		// Check all skin widget containers to be sure they all are proper arrays and not other values like true, false and etc.:
+		foreach( $skin_widgets as $container_code => $container_widgets )
+		{
+			if( ! empty( $container_widgets['type'] ) &&
+			    ! in_array( $container_widgets['type'], array( 'main', 'sub', 'page' ) ) )
+			{	// Skip not collection container:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+			if( isset( $container_widgets['coll_type'] ) &&
+			    ! is_allowed_option( $this->get( 'type' ), $container_widgets['coll_type'] ) )
+			{	// Skip container because it should not be installed for the given collection kind:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+
+			if( isset( $container_widgets['skin_type'] ) &&
+			    ! is_allowed_option( $skin_type, $container_widgets['skin_type'] ) )
+			{	// Skip container because it should not be installed for the given skin type:
+				unset( $skin_widgets[ $container_code ] );
+				continue;
+			}
+
+			if( $container_widgets === true )
+			{	// Set empty container if it has not been detected in b2evolution default widget declarations above:
+				$skin_widgets[ $container_code ] = array();
+			}
+			elseif( ! is_array( $container_widgets ) )
+			{	// Ignore all other not array, probably it is a boolean false or some other string value which should be ignored indeed:
+				unset( $skin_widgets[ $container_code ] );
+			}
+		}
+
+		if( empty( $skin_widgets ) )
+		{	// No skin default widgets:
+			return;
+		}
+
+		// Get all containers declared in this collection skin type:
+		$blog_containers = $this->get_skin_containers( $skin_type );
+
+		// Install additional sub-containers and page containers from default config,
+		// which are not declared as main containers but should be installed too:
+		foreach( $skin_widgets as $container_code => $container_widgets )
+		{
+			if( isset( $container_widgets['type'] ) &&
+			    ( $container_widgets['type'] == 'sub' || $container_widgets['type'] == 'page' ) )
+			{	// If it is a sub-container or page container:
+				$blog_containers[ $container_code ] = array(
+						isset( $container_widgets['name'] ) ? $container_widgets['name'] : $container_code,
+						isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
+						( $container_widgets['type'] == 'sub' ? 0 : 1 ), // Main or Sub-container
+						isset( $container_widgets['item_ID'] ) ? $container_widgets['item_ID'] : NULL,
+					);
+			}
+		}
+
+		// Create rows to insert for all collection containers:
+		$widget_containers_sql_rows = array();
+		foreach( $blog_containers as $container_code => $wico_data )
+		{
+			$widget_containers_sql_rows[] = '( '.$DB->quote( $container_code ).', '
+				.$DB->quote( $skin_type ).', '
+				.$DB->quote( $wico_data[0] ).', '
+				.$this->ID.', '
+				.$DB->quote( $wico_data[1] ).', '
+				.( isset( $wico_data[2] ) ? intval( $wico_data[2] ) : '1' ).', '
+				.( isset( $wico_data[3] ) ? intval( $wico_data[3] ) : 'NULL' ).' )';
+		}
+
+		if( empty( $widget_containers_sql_rows ) )
+		{	// No collection containers to install:
+			return;
+		}
+
+		// Insert widget containers records by one SQL query:
+		$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main, wico_item_ID  ) VALUES'
+			.implode( ', ', $widget_containers_sql_rows ) );
+
+		$insert_id = $DB->insert_id;
+		foreach( $blog_containers as $container_code => $wico_data )
+		{
+			$blog_containers[ $container_code ]['wico_ID'] = $insert_id;
+			$insert_id++;
+		}
+
+		$basic_widgets_insert_sql_rows = array();
+		foreach( $skin_widgets as $container_code => $container_widgets )
+		{
+			if( ! isset( $blog_containers[ $container_code ] ) )
+			{	// Skip container which is not supported by current collection's skin:
+				continue;
+			}
+
+			$wico_id = $blog_containers[ $container_code ]['wico_ID'];
+
+			foreach( $container_widgets as $key => $widget )
+			{
+				if( ! is_number( $key ) )
+				{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+					continue;
+				}
+
+				if( isset( $widget['install'] ) && ! $widget['install'] )
+				{	// Skip widget because it should not be installed by condition from config:
+					continue;
+				}
+
+				if( isset( $widget['coll_type'] ) && ! is_allowed_option( $this->get( 'type' ), $widget['coll_type'] ) )
+				{	// Skip widget because it should not be installed for the given collection kind:
+					continue;
+				}
+
+				if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
+				{	// Skip widget because it should not be installed for the current version:
+					continue;
+				}
+
+				if( isset( $widget['coll_ID'] ) && ! is_allowed_option( $this->ID, $widget['coll_ID'] ) )
+				{	// Skip widget because it should not be installed for the given collection ID:
+					continue;
+				}
+
+				if( isset( $widget['skin_type'] ) && ! is_allowed_option( $skin_type, $widget['skin_type'] ) )
+				{	// Skip widget because it should not be installed for the given skin type:
+					continue;
+				}
+
+				// Initialize a widget row to insert into DB below by single query:
+				$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+				$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+				$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+				$basic_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[2] ).', '.$DB->quote( $widget_params ).' )';
+			}
+		}
+
+		// Check if there are widgets to create:
+		if( ! empty( $basic_widgets_insert_sql_rows ) )
+		{	// Insert the widget records by single SQL query:
+			$DB->query( 'INSERT INTO T_widget__widget ( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
+		}
+	}
+
+
+	/**
 	 * Get name of default item type
 	 *
 	 * @return string Name of default ItemType object
@@ -7102,24 +7422,13 @@ class Blog extends DataObject
 				$marketing_popup_show_frequency = $this->get_setting( 'marketing_popup_show_period_val' )
 					.$this->get_setting( 'marketing_popup_show_period_unit' );
 			}
-			echo '<script type="text/javascript">
-			// <![CDATA[
-			jQuery( function()
-			{
-				ddexitpop.init(
-				{
-					contentsource: ["id", "evo_container__'.$marketing_popup_container_code.'"],
-					fxclass: "'.$this->get_setting( 'marketing_popup_animation' ).'",
-					hideaftershow: '.( $this->get_setting( 'marketing_popup_show_repeat' ) ? 'false' : 'true' ).',
-					displayfreq: "'.$marketing_popup_show_frequency.'",
-				} )
-				jQuery( ".ddexitpop button.close" ).click( function()
-				{	// Hide popup on click top-right close icon button:
-					ddexitpop.hidepopup();
-				} )
-			} )
-			// ]]>
-			</script>';
+			expose_var_to_js( 'evo_ddexitpop_config', array(
+				'container_code' => $marketing_popup_container_code,
+				'animation'      => $this->get_setting( 'marketing_popup_animation' ),
+				'show_repeat'    => (boolean)$this->get_setting( 'marketing_popup_show_repeat' ),
+				'show_frequency' => $marketing_popup_show_frequency,
+			) );
+			require_js_defer( 'build/ddexitpop.bmin.js', 'blog', false, '#', 'footerlines' );
 		}
 	}
 
@@ -7182,7 +7491,7 @@ class Blog extends DataObject
 	 */
 	function get_link_locale_selector( $field_name, $locale, $restrict_used_locales = true )
 	{
-		global $DB, $current_User;
+		global $DB;
 
 		if( $restrict_used_locales &&
 		    ( $this->get( 'locale' ) == $locale ||
@@ -7193,7 +7502,7 @@ class Blog extends DataObject
 
 		$linked_colls = $this->get_locales( 'coll' );
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'editall' ) )
+		if( ! check_user_perm( 'blogs', 'editall' ) )
 		{	// Display only the stored value because current User has no permission to edit all collections:
 			if( isset( $linked_colls[ $locale ] ) )
 			{	// Get the linked collection:
@@ -7248,6 +7557,50 @@ class Blog extends DataObject
 		$r .= '</select>';
 
 		return $r;
+	}
+
+
+	/**
+	 * Reset widgets for this collection
+	 *
+	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
+	 */
+	function reset_widgets( $skin_type = 'all' )
+	{
+		if( empty( $this->ID ) )
+		{	// This function should be called only for created collection:
+			return;
+		}
+
+		global $DB;
+
+		$all_skin_types = array( 'normal', 'mobile', 'tablet', 'alt' );
+
+		if( $skin_type == 'all' )
+		{	// Reset widgets for all skin types:
+			$skin_types = $all_skin_types;
+		}
+		elseif( in_array( $skin_type, $all_skin_types ) )
+		{	// Reset widgets only for requested skin type:
+			$skin_types = array( $skin_type );
+		}
+		else
+		{	// No correct skin type is requested:
+			return;
+		}
+
+		foreach( $skin_types as $skin_type )
+		{	// Remove previous widgets:
+			$DB->query( 'DELETE T_widget__container, T_widget__widget
+				 FROM T_widget__container
+				 LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID
+				WHERE wico_coll_ID = '.$DB->quote( $this->ID )
+					.( empty( $skin_type ) ? '' :
+				' AND wico_skin_type = '.$DB->quote( $skin_type ) ) );
+
+			// Add default widgets:
+			$this->setup_default_widgets( $skin_type );
+		}
 	}
 }
 

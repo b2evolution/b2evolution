@@ -1043,6 +1043,9 @@ h2.user_title::first-line {
 #itemform_extra .itemform_extra_radio .form-group input {
   margin-left: 0;
 }
+#ffield_item_tags .input-group {
+  width: 100%;
+}
 #ffield_item_switchable_params .evo_fields_table__input {
   display: table;
 }
@@ -1054,6 +1057,12 @@ h2.user_title::first-line {
 }
 #ffield_item_switchable_params .evo_fields_table__input > input[type=text] {
   display: table-cell;
+}
+#ffield_post_title .evo_fields_table__label {
+  font-size: 18px;
+}
+#ffield_post_title .form_text_input {
+  font-size: 20px;
 }
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
@@ -1859,6 +1868,13 @@ div.query-builder .rule-container .rule-value-container {
 }
 #customizer_wrapper .controls .help-inline {
   display: inline-block;
+}
+#customizer_wrapper .form-group.checkbox-group .controls {
+  display: inline-block;
+  vertical-align: middle;
+}
+#customizer_wrapper .form-group.checkbox-group .controls .checkbox {
+  padding-top: 2px;
 }
 #customizer_wrapper .file_select_item {
   margin: 0;

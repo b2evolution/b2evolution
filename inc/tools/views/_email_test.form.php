@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $current_User, $admin_url;
+global $admin_url;
 global $test_mail_output, $email_send_allow_php_mail;
 
 

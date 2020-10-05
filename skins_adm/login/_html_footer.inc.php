@@ -36,5 +36,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 <p class="footer"><?php echo $app_footer_text; ?></p>
 <p class="footer"><?php echo $copyright_text; ?></p>
 
+<?php
+// Include ALL exposed JS variables into <script>:
+include_js_vars();
+
+// Add JavaScript and CSS files included by plugins and skin
+include_footerlines();
+?>
 </body>
 </html>

@@ -103,6 +103,7 @@ if( $Skin->get_setting( 'section_1_display' ) ) {
 					'glue'              => ' - ',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'register_text'     => '',
 					'login_text'        => '',
@@ -111,6 +112,7 @@ if( $Skin->get_setting( 'section_1_display' ) ) {
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

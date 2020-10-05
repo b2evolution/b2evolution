@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $current_User, $admin_url;
+global $admin_url;
 
 $SQL = new SQL();
 $SQL->SELECT( 'tag_ID, tag_name, COUNT( it.itag_itm_ID ) AS tag_count' );
@@ -84,9 +84,9 @@ $Results->register_filter_preset( 'all', T_('All'), '?ctrl=itemtags' );
 
 function tag_td_name( $tag_ID, $tag_name )
 {
-	global $current_User, $admin_url;
+	global $admin_url;
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Display tag name as link to edit form only if current user has a perm:
 		$tag_name = '<a href="'.$admin_url.'?ctrl=itemtags&amp;tag_ID='.$tag_ID
 				.'&amp;action=edit&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ).'">'
@@ -111,7 +111,7 @@ $Results->cols[] = array(
 	);
 
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	function tag_td_actions( $tag_ID )
 	{
@@ -126,7 +126,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			'td' => '%tag_td_actions( #tag_ID# )%',
 		);
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{	// Allow to clean up tags only if current user has a permission to edit tags:
 		$Results->global_icon( T_('Cleanup orphans'), 'cleanup', regenerate_url( 'action', 'action=cleanup&amp;return_to='.urlencode( regenerate_url( 'action', '', '', '&' ) ) ).'&amp;'.url_crumb( 'tag' ), T_('Cleanup orphans'), 3, 4 );
 	}

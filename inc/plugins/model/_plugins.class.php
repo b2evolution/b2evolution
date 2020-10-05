@@ -334,7 +334,7 @@ class Plugins
 		if( ! empty( $this->log_register ) )
 		{	// Display additional log on upgrade page when we reload all plugins:
 			global $plugins_path;
-			echo '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />';
+			echo get_install_format_text_and_log( '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />' );
 			evo_flush();
 		}
 
@@ -674,7 +674,7 @@ class Plugins
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
 	{
-		global $Debuglog, $Timer;
+		global $Debuglog, $Timer, $Blog;
 
 		$Timer->resume( 'plugins_inst_'.$set_type );
 
@@ -705,8 +705,11 @@ class Plugins
 			// Check what other settings are defined for the Plugin,
 			// We should not merge them with $defaults because they are stored in different DB table,
 			// I.e. they are should be initialized in $Plugin->Settings, but we still need this object for a proper settings work:
-			$other_defaults = $Plugin->get_coll_setting_definitions( $params );
-			$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
+			if( isset( $Blog ) )
+			{	// Only when current collection is defined in order to avoid errors because global $Blog may be used inside:
+				$other_defaults = $Plugin->get_coll_setting_definitions( $params );
+				$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
+			}
 		}
 
 		if( empty( $defaults ) && empty( $other_defaults ) )
@@ -1342,7 +1345,7 @@ class Plugins
 
 
 	/**
-	 * Render the content of an item by calling the relevant renderer plugins.
+	 * Render the content of an item, Comment, Message, Widget by calling the relevant renderer plugins.
 	 *
 	 * @param string content to render (by reference)
 	 * @param array renderer codes to use for opt-out, opt-in and lazy
@@ -1350,12 +1353,11 @@ class Plugins
 	 *        'entityencoded', 'xml', 'htmlfeed' and 'text' are supported.
 	 * @param array Additional params to the Render* methods (e.g. "Item" for items).
 	 *              Do not use "data" or "format" here, because it gets used internally.
+	 * @param string Prefix of render function: 'Render' - for rendering at save in DB time, 'Display' - for rendering at display on screen time
 	 * @return string rendered content
 	 */
 	function render( & $content, $renderers, $format, $params, $event_prefix = 'Render' )
 	{
-		// echo implode(',',$renderers);
-
 		$params['data'] = & $content;
 		$params['format'] = $format;
 
@@ -1407,10 +1409,16 @@ class Plugins
 			$setting_Blog = & get_setting_Blog( 'default_blog_ID' );
 		}
 
+		// Collect all renderer plugins used in current page in order to know when we really need to load their JS/CSS files:
+		global $evo_renderers_used_in_current_page;
+		if( ! is_array( $evo_renderers_used_in_current_page ) )
+		{	// Initialize array for curently used renderer plugins once:
+			$evo_renderers_used_in_current_page = array();
+		}
+		$evo_renderers_used_in_current_page += $renderers;
+
 		foreach( $renderer_Plugins as $loop_RendererPlugin )
 		{ // Go through whole list of renders
-			// echo ' ',$loop_RendererPlugin->code, ':';
-
 			$apply_rendering_value = $loop_RendererPlugin->get_coll_setting( 'coll_apply_rendering', $setting_Blog );
 			if( $loop_RendererPlugin->is_renderer_enabled( $apply_rendering_value, $renderers ) )
 			{ // Plugin is enabled to call method
@@ -2391,28 +2399,27 @@ class Plugins
 		{
 			if( is_admin_page() )
 			{ // Display info about no renderer plugins only in backoffice
-				global $current_User;
-				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
+				if( check_user_perm( 'admin', 'normal' ) )
 				{
 					global $admin_url;
 					switch( $setting_name )
 					{
 						case 'msg_apply_rendering':
-							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'perm_messaging', 'reply' ) && check_user_perm( 'options', 'edit' ) )
 							{ // Check if current user can edit the messaging settings
 								$settings_url = $admin_url.'?ctrl=msgsettings&amp;tab=renderers';
 							}
 							break;
 
 						case 'email_apply_rendering':
-							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'perm_messaging', 'reply' ) && check_user_perm( 'options', 'edit' ) )
 							{ // Check if current user can edit the email settings
 								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
 							}
 							break;
 
 						case 'shared_apply_rendering':
-							if( $current_User->check_perm( 'options', 'edit' ) )
+							if( check_user_perm( 'options', 'edit' ) )
 							{	// Check if current user can edit the plugin settings for shared container:
 								$settings_url = $admin_url.'?ctrl=plugins&amp;tab=shared';
 							}
@@ -2421,7 +2428,7 @@ class Plugins
 						case 'coll_apply_comment_rendering':
 						case 'coll_apply_rendering':
 						default:
-							if( ! empty( $setting_Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
+							if( ! empty( $setting_Blog ) && check_user_perm( 'blog_properties', 'edit', false, $setting_Blog->ID ) )
 							{ // Check if current user can edit the blog plugin settings
 								$settings_url = $admin_url.'?ctrl=coll_settings&amp;tab=plugins&amp;blog='.$setting_Blog->ID;
 							}

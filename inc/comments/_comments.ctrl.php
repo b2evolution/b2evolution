@@ -80,7 +80,7 @@ switch( $action )
 			$check_permlevel = ( $action == 'delete' ) ? 'delete' : 'edit';
 		}
 		// Check permission:
-		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
+		check_user_perm( $check_permname, $check_permlevel, true, $edited_Comment );
 
 		if( $action == 'edit' || $action == 'switch_view' )
 		{	// Restrict comment status by parent item:
@@ -113,26 +113,26 @@ switch( $action )
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
+		check_user_perm( 'blog_post!draft', 'edit', true, $blog );
 		break;
 
 	case 'trash_delete':
 		param( 'blog_ID', 'integer', 0 );
 
 		// Check permission:
-		$current_User->check_perm( 'blogs', 'editall', true );
+		check_user_perm( 'blogs', 'editall', true );
 		break;
 
 	case 'emptytrash':
 		// Check permission:
-		$current_User->check_perm( 'blogs', 'all', true );
+		check_user_perm( 'blogs', 'all', true );
 		break;
 
 	case 'list':
 	case 'mass_delete':
 		if( $action == 'mass_delete' )
 		{ // Check permission:
-			$current_User->check_perm( 'blogs', 'all', true );
+			check_user_perm( 'blogs', 'all', true );
 		}
 
 		// Check permission:
@@ -170,7 +170,7 @@ switch( $action )
 		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission for spam voting
-		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
+		check_user_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
 
 		if( $edited_Comment !== false )
 		{ // The comment still exists
@@ -207,7 +207,7 @@ switch( $tab3 )
 
 	case 'meta':
 		// Check permission for internal comments:
-		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
+		check_user_perm( 'meta_comment', 'view', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( TB_('Internal comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
@@ -258,11 +258,11 @@ switch( $action )
 
 		// Check if current User can edit special comment settings which are allowed only from back-office:
 		$can_edit_backoffice_settings = ( param( 'from', 'string' ) == 'backoffice' &&
-			$current_User->check_perm( 'admin', 'restricted' ) );
+			check_user_perm( 'admin', 'restricted' ) );
 
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
-			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
+			if( check_user_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
 			{	// Only admins can change the author
 				if( param_check_not_empty( 'comment_author_login', TB_('Please enter valid author login.') ) && param_check_login( 'comment_author_login', true ) )
 				{
@@ -315,8 +315,8 @@ switch( $action )
 
 					if( ($current_User->ID == $dest_Item_Blog_User->ID &&
 						$current_User->ID == $comment_Item_Blog_User->ID ) ||
-						( $current_User->check_perm( 'blog_admin', 'edit', false, $dest_Item_Blog->ID ) &&
-						$current_User->check_perm( 'blog_admin', 'edit', false, $comment_Item_Blog->ID ) ) )
+						( check_user_perm( 'blog_admin', 'edit', false, $dest_Item_Blog->ID ) &&
+						check_user_perm( 'blog_admin', 'edit', false, $comment_Item_Blog->ID ) ) )
 					{ // current user is the owner of both the source and the destination blogs or current user is admin for both blogs
 						$edited_Comment->set_Item( $dest_Item );
 					}
@@ -397,8 +397,8 @@ switch( $action )
 		param_check_not_empty( 'content', TB_('Empty comment content is not allowed.') );
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
-		if( $current_User->check_perm( 'admin', 'restricted' ) &&
-		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'admin', 'restricted' ) &&
+		    check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // We use user date
 			param_date( 'comment_issue_date', TB_('Please enter a valid comment date.'), true );
 			if( strlen(get_param('comment_issue_date')) )
@@ -642,14 +642,17 @@ switch( $action )
 		$new_Item = new Item();
 		$new_Item->set( 'status', 'draft' );
 		$new_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
-		$new_Item->set( 'title', TB_( 'Elevated from comment' ) );
+		// Generate Item title from Comment content excerpt by first X words allowed for slug length:
+		$item_title = explode( ' ', $edited_Comment->get_excerpt() );
+		$item_title = array_slice( $item_title, 0, $Blog->get_setting( 'slug_limit' ) );
+		$new_Item->set( 'title', implode( ' ', $item_title ) );
 
 		if( $type == 'quote' )
 		{ // Set a post data for a quote mode:
 			$item_content = $edited_Comment->get_author_name().' '.TB_( 'wrote' ).':';
 			if( $new_Item->get_type_setting( 'allow_html' ) )
 			{ // Use html quote format if HTML is allowed for new creating post:
-				$item_content .= ' <blockquote>'.$edited_Comment->get_content( 'raw_text' ).'</blockquote>';
+				$item_content .= ' <blockquote>'.$edited_Comment->get( 'content' ).'</blockquote>';
 			}
 			else
 			{ // Use markdown quote format if HTML is NOT allowed for new creating post:
@@ -661,7 +664,7 @@ switch( $action )
 		else // $type == 'original'
 		{ // Set a post data for an original mode:
 			// Use an original comment content for new creating post:
-			$item_content = $edited_Comment->get_content( 'raw_text' );
+			$item_content = $edited_Comment->get( 'content' );
 
 			// Set a post creator:
 			$author_User = & $edited_Comment->get_author_User();
@@ -674,12 +677,50 @@ switch( $action )
 				$new_Item->set_creator_by_login( $author_User->login );
 			}
 		}
-		$new_Item->set( 'content', $item_content );
+
+		// Get all attached files to the elevated Comment:
+		$comment_LinkOwner = new LinkComment( $edited_Comment );
+		$comment_Links = & $comment_LinkOwner->get_Links();
+		$comment_has_links = ! empty( $comment_Links );
+		if( ! $comment_has_links )
+		{	// If comment has at least one attached file then set content only after
+			// we will convert all inline tags to new link IDs after insert new Item:
+			// (otherwise note "Invalid inline file placeholders won't be displayed." appears)
+			$new_Item->set( 'content', $item_content );
+		}
 
 		if( ! $new_Item->dbinsert() )
 		{
 			$Messages->add( TB_( 'Unable to create the new post!' ), 'error' );
 			break;
+		}
+
+		if( $comment_has_links )
+		{	// Link all attached files from the elevated Comment to new create Item:
+			$item_LinkOwner = new LinkItem( $new_Item );
+			$inline_link_IDs = array();
+			foreach( $comment_Links as $comment_Link )
+			{
+				if( $item_link_ID = $item_LinkOwner->add_link( $comment_Link->get( 'file_ID' ), $comment_Link->get( 'position' ), $comment_Link->get( 'order' ), false ) )
+				{	// If file was linked successfully:
+					if( $comment_Link->get( 'position' ) == 'inline' )
+					{	// Store what inline link IDs should updated in Item's content:
+						$inline_link_IDs[ $comment_Link->ID ] = $item_link_ID;
+					}
+				}
+			}
+
+			if( ! empty( $inline_link_IDs ) )
+			{	// Replace comment inline link IDs with new item link IDs:
+				foreach( $inline_link_IDs as $comment_link_ID => $item_link_ID )
+				{
+					$item_content = replace_outside_code_tags( '/\[([a-z]+):'.$comment_link_ID.'/i', '[$1:'.$item_link_ID, $item_content );
+				}
+			}
+
+			// Set content with updated link IDs:
+			$new_Item->set( 'content', $item_content );
+			$new_Item->dbupdate();
 		}
 
 		// Deprecate the comment after elevating
@@ -781,7 +822,7 @@ $AdminUI->set_path( 'collections', 'comments' );
 
 if( $tab3 == 'fullview' || $tab3 == 'meta' )
 { // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-	require_js( '#jqueryUI#' );
+	require_js_defer( '#jqueryUI#' );
 }
 
 if( $tab3 == 'fullview' || $tab3 == 'listview' )
@@ -796,8 +837,6 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Init JS to quick upload several files:
-	init_fileuploader_js();
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation

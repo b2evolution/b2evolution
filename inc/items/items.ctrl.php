@@ -251,7 +251,7 @@ switch( $action )
 		}
 
 		// Check perms:
-		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $Blog->ID );
+		check_user_perm( 'blog_post_statuses', 'edit', true, $Blog->ID );
 		break;
 
 	case 'make_posts_from_files':
@@ -287,7 +287,7 @@ switch( $action )
 
 		// Get status (includes PERM CHECK):
 		$item_status = param( 'post_status', 'string', $Blog->get_allowed_item_status() );
-		$current_User->check_perm( 'blog_post!'.$item_status, 'create', true, $Blog->ID );
+		check_user_perm( 'blog_post!'.$item_status, 'create', true, $Blog->ID );
 
 		load_class( 'files/model/_filelist.class.php', 'FileList' );
 		$selected_Filelist = new Filelist( $fm_FileRoot, false );
@@ -327,7 +327,7 @@ switch( $action )
 						// Create a new category from an entered name
 
 						// Check permissions:
-						$current_User->check_perm( 'blog_cats', '', true, $blog );
+						check_user_perm( 'blog_cats', '', true, $blog );
 
 						$ChapterCache = & get_ChapterCache();
 						$new_Chapter = & $ChapterCache->new_obj( NULL, $blog );	// create new category object
@@ -463,7 +463,7 @@ switch( $action )
 		}
 
 		// Check perm:
-		$current_User->check_perm( 'blog_post_statuses', 'edit', true, $blog );
+		check_user_perm( 'blog_post_statuses', 'edit', true, $blog );
 
 		$new_post_creation_result = false;
 		$CommentCache = & get_CommentCache();
@@ -606,7 +606,7 @@ switch( $action )
 		foreach( $selected_items as $selected_item_ID )
 		{
 			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
-			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			    check_user_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
 			{	// If current User has a permission to edit the selected Item:
 				$selected_Item->set( 'status', $item_status );
 				if( $selected_Item->dbupdate() )
@@ -682,7 +682,7 @@ switch( $action )
 			foreach( $selected_items as $selected_item_ID )
 			{
 				if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
-				    $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $selected_Item ) &&
+				    check_user_perm( 'item_post!CURSTATUS', 'delete', false, $selected_Item ) &&
 				    $selected_Item->dbdelete() )
 				{	// If current User has a permission to delete the selected Item:
 					$items_success++;
@@ -747,8 +747,8 @@ switch( $action )
 		foreach( $selected_comments as $selected_comment_ID )
 		{
 			if( ( $selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false ) ) &&
-			    $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $selected_Comment ) &&
-			    $current_User->check_perm( 'comment!'.$comment_status, 'moderate', false, $selected_Comment ) )
+			    check_user_perm( 'comment!CURSTATUS', 'moderate', false, $selected_Comment ) &&
+			    check_user_perm( 'comment!'.$comment_status, 'moderate', false, $selected_Comment ) )
 			{	// If current User has a permission to edit the selected Comment:
 				$selected_Comment->set( 'status', $comment_status );
 				if( $selected_Comment->dbupdate() )
@@ -827,7 +827,7 @@ switch( $action )
 		{
 			$comment_status = false;
 			if( ( $selected_Comment = & $CommentCache->get_by_ID( $selected_comment_ID, false, false ) ) &&
-			    $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $selected_Comment ) )
+			    check_user_perm( 'comment!CURSTATUS', 'delete', false, $selected_Comment ) )
 			{	// If current User has a permission to recycle/delete the selected Comment:
 				$comment_status = $selected_Comment->get( 'status' );
 				if( $selected_Comment->dbdelete( $force_permanent_delete ) )
@@ -918,7 +918,7 @@ switch( $action )
 		foreach( $selected_items as $selected_item_ID )
 		{
 			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
-			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			    check_user_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
 			{	// If current User has a permission to edit the selected Item:
 				$current_extra_categories = postcats_get_byID( $selected_Item->ID );
 				if( $cat_type == 'main' )
@@ -1046,7 +1046,7 @@ switch( $action )
 		foreach( $selected_items as $selected_item_ID )
 		{
 			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
-			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			    check_user_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
 			{	// If current User has a permission to edit the selected Item:
 				if( $renderer_change_type == 'add_renderer' )
 				{
@@ -1268,6 +1268,9 @@ switch( $action )
 		// Load all custom fields:
 		$edited_Item->get_custom_fields_defs();
 
+		// Set parent item ID to find category order
+		$edited_Item->set( 'parent_item_ID', $edited_Item->ID );
+
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
 
@@ -1301,7 +1304,7 @@ switch( $action )
 			{	// Create Item in different collection:
 				$BlogCache = & get_BlogCache();
 				$linked_Blog = $BlogCache->get_by_ID( $post_coll_ID, false, false );
-				if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $post_coll_ID ) )
+				if( ! check_user_perm( 'blog_post_statuses', 'edit', false, $post_coll_ID ) )
 				{	// If current User cannot create an Item in the selected locale collection,
 					// Redirect back to edit Item form:
 					$Messages->add( sprintf( TB_('You don\'t have a permission to create new Item in the collection "%s"!'), $linked_Blog ? $linked_Blog->get( 'name' ) : '#'.$post_coll_ID ) );
@@ -1365,7 +1368,7 @@ switch( $action )
 		// This is somewhat in between new and edit...
 
 		// Check permission based on DB status:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$edited_Item->status = param( 'post_status', 'string', NULL );		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
@@ -1415,12 +1418,12 @@ switch( $action )
 
 	case 'history':
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 		break;
 
 	case 'history_lastseen':
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$SQL = new SQL( 'Find last not seen revision of the Item #'.$edited_Item->ID.' by current User' );
 		$SQL->SELECT( 'iver_ID' );
@@ -1445,7 +1448,7 @@ switch( $action )
 
 	case 'history_details':
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
 
@@ -1466,7 +1469,7 @@ switch( $action )
 
 	case 'history_compare':
 		// Check permission:
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{
 			$Messages->add( TB_('You have no permission to view history for this item.'), 'error' );
 			header_redirect( $admin_url );
@@ -1645,7 +1648,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		param( 'r', 'integer', 0 );
 
@@ -1659,7 +1662,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:
 		$edited_Item->restrict_status();
@@ -1682,7 +1685,7 @@ switch( $action )
 
 	case 'propose':
 		// Check permission:
-		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
+		check_user_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ TB_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		$AdminUI->breadcrumbpath_add( TB_('Propose change'), '?ctrl=items&amp;action=propose&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
@@ -1697,7 +1700,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Get params to skip/force/mark notifications and pings:
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			param( 'item_members_notified', 'string', NULL );
 			param( 'item_community_notified', 'string', NULL );
@@ -1725,7 +1728,7 @@ switch( $action )
 		check_cross_posting( $post_category, $post_extracats );
 
 		// Check permission on statuses:
-		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
+		check_user_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
@@ -1734,6 +1737,9 @@ switch( $action )
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
+		
+		// Update the active tab pane for current user
+		save_active_tab_pane_value( $Blog->ID );
 
 		// CREATE NEW POST:
 		load_class( 'items/model/_item.class.php', 'Item' );
@@ -1784,14 +1790,14 @@ switch( $action )
 
 		if( $result && $action == 'create_link' )
 		{	// If the item has been inserted correctly and we should copy all links from the duplicated item:
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
-			    && $current_User->check_perm( 'files', 'view', false ) )
+			if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item )
+			    && check_user_perm( 'files', 'view', false ) )
 			{	// Allow this action only if current user has a permission to view the links of new created item:
 				$original_item_ID = param( 'p', 'integer', NULL );
 				$ItemCache = & get_ItemCache();
 				if( $original_Item = & $ItemCache->get_by_ID( $original_item_ID, false, false ) )
 				{	// Copy the links only if the requested item is correct:
-					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $original_Item ) )
+					if( check_user_perm( 'item_post!CURSTATUS', 'view', false, $original_Item ) )
 					{	// Current user must has a permission to view an original item
 						$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID,
 								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order )
@@ -1843,7 +1849,7 @@ switch( $action )
 		// Delete Item from Session
 		delete_session_Item( 0 );
 
-		if( ! $exit_after_save && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+		if( ! $exit_after_save && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 		{	// We want to continue editing...
 			$tab_switch_params = 'p='.$edited_Item->ID;
 			$action = 'edit';	// It's basically as if we had updated
@@ -1907,7 +1913,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		param( 'dest_post_ID', 'integer', true );
 
@@ -1948,7 +1954,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		param( 'unlink_item_ID', 'integer', true );
 
@@ -1975,13 +1981,16 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
+		
+		// Update the active tab pane for current user
+		save_active_tab_pane_value( $Blog->ID );
 
 		// Get params to skip/force/mark notifications and pings:
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			param( 'item_members_notified', 'string', NULL );
 			param( 'item_community_notified', 'string', NULL );
@@ -2033,7 +2042,7 @@ switch( $action )
 			foreach( $prev_extra_cat_IDs as $cat )
 			{
 				$cat_blog = get_catblog( $cat );
-				if( ! $current_User->check_perm( 'blog_admin', '', false, $cat_blog ) )
+				if( ! check_user_perm( 'blog_admin', '', false, $cat_blog ) )
 				{
 					$Chapter = $ChapterCache->get_by_ID( $cat );
 					$off_limit_cats[$cat] = $Chapter;
@@ -2219,7 +2228,7 @@ switch( $action )
 		unset( $edited_Item->ItemType );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		set_session_Item( $edited_Item );
 
@@ -2269,8 +2278,8 @@ switch( $action )
 		param( 'cat_ID', 'integer', NULL );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
-		$current_User->check_perm( 'item_post!'.$status, 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!'.$status, 'edit', true, $edited_Item );
 
 		// Set new post type
 		$edited_Item->set( 'status', $status );
@@ -2326,7 +2335,7 @@ switch( $action )
 
 		while ( $Item = & $ItemList->get_item () )
 		{	// check user permission
-			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
+			check_user_perm( 'item_post!CURSTATUS', 'edit', true, $Item );
 
 			// Not allow html content on post titles
 			$title = param ( 'mass_title_' . $Item->ID, 'htmlspecialchars', NULL );
@@ -2380,13 +2389,13 @@ switch( $action )
 
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
-		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
 
 		$edited_Item->set( 'status', $post_status );
 
 		if( $action == 'publish_now' )
 		{ // Update post dates
-			$current_User->check_perm( 'blog_edit_ts', 'edit', true, $Blog->ID );
+			check_user_perm( 'blog_edit_ts', 'edit', true, $Blog->ID );
 			// fp> TODO: remove seconds ONLY if date is in the future
 			$edited_Item->set( 'datestart', remove_seconds($localtimenow) );
 			$edited_Item->set( 'datemodified', date('Y-m-d H:i:s', $localtimenow) );
@@ -2403,7 +2412,7 @@ switch( $action )
 		}
 
 		// Get params to skip/force/mark notifications and pings:
-		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{	// If user has a permission to edit advanced properties of items:
 			param( 'item_members_notified', 'string', NULL );
 			param( 'item_community_notified', 'string', NULL );
@@ -2475,7 +2484,7 @@ switch( $action )
 
 		$post_status = param( 'post_status', 'string', true );
 		// Check permissions:
-		$current_User->check_perm( 'item_post!'.$post_status, 'moderate', true, $edited_Item );
+		check_user_perm( 'item_post!'.$post_status, 'moderate', true, $edited_Item );
 
 		$edited_Item->set( 'status', $post_status );
 
@@ -2495,7 +2504,7 @@ switch( $action )
 		$post_status = 'deprecated';
 		// Check permissions:
 		/* TODO: Check extra categories!!! */
-		$current_User->check_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!'.$post_status, 'edit', true, $edited_Item );
 
 		$edited_Item->set( 'status', $post_status );
 		$edited_Item->set( 'datemodified', date('Y-m-d H:i:s',$localtimenow) );
@@ -2520,7 +2529,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check permission:
-		$current_User->check_perm( 'blog_del_post', '', true, $blog );
+		check_user_perm( 'blog_del_post', '', true, $blog );
 
 		// fp> TODO: non javascript confirmation
 		// $AdminUI->title = TB_('Deleting post...');
@@ -2569,7 +2578,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$dest_post_ID = param( 'dest_post_ID', 'integer', true );
 
@@ -2690,7 +2699,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
+		check_user_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
 
 		// Check if current User can create a new proposed change:
 		$edited_Item->can_propose_change( true );
@@ -2698,7 +2707,7 @@ switch( $action )
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
 			$Messages->add( TB_('New proposed change has been recorded.'), 'success' );
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Redirect to item history page with new poroposed change if current User has a permisson:
 				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
 			}
@@ -2721,7 +2730,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		// Try to get a proposed change by requested ID:
 		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
@@ -2763,7 +2772,7 @@ switch( $action )
  */
 function init_list_mode()
 {
-	global $tab, $tab_type, $Collection, $Blog, $UserSettings, $ItemList, $AdminUI, $current_User;
+	global $tab, $tab_type, $Collection, $Blog, $UserSettings, $ItemList, $AdminUI;
 
 	// set default itemslist param prefix
 	$items_list_param_prefix = 'items_';
@@ -2786,7 +2795,7 @@ function init_list_mode()
 		}
 	}
 
-	if( $tab == 'tracker' && ( ! $Blog->get_setting( 'use_workflow' ) || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) ) )
+	if( $tab == 'tracker' && ( ! $Blog->get_setting( 'use_workflow' ) || ! check_user_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) ) )
 	{ // Display workflow view only if it is enabled
 		global $Messages;
 		$Messages->add( TB_('Workflow feature has not been enabled for this collection.'), 'note' );
@@ -2834,7 +2843,7 @@ function init_list_mode()
 			require_js_helper( 'colorbox' );
 
 			// require clipboardjs
-			require_js( '#clipboardjs#' );
+			require_js_async( '#clipboardjs#' );
 
 			$AdminUI->breadcrumbpath_add( TB_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 			break;
@@ -2874,7 +2883,7 @@ function init_list_mode()
 			$AdminUI->breadcrumbpath_add( TB_( $tab_type ), '?ctrl=items&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab_type='.urlencode( $tab_type ).'&amp;filter=restore' );
 
 			// JS to edit an order of items from list view:
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		case 'tracker':
@@ -2887,7 +2896,7 @@ function init_list_mode()
 			$AdminUI->set_page_manual_link( 'workflow-features' );
 
 			// JS to edit priority of items from list view
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 			break;
 
 		default:
@@ -2928,7 +2937,7 @@ switch( $action )
 		if( ! blog_has_cats( $blog ) )
 		{
 			$error_message = TB_('Since this blog has no categories, you cannot post into it.');
-			if( $current_User->check_perm( 'blog_cats', 'edit', false, $blog ) )
+			if( check_user_perm( 'blog_cats', 'edit', false, $blog ) )
 			{ // If current user has a permission to create a category
 				global $admin_url;
 				$error_message .= ' '.sprintf( TB_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$blog.'"');
@@ -3004,7 +3013,7 @@ switch( $action )
 						) );
 				}
 
-				if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+				if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 				{	// If user has a permission to merge the edited Item:
 					$AdminUI->global_icon( TB_('Merge with...'), 'merge', '#',
 						' '.TB_('Merge with...'), 4, 3, array(
@@ -3013,7 +3022,7 @@ switch( $action )
 						) );
 				}
 
-				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+				if( check_user_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 				{	// User has permissions to delete this post
 					$AdminUI->global_icon( TB_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
 						' '.TB_('Delete'), 4, 3, array(
@@ -3056,7 +3065,7 @@ switch( $action )
 				}
 			}
 
-			if( $action != 'propose' && $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
+			if( $action != 'propose' && $Blog->get_setting( 'in_skin_editing' ) && ( check_user_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 				$mode_inskin_action = get_htsrv_url().'item_edit.php';
@@ -3076,7 +3085,7 @@ switch( $action )
 
 		if( in_array( $action, array( 'history', 'history_details', 'history_compare' ) ) )
 		{	// History tabs:
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+			if( check_user_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
 			{	// User has permissions to edit this Item:
 				$AdminUI->global_icon( TB_('Edit current version'), 'edit',  $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, TB_('Edit current version'), 4, 3, array( 'style' => 'margin-right:3ex' ) );
 			}
@@ -3103,7 +3112,7 @@ switch( $action )
 		if( ! blog_has_cats( $blog ) )
 		{
 			$error_message = TB_('Since this blog has no categories, you cannot post into it.');
-			if( $current_User->check_perm( 'blog_cats', 'edit', false, $blog ) )
+			if( check_user_perm( 'blog_cats', 'edit', false, $blog ) )
 			{ // If current user has a permission to create a category
 				global $admin_url;
 				$error_message .= ' '.sprintf( TB_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$blog.'"');
@@ -3212,8 +3221,6 @@ if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit'
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Init JS to quick upload several files:
-	init_fileuploader_js();
 }
 
 if( in_array( $action, array( 'new', 'new_version', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
@@ -3519,7 +3526,7 @@ switch( $action )
 			if( $Blog->get( 'notes' ) )
 			{
 				$edit_link = '';
-				if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $blog ) )
 				{
 					$edit_link = action_icon( TB_('Edit').'...', 'edit_button', $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID, ' '.TB_('Edit').'...', 3, 4, array( 'class' => 'btn btn-default btn-sm' ) );
 				}

@@ -147,7 +147,7 @@ class item_workflow_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $current_User;
+		global $Item;
 		global $ReqURL;
 
 		if( empty( $Item ) )
@@ -162,16 +162,15 @@ class item_workflow_Widget extends ComponentWidget
 			return false;
 		}
 
-		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() ) )
+		if( ! check_user_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() ) )
 		{	// Current User has no permission to be assigned for tasks of the Item's Collection:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you don\'t have a permission to be assigned for tasks of the Item\'s Collection.' );
 			return false;
 		}
 
 		$allow_edit = $this->disp_params['allow_edit'] &&
-				is_logged_in() &&
-				$current_User->check_perm( 'admin', 'restricted' ) &&
-				$current_User->check_perm( 'options', 'edit' );
+				check_user_perm( 'admin', 'restricted' ) &&
+				check_user_perm( 'options', 'edit' );
 
 		$this->init_display( $params );
 
@@ -268,15 +267,7 @@ class item_workflow_Widget extends ComponentWidget
 			echo '</div>';
 			$Form->end_form();
 
-			?>
-			<script>
-			jQuery( '#evo_widget_item_workflow_properties_<?php echo $this->ID;?> a' ).click( function() {
-					jQuery( '#evo_widget_item_workflow_form_<?php echo $this->ID;?>' ).show();
-					jQuery( '#evo_widget_item_workflow_properties_<?php echo $this->ID;?>' ).hide();
-					return false;
-				} );
-			</script>
-			<?php
+			expose_var_to_js( 'evo_workflow_properties_widget_config', $this->ID );
 		}
 
 		echo $this->disp_params['block_body_end'];

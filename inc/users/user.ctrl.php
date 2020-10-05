@@ -29,7 +29,7 @@ param( 'display_mode', 'string', 'normal' );
 /**
  * @global boolean true, if user is only allowed to edit his profile
  */
-$user_profile_only = ! $current_User->check_perm( 'users', 'view' );
+$user_profile_only = ! check_user_perm( 'users', 'view' );
 
 if( $user_profile_only )
 { // User has no permissions to view: he can only edit his profile
@@ -49,7 +49,7 @@ if( $user_profile_only )
 
 if( $action == 'new' )
 {	// Check permission, only admins can create new user:
-	$current_User->check_perm( 'users', 'edit', true );
+	check_user_perm( 'users', 'edit', true );
 }
 
 /*
@@ -461,7 +461,7 @@ if( !$Messages->has_errors() )
 			{ // The user is updated
 				if( ( $user_tab == 'admin' ) && ( $edited_User->ID == $current_User->ID ) )
 				{ // an admin user has edited his own admin preferences
-					if( $current_User->check_status( 'is_closed' ) )
+					if( check_user_status( 'is_closed' ) )
 					{ // an admin user has changed his own status to closed, logout the user
 						logout();
 						header_redirect( $baseurl, 303 );
@@ -579,7 +579,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'emails', 'edit', true );
+			check_user_perm( 'emails', 'edit', true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -601,7 +601,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'emails', 'edit', true );
+			check_user_perm( 'emails', 'edit', true );
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
@@ -777,7 +777,7 @@ if( !$Messages->has_errors() )
 			$Session->assert_received_crumb( 'user' );
 
 			// Check edit permissions:
-			$current_User->check_perm( 'users', 'edit', true );
+			check_user_perm( 'users', 'edit', true );
 
 			if( $edited_User->ID == $current_User->ID || $edited_User->ID == 1 )
 			{	// Don't delete a logged in user
@@ -818,7 +818,7 @@ if( !$Messages->has_errors() )
 			if( param( 'delete_comments', 'integer', 0 ) )
 			{ // Delete the comments
 				// Count even recycled comments only if current User has global editall blogs permission, because only those users can delete trashed comments
-				$comments_created = $edited_User->get_num_comments( '', $current_User->check_perm( 'blogs', 'eidtall', false ) );
+				$comments_created = $edited_User->get_num_comments( '', check_user_perm( 'blogs', 'eidtall', false ) );
 				if( $comments_created > 0 && $edited_User->delete_comments() )
 				{ // The comments were deleted successfully
 					$result_message = ( $comments_created == 1 ) ? TB_('1 comment was deleted.') : sprintf( TB_('%s comments were deleted.'), $comments_created );
@@ -961,7 +961,7 @@ if( $display_mode != 'js')
 		case 'profile':
 			$AdminUI->breadcrumbpath_add( TB_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
-			require_js( '#jcrop#', 'rsc_url' );
+			require_js_defer( '#jcrop#', 'rsc_url' );
 			require_css( '#jcrop_css#', 'rsc_url' );
 
 			// Set an url for manual page:
@@ -982,7 +982,7 @@ if( $display_mode != 'js')
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'user-profile-picture-tab' );
 			}
-			require_js( '#jcrop#', 'rsc_url' );
+			require_js_defer( '#jcrop#', 'rsc_url' );
 			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'social':
@@ -1253,7 +1253,7 @@ switch( $action )
 
 						case 'delete_all_messages':
 							$messages_count = $edited_User->get_num_messages( 'sent' );
-							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+							if( $messages_count > 0 && check_user_perm( 'perm_messaging', 'abuse' ) )
 							{	// Display a confirm message if current user can delete the messages sent by the edited user
 								$confirm_message = sprintf( TB_('Delete %d private messages sent by the user?'), $messages_count );
 							}
@@ -1261,7 +1261,7 @@ switch( $action )
 
 						case 'delete_all_received_messages':
 							$messages_count = $edited_User->get_num_messages( 'received' );
-							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+							if( $messages_count > 0 && check_user_perm( 'perm_messaging', 'abuse' ) )
 							{	// Display a confirm message if curent user can delete the messages sent by the edited user
 								$confirm_message = sprintf( TB_('Delete %d private messages received by the user?'), $messages_count );
 							}
@@ -1280,12 +1280,12 @@ switch( $action )
 							{	// User can NOT delete admin and own account:
 								$confirm_messages = array();
 								$sent_emails_count = $edited_User->get_num_sent_emails();
-								if( $sent_emails_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+								if( $sent_emails_count > 0 && check_user_perm( 'emails', 'edit' ) )
 								{	// Display a confirm message if current user can delete at least one email sent log of the edited user:
 									$confirm_messages[] = array( sprintf( TB_('%d emails sent to the user'), $sent_emails_count ), 'warning' );
 								}
 								$email_returns_count = $edited_User->get_num_email_returns();
-								if( $email_returns_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+								if( $email_returns_count > 0 && check_user_perm( 'emails', 'edit' ) )
 								{	// Display a confirm message if current user can delete at least one email return of the edited user:
 									$confirm_messages[] = array( sprintf( TB_('%d email returns from the user\'s email address'), $email_returns_count ), 'warning' );
 								}
@@ -1309,7 +1309,7 @@ switch( $action )
 									$confirm_messages[] = array( sprintf( TB_('%s comments posted by the user'), $edited_User->get_num_comments( '', true ) ), 'warning' );
 								}
 								$messages_count = $edited_User->get_num_messages();
-								if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+								if( $messages_count > 0 && check_user_perm( 'perm_messaging', 'abuse' ) )
 								{	// Display a confirm message if current user can delete the messages sent by the edited user
 									$confirm_messages[] = array( sprintf( TB_('%d private messages sent by the user'), $messages_count ), 'warning' );
 								}
@@ -1369,7 +1369,7 @@ switch( $action )
 
 				if( $display_mode != 'js')
 				{
-					require_js( '#jcrop#', 'rsc_url' );
+					require_js_defer( '#jcrop#', 'rsc_url' );
 					require_css( '#jcrop_css#', 'rsc_url' );
 					$AdminUI->disp_payload_begin();
 				}

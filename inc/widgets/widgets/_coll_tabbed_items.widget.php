@@ -31,6 +31,10 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 	 */
 	function __construct( $db_row = NULL )
 	{
+		// Use standard style to display debug messages on customizer for this widget
+		// instead of menu style that is used by default on the parent class:
+		$this->debug_message_style = 'standard';
+
 		// Call parent constructor:
 		parent::__construct( $db_row, 'core', 'coll_tabbed_items' );
 	}
@@ -82,7 +86,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'content_list_master';
@@ -137,9 +141,9 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 					'type' => 'select',
 					'options' => $template_options,
 					'defaultvalue' => 'content_tabs',
-					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+					'input_suffix' => ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 					'class' => 'evo_template_select',
 				),
@@ -341,6 +345,32 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 
 		$this->init_display( $params );
 
+		if( ! isset( $Item ) ||
+		    ! $Item instanceof Item )
+		{	// No current Item:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because this is not an Item page, so there can be no switcher params.' );
+			return false;
+		}
+
+		if( ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item->get_setting( 'switchable' ) )
+		{	// Item doesn't use switcher params:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use switcher params.' );
+			return false;
+		}
+
+		if( $this->get_param( 'param_code' ) == '' )
+		{	// Display error when param code is not defined:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed because you did not set a param code for tab switching.' );
+			return false;
+		}
+	
+		if( $Item->get_switchable_param( $this->get_param( 'param_code' ) ) === NULL )
+		{	// No default value:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the param <code>'.$this->get_param( 'param_code' ).'</code> has not been declared/initialized in the Item.' );
+			return false;
+		}
+
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 
 		$listBlog = ( $blog_ID ? $BlogCache->get_by_ID( $blog_ID, false ) : $Blog );
@@ -461,11 +491,14 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		{	// Initialize tabs from items list:
 			$items_tabs[] = array(
 					'value' => $row_Item->get( 'urltitle' ),
-					'text'  => $row_Item->get( 'title' )
+					'text'  => $row_Item->get_title( array(
+							'title_field' => 'short_title,title',
+							'link_type'   => 'none',
+						) ),
 				);
 		}
 		// Set active tab by default on page loading:
-		if( ! in_array( $disp, array( 'single', 'page', 'widget-page' ) ) && isset( $items_tabs[0] ) )
+		if( ! in_array( $disp, array( 'single', 'page', 'widget_page' ) ) && isset( $items_tabs[0] ) )
 		{	// Use first item tab by default for not single Item pages:
 			$default_tabs = array( $this->get_param( 'param_code' ) => $items_tabs[0]['value'] );
 		}

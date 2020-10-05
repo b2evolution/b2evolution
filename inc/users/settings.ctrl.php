@@ -6,7 +6,7 @@ global $demo_mode;
 
 $AdminUI->set_path( 'users', 'usersettings', 'usersettings' );
 
-$current_User->check_perm( 'users', 'view', true );
+check_user_perm( 'users', 'view', true );
 
 param_action();
 
@@ -17,7 +17,7 @@ switch ( $action )
 		$Session->assert_received_crumb( 'usersettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'users', 'edit', true );
+		check_user_perm( 'users', 'edit', true );
 
 		// Session settings
 		$Settings->set( 'redirect_to_after_login', param( 'redirect_to_after_login', 'url', '' ) );

@@ -866,7 +866,7 @@ class ComponentWidget extends DataObject
 				{	// Plugin failed (happens when a plugin has been disabled for example):
 					if( $this->mode == 'designer' )
 					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
-						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').': "'.$this->code.'"</span>'.$this->disp_params['block_end'];
+						echo $this->disp_params['block_start'].get_rendering_error( T_('Inactive / Uninstalled plugin').': "'.$this->code.'"', 'span' ).$this->disp_params['block_end'];
 					}
 					return false;
 				}
@@ -886,7 +886,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display_with_cache( $params, $keys = array() )
 	{
-		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session, $current_User;
+		global $Collection, $Blog, $Timer, $debug, $admin_url, $Session;
 
 		$this->init_display( $params );
 
@@ -910,7 +910,7 @@ class ComponentWidget extends DataObject
 				$designer_mode_data['data-subcontainer-code'] = $this->get_param( 'container' );
 			}
 			// Set data to know current user has a permission to edit this widget:
-			$designer_mode_data['data-can-edit'] = $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;
+			$designer_mode_data['data-can-edit'] = check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) ? 1 : 0;
 			// Don't load a widget content from cache when designer mode is enabled:
 			$force_nocaching = true;
 			// Set designer mode:
@@ -930,12 +930,15 @@ class ComponentWidget extends DataObject
 				$is_subcontainer = ( $this->get( 'code' ) == 'subcontainer' || $this->get( 'code' ) == 'subcontainer_row' );
 				echo '<div class="dev-blocks '.( $is_subcontainer ? 'dev-blocks--subcontainer' : 'dev-blocks--widget' ).'"><div class="dev-blocks-name" title="'.
 							( $Blog->get_setting('cache_enabled_widgets') ? 'Widget params have BlockCache turned off' : 'Collection params have BlockCache turned off' ).'">';
-				if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+				if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 				{	// Display a link to edit this widget only if current user has a permission:
 					echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 				}
 				echo 'Widget: <b>'.$this->get_name().'</b> - Cache OFF <i class="fa fa-info">?</i></div>'."\n";
 			}
+
+			// Start to collect output buffer in order to can clean up rendering errors when it need below:
+			ob_start();
 
 			if( ! empty( $designer_mode_data ) )
 			{	// Append designer mode html tag attributes to first not empty widget wrapper/container:
@@ -986,7 +989,7 @@ class ComponentWidget extends DataObject
 				}
 				if( ! $wrapper_is_found )
 				{	// Display error if widget has no wrappers to enable designer mode:
-					echo ' <span class="text-danger">Widget <code>'.$this->code.'</code> cannot be manipulated because it lacks a wrapper tag.</span> ';
+					echo ' '.get_rendering_error( 'Widget <code>'.$this->code.'</code> cannot be manipulated because it lacks a wrapper tag.', 'span' ).' ';
 				}
 			}
 
@@ -998,6 +1001,15 @@ class ComponentWidget extends DataObject
 			{	// Hide the widget by code if it is requsted from skin:
 				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden by code <code>'.$this->code.'</code> from skin template.' );
 			}
+
+			$widget_content = ob_get_clean();
+
+			if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+			{	// Clean up rendering errors from content if current User is not collection admin:
+				$widget_content = clear_rendering_errors( $widget_content );
+			}
+
+			echo $widget_content;
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -1022,11 +1034,16 @@ class ComponentWidget extends DataObject
 				if( $display_containers )
 				{ // DEBUG:
 					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--incache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
-					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 					{	// Display a link to edit this widget only if current user has a permission:
 						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 					}
 					echo 'Widget: <b>'.$this->get_name().'</b> - FROM cache <i class="fa fa-info">?</i></div>'."\n";
+				}
+
+				if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+				{	// Clean up rendering errors from content if current User is not collection admin:
+					$content = clear_rendering_errors( $content );
 				}
 
 				echo $content;
@@ -1043,7 +1060,7 @@ class ComponentWidget extends DataObject
 				if( $display_containers )
 				{ // DEBUG:
 					echo '<div class="dev-blocks dev-blocks--widget dev-blocks--widget--notincache"><div class="dev-blocks-name" title="Cache key = '.$this->BlockCache->serialized_keys.'">';
-					if( is_logged_in() && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
+					if( check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 					{	// Display a link to edit this widget only if current user has a permission:
 						echo '<span class="dev-blocks-action"><a href="'.$admin_url.'?ctrl=widgets&amp;action=edit&amp;wi_ID='.$this->ID.'">Edit</a></span>';
 					}
@@ -1062,7 +1079,14 @@ class ComponentWidget extends DataObject
 				}
 
 				// Save collected cached data if needed:
-				$this->BlockCache->end_collect();
+				$content = $this->BlockCache->end_collect( false );
+
+				if( ! check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+				{	// Clean up rendering errors from content if current User is not collection admin:
+					$content = clear_rendering_errors( $content );
+				}
+
+				echo $content;
 
 				if( $display_containers )
 				{ // DEBUG:
@@ -1152,7 +1176,10 @@ class ComponentWidget extends DataObject
 		if( $this->disp_params['block_display_title'] && !empty( $title ) )
 		{
 			$r = $this->disp_params['block_title_start'];
-			$r .= format_to_output( $title );
+			if( ! isset( $this->disp_params['hide_header_title'] ) )
+			{
+				$r .= format_to_output( $title );
+			}
 			$r .= $this->disp_params['block_title_end'];
 
 			if( $display ) echo $r;
@@ -1553,7 +1580,7 @@ class ComponentWidget extends DataObject
 		if( ! ( $param_value_is_ID && $param_Item = & $ItemCache->get_by_ID( $param_value, false, false ) ) &&
 		    ! ( ! $param_value_is_ID && $param_Item = & $ItemCache->get_by_urltitle( $param_value, false, false ) ) )
 		{	// Item is not detected:
-			return '<span class="evo_param_error">'.T_('Item is not found.').'</span>';
+			return get_rendering_error( T_('Item is not found.'), 'span' );
 		}
 
 		$item_info = '';
@@ -1618,7 +1645,7 @@ class ComponentWidget extends DataObject
 	 */
 	function display_error_message( $message = NULL )
 	{
-		global $current_User, $Blog;
+		global $Blog;
 
 		if( isset( $this->BlockCache ) )
 		{	// Do NOT cache because this widget has an error which is dispalyed only for collection admin:
@@ -1633,9 +1660,9 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
-		if( is_logged_in() && $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
+		if( check_user_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// Display error only for collection admin:
-			echo '<span class="evo_param_error">'.$message.'</span>';
+			display_rendering_error( $message, 'span' );
 		}
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

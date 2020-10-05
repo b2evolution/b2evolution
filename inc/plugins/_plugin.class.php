@@ -1055,6 +1055,7 @@ class Plugin
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
+	 * Remember to set adminUI_set_path() function to set the correct full selected path.
 	 */
 	function AdminAfterMenuInit()
 	{
@@ -3515,7 +3516,7 @@ class Plugin
 			}
 
 			// Use the same protocol as with current host (so includes from within https do not fail when on http):
-			$r = url_same_protocol( $r );
+			$r = force_https_if_needed( $r );
 
 			$this->_plugin_url = $r;
 		}
@@ -3940,9 +3941,9 @@ class Plugin
 	 */
 	function get_help_file()
 	{
-		global $default_locale, $plugins_path, $current_User;
+		global $default_locale, $plugins_path;
 
-		if( empty( $current_User ) || !$current_User->check_perm( 'options', 'view', false ) )
+		if( ! check_user_perm( 'options', 'view' ) )
 		{ // README gets displayed through plugins controller, which requires these perms
 			// TODO: Catch "disp_help" and "disp_help_plain" messages in plugins.php before general perms check!?
 			return false;
@@ -3996,9 +3997,9 @@ class Plugin
 	 */
 	function get_edit_settings_url()
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! $current_User->check_perm( 'options', 'edit', false ) )
+		if( ! check_user_perm( 'options', 'edit', false ) )
 		{
 			return false;
 		}
@@ -4067,6 +4068,27 @@ class Plugin
 		}
 
 		return '<span class="label label-info evo_widget_icon"><span class="fa fa-'.$this->widget_icon.'"></span></span>';
+	}
+
+
+	/**
+	 * Display widget title
+	 *
+	 * @param string Title, NULL to use title from widget param 'title'
+	 */
+	function display_widget_title( $widget_title = NULL )
+	{
+		if( $widget_title === NULL )
+		{	// Use title from widget param:
+			$widget_title = $this->get_widget_setting( 'title' );
+		}
+
+		if( ! empty( $widget_title ) )
+		{	// We want to display a title for the widget block:
+			echo $this->widget_params['block_title_start'];
+			echo $widget_title;
+			echo $this->widget_params['block_title_end'];
+		}
 	}
 
 
@@ -4710,12 +4732,28 @@ class Plugin
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of CSS file relative to current plugin folder
-	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 * @param boolean TRUE to load CSS file asynchronously, FALSE otherwise.
 	 */
-	function require_css( $css_file, $output = false )
+	function require_css( $css_file, $output = false, $position = 'headlines', $async = false )
 	{
 		global $app_version_long;
-		require_css( $this->get_plugin_url().$css_file, 'relative', NULL, NULL, $this->version.'+'.$app_version_long, $output );
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, $async );
+	}
+
+
+	/**
+	 * Require CSS file to load asynchronously
+	 * 
+	 * @param string Name of CSS file relative to current plugin folder
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head> or <body>
+	 * @param string Position where the CSS files will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_css_async( $css_file, $output = false, $position = 'headlines' )
+	{
+		global $app_version_long;
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output, $position, true );
 	}
 
 
@@ -4726,11 +4764,41 @@ class Plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
 	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+	 *                'immediate' or FALSE to load javascript immediately
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
 	 */
-	function require_js( $js_file, $output = false )
+	function require_js( $js_file, $output = false, $async_defer = false, $position = 'headlines' )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'relative', false, $output, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'absolute', $async_defer, $output, $this->version.'+'.$app_version_long, $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "async"
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_async( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, $output, 'async', $position );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+	 *
+	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param string Position where the JS file will be inserted, either 'headlines' (inside <head>) or 'footerlines' (before </body>)
+	 */
+	function require_js_defer( $js_file, $output = false, $position = 'headlines' )
+	{
+		$this->require_js( $js_file, $output, 'defer', $position );
 	}
 
 

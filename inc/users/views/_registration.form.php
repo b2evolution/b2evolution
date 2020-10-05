@@ -13,17 +13,13 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
 
 global $collections_Module, $Plugins;
 
-global $baseurl, $admin_url, $current_User, $Blog;
+global $baseurl, $admin_url, $Blog;
 
 $Form = new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', '',
@@ -90,7 +86,7 @@ $Form->begin_fieldset( TB_('Standard registration').get_manual_link('default-use
 	$TemplateCache = & get_TemplateCache();
 	$TemplateCache->load_by_context( $context );
 
-	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+	$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ), NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => TB_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'registration_master_template', $Settings->get( 'registration_master_template' ), $TemplateCache->get_code_option_array(), TB_('Registration master template'), NULL, array( 'input_suffix' => $template_input_suffix ) );
 
@@ -258,7 +254,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

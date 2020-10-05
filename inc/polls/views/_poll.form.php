@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $edited_Poll, $action, $admin_url;
 
 // Get permission of current user if he can edit the edited Poll:
-$perm_poll_edit = $current_User->check_perm( 'polls', 'edit', false, $edited_Poll );
+$perm_poll_edit = check_user_perm( 'polls', 'edit', false, $edited_Poll );
 
 // Determine if we are creating or updating:
 $creating = is_create_action( $action );
@@ -33,7 +33,7 @@ $Form->begin_form( 'fform', ( $creating ?  TB_('New poll') : TB_('Poll') ).get_m
 	$Form->hidden( 'action',  $creating ? 'create' : 'update' );
 	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',pqst_ID' : '' ) ) );
 
-	if( $current_User->check_perm( 'polls', 'edit' ) )
+	if( check_user_perm( 'polls', 'edit' ) )
 	{	// Allow to change an owner if current user has a permission to edit all polls:
 		$Form->username( 'pqst_owner_login', $edited_Poll->get_owner_User(), TB_('Owner'), '', '', array( 'required' => true ) );
 	}
@@ -118,11 +118,11 @@ if( $edited_Poll->ID > 0 )
 	 */
 	function poll_option_td_option( $PollOption )
 	{
-		global $edited_Poll, $current_User, $admin_url;
+		global $edited_Poll, $admin_url;
 
 		$r = $PollOption->get_name();
 
-		if( $current_User->check_perm( 'polls', 'edit', false, $edited_Poll ) )
+		if( check_user_perm( 'polls', 'edit', false, $edited_Poll ) )
 		{	// Display the option text as link to edit the option details:
 			$r = '<a href="'.$admin_url.'?ctrl=polls&amp;pqst_ID='.$edited_Poll->ID.'&amp;popt_ID='.$PollOption->ID.'&amp;action=edit_option'.'">'.$r.'</a>';
 		}

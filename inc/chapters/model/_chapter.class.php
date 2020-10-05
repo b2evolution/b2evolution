@@ -829,10 +829,8 @@ class Chapter extends DataObject
 			return false;
 		}
 
-		global $current_User;
-
-		if( ! $current_User->check_perm( 'admin', 'restricted' ) ||
-		    ! $current_User->check_perm( 'blog_cats', '', false, $this->blog_ID ) )
+		if( ! check_user_perm( 'admin', 'restricted' ) ||
+		    ! check_user_perm( 'blog_cats', '', false, $this->blog_ID ) )
 		{ // User has no right to edit this chapter
 			return false;
 		}

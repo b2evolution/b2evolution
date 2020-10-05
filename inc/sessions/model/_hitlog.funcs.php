@@ -33,18 +33,18 @@ function hits_results_block( $params = array() )
 		return;
 	}
 
-	global $blog, $sec_ID, $current_User;
+	global $blog, $sec_ID;
 
 	if( $blog == 0 )
 	{
-		if( ! $current_User->check_perm( 'stats', 'view' ) )
+		if( ! check_user_perm( 'stats', 'view' ) )
 		{ // Current user has no permission to view all stats (aggregated stats)
 			return;
 		}
 	}
 	else
 	{
-		if( ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
+		if( ! check_user_perm( 'stats', 'list', false, $blog ) )
 		{ // Current user has no permission to view the stats of the selected blog
 			return;
 		}
@@ -1174,8 +1174,7 @@ function stats_goal_hit_extra_params( $ghit_params )
 		$ItemCache = & get_ItemCache();
 		if( $Item = & $ItemCache->get_by_ID( intval( $matches[1] ), false, false ) )
 		{ // Display a link to view with current item title
-			global $current_User;
-			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+			if( check_user_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 			{ // Link to admin view
 				return $Item->get_title( array( 'link_type' => 'admin_view' ) );
 			}
@@ -1199,7 +1198,7 @@ function stats_goal_hit_extra_params( $ghit_params )
  */
 function display_hits_summary_panel( $diagram_columns = array() )
 {
-	global $ReqURL, $current_User;
+	global $ReqURL;
 
 	$hits_summary_mode = get_hits_summary_mode();
 
@@ -1226,7 +1225,7 @@ function display_hits_summary_panel( $diagram_columns = array() )
 		display_hits_filter_form( 'filter', $diagram_columns, $hits_summary_mode == 'aggregate' );
 	}
 
-	if( $current_User->check_perm( 'stats', 'edit' ) )
+	if( check_user_perm( 'stats', 'edit' ) )
 	{	// Display button to aggregate hits right now only if current user has a permission to edit hits:
 		echo '<a href="'.url_add_param( $current_url, 'action=aggregate&'.url_crumb( 'aggregate' ) ).'"'
 			.' class="btn btn-default pull-right">'
@@ -1607,5 +1606,48 @@ function get_hit_full_url( $hit_uri, $hit_coll_ID )
 	}
 
 	return $hit_host.$hit_uri;
+}
+
+
+/**
+ * Get the search engine parameter definitions.
+ * 
+ * Based on search engine detections YAML list maintained and used by Matomo - {@link https://github.com/matomo-org/searchengine-and-social-list}
+ * 
+ * @return array of search engine definitions
+ */
+function get_search_engine_params()
+{
+	global $search_engine_params, $inc_path;
+
+	if( empty( $search_engine_params ) )
+	{
+		$search_engine_params = array();
+
+		// Load search engine definitions:
+		$search_engine_definitions = json_decode( file_get_contents( $inc_path.'_ext/matomo/SearchEngines.json' ) );
+
+		foreach( $search_engine_definitions as $name => $info )
+		{
+			if( empty( $info ) || !is_array( $info ) )
+			{
+				continue;
+			}
+
+			foreach( $info as $url_definitions )
+			{
+				$url_definitions = (array) $url_definitions;
+				foreach( $url_definitions['urls'] as $url )
+				{
+					$search_engine_data = $url_definitions;
+					unset( $search_engine_data['urls'] );
+					$search_engine_data['name'] = $name;
+					$search_engine_params[$url] = $search_engine_data;
+				}
+			}
+		}
+	}
+
+	return $search_engine_params;
 }
 ?>

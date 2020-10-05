@@ -139,7 +139,7 @@ $content_mode = resolve_auto_content_mode( $content_mode );
 if( $params['include_cover_images'] )
 { // Include the cover images on teaser place
 // TODO: synonym for '#cover_and_teaser_all'
-	$teaser_image_positions = 'cover,teaser,teaserperm,teaserlink';
+	$teaser_image_positions = 'cover,background,teaser,teaserperm,teaserlink';
 }
 else
 { // Don't include the cover images
@@ -180,7 +180,7 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
@@ -233,7 +233,7 @@ switch( $content_mode )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $teaser_image_positions,
 				) );
 		}
@@ -312,7 +312,7 @@ switch( $content_mode )
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
 						'gallery_order'       => $params['gallery_order'],
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 						'restrict_to_image_position' => 'aftermore',
 					) );
 			}

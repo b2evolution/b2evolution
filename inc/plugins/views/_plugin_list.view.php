@@ -20,10 +20,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var Plugins
  */
 global $admin_Plugins;
@@ -79,9 +75,9 @@ if( count( $admin_Plugins->get_plugin_groups() ) )
  */
 function plugin_results_td_status( $plug_status, $plug_ID )
 {
-	global $admin_Plugins, $current_User, $admin_url;
+	global $admin_Plugins, $admin_url;
 
-	$perm_edit = $current_User->check_perm( 'options', 'edit', false );
+	$perm_edit = check_user_perm( 'options', 'edit', false );
 
 	if( $plug_status == 'enabled' )
 	{ // Enabled
@@ -141,10 +137,9 @@ $Results->cols[] = array(
  */
 function plugin_results_td_name( $Plugin )
 {
-	global $current_User;
 	$r = '<strong>'.$Plugin->name.'</strong>';
 
-	if( $current_User->check_perm( 'options', 'edit', false ) )
+	if( check_user_perm( 'options', 'edit', false ) )
 	{ // Wrap in "edit settings" link:
 		$r = '<a href="'.regenerate_url( '', 'action=edit_settings&amp;plugin_ID='.$Plugin->ID )
 			.'" title="'.T_('Edit plugin settings!').'">'.$r.'</a>';
@@ -247,7 +242,7 @@ function plugin_results_td_actions( $Plugin )
 	$r .= action_icon( T_('Un-install this plugin!'), 'delete', $admin_url.'?ctrl=plugins&amp;action=uninstall&amp;plugin_ID='.$Plugin->ID.'&amp;'.url_crumb( 'plugin' ) );
 	return $r;
 }
-if( $current_User->check_perm( 'options', 'edit', false ) )
+if( check_user_perm( 'options', 'edit', false ) )
 {
 	$Results->cols[] = array(
 			'th' => T_('Actions'),
@@ -258,7 +253,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 // Action icons:
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // Display action link to reload plugins:
 	$Results->global_icon( T_('Reload events and codes for installed plugins.'), 'reload', regenerate_url( 'action', 'action=reload_plugins' ).'&amp;'.url_crumb('plugin'), T_('Reload plugins'), 3, 4 );
 }

@@ -15,13 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'items/model/_itemtag.class.php', 'ItemTag' );
 
-/**
- * @var User
- */
-global $current_User;
-
 // Check minimum permission:
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'options', 'view', true );
 
 $AdminUI->set_path( 'site', 'tags' );
 
@@ -49,14 +44,14 @@ switch( $action )
 
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$edited_ItemTag = new ItemTag();
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 		break;
 
 	case 'create':
@@ -67,7 +62,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'tag' );
 
 		// Check that current user has permission to create tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// load data from request
 		if( $edited_ItemTag->load_from_Request() )
@@ -90,7 +85,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'tag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an tag_ID:
 		param( 'tag_ID', 'integer', true );
@@ -116,7 +111,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'tag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Make sure we got an tag_ID:
 		param( 'tag_ID', 'integer', true );
@@ -148,7 +143,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'tag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$item_ID = param( 'item_ID', 'integer', 0, true );
 
@@ -156,7 +151,7 @@ switch( $action )
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 
 		// Check permission based on DB status:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		check_user_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
 		$result = $DB->query( 'DELETE FROM T_items__itemtag
 			WHERE itag_itm_ID = '.$DB->quote( $edited_Item->ID ).'
@@ -182,7 +177,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'tag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$old_tag_ID = param( 'old_tag_ID', 'integer', 0, true );
 
@@ -238,7 +233,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'tag' );
 
 		// Check that current user has permission to edit tags:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$DB->query( 'DELETE T_items__itemtag FROM T_items__itemtag
 				LEFT JOIN T_items__item ON itag_itm_ID = post_ID

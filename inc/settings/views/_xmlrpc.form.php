@@ -15,10 +15,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -42,7 +38,7 @@ $Form->begin_fieldset( TB_('Remote publishing').get_manual_link('xml-rpc') );
 	$Form->text_input( 'xmlrpc_default_title', $Settings->get('xmlrpc_default_title'), 50, TB_('Default title'), '<br />'.TB_('Default title for items created with a XML-RPC API that doesn\'t send a post title (e. g. the Blogger API).'), array( 'maxlength' => 255 ) );
 $Form->end_fieldset();
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

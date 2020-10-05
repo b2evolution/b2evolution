@@ -40,7 +40,7 @@ load_class( 'collections/model/_section.class.php', 'Section' );
  */
 function task_begin( $title )
 {
-	echo get_install_format_text( $title."\n" );
+	echo get_install_format_text_and_log( $title."\n" );
 	evo_flush();
 }
 
@@ -51,7 +51,7 @@ function task_begin( $title )
  */
 function task_end( $message = 'OK.' )
 {
-	echo get_install_format_text( $message."<br />\n", 'br' );
+	echo get_install_format_text_and_log( $message."<br />\n", 'br' );
 }
 
 
@@ -65,10 +65,10 @@ function task_errors( $errors = array(), $type = 'danger' )
 		return;
 	}
 
-	echo get_install_format_text( '<br />', 'br' );
+	echo get_install_format_text_and_log( '<br />', 'br' );
 	foreach( $errors as $error )
 	{
-		echo get_install_format_text( '<span class="text-'.$type.'">'.$error.'</span><br />', 'br' );
+		echo get_install_format_text_and_log( '<span class="text-'.$type.'">'.$error.'</span><br />', 'br' );
 	}
 }
 
@@ -1023,7 +1023,6 @@ function get_demo_users( $create = false, $output = true, &$error_messages = NUL
 function get_demo_user( $login, $create = false, $output = true, &$error_messages = NULL )
 {
 	global $DB;
-	global $current_User;
 	global $user_timestamp;
 
 	// Get list of demo users:
@@ -1269,7 +1268,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	{	// handle only E_USER_NOTICE
 		if( $errno == E_USER_NOTICE )
 		{
-			echo get_install_format_text( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
+			echo get_install_format_text_and_log( '<span class="text-warning"><evo:warning>'.$errstr.'</evo:warning></span> ' );
 		}
 	}
 
@@ -1477,6 +1476,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	// Use this var to shift the posts of the collections in time below:
 	$timeshift = 0;
 
+	// Initialize for setup default widgets per collection:
+	$BlogCache = & get_BlogCache();
+
 	if( $install_collection_home )
 	{	// Install Home blog
 		$coll_error_messages = array();
@@ -1491,12 +1493,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'main' );
+				$Blog->setup_default_widgets();
 			}
 
 			$collection_created++;
@@ -1530,12 +1529,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'std' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1568,12 +1564,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'std' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1606,12 +1599,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'photo' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1644,12 +1634,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'forum' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1682,12 +1669,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'manual' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1720,12 +1704,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
 			{	// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'group' );
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1757,13 +1738,9 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 					update_install_progress_bar();
 				}
 			}
-			else
-			{
-				// Insert basic widgets:
-				insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
-				insert_basic_widgets( $blog_ID, 'alt', false, 'minisite' );
+			elseif( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) )
+			{	// Insert basic widgets:
+				$Blog->setup_default_widgets();
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1784,7 +1761,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 	// Install default shared widgets:
 	global $installed_default_shared_widgets;
 	task_begin( TB_('Installing default shared widgets...') );
-	insert_shared_widgets( 'normal', true );
+	insert_shared_widgets( 'normal' );
 	task_end();
 	$installed_default_shared_widgets = true;
 
@@ -2659,21 +2636,21 @@ This is an extra line.' ),
 		'category'  => 'background',
 		'type'      => 'Child Post',
 		'parent_ID' => '#get_item#another_custom_fields_example#ID#',
-		'content'   => '<p>'.sprintf( TD_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
-<p>'.TD_('This also allows us to access the custom fields of the parent post:').'</p>
-<p>[parent:fields]</p>
-[teaserbreak]
-<p>'.TD_('It is also possible to selectively display only a couple of these fields:').'</p>
-<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>
-<p>'.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>
-<p>'.sprintf( TD_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' ).'</p>
-<p>'.sprintf( TD_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
-<h3>'.TD_('Replicated fields').'</h3>
-<p>'.TD_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>
-<p>'.TD_('This child post has the following fields which automatically replicate from its parent:').'</p>
-<p>[fields]</p>
-<p>'.sprintf( TD_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>
-<p>[compare:$this$,$parent$]</p>',
+		'content'   => sprintf( TD_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' )."\n\n"
+.TD_('This also allows us to access the custom fields of the parent post:')."\n\n"
+.'[parent:fields]'."\n\n"
+.'[teaserbreak]'."\n\n"
+.TD_('It is also possible to selectively display only a couple of these fields:')."\n\n"
+.'[parent:fields:first_numeric_field,first_string_field,second_numeric_field]'."\n\n"
+.sprintf( TD_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' )."\n\n"
+.sprintf( TD_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' )."\n\n"
+.sprintf( TD_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' )."\n\n"
+.'###'.TD_('Replicated fields')."\n\n"
+.TD_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).')."\n\n"
+.TD_('This child post has the following fields which automatically replicate from its parent:')."\n\n"
+.'[fields]'."\n\n"
+.sprintf( TD_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' )."\n\n"
+.'[compare:$this$,$parent$]',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123' ),
 			array( 'first_string_field', 'abc' ),
@@ -2682,6 +2659,9 @@ This is an extra line.' ),
 		),
 		'files' => array(
 			array( 'monument-valley/monument-valley-road.jpg', 'attachment', 'custom_field' => 'image_1' ),
+		),
+		'settings' => array(
+			'editor_code' => 'html', // use markup(don't use tinymce) edtior by default for this demo item
 		),
 	);
 
@@ -3618,7 +3598,6 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$categories = array(
 				'bug'             => array( TD_('Bug'), 'order' => 10 ),
 				'feature_request' => array( TD_('Feature Request'), 'order' => 20 ),
-				'recipes'         => array( TD_('Recipes'), 'default_item_type' => 'Recipe' ),
 			);
 
 			// Additional sample Items:
@@ -3690,6 +3669,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			// Prepend additional sample Items before generic Items:
 			$demo_items = array_merge( $top_demo_items, $demo_items );
+
+			// Don't install the following demo Items:
+			$exclude_demo_items = array(
+					'mongolian_beef',
+					'stuffed_peppers',
+					'custom_fields_example',
+					'another_custom_fields_example',
+					'child_post_example',
+				);
 			break;
 	}
 
@@ -3707,7 +3695,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			$edited_Blog->dbupdate();
 		}
 
-		if( isset( $exclude_demo_items ) )
+		if( ! empty( $exclude_demo_items ) )
 		{	// Exclude demo items which must not be installed:
 			foreach( $exclude_demo_items as $exclude_demo_item_key )
 			{
@@ -4176,7 +4164,7 @@ function install_demo_content()
 	$DB->begin();
 	if( $create_demo_organization )
 	{
-		echo get_install_format_text( '<h2>'.TB_('Creating demo organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.TB_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
 		if( $create_demo_organization )
@@ -4221,7 +4209,7 @@ function install_demo_content()
 	$emails_data_installed = 0;
 	if( $create_sample_contents || $create_demo_email_lists )
 	{
-		echo get_install_format_text( '<h2>'.TB_('Creating demo website...').'</h2>', 'h2' );
+		echo get_install_format_text_and_log( '<h2>'.TB_('Creating demo website...').'</h2>', 'h2' );
 	}
 
 	if( $create_sample_contents )
@@ -4239,7 +4227,7 @@ function install_demo_content()
 	{
 		evo_flush();
 		echo '<br/>';
-		echo get_install_format_text( '<span class="text-success">'.TB_('Demo elements successfully created.').'</span>' );
+		echo get_install_format_text_and_log( '<span class="text-success">'.TB_('Demo elements successfully created.').'</span>' );
 
 		if( $collections_installed )
 		{	// Display button to view website if at least one collection was created:

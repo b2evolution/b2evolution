@@ -21,7 +21,7 @@ load_class( 'users/model/_organization.class.php', 'Organization' );
 global $current_User;
 
 // Check minimum permission:
-$current_User->check_perm( 'orgs', 'create', true );
+check_user_perm( 'orgs', 'create', true );
 
 // Set options path:
 $AdminUI->set_path( 'users', 'organizations' );
@@ -48,7 +48,7 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'create', true );
+		check_user_perm( 'orgs', 'create', true );
 
 		if( ! isset( $edited_Organization ) )
 		{ // We don't have a model to use, start with blank object:
@@ -64,7 +64,7 @@ switch( $action )
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'view', true, $edited_Organization );
+		check_user_perm( 'orgs', 'view', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -80,7 +80,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'create', true );
+		check_user_perm( 'orgs', 'create', true );
 
 		// load data from request
 		if( $edited_Organization->load_from_Request() )
@@ -139,7 +139,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+		check_user_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -180,7 +180,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+		check_user_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		// Make sure we got an org_ID:
 		param( 'org_ID', 'integer', true );
@@ -213,7 +213,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+		check_user_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		$user_login = param( 'user_login', 'string', NULL );
 		param_check_not_empty( 'user_login', TB_('Please enter the login of the user you wish to add.') );
@@ -261,7 +261,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'organization' );
 
 		// Check permission:
-		$current_User->check_perm( 'orgs', 'edit', true, $edited_Organization );
+		check_user_perm( 'orgs', 'edit', true, $edited_Organization );
 
 		$user_login = param( 'user_login', 'string', NULL );
 		param_check_not_empty( 'user_login', TB_('Please enter the login of the user you wish to add.') );

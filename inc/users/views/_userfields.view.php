@@ -122,8 +122,8 @@ $Results->ID_col = 'ufdf_ID';
 /*
  * Group columns:
  */
-$group_td_colspan = $current_User->check_perm( 'users', 'edit', false ) ? -2 : 0;
-if( $current_User->check_perm( 'users', 'edit' ) )
+$group_td_colspan = check_user_perm( 'users', 'edit', false ) ? -2 : 0;
+if( check_user_perm( 'users', 'edit' ) )
 { // We have permission to modify:
 	$td_group_name = '<a href="?ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID=$ufgp_ID$">$ufgp_name$</a>';
 }
@@ -135,7 +135,7 @@ $Results->grp_cols[] = array(
 						'td_colspan' => $group_td_colspan,
 						'td' => '<b>'.$td_group_name.'</b>',
 					);
-if( $current_User->check_perm( 'users', 'edit', false ) )
+if( check_user_perm( 'users', 'edit', false ) )
 {	// We have permission to modify:
 	$Results->grp_cols[] = array(
 							'td' => '$ufgp_order$',
@@ -144,10 +144,10 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 	function grp_actions( & $row )
 	{
-		global $usedgroups, $current_User;
+		global $usedgroups;
 
 		$r = '';
-		if( $current_User->check_perm( 'users', 'edit', false ) )
+		if( check_user_perm( 'users', 'edit', false ) )
 		{
 			$r = action_icon( T_('Edit this group...'), 'edit', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=edit&amp;ufgp_ID='.$row->ufgp_ID ) )
 					.action_icon( T_('Duplicate this group...'), 'copy', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=new&amp;ufgp_ID='.$row->ufgp_ID ) );
@@ -201,7 +201,7 @@ $Results->cols[] = array(
 		'td_class' => 'center',
 	);
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 {	// We have permission to modify:
 	function order_actions( & $row )
 	{

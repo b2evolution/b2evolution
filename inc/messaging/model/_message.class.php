@@ -775,7 +775,7 @@ class Message extends DataObject
 	{
 		global $current_User;
 
-		return $current_User->check_perm( 'perm_messaging', $action, $assert );
+		return check_user_perm( 'perm_messaging', $action, $assert );
 	}
 
 
@@ -1095,7 +1095,7 @@ class Message extends DataObject
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[m'.$this->ID.']',
-				'restrict_to_image_position' => 'inline', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'restrict_to_image_position' => 'inline', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 				'exclude_inline_tagged'      => true, // Use true to exclude inline attachments which are already rendered in content by inline tags like '[image:123]'
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
@@ -1248,7 +1248,7 @@ class Message extends DataObject
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 				'restrict_to_image_position' => 'inline',
 				'exclude_inline_tagged'      => true, // Use true to exclude inline attachments which are already rendered in content by inline tags like '[image:123]'
 				'data'                       => '',

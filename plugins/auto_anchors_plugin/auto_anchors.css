@@ -1,5 +1,5 @@
 .evo_auto_anchor_header:hover .evo_auto_anchor_link {
-	visibility: visible;
+	visibility: visible !important;
 }
 .evo_auto_anchor_link {
 	visibility: hidden;

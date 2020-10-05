@@ -27,7 +27,7 @@ param( 'grp_ID', 'integer', NULL );		// Note: should NOT be memorized:    -- " -
 /**
  * @global boolean true, if user is only allowed to view group
  */
-$user_view_group_only = ! $current_User->check_perm( 'users', 'edit' );
+$user_view_group_only = ! check_user_perm( 'users', 'edit' );
 
 if( $user_view_group_only )
 { // User has no permissions to view: he can only edit his profile
@@ -68,7 +68,7 @@ if( $grp_ID !== NULL )
 	}
 	elseif( $action == 'list' )
 	{ // 'list' is default, $grp_ID given
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{
 			$action = 'edit';
 		}
@@ -80,7 +80,7 @@ if( $grp_ID !== NULL )
 
 	if( $action != 'view' && $action != 'list' && $action != 'filter' )
 	{ // check edit permissions
-		if( !$current_User->check_perm( 'users', 'edit' ) )
+		if( ! check_user_perm( 'users', 'edit' ) )
 		{
 			$Messages->add( TB_('You have no permission to edit groups!'), 'error' );
 			$action = 'view';
@@ -287,9 +287,9 @@ if( !empty( $edited_Group ) )
 		$AdminUI->breadcrumbpath_add( $edited_Group->dget('name'), '?ctrl=groups&amp;action=new' );
 	}
 }
-if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
+if( $action == 'list' && check_user_perm( 'users', 'edit', false ) )
 { // Include to edit group level
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 }
 
 // Set an url for manual page:
@@ -324,7 +324,7 @@ switch( $action )
 				// Memorize action to filter permissions table:
 				memorize_param( 'action', 'string', true );
 				// Load JavaScript to toggle checkboxes:
-				require_js( 'collectionperms.js', 'rsc_url' );
+				require_js_defer( 'collectionperms.js', 'rsc_url' );
 				break;
 			default:
 				// General Permissions:

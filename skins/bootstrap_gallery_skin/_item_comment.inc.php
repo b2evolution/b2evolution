@@ -185,7 +185,7 @@ echo '</span>';
 echo '<div class="action_btn_group">';
 	$Comment->edit_link( ' ', '', '#', T_('Edit this reply'), button_class( 'text' ).' comment_edit_btn', '&amp;', true, $comment_redirect_url ); /* Link for editing */
 	echo '<span class="'.button_class( 'group' ).'">';
-		$delete_button_is_displayed = is_logged_in() && $current_User->check_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
+		$delete_button_is_displayed = check_user_perm( 'comment!CURSTATUS', 'delete', false, $Comment );
 		$Comment->moderation_links( array(
 			'text' => '#',
 			'ajax_button' => true,

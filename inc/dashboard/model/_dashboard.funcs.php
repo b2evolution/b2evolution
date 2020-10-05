@@ -359,7 +359,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
+		$user_permission = check_user_perm( 'meta_comment', 'edit', false, $Comment );
 		if( $user_permission )
 		{ // Put the internal comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';

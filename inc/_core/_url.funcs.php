@@ -564,7 +564,28 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL,
 
 
 /**
+ * Force URL to https if currently this protocol is used
+ *
+ * @param string URL
+ * @return string URL forced to https protocol
+ */
+function force_https_if_needed( $url )
+{
+	if( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] != 'off' &&
+	    substr( $url, 0, 7 ) == 'http://' )
+	{	// Force http URL to currently used https protocol:
+		$url = 'https://'.substr( $url, 7 );
+	}
+	// else: we do NOT need to change https -> http
+
+	return $url;
+}
+
+
+/**
  * Get $url with the same protocol (http/https) as $other_url.
+ *
+ * @deprecated Use force_https_if_needed() instead because we do NOT need to change https -> http, only http -> https is really important.
  *
  * @param string URL
  * @param string other URL (defaults to {@link $ReqHost})
@@ -983,8 +1004,7 @@ function get_dispctrl_url( $dispctrl, $params = '' )
 
 	if( is_admin_page() || empty( $Blog ) )
 	{ // Backoffice part
-		global $current_User;
-		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_status( 'can_access_admin' ) )
+		if( check_user_perm( 'admin', 'restricted' ) && check_user_status( 'can_access_admin' ) )
 		{ // User must has an access to backoffice
 			global $admin_url;
 			return url_add_param( $admin_url, 'ctrl='.$dispctrl.$params );
@@ -1187,24 +1207,25 @@ function clear_url( $url, $exclude_params )
 
 
 /**
- * Keep only allowed noredir params from current URL in the given URL
+ * Keep allowed params from current URL in the given URL by config
  *
  * @param string Given URL
  * @param string Separator between URL params
- * @param array Additional noredir params for config var $noredir_params. Used for Item's switchable params
- * @return string Given URL with allowed noredir params which are found in current URL
+ * @param array Additional params for config params. Used for Item's switchable params
+ * @return string Given URL with allowed params which are found in currently opened URL
  */
-function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = array() )
+function url_keep_params( $url, $glue = '&', $custom_keep_params = array() )
 {
-	global $noredir_params;
+	// By default allow params from this config for all cases:
+	global $passthru_in_all_redirs__params;
 
-	$all_noredir_params = is_array( $custom_noredir_params ) ? $custom_noredir_params : array();
-	if( is_array( $noredir_params ) )
-	{	// Merge config and custom noredir params:
-		$all_noredir_params = array_merge( $noredir_params, $all_noredir_params );
+	$all_keep_params = is_array( $custom_keep_params ) ? $custom_keep_params : array();
+	if( is_array( $passthru_in_all_redirs__params ) )
+	{	// Merge config and custom params:
+		$all_keep_params = array_merge( $passthru_in_all_redirs__params, $all_keep_params );
 	}
 
-	if( empty( $all_noredir_params ) )
+	if( empty( $all_keep_params ) )
 	{	// No allowed params:
 		return $url;
 	}
@@ -1216,7 +1237,7 @@ function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = a
 	$allowed_params = array();
 	foreach( $_GET as $param => $value )
 	{	// Check each GET param:
-		if( in_array( $param, $all_noredir_params ) && // If param is allowed by config $noredir_params
+		if( in_array( $param, $all_keep_params ) && // If param is allowed by config and custom params
 		    ! in_array( $param, $url_params ) ) // If param is NOT defined in the given URL yet
 		{
 			$allowed_params[ $param ] = $value;
@@ -1225,5 +1246,74 @@ function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = a
 
 	// Append allowed params from current URL to the given URL:
 	return url_add_param( $url, $allowed_params, $glue );
+}
+
+
+/**
+ * Keep allowed params from current URL in the given Canonical URL
+ *
+ * @param string Canonical URL
+ * @param string Separator between URL params
+ * @param array Additional params for config params. Used for Item's switchable params
+ * @return string Canonical URL with allowed params which are found in currently opened URL
+ */
+function url_keep_canonicals_params( $canonical_url, $glue = '&', $custom_keep_params = array() )
+{
+	global $accepted_in_canonicals__params, $accepted_in_canonicals_disp__params, $disp;
+
+	// For canonical URLs we should keep params from additional config:
+	if( is_array( $accepted_in_canonicals__params ) )
+	{	// Merge config and custom params:
+		$custom_keep_params = array_merge( $accepted_in_canonicals__params, $custom_keep_params );
+	}
+
+	if( isset( $disp, $accepted_in_canonicals_disp__params[ $disp ] ) &&
+	    is_array( $accepted_in_canonicals_disp__params[ $disp ] ) )
+	{	// Allow also params per current disp:
+		$custom_keep_params = array_merge( $accepted_in_canonicals_disp__params[ $disp ], $custom_keep_params );
+	}
+
+	return url_keep_params( $canonical_url, $glue, $custom_keep_params );
+}
+
+
+/**
+ * Get URL with same domain as current URL
+ *
+ * @param string Original URL to check and use with current domain
+ * @return string Fixed URL with domain of current URL
+ */
+function get_same_domain_url( $url )
+{
+	global $ReqHost;
+
+	if( ! isset( $ReqHost ) || strpos( $url, $ReqHost ) === 0 )
+	{	// If domain of original URL is same as current URL domain:
+		return $url;
+	}
+	else
+	{	// Use current domain if domains are different, e.g. when collection URL uses subdomain or different absolute URL:
+		return preg_replace( '#^https?://[^/]+#i', $ReqHost, $url );
+	}
+}
+
+
+/**
+ * Get admin URL
+ *
+ * @param string URL params
+ * @param string Delimiter to use for more params
+ * @return string Admin URL
+ */
+function get_admin_url( $url_params = '', $glue = '&amp;' )
+{
+	global $admin_url, $current_admin_url;
+
+	if( ! isset( $current_admin_url ) )
+	{	// Initialize current admin URL once:
+		$current_admin_url = get_same_domain_url( $admin_url );
+	}
+
+	return url_add_param( $current_admin_url, $url_params, $glue );
 }
 ?>

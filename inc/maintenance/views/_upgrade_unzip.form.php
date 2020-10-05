@@ -40,7 +40,7 @@ if( $action_success && $unzip_success )
 elseif( $unzip_success )
 { // Init the buttons to select next action
 	$form_buttons[] = array( 'submit', 'actionArray[ready]', TB_('Skip Unzip'), 'SaveButton' );
-	if( file_exists( $upgrade_file ) && $current_User->check_perm( 'files', 'all' ) )
+	if( file_exists( $upgrade_file ) && check_user_perm( 'files', 'all' ) )
 	{	// Allow to unzip only if current user has a permission to edit all files:
 		$form_buttons[] = array( 'submit', 'actionArray[force_unzip]', TB_('Force New Unzip'), 'SaveButton btn-warning' );
 	}

@@ -46,7 +46,7 @@ $AdminUI->breadcrumbpath_add( TB_('Site Dashboard'), $admin_url.'?ctrl=dashboard
 $AdminUI->set_page_manual_link( 'site-dashboard' );
 
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-require_js( '#jqueryUI#' );
+require_js_defer( '#jqueryUI#' );
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -54,8 +54,8 @@ require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for 
 require_js_helper( 'colorbox' );
 
 // Include files to work with charts
-require_js( '#easypiechart#' );
-require_css( 'jquery/jquery.easy-pie-chart.css' );
+require_js_defer( '#easypiechart#' );
+require_css( 'ext:jquery/easy-pie-chart/css/jquery.easy-pie-chart.css' );
 
 // Init JS to autcomplete the user logins
 init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
@@ -70,7 +70,7 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 $collection_count = get_table_count( 'T_blogs' );
-if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
+if( check_user_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
@@ -82,7 +82,7 @@ $AdminUI->disp_payload_end();
  * Administrative tasks
  */
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // We have some serious admin privilege:
 	/**
 	 * @var AbstractSettings

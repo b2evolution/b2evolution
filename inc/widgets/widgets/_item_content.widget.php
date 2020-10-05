@@ -100,7 +100,12 @@ class item_content_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
-				)
+				),
+				'info' => array(
+					'type' => 'info',
+					'label' => T_('Info'),
+					'info' => sprintf( T_('This widget will use the templates associated with the current <a %s>Item Type</a>.'), 'href="'.get_admin_url( 'ctrl=itemtypes&amp;blog='.$this->get_coll_ID() ).'"' ),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )

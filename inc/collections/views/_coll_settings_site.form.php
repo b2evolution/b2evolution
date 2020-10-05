@@ -14,10 +14,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -40,7 +36,7 @@ $Form->hidden( 'action', 'update_settings_site' );
 
 // --------------------------------------------
 
-if( $current_User->check_perm( 'users', 'edit' ) )
+if( check_user_perm( 'users', 'edit' ) )
 {
 	$Form->begin_fieldset( TB_('Locking down b2evolution for maintenance, upgrade or server switching...').get_manual_link('system-lock') );
 		$Form->checkbox_input( 'system_lock', $Settings->get('system_lock'), TB_('Lock system'), array(
@@ -120,7 +116,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 }

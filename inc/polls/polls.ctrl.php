@@ -19,7 +19,7 @@ load_class( 'polls/model/_poll_option.class.php', 'PollOption' );
 
 
 // Check minimum permission:
-$current_User->check_perm( 'polls', 'create', true );
+check_user_perm( 'polls', 'create', true );
 
 $AdminUI->set_path( 'site', 'polls' );
 
@@ -53,14 +53,14 @@ switch( $action )
 {
 	case 'new':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'create', true );
+		check_user_perm( 'polls', 'create', true );
 
 		$edited_Poll = new Poll();
 		break;
 
 	case 'edit':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'view', true, $edited_Poll );
+		check_user_perm( 'polls', 'view', true, $edited_Poll );
 		break;
  
 	case 'create':
@@ -71,7 +71,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to create polls:
-		$current_User->check_perm( 'polls', 'create', true );
+		check_user_perm( 'polls', 'create', true );
 
 		// load data from request
 		if( $edited_Poll->load_from_Request() )
@@ -94,7 +94,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit the poll:
-		$current_User->check_perm( 'polls', 'edit', true );
+		check_user_perm( 'polls', 'edit', true );
 
 		// Make sure we got an pqst_ID:
 		param( 'pqst_ID', 'integer', true );
@@ -120,7 +120,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit polls:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'pqst_ID', 'integer', true );
@@ -142,14 +142,14 @@ switch( $action )
 
 	case 'new_option':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		$edited_PollOption = new PollOption();
 		break;
 
 	case 'edit_option':
 		// Check permission:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 		break;
  
 	case 'create_option':
@@ -160,7 +160,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to create polls:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// load data from request
 		if( $edited_PollOption->load_from_Request( $edited_Poll->ID ) )
@@ -183,7 +183,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit the poll:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'popt_ID', 'integer', true );
@@ -209,7 +209,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'poll' );
 
 		// Check that current user has permission to edit polls:
-		$current_User->check_perm( 'polls', 'edit', true, $edited_Poll );
+		check_user_perm( 'polls', 'edit', true, $edited_Poll );
 
 		// Make sure we got an pqst_ID:
 		param( 'popt_ID', 'integer', true );

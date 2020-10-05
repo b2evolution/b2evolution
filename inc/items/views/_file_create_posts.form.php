@@ -110,7 +110,7 @@ function fcpf_categories_select( $parent_category_ID = -1, $level = 0 )
 $FileCache = & get_FileCache();
 
 // Check if current user can add new categories
-$user_has_cat_perms = $current_User->check_perm( 'blog_cats', '', false, $blog );
+$user_has_cat_perms = check_user_perm( 'blog_cats', '', false, $blog );
 
 // Get the categories
 $categories = fcpf_categories_select();

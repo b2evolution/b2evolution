@@ -86,7 +86,7 @@ switch( $action )
 		}
 
 		// Check permissions to create new collection:
-		if( ! $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
+		if( ! check_user_perm( 'blogs', 'create', false, $sec_ID ) )
 		{
 			$Messages->add( TB_('You don\'t have permission to create a collection.'), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
@@ -94,7 +94,7 @@ switch( $action )
 		}
 
 		// Check permissions to copy the selected collection:
-		if( $action == 'copy' && ! $current_User->check_perm( 'blog_properties', 'copy', false, $edited_Blog->ID ) )
+		if( $action == 'copy' && ! check_user_perm( 'blog_properties', 'copy', false, $edited_Blog->ID ) )
 		{
 			$Messages->add( sprintf( TB_('You don\'t have a permission to copy the collection "%s".'), $edited_Blog->get( 'shortname' ) ), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
@@ -127,7 +127,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0, true );
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
+		check_user_perm( 'blogs', 'create', true, $sec_ID );
 
 		param( 'kind', 'string', true );
 
@@ -140,7 +140,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
+		check_user_perm( 'blogs', 'create', true, $sec_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -169,7 +169,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blogs', 'create', true, $sec_ID );
+		check_user_perm( 'blogs', 'create', true, $sec_ID );
 
 		$edited_Blog = new Blog( NULL );
 
@@ -178,7 +178,7 @@ switch( $action )
 		param( 'kind', 'string', true );
 		param( 'blog_urlname', 'string', true );
 
-		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
+		if( $kind == 'main' && ! check_user_perm( 'blog_admin', 'editAll', false ) )
 		{ // Non-collection admins should not be able to create home/main collections
 			$Messages->add( sprintf( TB_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
 			header_redirect( $admin_url.'?ctrl=collections' ); // will EXIT
@@ -189,7 +189,7 @@ switch( $action )
 		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		$edited_Blog->init_by_kind( $kind );
-		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+		if( ! check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		{ // validate the urlname, which was already set by init_by_kind() function
 		 	// It needs to validated, because the user can not set the blog urlname, and every new blog would have the same urlname without validation.
 		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
@@ -203,10 +203,25 @@ switch( $action )
 			param_error( 'create_demo_contents', TB_('Please select an option for "New contents"') );
 		}
 
+		if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
+		{	// Allow to create demo organization and users only for collection admins:
+			param( 'create_demo_org', 'boolean', false );
+			param( 'create_demo_users', 'boolean', false );
+		}
+		else
+		{	// Deny to create demo organization and users for not collection admins:
+			set_param( 'create_demo_org', false );
+			set_param( 'create_demo_users', false );
+		}
+
 		if( $edited_Blog->load_from_Request() )
 		{
 			// create the new blog
-			$edited_Blog->create( $kind );
+			$edited_Blog->create( $kind, array(
+					'create_demo_contents' => $create_demo_contents,
+					'create_demo_users'    => $create_demo_users,
+					'create_demo_org'      => $create_demo_org,
+				) );
 
 			global $Settings;
 
@@ -228,52 +243,6 @@ switch( $action )
 			}
 			$Settings->dbupdate();
 
-			// Create demo contents for the new collection:
-			if( $create_demo_contents )
-			{
-				global $user_org_IDs;
-
-				load_funcs( 'collections/_demo_content.funcs.php' );
-				if( $current_User->check_perm( 'blog_admin', 'editall', false ) )
-				{ // Only collection admins can create demo organization and users
-					param( 'create_demo_org', 'boolean', false );
-					param( 'create_demo_users', 'boolean', false );
-				}
-				else
-				{
-					set_param( 'create_demo_org', false );
-					set_param( 'create_demo_users', false );
-				}
-				$user_org_IDs = NULL;
-
-				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', false ) )
-				{ // Create the demo organization
-					if( $new_demo_organization = create_demo_organization( $edited_Blog->owner_user_ID ) )
-					{
-						$user_org_IDs = array( $new_demo_organization->ID );
-					}
-				}
-
-				// Switch locale to translate content
-				locale_temp_switch( param( 'blog_locale', 'string' ) );
-
-				$error_messages = array();
-				if( $create_demo_users )
-				{
-					get_demo_users( true, false, $error_messages );
-				}
-
-				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, true, 86400, $error_messages );
-				if( $error_messages )
-				{
-					foreach( $error_messages as $error_message )
-					{
-						$Messages->add_to_group( $error_message, 'error', TB_('Demo contents').':' );
-					}
-				}
-				locale_restore_previous();
-			}
-
 			// We want to highlight the edited object on next list display:
 			// $Session->set( 'fadeout_array', array( 'blog_ID' => array($edited_Blog->ID) ) );
 
@@ -290,7 +259,7 @@ switch( $action )
 		param( 'sec_ID', 'integer', 0 );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'copy', true, $edited_Blog->ID );
+		check_user_perm( 'blog_properties', 'copy', true, $edited_Blog->ID );
 
 		// Get name of the duplicating collection to display on the form:
 		$duplicating_collection_name = $edited_Blog->get( 'shortname' );
@@ -318,7 +287,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collection' );
 
 		// Check permissions:
-		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
+		check_user_perm( 'blog_properties', 'edit', true, $blog );
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed
@@ -361,7 +330,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'collectionsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$Settings->set( 'blogs_order_by', param( 'blogs_order_by', 'string', true ) );
 		$Settings->set( 'blogs_order_dir', param( 'blogs_order_dir', 'string', true ) );
@@ -434,10 +403,10 @@ switch( $action )
 		$Session->assert_received_crumb( 'collectionsettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Lock system
-		if( $current_User->check_perm( 'users', 'edit' ) )
+		if( check_user_perm( 'users', 'edit' ) )
 		{
 			$system_lock = param( 'system_lock', 'integer', 0 );
 			if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )
@@ -533,7 +502,7 @@ switch( $action )
 		// New/Edit section:
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'view', true, $edited_Section->ID );
+		check_user_perm( 'section', 'view', true, $edited_Section->ID );
 		break;
 
 	case 'create_section':
@@ -544,7 +513,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'section' );
 
 		// Check permission:
-		$current_User->check_perm( 'section', 'edit', true, $edited_Section->ID );
+		check_user_perm( 'section', 'edit', true, $edited_Section->ID );
 
 		if( $edited_Section->load_from_Request() )
 		{
@@ -573,7 +542,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'section' );
 
 		// Check permissions:
-		$current_User->check_perm( 'section', 'edit', true, $edited_Section->ID );
+		check_user_perm( 'section', 'edit', true, $edited_Section->ID );
 
 		if( $edited_Section->ID == 1 )
 		{	// Forbid to delete default section:
@@ -608,7 +577,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'siteskin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'skinpage', 'string', '' );
 
@@ -723,7 +692,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'demo_content' );
 
 		// Check permission:
-		$current_User->check_perm( 'blogs', 'create', true );
+		check_user_perm( 'blogs', 'create', true );
 
 		// Install process is executed below in template in order to display it in real time.
 		break;
@@ -735,7 +704,7 @@ switch( $tab )
 		if( $Settings->get( 'site_skins_enabled' ) )
 		{
 			// Check minimum permission:
-			$current_User->check_perm( 'options', 'view', true );
+			check_user_perm( 'options', 'view', true );
 
 			$AdminUI->set_path( 'site', 'skin', 'skin_'.$skin_type );
 
@@ -757,7 +726,7 @@ switch( $tab )
 
 	case 'site_settings':
 		// Check minimum permission:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		$AdminUI->set_path( 'site', 'settings' );
 
@@ -772,7 +741,7 @@ switch( $tab )
 
 	case 'blog_settings':
 		// Check minimum permission:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
@@ -1041,7 +1010,7 @@ switch( $action )
 				}
 
 				// Welcome panel to create demo content:
-				if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count == 0 )
+				if( check_user_perm( 'blogs', 'create' ) && $collection_count == 0 )
 				{
 					$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
 				}

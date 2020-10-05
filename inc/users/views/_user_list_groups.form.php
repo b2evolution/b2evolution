@@ -40,7 +40,7 @@ $Form->begin_fieldset( TB_('Change groups...').get_manual_link( 'userlist-change
 	// Primary Group:
 	$GroupCache = & get_GroupCache();
 	$group_where_sql = '';
-	if( ! $current_User->check_perm( 'users', 'edit' ) )
+	if( ! check_user_perm( 'users', 'edit' ) )
 	{	// Show the limited list for moderators:
 		$group_where_sql = 'grp_level < '.$current_User->get_Group()->get( 'level' );
 	}

@@ -16,10 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -113,7 +109,7 @@ $Form->info( TB_('Local / corrected time'), date_i18n( locale_timefmt(), $localt
 $Form->end_fieldset();
 
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array( array( 'submit', '', TB_('Save Changes!'), 'SaveButton' ) ) ) ;
 }

@@ -16,7 +16,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog, $Settings, $AdminUI, $current_User, $skin_type, $admin_url, $mode;
+global $Collection, $Blog, $Settings, $AdminUI, $skin_type, $admin_url, $mode;
 
 switch( $skin_type )
 {
@@ -57,9 +57,9 @@ $can_edit_skin_settings =
 	// When skin ID has a real value ( when $skin_ID = 0 means it must be the same as the normal skin value )
 	$skin_ID &&
 		// If current User can edit collection properties:
-	( ( isset( $Blog ) && $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) ) ||
+	( ( isset( $Blog ) && check_user_perm( 'blog_properties', 'edit', false, $Blog->ID ) ) ||
 		// If site skins are enabled and current User can edit site options:
-		( $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) )
+		( $Settings->get( 'site_skins_enabled' ) && check_user_perm( 'options', 'edit' ) )
 	);
 
 if( $can_edit_skin_settings )
@@ -112,7 +112,7 @@ $Form->begin_form( 'fform' );
 	// Initialize a link to go to site/collection skin settings:
 	if( isset( $Blog ) )
 	{	// If collection skin page is opened currently:
-		if( $current_User->check_perm( 'options', 'view' ) )
+		if( check_user_perm( 'options', 'view' ) )
 		{	// If current user has a permission to view site skin:
 			$goto_link_url = $admin_url.'?ctrl=collections&amp;tab=site_skin'.( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' ? '&amp;skin_type='.$skin_type : '' );
 			$goto_link_title = TB_('Go to Site skin');
@@ -123,7 +123,7 @@ $Form->begin_form( 'fform' );
 	else
 	{	// If site skin page is opened currently:
 		if( ( $working_coll_ID = get_working_blog() ) &&
-		    $current_User->check_perm( 'blog_properties', 'edit', false, $working_coll_ID ) )
+		    check_user_perm( 'blog_properties', 'edit', false, $working_coll_ID ) )
 		{	// If working collection is set and current user has a permission to edit the collection skin:
 			$goto_link_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$working_coll_ID.( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' ? '&amp;skin_type='.$skin_type : '' );
 			$goto_link_title = TB_('Go to Collection skin');

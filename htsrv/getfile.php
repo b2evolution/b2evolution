@@ -70,7 +70,7 @@ if( ! $public_access_to_media )
 	//pre_dump( $perm_blog );
 
 	// Check permission (#2):
-	$current_User->check_perm( 'files', 'view', true, $perm_blog );
+	check_user_perm( 'files', 'view', true, $perm_blog );
 }
 
 // Load the other params:

@@ -24,22 +24,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function render_template_code( $code, & $params, $objects = array(), & $used_template_tags = NULL )
 {
-	global $current_locale;
-
 	$TemplateCache = & get_TemplateCache();
-	if( ! ( $Template = & $TemplateCache->get_by_code( $code, false, false ) ) )
-	{
-		return false;
-	}
-
-	// Check if the template has a child matching the current locale:
-	$localized_templates = $Template->get_localized_templates( $current_locale );
-	if( ! empty( $localized_templates ) )
-	{	// Use localized template:
-		$Template = & $localized_templates[0];
-	}
-
-	if( $Template )
+	if( $Template = & $TemplateCache->get_localized_by_code( $code, false, false ) )
 	{	// Render variables in available Template:
 		return render_template( $Template->template_code, $params, $objects, $used_template_tags );
 	}
@@ -62,7 +48,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|echo|set|param):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|User|echo|set|param):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -219,7 +205,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Chapter = ( !isset( $objects['Chapter'] ) ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Chapter/Category is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Chapter/Category is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -228,7 +214,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
 			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Collection/Blog is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -237,7 +223,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Comment = ( !isset( $objects['Comment'] ) ? $Comment : $objects['Comment'] );
 			if( empty( $rendered_Comment ) || ! ( $rendered_Comment instanceof Comment ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Comment is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Comment is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -246,7 +232,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_File = ( !isset( $objects['File'] ) ? $File : $objects['File'] );
 			if( empty( $rendered_File ) || ! ( $rendered_File instanceof File ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object File is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object File is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -255,7 +241,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Form = ( !isset( $objects['Form'] ) ? $Form : $objects['Form'] );
 			if( empty( $rendered_Form ) || ! ( $rendered_Form instanceof Form ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Form is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Form is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -266,11 +252,11 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $rendered_Item ))
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Item is not defined at this moment.', 'span' );
 			}
 			if( ! ( $rendered_Item instanceof Item ) )
 			{
-				return '<span class="evo_param_error">Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.</span>';
+				return get_rendering_error( 'Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.', 'span' );
 			}
 			break;
 
@@ -285,7 +271,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $rendered_Plugin ) )
 			{
-				return '<span class="evo_param_error">Plugin <code>'.$match_var[3].'</code> is not installed.</span>';
+				return get_rendering_error( 'Plugin <code>'.$match_var[3].'</code> is not installed.', 'span' );
 			}
 
 			$var = $scope;
@@ -296,7 +282,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $tag ))
 			{
-				return '<span class="evo_param_error">['.$var.']: Tag is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Tag is not defined at this moment.', 'span' );
 			}
 			break;
 
@@ -304,16 +290,25 @@ function render_template_callback( $var, $params, $objects = array() )
 			$param_name = substr( $var, 5 );
 			if( ! isset( $params[ $param_name ] ) )
 			{	// Param is not found:
-				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not passed.</span>';
+				return get_rendering_error( 'Param <code>'.$param_name.'</code> is not passed.', 'span' );
 			}
 			elseif( ! is_scalar( $params[ $param_name ] ) )
 			{	// Param is not scalar and cannot be printed on screen:
-				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not scalar.</span>';
+				return get_rendering_error( 'Param <code>'.$param_name.'</code> is not scalar.', 'span' );
+			}
+			break;
+
+		case 'User':
+			global $User;
+			$rendered_User = ( !isset( $objects['User'] ) ? $User : $objects['User'] );
+			if( empty( $rendered_User ) || ! ( $rendered_User instanceof User ) )
+			{
+				return get_rendering_error( '['.$var.']: Object User is not defined at this moment.', 'span' );
 			}
 			break;
 
 		default:
-			return '<span class="evo_param_error">['.$var.']: Scope "'.$scope.':" is not recognized.</span>';
+			return get_rendering_error( '['.$var.']: Scope "'.$scope.':" is not recognized.', 'span' );
 	}
 
 	$match_found = true;
@@ -700,11 +695,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Form:search_content_type':
-			global $Blog, $current_User;
+			global $Blog;
 
 			if( ! $Blog )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Blog is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Blog is not defined at this moment.', 'span' );
 			}
 
 			$search_type = param( 'search_type', 'string', NULL );
@@ -718,8 +713,7 @@ function render_template_callback( $var, $params, $objects = array() )
 				$content_type_options['comment'] = T_('Comments');
 			}
 			if( $Blog->get_setting( 'search_include_metas' ) &&
-			    is_logged_in() &&
-			    $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID )  )
+			    check_user_perm( 'meta_comment', 'view', false, $Blog->ID )  )
 			{
 				$content_type_options['meta'] = T_('Internal comments');
 			}
@@ -875,6 +869,10 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
+		case 'Item:files':
+			echo $rendered_Item->get_files( $params );
+			break;
+
 		case 'Item:flag_icon':
 			echo $rendered_Item->get_flag( $params );
 			break;
@@ -902,9 +900,9 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item:images':
 			echo $rendered_Item->get_images( array_merge( array(
-					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+																// '#cover_and_teaser_all' => 'cover,background,teaser,teaserperm,teaserlink'
 					'limit'                      => 1000, // Max # of images displayed
 					'before'                     => '<div>',
 					'before_image'               => '<figure class="evo_image_block">',
@@ -926,7 +924,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 				), $params ) );
 			break;
-			
+
 		case 'Item:issue_date':
 			$rendered_Item->issue_date( $params );
 			break;
@@ -946,6 +944,15 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Item->lastedit_user( array_merge( array(
 					'link_text' => 'auto',		// select login or nice name automatically
 				), $params ) );
+			break;
+
+		case 'Item:location':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'before'    => '<div class="evo_post_location"><strong>'.T_('Location').': </strong>',
+					'after'     => '</div>',
+					'separator' => ', ',
+				), $params );
+			echo $rendered_Item->get_location( $temp_params['before'], $temp_params['after'], $temp_params['separator'] );
 			break;
 
 		case 'Item:mod_date':
@@ -1026,6 +1033,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->get_type_setting( 'name' );
 			break;
 
+		case 'Item:url_link':
+			$rendered_Item->url_link( $params );
+			break;
+
 		case 'Item:visibility_status':
 			if( $rendered_Item->status != 'published' )
 			{
@@ -1049,7 +1060,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $temp_params['disp'] ) )
 			{
-				echo '<span class="evo_param_error">['.$var.']: Missing required param "disp".</span>';
+				display_rendering_error( '['.$var.']: Missing required param "disp".', 'span' );
 				break;
 			}
 
@@ -1088,7 +1099,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			}
 			else
 			{
-				echo '<span class="evo_param_error">['.$var.']: disp "'.$temp_params['disp'].'" is not recognized.</span>';
+				display_rendering_error( '['.$var.']: disp "'.$temp_params['disp'].'" is not recognized.', 'span' );
 			}
 			break;
 
@@ -1096,7 +1107,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Plugin->SkinTag( $params );
 			break;
 
-		// Tag
+		// Tag:
 		case 'Tag:name':
 			echo $tag;
 			break;
@@ -1106,7 +1117,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
 			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
+				return get_rendering_error( '['.$var.']: Object Collection/Blog is not defined at this moment.', 'span' );
 			}
 
 			$temp_params = array(
@@ -1121,7 +1132,110 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			echo $rendered_Blog->get_tag_link( $tag, $temp_params['text'], $temp_params );
 			break;
-		
+
+		// User:
+		case 'User:custom':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'field'       => NULL,
+					'before'      => '',
+					'before_item' => '',
+					'after_item'  => '',
+					'after'       => '',
+					'separator'   => '',
+					'limit'       => NULL,
+				), $params );
+			$userfield_values = $rendered_User->userfield_values_by_code( $temp_params['field'], true );
+
+			if( is_array( $userfield_values ) )
+			{	// We expect $userfield_values to be an Array:
+				if( isset( $temp_params['limit'] ) )
+				{
+					$userfield_values = array_slice( $userfield_values, 0, ( int ) $temp_params['limit'] );
+				}
+
+				if( ! empty( $temp_params['before_item'] ) || ! empty( $temp_params['after_item'] ) )
+				{
+					$temp_values = array();
+					foreach( $userfield_values as $userfield_value )
+					{
+						$temp_values[] = $temp_params['before_item'].$userfield_value.$temp_params['after_item'];
+					}
+					$userfield_values = $temp_values;
+				}
+
+				echo format_to_output( $temp_params['before'].implode( $temp_params['separator'], $userfield_values ).$temp_params['after'] );
+			}
+			else
+			{
+				debug_die( '$userfield_values is not an array!' );
+			}
+			break;
+
+		case 'User:email':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->email( $temp_params['format'] );
+			break;
+
+		case 'User:first_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->first_name( $temp_params['format'] );
+			break;
+
+		case 'User:fullname':
+			echo $rendered_User->get( 'fullname' );
+			break;
+
+		case 'User:id':
+			echo $rendered_User->ID;
+			break;
+
+		case 'User:last_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->last_name( $temp_params['format'] );
+			break;
+
+		case 'User:login':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			echo $rendered_User->login( $temp_params['format'] );
+			break;
+
+		case 'User:nick_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->nick_name( $temp_params['format'] );
+			break;
+
+		case 'User:picture':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'size'                => 'crop-top-64x64',
+					'class'               => 'avatar',
+					'align'               => '',
+					'zoomable'            => false,
+					'avatar_overlay_text' => '',
+					'lightbox_group'      => '',
+					'tag_size'            => NULL,
+					'protocol'            => '',
+				), $params );
+			echo $rendered_User->get_avatar_imgtag( $temp_params['size'], $temp_params['class'], $temp_params['align'], $temp_params['zoomable'],
+					$temp_params['avatar_overlay_text'], $temp_params['lightbox_group'], $temp_params['tag_size'], $temp_params['protocol'] );
+			break;
+
+		case 'User:preferred_name':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => 'htmlbody',		
+				), $params );
+			$rendered_User->preferred_name( $temp_params['format'] );
+			break;
+
 		// Others
 		default:
 			switch( $scope )
@@ -1144,7 +1258,7 @@ function render_template_callback( $var, $params, $objects = array() )
 	}
 	else
 	{	// Display error for not recognized variable:
-		return '<span class="evo_param_error">['.$var.'] is not recognized.</span>';
+		return get_rendering_error( '['.$var.'] is not recognized.', 'span' );
 	}
 }
 
@@ -1216,13 +1330,40 @@ function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', 
 /**
  * Get list of context available to templates
  */
-function get_template_contexts()
+function get_template_contexts( $format = 'keys', $exclude = array() )
 {
-	return array(
-		'custom1', 'custom2', 'custom3',
-		'content_list_master', 'content_list_item', 'content_list_category',
-		'content_block', 'item_details', 'item_content',
-		'registration_master', 'registration',
-		'search_form', 'search_result' );
+	$template_contexts = array(
+			'custom1'               => sprintf( T_('Custom %d'), 1 ),
+			'custom2'               => sprintf( T_('Custom %d'), 2 ),
+			'custom3'               => sprintf( T_('Custom %d'), 3 ),
+			'content_list_master'   => T_('Content List Master'),
+			'content_list_item'     => T_('Content List Item'),
+			'content_list_category' => T_('Content List Category'),
+			'content_block'         => T_('Content Block'),
+			'item_details'          => T_('Item Details'),
+			'item_content'          => T_('Item Content'),
+			'registration_master'   => T_('Registration Master'),
+			'registration'          => T_('Registration'),
+			'search_form'           => T_('Search Form'),
+			'search_result'         => T_('Search Result')
+		);
+
+	if( !empty( $exclude ) )
+	{
+		$template_contexts = array_diff_key( $template_contexts, array_fill_keys( $exclude, NULL ) );
+	}
+
+	switch( $format )
+	{
+		case 'keys':
+			$template_contexts = array_keys( $template_contexts );
+			break;
+
+		case 'raw':
+		default:
+			// Do nothing
+	}
+
+	return $template_contexts;
 }
 ?>

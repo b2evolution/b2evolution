@@ -14,8 +14,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $deferred_AdminToolActions;
 
 // Check permission:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
 load_funcs( 'tools/model/_maintenance.funcs.php' );
@@ -26,11 +26,11 @@ load_funcs( 'tools/model/_system.funcs.php' );
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
 
-if( $current_User->check_perm( 'options', 'edit' ) &&
+if( check_user_perm( 'options', 'edit' ) &&
     ( $action != 'utf8check' && $action != 'utf8upgrade' ) &&
     system_check_charset_update() )
 { // DB charset is required to update
-	$Messages->add( sprintf( TB_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
+	$Messages->add( sprintf( TB_('WARNING: Your database and/or some of your tables have a different charset/collation than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
 }
 
 param( 'tab', 'string', '', true );
@@ -38,7 +38,7 @@ param( 'tab3', 'string', 'tools', true );
 
 if( $tab3 == 'import' )
 {	// Check permission for import pages:
-	$current_User->check_perm( 'options', 'edit', true );
+	check_user_perm( 'options', 'edit', true );
 }
 
 $tab_Plugin = NULL;
@@ -71,7 +71,14 @@ if( ! empty($tab) )
 }
 
 // Highlight the requested tab (if valid):
-$AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
+if( $tab_Plugin && method_exists( $tab_Plugin, 'adminUI_set_path' ) )
+{
+	$tab_Plugin->adminUI_set_path( $AdminUI );
+}
+else
+{
+	$AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
+}
 
 
 if( empty( $tab ) )
@@ -82,7 +89,7 @@ if( empty( $tab ) )
 		$Session->assert_received_crumb( 'tools' );
 
 		// fp> TODO: have an option to only PRUNE files older than for example 30 days
-		$current_User->check_perm('options', 'edit', true);
+		check_user_perm('options', 'edit', true);
 	}
 
 	set_max_execution_time( 0 );
@@ -111,19 +118,19 @@ if( empty( $tab ) )
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			$template_log_title = TB_('Clear full page caches (/cache/* directories)');
+			$template_log_title = TB_('Clear full page caches (/_cache/* directories)');
 			$template_action = $action;
 			break;
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			$template_log_title = TB_('Clear thumbnail caches (?evocache directories)');
+			$template_log_title = TB_('Clear thumbnail caches (_evocache directories)');
 			$template_action = $action;
 			break;
 
 		case 'repair_cache':
 			// Repair cache
-			$template_log_title = TB_('Repair /cache/* directory structure');
+			$template_log_title = TB_('Repair /_cache/* directory structure');
 			$template_action = $action;
 			break;
 
@@ -481,10 +488,10 @@ if( empty( $tab ) )
 			// UPDATE general settings from tools:
 
 			// Check permission:
-			$current_User->check_perm( 'options', 'edit', true );
+			check_user_perm( 'options', 'edit', true );
 
 			// Lock system
-			if( $current_User->check_perm( 'users', 'edit' ) )
+			if( check_user_perm( 'users', 'edit' ) )
 			{
 				$system_lock = param( 'system_lock', 'integer', 0 );
 				if( $Settings->get( 'system_lock' ) && ( ! $system_lock ) && ( ! $Messages->has_errors() ) && ( 1 == $Messages->count() ) )

@@ -66,11 +66,13 @@ body {
 			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
 			font-weight: normal;
 		}
-		&.user {
-			color: #ccc; // Don't use a color for user names in the header site menu
+		&.evo_widget_basic_menu_link_myprofile {
 			position: relative;
 			padding-left: 49px;
-			font-weight: normal;
+			.user {
+				color: #ccc; // Don't use a color for user names in the header site menu
+				font-weight: normal;
+			}
 			img {
 				position: absolute;
 				top: 0;
@@ -105,7 +107,7 @@ body {
 	.evo_widget {
 		padding: 0;
 		display: inline-block;
-		&.widget_core_msg_menu_link .badge {
+		.evo_widget_basic_menu_link_messages .badge {
 			margin-top: -3px;
 		}
 		&.widget_core_site_logo a:hover {

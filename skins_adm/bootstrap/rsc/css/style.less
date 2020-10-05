@@ -1124,6 +1124,12 @@ h2.user_title::first-line {
 	}
 }
 
+#ffield_item_tags {
+	.input-group {
+		width: 100%;
+	}
+}
+
 #ffield_item_switchable_params {
 	.evo_fields_table__input {
 		display: table;
@@ -1136,6 +1142,15 @@ h2.user_title::first-line {
 		> input[type=text] {
 			display: table-cell;
 		}
+	}
+}
+
+#ffield_post_title {
+	.evo_fields_table__label {
+		font-size: 18px;
+	}
+	.form_text_input {
+		font-size: 20px;
 	}
 }
 
@@ -1940,6 +1955,15 @@ div.query-builder .rule-container .rule-value-container {
 	}
 	.controls .help-inline {
 		display: inline-block;
+	}
+	.form-group.checkbox-group {
+		.controls {
+			display: inline-block;
+			vertical-align: middle;
+			.checkbox {
+				padding-top: 2px;
+			}
+		}
 	}
 	.file_select_item {
 		margin: 0;

@@ -18,8 +18,8 @@ global $admin_url;
 
 
 // Check permission to display:
-$current_User->check_perm( 'admin', 'normal', true );
-$current_User->check_perm( 'options', 'view', true );
+check_user_perm( 'admin', 'normal', true );
+check_user_perm( 'options', 'view', true );
 
 load_funcs( 'plugins/_plugin.funcs.php' );
 
@@ -104,7 +104,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'plugin' );
 
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -155,7 +155,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'plugin' );
 
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -242,7 +242,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		if( $admin_Plugins->reload_plugins() )
 		{ // Plugins have been changed
@@ -268,7 +268,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin', 'string', true );
 
@@ -288,7 +288,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', 0 );
 
@@ -363,7 +363,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
 		param( 'uninstall_confirmed_drop', 'integer', 0 );
@@ -453,7 +453,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -628,7 +628,7 @@ switch( $action )
 
 	case 'edit_settings':
 		// Check permission:
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		// Edit plugin settings:
 		param( 'plugin_ID', 'integer', true );
@@ -672,7 +672,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'plugin' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		param( 'plugin_ID', 'integer', true );
 
@@ -816,7 +816,7 @@ switch( $action )
 	case 'disp_help_plain': // just the help, without any payload
 
 		// Check permission: (with plugins... you never know...)
-		$current_User->check_perm( 'options', 'view', true );
+		check_user_perm( 'options', 'view', true );
 
 		param( 'plugin_class', 'string', true );
 
@@ -1044,7 +1044,7 @@ switch( $action )
 		// Display plugin info:
 		$Form = new Form( $pagenow );
 
-		if( $edit_Plugin->ID > 0 && $current_User->check_perm( 'options', 'edit', false ) )
+		if( $edit_Plugin->ID > 0 && check_user_perm( 'options', 'edit', false ) )
 		{ // Edit settings button (if installed):
 			$Form->global_icon( TB_('Edit plugin settings!'), 'edit', $admin_url.'?ctrl=plugins&amp;action=edit_settings&amp;plugin_ID='.$edit_Plugin->ID );
 		}

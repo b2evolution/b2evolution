@@ -51,7 +51,7 @@ $line_class = 'odd';
  */
 function cat_line( $Chapter, $level )
 {
-	global $line_class, $permission_to_edit, $current_User, $Settings, $admin_url;
+	global $line_class, $permission_to_edit, $Settings, $admin_url;
 	global $ChapterCache, $current_default_cat_ID;
 	global $number_of_posts_in_cat;
 

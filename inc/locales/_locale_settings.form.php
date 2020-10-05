@@ -16,10 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * @var User
- */
-global $current_User;
-/**
  * @var GeneralSettings
  */
 global $Settings;
@@ -260,7 +256,7 @@ else
 				$messages_pot_file_info['messages.pot']['all'].' '.$button_generate_POT_file,
 				$messages_DB_info.' '.$button_import_POT_file
 			).'<br />';
-		if( $current_User->check_perm( 'options', 'edit' ) && !$allow_po_extraction )
+		if( check_user_perm( 'options', 'edit' ) && !$allow_po_extraction )
 		{
 			echo '<span class="notes">';
 			echo TB_('To allow the extraction of language files, please set $allow_po_extraction = 1; in conf/_locales.php.');
@@ -291,7 +287,7 @@ else
 		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?> title="<?php echo TB_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
 			?>"><?php echo TB_('Start of week') ?></th>
 		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo TB_('Priority') ?></th>
-		<?php if( $current_User->check_perm( 'options', 'edit' ) )
+		<?php if( check_user_perm( 'options', 'edit' ) )
 		{ ?>
 			<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo TB_('Edit') ?></th>
 			<?php
@@ -303,7 +299,7 @@ else
 			<th colspan="2"><?php echo TB_('Back-office') ?></th>
 			<th colspan="2"><?php echo TB_('Demo contents') ?></th>
 			<?php
-			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
+			if( check_user_perm( 'options', 'edit' ) && $allow_po_extraction )
 			{
 				echo '<th rowspan="2" class="lastcol">'.TB_('Extract').'</th>';
 			}
@@ -452,12 +448,12 @@ else
 			locale_flag( $lkey );
 			echo'
 			<strong>';
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
 				echo '<a href="'.$pagenow.'?ctrl=locales&amp;action=edit&amp;edit_locale='.$lkey.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'" title="'.TB_('Edit locale').'">';
 			}
 			echo $lkey;
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
 				echo '</a>';
 			}
@@ -489,7 +485,7 @@ else
 		echo '<td class="right">'.$locale_data['priority'].'</td>';
 
 
-		if( $current_User->check_perm( 'options', 'edit' ) )
+		if( check_user_perm( 'options', 'edit' ) )
 		{
 			if( $loc_transinfo )
 			{
@@ -551,7 +547,7 @@ else
 				$po_file = $locales_path.$locale_data['messages'].'/LC_MESSAGES/'.$po_file;
 				if( ! is_file( $po_file ) )
 				{
-					echo '<td class="lastcol center" colspan="'.(1 + (int)($current_User->check_perm( 'options', 'edit' ) )).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.TB_('No PO file').'</a></td>';
+					echo '<td class="lastcol center" colspan="'.(1 + (int)(check_user_perm( 'options', 'edit' ) )).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.TB_('No PO file').'</a></td>';
 				}
 				else
 				{ // File exists:
@@ -566,7 +562,7 @@ else
 				}
 			}
 
-			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
+			if( check_user_perm( 'options', 'edit' ) && $allow_po_extraction )
 			{ // Translator options:
 				if( is_file( $po_file ) )
 				{
@@ -585,7 +581,7 @@ else
 
 	echo '</table>';
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{
 		echo '<p class="center"><a href="'.$pagenow.'?ctrl=locales&amp;action=edit'.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;edit_locale=_new_">'.get_icon( 'new' ).' '.TB_('Create new locale').'</a></p>';
 
@@ -598,7 +594,7 @@ else
 
 	$Form->end_fieldset();
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{
 		$Form->end_form( array( array( 'submit', 'submit', TB_('Save Changes!'), 'SaveButton' ) ) );
 	}

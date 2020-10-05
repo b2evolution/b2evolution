@@ -290,16 +290,16 @@ div.avatartag {
 	[class^=evobar-icon-] {
 		display: inline-block;
 		font-size: 10px;
-		&:before {
+		&::before {
 			width: 10px;
 			height: 10px;
 			content: "\25BC"; // arrow down
 		}
 	}
-	.evobar-icon-right:before {
+	.evobar-icon-right::before {
 		content: "\25B6"; // arrow right
 	}
-	.evobar-icon-left:before {
+	.evobar-icon-left::before {
 		content: "\25C0"; // arrow left
 	}
 }
@@ -370,11 +370,7 @@ span.checkbox_error input.checkbox {
 span.checkbox_surround {
 	background: #fbf2ee;
 	border: 1px solid #F825F1;
-}
-span.checkbox_surround input.checkbox {
-	background: #fbf2ee;
-}
-span.checkbox_surround_init {
+	border-radius: 2px;
 	padding : 1px;
 }
 // Large inputs and textareas (with full width)
@@ -566,7 +562,7 @@ div.bText div.log_container li {
 	padding: 0;
 	background: none;
 }
-div.bText div.log_container ul li:before {
+div.bText div.log_container ul li::before {
 	content: none;
 }
 // ---------------- //

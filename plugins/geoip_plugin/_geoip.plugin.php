@@ -38,7 +38,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $plugin_actions = array( 'geoip_download', 'geoip_find_country', 'geoip_fix_country' );
@@ -585,8 +585,7 @@ jQuery( document ).ready( function()
 			return;
 		}
 
-		global $current_User;
-		if( ! is_logged_in() || ! $current_User->check_perm( 'options', 'edit' ) )
+		if( ! check_user_perm( 'options', 'edit' ) )
 		{	// Current User must has a permission to run tools:
 			return;
 		}

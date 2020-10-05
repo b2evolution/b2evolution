@@ -117,7 +117,7 @@ function load_db_schema( $inlcude_plugins = false )
 	// Load modules:
 	foreach( $modules as $module )
 	{
-		echo get_install_format_text( 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />', 'br' );
+		echo get_install_format_text_and_log( 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />', 'br' );
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 
@@ -687,8 +687,11 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 	}
 
 	if( $params['always_continue'] || $maxwords < 1 )
-	{ // we want a continued text
-		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
+	{ // we want a continued text if avoid_end_hellip is not set:
+		if( ! isset( $params['avoid_end_hellip'] ) )
+		{
+			$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
+		}
 	}
 
 	return $str;
@@ -1637,9 +1640,11 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
 	{
 		$additional_attrs = ' '.trim( $additional_attrs );
 	}
-	//return $text;
-	/*preg_match( '/<code>([.\r\n]+?)<\/code>/i', $text, $matches );
-	pre_dump( $text, $matches );*/
+
+	// Add style class to break long urls:
+	$additional_attrs = stripos( $additional_attrs, ' class="' ) === false
+		? $additional_attrs.' class="linebreak"'
+		: preg_replace( '/ class="([^"]*)"/i', ' class="$1 linebreak"', $additional_attrs );
 
 	$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
 	$text = preg_replace(
@@ -3142,29 +3147,46 @@ function debug_die( $additional_info = '', $params = array() )
 			header($status_header);
 		}
 
-		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3 style="color:#f00;">'.T_('An unexpected error has occurred!').'</h3>';
-		echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
-		echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
-		echo '</div>';
-
+		$too_many_connections = false;
 		if( ! empty( $additional_info ) )
-		{
-			echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
-			if( $debug || $display_errors_on_production )
-			{ // Display additional info only in debug mode or when it was explicitly set by display_errors_on_production setting because it can reveal system info to hackers and greatly facilitate exploits
-				echo '<h3>'.T_('Additional information about this error:').'</h3>';
-				echo $additional_info;
-			}
-			else
+		{	//Handling of "Too many connections":
+			$find_token = 'Too many connections';
+
+			if( preg_match( "/{$find_token}/i", $additional_info ) ) 
 			{
-				echo '<p><i>Enable debugging to get additional information about this error.</i></p>' . get_manual_link('debugging','How to enable debug mode?');
+				load_funcs( 'skins/_skin.funcs.php' );
+				$too_many_connections = true;
+				require skin_fallback_path( 'too_many_connections.main.php', 6 );
+				http_response_code( 503 );
 			}
+		}
+
+		if( ! $too_many_connections )
+		{
+			echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
+			echo '<h3 style="color:#f00;">'.T_('An unexpected error has occurred!').'</h3>';
+			echo '<p>'.T_('If this error persists, please report it to the administrator.').'</p>';
+			echo '<p><a href="'.$baseurl.'">'.T_('Go back to home page').'</a></p>';
 			echo '</div>';
 
-			// Append the error text to AJAX log if it is AJAX request
-			ajax_log_add( $additional_info, 'error' );
-			ajax_log_display();
+			if( ! empty( $additional_info ) )
+			{
+				echo '<div style="background-color: #ddd; padding: 1ex; margin-bottom: 1ex;">';
+				if( $debug || $display_errors_on_production )
+				{ // Display additional info only in debug mode or when it was explicitly set by display_errors_on_production setting because it can reveal system info to hackers and greatly facilitate exploits
+					echo '<h3>'.T_('Additional information about this error:').'</h3>';
+					echo $additional_info;
+				}
+				else
+				{
+					echo '<p><i>Enable debugging to get additional information about this error.</i></p>' . get_manual_link('debugging','How to enable debug mode?');
+				}
+				echo '</div>';
+
+				// Append the error text to AJAX log if it is AJAX request
+				ajax_log_add( $additional_info, 'error' );
+				ajax_log_display();
+			}
 		}
 	}
 
@@ -3370,10 +3392,10 @@ function debug_info( $force = false, $force_clean = false )
 
 		$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 
-		require_js( '#jqueryUI#', $relative_to, false, true );
+		require_js_defer( '#jqueryUI#', $relative_to, true );
 		require_css( '#jqueryUI_css#', $relative_to, NULL, NULL, '#', true );
-		require_js( 'debug_jslog.js', $relative_to, false, true );
-		require_js( 'jquery/jquery.cookie.min.js', $relative_to, false, true );
+		require_js_defer( 'debug_jslog.js', $relative_to, true );
+		require_js_defer( 'ext:jquery/cookie/jquery.cookie.min.js', $relative_to, true );
 
 		$jslog_style_cookies = param_cookie( 'jslog_style', 'string' );
 		$jslog_styles = array();
@@ -3482,8 +3504,24 @@ function debug_info( $force = false, $force_clean = false )
 	}
 
 	// FULL DEBUG INFO(s) FROM PREVIOUS SESSION(s), after REDIRECT(s):
-	if( isset( $Session ) && ( $sess_debug_infos = $Session->get( 'debug_infos' ) ) && ! empty( $sess_debug_infos ) )
-	{
+	$get_redirected_debuginfo_from_sess_ID = param( 'get_redirected_debuginfo_from_sess_ID', 'integer' );
+	if( ! empty( $get_redirected_debuginfo_from_sess_ID ) )
+	 {	// Get Session by ID for debug info from redirected page:
+		// (This is used for redirect from different domain)
+		$debug_info_Session = new Session( $get_redirected_debuginfo_from_sess_ID );
+	}
+	elseif( isset( $Session ) )
+	{	// Use current Session for debug info from redirected page:
+		$debug_info_Session = $Session;
+	}
+
+	if( isset( $debug_info_Session ) && ! empty( $debug_info_Session->ID ) )
+	{	// Get debug info from redirected page:
+		$sess_debug_infos = $debug_info_Session->get( 'debug_infos' );
+	}
+
+	if( ! empty( $sess_debug_infos ) )
+	{	// Display debug info from redirected page:
 		$count_sess_debug_infos = count( $sess_debug_infos );
 		if( $count_sess_debug_infos > 1 )
 		{	// Links to those Debuglogs:
@@ -3545,7 +3583,7 @@ function debug_info( $force = false, $force_clean = false )
 		// So in that case we want them to move over to the next page...
 		if( $http_response_code < 300 || $http_response_code >= 400 )
 		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
-			$Session->delete( 'debug_infos' );
+			$debug_info_Session->delete( 'debug_infos' );
 		}
 
 		echo "\n\n\n";
@@ -3690,21 +3728,8 @@ function debug_info( $force = false, $force_clean = false )
 
 			// add jquery.tablesorter to the "Debug info" table.
 			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, true, true );
-			echo '
-			<script>
-			(function($){
-				jQuery( "table.debug_timer th" ).on( "click", function(event) {
-					var table = jQuery(this).closest( "table.debug_timer" );
-					if( table.data( "clicked_once" ) ) return; else table.data( "clicked_once", true );
-					jQuery( "tbody:eq(0) tr:last", table ).remove();
-					jQuery( "tbody:eq(1) tr", table ).appendTo( jQuery( "tbody:eq(0)", table ) );
-					// click for tablesorter:
-					table.tablesorter();
-					jQuery(event.currentTarget).click();
-				});
-			})(jQuery);
-			</script>';
+			require_js_defer( 'ext:jquery/tablesorter/jquery.tablesorter.min.js', $relative_to, true );
+			require_js_defer( 'src/evo_init_debug_timer.js', $relative_to, true );
 		}
 
 
@@ -4653,7 +4678,7 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
  */
 function mail_template( $template_name, $format = 'auto', $params = array(), $User = NULL )
 {
-	global $current_charset, $current_User;
+	global $current_charset;
 	global $track_email_image_load, $track_email_click_html, $track_email_click_plain_text;
 
 	$params = array_merge( array(
@@ -5054,7 +5079,7 @@ function action_icon( $title, $icon, $url, $word = NULL, $icon_weight = NULL, $w
 		// OR we default to icon because the user doesn't want the word either!!
 
 		$icon_attribs = array_merge( array(
-				'title' => $title
+				'title' => false, // No need to set attribute "ttile" for icon because parent <a> already has it
 			), $icon_attribs );
 
 		if( $icon_s = get_icon( $icon, 'imgtag', $icon_attribs, true ) )
@@ -7714,34 +7739,53 @@ function is_ip_url_domain( $url )
  */
 function save_to_file( $data, $filename, $mode = 'a' )
 {
-	global $Settings;
+	global $Settings, $evo_save_file_error_msg;
 
-	if( ! file_exists($filename) )
-	{	// Create target file
-		@touch( $filename );
+	if( ! file_exists( $filename ) )
+	{	// Try to create a target file:
+		if( ! @touch( $filename ) )
+		{	// If file could not be created:
+			$evo_save_file_error_msg = T_('File could not be created!');
+			return false;
+		}
 
 		// Doesn't work during installation
-		if( !empty($Settings) )
+		if( ! empty( $Settings ) )
 		{
-			$chmod = $Settings->get('fm_default_chmod_file');
-			@chmod( $filename, octdec($chmod) );
+			$chmod = $Settings->get( 'fm_default_chmod_file' );
+			@chmod( $filename, octdec( $chmod ) );
 		}
 	}
 
-	if( ! is_writable($filename) )
-	{
+	if( ! is_writable( $filename ) )
+	{	// File is not writable:
+		$evo_save_file_error_msg = T_('File is not writable!');
 		return false;
 	}
 
-	$f = @fopen( $filename, $mode );
-	$ok = @fwrite( $f, $data );
+	if( ! ( $f = @fopen( $filename, $mode ) ) )
+	{	// Could not open file:
+		$evo_save_file_error_msg = T_('File could not be opened for writing data!');
+		return false;
+	}
+	if( ! @fwrite( $f, $data ) )
+	{	// Could not write data into file:
+		$evo_save_file_error_msg = T_('Data could not be written to the file!');
+		return false;
+	}
 	@fclose( $f );
 
-	if( $ok && file_exists($filename) )
-	{
-		return $filename;
+	if( ! file_exists( $filename ) )
+	{	// Additonal check for existing file on disk:
+		$evo_save_file_error_msg = T_('File doesn\'t exist!');
+		return false;
 	}
-	return false;
+
+	// Reset error log on success result:
+	$evo_save_file_error_msg = '';
+
+	// Return file name on success result:
+	return $filename;
 }
 
 
@@ -7983,11 +8027,11 @@ function echo_editable_column_js( $params = array() )
 	$params = array_merge( array(
 			'column_selector' => '', // jQuery selector of cell
 			'ajax_url'        => '', // AJAX url to update a column value
-			'options'         => array(), // Key = Value of option, Value = Title of option
+			'options'         => array(), // Key = Value of option, Value = Title of option. Do not use Javascript code to populate this - use 'options_eval' param to do this.
 			'new_field_name'  => '', // Name of _POST variable that will be send to ajax request with new value
 			'ID_value'        => '', // jQuery to get value of ID
 			'ID_name'         => '', // ID of field in DB
-			'tooltip'         => TS_('Click to edit'),
+			'tooltip'         => T_('Click to edit'),
 			'colored_cells'   => false, // Use TRUE when colors are used for background of cell
 			'print_init_tags' => true, // Use FALSE to don't print <script> tags if it is already used inside js
 			'field_type'      => 'select', // Type of the editable field: 'select', 'text'
@@ -7996,122 +8040,7 @@ function echo_editable_column_js( $params = array() )
 			'callback_code'   => '', // Additional JS code after main callback code
 		), $params );
 
-	// Set onblur action to 'submit' when type is 'text' in order to don't miss the selected user login from autocomplete list
-	$onblur_action = $params['field_type'] == 'text' ? 'submit' : 'cancel';
-
-	if( $params['field_type'] == 'select' )
-	{
-		$options = '';
-		if( is_array( $params['options'] ) )
-		{
-			foreach( $params['options'] as $option_value => $option_title )
-			{
-				$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
-			}
-		}
-	}
-
-	if( $params['print_init_tags'] )
-	{
-?>
-<script>
-jQuery( document ).ready( function()
-{
-<?php
-	}
-?>
-if( jQuery( '<?php echo $params['column_selector']; ?>' ).length > 0 )
-{	// Initialize only when the requested element exists on the current page:
-	jQuery( '<?php echo $params['column_selector']; ?>' ).editable( '<?php echo $params['ajax_url']; ?>',
-	{
-		data: function( value, settings )
-		{
-			value = ajax_debug_clear( value );
-			<?php if( $params['field_type'] == 'select' ) { ?>
-			var result = value.match( /rel="([^"]*)"/ );
-			<?php
-			if( is_array( $params['options'] ) )
-			{
-				echo "return { ".$options."'selected' : result[1] }";
-			}
-			else
-			{
-				echo "return ".$params['options'];
-			}
-			?>
-			<?php } else { ?>
-			var result = value.match( />\s*([^<]+)\s*</ );
-			return result[1] == '<?php echo $params['null_text'] ?>' ? '' : result[1];
-			<?php } ?>
-		},
-		type       : '<?php echo $params['field_type']; ?>',
-		class_name : '<?php echo $params['field_class']; ?>',
-		name       : '<?php echo $params['new_field_name']; ?>',
-		tooltip    : '<?php echo $params['tooltip']; ?>',
-		event      : 'click',
-		onblur     : '<?php echo $onblur_action; ?>',
-		onedit     : function ( settings, original )
-		{
-			// Set width to fix value to don't change it on selector displaying:
-			var wrapper_width = jQuery( original ).width();
-			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
-		},
-		callback   : function ( settings, original )
-		{
-			<?php
-			if( $params['colored_cells'] )
-			{ // Use different color for each value
-			?>
-			jQuery( this ).html( ajax_debug_clear( settings ) );
-			var link = jQuery( this ).find( 'a' );
-			jQuery( this ).css( 'background-color', link.attr( 'color' ) == 'none' ? 'transparent' : link.attr( 'color' ) );
-			link.removeAttr( 'color' );
-			<?php
-			}
-			else
-			{ // Use simple fade effect
-			?>
-			if( typeof( evoFadeSuccess ) == 'function' )
-			{
-				evoFadeSuccess( this );
-			}
-			<?php
-			}
-			// Execute additional code:
-			echo $params['callback_code'];
-			?>
-		},
-		submitdata : function( value, settings )
-		{
-			return { <?php echo $params['ID_name']; ?>: <?php echo $params['ID_value']; ?> }
-		},
-		onerror : function( settings, original, xhr )
-		{
-			if( typeof( evoFadeFailure ) == 'function' )
-			{
-				evoFadeFailure( original );
-			}
-			var input = jQuery( original ).find( 'input' );
-			if( input.length > 0 )
-			{
-				jQuery( original ).find( 'span.field_error' ).remove();
-				input.addClass( 'field_error' );
-				if( typeof( xhr.responseText ) != 'undefined' )
-				{
-					input.after( '<span class="note field_error">' + xhr.responseText + '</span>' );
-				}
-			}
-		}
-	} );
-}
-<?php
-	if( $params['print_init_tags'] )
-	{
-?>
-} );
-</script>
-<?php
-	}
+	expose_var_to_js( $params['column_selector'], $params, 'evo_init_editable_column_config' );
 }
 
 
@@ -8343,83 +8272,7 @@ function echo_fieldset_folding_js()
 		return;
 	}
 
-?>
-<script>
-jQuery( document ).on( 'click', 'span[id^=icon_folding_], span[id^=title_folding_]', function()
-{
-	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
-	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
-	var value_obj = is_icon ? jQuery( this ).prev() : jQuery( this ).prev().prev();
-
-	if( wrapper_obj.length == 0 || value_obj.length == 0 )
-	{ // Invalid layout
-		return false;
-	}
-
-	if( value_obj.val() == '1' )
-	{ // Collapse
-		wrapper_obj.removeClass( 'folded' );
-		value_obj.val( '0' );
-	}
-	else
-	{ // Expand
-		wrapper_obj.addClass( 'folded' );
-		value_obj.val( '1' );
-	}
-
-	// Change icon image
-	var clickimg = is_icon ? jQuery( this ) : jQuery( this ).prev();
-	if( clickimg.hasClass( 'fa' ) || clickimg.hasClass( 'glyphicon' ) )
-	{ // Fontawesome icon | Glyph bootstrap icon
-		if( clickimg.data( 'toggle' ) != '' )
-		{ // This icon has a class name to toggle
-			var icon_prefix = ( clickimg.hasClass( 'fa' ) ? 'fa' : 'glyphicon' );
-			if( clickimg.data( 'toggle-orig-class' ) == undefined )
-			{ // Store original class name in data
-				clickimg.data( 'toggle-orig-class', clickimg.attr( 'class' ).replace( new RegExp( '^'+icon_prefix+' (.+)$', 'g' ), '$1' ) );
-			}
-			if( clickimg.hasClass( clickimg.data( 'toggle-orig-class' ) ) )
-			{ // Replace original class name with exnpanded
-				clickimg.removeClass( clickimg.data( 'toggle-orig-class' ) )
-					.addClass( icon_prefix + '-' + clickimg.data( 'toggle' ) );
-			}
-			else
-			{ // Revert back original class
-				clickimg.removeClass( icon_prefix + '-' + clickimg.data( 'toggle' ) )
-					.addClass( clickimg.data( 'toggle-orig-class' ) );
-			}
-		}
-	}
-	else
-	{ // Sprite icon
-		var icon_bg_pos = clickimg.css( 'background-position' );
-		clickimg.css( 'background-position', clickimg.data( 'xy' ) );
-		clickimg.data( 'xy', icon_bg_pos );
-	}
-
-	// Toggle title
-	var title = clickimg.attr( 'title' );
-	clickimg.attr( 'title', clickimg.data( 'title' ) );
-	clickimg.data( 'title', title );
-} );
-
-jQuery( 'input[type=hidden][id^=folding_value_]' ).each( function()
-{ // Check each feildset is folded correctly after refresh a page
-	var wrapper_obj = jQuery( this ).closest( '.fieldset_wrapper' );
-	if( jQuery( this ).val() == '1' )
-	{ // Collapse
-		wrapper_obj.addClass( 'folded' );
-	}
-	else
-	{ // Expand
-		wrapper_obj.removeClass( 'folded' );
-	}
-} );
-
-// Expand all fieldsets that have the fields with error
-jQuery( '.field_error' ).closest( '.fieldset_wrapper.folded' ).find( 'span[id^=icon_folding_]' ).click();
-</script>
-<?php
+	expose_var_to_js( 'evo_fieldset_folding_config', true );
 }
 
 
@@ -8456,6 +8309,56 @@ function save_fieldset_folding_values( $blog_ID = NULL )
 
 	// Update the folding setting for current user
 	$UserSettings->dbupdate();
+}
+
+
+/**
+ * Save the values of active tab pane into DB
+ *
+ * @param integer Blog ID is used to save setting per blog, NULL- to don't save per blog
+ */
+function save_active_tab_pane_value( $blog_ID = NULL )
+{
+	if( ! is_logged_in() )
+	{ // Only loggedin users can fold fieldset
+		return;
+	}
+
+	$tab_pane_value = param( 'tab_pane_active', 'array:string' );
+
+	if( empty( $tab_pane_value ) )
+	{ // No tab pane value go from request, Exit here
+		return;
+	}
+
+	global $UserSettings;
+
+	if( is_array( $tab_pane_value ) && ! empty( $tab_pane_value ) )
+	{	// Get first key:
+		$key = array_keys( $tab_pane_value );
+		$key = trim( $key[0] );
+	}
+	else
+	{
+		$key = '';
+	}
+
+	$value = ( isset( $tab_pane_value[ $key ] ) ) ? $tab_pane_value[ $key ] : '';
+	$value = trim( $value );
+	
+	if( ! empty( $key ) &&  ! empty( $value ) )
+	{
+		$setting_name = 'active_'.$key;
+
+		if( $blog_ID !== NULL )
+		{ // Save setting per blog
+			$setting_name .= '_'.$blog_ID;
+		}
+		$UserSettings->set( $setting_name, $value );
+
+		// Update the folding setting for current user
+		$UserSettings->dbupdate();
+	}
 }
 
 
@@ -8734,12 +8637,16 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
  * @param string Format (Used for CLI mode)
  * @return string Prepared text
  */
-function get_install_format_text( $text, $format = 'string' )
+function get_install_format_text_and_log( $text, $format = 'string' )
 {
-	global $display;
+	global $display, $logs_path, $log_file_handle, $avoid_log_file;
 
 	if( empty( $display ) || $display != 'cli' )
 	{	// Don't touch text for non CLI modes:
+		if( ! $avoid_log_file )
+		{	// Include in log file:
+			prepare_install_log_message( $text );
+		}
 		return $text;
 	}
 
@@ -8800,8 +8707,161 @@ function get_install_format_text( $text, $format = 'string' )
 
 	// Replace all html entities like "&nbsp;", "&raquo;", "&laquo;" to readable chars:
 	$text = html_entity_decode( $text );
-
+	
+	if( ! $avoid_log_file )
+	{	// Include in log file:
+		prepare_install_log_message( $text );
+	}
+	
 	return $text;
+}
+
+
+/**
+* Start to log into file on disk
+*/
+function start_install_log( $log_file_name )
+{	// TODO: Factorize with start_log():
+	global $rsc_url, $app_version_long, $log_file_handle, $logs_path, $servertimenow;
+
+	// Get file path for log:
+	$log_file_path = $logs_path.date( 'Y-m-d-H-i-s', $servertimenow ).'-'.$log_file_name.'.html';
+	
+	// Check log path is writeable or not: 
+	if ( ! is_writable( $logs_path ) ) {
+
+		return false;
+	}
+	
+	// Try to create log file:
+	if( ! ( $log_file_handle = fopen( $log_file_path, 'w' ) ) )
+	{	
+		return false;
+	}
+
+	// Write header of the log file:
+	install_log_to_file( '<!DOCTYPE html>'."\r\n"
+		.'<html lang="en-US">'."\r\n"
+		.'<head>'."\r\n"
+		.'<link href="'.$rsc_url.'css/bootstrap/bootstrap.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
+		.'</head>'."\r\n"
+		.'<body>'."\r\n"
+		.'<div style="padding:5px">' );
+}
+
+
+/**
+* End of log into file on disk
+*/
+function end_install_log()
+{	// TODO: Factorize with end_log():
+	global $log_file_handle;
+
+	// Write footer of the log file:
+	install_log_to_file( '</div>'."\r\n"
+		.'</body>'."\r\n"
+		.'</html>' );
+
+	if( isset( $log_file_handle ) && $log_file_handle )
+	{	// Close the log file:
+		fclose( $log_file_handle );
+	}
+}
+
+
+/**
+* Log a message on screen and into file on disk
+*
+* @param string Message
+* @param string Type: 'success', 'error', 'warning'
+* @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+* @param boolean TRUE to display label
+*/
+function prepare_install_log_message( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
+{	// TODO: Factorize with log():
+	global $log_file_handle;
+
+	if( ! isset( $log_file_handle ) || ! $log_file_handle )
+	{	
+		return false;
+	}
+	
+	$message = get_install_log( $message, $type, $type_html_tag, $display_label );
+
+	if( $message === false )
+	{	// Skip when message should not be displayed:
+		return;
+	}
+
+	// Try to store a message into the log file on the disk:
+	install_log_to_file( $message );
+}
+
+
+/**
+* Get a log message
+*
+* @param string Message
+* @param string Type: 'success', 'error', 'warning', 'info'
+* @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+* @param boolean TRUE to display label
+* @return string|FALSE Formatted log message, FALSE - when message should not be displayed
+*/
+function get_install_log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
+{	// TODO: Factorize with get_log():
+	if( $message === '' )
+	{	// Don't log empty strings:
+		return false;
+	}
+
+	switch( $type )
+	{
+		case 'success':
+			$before = '<'.$type_html_tag.' class="text-success"> ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		case 'error':
+			$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label ? '<span class="label label-danger">ERROR</span>' : '' ).' ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		case 'warning':
+			$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		case 'info':
+			$before = '<'.$type_html_tag.' class="text-info">'.( $display_label ? '<span class="label label-info">INFO</span>' : '' ).' ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		default:
+			$before = '';
+			$after = '';
+			break;
+	}
+
+	return $before.$message.$after;
+}
+
+
+/**
+* Log a message into file on disk
+*
+* @param string Message
+*/
+function install_log_to_file( $message )
+{	// TODO: Factorize with log_to_file():
+	global $log_file_handle;
+
+	if( ! isset( $log_file_handle ) || ! $log_file_handle )
+	{	
+		return false;
+	}
+
+	// Put a message into the log file on the disk:
+	fwrite( $log_file_handle, $message."\r\n" );
 }
 
 
@@ -8843,7 +8903,49 @@ function render_inline_files( $content, $Object, $params = array() )
 	$params = array_merge( array(
 			'check_code_block' => false,
 			'clear_paragraph'  => true,
+			'render_tag_image'     => true,
+			'render_tag_file'      => true,
+			'render_tag_inline'    => true,
+			'render_tag_video'     => true,
+			'render_tag_audio'     => true,
+			'render_tag_thumbnail' => true,
+			'render_tag_folder'    => true,
 		), $params );
+
+		$render_tags = array();
+		if( $params['render_tag_image'] )
+		{	// Render short tag [image:]
+			$render_tags[] = 'image';
+		}
+		if( $params['render_tag_file'] )
+		{	// Render short tag [file:]
+			$render_tags[] = 'file';
+		}
+		if( $params['render_tag_inline'] )
+		{	// Render short tag [inline:]
+			$render_tags[] = 'inline';
+		}
+		if( $params['render_tag_video'] )
+		{	// Render short tag [video:]
+			$render_tags[] = 'video';
+		}
+		if( $params['render_tag_audio'] )
+		{	// Render short tag [audio:]
+			$render_tags[] = 'audio';
+		}
+		if( $params['render_tag_thumbnail'] )
+		{	// Render short tag [thumbnail:]
+			$render_tags[] = 'thumbnail';
+		}
+		if( $params['render_tag_folder'] )
+		{	// Render short tag [folder:]
+			$render_tags[] = 'folder';
+		}
+
+		if( empty( $render_tags ) )
+		{	// No tags for rendering:
+			return $content;
+		}
 
 	if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 	{	// Call render_inline_files() on everything outside code/pre:
@@ -8862,7 +8964,7 @@ function render_inline_files( $content, $Object, $params = array() )
 	}
 
 	// Find all matches with inline tags
-	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
+	preg_match_all( '/\[('.implode( '|', $render_tags ).'):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
 
 	if( !empty( $inlines[0] ) )
 	{	// There are inline tags in the content...
@@ -9050,14 +9152,36 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
 							$current_file_params['title'] = $inline_params[0];
 						}
-						$opt_index++;
+						if( $inline_type == 'image' )
+						{	// Caption has always a reserved placefor image short tag:
+							$opt_index++;
+						}
 
-						// TODO: Alt text:
+						// RegExp to detect HRef option:
+						$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+
+						// Alt text:
+						$current_image_params['image_alt'] = '';
+						if( isset( $inline_params[ $opt_index ] ) &&
+						    substr( $inline_params[ $opt_index ], 0, 1 ) != '.' &&
+						    ! preg_match( $href_regexp, $inline_params[ $opt_index ] ) &&
+						    ( $inline_type == 'image' || ! in_array( $inline_params[ $opt_index ], array( 'small', 'medium', 'large', 'original' ) ) ) )
+						{	// Override the image File's alt text with provided in current inline tag:
+							if( $inline_params[ $opt_index ] == '-' )
+							{	// Alt text display is disabled:
+								$current_image_params['image_alt'] = '-';
+							}
+							else
+							{	// New image alt text was set:
+								$current_image_params['image_alt'] = strip_tags( $inline_params[ $opt_index ] );
+							}
+							$opt_index++;
+						}
 
 						// HRef:
 						if( $inline_type != 'inline' &&
 						    ! empty( $inline_params[ $opt_index ] ) &&
-						    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $inline_params[ $opt_index ], $href_match ) )
+						    preg_match( $href_regexp, $inline_params[ $opt_index ], $href_match ) )
 						{
 							if( stripos( $href_match[0], 'http' ) === 0 )
 							{	// Absolute URL:
@@ -9177,12 +9301,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									unset( $current_file_params['class'] );
 								}
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										'', '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
+										'', '', $current_image_params['image_alt'], '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
 								break;
 
 							default:
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', '', '' );
+										( empty( $current_file_params['class'] ) ? '' : $current_file_params['class'] ), '', $current_image_params['image_alt'], '' );
 						}
 					}
 				}
@@ -9197,6 +9321,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				{
 					global $thumbnail_sizes;
 
+					$thumbnail_alt = '';
 					$thumbnail_href = false;
 					$thumbnail_rel = NULL;
 					$thumbnail_additional_class = false;
@@ -9211,11 +9336,29 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						$inline_params = explode( ':', $inline[4] );
 						$opt_index = 0;
 
-						// TODO: Alt text:
+						// RegExp to detect HRef option:
+						$href_regexp = '#^(https?|\(\((.*?)\)\))$#i';
+
+						// Alt text:
+						if( isset( $inline_params[ $opt_index ] ) &&
+						    substr( $inline_params[ $opt_index ], 0, 1 ) != '.' &&
+						    ! preg_match( $href_regexp, $inline_params[ $opt_index ] ) &&
+						    ! in_array( $inline_params[ $opt_index ], array( 'small', 'medium', 'large', 'left', 'right' ) ) )
+						{	// Override the image File's alt text with provided in current inline tag:
+							if( $inline_params[ $opt_index ] == '-' )
+							{	// Alt text display is disabled:
+								$thumbnail_alt = '-';
+							}
+							else
+							{	// New image alt text was set:
+								$thumbnail_alt = strip_tags( $inline_params[ $opt_index ] );
+							}
+							$opt_index++;
+						}
 
 						// HRef:
 						if( ! empty( $inline_params[ $opt_index ] ) &&
-						    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $inline_params[ $opt_index ], $href_match ) )
+						    preg_match( $href_regexp, $inline_params[ $opt_index ], $href_match ) )
 						{
 							if( stripos( $href_match[0], 'http' ) === 0 )
 							{	// Absolute URL:
@@ -9305,6 +9448,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						'image_link_title'    => '',	// can be text or #title# or #desc#
 						'image_link_rel'      => $thumbnail_rel,
 						'image_class'         => implode( ' ', $thumbnail_classes ),
+						'image_alt'           => $thumbnail_alt,
 					);
 
 					switch( $object_class )
@@ -9743,7 +9887,7 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	if( ! empty( $Item ) )
 	{	// Try to get attached images
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink', 'image', array(
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,background,teaser,teaserperm,teaserlink', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
 		{	// Item has linked files:
@@ -9867,8 +10011,8 @@ function insert_image_links_block( $params )
 			}
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& ( ( $edited_Item && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) ) || ( empty( $edited_Item ) && $params['temp_ID'] ) )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& ( ( $edited_Item && check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) ) || ( empty( $edited_Item ) && $params['temp_ID'] ) )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new posts we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9893,8 +10037,8 @@ function insert_image_links_block( $params )
 			}
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& check_user_perm( 'comment!CURSTATUS', 'edit', false, $edited_Comment )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new comments we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9912,8 +10056,8 @@ function insert_image_links_block( $params )
 			$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'emails', 'edit', false )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& check_user_perm( 'emails', 'edit', false )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -9931,8 +10075,8 @@ function insert_image_links_block( $params )
 			$edited_Message = $MessageCache->get_by_ID( $params['target_ID'], false, false );
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'perm_messaging', 'reply' )
-				&& $current_User->check_perm( 'files', 'view', false ) )
+				&& check_user_perm( 'perm_messaging', 'reply' )
+				&& check_user_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new messages we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
 				global $LinkOwner; // Initialize this object as global because this is used in many link functions
@@ -10004,7 +10148,7 @@ function get_csv_line( $row, $delimiter = ';', $enclosure = '"', $eol = "\n" )
  */
 function display_importer_upload_panel( $params = array() )
 {
-	global $admin_url, $current_User, $media_path;
+	global $admin_url, $media_path;
 
 	$params = array_merge( array(
 			'folder'                 => '',
@@ -10045,14 +10189,14 @@ function display_importer_upload_panel( $params = array() )
 
 	$FileRootCache = & get_FileRootCache();
 	$FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
-	$import_perm_view = $current_User->check_perm( 'files', 'view', false, $FileRoot );
+	$import_perm_view = check_user_perm( 'files', 'view', false, $FileRoot );
 	if( $import_perm_view )
 	{ // Current user must has access to the import dir
-		if( $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		if( check_user_perm( 'files', 'edit_allowed', false, $FileRoot ) )
 		{ // User has full access
 			$import_title = T_('Upload/Manage import files');
 		}
-		else if( $current_User->check_perm( 'files', 'add', false, $FileRoot ) )
+		else if( check_user_perm( 'files', 'add', false, $FileRoot ) )
 		{ // User can only upload the files to import root
 			$import_title = T_('Upload import files');
 		}
@@ -10508,5 +10652,102 @@ function get_querybuilder_operator( $operator )
 		default:
 			return $operator;
 	}
+}
+
+
+/**
+ * Temporary function to check if we should use defer when loading scripts.
+ */
+function use_defer()
+{
+	global $disp, $ReqPath,
+		$use_defer,
+		$use_defer_for_backoffice,
+		$use_defer_for_loggedin_users,
+		$use_defer_for_anonymous_users,
+		$use_defer_for_anonymous_disp_register,
+		$use_defer_for_anonymous_disp_register_finish,
+		$use_defer_for_anonymous_disp_users,
+		$use_defer_for_anonymous_disp_anonpost,
+		$use_defer_for_loggedin_disp_single_page,
+		$use_defer_for_loggedin_disp_front,
+		$use_defer_for_loggedin_disp_profile,
+		$use_defer_for_loggedin_disp_pwdchange,
+		$use_defer_for_loggedin_disp_edit,
+		$use_defer_for_loggedin_disp_proposechange,
+		$use_defer_for_loggedin_disp_edit_comment,
+		$use_defer_for_loggedin_disp_comments,
+		$use_defer_for_loggedin_disp_visits,
+		$use_defer_for_loggedin_disp_messages,
+		$use_defer_for_loggedin_disp_threads,
+		$use_defer_for_loggedin_disp_users,
+		$use_defer_for_loggedin_disp_contacts,
+		$use_defer_for_default_register_form;
+	
+	$r =  $use_defer
+		   && ( is_admin_page() ? $use_defer_for_backoffice : true )
+		   && ( is_logged_in() ? $use_defer_for_loggedin_users : $use_defer_for_anonymous_users )
+		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true )
+		   && ( $disp == 'register_finish' ? $use_defer_for_anonymous_disp_register_finish : true )
+		   && ( $disp == 'users' ? $use_defer_for_anonymous_disp_users : true )
+		   && ( $disp == 'anonpost' ? $use_defer_for_anonymous_disp_anonpost : true )
+		   && ( empty( $disp ) && $ReqPath == '/htsrv/register.php' ? $use_defer_for_default_register_form : true )
+		   && ( is_logged_in() && in_array( $disp, array( 'single', 'page' ) ) ? $use_defer_for_loggedin_disp_single_page : true )
+		   && ( is_logged_in() && $disp == 'front' ? $use_defer_for_loggedin_disp_front : true )
+		   && ( is_logged_in() && $disp == 'profile' ? $use_defer_for_loggedin_disp_profile : true )
+		   && ( is_logged_in() && $disp == 'pwdchange' ? $use_defer_for_loggedin_disp_pwdchange : true )
+		   && ( is_logged_in() && $disp == 'edit' ? $use_defer_for_loggedin_disp_edit : true )
+		   && ( is_logged_in() && $disp == 'proposechange' ? $use_defer_for_loggedin_disp_proposechange : true )
+		   && ( is_logged_in() && $disp == 'edit_comment' ? $use_defer_for_loggedin_disp_edit_comment : true )
+		   && ( is_logged_in() && $disp == 'comments' ? $use_defer_for_loggedin_disp_comments : true )
+		   && ( is_logged_in() && $disp == 'visits' ? $use_defer_for_loggedin_disp_visits : true )
+		   && ( is_logged_in() && $disp == 'messages' ? $use_defer_for_loggedin_disp_messages : true )
+		   && ( is_logged_in() && $disp == 'threads' ? $use_defer_for_loggedin_disp_threads : true )
+		   && ( is_logged_in() && $disp == 'users' ? $use_defer_for_loggedin_disp_users : true )
+		   && ( is_logged_in() && $disp == 'contacts' ? $use_defer_for_loggedin_disp_contacts : true );
+
+	return $r;
+}
+
+
+/**
+ * Get rendering error
+ *
+ * @param string Error message
+ * @param string HTML tag: <p>, <span>, <div>
+ * @return string
+ */
+function get_rendering_error( $error_message, $html_tag = 'p' )
+{
+	if( ! in_array( $html_tag, array( 'p', 'span', 'div' ) ) )
+	{	// Force not allowed html tag:
+		$html_tag = 'p';
+	}
+
+	return '<'.$html_tag.' class="evo_rendering_error">'.$error_message.'</'.$html_tag.'>';
+}
+
+
+/**
+ * Display rendering error
+ *
+ * @param string Error message
+ * @param string HTML tag: <p>, <span>, <div>
+ */
+function display_rendering_error( $error_message, $html_tag = 'p' )
+{
+	echo get_rendering_error( $error_message, $html_tag );
+}
+
+
+/**
+ * Clean up rendering errors `<p class="evo_rendering_error">...</p>` from provided content
+ *
+ * @param string Content with rendering error
+ * @return string Content without rendering error
+ */
+function clear_rendering_errors( $content )
+{
+	return preg_replace( '#<([a-z]+) class="evo_rendering_error">.+?</\1>#', '', $content );
 }
 ?>

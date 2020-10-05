@@ -91,7 +91,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Status'),
-		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'spamblacklist', 'edit' ) ?
 			/* Current user can edit IP ranges */'<a href="#" rel="$aipr_status$">%aipr_status_title( #aipr_status# )%</a>' :
 			/* No edit, only view the status */'%aipr_status_title( #aipr_status# )%',
 		'td_class' => 'jeditable_cell iprange_status_edit',
@@ -101,7 +101,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('IP Range Start'),
-		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'spamblacklist', 'edit' ) ?
 			/* Current user can edit IP ranges */'<a href="'.$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit&amp;filter=new">%int2ip( #aipr_IPv4start# )%</a>' :
 			/* No edit, only view the IP address */'%int2ip( #aipr_IPv4start# )%',
 		'order' => 'aipr_IPv4start',
@@ -109,7 +109,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('IP Range End'),
-		'td' => /* Check permission: */$current_User->check_perm( 'spamblacklist', 'edit' ) ?
+		'td' => /* Check permission: */check_user_perm( 'spamblacklist', 'edit' ) ?
 			/* Current user can edit IP ranges */'<a href="'.$admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges&amp;iprange_ID=$aipr_ID$&amp;action=iprange_edit&amp;filter=new">%int2ip( #aipr_IPv4end# )%</a>' :
 			/* No edit, only view the IP address */'%int2ip( #aipr_IPv4end# )%',
 		'order' => 'aipr_IPv4end',
@@ -142,7 +142,7 @@ $Plugins->trigger_event( 'GetAdditionalColumnsTable', array(
 	'column'  => 'aipr_IPv4start',
 	'Results' => $Results ) );
 
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 { // Check permission to edit IP ranges:
 
 	/**
@@ -175,14 +175,14 @@ if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
 		);
 }
 
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 {	// Check permission to edit IP ranges:
 	$Results->global_icon( T_('Add a new IP range...'), 'new', regenerate_url( 'action', 'action=iprange_new'), T_('New IP range').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 $Results->display();
 
-if( $current_User->check_perm( 'spamblacklist', 'edit' ) )
+if( check_user_perm( 'spamblacklist', 'edit' ) )
 { // Check permission to edit IP ranges:
 	// Print JS to edit status of IP range
 	echo_editable_column_js( array(

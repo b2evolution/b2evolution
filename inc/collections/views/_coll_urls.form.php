@@ -85,7 +85,7 @@ $Form->begin_fieldset( TB_('Collection base URL').get_admin_badge().get_manual_l
 			array( 'allow_both', sprintf( TB_('Allow both %s and %s as valid URLs'), '<code>http</code>', '<code>https</code>' ) )
 		);
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// Permission to edit advanced admin settings
 
 		$Form->radio( 'http_protocol', $edited_Blog->get_setting( 'http_protocol' ), $http_protocol_options, TB_('SSL'), true );
@@ -317,7 +317,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( TB_('Cookie Settings').get_admin_badge().get_manual_link( 'collection-cookie-settings' ) );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{	// If current user has a permission to edit collection advanced admin settings:
 		$Form->switch_layout( 'none' );
 		$Form->output = false;
@@ -347,7 +347,7 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( TB_('Assets URLs / CDN support').get_admin_badge().get_manual_link( 'assets-url-cdn-settings' ) );
 
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	if( check_user_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 	{ // Permission to edit advanced admin settings
 		global $rsc_url, $media_url, $skins_url, $plugins_url, $htsrv_url;
 
@@ -592,6 +592,21 @@ jQuery("#tag_prefix").keyup( function() {
 
 
 <?php
+$Form->begin_fieldset( TB_('User profile page URLs') . get_manual_link('user-profile-page-url-settings') );
+
+	$Form->text_input( 'user_prefix', $edited_Blog->get_setting( 'user_prefix' ), 30, TB_('Prefix'),
+		TB_('A prefix to be added to the URLs of the user profile pages'),
+		array( 'maxlength' => 120 ) );
+
+	$Form->radio( 'user_links', $edited_Blog->get_setting( 'user_links' ),
+		array(
+			array( 'params', TB_('Use params'), TB_('E-g: ').'<code>?disp=user&user_ID=4</code>' ),
+			array( 'prefix_id', TB_('Use prefix with user ID'), TB_('E-g: ').'<code>prefix:4</code>' ),
+			array( 'prefix_login', TB_('Use prefix with user login'), TB_('E-g: ').'<code>prefix:login</code>' ),
+		), TB_('User profile URLs'), true );
+
+$Form->end_fieldset();
+
 $Form->begin_fieldset( TB_('Single post URLs') . get_manual_link('single-post-url-settings') );
 
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),

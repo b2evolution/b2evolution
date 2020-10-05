@@ -68,10 +68,10 @@ class LinkUser extends LinkOwner
 
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
-			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+			return check_user_perm( 'files', $permlevel, $assert, $FileRoot );
 		}
 
-		return $current_User->ID == $this->User->ID || $current_User->check_perm( 'users', $permlevel, $assert );
+		return $current_User->ID == $this->User->ID || check_user_perm( 'users', $permlevel, $assert );
 	}
 
 	/**

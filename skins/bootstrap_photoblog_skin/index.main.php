@@ -146,6 +146,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'glue'              => ' - ',
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
+					'title_widget_page_disp'  => false,
 					'format'            => 'htmlbody',
 					'register_text'     => '',
 					'login_text'        => '',
@@ -154,6 +155,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'comments_text'     => '',
+					'search_text'       => '',
 					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
 						'before'              => '<span class="pull-right">',

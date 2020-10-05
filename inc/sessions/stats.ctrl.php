@@ -16,11 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class('sessions/model/_hitlist.class.php', 'Hitlist' );
 load_funcs('sessions/model/_hitlog.funcs.php');
 
-/**
- * @var User
- */
-global $current_User;
-
 global $collections_Module, $DB;
 param_action();
 
@@ -28,11 +23,11 @@ param_action();
 $activate_collection_toolbar = true;
 
 // Do we have permission to view all stats (aggregated stats) ?
-$perm_view_all = $current_User->check_perm( 'stats', 'view' );
+$perm_view_all = check_user_perm( 'stats', 'view' );
 
 // Section ID:
 param( 'sec_ID', 'integer', 0, true );
-if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+if( ! $perm_view_all && ! check_user_perm( 'section', 'view', false, $sec_ID ) )
 {
 	forget_param( 'sec_ID' );
 	unset( $sec_ID );
@@ -53,12 +48,12 @@ if( in_array( $tab, array( 'settings', 'goals' ) ) )
 
 param( 'action', 'string' );
 
-if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
+if( $tab == 'domains' && check_user_perm( 'stats', 'edit' ) )
 {
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 }
 
-if( ( $blog == 0 && empty( $sec_ID ) ) || ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
+if( ( $blog == 0 && empty( $sec_ID ) ) || ! check_user_perm( 'stats', 'list', false, $blog ) )
 {
 	if( ! $perm_view_all && isset( $collections_Module ) )
 	{ // Find a blog we can view stats for:
@@ -76,13 +71,13 @@ if( ( $blog == 0 && empty( $sec_ID ) ) || ! $current_User->check_perm( 'stats', 
 }
 
 // Check permission to view current blog
-$current_User->check_perm( 'stats', 'list', true, $blog );
+check_user_perm( 'stats', 'list', true, $blog );
 
 switch( $action )
 {
 	case 'changetype': // Change the type of a hit
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		param( 'hit_ID', 'integer', true );      // Required!
 		param( 'new_hit_type', 'string', true ); // Required!
@@ -97,7 +92,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'stats' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		param( 'date', 'integer', true ); // Required!
 		if( $r = Hitlist::prune( $date ) )
@@ -115,7 +110,7 @@ switch( $action )
 
 	case 'reset_counters':
 
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		$sql = 'UPDATE T_track__keyphrase
 				SET keyp_count_refered_searches = 0,
@@ -130,7 +125,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'statssettings' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// Hit & Session logs
 		$Settings->set( 'log_public_hits', param( 'log_public_hits', 'integer', 0 ) );
@@ -160,7 +155,7 @@ switch( $action )
 		// Display form to create new domain
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		if( $action == 'domain_new' )
 		{ // New Domain
@@ -190,7 +185,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'domain' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		param( 'dom_ID', 'integer', 0, true );
 		if( empty( $dom_ID ) )
@@ -243,7 +238,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'domain' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		param( 'dom_ID', 'integer', 0, true );
 		$DomainCache = & get_DomainCache();
@@ -275,7 +270,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'aggregate' );
 
 		// Check permission:
-		$current_User->check_perm( 'stats', 'edit', true );
+		check_user_perm( 'stats', 'edit', true );
 
 		// Do the aggregations:
 		Hitlist::aggregate_hits();
@@ -592,7 +587,7 @@ else
 
 if( $tab == 'domains' )
 { // Load jquery UI to highlight cell on change domain type
-	require_js( '#jqueryUI#' );
+	require_js_defer( '#jqueryUI#' );
 }
 
 if( in_array( $tab , array( 'hits', 'other', 'referers' ) ) ||

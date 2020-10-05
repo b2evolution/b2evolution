@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '7.1.7';
+	var $version = '7.2.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -164,6 +164,9 @@ class shortlinks_plugin extends Plugin
 
 		// Get collection from given params:
 		$setting_Blog = $this->get_Blog_from_params( $params );
+
+		// Get currently rendering Item:
+		$this->current_Item = $this->get_Item_from_params( $params );
 
 		$this->link_types = $this->get_coll_setting( 'link_types', $setting_Blog );
 
@@ -535,11 +538,16 @@ class shortlinks_plugin extends Plugin
 			$permalink = $Item->get_permanent_url();
 			$existing_link_text = $Item->get( 'title' );
 		}
-		elseif( ! empty( $this->link_types['anchor'] ) && isset( $anchor ) && ( $Item = & $ItemCache->get_by_ID( $ItemCache->ID_array[0], false, false ) ) )
-		{	// Item is found
-			$permalink = $Item->get_permanent_url();
+		elseif( ! empty( $this->link_types['anchor'] ) && isset( $anchor ) && ! empty( $this->current_Item ) )
+		{	// Use Item's URL with anchor:
+			if( $this->current_Item->get_permalink_type() != 'none' )
+			{	// Use full permanent URL like 'http://site.com/item-slug#anchor' only for normal Item that have separate single of intro page,
+				// For Item without permanent URL like "Content Blcok" or "Special" we should use only relative URL like '#anchor' in order
+				// to link always to currently opened URL, because they are included inside of another Item. NOTE: for proper work skin must not use html tag `<base href="/skin_folder" />`.
+				$permalink = $this->current_Item->get_permanent_url();
+			}
 			$permalink = $url_params == '' ? $permalink.$anchor : $url_params;
-			$existing_link_text = $Item->get( 'title' );
+			$existing_link_text = $this->current_Item->get( 'title' );
 			unset($anchor);
 		}
 
@@ -796,10 +804,10 @@ class shortlinks_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea:
-		require_js( 'functions.js', 'blog', true, true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		// Load js and css for modal window:
-		$this->require_js( 'shortlinks.js', true );
+		$this->require_js_defer( 'shortlinks.js', true );
 		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:
@@ -808,27 +816,38 @@ class shortlinks_plugin extends Plugin
 		// Initialize Javascript to build shortlinks modal window;
 		$this->init_js_lang_vars();
 
-		?><script>
-		//<![CDATA[
-		function shortlinks_toolbar( title, prefix )
+		$js_config = array(
+				'js_prefix'            => $params['js_prefix'],
+				'plugin_code'          => $this->code,
+
+				'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
+				'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
+				'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
+				'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
+				'toolbar_title'        => T_('Short Links:'),
+
+				'button_title'         => T_('Link to a Post'),
+				'button_value'         => T_('Link to a Post'),
+				'button_class'         => $this->get_template( 'toolbar_button_class' ),
+			);
+
+		if( is_ajax_request() )
 		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
-
-				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
-
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-
-				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_shortlinks_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
 		}
-		//]]>
-		</script><?php
+		else
+		{
+			expose_var_to_js( 'shortlinks_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_shortlinks_toolbar_config' );
+		}
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script>shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
 	}
@@ -839,6 +858,7 @@ class shortlinks_plugin extends Plugin
 	 */
 	function init_js_lang_vars( $relative_to = 'rsc_url' )
 	{
+		// TODO: Include in rsc/js/src/evo_init_plugin_shortlinks.js
 		global $Blog;
 
 		// Initialize variables for the file "shortlinks.js":

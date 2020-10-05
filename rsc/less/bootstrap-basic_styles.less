@@ -31,6 +31,12 @@ div.filters .filter_item {
 	}
 }
 
+// Break all long words:
+.linebreak {
+	word-break: break-all;
+	white-space: normal;
+}
+
 // ------
 
 // Meta categories that appears on categories widget:
@@ -171,4 +177,45 @@ tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
 	width: 100px;
 	display: inline-table;
 	vertical-align: middle;
+}
+
+// Tab pane for content form
+.content-form-with-tab {
+	.tab-content {
+		border: 1px solid #ddd;
+		border-width: 0 1px 1px;
+		padding: 1px;
+		.tab_pane_no_pads {
+				.pull-left, .pull-right {
+							line-height: 36px;
+							padding-right: 15px;
+							padding-left: 10px;
+							padding-bottom: 5px;
+				}
+		}
+		
+		.tab_pane_pads {
+				.pull-left, .pull-right {
+							color: #333;
+							line-height: 36px;
+							padding-bottom: 5px;
+				}
+				padding: 0 15px 15px 15px;
+		}
+		
+		.tab_pane_no_pads a, .tab_pane_pads a {
+				color: #333;
+		}
+	}
+	.badge {
+		margin-top: -1px;
+	}
+	.results_summary {
+		margin-top: 0px;
+		margin-right: 5px;
+		font-weight: normal;
+	}
+	.results_header{
+		display: none;
+	}
 }

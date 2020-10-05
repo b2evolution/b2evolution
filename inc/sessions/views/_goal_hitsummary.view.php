@@ -182,7 +182,7 @@ if( $Table->total_pages > 0 )
 
 		$Table->display_col_start();
 		echo $day;
-		if( $is_live_mode && $current_User->check_perm( 'stats', 'edit' ) )
+		if( $is_live_mode && check_user_perm( 'stats', 'edit' ) )
 		{	// Display a link to prune goal hits only for live data and if current user has a permission:
 			echo action_icon( T_('Prune goal hits for this date!'), 'delete', url_add_param( $admin_url, 'ctrl=goals&amp;action=prune&amp;date='.strtotime( $day ).'&amp;blog='.$blog.'&amp;'.url_crumb( 'goals' ) ) );
 		}

@@ -109,7 +109,7 @@ $Results->cols[] = array(
 					);
 
 
-if( $current_User->check_perm( 'files', 'view' ) )
+if( check_user_perm( 'files', 'view' ) )
 {
 	function file_actions( $link_ID )
 	{
@@ -117,11 +117,11 @@ if( $current_User->check_perm( 'files', 'view' ) )
 		 * @var File
 		 */
 		global $current_File;
-		global $LinkOwner, $current_User;
+		global $LinkOwner;
 
 		$r = '';
 
-		if( ! empty( $current_File ) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+		if( ! empty( $current_File ) && check_user_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			if( $current_File->is_dir() )
 				$title = T_('Locate this directory!');
@@ -145,7 +145,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 						);
 }
 
-if( $current_User->check_perm( 'files', 'view' )
+if( check_user_perm( 'files', 'view' )
 	&& $LinkOwner->check_perm( 'edit' ) )
 {	// Check that we have permission to edit LinkOwner object:
 	$Results->global_icon( T_('Link a file...'), 'link', url_add_param( $Blog->get_filemanager_link(),

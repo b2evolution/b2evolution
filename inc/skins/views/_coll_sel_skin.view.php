@@ -51,7 +51,7 @@ if( $action == 'new-selskin' )
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 		echo '<div class="skin_selector_block">';
 
-		if( $current_User->check_perm( 'options', 'edit', false ) )
+		if( check_user_perm( 'options', 'edit', false ) )
 		{ // A link to install new skin:
 			echo '<a href="'.$admin_url.'?ctrl=collections&amp;action=new-installskin&amp;kind='.$kind.'&amp;skin_type=normal"
 					class="skinshot skinshot_new">'.get_icon( 'new' ).T_('Install New').' &raquo;'.'</a>';

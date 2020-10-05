@@ -467,7 +467,7 @@ if( $params['comment_type'] == 'meta' )
 					<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
 				</div>';
 				// JS code to don't hide popup on click to checkbox:
-				$text_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+				expose_var_to_js( 'evo_commentform_renderers__click', true );
 		}
 
 		if( $Blog->get_setting( 'allow_html_comment' ) )
@@ -580,7 +580,7 @@ if( $params['comment_type'] == 'meta' )
 
 		if( $Item->can_attach() )
 		{	// Don't display "/Add file" on the preview button if JS is enabled:
-			echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+			echo '<script>document.querySelector( "input[type=submit].preview.btn-info" ).value = "'.TS_('Preview').'";</script>';
 		}
 
 			$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );

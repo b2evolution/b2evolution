@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var User
  */
-global $admin_url, $current_User;
+global $admin_url;
 
 global $edit_locale;
 
@@ -149,7 +149,7 @@ $Results->display();
 
 echo '<br />';
 
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 {
 	global $locales_path, $locales;
 

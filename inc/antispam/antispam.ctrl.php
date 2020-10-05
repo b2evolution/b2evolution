@@ -53,8 +53,8 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-if( ! ( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'spamblacklist', 'view' ) ) &&
-		! ( $current_User->check_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
+if( ! ( check_user_perm( 'admin', 'normal' ) && check_user_perm( 'spamblacklist', 'view' ) ) &&
+		! ( check_user_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
 {
 	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ TB_('Group/user permission denied by %s!'), $app_name ) );
 }
@@ -79,7 +79,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
+		check_user_perm( 'spamblacklist', 'edit', true ); // TODO: This should become different for 'edit'/'add' perm level - check for 'add' here.
 
 		$keyword = utf8_substr( $keyword, 0, 80 );
 		param( 'delhits', 'integer', 0 );
@@ -188,7 +188,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		param( 'hit_ID', 'integer', true );	// Required!
 		$Messages->add( sprintf( TB_('Removing entry #%d from the ban list...'), $hit_ID), 'note' );
@@ -203,7 +203,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		// Report this keyword as abuse:
 		antispam_report_abuse( $keyword );
@@ -217,7 +217,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		ob_start();
 		antispam_poll_abuse();
@@ -230,7 +230,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		// fp> Restore defaults has been removed because it's extra maintenance work and no real benefit to the user.
 
@@ -298,7 +298,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
@@ -333,7 +333,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
@@ -367,7 +367,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		$edited_IPRange = new IPRange();
 
@@ -392,7 +392,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		// Make sure we got an iprange_ID:
 		param( 'iprange_ID', 'integer', true );
@@ -418,7 +418,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'iprange' );
 
 		// Check permission:
-		$current_User->check_perm( 'spamblacklist', 'edit', true );
+		check_user_perm( 'spamblacklist', 'edit', true );
 
 		// Make sure we got an iprange_ID:
 		param( 'iprange_ID', 'integer', true );
@@ -440,7 +440,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'antispam' );
 
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		check_user_perm( 'options', 'edit', true );
 
 		$bankruptcy_blogs_IDs = param( 'bankruptcy_blogs', 'array:integer', array() );
 
@@ -484,7 +484,7 @@ if( $display_mode != 'js' )
 
 		if( isset( $collections_Module ) )
 		{ // Display list of blogs:
-			if( $current_User->check_perm( 'stats', 'view' ) )
+			if( check_user_perm( 'stats', 'view' ) )
 			{
 				$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'antispam', 'tab' => $tab, 'tab3' => $tab3 ), TB_('All'),
 								$admin_url.'?ctrl=antispam&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0', NULL, false, true );
@@ -538,9 +538,9 @@ if( $display_mode != 'js' )
 		case 'ipranges':
 			if( empty( $action ) )
 			{	// View a list of IP ranges
-				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+				require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js', 'rsc_url' );
 			}
-			elseif( ! $current_User->check_perm( 'spamblacklist', 'edit' ) )
+			elseif( ! check_user_perm( 'spamblacklist', 'edit' ) )
 			{	// Check permission to create/edit IP range
 				$Messages->add( TB_('You have no permission to edit this IP range!'), 'error' );
 				$action = '';
@@ -560,9 +560,9 @@ if( $display_mode != 'js' )
 			break;
 
 		case 'countries':
-			if( $current_User->check_perm( 'options', 'edit' ) )
+			if( check_user_perm( 'options', 'edit' ) )
 			{
-				require_js( 'jquery/jquery.jeditable.js' );
+				require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js' );
 			}
 
 			// Set an url for manual page:
@@ -574,12 +574,12 @@ if( $display_mode != 'js' )
 		case 'domains':
 			load_funcs('sessions/model/_hitlog.funcs.php');
 			$AdminUI->breadcrumbpath_add( TB_('Referring domains'), '?ctrl=antispam&amp;tab3='.$tab3 );
-			if( $current_User->check_perm( 'stats', 'edit' ) )
+			if( check_user_perm( 'stats', 'edit' ) )
 			{
-				require_js( 'jquery/jquery.jeditable.js' );
+				require_js_defer( 'customized:jquery/jeditable/jquery.jeditable.js' );
 			}
 			// Load jquery UI to highlight cell on change domain type
-			require_js( '#jqueryUI#' );
+			require_js_defer( '#jqueryUI#' );
 			// Used for edit form
 			$tab_from = 'antispam';
 			$blog = 0; // Don't restrict domains by blog ID on this controller
@@ -623,7 +623,7 @@ switch( $tab3 )
 		// Check permission:
 		if( $tool != 'whois' )
 		{
-			$current_User->check_perm( 'options', 'edit', true );
+			check_user_perm( 'options', 'edit', true );
 		}
 
 		switch( $tool )

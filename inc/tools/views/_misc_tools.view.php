@@ -166,7 +166,7 @@ if( !empty( $template_action ) )
 }
 
 
-if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
+if( check_user_perm( 'users', 'edit' ) && empty( $action ) )
 { // Setting to lock system
 	global $Settings;
 
@@ -183,7 +183,7 @@ if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 				'note' => T_('check this to prevent login (except for admins) and sending comments/messages. This prevents the DB from receiving updates (other than logging)').'<br />'.
 				          T_('Note: for a more complete lock down, rename the file /conf/_maintenance.html to /conf/maintenance.html (complete lock) or /conf/imaintenance.html (gives access to /install)') ) );
 
-	if( $current_User->check_perm( 'options', 'edit' ) )
+	if( check_user_perm( 'options', 'edit' ) )
 	{
 		$Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 	}
@@ -194,7 +194,7 @@ if( $current_User->check_perm( 'users', 'edit' ) && empty( $action ) )
 }
 
 // TODO: dh> this should really be a separate permission.. ("tools", "exec") or similar!
-if( $current_User->check_perm( 'options', 'edit' ) )
+if( check_user_perm( 'options', 'edit' ) )
 { // default admin actions:
 	global $Settings;
 
@@ -207,9 +207,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<li><a href="'.regenerate_url( 'action', 'action=del_itemprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered item cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=del_commentprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered comment cache (DB)').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=del_messageprecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear pre-rendered message cache (DB)').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=del_filecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear thumbnail caches (?evocache directories)').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=del_pagecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear full page caches (/cache/* directories)').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=repair_cache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Repair /cache/* directory structure').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_filecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear thumbnail caches (_evocache directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=del_pagecache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Clear full page caches (/_cache/* directories)').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=repair_cache&amp;'.url_crumb( 'tools' ) ).'">'.T_('Repair /_cache/* directory structure').'</a></li>';
 		echo '</ul>';
 		$block_item_Widget->disp_template_raw( 'block_end' );
 	}

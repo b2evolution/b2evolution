@@ -269,7 +269,7 @@ function get_icon_info( $name )
 			'size-glyph' => array( 10 ),
 			'fa' => 'caret-right',
 			'toggle-fa' => 'caret-down',
-			'size-fa' => array( 3 )
+			'size-fa' => array( 8 )
 		);
 		case 'collapse': return array(
 			'alt'  => '-',
@@ -281,7 +281,7 @@ function get_icon_info( $name )
 			'size-glyph' => array( 10 ),
 			'fa' => 'caret-down',
 			'toggle-fa' => 'caret-right',
-			'size-fa' => array( 3 )
+			'size-fa' => array( 8 )
 		);
 
 		case 'filters_show': return array(

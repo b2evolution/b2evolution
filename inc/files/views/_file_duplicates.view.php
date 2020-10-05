@@ -90,7 +90,7 @@ $Results->group_by = 'file_hash';
  * Group columns:
  */
 $Results->grp_cols[] = array(
-		'td_class' => 'firstcol'.($current_User->check_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
+		'td_class' => 'firstcol'.(check_user_perm( 'users', 'edit', false ) ? '' : ' lastcol' ),
 		'td_colspan' => 0,
 		'td' => sprintf( T_('%s duplicates'), '$total_duplicates$' ),
 	);
@@ -139,9 +139,8 @@ function td_file_duplicates_path( $File, $file_root_type, $file_root_ID, $file_p
 {
 	if( is_object( $File ) )
 	{ // Check if File object is correct
-		global $current_User;
 		$r = $File->get_view_link().' '.$File->get_target_icon();
-		if( $current_User->check_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
+		if( check_user_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
 		{ // Allow to delete a file only if current user has an access
 			global $admin_url;
 			$r .= action_icon( T_('Delete'), 'file_delete',
@@ -176,8 +175,7 @@ $Results->cols[] = array(
 
 function td_file_properties_link( $File, $link_text )
 {
-	global $current_User;
-	if( is_object( $File ) && $current_User->check_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
+	if( is_object( $File ) && check_user_perm( 'files', 'edit_allowed', false, $File->get_FileRoot() ) )
 	{ // Check if File object is correct and current user has an access
 		return '<a href="'.url_add_param( $File->get_linkedit_url(), 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $File->get_rdfp_rel_path() ).'&amp;'.url_crumb( 'file' ) ).'">'.$link_text.'</a>';
 	}

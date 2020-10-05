@@ -23,7 +23,7 @@ global $track_email_image_load, $track_email_click_html, $track_email_click_plai
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
 
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 {	// Print out this fake button on top in order to use submit action "test" on press "Enter" key:
 	echo '<input type="submit" name="actionArray[test]" style="position:absolute;left:-1000px" />';
 }
@@ -121,7 +121,7 @@ $Form->begin_fieldset( TB_('Campaign recipients').get_manual_link( 'campaign-rec
 $Form->end_fieldset();
 
 $buttons = array();
-if( $current_User->check_perm( 'emails', 'edit' ) )
+if( check_user_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 
 	$Form->begin_fieldset( TB_('Send test email').get_manual_link( 'campaign-send-test-panel' ) );

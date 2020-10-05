@@ -111,16 +111,16 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
 		// Get available templates:
 		$context = 'content_block';
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
 		$template_options = $TemplateCache->get_code_option_array();
-		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+		$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 				.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
-				array( 'onclick' => 'return b2template_list_highlight( this )' ),
+				array( 'onclick' => 'return b2template_list_highlight( this )', 'target' => '_blank' ),
 				array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
 		$ItemTypeCache = & get_ItemTypeCache();
@@ -267,6 +267,8 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $Item;
+
 		$this->init_display( $params );
 
 		$TemplateCache = & get_TemplateCache();
@@ -278,20 +280,16 @@ class content_block_Widget extends ComponentWidget
 			return false;
 		}
 
-		echo $this->disp_params['block_start'];
-
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
 		// Get item by ID or slug:
 		$widget_Item = & $this->get_widget_Item();
 
 		if( ! $widget_Item && $this->get_param( 'select_type' ) == 'random' )
 		{	// If no item found ramdomly:
-			echo '<p class="evo_param_error">'.T_('No Item is found randomly.').'</p>';
+			$this->display_error_message( T_('No Item is found randomly.') );
+			return false;
 		}
-		elseif( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
+
+		if( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
 		{	// Item is not found by ID and slug or it is not a content block:
 			if( $widget_Item )
 			{	// It is not a content block:
@@ -303,25 +301,69 @@ class content_block_Widget extends ComponentWidget
 				$wrong_item_info = empty( $widget_item_ID ) ? '' : '#'.$widget_item_ID;
 				$wrong_item_info .= empty( $this->disp_params['item_slug'] ) ? '' : ' <code>'.$this->disp_params['item_slug'].'</code>';
 			}
-			echo '<p class="evo_param_error">'.sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ).'</p>';
+			$this->display_error_message( sprintf( T_('The referenced Item (%s) is not a Content Block.'), utf8_trim( $wrong_item_info ) ) );
+			return false;
 		}
-		elseif( ! $widget_Item->can_be_displayed() )
+
+		if( ! $widget_Item->can_be_displayed() )
 		{	// Current user has no permission to view item with such status:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			$this->display_error_message( sprintf( T_('Content block "%s" cannot be included because you have no permission.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ) );
+			return false;
 		}
-		elseif( ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
-		        ( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ||
-		        ( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID ) ) )
-		{	// Display a content block item ONLY if at least one condition:
-			//  - Content block Item is in same collection as this widget,
-			//  - Content block Item has same owner as owner of this widget's collection,
-			//  - Content block Item from collection for shared content blocks:
-			echo $widget_Item->get_content_block( array_merge( $params, array( 'template_code' => $this->disp_params['template'] ) ) );
+
+		// Display a content block Item if at least one condition is true:
+		$content_block_is_allowed = false;
+		if( isset( $Item ) && ( $Item instanceof Item ) )
+		{	// 1. Content block Item has same owner as owner of the current Item:
+			$content_block_is_allowed = $widget_Item->get( 'creator_user_ID' ) == $Item->get( 'creator_user_ID' );
 		}
-		else
+		$content_block_is_allowed = $content_block_is_allowed ||
+			// 2. Content block Item is in same collection as this widget:
+			( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get_blog_ID() == $widget_Blog->ID ) ||
+			// 3. Content block Item has same owner as owner of this widget's collection:
+			( ( $widget_Blog = & $this->get_Blog() ) && $widget_Item->get( 'creator_user_ID' ) == $widget_Blog->get( 'owner_user_ID' ) ) ||
+			// 4. Content block Item from collection for shared content blocks:
+			( ( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) && $widget_Item->get_blog_ID() == $info_Blog->ID );
+
+		if( ! $content_block_is_allowed )
 		{	// Display error if the requested content block item cannot be used in this place:
-			echo '<p class="evo_param_error">'.sprintf( T_('Content block "%s" cannot be included here. It must be in the same collection or the info pages collection; in any other case, it must have the same owner.'), '#'.$widget_Item->ID.' '.$widget_Item->get( 'urltitle' ) ).'</p>';
+			if( isset( $Item ) && ( $Item instanceof Item ) )
+			{	// For page with current Item:
+				$this->display_error_message( sprintf(
+					T_('Content block #%d %s (Coll #%d) (Owner: %s) cannot be included here. It must be in the same collection as this Widget (Coll #%d) or the info pages collection (Coll #%d)').'; '.
+					T_('in any other case, it must have the same owner as the current Item (Item #%d) of the page (Owner: %s) or the same owner as the current Item\'s collection (Owner: %s).'),
+						$widget_Item->ID, '<code>'.$widget_Item->get( 'urltitle' ).'</code>', // Content block #%d %s
+						$widget_Item->get_blog_ID(), // (Coll #%d)
+						get_user_identity_link( NULL, $widget_Item->get( 'creator_user_ID' ) ), // (Owner: %s)
+						$widget_Blog->ID, // as this Widget (Coll #%d)
+						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
+						$Item->ID, get_user_identity_link( NULL, $Item->get( 'creator_user_ID' ) ), // the current Item (Item #%d) (Owner: %s)
+						$Item->get_Blog() ? get_user_identity_link( NULL, $Item->get_Blog()->get( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the current Item\'s collection (Owner: %s)
+					) );
+			}
+			else
+			{	// For page without current Item:
+				$this->display_error_message( sprintf(
+					T_('Content block #%d %s (Coll #%d) (Owner: %s) cannot be included here. It must be in the same collection as this Widget (Coll #%d) or the info pages collection (Coll #%d)').'. '.
+					T_('In any other case, it must have the same owner as the current collection (Owner: %s). Note: this page has no current Item, so we cannot check for "same owner as current Item".'),
+						$widget_Item->ID, '<code>'.$widget_Item->get( 'urltitle' ).'</code>', // Content block #%d %s
+						$widget_Item->get_blog_ID(), // (Coll #%d)
+						get_user_identity_link( NULL, $widget_Item->get( 'creator_user_ID' ) ), // (Owner: %s)
+						$widget_Blog->ID, // as this Widget (Coll #%d)
+						( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) ) ? $info_Blog->ID : 0, // the info pages collection (Coll #%d)
+						$widget_Blog ? get_user_identity_link( NULL, $widget_Blog->get( 'owner_user_ID' ) ) : '<code>'.T_('No collection found').'</code>' // the current collection (Owner: %s)
+					) );
+			}
+			return false;
 		}
+
+		echo $this->disp_params['block_start'];
+
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
+
+		echo $widget_Item->get_content_block( array_merge( $params, array( 'template_code' => $this->disp_params['template'] ) ) );
 
 		echo $this->disp_params['block_body_end'];
 

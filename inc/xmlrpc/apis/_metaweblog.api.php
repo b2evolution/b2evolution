@@ -219,7 +219,7 @@ function mw_editpost( $m, $item_type = 'post' )
 	}
 
 	// We need to be able to edit this post:
-	if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+	if( ! check_user_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{
 		return xmlrpcs_resperror( 3 ); // Permission denied
 	}
