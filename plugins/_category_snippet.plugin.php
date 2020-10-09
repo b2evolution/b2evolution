@@ -29,7 +29,7 @@ class category_snippet_plugin extends Plugin
 	var $name;
 	var $code = 'evo_cat_snippet';
 	var $priority = 50;
-	var $version = '7.2.1';
+	var $version = '7.3.0';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'infoitem';
