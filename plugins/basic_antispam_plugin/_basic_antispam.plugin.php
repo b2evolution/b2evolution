@@ -107,6 +107,12 @@ class basic_antispam_plugin extends Plugin
 					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
 					'defaultvalue' => '0',
 				),
+				'block_unintelligible_words' => array(
+					'type' => 'checkbox',
+					'label' => ('Block unintelligible words'),
+					'note' => sprintf( T_('Check to block unintelligible words like %s.'), '<code>PFdDCgyru</code>' ),
+					'defaultvalue' => 1,
+				),
 			);
 	}
 
@@ -291,6 +297,45 @@ class basic_antispam_plugin extends Plugin
 				}
 			}
 		}
+
+		if( $this->Settings->get( 'block_unintelligible_words' ) &&
+		    ( $unintelligible_word = $this->find_unintelligible_word( $params['Comment']->content ) ) )
+		{	// Block unintelligible words:
+			$this->msg( sprintf( T_('The word "%s" is not intelligible.'), $unintelligible_word ), 'error' );
+			if( $comment_Item )
+			{
+				syslog_insert( sprintf( 'The comment was rejected because the word "%s" is not intelligible', $unintelligible_word ), 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
+			}
+		}
+	}
+
+
+	/**
+	 * Find first unintelligible word like `PFdDCgyru` in the provided $content by rule:
+	 *   >= 6 chars
+	 *   >= 4 uppercase letters
+	 *   >= 2 lowercase letters
+	 *
+	 * @param string Content
+	 * @return FALSE|string First found unintelligible word OR FALSE if not found
+	 */
+	function find_unintelligible_word( $content )
+	{
+		if( ! preg_match_all( '/\b[a-z]{6,}\b/i', $content, $matches ) )
+		{	// The content has no words with length >= 6 chars
+			return false;
+		}
+
+		foreach( $matches[0] as $unintelligible_word )
+		{
+			if( preg_match_all( '/[A-Z]/', $unintelligible_word ) >= 4 &&
+			    preg_match_all( '/[a-z]/', $unintelligible_word ) >= 2 )
+			{	// Return first found unintelligible word:
+				return $unintelligible_word;
+			}
+		}
+
+		return false;
 	}
 
 
