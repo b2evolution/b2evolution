@@ -312,24 +312,31 @@ class basic_antispam_plugin extends Plugin
 
 	/**
 	 * Find first unintelligible word like `PFdDCgyru` in the provided $content by rule:
-	 *   >= 6 chars
-	 *   >= 4 uppercase letters
-	 *   >= 2 lowercase letters
+	 *  1) a lowercase letter followed by an uppercase letter
+	 *  2) >= 6 letters
+	 *  3) >= 4 uppercase letters
+	 *  4) >= 2 lowercase letters
+	 *  5) # of lowercase letters < 120% # of uppercase letters
 	 *
 	 * @param string Content
 	 * @return FALSE|string First found unintelligible word OR FALSE if not found
 	 */
 	function find_unintelligible_word( $content )
 	{
-		if( ! preg_match_all( '/\b[a-zA-Z0-9]{6,}\b/', $content, $matches ) )
-		{	// The content has no words with length >= 6 chars
+		// 1) Find words where a lowercase letter followed by an uppercase letter:
+		if( ! preg_match_all( '/\b(\w*[a-z][A-Z]\w*)+\b/', $content, $matches ) )
+		{	// The content is clean:
 			return false;
 		}
 
 		foreach( $matches[0] as $unintelligible_word )
 		{
-			if( preg_match_all( '/[A-Z]/', $unintelligible_word ) >= 4 &&
-			    preg_match_all( '/[a-z]/', $unintelligible_word ) >= 2 )
+			$uppercase_num = preg_match_all( '/[A-Z]/', $unintelligible_word );
+			$lowercase_num = preg_match_all( '/[a-z]/', $unintelligible_word );
+			if( $uppercase_num + $lowercase_num >= 6 && // 2) >= 6 letters
+			    $uppercase_num >= 4 && // 3) >= 4 uppercase letters
+			    $lowercase_num >= 2 && // 4) >= 2 lowercase letters
+			    $lowercase_num / $uppercase_num < 1.2 ) // 5) # of lowercase chars < 120% # of uppercase chars
 			{	// Return first found unintelligible word:
 				return $unintelligible_word;
 			}
