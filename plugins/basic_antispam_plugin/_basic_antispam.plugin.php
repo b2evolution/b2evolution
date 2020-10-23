@@ -321,7 +321,7 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function find_unintelligible_word( $content )
 	{
-		if( ! preg_match_all( '/\b[a-z]{6,}\b/i', $content, $matches ) )
+		if( ! preg_match_all( '/\b[a-zA-Z0-9]{6,}\b/', $content, $matches ) )
 		{	// The content has no words with length >= 6 chars
 			return false;
 		}
