@@ -43,6 +43,8 @@ switch ( $action )
 		param( 'allow_anonymous_user_profiles', 'integer', 0 );
 		param( 'user_url_loggedin', 'string', '' );
 		param( 'user_url_anonymous', 'string', '' );
+		param( 'show_reputation_data', 'integer', 0 );
+		param( 'blur_avatar_if_anonymous', 'integer', 0 );
 
 		$updated_settings = array(
 			array( 'use_gravatar', $use_gravatar ),
@@ -58,7 +60,9 @@ switch ( $action )
 			array( 'allow_anonymous_user_list', $allow_anonymous_user_list ),
 			array( 'allow_anonymous_user_profiles', $allow_anonymous_user_profiles ),
 			array( 'user_url_loggedin', $user_url_loggedin ),
-			array( 'user_url_anonymous', $user_url_anonymous ) );
+			array( 'user_url_anonymous', $user_url_anonymous ),
+			array( 'show_reputation_data', $show_reputation_data ),
+			array( 'blur_avatar_if_anonymous', $blur_avatar_if_anonymous ) );
 
 		if( $allow_anonymous_user_list || $allow_anonymous_user_profiles )
 		{ // Update the user groups levels only if at least one users page is available for anonymous users
