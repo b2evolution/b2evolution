@@ -117,14 +117,14 @@ class captcha_qstn_plugin extends Plugin
 					cptq_question VARCHAR( 255 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 					cptq_answers  VARCHAR( 255 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 					PRIMARY KEY( cptq_ID )
-				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset,
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->get_connection_charset(),
 
 				// Assign a random question ID for each IP address
 				'CREATE TABLE '.$this->get_sql_table('ip_question').' (
 					cptip_IP      INT UNSIGNED NOT NULL,
 					cptip_cptq_ID INT UNSIGNED NOT NULL,
 					KEY( cptip_IP, cptip_cptq_ID )
-				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset,
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->get_connection_charset(),
 			);
 	}
 
