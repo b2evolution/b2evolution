@@ -27,7 +27,7 @@ $result = Hitlist::dbprune( 'cron_job' ); // will prune once per day, according 
 // Restore DB error states
 $DB->restore_error_state();
 // Get the unknown errors from screen
-$unknown_errors = ob_get_clean();
+$unknown_errors = trim( ob_get_clean() );
 
 if( ! empty( $unknown_errors ) )
 { // Some errors were created, probably DB errors
