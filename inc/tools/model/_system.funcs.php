@@ -414,7 +414,7 @@ function system_check_db_utf8()
 	$DB->show_errors = false;
 	$DB->halt_on_error = false;
 	$current_connection_charset = $DB->get_connection_charset();
-	$ok = ( $DB->set_connection_charset( 'utf8' ) && 'utf8' == $DB->get_connection_charset() );
+	$ok = ( $DB->set_connection_charset( 'utf8' ) && $DB->is_expected_connection_charset( 'utf8' ) );
 	$DB->set_connection_charset( $current_connection_charset );
 	$DB->show_errors = $save_show_errors;
 	$DB->halt_on_error = $save_halt_on_error;
