@@ -351,7 +351,7 @@ class AdminUI extends AdminUI_general
 						'header_text' => '<div class="evo_pager"><div class="results_summary">$nb_results$ Results $reset_filters_button$</div><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
-						'header_text_single' => '<div class="results_summary">$nb_results$ attachments $reset_filters_button$</div>',
+						'header_text_single' => '<div class="results_summary">$nb_results$ Results $reset_filters_button$</div>',
 					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
