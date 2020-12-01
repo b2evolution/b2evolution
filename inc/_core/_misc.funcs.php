@@ -111,7 +111,7 @@ function load_db_schema( $inlcude_plugins = false )
 
 	if( empty( $db_storage_charset ) )
 	{ // If no specific charset has been requested for datstorage, use the one of the current connection (optimize for speed - no conversions)
-		$db_storage_charset = $DB->connection_charset;
+		$db_storage_charset = $DB->get_connection_charset();
 	}
 
 	// Load modules:
@@ -3811,7 +3811,7 @@ function debug_info( $force = false, $force_clean = false )
 	}
 	else
 	{
-		echo '<pre>Current DB charset: '.$DB->connection_charset."</pre>\n";
+		echo '<pre>Current DB charset: '.$DB->get_connection_charset()."</pre>\n";
 
 		$DB->dump_queries( ! $clean );
 	}

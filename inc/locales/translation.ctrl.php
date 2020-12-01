@@ -38,7 +38,7 @@ global $locales, $io_charset, $evo_charset;
 if( $locales[$edit_locale]['charset'] == 'utf-8' && $io_charset != 'utf-8' )
 {
 	// Set encoding for MySQL connection
-	$DB->connection_charset = $locales[$edit_locale]['charset'];
+	$DB->set_connection_charset( $locales[$edit_locale]['charset'] );
 	// Set charset for html format
 	$io_charset = $locales[$edit_locale]['charset'];
 	$evo_charset = $locales[$edit_locale]['charset'];

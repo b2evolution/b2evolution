@@ -1977,7 +1977,7 @@ function update_basic_config_file( $params = array() )
 	if( $params['create_db'] )
 	{	// Try to create DB if it doesn't exist yet:
 		$DB->query( 'CREATE DATABASE IF NOT EXISTS `'.$params['db_name'].'`
-			CHARACTER SET '.$DB->connection_charset );
+			CHARACTER SET '.$DB->get_connection_charset() );
 		if( $DB->error )
 		{
 			display_install_messages( sprintf( T_('You don\'t seem to have permission to create this new database on "%s" (%s).'), $params['db_host'], $DB->last_error ) );

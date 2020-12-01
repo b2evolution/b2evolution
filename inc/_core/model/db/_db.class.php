@@ -1901,7 +1901,7 @@ class DB
 	 * @param boolean Use the "regular charset => mysql charset map"?
 	 * @return boolean true on success, false on failure
 	 */
-	protected function set_connection_charset( $charset )
+	public function set_connection_charset( $charset )
 	{
 		global $Debuglog;
 
@@ -1939,6 +1939,17 @@ class DB
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get the charset of the connection.
+	 *
+	 * @return string
+	 */
+	public function get_connection_charset()
+	{
+		return $this->connection_charset;
 	}
 
 }

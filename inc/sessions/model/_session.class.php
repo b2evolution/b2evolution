@@ -184,7 +184,7 @@ class Session
 						if( ! is_array( $this->_data ) )
 						{
 							$Debuglog->add( 'Session: Session data corrupted!<br />
-								connection_charset: '.var_export( $DB->connection_charset, true ).'<br />
+								connection_charset: '.var_export( $DB->get_connection_charset(), true ).'<br />
 								Serialized data was: --['.var_export( $row->sess_data, true ).']--', array('session','error') );
 							$this->_data = array();
 						}

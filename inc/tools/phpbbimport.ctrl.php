@@ -89,7 +89,7 @@ switch( $action )
 				'aliases'  => phpbb_tables_aliases( $phpbb_db_prefix ),
 				'use_transactions'   => $db_config['use_transactions'],
 				'table_options'      => $db_config['table_options'],
-				'connection_charset' => $DB->connection_charset,		// Use same charset as main DB connection so that charsets match!
+				'connection_charset' => $DB->get_connection_charset(),		// Use same charset as main DB connection so that charsets match!
 				'halt_on_error' => false,
 				'show_errors'   => false,
 				'new_link'      => true,

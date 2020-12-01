@@ -499,7 +499,7 @@ class test_plugin extends Plugin
 					test_ID   INT UNSIGNED NOT NULL AUTO_INCREMENT,
 					test_name VARCHAR( 255 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 					PRIMARY KEY( test_ID )
-				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->get_connection_charset()
 			);
 	}
 

@@ -5819,7 +5819,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Reset names to NULL if its are default
 		$DB->query( $sql = 'UPDATE T_cron__task
 			INNER JOIN ( '.cron_job_sql_query().' ) AS temp
-			        ON ctsk_key = CONVERT( temp.task_key USING ascii ) AND ctsk_name = CONVERT( temp.task_name USING '.$DB->connection_charset.' )
+			        ON ctsk_key = CONVERT( temp.task_key USING ascii ) AND ctsk_name = CONVERT( temp.task_name USING '.$DB->get_connection_charset().' )
 			SET ctsk_name = NULL' );
 		$DB->commit();
 		task_end();
@@ -5861,7 +5861,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Set default levels depending on name
 		$DB->query( 'UPDATE T_groups
 			INNER JOIN ( '.$group_level_query.' ) AS temp
-			       ON grp_name = CONVERT( temp.group_name USING '.$DB->connection_charset.' )
+			       ON grp_name = CONVERT( temp.group_name USING '.$DB->get_connection_charset().' )
 			  SET grp_level = temp.group_level' );
 		// Set default '4' level for all other groups
 		$DB->query( 'UPDATE T_groups
