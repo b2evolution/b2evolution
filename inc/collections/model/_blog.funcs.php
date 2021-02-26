@@ -2283,7 +2283,7 @@ function blogs_all_results_block( $params = array() )
 
 	if( ! empty( $cf_name ) )
 	{ // Filter by name
-		$SQL->WHERE_and( '( blog_name LIKE \'%'.$cf_name.'%\' OR blog_shortname LIKE \'%'.$cf_name.'%\' OR blog_urlname LIKE \'%'.$cf_name.'%\' )' );
+		$SQL->WHERE_and( '( blog_name LIKE '.$DB->quote('%'.$cf_name.'%').' OR blog_shortname LIKE '.$DB->quote('%'.$cf_name.'%').' OR blog_urlname LIKE '.$DB->quote('%'.$cf_name.'%').' )' );
 	}
 
 	if( ! empty( $cf_owner ) )
