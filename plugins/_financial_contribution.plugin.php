@@ -23,7 +23,7 @@ class financial_contribution_plugin extends Plugin
 	var $name;
 	var $code = 'fin_contrib';
 	var $priority = 50;
-	var $version = '7.2.2';
+	var $version = '7.2.3';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';
@@ -57,7 +57,7 @@ class financial_contribution_plugin extends Plugin
 					fnct_amount    DOUBLE UNSIGNED NOT NULL,
 					fnct_timestamp TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
 					PRIMARY KEY( fnct_item_ID, fnct_user_ID )
-				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset,
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->get_connection_charset(),
 			);
 	}
 

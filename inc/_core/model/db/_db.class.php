@@ -1901,7 +1901,7 @@ class DB
 	 * @param boolean Use the "regular charset => mysql charset map"?
 	 * @return boolean true on success, false on failure
 	 */
-	protected function set_connection_charset( $charset )
+	public function set_connection_charset( $charset )
 	{
 		global $Debuglog;
 
@@ -1939,6 +1939,39 @@ class DB
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get the charset of the connection.
+	 *
+	 * @return string
+	 */
+	public function get_connection_charset()
+	{
+		return $this->connection_charset;
+	}
+
+
+	/**
+	 * Check if the charset is currently used as connection charset
+	 *
+	 * @param string Expected connection charset
+	 * @return boolean
+	 */
+	public function is_expected_connection_charset( $expected_charset )
+	{
+		// Convert to proper mysql charset:
+		$expected_charset = self::php_to_mysql_charmap( $expected_charset );
+
+		if( $this->get_connection_charset() == $expected_charset )
+		{	// Current connection charset exactly matches to the expected charset:
+			return true;
+		}
+
+		// Also compare if current charset is extended version of the expected charset,
+		// e.g. if 'utf8mb4' is using currently then consider 'utf8' correct as well:
+		return ( stripos( $this->get_connection_charset(), $expected_charset ) === 0 );
 	}
 
 }

@@ -157,14 +157,23 @@ class coll_locale_switch_Widget extends ComponentWidget
 				if( ! empty( $linked_coll_ID ) )
 				{	// Use linked collection:
 					$BlogCache = & get_BlogCache();
-					if( $locale_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false ) )
-					{
-						$locale_switch_url = url_add_param( $locale_Blog->get( 'url' ), 'coll_locale='.urlencode( $coll_locale ) );
-					}
+					$locale_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false );
 				}
 				else
 				{	// Use current collection:
-					$locale_switch_url = url_add_param( $Blog->get( 'url' ), 'coll_locale='.urlencode( $coll_locale ) );
+					$locale_Blog = $Blog;
+				}
+				if( $locale_Blog )
+				{
+					$locale_switch_url = $locale_Blog->get( 'url' );
+					if( $coll_locale != $locale_Blog->get( 'locale' ) )
+					{	// Append locale param only when main locale of the Collection is different than current needed:
+						$locale_switch_url = url_add_param( $locale_switch_url, 'coll_locale='.urlencode( $coll_locale ) );
+					}
+				}
+				else
+				{	// Skip wrong Collection:
+					continue;
 				}
 			}
 

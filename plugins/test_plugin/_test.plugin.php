@@ -34,7 +34,7 @@ class test_plugin extends Plugin
 	var $name = 'Test';
 	var $code = 'evo_TEST';
 	var $priority = 50;
-	var $version = '7.2.2';
+	var $version = '7.2.3';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
 
@@ -499,7 +499,7 @@ class test_plugin extends Plugin
 					test_ID   INT UNSIGNED NOT NULL AUTO_INCREMENT,
 					test_name VARCHAR( 255 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 					PRIMARY KEY( test_ID )
-				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->get_connection_charset()
 			);
 	}
 

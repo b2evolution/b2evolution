@@ -102,7 +102,7 @@ class EmailTrackingHelper
 		$passthrough_url = $this->get_passthrough_url();
 
 		$unsubscribe_link_re = '/quick_unsubscribe\.php(?:[^\<\>])+type=(newsletter)/';
-		$email_func_re = '/(?:\?|&)evo_mail_function=(like|dislike|cta(?:1|2|3))&?/';
+		$email_func_re = '/(?:\?|&|&amp;)evo_mail_function=(like|dislike|cta(?:1|2|3))&?/';
 		$activate_link_re = '/login\.php\?action=activateacc_ez/';
 
 		switch( $this->content_type )

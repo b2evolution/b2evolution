@@ -650,7 +650,7 @@ switch( $action )
 			if( ! is_null( $old_db_version ) )
 			{
 				$expected_connection_charset = $DB->php_to_mysql_charmap( $evo_charset );
-				if( $DB->connection_charset != $expected_connection_charset )
+				if( ! $DB->is_expected_connection_charset( $expected_connection_charset ) )
 				{
 					display_install_messages( sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (mysqli::set_charset(%s))',
 						$current_locale, $evo_charset, $expected_connection_charset ) );
@@ -936,7 +936,7 @@ switch( $action )
 
 		// fp> TODO: this test should probably be made more generic and applied to upgrade too.
 		$expected_connection_charset = DB::php_to_mysql_charmap($evo_charset);
-		if( $DB->connection_charset != $expected_connection_charset )
+		if( ! $DB->is_expected_connection_charset( $expected_connection_charset ) )
 		{
 			display_install_messages( sprintf( T_('In order to install b2evolution with the %s locale, your MySQL needs to support the %s connection charset.').' (mysqli::set_charset(%s))',
 				$current_locale, $evo_charset, $expected_connection_charset ) );

@@ -7495,7 +7495,7 @@ class Blog extends DataObject
 
 		if( $restrict_used_locales &&
 		    ( $this->get( 'locale' ) == $locale ||
-		      in_array( $locale, $this->get_locales() ) ) )
+		      in_array( $locale, array_keys( $this->get_locales() ) ) ) )
 		{	// Don't allow selector if this collection already uses the requested locale:
 			return T_('N/A');
 		}
