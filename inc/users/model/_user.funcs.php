@@ -6795,7 +6795,9 @@ function users_results_block( $params = array() )
 			'display_btn_change_groups'  => false,
 			'force_check_user'     => false,
 			'where_duplicate_email' => false,
+			'display_btn_deluser'  => false,
 			'display_btn_delspam'  => false,
+			'display_deluser_info' => false,
 			'display_delspam_info' => false,
 		), $params );
 
@@ -7027,15 +7029,21 @@ function users_results_block( $params = array() )
 
 	if( check_user_perm( 'users', 'edit' ) && $UserList->result_num_rows > 0 )
 	{	// Buttons and info to delete spammers:
+		if( $params['display_btn_deluser'] )
+		{	// Button to go to list with confirmation before users deleting:
+			$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=users&amp;action=users" class="btn btn-default">'
+					.format_to_output( T_('Delete users...') )
+				.'</a>';
+		}
 		if( $params['display_btn_delspam'] )
 		{	// Button to go to list with confirmation before spammers deleting:
-			$user_list_buttons[] = ( $params['display_btn_export'] ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
+			$user_list_buttons[] = '<a href="'.$admin_url.'?ctrl=users&amp;action=spammers" class="btn btn-danger">'
 					.format_to_output( T_('Delete spammers...') )
 				.'</a>';
 		}
-		if( $params['display_delspam_info'] )
-		{	// Info and button to confirm to delete spammers:
-			$SQL = new SQL( 'Get a count of deleting spammers per each group' );
+		if( $params['display_deluser_info'] || $params['display_delspam_info'] )
+		{	// Info and button to confirm to delete users or spammers:
+			$SQL = new SQL( 'Get a count of deleting users or spammers per each group' );
 			$SQL->SELECT( 'grp_name, COUNT( user_ID ) AS num_users' );
 			$SQL->FROM( 'T_users' );
 			$SQL->FROM_add( 'LEFT JOIN T_groups ON user_grp_ID = grp_ID' );
@@ -7050,7 +7058,17 @@ function users_results_block( $params = array() )
 			}
 			echo '</ul>';
 			// Display to delete the selected users as spammers completely:
-			echo '<a href="'.$admin_url.'?ctrl=users&amp;action=delete_spammers&amp;users='.rawurlencode( implode( ',', $UserList->filters['users'] ) ).'&amp;'.url_crumb( 'users' ).'" class="btn btn-danger">'.T_('Delete spammers NOW!').'</a>';
+			if( $params['display_deluser_info'] )
+			{
+				$delete_action = 'delete_users';
+				$delete_button_text = T_('Delete users NOW!');
+			}
+			else
+			{
+				$delete_action = 'delete_spammers';
+				$delete_button_text = T_('Delete spammers NOW!');
+			}
+			echo '<a href="'.$admin_url.'?ctrl=users&amp;action='.$delete_action.'&amp;users='.rawurlencode( implode( ',', $UserList->filters['users'] ) ).'&amp;'.url_crumb( 'users' ).'" class="btn btn-danger">'.$delete_button_text.'</a>';
 		}
 	}
 

@@ -29,6 +29,7 @@ users_results_block( array(
 		'display_btn_tags'   => true,
 		'display_btn_account_status' => true,
 		'display_btn_change_groups'  => true,
+		'display_btn_deluser'=> true,
 		'display_btn_delspam'=> true,
 		'display_btn_export' => true,
 	) );
