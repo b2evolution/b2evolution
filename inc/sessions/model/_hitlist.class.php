@@ -144,7 +144,7 @@ class Hitlist
 				$Messages->add( $error_message, 'error' );
 			}
 			if( $day_limit )
-			{	// Limit a pruning by one execution per day:
+			{	// Limit pruning to one execution per day:
 				return array(
 						'result'  => 'error',
 						'message' => $error_message
