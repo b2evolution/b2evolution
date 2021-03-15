@@ -265,7 +265,7 @@ class Hitlist
 		$hitlist_Timer->stop( 'sessions_total' );
 		if( $sessions_i > 1 )
 		{	// Display total pruned sessions only if it was executed more 1 time per 1000 limited records:
-			$Debuglog->add( 'Hitlist::dbprune(): Total autopruned '.$sessions_rows_affected.' rows from T_sessions.', 'request' );
+			$Debuglog->add( 'Hitlist::dbprune(): Total autopruned '.$sessions_rows_affected_total.' rows from T_sessions.', 'request' );
 			$return_message .= Hitlist::log_pruning( sprintf( 'Total %s rows from %s, Execution time: %s seconds', $sessions_rows_affected_total, 'T_sessions', $hitlist_Timer->get_duration( 'sessions_total' ) ), $output_message, true );
 		}
 
