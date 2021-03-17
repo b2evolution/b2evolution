@@ -576,17 +576,17 @@ class Skin extends DataObject
 				break;
 		}
 
+		// Store the file names to return
+		$files = array();
+
 		if( ! $dir = @opendir( $skin_path ) )
 		{ // Skin directory not found!
 			if( $display_messages )
 			{
 				$Messages->add( T_('Cannot open skin directory.'), 'error' ); // No trans
 			}
-			return false;
+			return $files;
 		}
-
-		// Store the file names to return
-		$files = array();
 
 		// Go through all files in the skin directory:
 		while( ( $file = readdir( $dir ) ) !== false )

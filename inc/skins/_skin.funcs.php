@@ -3461,7 +3461,11 @@ function display_skin_fieldset( & $Form, $skin_ID, $display_params )
 		$tmp_params = array( 'for_editing' => true );
 		$skin_params = $edited_Skin->get_param_definitions( $tmp_params );
 
-		if( empty( $skin_params ) )
+		if( !skin_exists( $edited_Skin->folder ) )
+		{
+			echo '<p class="text-danger">'.T_('The skin files are missing.').'</p>';
+		}
+		elseif( empty( $skin_params ) )
 		{ // Advertise this feature!!
 			echo '<p>'.T_('This skin does not provide any configurable settings.').'</p>';
 		}
