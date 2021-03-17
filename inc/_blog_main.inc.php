@@ -1004,7 +1004,7 @@ if( !isset( $skin ) && !empty( $blog_skin_ID ) )	// Note: if $skin is set to '',
 // Because a lot of bloggers will delete skins, we have to make this fool proof with extra checking:
 if( !empty( $skin ) && !skin_exists( $skin ) )
 { // We want to use a skin, but it doesn't exist!
-	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist. It must be properly set in the <a %s>blog properties</a> or properly overriden in a stub file.'),
+	$err_msg = sprintf( T_('The skin [%s] set for blog [%s] does not exist.'),
 		htmlspecialchars($skin),
 		$Blog->dget('shortname'),
 		'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$Blog->ID.'"' );
