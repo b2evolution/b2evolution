@@ -278,7 +278,6 @@ class coll_activity_stats_Widget extends ComponentWidget
 			);
 
 		init_jqplot_js( 'blog', false, '#', 'footerlines' );
-		require_js_defer( 'src/evo_init_canvas_bar_chart.js', 'blog', false, '#', 'footerlines'  );
 		expose_var_to_js( 'coll_activity_stats_widget_config', evo_json_encode( $coll_activity_stats_config ) );
 
 		return true;

@@ -2427,6 +2427,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 function init_jqplot_js( $relative_to = 'rsc_url', $output = false, $version = '#', $position = 'headlines' )
 {
 	require_js_defer( 'build/evo_jqplot.bmin.js', $relative_to, $output, $version, $position );
+	require_js_defer( 'src/evo_init_canvas_bar_chart.js', $relative_to, $output, $version, $position );
 	require_css_async( 'b2evo_jqplot.bmin.css', $relative_to, NULL, NULL, $version, $output, $position );
 }
 

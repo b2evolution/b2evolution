@@ -1352,7 +1352,7 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	$chart['series_color'] = array();
 	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
 	{
-		$chart['series_color'][ $col_num ] = $diagram_column_data['color'];
+		$chart['series_color'][ $col_num - 1 ] = $diagram_column_data['color'];
 		array_unshift( $chart['chart_data'][ $col_num++ ], $diagram_column_data['title'] );
 	}
 
