@@ -3599,7 +3599,7 @@ function check_usertags( $user_ID, $test_tags = array(), $type = 'has_any' )
  */
 function get_account_activation_info( $edited_User )
 {
-	global $Settings, $UserSettings, $servertimenow;
+	global $Settings, $UserSettings, $servertimenow, $DB;
 
 	$field_label = T_('Latest account activation email');
 	$can_be_validated = $edited_User->check_status( 'can_be_validated' );
@@ -3638,8 +3638,29 @@ function get_account_activation_info( $edited_User )
 	}
 	else
 	{ // format last activation email date
-		$last_activation_email_info = format_to_output( $last_activation_email );
-		$result[] = array( $field_label, $last_activation_email_info, $field_note );
+		$last_activation_email_info = $last_activation_email;
+		if( check_user_perm( 'emails', 'view' ) )
+		{	// Try to get a link to the last activation email:
+			$SQL = new SQL( 'Get last activation email ID' );
+			$SQL->SELECT( 'emlog_ID' );
+			$SQL->FROM( 'T_email__log' );
+			$SQL->WHERE('emlog_user_ID = '.$DB->quote( $edited_User->ID ) );
+			$SQL->WHERE_and( 'emlog_timestamp = '.$DB->quote( $last_activation_email ) );
+			$emlog_ID = $DB->get_var( $SQL );
+			if( ! empty( $emlog_ID ) )
+			{	// Generate a link to the found email log by date:
+				$last_activation_email_info = get_link_tag( get_admin_url( 'ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID ), $last_activation_email );
+			}
+			else
+			{	// Generate a link to filter email logs of the edited User by the last activation email date:
+				$last_activation_email_date = mysql2localedate( $last_activation_email );
+				$last_activation_email_info = get_link_tag( get_admin_url( 'ctrl=email&amp;tab=sent&amp;username='.rawurlencode( $edited_User->login )
+					.'&amp;datestartinput='.rawurlencode( $last_activation_email_date )
+					.'&amp;datestopinput='.rawurlencode( $last_activation_email_date )
+				), $last_activation_email );
+			}
+		}
+		$result[] = array( $field_label, format_to_output( $last_activation_email_info ), $field_note );
 	}
 
 	if( $is_secure_validation )
