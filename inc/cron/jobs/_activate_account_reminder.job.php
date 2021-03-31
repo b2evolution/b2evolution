@@ -41,9 +41,10 @@ $reminder_delay_conditions = array();
 for( $i = 0; $i <= $number_of_max_reminders; $i++ )
 {
 	$reminder_date = date2mysql( $servertimenow - $activate_account_reminder_config[$i] );
+	$reminder_counter_condition = 'reminder_sent.uset_value '.( $i == $number_of_max_reminders ? '>=' : '=' ).' '.$i;
 	$reminder_delay_conditions[] = ( $i == 0
-		? '( ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_date ).' ) AND ( reminder_sent.uset_value IS NULL OR reminder_sent.uset_value = "'.$i.'" ) )'
-		: '( last_sent.uset_value < '.$DB->quote( $reminder_date ).' AND reminder_sent.uset_value = "'.$i.'" )' );
+		? '( ( last_sent.uset_value IS NULL OR last_sent.uset_value < '.$DB->quote( $reminder_date ).' ) AND ( reminder_sent.uset_value IS NULL OR '.$reminder_counter_condition.' ) )'
+		: '( last_sent.uset_value < '.$DB->quote( $reminder_date ).' AND '.$reminder_counter_condition.' )' );
 }
 
 $SQL = new SQL( 'Get users which should be reminded or deleted because of they are not activated' );
@@ -79,20 +80,20 @@ foreach( $reminder_users as $reminder_user )
 	$activation_reminder_count = $reminder_user->uset_value;
 	if( $reminder_user->user_status == 'pendingdelete' &&
 	    ( // If this is the last reminder number and the option "Delete account" is enabled
-	      ( $activation_reminder_count == $number_of_max_reminders && ! empty( $activate_account_reminder_config[ $activation_reminder_count ] ) ) ||
+	      ( $activation_reminder_count >= $number_of_max_reminders && ! empty( $activate_account_reminder_config[ $number_of_max_reminders ] ) ) ||
 	      // Case when "Delete warning" is not enabled(=="Don't send") but "Delete account" is enabled, so we should use penultimate reminder number as last("Delete account") in order to skip the reminder of "Delete warning":
-	      ( $activation_reminder_count == $number_of_max_reminders - 1 && empty( $activate_account_reminder_config[ $number_of_max_reminders - 1 ] ) && ! empty( $activate_account_reminder_config[ $number_of_max_reminders ] ) )
+	      ( $activation_reminder_count >= $number_of_max_reminders - 1 && empty( $activate_account_reminder_config[ $number_of_max_reminders - 1 ] ) && ! empty( $activate_account_reminder_config[ $number_of_max_reminders ] ) )
 	    ) )
 	{	// This user must be deleted completely ONLY if it is in "Pending delete" status:
 		$delete_account_users[] = $reminder_user->user_ID;
 	}
 	elseif( $reminder_user->user_status == 'pendingdelete' &&
-	        $activation_reminder_count == $number_of_max_reminders - 1 && // If this is the penultimate reminder number
-	        ! empty( $activate_account_reminder_config[ $activation_reminder_count ] ) ) // If the option "Delete warning" is enabled
+	        $activation_reminder_count >= $number_of_max_reminders - 1 && // If this is the penultimate reminder number
+	        ! empty( $activate_account_reminder_config[ $number_of_max_reminders - 1 ] ) ) // If the option "Delete warning" is enabled
 	{	// This user must receive a delete warning email ONLY if it is in "Pending delete" status:
 		$send_delete_warning_users[] = $reminder_user->user_ID;
 	}
-	elseif( $activation_reminder_count == $number_of_max_reminders - 2 )
+	elseif( $activation_reminder_count >= $number_of_max_reminders - 2 )
 	{	// This user must be marked with status "Failed activation" or "Pending delete":
 		$mark_failed_users[] = $reminder_user->user_ID;
 	}
