@@ -163,7 +163,7 @@ $config_is_done = 0;
  * We'd really appreciate it if you kept the basic footer, but it's your choice
  */
 
-$footer=false;
+$footer=true;
 $footer_type='default';
 
 /**
@@ -171,7 +171,7 @@ $footer_type='default';
  */
 
 $app_footer_text=true;
-$copyright_text=false;
+$copyright_text=true;
 
 /**
  * This determines if the "Go to the dashboard & start creating →" button should be displayed
@@ -201,7 +201,7 @@ $your_site=true;
  * custom: Your custom icon
  */
 
-$image=false;
+$image=true;
 $image_type='default';
 $icon_with='254';
 $icon_height='52';
