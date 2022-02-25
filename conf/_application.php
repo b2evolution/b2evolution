@@ -61,11 +61,26 @@ $required_mysql_version = array( 'application' => '5.5.3' );
 /**
  * Is displayed on the login screen:
  */
-$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version_long.'</strong></a>
-		&ndash;
-		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
-$copyright_text = '<span class="nobr">&copy;2003-2020 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
+if($app_footer_text){
+	$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website">
+							<strong>b2evolution '.$app_version_long.'</strong>
+						</a>
+						&ndash;
+						<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">
+							GPL License
+						</a>';
+}
+
+if ($copyright_text){
+	$copyright_text = '<span class="nobr">&copy;2003-2020 by <a href="http://fplanque.net/">
+					   		Fran&ccedil;ois</a>
+					   		<a href="http://fplanque.com/">Planque</a>
+					   		&amp;
+					   		<a href="http://b2evolution.net/about/about-us">others</a>.
+					   </span>';
+}
+
 
 /**
  * Do you want to display the help links to online documentation?

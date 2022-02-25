@@ -151,6 +151,70 @@ $admin_email = 'postmaster@localhost';
  */
 $config_is_done = 0;
 
+/**
+ * This determines if the footer should be displayed and in what mode
+
+ * true: The footer will displayed
+ * false: The footer will not displayed
+
+ * default: The standart footer
+ * custom: Your custom footer
+
+ * We'd really appreciate it if you kept the basic footer, but it's your choice
+ */
+
+$footer=false;
+$footer_type='default';
+
+/**
+ * This determines if app footer text and copyright text should be displayed
+ */
+
+$app_footer_text=true;
+$copyright_text=false;
+
+/**
+ * This determines if the "Go to the dashboard & start creating →" button should be displayed
+
+ * true: The button will displayed
+ * false: The button will not displayed
+ */
+
+$go_to_dashboard=true;
+
+/**
+ * This determines if the "Your Site" button should be displayed
+
+ * true: The button will displayed
+ * false: The button will not displayed
+ */
+
+$your_site=true;
+
+/**
+ * This determines if the icon should be displayed and other settings
+
+ * true: The icon will displayed
+ * false: The icon will not displayed
+
+ * default: The standart icon
+ * custom: Your custom icon
+ */
+
+$image=false;
+$image_type='default';
+$icon_with='254';
+$icon_height='52';
+
+/**
+ * Only in custom Mode
+
+ * icon_url: A URL can be specified here, to which you will be redirected if you click on the image
+ * icon_path: The path to the icon... This must be specified, otherwise the default mode will be used automatically
+ */
+
+$icon_url='';
+$icon_path='';
 
 /*
  * IMPORTANT: you will find more parameters in the other files of the /conf folder.
