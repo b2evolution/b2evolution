@@ -81,16 +81,39 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<!-- Start of skin_wrapper -->
 		<div class="container">
 			<div class="header">
-				<nav>
-					<ul class="nav nav-pills pull-right">
-						<li role="presentation" class="active"><a href="index.php"><?php echo T_('Your site'); ?></a></li>
-					</ul>
-				</nav>
-				<h3 class="text-muted"><a href="http://b2evolution.net/">
-					<img src="rsc/img/b2evolution_254x52.png" width="254" height="52" alt="b2evolution" class="b2evolution_plane_logo"
-					  srcset="rsc/img/b2evolution_508x104.png 2x,
-						 		 rsc/img/b2evolution_762x156.png 3x" /></a>
-				</h3>
+				<?php if($your_site){ ?>
+					<nav>
+						<ul class="nav nav-pills pull-right">
+							<li role="presentation" class="active">
+								<a href="/"><?php echo T_('Your site'); ?></a>
+							</li>
+						</ul>
+					</nav>
+				<?php } ?>
+				<?php if($image){ ?>
+					<h3 class="text-muted">
+						<?php if(!$icon_path){
+							$image_type='default';
+						} ?>
+
+						<?php if("$image_type" == "default"){ ?>
+							<a href="http://b2evolution.net/">
+								<img
+								src="rsc/img/b2evolution_254x52.png"
+								width=<?php "$icon_with" ?>
+								height=<?php "$icon_height" ?>
+								alt="b2evolution"
+								class="b2evolution_plane_logo"
+								srcset="rsc/img/b2evolution_508x104.png 2x, rsc/img/b2evolution_762x156.png 3x"
+								/>
+							</a>
+						<?php } ?>
+						
+						<?php if("$image_type" == "custom"){
+							require dirname(__FILE__).'/conf/custom/_custom_icon.php';
+						} ?>
+					</h3>
+				<?php } ?>
 			</div>
 
 		<!-- InstanceBeginEditable name="Main" -->
@@ -117,7 +140,9 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 				echo '<p><strong>'.T_('Your b2evolution CMS is installed and working but there is no content yet.').'</strong></p>';
 
 				// Display this link to create blog
-				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=dashboard">'.T_( 'Go to the dashboard & start creating' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
+				if($go_to_dashboard) {
+					echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=dashboard">'.T_( 'Go to the dashboard & start creating' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
+				}
 			}
 			else
 			{
@@ -163,16 +188,24 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 				echo '<ul class="pager"><li class="next"><a href="'.$admin_url.'?ctrl=collections&amp;action=new">'.T_( 'Add a new collection' ).' <span aria-hidden="true">&rarr;</span></a></li></ul>';
 			}
 		}
-?>
-
+		?>
+		
+		<?php if($footer){ ?>
 			<footer class="footer">
-				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
-				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
-				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
-				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
-				</p>
+				<?php if("$footer_type" == "default"){ ?>
+					<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
+					<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
+					&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+					&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
+					&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
+					</p>
+				<?php } ?>
+				
+				<?php if("$footer_type" == "custom"){
+					require dirname(__FILE__).'/conf/custom/_custom_footer.php';
+				} ?>
 			</footer>
+		<?php } ?>
 
 		</div><!-- /container -->
 		<!-- End of skin_wrapper -->
