@@ -30,6 +30,8 @@ load_funcs('files/model/_file.funcs.php');
 // Load utf8 support functions
 load_funcs( '_ext/_portable_utf8.php' );
 
+load_funcs( '_ext/random/random.php' );
+
 
 /**
  * Call a method for all modules in a row
@@ -5959,7 +5961,7 @@ function generate_random_key( $length = 32, $keychars = 'abcdefghijklmnopqrstuvw
 
 	for( $i = 0; $i < $length; $i++ )
 	{
-		$key .= $keychars[mt_rand(0, $rnd_max)]; // get a random character out of $keychars
+		$key .= $keychars[random_int(0, $rnd_max)]; // get a random character out of $keychars
 	}
 
 	return $key;
