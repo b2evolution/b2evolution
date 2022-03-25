@@ -21,7 +21,7 @@ class infodots_plugin extends Plugin
 	var $code = 'b2evoDot';
 	var $name = 'Info dots renderer';
 	var $priority = 95;
-	var $version = '7.2.3';
+	var $version = '7.2.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

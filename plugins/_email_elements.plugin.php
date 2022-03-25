@@ -17,7 +17,7 @@ class email_elements_plugin extends Plugin
 	var $code = 'b2evEmailEl';
 	var $name = 'Email Elements';
 	var $priority = 50;
-	var $version = '7.2.3';
+	var $version = '7.2.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
