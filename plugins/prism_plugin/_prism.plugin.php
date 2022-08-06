@@ -21,7 +21,7 @@ class prism_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.2.4';
+	var $version = '7.2.5';
 	var $number_of_installs = 1;
 
 

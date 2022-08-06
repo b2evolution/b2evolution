@@ -1,6 +1,6 @@
 {
   "name": "b2evolution",
-  "version": "7.2.4-stable",
+  "version": "7.2.5-stable",
   "description": "Multiblog/CMS + user community + email marketing + social network + everything you need to run and maintain a modern website (PHP/MySQL).",
   "devDependencies": {
     "jquery": ">=1.11.1",

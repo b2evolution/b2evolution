@@ -23,7 +23,7 @@ class bookmarklet_plugin extends Plugin
 	var $name = 'Bookmarklet';
 	var $code = 'cafeBkmk';
 	var $priority = 94;
-	var $version = '7.2.4';
+	var $version = '7.2.5';
 	var $author = 'Cafelog team';
 	var $number_of_installs = 1;
 
