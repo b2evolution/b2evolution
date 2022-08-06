@@ -187,6 +187,7 @@ function score_date( $date, $score_weights = array() )
 
 /**
  * Count score of multiple occurrences
+ * 
  * The score is sum( $score_weight / x ) where x goes from 2 to match count
  *
  * @param integer match count
@@ -238,7 +239,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			debug_die( 'Invalid search type received!' );
 	}
 
-	// Check whole term match
+	// Check whole term match:
 	foreach( $searched_parts as $searched_part )
 	{
 		if( isset( $scores_map[$searched_part]['map']['whole_term'] ) )
@@ -247,7 +248,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 		}
 	}
 
-	// Whole search term was not found, count percentage based on the matched parts
+	// Whole search term was not found, count percentage based on the matched parts:
 	$matched_quoted_parts = 0;
 	foreach( $quoted_parts as $quoted_part )
 	{
@@ -383,7 +384,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 	$search_ItemList->query_init();
 
 	if( ! is_logged_in() && ! empty( $authors ) )
-	{	// This is necessary because the 'authors_login' filter above will not work for non-existent logins and
+	{	// This is necessary because the 'authors_login' filter above will not work for non-existent logins
 		$search_ItemList->ItemQuery->WHERE_and( 'user_login = '.$DB->quote( $authors ) );
 	}
 
@@ -684,29 +685,36 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
 	$files_SQL->FROM_add( 'LEFT JOIN T_comments ON link_cmt_ID = comment_ID' );
 	$files_SQL->FROM_add( 'LEFT JOIN T_postcats AS cpc ON comment_item_ID = cpc.postcat_post_ID' );
 	$files_SQL->FROM_add( 'LEFT JOIN T_categories AS ccat ON cpc.postcat_cat_ID = ccat.cat_ID' );
+
 	if( ! empty( $authors ) && ! is_logged_in() )
 	{
 		$files_SQL->FROM_add( 'LEFT JOIN T_users AS iuser ON comment_author_user_ID = iuser.user_ID' );
 		$files_SQL->FROM_add( 'LEFT JOIN T_users AS cuser ON comment_author_user_ID = cuser.user_ID' );
 	}
+
 	$files_SQL->WHERE( '( icat.cat_blog_ID = '.$DB->quote( $Blog->ID ).' OR ccat.cat_blog_ID = '.$DB->quote( $Blog->ID ).' )' );
 	$files_SQL->WHERE_and( $file_where_condition );
+
 	if( ! empty( $authors ) )
 	{
 		if( is_logged_in() )
 		{
-			if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $authors ) === false )
-			{
-				debug_die( 'Invalid comment author filter request' );
+			if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $authors ) )
+			{	// If JS active, we will receive a numeric list:
+				$files_SQL->WHERE_and( '( comment_author_user_ID IN ('.$authors.') OR post_creator_user_ID IN ('.$authors.') )' );
 			}
-
-			$files_SQL->WHERE_and( '( comment_author_user_ID IN ('.$authors.') OR post_creator_user_ID IN ('.$authors.') )' );
+			else
+			{	// If JS not active, we will have more limited results.
+				// TODO: Extend support for search without JS
+				$files_SQL->WHERE_and( '( comment_author = '.$DB->quote( $authors ).' )' );
+			}
 		}
 		else
 		{
 			$files_SQL->WHERE_and( '( comment_author = '.$DB->quote( $authors ).' OR cuser.user_login = '.$DB->quote( $authors ).' OR iuser.user_login = '.$DB->quote( $authors ).' )' );
 		}
 	}
+
 	if( $content_age != '' )
 	{
 		$date_min = remove_seconds( strtotime( get_search_date_by_content_age( $content_age ) ) + $time_difference );
@@ -993,6 +1001,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 
 /*
  * Perform search (after having displayed the first part of the page) & display results.
+ *
  * The search results are cached in the session for faster page by page navigation.
  *
  * @param array Display Params
