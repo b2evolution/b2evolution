@@ -22,7 +22,7 @@ class quicktags_plugin extends Plugin
 	var $code = 'b2evQTag';
 	var $name = 'Quick Tags';
 	var $priority = 30;
-	var $version = '7.2.3';
+	var $version = '7.2.5';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 

@@ -29,7 +29,7 @@ class tag_snippet_plugin extends Plugin
 	var $name;
 	var $code = 'evo_tag_snippet';
 	var $priority = 50;
-	var $version = '7.2.3';
+	var $version = '7.2.5';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'infoitem';

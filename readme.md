@@ -2,7 +2,7 @@
 
 # b2evolution CMS
 
-This is b2evolution CMS version **7.2.3-stable**.
+This is b2evolution CMS version **7.2.5-stable**.
 
 ## A complete engine for your website !
 

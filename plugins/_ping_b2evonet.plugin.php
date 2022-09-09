@@ -33,7 +33,7 @@ class ping_b2evonet_plugin extends Plugin
 	 */
 	var $code = 'ping_b2evonet';
 	var $priority = 50;
-	var $version = '7.2.3';
+	var $version = '7.2.5';
 	var $author = 'The b2evo Group';
 
 	/*
