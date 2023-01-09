@@ -702,7 +702,7 @@ function db_delta( $queries, $exclude_types = array(), $execute = false )
 				{
 					if( ! empty( $primary_key_fields ) )
 					{
-						$column_definition .= ', DROP PRIMARY KEY';
+						$column_definition .= ', DROP PRIMARY KEY, ADD PRIMARY KEY('.$tablefield->Field.')';
 						unset( $obsolete_indices['PRIMARY'] );
 					}
 				}
