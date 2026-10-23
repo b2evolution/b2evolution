@@ -2711,8 +2711,8 @@ function skin_opengraph_tags()
 		echo '<meta property="og:image" content="'.format_to_output( $og_image_File->get_url(), 'htmlattr' )."\" />\n";
 		if( $image_dimensions = $og_image_File->get_image_size( 'widthheight') )
 		{
-			echo '<meta property="og:image:height" content="'.format_to_output( $image_dimensions[0], 'htmlattr' )."\" />\n";
-			echo '<meta property="og:image:width" content="'.format_to_output( $image_dimensions[1], 'htmlattr' )."\" />\n";
+			echo '<meta property="og:image:height" content="'.format_to_output( $image_dimensions[1], 'htmlattr' )."\" />\n";
+			echo '<meta property="og:image:width" content="'.format_to_output( $image_dimensions[0], 'htmlattr' )."\" />\n";
 		}
 	}
 }

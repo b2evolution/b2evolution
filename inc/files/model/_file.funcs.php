@@ -3000,6 +3000,7 @@ function get_social_tag_image_file( $disp )
 			}
 			break;
 
+		case 'front':
 		case 'posts':
 			$intro_Item = & get_featured_Item( $disp, NULL, true );
 			if( $intro_Item && $intro_Item->is_intro() )

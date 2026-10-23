@@ -673,6 +673,7 @@ function system_check_api_url( $title, $url )
  */
 function display_system_check( $params )
 {
+	global $allow_evo_stats;	// to tell "disabled by config" from "no access"
 	global $instance_name, $app_date, $app_version, $app_timestamp, $version_long,
 		$localtimenow, $servertimenow, $allow_evodb_reset,
 		$baseurl, $htsrv_url, $host,
@@ -756,6 +757,10 @@ function display_system_check( $params )
 			default:
 				disp_system_check( 'error', $msg );
 		}
+	}
+	elseif( isset( $allow_evo_stats ) && $allow_evo_stats === false )
+	{	// Version check deliberately disabled by configuration ($allow_evo_stats = false): say so, no alarm
+		disp_system_check( 'note', '<p>'.T_('Version check and usage stats are disabled by configuration ($allow_evo_stats = false).').'</p>' );
 	}
 	else
 	{	// Display error when no access to check version:

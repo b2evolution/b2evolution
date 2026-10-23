@@ -226,8 +226,15 @@ if( check_user_perm( 'options', 'edit' ) )
 	}
 	else
 	{
-		echo '<p>Updates from b2evolution.net are disabled!</p>';
-		echo '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
+		if( isset( $allow_evo_stats ) && $allow_evo_stats === false )
+		{	// Deliberately disabled by configuration:
+			echo '<p>'.T_('Version check and usage stats are disabled by configuration ($allow_evo_stats = false).').'</p>';
+		}
+		else
+		{
+			echo '<p>Updates from b2evolution.net are disabled!</p>';
+			echo '<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
+		}
 	}
 
 	// Track just the first login into b2evolution to determine how many people installed manually vs automatic installs:
