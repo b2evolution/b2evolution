@@ -1876,7 +1876,7 @@ class DB
 				'koi8-r'       => 'koi8r',
 				'shift_jis'    => 'sjis',
 				'tis-620'      => 'tis620',
-				'utf-8'        => 'utf8',
+				'utf-8'        => 'utf8mb4',	// real 4-byte UTF-8 (MySQL >= 5.5.3, every MariaDB); MariaDB 10.6+ never reports 'utf8' anymore
 				'windows-1250' => 'cp1250',
 				'windows-1251' => 'cp1251',
 				'windows-1252' => 'latin1',
