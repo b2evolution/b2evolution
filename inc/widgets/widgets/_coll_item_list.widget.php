@@ -51,7 +51,7 @@ class coll_item_list_Widget extends ComponentWidget
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
 
-		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+		$template_options = array( '' => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
 		load_funcs( 'files/model/_image.funcs.php' );
 

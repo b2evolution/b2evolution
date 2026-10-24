@@ -65,12 +65,15 @@ class WidgetContainerCache extends DataObjectCache
 		$container_code = $WidgetContainer->get( 'code' );
 		if( ! empty( $container_code ) )
 		{	// This container is not shared and it is a main container ( has code )
-			$skin_type = $WidgetContainer->get( 'skin_type' );
-			if( ! isset( $this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] ) )
+			// Shared containers (coll_ID NULL) and NULL skin types are cached under the '' key,
+			// as the readers below expect (PHP 8.5 deprecates NULL as an array offset):
+			$coll_ID = ( $WidgetContainer->coll_ID === NULL ) ? '' : $WidgetContainer->coll_ID;
+			$skin_type = (string) $WidgetContainer->get( 'skin_type' );
+			if( ! isset( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ] ) )
 			{
-				$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ] = array();
+				$this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ] = array();
 			}
-			$this->cache_by_coll_skintype_code[ $WidgetContainer->coll_ID ][ $skin_type ][ $container_code ] = & $WidgetContainer;
+			$this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $container_code ] = & $WidgetContainer;
 		}
 
 		return parent::add( $WidgetContainer );
@@ -85,6 +88,10 @@ class WidgetContainerCache extends DataObjectCache
 	function load_by_coll_ID( $coll_ID )
 	{
 		global $DB;
+		if( $coll_ID === NULL )
+		{	// Shared containers live under the '' key:
+			$coll_ID = '';
+		}
 
 		if( isset( $this->cache_by_coll_skintype_code[ $coll_ID ] ) )
 		{	// Don't load widget containers twice:
@@ -112,6 +119,10 @@ class WidgetContainerCache extends DataObjectCache
 	 */
 	function get_by_coll_skintype( $coll_ID, $skin_type )
 	{
+		if( $coll_ID === NULL )
+		{	// Shared containers live under the '' key:
+			$coll_ID = '';
+		}
 		$this->load_by_coll_ID( $coll_ID );
 
 		if( isset( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ] ) )
@@ -134,6 +145,10 @@ class WidgetContainerCache extends DataObjectCache
 	 */
 	function & get_by_coll_skintype_code( $coll_ID, $skin_type, $code, $halt_on_error = false )
 	{
+		if( $coll_ID === NULL )
+		{	// Shared containers live under the '' key:
+			$coll_ID = '';
+		}
 		$this->load_by_coll_ID( $coll_ID );
 
 		if( empty( $this->cache_by_coll_skintype_code[ $coll_ID ][ $skin_type ][ $code ] ) && // collection/skin container

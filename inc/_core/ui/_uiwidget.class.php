@@ -24,6 +24,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @package evocore
  * @abstract
  */
+#[\AllowDynamicProperties] // Table/Results/Form/Menu copy layout templates and request params onto the object
 class Widget
 {
 	/**

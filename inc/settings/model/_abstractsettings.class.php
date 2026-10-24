@@ -33,8 +33,15 @@ $GLOBALS['debug_settings'] = false;
  * @abstract
  * @see UserSettings, GeneralSettings, PluginSettings, CollectionSettings
  */
+#[\AllowDynamicProperties]
 class AbstractSettings
 {
+	/**
+	 * Number of key columns (count of {@link $col_key_names}).
+	 * @var integer
+	 */
+	var $count_col_key_names;
+
 	/**
 	 * The DB table which stores the settings.
 	 *
@@ -122,7 +129,7 @@ class AbstractSettings
 
 		if( $this->count_col_key_names > 3 || $this->count_col_key_names < 1 )
 		{
-			debug_die( 'Settings keycount not supported for class '.get_class() );
+			debug_die( 'Settings keycount not supported for class '.get_class( $this ) );
 		}
 	}
 
@@ -707,7 +714,7 @@ class AbstractSettings
 		if( ! empty($query_where_delete) )
 		{
 			$query = 'DELETE FROM '.$this->db_table_name." WHERE\n(".implode( ")\nOR (", $query_where_delete ).')';
-			$r = (boolean)$DB->query( $query );
+			$r = (bool)$DB->query( $query );
 		}
 
 

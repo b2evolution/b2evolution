@@ -18,6 +18,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class nofollow_plugin extends Plugin
 {
+	/**#@+
+	 * Link attribute options for the current rendering, set by {@link RenderItemAsHtml()} & co.
+	 * @var array
+	 */
+	var $setting_rel_options;
+	var $setting_target_options;
+	/**#@-*/
+
 	var $code = 'evo_nofollow';
 	var $name = 'Tag external links';
 	var $priority = 99;

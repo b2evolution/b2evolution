@@ -78,7 +78,7 @@ elseif( empty( $disable_http_auth ) && $Settings->get( 'http_auth_accept' ) && !
 	$login_action = array( 'login' => '' );
 }
 
-$Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
+$Debuglog->add( 'Login: login: '.var_export( htmlspecialchars( (string) $login, ENT_COMPAT, $evo_charset ), true ), '_init_login' );
 $Debuglog->add( 'Login: pass: '.( empty( $pass ) ? '' : 'not' ).' empty', '_init_login' );
 
 // either 'login' (normal) or 'redirect_to_backoffice' may be set here. This also helps to display the login form again, if either login or pass were empty.
@@ -174,7 +174,9 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 		if( is_email( $login ) )
 		{ // we have an email address instead of login name
 			// get user by email and password
-			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pepper_sess );
+			$email_user_data = $UserCache->get_by_emailAndPwd( $login, $pass, $pwd_hashed, $pepper_sess );
+			// get_by_emailAndPwd() returns false when no user matches: destructuring false is a warning since PHP 8
+			list( $User, $exists_more ) = is_array( $email_user_data ) ? $email_user_data : array( false, false );
 			if( $User )
 			{ // user was found
 				$email_login = $User->get( 'login' );

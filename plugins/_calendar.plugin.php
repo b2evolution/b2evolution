@@ -28,6 +28,14 @@ class calendar_plugin extends Plugin
 
 	var $name;
 	var $code = 'evo_Calr';
+
+	/**#@+
+	 * Items table used by the calendar queries, set in {@link PluginInit()}.
+	 */
+	var $dbtable;
+	var $dbprefix;
+	var $dbIDname;
+	/**#@-*/
 	var $priority = 20;
 	var $version = '7.2.5';
 	var $author = 'The b2evo Group';
@@ -399,6 +407,7 @@ class calendar_plugin extends Plugin
  *
  * @package evocore
  */
+#[\AllowDynamicProperties]
 class Calendar
 {
 	var $year;

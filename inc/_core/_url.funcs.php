@@ -349,7 +349,10 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL,
 		{
 			$info['error'] .= ' (#'.$errno.')';
 		}
-		curl_close( $ch );
+		if( PHP_VERSION_ID < 80000 )
+		{	// curl_close() has no effect since PHP 8.0 and is deprecated in 8.5
+			curl_close( $ch );
+		}
 
 		return $r;
 	}

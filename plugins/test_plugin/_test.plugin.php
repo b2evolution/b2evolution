@@ -2004,7 +2004,7 @@ class test_plugin extends Plugin
 	 *   - 'Comment': the Comment (by reference)
 	 *   - 'original_comment': this is the unstripped and unformated posted comment
 	 *   - 'action': "save" or "preview" (by reference) (since 1.10)
-	 *   - 'is_preview': is this a request for previewing the comment? (boolean)
+	 *   - 'is_preview': is this a request for previewing the comment? (bool)
 	 */
 	function BeforeCommentFormInsert( & $params )
 	{
@@ -2979,7 +2979,7 @@ class test_plugin extends Plugin
 	 *   - 'edit_layout':
 	 *			"public" - public front-office user profile form (info only),
 	 *			"private" - private front-office user profile form (editable),
-	 *   - 'is_admin_page': (boolean) indicates whether we are in front-office or backoffice
+	 *   - 'is_admin_page': (bool) indicates whether we are in front-office or backoffice
 	 */
 	function DisplayProfileFormFieldset( & $params )
 	{

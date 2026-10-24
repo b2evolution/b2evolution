@@ -1012,7 +1012,7 @@ class File extends DataObject
 
 		if( $this->ID && // File is stored in DB before
 		    $this->load_meta() && // Meta data was loaded successfully
-		    $this->_lastmod_ts != strtotime( $this->ts ) )
+		    $this->_lastmod_ts != strtotime( (string) $this->ts ) )
 		{	// We must update timestamp in DB if it is defferent than last modification date of this File on DISK:
 			$this->set( 'ts', date2mysql( $this->_lastmod_ts ) );
 			if( $this->is_image() &&

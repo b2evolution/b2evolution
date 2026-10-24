@@ -34,6 +34,7 @@ load_class( 'plugins/_plugin.class.php', 'Plugin' );
  *
  * @package plugins
  */
+#[\AllowDynamicProperties]
 class Plugins
 {
 	/**#@+
@@ -440,7 +441,10 @@ class Plugins
 		}
 
 		// Memorizes Plugin in code hash array:
-		if( ! empty($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
+		if( $Plugin->code === NULL )
+		{	// Plugins without a code are not indexed by code (PHP 8.5 deprecates NULL as an array offset)
+		}
+		elseif( ! empty($this->index_code_ID[ $Plugin->code ]) && $this->index_code_ID[ $Plugin->code ] != $Plugin->ID )
 		{ // The plugin's default code is already in use!
 			$Plugin->code = NULL;
 		}
@@ -2010,7 +2014,7 @@ class Plugins
 	 * @params array params to set Blog and apply_rendering setting_name ( see {@link load_index_apply_rendering()} )
 	 * @return array validated array of renderer codes
 	 */
-	function validate_renderer_list( $renderers = array('default'), $params )
+	function validate_renderer_list( $renderers, $params )
 	{
 		// Init Blog and $setting_name from the given params
 		if( isset( $params['Item'] ) )
@@ -2155,7 +2159,7 @@ class Plugins
 	 * @param array If given, assume these renderers to be checked.
 	 * @param array params from where to get 'apply_rendering' setting
 	 */
-	function get_renderer_options( $current_renderers = NULL, $params )
+	function get_renderer_options( $current_renderers, $params )
 	{
 		global $inc_path, $admin_url;
 
@@ -2167,7 +2171,7 @@ class Plugins
 
 		if( ! is_array( $current_renderers ) )
 		{
-			$current_renderers = explode( '.', $current_renderers );
+			$current_renderers = explode( '.', (string) $current_renderers );
 		}
 
 		$setting_Blog = NULL;
@@ -2333,7 +2337,7 @@ class Plugins
 	 * @param array If given, assume these renderers to be checked.
 	 * @param array params from where to get 'apply_rendering' setting
 	 */
-	function get_renderer_checkboxes( $current_renderers = NULL, $params )
+	function get_renderer_checkboxes( $current_renderers, $params )
 	{
 		if( isset( $params['setting_name'] ) )
 		{	// Use the defined setting name from params:

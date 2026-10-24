@@ -621,7 +621,7 @@ function download_archive( $archive_path )
  * @param boolean overwrite
  * @param array read only file list
  */
-function verify_overwrite( $src, $dest, $action = '', $overwrite = true, & $read_only_list )
+function verify_overwrite( $src, $dest, $action, $overwrite, & $read_only_list )
 {
 	global $basepath, $Settings;
 

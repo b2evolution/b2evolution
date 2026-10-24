@@ -26,7 +26,7 @@ $b2newpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $xmlrp
  *					2 username (string): Login for a Blogger user who is member of the blog.
  *					3 password (string): Password for said username.
  *					4 content (string): The content of the post.
- *					5 publish (boolean): If set to true, the post will be published immediately.
+ *					5 publish (bool): If set to true, the post will be published immediately.
  *					6 title (string): The title of the post.
  *					7 category (string): The internal name of the category you want to post the post into.
  *					8 date (string): This is the date that will be shown in the post, give "" for current date.

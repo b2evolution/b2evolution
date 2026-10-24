@@ -24,6 +24,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @version beta
  * @abstract
  */
+#[\AllowDynamicProperties] // set() stores any DB column as a property
 class DataObject
 {
 	/**

@@ -21,10 +21,20 @@ load_class( '_core/model/db/_sql.class.php', 'SQL' );
  */
 class ItemQuery extends SQL
 {
+	var $dbtablename;
+	var $dbprefix;
+	var $dbIDname;
+	var $m;
+	var $w;
 	var $p;
 	var $pl;
 	var $title;
 	var $blog;
+	var $Blog;
+	var $cat_array;
+	var $cat_modifier;
+	var $assignees_logins;
+	var $author_assignee;
 	var $cat;
 	var $catsel;
 	var $show_statuses;
@@ -73,7 +83,7 @@ class ItemQuery extends SQL
 	 * @param string Prefix of fields in the table
 	 * @param string Name of the ID field (including prefix)
 	 */
-	function __construct( $dbtablename, $dbprefix = '', $dbIDname )
+	function __construct( $dbtablename, $dbprefix, $dbIDname )
 	{
 		$this->dbtablename = $dbtablename;
 		$this->dbprefix = $dbprefix;
@@ -1415,7 +1425,7 @@ class ItemQuery extends SQL
 //		}
 //		$order_clause = implode( ',', $orderby_fields );
 
-		if( strpos( $this->itemtype_usage, '*featured*' ) !== false )
+		if( strpos( (string) $this->itemtype_usage, '*featured*' ) !== false )
 		{	// If we get featured posts together with other post types(like intro) then we should order featured posts below not featured posts:
 			$order_clause = trim( 'post_featured, '.$order_clause, ', ' );
 		}

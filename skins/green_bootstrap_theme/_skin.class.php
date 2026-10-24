@@ -2447,7 +2447,7 @@ class green_bootstrap_theme_Skin extends Skin
 		// Check when we should use layout with 3 columns:
 		if( $disp == 'front' )
 		{	// Front page
-			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'front' );
+			return (bool)$this->get_checklist_setting( 'use_3_cols', 'front' );
 		}
 
 		if( $disp == 'single' )
@@ -2459,16 +2459,16 @@ class green_bootstrap_theme_Skin extends Skin
 
 		if( $disp_detail == 'posts-topcat-nointro' || $disp_detail == 'posts-topcat-intro' )
 		{	// Category page with or without intro:
-			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
+			return (bool)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
 		}
 
 		if( $disp_detail == 'posts-subcat-nointro' || $disp_detail == 'posts-subcat-intro' )
 		{	// Sub-category page with or without intro:
-			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
+			return (bool)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
 		}
 
 		// All other disps:
-		return (boolean)$this->get_checklist_setting( 'use_3_cols', 'other' );
+		return (bool)$this->get_checklist_setting( 'use_3_cols', 'other' );
 	}
 
 

@@ -90,7 +90,7 @@ $UserCache = & get_UserCache();
 // KEYWORDS:
 $Form->begin_fieldset( T_('Keywords'), array( 'id' => 'items_filter_keywords', 'fold' => true, 'default_fold' => false ) );
 ?>
-<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
+<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars( (string) $s ) ?>" class="SearchField form-control" /></div>
 <div class="tile">
 	<input type="radio" name="<?php echo $pp ?>sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
 	<label for="sentAND"><?php echo T_('AND') ?></label>

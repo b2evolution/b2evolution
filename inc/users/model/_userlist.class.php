@@ -226,9 +226,11 @@ class UserList extends DataObjectList2
 			/*
 			 * Restrict by gender
 			 */
-			memorize_param( 'gender_men', 'integer', strpos( $this->default_filters['gender'], 'M' ) !== false, strpos( $this->filters['gender'], 'M' ) !== false );
-			memorize_param( 'gender_women', 'integer', strpos( $this->default_filters['gender'], 'F' ) !== false, strpos( $this->filters['gender'], 'F' ) !== false );
-			memorize_param( 'gender_other', 'integer', strpos( $this->default_filters['gender'], 'O' ) !== false, strpos( $this->filters['gender'], 'O' ) !== false );
+			$default_gender = (string) $this->default_filters['gender'];
+			$filter_gender = (string) $this->filters['gender'];
+			memorize_param( 'gender_men', 'integer', strpos( $default_gender, 'M' ) !== false, strpos( $filter_gender, 'M' ) !== false );
+			memorize_param( 'gender_women', 'integer', strpos( $default_gender, 'F' ) !== false, strpos( $filter_gender, 'F' ) !== false );
+			memorize_param( 'gender_other', 'integer', strpos( $default_gender, 'O' ) !== false, strpos( $filter_gender, 'O' ) !== false );
 
 			/*
 			 * Restrict by status

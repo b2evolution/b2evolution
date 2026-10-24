@@ -834,6 +834,7 @@ class ValidUTF8XMLFilter extends php_user_filter
 {
 	protected static $pattern = '/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u';
 
+	#[\ReturnTypeWillChange]
 	function filter( $in, $out, & $consumed, $closing )
 	{
 		while( $bucket = stream_bucket_make_writeable( $in ) )

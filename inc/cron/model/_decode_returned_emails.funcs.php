@@ -114,8 +114,8 @@ function dre_connect( $cron = false, $print_out_folders = false )
 	// Connect to mail server (one retry)
 	$mbox = @imap_open( $mailserver, $Settings->get('repath_username'), $Settings->get('repath_password'), NULL, 1 );
 
-	if( is_null(@get_resource_type($mbox)) )
-	{	// Not a resource
+	if( $mbox === false )
+	{	// imap_open() failed (returns false; a resource before PHP 8.1, an IMAP\Connection object since)
 		$error = imap_errors();
 		if( is_array($error) )
 		{

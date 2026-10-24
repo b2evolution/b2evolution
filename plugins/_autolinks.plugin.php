@@ -354,7 +354,7 @@ class autolinks_plugin extends Plugin
 			return;
 		}
 
-		while( ($data = fgetcsv($handle, 1000, ';', '"')) !== false )
+		while( ($data = fgetcsv($handle, 1000, ';', '"', '\\')) !== false )
 		{
 			$this->read_line( $data, $coll_ID );
 		}

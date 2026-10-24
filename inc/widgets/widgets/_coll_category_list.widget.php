@@ -82,9 +82,9 @@ class coll_category_list_Widget extends ComponentWidget
 	 * @param array local params
 	 *  - 'title': block title (string, default "Categories")
 	 *  - 'option_all': "All categories" link title, empty to disable (string, default "All")
-	 *  - 'use_form': Add a form with checkboxes to allow selection of multiple categories (boolean)
-	 *  - 'disp_names_for_coll_list': Display blog names, if this is an aggregated blog? (boolean)
-	 *  - 'display_checkboxes': Add checkboxes (but not a complete form) to allow selection of multiple categories (boolean)
+	 *  - 'use_form': Add a form with checkboxes to allow selection of multiple categories (bool)
+	 *  - 'disp_names_for_coll_list': Display blog names, if this is an aggregated blog? (bool)
+	 *  - 'display_checkboxes': Add checkboxes (but not a complete form) to allow selection of multiple categories (bool)
 	 */
 	function get_param_definitions( $params )
 	{

@@ -92,7 +92,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
-		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+		$template_options = array( '' => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
 		$ItemTypeCache = & get_ItemTypeCache();
 

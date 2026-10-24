@@ -74,7 +74,7 @@ $Form->begin_fieldset( TB_('Comment viewing options') . get_manual_link('comment
 
 	$Form->checkbox( 'threaded_comments', $edited_Blog->get_setting( 'threaded_comments' ), TB_('Threaded comments'), TB_('Check to enable hierarchical threads of comments.') );
 
-	$paged_comments_disabled = (boolean) $edited_Blog->get_setting( 'threaded_comments' );
+	$paged_comments_disabled = (bool) $edited_Blog->get_setting( 'threaded_comments' );
 	$Form->checkbox( 'paged_comments', $edited_Blog->get_setting( 'paged_comments' ), TB_( 'Paged comments' ), TB_( 'Check to enable paged comments on the public pages.' ), '', 1, $paged_comments_disabled );
 
 	$Form->text( 'comments_per_page', $edited_Blog->get_setting('comments_per_page'), 4, TB_('Comments/Page'),  TB_('How many comments do you want to display on one page?'), 4 );

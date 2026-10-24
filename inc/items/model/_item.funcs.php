@@ -325,7 +325,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 	}
 
 	// Convert to boolean because settings may have '0' and '1' values instead:
-	$load_featured = (boolean)$load_featured;
+	$load_featured = (bool)$load_featured;
 
 	// Check clear disp details without suffix -intro and -nointro:
 	$check_clear_disp_detail = preg_replace( '#(-intro|-nointro)$#', '', $disp_detail );
@@ -470,7 +470,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
  */
 function has_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $check_featured = false )
 {
-	return (boolean)get_featured_Item( $restrict_disp, $coll_IDs, true, $check_featured );
+	return (bool)get_featured_Item( $restrict_disp, $coll_IDs, true, $check_featured );
 }
 
 
@@ -5089,6 +5089,7 @@ function prepare_item_content( $content )
 			'[teaserbreak]', '[teaserbreak]', '[teaserbreak]',
 			'[pagebreak]', '[pagebreak]', '[pagebreak]'
 		);
+	$content = (string) $content;
 	if( strpos( $content, '<code' ) !== false || strpos( $content, '<pre' ) !== false )
 	{ // Call prepare_item_content_callback() on everything outside code/pre:
 		$content = callback_on_non_matching_blocks( $content,
@@ -6047,7 +6048,7 @@ function item_type_global_icons( $object_Widget )
 				);
 				// Make last used import controller first:
 				$last_import_controller = $Session->get( 'last_import_controller_'.$Blog->ID );
-				if( isset( $import_buttons[ $last_import_controller ] ) )
+				if( $last_import_controller !== NULL && isset( $import_buttons[ $last_import_controller ] ) )
 				{
 					$first_import_button = $import_buttons[ $last_import_controller ];
 					unset( $import_buttons[ $last_import_controller ] );

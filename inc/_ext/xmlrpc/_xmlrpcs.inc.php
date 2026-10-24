@@ -200,8 +200,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 	{
 		if(is_string($err))
 		{
-			$str = $GLOBALS['xmlrpcstr']["multicall_${err}"];
-			$code = $GLOBALS['xmlrpcerr']["multicall_${err}"];
+			$str = $GLOBALS['xmlrpcstr']["multicall_{$err}"];
+			$code = $GLOBALS['xmlrpcerr']["multicall_{$err}"];
 		}
 		else
 		{
@@ -792,7 +792,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			}
 			if(isset($wanted))
 			{
-				$msg = "Wanted ${wanted}, got ${got} at param ${pno}";
+				$msg = "Wanted {$wanted}, got {$got} at param {$pno}";
 				logIO($msg);
 				logIO( 'Method signatures: '.var_export($sig, true) );
 
@@ -800,7 +800,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			}
 			else
 			{
-				$msg = "No method signature matches number of parameters, got ${numParams} expected ".implode(' or ', $exp_p);
+				$msg = "No method signature matches number of parameters, got {$numParams} expected ".implode(' or ', $exp_p);
 				logIO($msg);
 				logIO( 'Method signatures: '.var_export($sig, true) );
 
@@ -1005,18 +1005,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 				sprintf('XML error: %s at line %d, column %d',
 					xml_error_string(xml_get_error_code($parser)),
 					xml_get_current_line_number($parser), xml_get_current_column_number($parser)));
-				xml_parser_free($parser);
+				if( PHP_VERSION_ID < 80000 ) { xml_parser_free($parser); } // no effect since PHP 8.0, deprecated in 8.5
 			}
 			elseif ($GLOBALS['_xh']['isf'])
 			{
-				xml_parser_free($parser);
+				if( PHP_VERSION_ID < 80000 ) { xml_parser_free($parser); } // no effect since PHP 8.0, deprecated in 8.5
 				$r = new xmlrpcresp(0,
 					$GLOBALS['xmlrpcerr']['invalid_request'],
 					$GLOBALS['xmlrpcstr']['invalid_request'] . ' ' . $GLOBALS['_xh']['isf_reason']);
 			}
 			else
 			{
-				xml_parser_free($parser);
+				if( PHP_VERSION_ID < 80000 ) { xml_parser_free($parser); } // no effect since PHP 8.0, deprecated in 8.5
 				// small layering violation in favor of speed and memory usage:
 				// we should allow the 'execute' method handle this, but in the
 				// most common scenario (xmlrpcvals type server with some methods
@@ -1102,7 +1102,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 					return new xmlrpcresp(
 						0,
 						$GLOBALS['xmlrpcerr']['incorrect_params'],
-						$GLOBALS['xmlrpcstr']['incorrect_params'] . ": ${errstr}"
+						$GLOBALS['xmlrpcstr']['incorrect_params'] . ": {$errstr}"
 					);
 				}
 			}

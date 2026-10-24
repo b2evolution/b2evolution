@@ -25,6 +25,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 class Hit
 {
+	/**#@+
+	 * User agent detection flags, initialized by {@link detect_useragent()}.
+	 * @var boolean
+	 */
+	var $is_lynx;
+	var $is_firefox;
+	var $is_gecko;
+	var $is_IE;
+	var $is_winIE;
+	var $is_macIE;
+	var $is_chrome;
+	var $is_safari;
+	var $is_opera;
+	var $is_NS4;
+	/**#@-*/
+
 	/**
 	 * ID in DB, gets set when {@link log()} was called and the hit was logged.
 	 */
@@ -928,9 +944,9 @@ class Hit
 		$sql_insert_fields = array(
 				'hit_datetime'          => 'FROM_UNIXTIME( '.$localtimenow.' )',
 				'hit_uri'               => $DB->quote( substr( $ReqURI, 0, 250 ) ), // VARCHAR(250) and likely to be longer
-				'hit_disp'              => $DB->quote( substr( $disp, 0, 30 ) ), // VARCHAR(30) and likely to be longer
-				'hit_ctrl'              => $DB->quote( substr( $ctrl, 0, 30 ) ), // VARCHAR(30) and likely to be longer
-				'hit_action'            => $DB->quote( substr( $this->action, 0, 30 ) ), // VARCHAR(30) and likely to be longer
+				'hit_disp'              => $DB->quote( substr( (string) $disp, 0, 30 ) ), // VARCHAR(30) and likely to be longer; NULL on admin pages
+				'hit_ctrl'              => $DB->quote( substr( (string) $ctrl, 0, 30 ) ), // VARCHAR(30) and likely to be longer; NULL on front pages
+				'hit_action'            => $DB->quote( substr( (string) $this->action, 0, 30 ) ), // VARCHAR(30) and likely to be longer
 				'hit_type'              => $DB->quote( $this->hit_type ),
 				'hit_referer_type'      => $DB->quote( $this->referer_type ),
 				'hit_referer'           => $DB->quote( substr( $this->referer, 0, 250 ) ), // VARCHAR(250) and likely to be longer

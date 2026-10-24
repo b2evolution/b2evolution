@@ -51,7 +51,7 @@ class Swift_Transport_EsmtpTransport extends Swift_Transport_AbstractSmtpTranspo
      * @param Swift_Transport_EsmtpHandler[] $extensionHandlers
      * @param string                         $localDomain
      */
-    public function __construct(Swift_Transport_IoBuffer $buf, array $extensionHandlers, Swift_Events_EventDispatcher $dispatcher, $localDomain = '127.0.0.1', Swift_AddressEncoder $addressEncoder = null)
+    public function __construct(Swift_Transport_IoBuffer $buf, array $extensionHandlers, Swift_Events_EventDispatcher $dispatcher, $localDomain = '127.0.0.1', ?Swift_AddressEncoder $addressEncoder = null)
     {
         parent::__construct($buf, $dispatcher, $localDomain, $addressEncoder);
         $this->setExtensionHandlers($extensionHandlers);
@@ -141,7 +141,7 @@ class Swift_Transport_EsmtpTransport extends Swift_Transport_AbstractSmtpTranspo
      */
     public function setEncryption($encryption)
     {
-        $encryption = strtolower($encryption);
+        $encryption = strtolower((string) $encryption);
         if ('tls' == $encryption) {
             $this->params['protocol'] = 'tcp';
             $this->params['tls'] = true;

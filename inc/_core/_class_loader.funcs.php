@@ -41,19 +41,11 @@ function evocms_autoload_class( $classname )
 
 
 /*
- * Use spl_autoload_register mechanism, if available (PHP>=5.1.2).
+ * Use spl_autoload_register mechanism (PHP>=5.1.2).
  * This way a stacked set of autoload functions can be used.
+ * (The __autoload() fallback for PHP<5.1.2 was removed: __autoload() is a compile error since PHP 8.0.)
  */
-if( function_exists('spl_autoload_register') )
-{
-	// spl_autoload_register( 'var_dump' );
-	spl_autoload_register( 'evocms_autoload_class' );
-}
-else
-{
-	// PHP<5.1.2: Use the fallback method. Function in a separate file as by simply adding it here would generate deprecated warning
-	load_funcs( '_core/fallback/_autoload.funcs.php' );
-}
+spl_autoload_register( 'evocms_autoload_class' );
 
 
 /**

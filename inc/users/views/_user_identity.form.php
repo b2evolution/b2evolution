@@ -351,7 +351,7 @@ if( $action != 'view' )
 				$birthday_months = array();
 				if( $Settings->get( 'birthday_month' ) == 'optional' )
 				{
-					$birthday_months[NULL] = '---';
+					$birthday_months[''] = '---';
 				}
 				foreach( $month as $key => $value )
 				{
@@ -369,7 +369,7 @@ if( $action != 'view' )
 				$birthday_days = range( 1, 31 );
 				if( $Settings->get( 'birthday_day' ) == 'optional' )
 				{
-					$birthday_days = array( NULL => '---' ) + $birthday_days;
+					$birthday_days = array( '' => '---' ) + $birthday_days;
 				}
 				$Form->select_input_array( 'edited_user_birthday_day', $edited_User->birthday_day, $birthday_days, '' );
 			}
@@ -379,7 +379,7 @@ if( $action != 'view' )
 				$birthday_years = range( (int) date( 'Y' ), 1900, -1 );
 				if( $Settings->get( 'birthday_year' ) == 'optional' )
 				{
-					$birthday_years = array( NULL => '---' ) + $birthday_years;
+					$birthday_years = array( '' => '---' ) + $birthday_years;
 				}
 				$Form->select_input_array( 'edited_user_birthday_year', $edited_User->birthday_year, $birthday_years, '' );
 			}

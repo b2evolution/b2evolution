@@ -41,7 +41,7 @@ if( isset( $use_l10n ) && $use_l10n )
 	 *              - 'alt_basedir': Alternate base directory to search
 	 *                               for translations, e. g. a plugin or
 	 *                               skin directory.
-	 *              - 'for_helper': (boolean) Is the translation for the b2evoHelper object?
+	 *              - 'for_helper': (bool) Is the translation for the b2evoHelper object?
 	 * @return string The translated string or the original string on error.
 	 *
 	 * @internal The last parameter/its 'alt_basedir' key is used by

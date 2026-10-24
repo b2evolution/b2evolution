@@ -547,7 +547,7 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
 
 	foreach( $blocked_emails as $email => $email_blocked_ID )
 	{ // The blocked email has TRUE value; Trust emails - FALSE
-		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $email_blocked_ID;
+		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (bool) $email_blocked_ID;
 	}
 }
 
@@ -592,7 +592,7 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 		$SQL->FROM( 'T_email__address' );
 		$SQL->WHERE( 'emadr_address = '.$DB->quote( utf8_strtolower( $email ) ) );
 		$SQL->WHERE_and( get_mail_blocked_condition( true, $blocked_statuses ) );
-		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL );
+		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (bool) $DB->get_var( $SQL );
 	}
 
 	// Get email block status from cache variable

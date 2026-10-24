@@ -31,6 +31,7 @@ load_class( '_core/model/db/_sql.class.php', 'SQL' );
  * @package evocore
  * @version beta
  */
+#[\AllowDynamicProperties] // per-cache lookup arrays are added by subclasses
 class DataObjectCache
 {
 	var $dbtablename;
@@ -130,7 +131,7 @@ class DataObjectCache
 	 * @param mixed  The value that gets used for the "None" option in the objects options list.
 	 * @param string Additional part for SELECT clause of sql query
 	 */
-	function __construct( $objtype, $load_all, $tablename, $prefix = '', $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
+	function __construct( $objtype, $load_all, $tablename, $prefix, $dbIDname, $name_field = NULL, $order_by = '', $allow_none_text = NULL, $allow_none_value = '', $select = '' )
 	{
 		$this->objtype = $objtype;
 		$this->load_all = $load_all;
@@ -231,7 +232,7 @@ class DataObjectCache
 		if( empty( $req_list ) )
 			return false;
 
-		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class( $this ).'->'.__FUNCTION__.'()' );
 		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.$DB->quote( $req_list ).')');
 
 		return $this->load_by_sql($SQL);
@@ -245,7 +246,7 @@ class DataObjectCache
 	 */
 	function load_where( $sql_where )
 	{
-		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class( $this ).'->'.__FUNCTION__.'()' );
 		$SQL->WHERE($sql_where);
 		return $this->load_by_sql($SQL);
 	}
@@ -278,7 +279,7 @@ class DataObjectCache
 
 		if( empty( $SQL->title ) )
 		{	// Set SQL title for debug info:
-			$SQL->title = 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
+			$SQL->title = 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class( $this ).'->'.__FUNCTION__.'()';
 		}
 
 		return $this->instantiate_list( $DB->get_results( $SQL ) );

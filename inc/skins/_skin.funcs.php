@@ -3194,7 +3194,8 @@ function widget_container_customize_params( $params, $wico_code, $wico_name )
 	// Replace variables/masks in params with widget container properties;
 	// Possible variables/masks in params:
 	//   - $wico_class$ - Widget container class
-	$params = str_replace( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', $wico_code ), $params );
+	// (only in string params: $params also carries objects, which PHP 8 cannot cast to string)
+	$params = str_replace_in_strings( '$wico_class$', 'evo_container__'.str_replace( ' ', '_', (string) $wico_code ), $params );
 
 	return $params;
 }

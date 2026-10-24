@@ -34,7 +34,7 @@ $wordpressgetusersblogs_sig = array(array($xmlrpcArray,$xmlrpcString,$xmlrpcStri
  *					1 password (string): Password for said username.
  *						(currently not required by b2evo)
  * @return xmlrpcresp XML-RPC Response, an array of <struct>s containing for each blog:
- *					- isAdmin (boolean)
+ *					- isAdmin (bool)
  *					- url (string)
  *					- blogid (string)
  *					- blogName (string)

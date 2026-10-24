@@ -388,7 +388,7 @@ $metawebloggetrecentposts_sig = array(
  *					1 username (string): Login for a Blogger user who has permission to edit the given
  *						post (either the user who originally created it or an admin of the blog).
  *					2 password (string): Password for said username.
- *					3 numposts (integer): number of posts to retrieve.
+ *					3 numposts (int): number of posts to retrieve.
  */
 function mw_getrecentposts( $m )
 {

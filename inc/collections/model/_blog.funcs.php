@@ -1939,7 +1939,7 @@ function get_blog_order( $Blog = NULL, $return = 'field', $separator = ',' )
  * @param boolean set tru to allow 'none' option, false otherwise
  * @return string HTML code of <option>s for <select>
  */
-function get_post_orderby_options( $coll_ID = NULL, $selected_value, $allow_none = false )
+function get_post_orderby_options( $coll_ID, $selected_value, $allow_none = false )
 {
 	// Get available sort options:
 	$available_sort_options = get_available_sort_options( $coll_ID, $allow_none, true );

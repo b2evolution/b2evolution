@@ -1764,7 +1764,7 @@ class Form extends Widget
 	 * @param string CSS class for select
 	 * @param string Javascript to add for onchange event (trailing ";").
 	 */
-	function time_select( $field_name, $field_value = NULL, $precision = '5mn', $field_label, $field_note = NULL, $field_class = NULL, $field_onchange = NULL )
+	function time_select( $field_name, $field_value, $precision, $field_label, $field_note = NULL, $field_class = NULL, $field_onchange = NULL )
 	{
 		preg_match( '#([0-9]+)(mn|s)#', $precision, $matches );
 
@@ -1863,7 +1863,7 @@ class Form extends Widget
 	 * @param integer increment for the loop (precision)
 	 * @param array params
 	 */
-	function _number_select( $field_value, $max, $precision = 1, $field_params )
+	function _number_select( $field_value, $max, $precision, $field_params )
 	{
 			$r	=	'<select'.get_field_attribs_as_string( $field_params ).'>';
 

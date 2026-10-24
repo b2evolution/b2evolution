@@ -618,7 +618,7 @@ class DB
 	 */
 	function escape($str)
 	{
-		return $this->dbhandle->real_escape_string($str);
+		return $this->dbhandle->real_escape_string( (string) $str );
 	}
 
 

@@ -36,6 +36,36 @@ class Item extends ItemLight
 	var $datecreated;
 
 	/**
+	 * Custom fields of this Item, loaded lazily (see {@link Item::get_custom_fields_defs()}).
+	 * @var array|NULL
+	 */
+	var $custom_fields;
+
+	/**
+	 * Number of content pages (set by {@link split_pages()}).
+	 * @var integer
+	 */
+	var $pages;
+
+	/**
+	 * Cache for {@link has_content_parts()}.
+	 * @var array
+	 */
+	var $cache_has_content_parts;
+
+	/**
+	 * Renderer plugins validated for this Item (see {@link get_renderers_validated()}).
+	 * @var array|NULL
+	 */
+	var $renderers_validated;
+
+	/**
+	 * ID of the Item Type the custom fields were loaded for.
+	 * @var integer|NULL
+	 */
+	var $custom_fields_loaded_ityp_ID;
+
+	/**
 	 * The User who has created the Item (lazy-filled).
 	 * @see Item::get_creator_User()
 	 * @see Item::set_creator_User()
@@ -5443,10 +5473,10 @@ class Item extends ItemLight
 			$placeholder_html = $params['placeholder'];
 			switch( $placeholder_html )
 			{
-				case '#file_text_icon';
+				case '#file_text_icon':
 					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-file-text-o"></i></a></div>';
 					break;
-				case '#file_thumbnail_text_icon';
+				case '#file_thumbnail_text_icon':
 					$placeholder_html = '<div class="evo_thumblist_placeholder" style="width:80px;height:80px"><a href="$url$"></a></div>';
 					break; 
 			}
@@ -13563,7 +13593,7 @@ class Item extends ItemLight
 		}
 
 		// Try to use a message from Item Type setting:
-		$item_type_msg = trim( $this->get_type_setting( 'comment_form_msg' ) );
+		$item_type_msg = trim( (string) $this->get_type_setting( 'comment_form_msg' ) );
 		if( ! empty( $item_type_msg ) )
 		{	// Use a message of the item type:
 			return $item_type_msg;
@@ -14009,7 +14039,7 @@ class Item extends ItemLight
 			$SQL->WHERE( 'iver_itm_ID = '.$this->ID );
 			$SQL->WHERE_and( 'iver_type = "proposed"' );
 
-			$this->has_proposed_change = (boolean) $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+			$this->has_proposed_change = (bool) $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
 		}
 
 		return $this->has_proposed_change;

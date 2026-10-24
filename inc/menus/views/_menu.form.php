@@ -52,7 +52,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 
 	$Form->text_input( 'menu_name', $edited_SiteMenu->get( 'name' ), 50, TB_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
 
-	$parent_menu_options = array( NULL => '('.TB_('None').')' );
+	$parent_menu_options = array( '' => '('.TB_('None').')' );
 	$SQL = new SQL('Get possible menus translated from');
 	$SQL->SELECT( 'menu_ID, menu_name' );
 	$SQL->FROM( 'T_menus__menu' );

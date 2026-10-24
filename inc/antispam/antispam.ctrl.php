@@ -633,7 +633,7 @@ switch( $tab3 )
 				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
 				break;
 
-			case 'whois';
+			case 'whois':
 				$AdminUI->disp_view( 'antispam/views/_antispam_whois.view.php' );
 				break;
 

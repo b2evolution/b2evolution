@@ -65,7 +65,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->select_object( 'tpl_owner_grp_ID', $edited_Template->get( 'owner_grp_ID' ), $GroupCache, TB_('Owned by') );
 
 	// Base template ID:
-	$base_template_options = array( NULL => '('.TB_('None').')' );
+	$base_template_options = array( '' => '('.TB_('None').')' );
 	$SQL = new SQL('Get possible base templates');
 	$SQL->SELECT( 'tpl_ID, tpl_name' );
 	$SQL->FROM( 'T_templates' );

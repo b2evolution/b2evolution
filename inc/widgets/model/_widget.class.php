@@ -32,6 +32,12 @@ class ComponentWidget extends DataObject
 	 */
 	var $wico_ID;
 
+	/**
+	 * Renderer plugins validated for this widget (see {@link get_renderers_validated()}).
+	 * @var array|NULL
+	 */
+	var $renderers_validated;
+
 	var $order;
 	/**
 	 * @var string Type of the plugin ("core" or "plugin")
@@ -812,8 +818,8 @@ class ComponentWidget extends DataObject
 		// Add custom id if required, default to generic id for validation purposes:
 		$widget_ID = ( !empty($params[ 'widget_ID' ]) ? $params[ 'widget_ID' ] : 'widget_'.$this->type.'_'.$this->code.'_'.$this->ID );
 
-		// Replace the values:
-		$this->disp_params = str_replace( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
+		// Replace the values (only in string params: $params also carries objects):
+		$this->disp_params = str_replace_in_strings( array( '$wi_ID$', '$wi_class$' ), array( $widget_ID, $widget_css_class ), $params );
 	}
 
 

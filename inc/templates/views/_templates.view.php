@@ -61,12 +61,12 @@ function filter_templates_list( & $Form )
 	$Form->text_input( 'q', get_param( 'q' ), 20, T_('Name / Code'), '', array( 'maxlength' => 50 ) );
 
 	// Context:
-	$field_options = array( NULL => T_('All contexts') ) + get_template_contexts( 'raw' );
+	$field_options = array( '' => T_('All contexts') ) + get_template_contexts( 'raw' );
 	$Form->select_input_array( 'context', get_param( 'context' ), $field_options, T_('Context'), '', array( 'force_keys_as_values' => false ) );
 
 	// Owner:
 	$GroupCache = & get_GroupCache();
-	$field_options = array( NULL => T_('All owners'), '0' => 'SYSTEM' ) + $GroupCache->get_option_array();
+	$field_options = array( '' => T_('All owners'), '0' => 'SYSTEM' ) + $GroupCache->get_option_array();
 	$Form->select_input_array( 'owner', get_param( 'owner' ), $field_options, T_('Owner'), '', array( 'force_keys_as_values' => true ) );	
 }
 $Results->filter_area = array(

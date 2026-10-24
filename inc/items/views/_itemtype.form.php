@@ -68,7 +68,7 @@ $Form->begin_fieldset( TB_('General').get_manual_link('item-type-general') );
 	$context = 'item_content';
 	$TemplateCache = & get_TemplateCache();
 	$TemplateCache->load_by_context( $context );
-	$template_options = array( NULL => sprintf( TB_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
+	$template_options = array( '' => sprintf( TB_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
 	$template_input_suffix = ( check_user_perm( 'options', 'edit' ) ? '&nbsp;'
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.'&amp;blog='.$Blog->ID, NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => TB_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'ityp_template_excerpt', $edited_Itemtype->get( 'template_excerpt' ), $template_options, TB_('Template for Excerpt display'), NULL, array( 'input_suffix' => $template_input_suffix ) );

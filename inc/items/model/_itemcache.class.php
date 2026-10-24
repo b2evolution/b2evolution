@@ -218,7 +218,7 @@ class ItemCache extends DataObjectCache
 			}
 		}
 
-		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class( $this ).'->'.__FUNCTION__.'()' );
 		$sql_where = array();
 		if( ! empty( $IDs ) )
 		{	// Load Items by IDs:

@@ -37,7 +37,7 @@ $debug_pwd = '';
 
 // Most of the time you'll want to see all errors, including notices, to alert you on potential issues:
 // b2evo should run without any notices! (same for plugins!)
-error_reporting( E_ALL | E_STRICT );
+error_reporting( E_ALL ); // E_STRICT is part of E_ALL since PHP 5.4 and the constant is deprecated in PHP 8.4
 /**
  * Do we want to display errors, even when not in debug mode?
  *

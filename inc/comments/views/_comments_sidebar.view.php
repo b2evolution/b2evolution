@@ -108,7 +108,7 @@ elseif( $CommentList->is_trashfilter() )
 $fold_keywords = ( $CommentList->default_filters['keywords'] == $CommentList->filters['keywords'] );
 $Form->begin_fieldset( T_('Keywords'), array( 'id' => 'comment_filter_keywords', 'fold' => true, 'default_fold' => $fold_keywords ) );
 ?>
-<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
+<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars( (string) $s ) ?>" class="SearchField form-control" /></div>
 <div class="tile">
 	<input type="radio" name="<?php echo $pp ?>sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
 	<label for="sentAND"><?php echo T_('AND') ?></label>
@@ -227,7 +227,7 @@ if( $tab3 != 'meta' )
 	$fold_author_url = ( $CommentList->default_filters['author_url'] == $CommentList->filters['author_url'] );
 	$Form->begin_fieldset( T_('Author URL'), array( 'id' => 'comment_filter_author_url', 'fold' => true, 'default_fold' => $fold_author_url ) );
 	?>
-	<div class="tile"><input type="text" name="<?php echo $pp ?>author_url" size="20" value="<?php echo htmlspecialchars($author_url) ?>" class="SearchField form-control" /></div>
+	<div class="tile"><input type="text" name="<?php echo $pp ?>author_url" size="20" value="<?php echo htmlspecialchars( (string) $author_url ) ?>" class="SearchField form-control" /></div>
 	<div class="tile">
 		<input type="radio" name="<?php echo $pp ?>url_match" value="=" id="with_url" class="radio" <?php if( $url_match=='=' ) echo 'checked="checked" '?> />
 		<label for="with_url"><?php echo T_('With this') ?></label>
@@ -247,7 +247,7 @@ if( $tab3 != 'meta' )
 	$fold_ip_address = ( $CommentList->default_filters['author_IP'] == $CommentList->filters['author_IP'] );
 	$Form->begin_fieldset( T_('IP'), array( 'id' => 'comment_filter_ip_address', 'fold' => true, 'default_fold' => $fold_ip_address ) );
 	?>
-	<?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" value="<?php echo htmlspecialchars($author_IP) ?>" class="SearchField form-control" />
+	<?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" value="<?php echo htmlspecialchars( (string) $author_IP ) ?>" class="SearchField form-control" />
 	<span class="note"><?php
 		// We use sprintf to avoid problems with a single % sign in transifex
 		echo sprintf( T_('use \'%%\' for partial matches') );

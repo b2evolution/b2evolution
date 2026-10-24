@@ -101,7 +101,7 @@ class item_about_author_Widget extends ComponentWidget
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
 
-		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+		$template_options = array( '' => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
 		// Load Userfield class and all fields:
 		load_class( 'users/model/_userfield.class.php', 'Userfield' );

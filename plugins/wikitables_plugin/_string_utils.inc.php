@@ -508,6 +508,7 @@ class ExplodeIterator implements Iterator {
 		$this->rewind();
 	}
 
+	#[\ReturnTypeWillChange]
 	function rewind() {
 		$this->curPos = 0;
 		$this->endPos = strpos( $this->subject, $this->delim );
@@ -526,10 +527,12 @@ class ExplodeIterator implements Iterator {
 		}
 	}
 
+	#[\ReturnTypeWillChange]
 	function current() {
 		return $this->current;
 	}
 
+	#[\ReturnTypeWillChange]
 	function key() {
 		return $this->curPos;
 	}
@@ -537,6 +540,7 @@ class ExplodeIterator implements Iterator {
 	/**
 	 * @return string
 	 */
+	#[\ReturnTypeWillChange]
 	function next() {
 		if ( $this->endPos === false ) {
 			$this->curPos = false;
@@ -555,6 +559,7 @@ class ExplodeIterator implements Iterator {
 	/**
 	 * @return bool
 	 */
+	#[\ReturnTypeWillChange]
 	function valid() {
 		return $this->curPos !== false;
 	}

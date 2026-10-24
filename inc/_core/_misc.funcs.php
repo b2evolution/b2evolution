@@ -295,6 +295,39 @@ function shutdown()
 /***** Formatting functions *****/
 
 /**
+ * Replace masks in the STRING values of a (possibly nested) array, leaving
+ * every other value (objects, arrays, booleans, integers, NULL) untouched.
+ *
+ * Widget and container params mix strings holding masks like $wi_ID$ with
+ * objects (WidgetContainer, ItemList, Item...). str_replace() applied to the
+ * whole array tries to cast those objects to string, which is a fatal Error
+ * since PHP 8.0 ("Object of class ... could not be converted to string").
+ *
+ * @param string|array Mask(s) to search for (same as str_replace())
+ * @param string|array Replacement(s) (same as str_replace())
+ * @param mixed Value to process
+ * @return mixed Processed value
+ */
+function str_replace_in_strings( $search, $replace, $subject )
+{
+	if( is_string( $subject ) )
+	{
+		return str_replace( $search, $replace, $subject );
+	}
+
+	if( is_array( $subject ) )
+	{
+		foreach( $subject as $key => $value )
+		{
+			$subject[ $key ] = str_replace_in_strings( $search, $replace, $value );
+		}
+	}
+
+	return $subject;
+}
+
+
+/**
  * Format a string/content for being output
  *
  * @author fplanque
@@ -364,7 +397,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'formvalue':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
 			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			$content = htmlspecialchars( (string) $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			break;
 
 		case 'xml':
@@ -393,7 +426,7 @@ function format_to_output( $content, $format = 'htmlbody' )
 		case 'syslog':
 			// Replace special chars to &amp;, &quot;, &#039;|&apos;, &lt; and &gt; :
 			// Handles & " ' < > to &amp; &quot; &apos; &lt; &gt;
-			$content = htmlspecialchars( $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
+			$content = htmlspecialchars( (string) $content, ENT_QUOTES | ENT_HTML5, $evo_charset );
 			$content = preg_replace( "/\[\[(.+?)]]/is", "<code>$1</code>", $content ); // Replaces [[...]] into <code>...</code>
 			break;
 
@@ -712,6 +745,12 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 function convert_chars( $content, $flag = 'html' )
 {
 	global $b2_htmltrans, $evo_charset;
+
+	if( $content === NULL )
+	{	// Empty fields are often NULL: strtr()/preg_replace() on NULL is deprecated since PHP 8.1
+		// and already returned an empty string.
+		$content = '';
+	}
 
 	/**
 	 * Translation of invalid Unicode references range to valid range.
@@ -6121,7 +6160,7 @@ function format_french_phone( $phone )
 function get_manual_url( $topic )
 {
 	// fp> TODO: this below is a temmporary hack while we work on the new manual:
-	return 'http://b2evolution.net/man/'.str_replace( '_', '-', strtolower( rawurlencode( $topic ) ) );
+	return 'http://b2evolution.net/man/'.str_replace( '_', '-', strtolower( rawurlencode( (string) $topic ) ) );
 }
 
 
@@ -7330,7 +7369,7 @@ function force_https_url( $url, $force_https = true )
 	if( $force_https === 'login' )
 	{	// Force url to use https if it is defiend in the setting "Require SSL":
 		global $Settings;
-		$force_https = (boolean)$Settings->get( 'require_ssl' );
+		$force_https = (bool)$Settings->get( 'require_ssl' );
 	}
 
 	if( $force_https === true )
@@ -10529,7 +10568,7 @@ function get_import_attachments_folder( $file_path, $first_folder = false )
  */
 function clear_ids_list( $ids_list, $separator = ',' )
 {
-	if( $ids_list === '' )
+	if( $ids_list === '' || $ids_list === NULL )
 	{	// Empty list:
 		return $ids_list;
 	}

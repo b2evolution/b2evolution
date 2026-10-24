@@ -74,6 +74,11 @@ class WidgetCache extends DataObjectCache
 	{
 		global $DB, $Session;
 
+		if( $coll_ID === NULL )
+		{	// Widgets outside of a collection are cached under the '' key (PHP 8.5 deprecates NULL as an array offset):
+			$coll_ID = '';
+		}
+
 		if( ! isset( $this->cache_container_Widget_array[$coll_ID] ) )
 		{	// Not in Cache yet:
 			$sql = 'SELECT wi_ID, wi_wico_ID, wico_name, wico_code, wico_skin_type, wi_order, wi_enabled, wi_type, wi_code, wi_params

@@ -591,7 +591,7 @@ class rfc822_addresses_class
 		{
 			if(!$this->ParseAtom($a, $local_part, 1))
 				return(0);
-			$local_part = trim($local_part);
+			$local_part = trim((string) $local_part);	// ParseAtom() may leave it null (PHP 8.1: trim(null) deprecated)
 		}
 		if($a >= $l
 		|| strcmp($v[$a], '@'))

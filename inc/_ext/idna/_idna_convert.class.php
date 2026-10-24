@@ -54,6 +54,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+#[\AllowDynamicProperties]
 class idna_convert
 {
     // NP See below

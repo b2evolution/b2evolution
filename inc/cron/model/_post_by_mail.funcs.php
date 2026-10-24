@@ -99,8 +99,8 @@ function pbm_connect( $cron = false )
 	// Connect to mail server (one retry)
 	$mbox = @imap_open( $mailserver, $Settings->get('eblog_username'), $Settings->get('eblog_password'), NULL, 1 );
 
-	if( is_null(@get_resource_type($mbox)) )
-	{	// Not a resource
+	if( $mbox === false )
+	{	// imap_open() failed (returns false; a resource before PHP 8.1, an IMAP\Connection object since)
 		$error = imap_errors();
 		if( is_array($error) )
 		{

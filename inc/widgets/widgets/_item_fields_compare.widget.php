@@ -1117,7 +1117,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		//           OR in order to filter items if it is required by widget setting:
 		$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $items_limit );
 		// Set additional debug info prefix for SQL queries in order to know what code executes it:
-		$ItemList->query_title_prefix = get_class().' #'.$this->ID;
+		$ItemList->query_title_prefix = get_class( $this ).' #'.$this->ID;
 
 		if( $this->disp_params['items_type'] == 'default' )
 		{	// Exclude items with types which are hidden by collection setting "Show post types":

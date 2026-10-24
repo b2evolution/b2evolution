@@ -37,6 +37,7 @@ load_funcs('_core/_url.funcs.php');
  *
  * @package evocore
  */
+#[\AllowDynamicProperties]
 class XHTML_Validator
 {
 	var $tags;      // Array showing allowed attributes for tags
@@ -147,13 +148,11 @@ class XHTML_Validator
 		$this->last_checked_pos = 0;
 		$this->error = false;
 
-		// Creates the parser
-		xml_set_object( $this->parser, $this);
-
-		// set functions to call when a start or end tag is encountered
-		xml_set_element_handler($this->parser, 'tag_open', 'tag_close');
-		// set function to call for the actual data
-		xml_set_character_data_handler($this->parser, 'cdata');
+		// set methods to call when a start or end tag is encountered
+		// (proper callables instead of xml_set_object() + method names, deprecated in PHP 8.4)
+		xml_set_element_handler( $this->parser, array( $this, 'tag_open' ), array( $this, 'tag_close' ) );
+		// set method to call for the actual data
+		xml_set_character_data_handler( $this->parser, array( $this, 'cdata' ) );
 
 		xml_parser_set_option($this->parser, XML_OPTION_CASE_FOLDING, false);
 	}

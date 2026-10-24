@@ -408,8 +408,8 @@ C message size exceeds',
 			{
 				$error_title = 'Database schema is not up to date!';
 				$error_message = '<p>Database schema is not up to date!</p>'
-					.'<p>You have schema version &laquo;'.(integer)$this->get( 'db_version' ).'&raquo;, '
-					.'but we would need &laquo;'.(integer)$new_db_version.'&raquo;.</p>';
+					.'<p>You have schema version &laquo;'.(int)$this->get( 'db_version' ).'&raquo;, '
+					.'but we would need &laquo;'.(int)$new_db_version.'&raquo;.</p>';
 			}
 			global $adminskins_path;
 			require $adminskins_path.'conf_error.main.php'; // error & exit

@@ -1074,7 +1074,7 @@ class Chapter extends DataObject
 			$placeholder_html = $params['placeholder'];
 			switch( $placeholder_html )
 			{
-				case '#folder_icon';
+				case '#folder_icon':
 					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-folder-o"></i></a></div>';
 					break;
 			}

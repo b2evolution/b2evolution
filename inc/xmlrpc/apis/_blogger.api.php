@@ -37,7 +37,7 @@ $bloggernewpost_sig = array(array($xmlrpcString, $xmlrpcString, $xmlrpcString, $
  *					2 username (string): Login for a Blogger user who has permission to post to the blog.
  *					3 password (string): Password for said username.
  *					4 content (string): Contents of the post.
- *					5 publish (boolean): If true, the blog will be published immediately after the
+ *					5 publish (bool): If true, the blog will be published immediately after the
  *						post is made. (In b2evo,this means, the new post will be in 'published' state,
  *						otherwise it would be in draft state).
  * @return xmlrpcresp XML-RPC Response
@@ -110,7 +110,7 @@ $bloggereditpost_sig=array(array($xmlrpcBoolean, $xmlrpcString, $xmlrpcString, $
  *						post (either the user who originally created it or an admin of the blog).
  *					3 password (string): Password for said username.
  *					4 content (string): New content of the post.
- *					5 publish (boolean): If true, the blog will be published immediately after the
+ *					5 publish (bool): If true, the blog will be published immediately after the
  *						post is made. (In b2evo,this means, the new post will be in 'published' state,
  *						otherwise it would be in draft state).
  * @return xmlrpcresp XML-RPC Response
@@ -381,7 +381,7 @@ $bloggergetrecentposts_sig = array(array($xmlrpcArray, $xmlrpcString, $xmlrpcStr
  *					2 username (string): Login for a Blogger user who has permission to edit the given
  *						post (either the user who originally created it or an admin of the blog).
  *					3 password (string): Password for said username.
- *					4 numposts (integer): number of posts to retrieve.
+ *					4 numposts (int): number of posts to retrieve.
  * @return xmlrpcresp XML-RPC Response
  */
 function blogger_getrecentposts( $m )

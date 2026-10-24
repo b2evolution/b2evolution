@@ -75,7 +75,7 @@ $Form->begin_fieldset( TB_('Post list').get_manual_link('item-list-features') );
 	$ItemTypeCache = & get_ItemTypeCache();
 	$enabled_item_types = $edited_Blog->get_enabled_item_types( 'post' );
 	$show_post_types_options = array();
-	$show_post_types_values = explode( ',', $edited_Blog->get_setting( 'show_post_types' ) );
+	$show_post_types_values = explode( ',', (string) $edited_Blog->get_setting( 'show_post_types' ) );
 	foreach( $enabled_item_types as $enabled_item_type_ID )
 	{
 		if( ( $enabled_ItemType = & $ItemTypeCache->get_by_ID( $enabled_item_type_ID, false, false ) ) )

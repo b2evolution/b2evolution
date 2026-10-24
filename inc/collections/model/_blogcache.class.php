@@ -603,7 +603,7 @@ class BlogCache extends DataObjectCache
 
 		$blog_cache_SQL = $this->get_SQL_object();
 
-		$blog_cache_SQL->title = 'Get the '.$this->objtype.'(subscription collections) rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()';
+		$blog_cache_SQL->title = 'Get the '.$this->objtype.'(subscription collections) rows to load the objects into the cache by '.get_class( $this ).'->'.__FUNCTION__.'()';
 
 		// Initialize subquery to get all collections which allow subscription for new ITEMS/POSTS:
 		if( $CollectionSettings->get_default( 'allow_subscriptions' ) == 0 )

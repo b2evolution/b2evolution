@@ -38,7 +38,7 @@ $Timer->start( '_BLOG_MAIN.inc' );
 param( 'show_toolbar', 'string', NULL );
 if( $show_toolbar !== NULL && $show_toolbar !== 'hidden' )
 {	// Convert all not string possible values to boolean type:
-	$show_toolbar = (boolean)$show_toolbar;
+	$show_toolbar = (bool)$show_toolbar;
 }
 
 /*

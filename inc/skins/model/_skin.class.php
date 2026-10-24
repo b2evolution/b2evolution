@@ -25,6 +25,12 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Skin extends DataObject
 {
+	/**
+	 * Dynamic CSS rules collected by {@link add_dynamic_style()} (lazy initialized).
+	 * @var array
+	 */
+	var $dynamic_styles;
+
 	var $name;
 	var $folder;
 	var $type;

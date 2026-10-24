@@ -22,6 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @todo (fplanque)
  */
+#[\AllowDynamicProperties] // query builders store their filters as properties
 class SQL
 {
 	var $select = '';

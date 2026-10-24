@@ -34,6 +34,14 @@ class archives_plugin extends Plugin
 
 	var $name;
 	var $code = 'evo_Arch';
+
+	/**#@+
+	 * Items table used by the archive queries, set in {@link PluginInit()}.
+	 */
+	var $dbtable;
+	var $dbprefix;
+	var $dbIDname;
+	/**#@-*/
 	var $priority = 50;
 	var $version = '7.2.5';
 	var $author = 'The b2evo Group';

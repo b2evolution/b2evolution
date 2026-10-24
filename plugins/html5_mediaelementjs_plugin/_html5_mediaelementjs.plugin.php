@@ -58,7 +58,7 @@ class html5_mediaelementjs_plugin extends Plugin
 		// Set a video/audio size in css style, because option setting cannot sets correct size
 		$width = intval( $this->get_coll_setting( 'width', $Blog ) );
 		$width = empty( $width ) ? '100%' : $width.'px';
-		$height = trim( $this->get_coll_setting( 'height', $Blog ) );
+		$height = trim( (string) $this->get_coll_setting( 'height', $Blog ) );
 		$height = empty( $height ) ? '100%' : intval( $height );
 		add_css_headline( 'video.html5_mediaelementjs_player{ width: '.$width.' !important; height: '.( $height === '100%' ? $height : $height.'px' ).' !important; display: block; margin: auto; }
 audio.html5_mediaelementjs_player{ width: '.$width.' !important; display: block; margin: auto; }

@@ -1004,7 +1004,7 @@ function xmlrpcs_resperror( $errcode = NULL, $errmsg = NULL )
  *			- author_email (string)
  * @return xmlrpcmsg
  */
-function xmlrpcs_new_comment( $params = array(), & $commented_Item )
+function xmlrpcs_new_comment( $params, & $commented_Item )
 {
 	global $DB, $Plugins, $Messages, $Hit, $localtimenow;
 
@@ -1209,7 +1209,7 @@ function xmlrpcs_new_comment( $params = array(), & $commented_Item )
  *			- author_email (string)
  * @return xmlrpcmsg
  */
-function xmlrpcs_edit_comment( $params = array(), & $edited_Comment )
+function xmlrpcs_edit_comment( $params, & $edited_Comment )
 {
 	global $DB, $current_User, $Messages;
 

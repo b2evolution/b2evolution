@@ -95,7 +95,7 @@ class Table extends Widget
 		parent::__construct( $ui_template );
 
 		// Remove unexpected chars from prefix:
-		$this->param_prefix = preg_replace( '#[^a-z0-9\-_]#i', '', $param_prefix );
+		$this->param_prefix = preg_replace( '#[^a-z0-9\-_]#i', '', (string) $param_prefix );
 
 		$this->no_results_text = T_('No results').'.';
 	}

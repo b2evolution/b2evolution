@@ -31,6 +31,18 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 class ItemLight extends DataObject
 {
 	/**
+	 * Object type ('ItemLight', 'Item'...), set by the constructor.
+	 * @var string
+	 */
+	var $objtype;
+
+	/**
+	 * Publication date ("Y-m-d H:i:s"), same as {@link $issue_date} (both are used).
+	 * @var string
+	 */
+	var $datestart;
+
+	/**
 	 * Publish date ("Y-m-d H:i:s"). This may be in the future.
 	 * This should get compared to {@link $localtimenow}.
 	 * @var string

@@ -7425,7 +7425,7 @@ class Blog extends DataObject
 			expose_var_to_js( 'evo_ddexitpop_config', array(
 				'container_code' => $marketing_popup_container_code,
 				'animation'      => $this->get_setting( 'marketing_popup_animation' ),
-				'show_repeat'    => (boolean)$this->get_setting( 'marketing_popup_show_repeat' ),
+				'show_repeat'    => (bool)$this->get_setting( 'marketing_popup_show_repeat' ),
 				'show_frequency' => $marketing_popup_show_frequency,
 			) );
 			require_js_defer( 'build/ddexitpop.bmin.js', 'blog', false, '#', 'footerlines' );

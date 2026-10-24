@@ -35,6 +35,12 @@ load_class( '_core/ui/_menu.class.php', 'Menu' );
 class AdminUI_general extends Menu
 {
 	/**
+	 * Display mode, set by the constructor from the "mode" request param.
+	 * @var string
+	 */
+	var $mode;
+
+	/**
 	 * Visual path seperator (used in html title, ..)
 	 *
 	 * @var string

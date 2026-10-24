@@ -257,7 +257,7 @@ class Comment extends DataObject
 			$this->status = $db_row->comment_status;
 			$this->author = $db_row->comment_author;
 			$this->author_email = $db_row->comment_author_email;
-			$url = trim( $db_row->comment_author_url );
+			$url = trim( (string) $db_row->comment_author_url );
 			if( ! empty($url) && ! preg_match( '~^\w+://~', $url ) )
 			{ // URL given and does not start with a protocol:
 				$url = 'http://'.$url;

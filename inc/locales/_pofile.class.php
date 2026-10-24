@@ -201,7 +201,7 @@ class POFile
 			$list_counts = '';
 			foreach( $loc_vars as $source => $c )
 			{
-				$Messages->add_to_group( "<code>${source}</code>: ${c}", 'note', sprintf( TB_('Sources and number of strings (%s):'), '<code>'.basename( $this->filename ).'</code>' ) );
+				$Messages->add_to_group( "<code>{$source}</code>: {$c}", 'note', sprintf( TB_('Sources and number of strings (%s):'), '<code>'.basename( $this->filename ).'</code>' ) );
 			}
 		}
 
